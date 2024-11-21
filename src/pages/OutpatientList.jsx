@@ -80,6 +80,10 @@ const OutpatientList = () => {
     setSelectedPatient(null);
   };
 
+  const handleNewPatient = () => {
+    navigate("/reception/Patient-Registration");
+  };
+
   const filteredPatients = patients.filter((patient) => {
     if (searchCriterion === "IDNumber") {
       return patient.IDNumber.includes(searchQuery);
@@ -101,6 +105,13 @@ const OutpatientList = () => {
   return (
     <div className="container">
       <h4 className="text-center p-3">Patient List</h4>
+      <div className='d-flex justify-content-between'>
+                <Button type="primary" onClick={handleNewPatient} style={{ marginBottom: '20px' }}>Register New Patient</Button>
+                <Button onClick={() => handleAdmit()} style={{ marginBottom: '20px' }} type='primary'>
+                   <FileAddOutlined />
+                    Admit Patient
+                </Button>
+            </div>
       <div style={{ marginBottom: "20px" }}>
         <Radio.Group
           value={searchCriterion}
@@ -117,6 +128,7 @@ const OutpatientList = () => {
           onSearch={handleSearch}
           style={{ width: "100%" }}
         />
+          
       </div>
 
       {showList && (
