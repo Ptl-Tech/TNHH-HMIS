@@ -38,7 +38,7 @@ const useSignIn = () => {
       setOtp('');
       setIsOtpRequired(false);
       // Navigate to Doctor route after successful OTP verification
-      navigate("/reception");
+      navigate("/Security");
     }
   };
 
@@ -67,7 +67,7 @@ const useSignIn = () => {
       setOtp('');
       setIsOtpRequired(false);
       // Navigate to Doctor route after successful OTP verification
-      navigate("/reception");
+      navigate("/Security");
     }
   }, [verifyOtpUserInfo]);
 

@@ -31,6 +31,8 @@ import ResetPwd from "./Auth/ResetPwd";
 import ViewProfile from "./Auth/ViewProfile";
 import ReceptionLayout from "./Layouts/ReceptionLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
+import SecurityLayout from "./Layouts/SecurityLayout";
+import VisitorsRegistration from "./pages/VisitorsRegistration";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -116,6 +118,14 @@ function App() {
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
+      <Route element={<PrivateRoute/>}> 
+      <Route path="/Security" element={<SecurityLayout />} >
+      <Route index element={<VisitorsRegistration />} />
+
+      </Route>
+      </Route>
+      <Route path="*" element={<Navigate to="/login" />} />
+
     </Routes>
   );
 }
