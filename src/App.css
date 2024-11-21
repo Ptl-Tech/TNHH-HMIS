@@ -1,0 +1,145 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.ant-card .ant-card-body {
+ padding: 0px !important; 
+  border-radius: 0 0 8px 8px;
+}
+
+
+
+
+
+
+
+.scrollable-menu {
+  overflow-y: auto;
+  max-height: calc(100vh - 64px); /* Adjust the max-height based on your layout */
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.bg-primary {
+  background-color: rgba(172, 131, 66, 0.6) !important;
+}
+
+.card-style {
+  height: 150px; /* Set a fixed height */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center contents vertically */
+  align-items: center; /* Center contents horizontally */
+  text-align: center; /* Center text */
+  margin-bottom: 20px; /* Add space between cards */
+}
+
+.container {
+  padding: 20px;
+}
+
+.card {
+  margin: 10px 0;
+}
+
+.bg-light {
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.sidemenu{
+  height: 100dvh !important;
+  position: sticky !important;
+  left:0 !important;
+  top: 0 !important;
+  background-color: #002329 !important  ;
+  transition: 0.2s ease;
+
+}
+
+/* .header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color:  #f7b36b;
+  color: rgb(0, 35, 41);
+  padding: 8px 12px 8px 12px;
+  position: sticky;
+  width: 100%;
+  top: 0;
+  height: 64 !important;
+  line-height: 64px;
+} */
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+
+@media screen and (max-width: 768px) {
+  .sidemenu {
+    display: block; /* Hide the Sider component on smaller screens */
+    z-index: 1;
+  }
+  .sideStyle {
+    display: block; /* Hide the Sider component on smaller screens */
+    z-index: 1;
+  }
+  
+  .ant-layout-sider {
+    flex: 0 0 230px !important;
+    max-width: 230px !important;
+    min-width: 230px !important;
+    width: 230px !important;
+    height: 100dvh !important;
+    overflow-y: scroll !important;
+  }
+  
+  .ant-layout-sider-collapsed {
+    flex: 0 0 80px !important;
+    max-width: 0px !important;
+    min-width:0px !important;
+    width: 0 !important;
+  }
+  .contentStyle {
+    margin-left: 0; /* Adjust content margin for smaller screens */
+    width: 100%;
+    padding: 0;
+  }
+
+}
+
