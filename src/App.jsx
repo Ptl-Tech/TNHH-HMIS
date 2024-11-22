@@ -53,7 +53,7 @@ function App() {
 
       {/* removed - <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}  - from the nurse route otp*/}
       
-      {/* <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}> */}
+      <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}>
       <Route path="/Nurse" element={<NurseLayout />}>
             {/* <Route index element={<NurseDashboard />} /> */}
             <Route path="Dashboard" element={<Dashboard />} />
@@ -87,7 +87,7 @@ function App() {
             />
             <Route path="view-profile" element={<ViewProfile />} />
       </Route>
-      {/* </Route> */}
+      </Route>
 
 
       
