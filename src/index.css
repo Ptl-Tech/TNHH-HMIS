@@ -31,9 +31,9 @@
 .contentStyle {
   min-height: 100dvh;
   line-height: 22px;
-  color: #fff;
- // background-color: #fef9f7;
- // overflow-y: scroll !important;
+  /* color: #fff;
+  background-color: #fef9f7;
+  overflow-y: scroll !important; */
   height: 100%;
   
 }
