@@ -2,7 +2,7 @@ import React from 'react'
 
 const TriageList = () => {
   return (
-    <div>TriageList</div>
+    <div style={{ padding: '10px 10px' }}>TriageList</div>
   )
 }
 

@@ -20,6 +20,12 @@ const sideMenuItems = [
     },
 
     {
+      key: "Appointments-list",
+      icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      label: "Appointments",
+    },
+
+    {
         key: "Patient-Registration",
         icon: <UserOutlined style={{ color: "#fff" }} />,
         label: "Patient Registration",
@@ -41,12 +47,6 @@ const sideMenuItems = [
         key: "past-doctor-visit",
         icon: <HistoryOutlined style={{ color: "#fff" }} />,
         label: "Past Doctor Visit",
-    },
-
-    {
-        key: "Appointments-list",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        label: "Appointments",
     },
   ];
 

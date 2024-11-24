@@ -2,7 +2,7 @@ import React from 'react'
 
 const PatientRegistration = () => {
   return (
-    <div>PatientRegistration</div>
+    <div style={{ padding: '10px 10px' }}>PatientRegistration</div>
   )
 }
 

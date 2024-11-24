@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Outlet, useLocation} from "react-router-dom";
-import { Layout, theme, Breadcrumb } from "antd";
+import { Layout } from "antd";
 import NurseFooter from "../partials/nurse-partials/NurseFooter";
 import NurseSideMenu from "../partials/nurse-partials/NurseSideMenu";
 import NurseHeader from "../partials/nurse-partials/NurseHeader";
+import NurseBreadcrumb from "../partials/nurse-partials/NurseBreadcrumb";
 
 const { Content } = Layout;
 const NurseLayout = () => {
@@ -14,9 +15,6 @@ const NurseLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState(["/"]);
 
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
 
   return (
     <Layout>
@@ -28,38 +26,22 @@ const NurseLayout = () => {
         <NurseSideMenu collapsed={collapsed} setCollapsed={setCollapsed} openKeys={openKeys} setOpenKeys={setOpenKeys}/>
 
        <Layout className="site-layout">
-       <div className="site-layout">
-          <Breadcrumb
-            style={{
-              marginLeft: collapsed ? 80 : 230,
-              transition: "all 0.2s",
-              padding: 12,
-              color: "#67336d",
-            }}
-          >
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            {pathSegments.map((segment, index) => (
-              <Breadcrumb.Item key={index}>
-                {segment.charAt(0).toUpperCase() + segment.slice(1)}
-              </Breadcrumb.Item>
-            ))}
-          </Breadcrumb>
+     
+          
           <Content
             className="contentStyle"
             style={{
               marginLeft: collapsed ? 80 : 230,
-
               transition: "all 0.2s",
-              padding: 12,
-              minHeight: 680,
-              background: colorBgContainer,
-              borderRadius: 8,
+              padding: '20px 15px 10px 10px',
             }}
           >
+            <NurseBreadcrumb pathSegments={pathSegments} />
+
             <Outlet />
 
           </Content>
-        </div>
+     
         </Layout>
       </Layout>
 

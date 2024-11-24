@@ -2,7 +2,7 @@ import React from 'react'
 
 const PastDoctorVisit = () => {
   return (
-    <div>PastDoctorVisit</div>
+    <div style={{ padding: '10px 10px' }}>PastDoctorVisit</div>
   )
 }
 

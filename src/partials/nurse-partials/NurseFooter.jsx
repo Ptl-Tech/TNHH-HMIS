@@ -6,7 +6,9 @@ const NurseFooter = () => {
     <Footer
     style={{
       textAlign: "center",
-      color: "#67336d"
+      color: "#67336d",
+      backgroundColor: "white",
+
     }}
     >
         HMIS @ {new Date().getFullYear()} Created by potestastechnologies
