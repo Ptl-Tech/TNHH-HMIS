@@ -40,15 +40,21 @@ const SecurityLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState(["/"]);
   const rootSubmenuKeys = [
-   "/Security"
+   "/Security",
+   "/visitors-list"
   ];
 
   const items = [
     {
-      key: "Visitor Registration",
+      key: "/Security",
       label: "Visitor Registration",
-      icon: <TeamOutlined style={{ color: "#fff" }} />,
+      icon: <UserOutlined style={{ color: "#fff" }} />,
     },
+    {
+      key: "visitors-list",
+      label: "Visitors List",
+      icon: <TeamOutlined style={{ color: "#fff" }} />,
+    }
   ];
   
   
@@ -110,7 +116,7 @@ const SecurityLayout = () => {
           <Menu
             theme="light"
             mode="inline"
-            defaultSelectedKeys={["Visitor Registration"]}
+            defaultSelectedKeys={["Security"]}
             openKeys={openKeys}
             onOpenChange={onOpenChange}
             onClick={({ key }) => {

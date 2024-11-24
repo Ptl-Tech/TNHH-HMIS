@@ -6,10 +6,10 @@ import { USER_LOGIN_REQUEST, USER_LOGIN_SUCCESS, USER_LOGIN_FAIL, USER_LOGOUT, U
 const API = "http://217.21.122.62:8085/"
 console.log("Base URL: ", API)
 
-export const login = (staffNo, password) => async (dispatch) => {
+export const login = (staffNo, password, branchCode) => async (dispatch) => {
   try {
     dispatch({ type: USER_LOGIN_REQUEST });
-    const config = { headers: { "Content-Type": "application/json" } };
+    const config = { headers: { "Content-Type": "application/json", branchCode: branchCode } };
     const { data } = await axios.post(
       `${API}Authentication/Login`,
       { staffNo, password },
@@ -18,6 +18,7 @@ export const login = (staffNo, password) => async (dispatch) => {
 
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
     localStorage.setItem("userInfo", JSON.stringify(data));
+    localStorage.setItem("branchCode", branchCode);
   } catch (errors) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -31,11 +32,15 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
   try {
     dispatch({ type: OTP_VERIFY_REQUEST });
 
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
+
     const config = {
       headers: {
         "Content-Type": "application/json",
-        "staffNo": staffNo, // Add staffNo as a custom header
-        "sessionToken": sessionToken, // Add sessionToken as a Bearer token
+        "staffNo": staffNo,  // Add staffNo as a custom header
+        "sessionToken": sessionToken,  // Add sessionToken as a Bearer token
+        "branchCode": branchCode,  // Retrieve branchCode from localStorage if not passed directly
       },
     };
 
@@ -46,7 +51,7 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
     );
 
     dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
-    localStorage.setItem("userInfo", JSON.stringify(data));
+    localStorage.setItem("userInfo", JSON.stringify(data)); // Save updated user info after OTP verification
   } catch (error) {
     dispatch({
       type: OTP_VERIFY_FAIL,
@@ -55,11 +60,13 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
   }
 };
 
+
+
 export const logout = () => (dispatch) => {
   try {
     // Clear user data from localStorage
     localStorage.removeItem("userInfo");
-
+localStorage.removeItem("branchCode");
     // Dispatch logout action to update state
     dispatch({ type: USER_LOGOUT });
 

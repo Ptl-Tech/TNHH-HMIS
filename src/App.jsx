@@ -32,7 +32,9 @@ import ViewProfile from "./Auth/ViewProfile";
 import ReceptionLayout from "./Layouts/ReceptionLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
 import SecurityLayout from "./Layouts/SecurityLayout";
-import VisitorsRegistration from "./pages/VisitorsRegistration";
+import VisitorList from "./pages/VisitorList";
+import VisitorForm from "./pages/VisitorForm";
+import CreateVisitForm from "./pages/CreateVisitForm";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -81,7 +83,7 @@ function App() {
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/reception" element={<ReceptionLayout />}>
-        <Route index element={< ReceptionDashboard/>} />
+          <Route index element={<ReceptionDashboard />} />
 
           <Route
             path="/reception/Patient-Registration"
@@ -89,6 +91,7 @@ function App() {
           />
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
+          <Route path="/reception/create-visit/:patientNo" element={<CreateVisitForm />} />
 
         </Route>
       </Route>
@@ -118,14 +121,13 @@ function App() {
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
-      <Route element={<PrivateRoute/>}> 
-      <Route path="/Security" element={<SecurityLayout />} >
-      <Route index element={<VisitorsRegistration />} />
-
-      </Route>
+      <Route element={<PrivateRoute />}>
+        <Route path="/Security" element={<SecurityLayout />}>
+          <Route index element={<VisitorForm />} />
+          <Route path="/Security/visitors-list" element={<VisitorList />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/login" />} />
-
     </Routes>
   );
 }

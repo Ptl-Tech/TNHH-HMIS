@@ -46,6 +46,18 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
         return state;
     }
   }
+  export const patientByNoReducer = (state = { patient: {} }, action) => {
+    switch (action.type) {
+      case PATIENT_LIST_REQUEST:
+        return { loading: true };
+      case PATIENT_LIST_SUCCESS:
+        return { loading: false, patient: action.payload };
+      case PATIENT_LIST_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
 
   export const triageListReducer = (state = { patients: [] }, action) => {
     switch (action.type) {
