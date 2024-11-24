@@ -16,22 +16,62 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createPatient, createTriageVisit } from "../actions/patientActions";
+import {
+  listClinics,
+  listCounties,
+  listCountries,
+  listSubCounties,
+} from "../actions/DropdownListActions";
+
 import moment from "moment"; // Ensure you import moment
+import { useNavigate } from "react-router-dom";
 
 const PatientRegistration = () => {
   const dispatch = useDispatch();
   const createPatientState = useSelector((state) => state.createPatient);
-  const { loading, error, success, payload } = createPatientState;
+  const { loading, error, success } = createPatientState;
+  const navigate = useNavigate();
 
   const createTriageVisitState = useSelector(
     (state) => state.createTriageVisit
   );
+
+  const {
+    loading: countriesLoading,
+    error: countriesError,
+    success: countriesSuccess,
+    countries: countriesPayload,
+  } = useSelector((state) => state.countriesList);
+
+  const {
+    loading: countiesLoading,
+    error: countiesError,
+    success: countiesSuccess,
+    counties: countiesPayload,
+  } = useSelector((state) => state.countiesList);
+
+  const {
+    loading: subCountiesLoading,
+    error: subCountiesError,
+    success: subCountiesSuccess,
+    subCounties: subCountiesPayload,
+  } = useSelector((state) => state.subCounties);
+
+  const {
+    loading: clinicsLoading,
+    error: clinicsError,
+    success: clinicsSuccess,
+    clinics: clinicsPayload,
+  } = useSelector((state) => state.clinics);
+
   const {
     loading: visitLoading,
     error: visitError,
     success: visitSuccess,
     payload: visitPayload,
   } = createTriageVisitState;
+
+  const [age, setAge] = useState(null); // State to hold calculated age
 
   const [newPatient, setNewPatient] = useState({
     firstName: "",
@@ -57,10 +97,35 @@ const PatientRegistration = () => {
     howYouKnewABoutUs: "",
     doctor: "",
     clinic: "",
+    subCounty: "",
+    residence: "",
+    patientStatus: 0,
   });
 
   const [patientId, setPatientId] = useState(null);
+  const [dobError, setDobError] = useState(""); // State for DOB error message
 
+  // Handle dropdown display for fetching country list
+  const handleDisplayDropDown = (e) => {
+    const { name, value } = e.target;
+
+    // Fetch country list if nationality dropdown is selected
+    if (
+      name === "nationality" &&
+      countriesPayload &&
+      name === "county" &&
+      countiesPayload &&
+      name === "subCounty" &&
+      subCountiesPayload &&
+      name === "clinic" &&
+      clinicsPayload
+    ) {
+      dispatch(listCountries());
+      dispatch(listCounties());
+      dispatch(listSubCounties());
+      dispatch(listClinics());
+    }
+  };
   // Handle input changes for controlled inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -96,84 +161,119 @@ const PatientRegistration = () => {
     }
     setNewPatient((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleDateChange = (date, dateString) => {
-//patient should not be less than two years of age
-    const today = new Date();
-    const patientDate = new Date(dateString);
-    const ageDiff = today.getFullYear() - patientDate.getFullYear();
-    if (ageDiff < 2) {
-      message.error("Patient should not be less than two years of age.");
+    if (!dateString) {
+      setDobError("Date of birth is required.");
+      setAge(null);
       return;
     }
 
-    setNewPatient((prev) => ({ ...prev, dateOfBirth: dateString }));
+    const today = moment();
+    const dob = moment(dateString, "YYYY-MM-DD");
+    const years = today.diff(dob, "years");
+    const months = today.diff(dob, "months") % 12; // Remaining months after full years
+
+    if (years < 2) {
+      setDobError("Patient must be at least 2 years old.");
+      dispatch(listClinics());
+
+      setAge(null);
+    } else {
+      setDobError("");
+      setAge({ years, months }); // Store years and months in the state
+      setNewPatient((prev) => ({ ...prev, dob: dateString }));
+    }
   };
 
   const handleSwitchChange = (name, value) => {
     setNewPatient((prev) => ({ ...prev, [name]: value }));
   };
-  // Dispatch the create patient action
+
   const handleSubmit = async () => {
-    // Prepare the new patient data
-    const patientData = {
-      ...newPatient,
-      myAction: "create", // Set action as 'create'
-      patientNo: "", // Set patientNo as empty for new patient creation
-    };
-    const patientID = await dispatch(createPatient(patientData)); // Get the patient ID after dispatching
-    if (patientID) {
-      setPatientId(patientID);
-      console.log("Patient ID:", patientID);
-    }
-  };
-
-  const handleCreateVisit = () => {
-    if (!patientId) {
-      message.error("Please create a patient before creating a visit.");
-      return;
-    }
-    dispatch(createTriageVisit(patientId));
-    if (visitSuccess) {
-      setNewPatient({
+    try {
+      // Prepare the new patient data
+      const patientData = {
         ...newPatient,
+        myAction: "create", // Set action as 'create'
+        patientNo: "", // Set patientNo as empty for new patient creation
+      };
 
-        firstName: "",
-        middleName: "",
-        lastName: "",
-        idNumber: "",
-        gender: "",
-        dob: "",
-        phoneNumber: "",
-        paymentMode: 0,
-        nextOfKinFullName: "",
-        nextOfKinRelationship: "",
-        nextOfKinPhoneNo: "",
-        insuranceNo: "",
-        insuranceName: "",
-        insurancePrinicipalMemberName: "",
-        isPrincipleMember: false,
-        membershipNo: "",
-        nationality: "",
-        county: "",
-        schemeName: "",
-        howYouKnewABoutUs: "",
-        doctor: "",
-        clinisc: "",
-      });
+      // Dispatch `createPatient` and get the returned patient ID
+      const patientId = await dispatch(createPatient(patientData));
+
+      if (patientId) {
+        setPatientId(patientId); // Store patient ID in state
+        console.log("Patient ID:", patientId);
+        console.log("Patient ID:", patientId);
+        dispatch(createTriageVisit(patientId));
+        if (visitSuccess && visitPayload) {
+          message.success("Patient registered successfully!");
+          // Navigate to the visit creation page with the visit payload
+          navigate(`/reception/create-visit/${patientId}`, {
+            state: { patient: visitPayload },
+          });
+          console.log("Navigate to visit creation page with ID:", visitPayload);
+        } else {
+          message.error(visitError);
+          navigate('/reception/Patient-list');
+        }
+      }
+    } catch (error) {
+      console.error("Error during patient registration:", error);
+      message.error("Failed to register patient. Please try again.");
     }
   };
 
-  // Effect to handle messages based on success or error
-  useEffect(() => {
-    if (error) {
-      message.error(error);
-    }
-    if (success) {
-      message.success("Patient created successfully!");
-    }
-  }, [error, success]);
+  // const handleCreateVisit = async (patientId) => {
+  //   try {
+  //     // Dispatch the action to create a triage visit
+  //     await dispatch(createTriageVisit(patientId));
 
+  //     // Check for success and payload in the response
+  //     if (visitSuccess && visitPayload) {
+  //       message.success("Patient registered successfully!");
+  //       console.log("Patient ID:", patientId);
+
+  //       // Navigate to the visit creation page with the visit payload
+  //       navigate(`/reception/create-visit/${patientId}`, {
+  //         state: { visitPayload: visitPayload },
+  //       });
+  //       console.log("Navigate to visit creation page with ID:", patientId);
+  //     } else {
+  //       throw new Error("Visit creation failed.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during visit creation:", error);
+  //     message.error("Failed to create a visit. Please try again.");
+  //   }
+  // };
+
+  useEffect(() => {
+    if (visitSuccess && visitPayload) {
+      message.success("Patient registered successfully!");
+      console.log("Patient ID:", patientId);
+      navigate(`/reception/create-visit/${patientId}`, {
+        state: { visitPayload },
+      });
+      // Navigate to the visit creation page or perform additional actions
+      console.log("Navigate to visit creation page with ID:", patientId);
+    }
+  }, [visitSuccess, visitPayload, navigate]);
+
+  // // Effect to handle error or success side effects
+  // useEffect(() => {
+  //   if (error) {
+  //     message.error(error);
+  //   }
+  // }, [error]);
+
+  useEffect(() => {
+    //fetch country list
+    dispatch(listCountries());
+    dispatch(listCounties());
+    dispatch(listSubCounties());
+    console.log("country list: ", countriesPayload);
+  }, [dispatch]);
   return (
     <div className="card py-2 px-2">
       <div className="card-header d-flex justify-content-between">
@@ -278,16 +378,24 @@ const PatientRegistration = () => {
                   { required: true, message: "Please select date of birth" },
                 ]}
               >
-                {" "}
                 <DatePicker
                   className="w-100, custom-select"
                   placeholder="Select Date of Birth"
-                  value={newPatient.dob ? moment(newPatient.dob) : null} // Convert to moment if it's in string format
-                  onChange={(value) => handleSelectChange("dob", value)}
+                  value={newPatient.dob ? moment(newPatient.dob) : null}
+                  onChange={(date, dateString) =>
+                    handleDateChange(date, dateString)
+                  }
                   variant="borderless"
                   size="large"
                 />
               </Form.Item>
+              {dobError && <span style={{ color: "red" }}>{dobError}</span>}
+
+              {age !== null && (
+                <div className="text-success">
+                  Age: {age.years} years {age.months} months
+                </div>
+              )}
             </div>
             <div className="col-12 col-md-6 text-primary">
               <Form.Item
@@ -318,22 +426,31 @@ const PatientRegistration = () => {
                 label="Nationality:"
                 name="nationality"
                 rules={[
-                  {
-                    required: true,
-                    message: "Please select nationality",
-                  },
+                  { required: true, message: "Please select nationality" },
                 ]}
               >
                 <Select
                   placeholder="Select Nationality"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
+                  className="w-100 custom-select"
                   value={newPatient.nationality}
                   onChange={(value) => handleSelectChange("nationality", value)}
                   variant="borderless"
                   size="large"
+                  name="nationality"
+                  onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
                 >
                   <Select.Option value="">--Select Nationality--</Select.Option>
+                  {countriesPayload && countriesPayload.length > 0 ? (
+                    countriesPayload.map((country) => (
+                      <Select.Option key={country.Code} value={country.Code}>
+                        {country.Name}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option value="" disabled>
+                      No countries available
+                    </Select.Option>
+                  )}
                 </Select>
               </Form.Item>
             </div>
@@ -355,9 +472,21 @@ const PatientRegistration = () => {
                   value={newPatient.county}
                   onChange={(value) => handleSelectChange("county", value)}
                   variant="borderless"
+                  onFocus={handleDisplayDropDown}
                   size="large"
                 >
                   <Select.Option value="">--Select County--</Select.Option>
+                  {countiesPayload && countiesPayload.length > 0 ? (
+                    countiesPayload.map((county) => (
+                      <Select.Option key={county.Code} value={county.Code}>
+                        {county.Description}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option value="" disabled>
+                      No countries available
+                    </Select.Option>
+                  )}
                 </Select>
               </Form.Item>
             </div>
@@ -379,36 +508,49 @@ const PatientRegistration = () => {
                   className="w-100, custom-select"
                   //  options={relationshipOptions}
                   value={newPatient.nationality}
-                  onChange={(value) => handleSelectChange("subCounty", value)}
+                  onChange={(value) => handleSelectChange("county", value)}
                   variant="borderless"
+                  onFocus={handleDisplayDropDown}
                   size="large"
                 >
                   <Select.Option value="">--Select Sub County--</Select.Option>
+                  {subCountiesPayload && subCountiesPayload.length > 0 ? (
+                    subCountiesPayload.map((subCounty) => (
+                      <Select.Option
+                        key={subCounty.SubCountyCode}
+                        value={subCounty.SubCountyCode}
+                      >
+                        {subCounty.Name}
+                      </Select.Option>
+                    ))
+                  ) : (
+                    <Select.Option value="" disabled>
+                      No countries available
+                    </Select.Option>
+                  )}
                 </Select>
               </Form.Item>
             </div>
             <div className="col-12 col-md-6 text-primary">
               <Form.Item
-                label="County Ward:"
-                name="countyWard"
+                label="Residence:"
+                name="residence"
                 rules={[
                   {
                     required: true,
-                    message: "Please select County Ward",
+                    message: "Enter your residence",
                   },
                 ]}
               >
-                <Select
-                  placeholder="Select County Ward"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
-                  value={newPatient.countyWard}
-                  onChange={(value) => handleSelectChange("countyWard", value)}
+                <Input
+                  placeholder="Enter Residence"
+                  name="residence"
+                  value={newPatient.residence}
+                  onChange={handleInputChange}
+                  className=" custom-select"
                   variant="borderless"
                   size="large"
-                >
-                  <Select.Option value="">--Select County Ward--</Select.Option>
-                </Select>
+                />
               </Form.Item>
             </div>
           </div>
@@ -530,9 +672,16 @@ const PatientRegistration = () => {
                   value={newPatient.clinic}
                   onChange={(value) => handleSelectChange("clinic", value)}
                   variant="borderless"
+                  onFocus={handleDisplayDropDown}
                   size="large"
                 >
                   <Select.Option value="">--Select Clinic--</Select.Option>
+                  {clinicsPayload &&
+                    clinicsPayload.map((clinic) => (
+                      <Select.Option key={clinic.No} value={clinic.No}>
+                        {clinic.Description}
+                      </Select.Option>
+                    ))}
                 </Select>
               </Form.Item>
             </div>
@@ -562,7 +711,7 @@ const PatientRegistration = () => {
             </div>
           </div>
           <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12  text-primary">
+            <div className="col-12 col-md-6  text-primary">
               <Form.Item
                 label="Payment Mode:"
                 name="paymentMode"
@@ -586,10 +735,34 @@ const PatientRegistration = () => {
                 </Select>
               </Form.Item>
             </div>
+            <div className="col-12 col-md-6 text-primary">
+              <Form.Item
+                label="Patient Status:"
+                name="patientStatus"
+                rules={[
+                  { required: true, message: "Please select Patient Status" },
+                ]}
+              >
+                <Select
+                  placeholder="Select Patient Status"
+                  className="w-100, custom-select"
+                  value={newPatient.patientStatus}
+                  onChange={(value) =>
+                    handleSelectChange("patientStatus", value)
+                  }
+                  variant="borderless"
+                  size="large"
+                >
+                  <Select.Option value="0">Alive</Select.Option>
+                  <Select.Option value="1">Dead</Select.Option>
+                  <Select.Option value="2">Transfer</Select.Option>
+                </Select>
+              </Form.Item>
+            </div>
           </div>
 
           {/* Conditional rendering of insurance fields */}
-          {newPatient.paymentMode === "insurance" && (
+          {newPatient.paymentMode === "2" && (
             <>
               <div className="row g-3 my-2 align-items-center justify-content-center">
                 <div className="col-12 col-md-6 text-primary">
@@ -684,55 +857,51 @@ const PatientRegistration = () => {
                 </div>
               </div>
               <div className="row g-3 my-2 align-items-center justify-content-center">
-              <div className="col-12  text-primary">
-              <Form.Item
-                label="Is Principal Member ?"
-                name="isPrincipleMember"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "Please enter Scheme Name",
-                //   },
-                // ]}
-              >
-                <Switch
-                  checked={newPatient.isPrincipleMember}
-                  onChange={(checked) =>
-                    handleSwitchChange("isPrincipleMember", checked)
-                  }
-                  size="large"
-                  style={{ margin: "0 10px" }}
-                />
-              </Form.Item>
-            </div>
+                <div className="col-12  text-primary">
+                  <Form.Item
+                    label="Is Principal Member ?"
+                    name="isPrincipleMember"
+                    // rules={[
+                    //   {
+                    //     required: true,
+                    //     message: "Please enter Scheme Name",
+                    //   },
+                    // ]}
+                  >
+                    <Switch
+                      checked={newPatient.isPrincipleMember}
+                      onChange={(checked) =>
+                        handleSwitchChange("isPrincipleMember", checked)
+                      }
+                      size="large"
+                      style={{ margin: "0 10px" }}
+                    />
+                  </Form.Item>
                 </div>
+              </div>
             </>
           )}
 
           <div className="d-flex justify-content-center my-5 gap-3">
-            {
-              !patientId? (
-                <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              type="primary"
-              size="large"
-            >
-              {loading ? <Spin /> : "Save Patient Details"}
-            </Button>
-            ):(
-            
-                <Button
-              onClick={handleCreateVisit}
-              disabled={visitLoading}
-              type="primary"
-              size="large"
-            >
-              {visitLoading ? <Spin /> : "Create Visit"}
-            </Button>
-              )
-            }
-            
+            {!patientId ? (
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                type="primary"
+                size="large"
+              >
+                {loading ? <Spin /> : "Save Patient Details"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleCreateVisit}
+                disabled={visitLoading}
+                type="primary"
+                size="large"
+              >
+                {visitLoading ? <Spin /> : "Create Visit"}
+              </Button>
+            )}
           </div>
         </Form>
       </div>
