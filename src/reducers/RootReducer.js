@@ -1,6 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
-import { patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, triageListReducer } from "./patientReducer";
+import { patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, triageListReducer } from "./patientReducer";
+import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer } from "./DropdownReducer";
 import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 
 export const rootReducer = combineReducers({
@@ -10,8 +11,13 @@ export const rootReducer = combineReducers({
     forgotPwd:forgotPwdReducer,
     resetPwd:resetPwdReducer,
     createPatient:patientCreateReducer,
+    countriesList:countriesListReducer,
+    countiesList:countiesListReducer,
+    subCounties:subCountiesListReducer,
+    clinics:clinicsListReducer,
     createTriageVisit:patientTriageVisitCreateReducer,
     patientList:patientListReducer,
+    getPatientByNo:patientByNoReducer,
     triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,

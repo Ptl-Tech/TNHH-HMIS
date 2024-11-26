@@ -1,0 +1,178 @@
+import React, { useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  UserOutlined,
+  CheckSquareOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  BellFilled,
+  TeamOutlined,
+  UserSwitchOutlined,
+  FileTextOutlined,
+  HistoryOutlined,
+  FileAddOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
+import {
+  AppstoreOutlined,
+  MailOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+
+import { Layout, Menu, theme, Button, Avatar, Badge, Breadcrumb } from "antd";
+import { FaUserDoctor, FaEyeDropper, FaRadiation } from "react-icons/fa6";
+import { GiSoapExperiment } from "react-icons/gi";
+import { TbDental } from "react-icons/tb";
+import { LuBaby } from "react-icons/lu";
+import logo from "../assets/images/logo.png";
+import smallLogo from "../assets/images/smallLogo.png";
+
+import Signout from "../Auth/Signout";
+
+const { Header, Content, Footer, Sider } = Layout;
+
+const SecurityLayout = () => {
+  const location = useLocation();
+
+  // Extract the current route name from the location pathname
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const [collapsed, setCollapsed] = useState(false);
+  const [openKeys, setOpenKeys] = useState(["/"]);
+  const rootSubmenuKeys = [
+   "/Security",
+   "/visitors-list"
+  ];
+
+  const items = [
+    {
+      key: "/Security",
+      label: "Visitor Registration",
+      icon: <UserOutlined style={{ color: "#fff" }} />,
+    },
+    {
+      key: "visitors-list",
+      label: "Visitors List",
+      icon: <TeamOutlined style={{ color: "#fff" }} />,
+    }
+  ];
+  
+  
+  const onOpenChange = (keys) => {
+    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+    setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    if (latestOpenKey && rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+      setOpenKeys(keys);
+      setCollapsed(true);
+    } else {
+      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+    }
+  };
+
+  const navigate = useNavigate();
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  return (
+    <Layout>
+      <Header className="headerstyle">
+        <div className="d-flex justify-content-center pt-2">
+          <div className="demo-logo-vertical">
+            {collapsed ? (
+              <img
+                src={smallLogo}
+                height={70}
+                className="mb-3 pt-1"
+                alt="Logo"
+              />
+            ) : (
+              <img src={logo} height={70} className="mb-3 pt-1" alt="Logo" />
+            )}
+          </div>
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: "22px",
+              width: 64,
+              height: 64,
+              color: "#fff",
+            }}
+          />
+        </div>
+        <Signout />
+      </Header>
+
+      <Layout hasSider>
+        <Sider
+          className={`sideStyle ${collapsed ? "collapsed" : ""}`}
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          breakpoint="lg"
+        >
+          <Menu
+            theme="light"
+            mode="inline"
+            defaultSelectedKeys={["Security"]}
+            openKeys={openKeys}
+            onOpenChange={onOpenChange}
+            onClick={({ key }) => {
+              navigate(key);
+            }}
+            style={{
+              backgroundColor: "#ffffff",
+              height: "100vh",
+              paddingBottom: "90px",
+              color: "#67336d",
+            }}
+            items={items} // Pass the items array here
+          />
+        </Sider>
+       <Layout className="site-layout">
+       <div className="site-layout">
+       <Breadcrumb
+  style={{
+    marginLeft: collapsed ? 80 : 230,
+    transition: "all 0.2s",
+    padding: 12,
+    color: "#67336d",
+  }}
+>
+  <Breadcrumb.Item>Home</Breadcrumb.Item>
+  <Breadcrumb.Item>Visitor Registration</Breadcrumb.Item>
+</Breadcrumb>
+
+          <Content
+            className="contentStyle"
+            style={{
+              marginLeft: collapsed ? 80 : 230,
+
+              transition: "all 0.2s",
+              padding: 12,
+              minHeight: 680,
+              background: colorBgContainer,
+              borderRadius: 8,
+            }}
+          >
+            <Outlet />
+          </Content>
+        </div>
+        </Layout>
+      </Layout>
+
+      <Footer
+    style={{
+      textAlign: "center",
+      color: "#67336d",
+    }}
+  >
+    HMIS @ {new Date().getFullYear()} Created by potestastechnologies
+  </Footer>
+    </Layout>
+  );
+};
+
+export default SecurityLayout;

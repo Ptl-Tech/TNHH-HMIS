@@ -124,6 +124,22 @@
 .custom-select .ant-select-item {
   border-bottom: 1px solid #f0f0f0; /* Add light border for dropdown items */
 }
+.modal-title-content {
+  background-color: #f5f5dc; /* Light greyish cream */
+  padding: 20px;
+  //text-align: center; /* Center the title and logo */
+}
+
+.modal-logo-container {
+  margin-bottom: 10px; /* Space between logo and title */
+  text-align:center;
+
+}
+
+.modal-logo {
+  max-width: 150px; /* Adjust the logo size */
+  height: auto;
+}
 
 
 main {
