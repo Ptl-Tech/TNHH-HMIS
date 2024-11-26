@@ -26,6 +26,13 @@ const sideMenuItems = [
       label: "Appointments",
     },
 
+    
+    {
+      key: "Triage",
+      icon: <FileTextOutlined style={{ color: "#fff" }} />,
+      label: "Triage",
+    },
+
     {
       key: "Impatient",
       icon: <ImportOutlined style={{ color: "#fff" }} />,
@@ -42,12 +49,6 @@ const sideMenuItems = [
         key: "New-Patients",
         icon: <TeamOutlined style={{ color: "#fff" }} />,
         label: "Patient List",
-    },
-
-    {
-        key: "Triage",
-        icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        label: "Triage List",
     },
 
     {

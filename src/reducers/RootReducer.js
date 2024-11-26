@@ -1,6 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
 import { patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, triageListReducer } from "./patientReducer";
+import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -14,5 +15,6 @@ export const rootReducer = combineReducers({
     triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
+    getTriageWaitingList:getTriageWaitingListReducer
 
 });
