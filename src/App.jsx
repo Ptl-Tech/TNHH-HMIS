@@ -34,6 +34,8 @@ import Appointment from "./pages/nurse-view/Appointment";
 import PastDoctorVisit from "./pages/nurse-view/PastDoctorVisit";
 import TriageList from "./pages/nurse-view/TriageList";
 import Dashboard from "./pages/nurse-view/Dashboard";
+import Impatient from "./pages/nurse-view/Impatient";
+import ImpatientList from "./pages/nurse-view/ImpatientList";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -64,6 +66,8 @@ function App() {
             <Route path="Appointments-list" element={<Appointment />} />
             <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
             <Route path="Triage" element={<TriageList />} />
+            <Route path="Impatient" element={<Impatient />} />
+            <Route path="Impatient/Ward" element={<ImpatientList />} />
             <Route path="Patient-list" element={<Patientlist />} />
             <Route path="New-Patients" element={<NewPatients />} />
             

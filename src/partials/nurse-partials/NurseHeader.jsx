@@ -39,7 +39,7 @@ const NurseHeader = ({ collapsed, setCollapsed }) => {
             }}
           />
         </div>
-        <Signout />
+        {/* <Signout /> */}
       </Header>
 
   )

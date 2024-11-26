@@ -39,5 +39,4 @@ export default NurseBreadcrumb
 //propType validation
 NurseBreadcrumb.propTypes = {
     pathSegments: PropTypes.array.isRequired,
-    collapsed: PropTypes.bool.isRequired,
 };

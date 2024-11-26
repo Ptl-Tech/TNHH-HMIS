@@ -150,3 +150,80 @@ export const lastSixMonthsTotalPatientsLineGraphConfig = {
     shapeField: 'smooth',
     color: '#6643b5',
   };
+
+  // wards 
+
+  export const hospitalBranchesTotalWards = [
+    {
+      name: 'Aspen',
+      path: 'Aspen'
+    },
+    {
+      name: 'Birch',
+      path: 'Birch'
+    },
+    {
+      name: 'Boardroom',
+      path: 'Boardroom'
+    },
+    {
+      name: 'Bonsai',
+      path: 'Bonsai'
+    },
+    {
+      name: 'Chogoria Ground Floor',
+      path: 'ChogoriaGroundFloor'
+    },
+    {
+      name: 'Discharge Ward',
+      path: 'DischargeWard'
+    },
+    {
+      name: 'Dorothy Wing',
+      path: 'DorothyWing'
+    },
+    {
+      name: 'Elgon Ward',
+      path: 'ElgonWard'
+    },
+    {
+      name: 'Hazel',
+      path: 'Hazel'
+    },
+    {
+      name: 'Holly',
+      path: 'Holly'
+    },
+    {
+      name: 'Irowan',
+      path: 'Irowan'
+    },
+    {
+      name: 'Maple',
+      path: 'Maple'
+    },
+    {
+      name: 'Oak',
+      path: 'Oak'
+    },
+    {
+      name: 'Private',
+      path: 'Private'
+    },
+    {
+      name: 'Rahab Suits',
+      path: 'RahabSuits'
+    },
+    {
+      name: 'Silver Fir',
+      path: 'SilverFir'
+    },
+    {
+      name: 'Simon Wing',
+      path: 'SimonWing'
+    },
+    {
+      name: 'Willow',
+      path: 'Willow'
+    },
+  ]

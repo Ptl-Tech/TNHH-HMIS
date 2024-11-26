@@ -7,7 +7,8 @@ import {
     FileTextOutlined,
     HistoryOutlined,
     CalendarOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    ImportOutlined
   } from "@ant-design/icons";
 import PropTypes from 'prop-types';
 
@@ -23,6 +24,12 @@ const sideMenuItems = [
       key: "Appointments-list",
       icon: <CalendarOutlined style={{ color: "#fff" }} />,
       label: "Appointments",
+    },
+
+    {
+      key: "Impatient",
+      icon: <ImportOutlined style={{ color: "#fff" }} />,
+      label: "Impatient",
     },
 
     {
@@ -53,7 +60,8 @@ const sideMenuItems = [
   const rootSubmenuKeys = [
     "/Nurse",
     "/Patient-Registration",
-    "/appointements",
+    "/Appointments",
+    "/Impatient",
     "/nurses",
     "/procurement",
     "/Dental",
