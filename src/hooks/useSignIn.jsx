@@ -6,6 +6,7 @@ import { forgotPassword, login, verifyOtp } from '../actions/userActions';
 const useSignIn = () => {
   const [staffNo, setStaffNo] = useState('');
   const [password, setPassword] = useState('');
+  const [branchCode, setBranchCode] = useState('');
   const [otp, setOtp] = useState('');
   const [isOtpRequired, setIsOtpRequired] = useState(false);
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const useSignIn = () => {
   const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess , error: forgotPwdError } = loginHandler;
 
   const handleLogin = async () => {
-    await dispatch(login(staffNo, password));
+    await dispatch(login(staffNo, password, branchCode));
     console.log("User info:", userInfo);
     if (userInfo?.sessionToken) {
       setIsOtpRequired(true); // Show OTP modal when sessionToken exists
@@ -30,17 +31,16 @@ const useSignIn = () => {
   };
 
   const handleVerifyOtp = async () => {
-    console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken);
-    await dispatch(verifyOtp(staffNo, otp, userInfo.sessionToken));
-
+    console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken, userInfo?.branchCode);
+    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode?.branchCode)); // Pass branchCode here
+  
     if (verifyOtpUserInfo) {
-      // Reset OTP state before navigating
       setOtp('');
       setIsOtpRequired(false);
-      // Navigate to Doctor route after successful OTP verification
-      navigate("/reception");
+      navigate("/reception"); // Navigate to the next page after OTP verification
     }
   };
+  
 
 
   const handleForgotPassword = async () => {
@@ -54,13 +54,13 @@ const useSignIn = () => {
 
   // Effect to handle OTP modal visibility based on sessionToken
   useEffect(() => {
-    if (userInfo?.sessionToken && !verifyOtpSuccess) {
+    if (userInfo?.sessionToken  && !verifyOtpSuccess) {
       setIsOtpRequired(true); // Show OTP modal if sessionToken exists and OTP is not verified
     } else {
       setIsOtpRequired(false); // Close OTP modal after OTP verification
     }
   }, [userInfo?.sessionToken, verifyOtpSuccess]);
-
+  
   useEffect(() => {
     if (verifyOtpUserInfo) {
       // Reset OTP state before navigating
@@ -76,6 +76,9 @@ const useSignIn = () => {
     setStaffNo,
     password,
     setPassword,
+    branchCode,
+    setBranchCode,
+    handleForgotPassword,
     otp,
     setOtp,
     isOtpRequired,

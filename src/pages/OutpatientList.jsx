@@ -2,15 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listPatients } from "../actions/patientActions";
 import { Table, Button, Input, Pagination, Modal, Tooltip, Radio } from "antd";
-import { useNavigate } from "react-router-dom";
-import { PlusOutlined, EyeOutlined, SendOutlined, FileAddOutlined } from "@ant-design/icons";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  SendOutlined,
+  FileAddOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
 
 const { Search } = Input;
 
 const OutpatientList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, patients } = useSelector((state) => state.patientList);
+  const { loading, error, patients } = useSelector(
+    (state) => state.patientList
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCriterion, setSearchCriterion] = useState("IDNumber"); // Default search criterion
@@ -21,9 +29,24 @@ const OutpatientList = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
 
   const columns = [
-    { title: "Patient No", dataIndex: "PatientNo", key: "PatientNo", sorter: (a, b) => a.PatientNo - b.PatientNo },
-    { title: "First Name", dataIndex: "Names", key: "Names", sorter: (a, b) => a.Names.localeCompare(b.Names) },
-    { title: "Last Name", dataIndex: "LastName", key: "LastName", sorter: (a, b) => a.LastName.localeCompare(b.LastName) },
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+      sorter: (a, b) => a.PatientNo - b.PatientNo,
+    },
+    {
+      title: "First Name",
+      dataIndex: "Names",
+      key: "Names",
+      sorter: (a, b) => a.Names.localeCompare(b.Names),
+    },
+    {
+      title: "Last Name",
+      dataIndex: "LastName",
+      key: "LastName",
+      sorter: (a, b) => a.LastName.localeCompare(b.LastName),
+    },
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
@@ -39,11 +62,15 @@ const OutpatientList = () => {
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <Tooltip title="Dispatch to Observation Room">
-            <Button icon={<SendOutlined />} onClick={() => handleDispatch(record)}>
-              Dispatch
+          <Tooltip title="Create Patient Visit">
+            <Button
+              icon={<SendOutlined />}
+              onClick={() => handleDispatch(record)}
+            >
+              Create Visit
             </Button>
           </Tooltip>
+
           <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
             View Details
           </Button>
@@ -62,8 +89,11 @@ const OutpatientList = () => {
   };
 
   const handleDispatch = (record) => {
-    navigate(`/Nurse/Observation-Room/${record.PatientNo}`, { state: { patient: record } });
+    navigate(`/reception/create-visit/${record.PatientNo}`, { state: { patient: record } });
+    console.log(`Dispatching visit for patient ${record.PatientNo}`);
   };
+  
+
 
   const showModal = (record) => {
     setSelectedPatient(record);
@@ -78,6 +108,10 @@ const OutpatientList = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedPatient(null);
+  };
+
+  const handleNewPatient = () => {
+    navigate("/reception/Patient-Registration");
   };
 
   const filteredPatients = patients.filter((patient) => {
@@ -96,11 +130,34 @@ const OutpatientList = () => {
   const totalPatients = filteredPatients.length;
   const startRecord = (currentPage - 1) * pageSize + 1;
   const endRecord = Math.min(currentPage * pageSize, totalPatients);
-  const patientsToDisplay = filteredPatients.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const patientsToDisplay = filteredPatients.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
   return (
     <div className="container">
-      <h4 className="text-center p-3">Patient List</h4>
+     <h4 className="text-center p-3 text-dark">
+    <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
+    Patient List
+  </h4>
+      <div className="d-flex justify-content-between">
+        <Button
+          type="primary"
+          onClick={handleNewPatient}
+          style={{ marginBottom: "20px" }}
+        >
+          Register New Patient
+        </Button>
+        <Button
+          onClick={() => handleAdmit()}
+          style={{ marginBottom: "20px" }}
+          type="primary"
+        >
+          <FileAddOutlined />
+          Admit Patient
+        </Button>
+      </div>
       <div style={{ marginBottom: "20px" }}>
         <Radio.Group
           value={searchCriterion}
@@ -149,12 +206,25 @@ const OutpatientList = () => {
       >
         {selectedPatient && (
           <div>
-            <p><strong>First Name:</strong> {selectedPatient.Names}</p>
-            <p><strong>Last Name:</strong> {selectedPatient.LastName}</p>
-            <p><strong>Gender:</strong> {selectedPatient.Gender}</p>
-            <p><strong>Patient Type:</strong> {selectedPatient.PatientType}</p>
-            <p><strong>ID Number:</strong> {selectedPatient.IDNumber}</p>
-            <p><strong>Date Registered:</strong> {new Date(selectedPatient.DateRegistered).toLocaleString()}</p>
+            <p>
+              <strong>First Name:</strong> {selectedPatient.Names}
+            </p>
+            <p>
+              <strong>Last Name:</strong> {selectedPatient.LastName}
+            </p>
+            <p>
+              <strong>Gender:</strong> {selectedPatient.Gender}
+            </p>
+            <p>
+              <strong>Patient Type:</strong> {selectedPatient.PatientType}
+            </p>
+            <p>
+              <strong>ID Number:</strong> {selectedPatient.IDNumber}
+            </p>
+            <p>
+              <strong>Date Registered:</strong>{" "}
+              {new Date(selectedPatient.DateRegistered).toLocaleString()}
+            </p>
           </div>
         )}
       </Modal>

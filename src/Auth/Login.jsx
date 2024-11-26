@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import useSignIn from "../hooks/useSignIn";
-import { Alert, Button, Card, Input, Modal, Typography } from "antd";
+import { Alert, Button, Card, Input, Modal, Select, Typography } from "antd";
 import loginImg from "../assets/images/loginImg.jpg";
 import logoLogin from "../assets/images/logoLogin.png";
+import { branches } from "../constants/DropDownConstants";
 
 const { Title } = Typography;
 
@@ -16,6 +17,8 @@ const Login = () => {
     setPassword,
     otp,
     setOtp,
+    branchCode,
+    setBranchCode,
     isOtpRequired,
     handleLogin,
     handleVerifyOtp,
@@ -64,7 +67,10 @@ const Login = () => {
               />
             </div>
 
-            <p className="text-center text-muted" style={{ fontStyle: "italic" }}>
+            <p
+              className="text-center text-muted"
+              style={{ fontStyle: "italic" }}
+            >
               Sign in to access your account
             </p>
 
@@ -72,11 +78,16 @@ const Login = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 handleLogin(); // Proceed with login action
-             //   handleLoginSuccess(); // Trigger OTP modal on login success
+                //   handleLoginSuccess(); // Trigger OTP modal on login success
               }}
             >
               {error && (
-                <Alert message={error} type="error" showIcon closeText="Close" />
+                <Alert
+                  message={error}
+                  type="error"
+                  showIcon
+                  closeText="Close"
+                />
               )}
 
               <div className="mb-3">
@@ -116,7 +127,22 @@ const Login = () => {
                   placeholder="Enter your password"
                 />
               </div>
-
+              <div className="mb-3 text-start">
+      <label htmlFor="branchCode" className="form-label">
+        Branch <span className="text-danger">*</span>
+      </label>
+      <Select
+        size="large"
+        name="branchCode"
+        id="branchCode"
+        value={branchCode} // Bind the value of the select to branchCode
+        onChange={(value) => setBranchCode(value)} // Update branchCode state when a branch is selected
+        required
+        options={branches}
+        placeholder="Select Branch" // Placeholder text for the dropdown
+        style={{ width: "100%", color: "black" }}
+      />
+    </div>
               <div className="py-2 d-flex align-items-center">
                 <input
                   className="form-check-input me-2"
@@ -132,7 +158,13 @@ const Login = () => {
               </div>
 
               <div className="my-3">
-                <Button size="large" htmlType="submit" type="primary" disabled={loading} block>
+                <Button
+                  size="large"
+                  htmlType="submit"
+                  type="primary"
+                  disabled={loading}
+                  block
+                >
                   {loading ? "Logging in..." : "Login"}
                 </Button>
               </div>
@@ -140,7 +172,11 @@ const Login = () => {
 
             {/* Forgot Password Link */}
             <div className="text-center mt-3">
-              <a href="/forgot-password" className="text-muted" style={{ fontSize: "14px" }}>
+              <a
+                href="/forgot-password"
+                className="text-muted"
+                style={{ fontSize: "14px" }}
+              >
                 Forgot password?
               </a>
             </div>
@@ -197,24 +233,19 @@ const Login = () => {
           </p>
 
           <Input
-  value={otp}
-  onChange={(e) => setOtp(e.target.value)} // Ensure this correctly updates the OTP state
-  placeholder="Enter OTP"
-  maxLength={6}
-  style={{
-    textAlign: "center",
-    width: "100%",
-    maxWidth: "300px",
-    marginBottom: "20px",
-  }}
-/>
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)} // Ensure this correctly updates the OTP state
+            placeholder="Enter OTP"
+            maxLength={6}
+            style={{
+              textAlign: "center",
+              width: "100%",
+              maxWidth: "300px",
+              marginBottom: "20px",
+            }}
+          />
 
-
-          <Button
-            type="primary"
-            block
-            onClick={handleVerifyOtp}
-          >
+          <Button type="primary" block onClick={handleVerifyOtp}>
             Submit
           </Button>
         </div>

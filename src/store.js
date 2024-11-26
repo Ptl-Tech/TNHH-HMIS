@@ -8,9 +8,10 @@ const userInfoFromStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo")) 
   : null;
 
-const initialLoginState = userInfoFromStorage 
-  ? { isLoggedIn: true, sessionToken: userInfoFromStorage.sessionToken } 
-  : { isLoggedIn: false, sessionToken: null };
+  
+  const initialLoginState = userInfoFromStorage 
+  ? { isLoggedIn: true, sessionToken: userInfoFromStorage.sessionToken, branchCode: userInfoFromStorage.branchCode } 
+  : { isLoggedIn: false, sessionToken: null, branchCode: null };
 
 const initialOtpState = userInfoFromStorage && userInfoFromStorage.otpVerified 
   ? { isVerified: true, portalSession: userInfoFromStorage.portal_Session_Token, staffNo: userInfoFromStorage.no }
