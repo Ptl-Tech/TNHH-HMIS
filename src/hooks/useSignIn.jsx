@@ -37,7 +37,7 @@ const useSignIn = () => {
     if (verifyOtpUserInfo) {
       setOtp('');
       setIsOtpRequired(false);
-      navigate("/reception"); // Navigate to the next page after OTP verification
+      navigate("/Triage"); // Navigate to the next page after OTP verification
     }
   };
   
@@ -67,7 +67,7 @@ const useSignIn = () => {
       setOtp('');
       setIsOtpRequired(false);
       // Navigate to Doctor route after successful OTP verification
-      navigate("/reception");
+      navigate("/Triage");
     }
   }, [verifyOtpUserInfo]);
 

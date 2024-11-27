@@ -40,7 +40,7 @@ export const createPatient = (patient) => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -90,7 +90,7 @@ export const createTriageVisit = (patientId) => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode
       },
     };
@@ -102,10 +102,8 @@ export const createTriageVisit = (patientId) => async (dispatch, getState) => {
     );
     dispatch({ type: TRIAGE_VISIT_SUCCESS, payload: data });
 
-    message.success(data.message, 5);
   } catch (error) {
     dispatch({ type: TRIAGE_VISIT_FAIL, payload: error.message });
-    message.error(error.message, 5);
   }
 };
 
@@ -123,7 +121,7 @@ export const listPatients = () => async (dispatch, getState) => {
         headers: {
             "Content-Type": "application/json",
             staffNo: userInfo.userData.no, // Add staffNo as a custom header
-            sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+            sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
             branchCode: branchCode
           },
     };
