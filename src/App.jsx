@@ -115,6 +115,8 @@ function App() {
 
         </Route>
       </Route>
+
+
       <Route element={<PrivateRoute />}>
         <Route path="/Doctor" element={<DocLayout />}>
           <Route index element={<DoctorDashboard />} />
