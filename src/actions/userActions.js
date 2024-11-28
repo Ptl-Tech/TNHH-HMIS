@@ -49,11 +49,10 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
       { otpCode },
       config
     );
+  
 
-    const userInfo = {...data, staffNo}
-
-    dispatch({ type: OTP_VERIFY_SUCCESS, payload: userInfo });
-    localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Save updated user info after OTP verification
+    dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
+    localStorage.setItem("userInfo", JSON.stringify(data)); // Save updated user info after OTP verification
   } catch (error) {
     dispatch({
       type: OTP_VERIFY_FAIL,

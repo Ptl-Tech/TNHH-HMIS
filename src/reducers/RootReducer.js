@@ -4,6 +4,7 @@ import { patientByNoReducer, patientCreateReducer, patientListReducer, patientTr
 import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer } from "./DropdownReducer";
 import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 import { loadUserInfo } from "../actions/loadUserInfo";
+import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -22,7 +23,8 @@ export const rootReducer = combineReducers({
     triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
+    loadUserInfo:loadUserInfo,
     getTriageWaitingList:getTriageWaitingListReducer,
-    loadUserInfo:loadUserInfo
+    getTriageList:getTriageListReducer
 
 });

@@ -11,7 +11,7 @@ const DashboardStatistics = () => {
     <div style={{ marginTop: '16px' }}>
            <Row>
   
-              <Col flex={2}>
+              <Col span={8}>
                   <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <Avatar icon={<UserOutlined />} size={64}/>
@@ -44,7 +44,7 @@ const DashboardStatistics = () => {
                       </Space>
                   </Card>
               </Col>
-              <Col flex={3}>
+              <Col span={16}>
                 <Card style={{ padding: '10px 16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

@@ -11,16 +11,16 @@ const DashboardCard = ({card}) => {
             
             <div>
                 <Typography.Title level={5} style={{color: 'gray'}}>
-                    {card.title}
+                    {card?.title}
                 </Typography.Title>
                 <Typography.Text style={{ fontSize: '20px', fontWeight: 600}}>
-                    {card.value}
+                    {card?.value}
                 </Typography.Text>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <Typography.Text style={{ fontSize: '14px', color: '#0d6efd', fontWeight: 600}}>+12%</Typography.Text>
-                <Line {...card.lineGraphConfig} />
+                <Line {...card?.lineGraphConfig} />
             </div>
             
         </div>
@@ -33,10 +33,10 @@ const DashboardCard = ({card}) => {
                     {card.increasePercentage}
                 </Typography.Text>
                 <Typography.Text style={{ fontSize: '12px', color:'gray' }}>
-                    {card.subtitle}
+                    {card?.subtitle}
                 </Typography.Text>
-            </Space>
-        </Card>
+        </Space>
+    </Card>
   )
 }
 
