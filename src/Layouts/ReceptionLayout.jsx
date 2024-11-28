@@ -80,12 +80,12 @@ const ReceptionLayout = () => {
 
     {
       key: "BillingGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Billing</span>,
       type: "group",
       children: [
         {
           key: "Billing-list",
-          label: "Billing",
+          label: "Active Patient List",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
         }
       ]
@@ -95,7 +95,7 @@ const ReceptionLayout = () => {
     },
     {
         key: "AppointmentGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
         type: "group",
         children: [
           {

@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')).render(
         },
         components: {
           Menu: {
-            itemSelectedBg: '#ac8342',
+            itemSelectedBg: '#ED1C24',
             itemColor: '#000',
             itemSelectedColor: '#000',
             itemHoverBg: 'rgba(172, 131, 66, 0.6)', // Updated to match itemSelectedBg

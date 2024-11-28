@@ -1,7 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
-import { patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer } from "./patientReducer";
-import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer } from "./DropdownReducer";
+import { patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, postTriageVisitReducer } from "./patientReducer";
+import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 
 export const rootReducer = combineReducers({
@@ -15,9 +15,13 @@ export const rootReducer = combineReducers({
     countiesList:countiesListReducer,
     subCounties:subCountiesListReducer,
     clinics:clinicsListReducer,
+    kinsRelations:getrelationshipOptionsReducer,
     createTriageVisit:patientTriageVisitCreateReducer,
     patientList:patientListReducer,
     getPatientByNo:patientByNoReducer,
+    getInsurance:getInsuranceReducer,
+    getDoctorsList:getdoctorListReducer,
+    postTriageVisit:postTriageVisitReducer,
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,

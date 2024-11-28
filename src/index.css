@@ -125,6 +125,10 @@
   height: auto;
 }
 
+.custom-header {
+  background-color: #E89641;
+  font-weight: bold; /* Optional */
+}
 
 main {
   overflow-y: scroll !important;

@@ -15,6 +15,18 @@ import {
   CLINICS_LIST_SUCCESS,
   CLINICS_LIST_FAIL,
   CLINICS_LIST_RESET,
+  KINS_LIST_REQUEST,
+  KINS_LIST_SUCCESS,
+  KINS_LIST_FAIL,
+  KINS_LIST_RESET,
+  INSURANCE_LIST_REQUEST,
+  INSURANCE_LIST_SUCCESS,
+  INSURANCE_LIST_FAIL,
+  INSURANCE_LIST_RESET,
+  DOCTOR_LIST_REQUEST,
+  DOCTOR_LIST_SUCCESS,
+  DOCTOR_LIST_FAIL,
+  DOCTOR_LIST_RESET,
 } from "../constants/DropDownConstants";
 
 export const countriesListReducer = (state = { countries: [] }, action) => {
@@ -61,6 +73,54 @@ export const clinicsListReducer = (state = { clinics: [] }, action) => {
       return state;
   }
 };
+
+export const getrelationshipOptionsReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case KINS_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case KINS_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case KINS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case KINS_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+
+export const getInsuranceReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case INSURANCE_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case INSURANCE_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case INSURANCE_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case INSURANCE_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+export const getdoctorListReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case DOCTOR_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case DOCTOR_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case DOCTOR_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case DOCTOR_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+
 
 export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
   switch (action.type) {
