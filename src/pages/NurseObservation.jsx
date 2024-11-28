@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from "react";
 import {
+  Card,
+  InputNumber,
+  Typography,
   Form,
   Input,
-  InputNumber,
-  Button,
+  Select,
+  Divider,
   DatePicker,
   TimePicker,
-  Select,
-  message,
+  Tabs,
+  Row,
+  Col,
+  Switch,
+  Avatar,
+  Button,
 } from "antd";
+import React, { useState } from "react";
+import moment from "moment";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
-import { postPatientVitals } from "../actions/patientActions";
-import { SaveOutlined, CheckCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons'; // Import the icons
 
-const { TextArea } = Input;
-const { Option } = Select;
+const { TabPane } = Tabs;
 
 const NurseObservation = () => {
   const location = useLocation();
@@ -25,284 +29,468 @@ const NurseObservation = () => {
   const triageRecord = location.state?.triage || {};
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const [isPosted, setIsPosted] = useState(false); // State to manage post status
 
-  const { loading, success, error } = useSelector(
-    (state) => state.postPatientVitals
-  );
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    // Set the initial date and time to now
-    form.setFieldsValue({
-      date: moment(), // current date
-      time: moment(), // current time
-    });
-  }, [form]);
-
-  const onFinish = async (values) => {
-    setSubmitting(true);
-    const vitals = {
-      date: values.date.format("YYYY-MM-DD"),
-      time: values.time.format("HH:mm"),
-      temperature: values.temperature,
-      pulseRate: values.pulseRate,
-      respiratoryRate: values.respiratoryRate,
-      systolic: values.systolic,
-      diastolic: values.diastolic,
-      oxygenSaturation: values.oxygenSaturation,
-      consciousness: values.consciousness,
-      painScore: values.painScore,
-      observations: values.observations,
-    };
-
-    try {
-      await dispatch(postPatientVitals(triageRecord.id, vitals));
-      navigate("/Nurse/New-Patients");
-    } catch (error) {
-      console.error("Failed to submit observation:", error);
-    } finally {
-      setSubmitting(false);
-    }
+  const handleSwitchChange = (checked) => {
+    setIsPosted(checked); // Toggle the isPosted state
   };
-
-  const handleBack = () => {
-    navigate("/Nurse/New-Patients");
+  const handleDispatchClick = () => {
+    // Handle the dispatch to doctor logic here
+    console.log("Dispatch to doctor clicked");
   };
-
   return (
     <div className="container">
-      <h4 className="text-center p-3" style={{ color: "#ac8342" }}>
-        Nurse Observation Form
-      </h4>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button type="link" onClick={handleBack} className="text-success">
-          Back to New Patients List
+      {/* Container for the header and button */}
+      <div style={{ position: "relative", marginBottom: "16px" }}>
+        <h4 className="text-start p-3" style={{ color: "#E89641" }}>
+          Triage Observation Form
+        </h4>
+        {/* Dispatch button positioned at the top right */}
+        <Button
+          type="primary"
+          style={{
+            position: "absolute",
+            right: "0",
+            top: "0",
+            marginTop: "10px", // Optional margin to adjust the position from the top
+          }}
+          onClick={handleDispatchClick}
+        >
+          Dispatch to Doctor
         </Button>
       </div>
-      {patient && (
-        <div className="card-header" style={{ color: "#ac8342" }}>
-          <h5>Patient Details</h5>
-          <p>
-            <strong>First Name:</strong> {patient.firstName}
-          </p>
-          <p>
-            <strong>Last Name:</strong> {patient.lastName}
-          </p>
-          <p>
-            <strong>ID Number:</strong> {patient.idNumber}
-          </p>
-        </div>
-      )}
-      <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          label="Date of Observation"
-          className="pt-3"
-          name="date"
-          rules={[{ required: true, message: "Please select the date" }]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <DatePicker
-            format="YYYY-MM-DD"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
 
-        <Form.Item
-          label="Time of Observation"
-          name="time"
-          rules={[{ required: true, message: "Please select the time" }]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <TimePicker format="HH:mm" style={{ width: "100%" }} size="large" />
-        </Form.Item>
+      <Row gutter={[16, 16]}>
+        {/* Left Column (Patient Info) */}
+        {patient && (
+          <Col xs={24} md={8}>
+            {/* General Patient Info Card */}
+            <Card className="card-header">
+              <Typography.Title level={4} style={{ color: "#ac8342" }}>
+                General Patient Info
+              </Typography.Title>
 
-        <Form.Item
-          label="Temperature (°C)"
-          name="temperature"
-          rules={[{ required: true, message: "Please enter temperature" }]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <InputNumber
-            min={34}
-            max={42}
-            step={0.1}
-            placeholder="e.g., 37.0"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
+              {/* User Info Container */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "16px",
+                }}
+              >
+                {/* User Avatar */}
+                <Avatar
+                  // src="https://via.placeholder.com/50" // Replace with actual image URL if available
+                  alt="User Avatar"
+                  size={60}
+                  style={{
+                    marginRight: "12px",
+                    borderRadius: "50%",
+                    backgroundColor: "#8bc34a", // Greenish-yellow background
+                  }}
+                />
+                {/* User Name and Location */}
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Typography.Text strong style={{ fontSize: "16px" }}>
+                    {`${patient.firstName? patient.firstName + " " : ""} ${
+                      patient.middlename ? patient.middlename + " " : ""
+                    }${patient.lastName? patient.lastName : ""}`}
+                  </Typography.Text>
 
-        <Form.Item
-          label="Pulse Rate (bpm)"
-          name="pulseRate"
-          rules={[{ required: true, message: "Please enter pulse rate" }]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <InputNumber
-            min={30}
-            max={200}
-            placeholder="e.g., 80"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <span>USA |</span>
+                    <span> California</span>
+                  </div>
+                </div>
+              </div>
 
-        <Form.Item
-          label="Respiratory Rate (breaths per minute)"
-          name="respiratoryRate"
-          rules={[{ required: true, message: "Please enter respiratory rate" }]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <InputNumber
-            min={10}
-            max={60}
-            placeholder="e.g., 20"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
+              {/* Patient Details */}
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <Typography.Text strong style={{ fontSize: "14px" }}>
+                    Patient IDNumber:
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: "14px" }}>
+                  {patient.idNumber}
+                  </Typography.Text>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <Typography.Text strong style={{ fontSize: "14px" }}>
+                    Gender:
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: "16px" }}>
+                    Male
+                  </Typography.Text>
+                </div>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <Typography.Text strong style={{ fontSize: "14px" }}>
+                    Age:
+                  </Typography.Text>
+                  <Typography.Text style={{ fontSize: "16px" }}>
+                    28 <span style={{ color: "#888" }}>Years</span>
+                  </Typography.Text>
+                </div>
+              </div>
+            </Card>
 
-        <Form.Item
-          label="Blood Pressure (mmHg)"
-          required
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <Input.Group compact>
-            <Form.Item
-              name="systolic"
-              noStyle
-              rules={[
-                { required: true, message: "Please enter systolic pressure" },
-              ]}
-              labelCol={{ style: { color: "#ac8342" } }}
-            >
-              <InputNumber
-                placeholder="Systolic"
-                min={50}
-                max={250}
-                style={{ width: "49%" }}
-                size="large"
-              />
-            </Form.Item>
-            <Form.Item
-              name="diastolic"
-              noStyle
-              rules={[
-                { required: true, message: "Please enter diastolic pressure" },
-              ]}
-              labelCol={{ style: { color: "#ac8342" } }}
-            >
-              <InputNumber
-                placeholder="Diastolic"
-                min={30}
-                max={150}
-                style={{ width: "49%", marginLeft: "2%" }}
-                size="large"
-              />
-            </Form.Item>
-          </Input.Group>
-        </Form.Item>
+            {/* Consultation Details Card */}
+            <Card className="card-header mt-3">
+              <Typography.Title level={4} style={{ color: "#ac8342" }}>
+                Consultation Details
+              </Typography.Title>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+              >
+                <Form.Item label="Clinic" name="clinic">
+                  <Input placeholder="Enter clinic name" />
+                </Form.Item>
+                <Form.Item label="Doctor" name="doctor">
+                  <Input placeholder="Enter doctor name" />
+                </Form.Item>
+                <Form.Item label="Patient Type" name="patientType">
+                  <Input placeholder="Enter patient type" />
+                </Form.Item>
+              </div>
+            </Card>
+          </Col>
+        )}
 
-        <Form.Item
-          label="Oxygen Saturation (%)"
-          name="oxygenSaturation"
-          rules={[
-            { required: true, message: "Please enter oxygen saturation" },
-          ]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <InputNumber
-            min={70}
-            max={100}
-            placeholder="e.g., 98"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
+        {/* Right Column (Tabs Section) */}
+        <Col xs={24} md={16}>
+          <Card className="card-header">
+            <Tabs defaultActiveKey="1">
+              {/* Tab 1: Triage General Information */}
+              <TabPane tab="Triage General Info" key="1">
+                <Form layout="vertical">
+                  <Form.Item
+                    label="Temperature (°C)"
+                    name="temperature"
+                    rules={[
+                      { required: true, message: "Please enter temperature" },
+                    ]}
+                  >
+                    <InputNumber
+                      min={34}
+                      max={42}
+                      step={0.1}
+                      placeholder="e.g., 37.0"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Pulse Rate (bpm)"
+                    name="pulseRate"
+                    rules={[
+                      { required: true, message: "Please enter pulse rate" },
+                    ]}
+                  >
+                    <InputNumber
+                      min={30}
+                      max={200}
+                      placeholder="e.g., 80"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Respiratory Rate (breaths per minute)"
+                    name="respirationRate"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter respiratory rate",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      min={10}
+                      max={60}
+                      placeholder="e.g., 20"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                  <Form.Item label="Blood Pressure (mmHg)" required>
+                    <Input.Group compact>
+                      <Form.Item
+                        name="bloodPreasure"
+                        noStyle
+                        rules={[
+                          {
+                            required: true,
+                            message: "Enter systolic pressure",
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          placeholder="Systolic"
+                          min={50}
+                          max={250}
+                          style={{ width: "49%" }}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        name="bloodPreasure"
+                        noStyle
+                        rules={[
+                          {
+                            required: true,
+                            message: "Enter diastolic pressure",
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          placeholder="Diastolic"
+                          min={30}
+                          max={150}
+                          style={{ width: "49%", marginLeft: "2%" }}
+                        />
+                      </Form.Item>
+                    </Input.Group>
+                  </Form.Item>
+                  <Form.Item
+                    label="Oxygen Saturation (%)"
+                    name="sP02"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter oxygen saturation",
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      min={70}
+                      max={100}
+                      placeholder="e.g., 98"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                </Form>
+              </TabPane>
 
-        <Form.Item
-          label="Consciousness Level"
-          name="consciousness"
-          rules={[
-            { required: true, message: "Please select consciousness level" },
-          ]}
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <Select
-            placeholder="Select consciousness level"
-            style={{ width: "100%" }}
-            size="large"
-          >
-            <Option value="alert">Alert</Option>
-            <Option value="drowsy">Drowsy</Option>
-            <Option value="unconscious">Unconscious</Option>
-          </Select>
-        </Form.Item>
+              {/* Tab 2: Allergy and Medical History */}
+              <TabPane tab="Allergy & Medical History" key="2">
+                <Form layout="vertical">
+                  <Form.Item
+                    label="Observation Number"
+                    name="observationNo"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Patient Observation Number is required",
+                      },
+                    ]}
+                    // labelCol={{ style: { color: "#ac8342" } }}
+                  >
+                    <InputNumber
+                      min={1}
+                      max={100}
+                      placeholder="e.g., APP_0001"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Reason for Visit"
+                    name="reasonForVisit"
+                    // labelCol={{ style: { color: "#ac8342" } }}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Reason for Visit is required",
+                      },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Reason for Visit"
+                      size="medium"
+                      style={{ width: "100%" }}
+                    >
+                      <Select.Option value="3">New Presentation</Select.Option>
+                      <Select.Option value="4">Follow-up Visit</Select.Option>
+                      <Select.Option value="2">
+                        Patient Detoriated
+                      </Select.Option>
+                      <Select.Option value="1">
+                        Patient not Improving
+                      </Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item
+                    label="Complaints"
+                    name="complaints"
+                    // labelCol={{ style: { color: "#ac8342" } }}
+                    rules={[
+                      { required: true, message: "Complaints are required" },
+                    ]}
+                  >
+                    <Input placeholder="e.g., Headache" />
+                  </Form.Item>
+                  <Form.Item
+                    label="Drug Allergies"
+                    name="drugAllergy"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Drug Allergies are required",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="e.g., Penicillin" />
+                  </Form.Item>
+                  <Form.Item
+                    label="Food Allergies"
+                    name="foodAllergy"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Food Allergies are required",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="e.g., Eggs" />
+                  </Form.Item>
+                  <Form.Item label="Assessed By" name="assessedBy">
+                    <Input placeholder="e.g., Dr. Smith" readOnly />
+                  </Form.Item>
+                </Form>
+              </TabPane>
 
-        <Form.Item
-          label="Pain Score (0-10)"
-          name="painScore"
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <InputNumber
-            min={0}
-            max={10}
-            placeholder="0-10 scale"
-            style={{ width: "100%" }}
-            size="large"
-          />
-        </Form.Item>
+              {/* Tab 3: Injections and Medications */}
+              <TabPane tab="Injections & Medications" key="3">
+                <Form layout="vertical">
+                  <Form.Item
+                    label="Injections"
+                    name="injectionNo"
+                    rules={[
+                      { required: true, message: "Injections are required" },
+                    ]}
+                  >
+                    <Select placeholder="Injections" style={{ width: "100%" }}>
+                      <Select.Option value="1">1</Select.Option>
+                      <Select.Option value="2">2</Select.Option>
+                      <Select.Option value="3">3</Select.Option>
+                    </Select>
+                  </Form.Item>
 
-        <Form.Item
-          label="Other Observations"
-          name="observations"
-          labelCol={{ style: { color: "#ac8342" } }}
-        >
-          <TextArea
-            rows={4}
-            placeholder="Enter any additional observations or notes"
-            size="large"
-          />
-        </Form.Item>
+                  <Form.Item
+                    label="Quantity"
+                    name="quantity"
+                    rules={[
+                      { required: true, message: "Quantity is required" },
+                    ]}
+                  >
+                    <InputNumber
+                      min={1}
+                      max={100}
+                      placeholder="e.g., 1"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
 
-        <Form.Item className="d-flex justify-content-end gap-2">
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            disabled={submitting || loading}
-            size="large"
-            icon={<SaveOutlined />} // Add Save icon
-          >
-            Submit Observation
-          </Button>
+                  <Form.Item
+                    label="Injection Date"
+                    name={["injectionDate", "year"]}
+                    rules={[
+                      { required: true, message: "Injection Date is required" },
+                    ]}
+                  >
+                    <DatePicker
+                      format="YYYY-MM-DD"
+                      style={{ width: "100%" }}
+                      placeholder="Select Date"
+                      defaultValue={moment()} // Set default date to current date
+                    />
+                  </Form.Item>
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            style={{ marginLeft: "10px" }}
-            disabled={submitting || loading}
-            size="large"
-            icon={<CheckCircleOutlined />} // Add Check Circle icon
-          >
-            Dispatch to Doctor
-          </Button>
+                  <Form.Item
+                    label="Injection Time"
+                    name="injectionTime"
+                    rules={[
+                      { required: true, message: "Injection Time is required" },
+                    ]}
+                  >
+                    <TimePicker
+                      format="HH:mm"
+                      style={{ width: "100%" }}
+                      placeholder="Select Time"
+                      defaultValue={moment()} // Set default time to current time
+                    />
+                  </Form.Item>
 
-          <Button
-            type="default"
-            onClick={handleBack}
-            style={{ marginLeft: "10px" }}
-            size="large"
-            icon={<ArrowLeftOutlined />} // Add Arrow Left icon
-          >
-            Back to New Patients
-          </Button>
-        </Form.Item>
+                  <Form.Item label="Injection Remarks" name="injectionRemarks">
+                    <Input placeholder="e.g., Injection Remarks" />
+                  </Form.Item>
 
-        {error && <div style={{ color: "red" }}>{error}</div>}
-      </Form>
+                  {/* Switch to toggle post status */}
+                  <Form.Item label="Post Status" name="posted">
+                    <Switch
+                      checked={isPosted}
+                      onChange={handleSwitchChange}
+                      checkedChildren="Posted"
+                      unCheckedChildren="Not Posted"
+                    />
+                  </Form.Item>
+                </Form>
+              </TabPane>
+
+              <TabPane tab="Triage Dressing" key="4">
+                <Form layout="vertical">
+                  <Form.Item
+                    label="Process Number"
+                    name="processNo"
+                    rules={[
+                      { required: true, message: "Process Number is required" },
+                    ]}
+                  >
+                    <Select placeholder="Injections" style={{ width: "100%" }}>
+                      <Select.Option value="1">1</Select.Option>
+                      <Select.Option value="2">2</Select.Option>
+                      <Select.Option value="3">3</Select.Option>
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Item Number"
+                    name="itemNo"
+                    rules={[
+                      { required: true, message: "Item Number is required" },
+                    ]}
+                  >
+                    <InputNumber
+                      min={1}
+                      max={100}
+                      placeholder="e.g., 1"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    label="Unit of Measurement (UOM) and Quantity"
+                    name="unitOfMeasure"
+                    rules={[
+                      {
+                        required: true,
+                        message: "UOM and Quantity are required",
+                      },
+                    ]}
+                  >
+                    <Input.Group compact>
+                      <Input
+                        style={{ width: "48%", marginRight: "4%" }}
+                        placeholder="Select unit Of Measure"
+                      />
+                      <InputNumber
+                        style={{ width: "48%" }}
+                        placeholder="Select Quantity"
+                      />
+                    </Input.Group>
+                  </Form.Item>
+                  <Form.Item label=" Remarks" name="remarks">
+                    <Input placeholder="e.g., Remarks" />
+                  </Form.Item>
+                </Form>
+              </TabPane>
+            </Tabs>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

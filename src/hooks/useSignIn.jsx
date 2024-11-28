@@ -18,7 +18,6 @@ const useSignIn = () => {
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
   const {userInfo: verifyOtpUserInfo, success: verifyOtpSuccess } = verifyOtpHandler;
 
-
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
   const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess , error: forgotPwdError } = loginHandler;
 
@@ -40,8 +39,6 @@ const useSignIn = () => {
       navigate("/Nurse/Dashboard"); // Navigate to the next page after OTP verification
     }
   };
-  
-
 
   const handleForgotPassword = async () => {
     await dispatch(forgotPassword(staffNo ));
@@ -69,7 +66,7 @@ const useSignIn = () => {
       // Navigate to Doctor route after successful OTP verification
       navigate("/Nurse/Dashboard");
     }
-  }, [verifyOtpUserInfo]);
+  }, [verifyOtpUserInfo, navigate]);
 
   return {
     staffNo,

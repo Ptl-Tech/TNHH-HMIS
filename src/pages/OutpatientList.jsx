@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { listPatients } from "../actions/patientActions";
+import { createTriageVisit, listPatients } from "../actions/patientActions";
 import { Table, Button, Input, Pagination, Modal, Tooltip, Radio } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -27,7 +27,7 @@ const OutpatientList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-
+  const {loading: createTriageVisitLoading, success, error: createTriageVisitError, payload} = useSelector((state) => state.createTriageVisit);
   const columns = [
     {
       title: "Patient No",
@@ -83,15 +83,27 @@ const OutpatientList = () => {
     dispatch(listPatients());
   }, [dispatch]);
 
+  useEffect(() => {
+    // Navigate after successful triage visit creation
+    if (success) {
+      navigate(`/reception/create-visit/${selectedPatient?.PatientNo}`, {
+        state: { patient: selectedPatient },
+      });
+    } else if (createTriageVisitError) {
+      console.error(createTriageVisitError); // log the error or show a message
+    }
+  }, [success, createTriageVisitError, navigate, selectedPatient]);
+
   const handleSearch = (value) => {
     setSearchQuery(value);
     setShowList(true); // Show the list once a search is performed
   };
 
   const handleDispatch = (record) => {
-    navigate(`/reception/create-visit/${record.PatientNo}`, { state: { patient: record } });
-    console.log(`Dispatching visit for patient ${record.PatientNo}`);
+    dispatch(createTriageVisit(record.PatientNo));
+    setSelectedPatient(record); // Set the selected patient to navigate after success
   };
+
   
 
 

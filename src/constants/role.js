@@ -1,0 +1,1 @@
+export const roles=["Reception","Security","Production"]

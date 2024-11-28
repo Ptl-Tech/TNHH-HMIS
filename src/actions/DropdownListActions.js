@@ -34,7 +34,7 @@ export const listCountries = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -66,7 +66,7 @@ export const listCounties = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -98,7 +98,7 @@ export const listSubCounties = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -130,7 +130,7 @@ export const listClinics = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
