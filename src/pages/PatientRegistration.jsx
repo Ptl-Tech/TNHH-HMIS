@@ -7,6 +7,11 @@ import {
   message,
   Spin,
   Switch,
+  Row,
+  Col,
+  Card,
+  Typography,
+  Avatar,
 } from "antd";
 import {
   relationshipOptions,
@@ -25,13 +30,14 @@ import {
 
 import moment from "moment"; // Ensure you import moment
 import { useNavigate } from "react-router-dom";
+import { useForm } from "antd/es/form/Form";
 
 const PatientRegistration = () => {
   const dispatch = useDispatch();
   const createPatientState = useSelector((state) => state.createPatient);
   const { loading, error, success } = createPatientState;
   const navigate = useNavigate();
-
+  const form = useForm();
   const createTriageVisitState = useSelector(
     (state) => state.createTriageVisit
   );
@@ -215,7 +221,7 @@ const PatientRegistration = () => {
           console.log("Navigate to visit creation page with ID:", visitPayload);
         } else {
           message.error(visitError);
-          navigate('/reception/Patient-list');
+          navigate("/reception/Patient-list");
         }
       }
     } catch (error) {
@@ -275,287 +281,92 @@ const PatientRegistration = () => {
     console.log("country list: ", countriesPayload);
   }, [dispatch]);
   return (
-    <div className="card py-2 px-2">
-      <div className="card-header d-flex justify-content-between">
-        <h5 className="card-title" style={{ color: "#ac8342" }}>
-          Patient Registration
-        </h5>
-        <a
-          href="/Doctor/Patient-list"
-          className="btn btn-link ps-0 text-success"
+    <div className="container">
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={7}>
+          {/* <Typography.Title
+          level={3}
+          style={{ color: "#E89641", padding: "8px" }}
         >
-          Patient List
-        </a>
-      </div>
-      <div className="card-body">
-        <Form layout="vertical">
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
+          Patient Registration
+        </Typography.Title> */}
+          <Card bordered={false} className="card-header">
+            <Form layout="vertical" onFinish={handleSubmit}>
+              <Typography.Title level={5} style={{ color: "#003F6D" }}>
+                General Information
+              </Typography.Title>
               <Form.Item
-                label="First Name:"
                 name="firstName"
-                rules={[{ required: true, message: "Please enter first name" }]}
-              >
-                {/* <label className="form-label">First Name:</label> */}
-                <Input
-                  placeholder="Enter First Name"
-                  name="firstName"
-                  value={newPatient.firstName}
-                  onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Middle Name:"
-                name="middleName"
+                label="First Name"
                 rules={[
-                  { required: true, message: "Please enter middle name" },
+                  {
+                    required: true,
+                    message: "Please input your first name!",
+                  },
                 ]}
               >
-                <Input
-                  placeholder="Enter Middle Name"
-                  name="middleName"
-                  value={newPatient.middleName}
-                  onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
-                />
+                <Input placeholder="First Name" />
               </Form.Item>
-            </div>
-          </div>
-
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
               <Form.Item
-                label="Surname Name:"
                 name="lastName"
-                rules={[{ required: true, message: "Please enter last name" }]}
-              >
-                <Input
-                  placeholder="Enter Surname Name"
-                  name="lastName"
-                  value={newPatient.lastName}
-                  onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Gender:"
-                name="gender"
-                rules={[{ required: true, message: "Please select gender" }]}
-              >
-                <Select
-                  placeholder="Select Gender"
-                  className="w-100, custom-select"
-                  value={newPatient.gender}
-                  onChange={(value) => handleSelectChange("gender", value)}
-                  variant="borderless"
-                  size="large"
-                >
-                  <Select.Option value="0">--Select Gender--</Select.Option>
-                  <Select.Option value="1">Male</Select.Option>
-                  <Select.Option value="2">Female</Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Date of Birth:"
-                name="dob"
+                label="Last Name"
                 rules={[
-                  { required: true, message: "Please select date of birth" },
+                  {
+                    required: true,
+                    message: "Please input your last name!",
+                  },
                 ]}
+              >
+                <Input placeholder="Last Name" />
+              </Form.Item>
+              <Form.Item
+                name="middleName"
+                label="Middle Name"
+                rules={[
+                  {
+                    required: false,
+                    message: "Please input your middle name!",
+                  },
+                ]}
+              >
+                <Input placeholder="Middle Name" />
+              </Form.Item>
+              <Form.Item
+                name="registrationDate"
+                label="Registration Date"
+                rules={[]}
               >
                 <DatePicker
-                  className="w-100, custom-select"
-                  placeholder="Select Date of Birth"
-                  value={newPatient.dob ? moment(newPatient.dob) : null}
-                  onChange={(date, dateString) =>
-                    handleDateChange(date, dateString)
-                  }
-                  variant="borderless"
-                  size="large"
-                />
+                  format="DD/MM/YYYY"
+                  style={{ width: "100%" }}
+                  placeholder="Select Date"
+                  defaultValue={moment()} // Set default date to current date
+                />{" "}
               </Form.Item>
-              {dobError && <span style={{ color: "red" }}>{dobError}</span>}
-
-              {age !== null && (
-                <div className="text-success">
-                  Age: {age.years} years {age.months} months
-                </div>
-              )}
-            </div>
-            <div className="col-12 col-md-6 text-primary">
               <Form.Item
-                label="ID/Passport/Birth No:"
-                name="idNumber"
+                name="visitType"
+                label="Visit Type"
                 rules={[
                   {
                     required: true,
-                    message: "Please enter ID/Passport/Birth No",
+                    message: "Please select a visit type!",
                   },
                 ]}
               >
-                <Input
-                  placeholder="Enter ID No"
-                  name="idNumber"
-                  value={newPatient.idNumber}
-                  onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Nationality:"
-                name="nationality"
-                rules={[
-                  { required: true, message: "Please select nationality" },
-                ]}
-              >
-                <Select
-                  placeholder="Select Nationality"
-                  className="w-100 custom-select"
-                  value={newPatient.nationality}
-                  onChange={(value) => handleSelectChange("nationality", value)}
-                  variant="borderless"
-                  size="large"
-                  name="nationality"
-                  onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                >
-                  <Select.Option value="">--Select Nationality--</Select.Option>
-                  {countriesPayload && countriesPayload.length > 0 ? (
-                    countriesPayload.map((country) => (
-                      <Select.Option key={country.Code} value={country.Code}>
-                        {country.Name}
-                      </Select.Option>
-                    ))
-                  ) : (
-                    <Select.Option value="" disabled>
-                      No countries available
-                    </Select.Option>
-                  )}
+                <Select placeholder="Select Visit Type">
+                  <Select.Option value="1">Revisit</Select.Option>
+                  <Select.Option value="2">New Consultation</Select.Option>
                 </Select>
               </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="County:"
-                name="county"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select County",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select County"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
-                  value={newPatient.county}
-                  onChange={(value) => handleSelectChange("county", value)}
-                  variant="borderless"
-                  onFocus={handleDisplayDropDown}
-                  size="large"
-                >
-                  <Select.Option value="">--Select County--</Select.Option>
-                  {countiesPayload && countiesPayload.length > 0 ? (
-                    countiesPayload.map((county) => (
-                      <Select.Option key={county.Code} value={county.Code}>
-                        {county.Description}
-                      </Select.Option>
-                    ))
-                  ) : (
-                    <Select.Option value="" disabled>
-                      No countries available
-                    </Select.Option>
-                  )}
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Sub County:"
-                name="subCounty"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select nationality",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select Sub County"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
-                  value={newPatient.nationality}
-                  onChange={(value) => handleSelectChange("county", value)}
-                  variant="borderless"
-                  onFocus={handleDisplayDropDown}
-                  size="large"
-                >
-                  <Select.Option value="">--Select Sub County--</Select.Option>
-                  {subCountiesPayload && subCountiesPayload.length > 0 ? (
-                    subCountiesPayload.map((subCounty) => (
-                      <Select.Option
-                        key={subCounty.SubCountyCode}
-                        value={subCounty.SubCountyCode}
-                      >
-                        {subCounty.Name}
-                      </Select.Option>
-                    ))
-                  ) : (
-                    <Select.Option value="" disabled>
-                      No countries available
-                    </Select.Option>
-                  )}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Residence:"
-                name="residence"
-                rules={[
-                  {
-                    required: true,
-                    message: "Enter your residence",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="Enter Residence"
-                  name="residence"
-                  value={newPatient.residence}
-                  onChange={handleInputChange}
-                  className=" custom-select"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
+            </Form>
+          </Card>
+        </Col>
+        <Col xs={24} md={11}>
+          <Card bordered={false} className="card-header">
+            <Typography.Title level={5} style={{ color: "#003F6D" }}>
+              Contact Information
+            </Typography.Title>
+            <Form layout="vertical" onFinish={handleSubmit}>
               <Form.Item
                 label="Phone Number:"
                 name="phoneNumber"
@@ -569,342 +380,531 @@ const PatientRegistration = () => {
                     message: "Phone number must be in the format 2547xxxxxxxx",
                   },
                 ]}
+                style={{ width: "100%" }}
               >
                 <Input
                   placeholder="254 0000 00000"
                   name="phoneNumber"
                   value={newPatient.phoneNumber}
                   onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
                 />
               </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Next of Kin Name:"
-                name="nextOfKinFullName"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "Please enter Next of Kin Name",
-                //   },
-                // ]}
-              >
-                <Input
-                  placeholder="Enter Next of Kin Name"
-                  name="nextOfKinFullName"
-                  value={newPatient.nextOfKinFullName}
-                  onChange={handleInputChange}
-                  className="custom-input"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-          </div>
-
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Next of Kin Relationship:"
-                name="nextOfKinRelationship"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "Please enter Next of Kin Name",
-                //   },
-                // ]}
-              >
-                <Select
-                  placeholder="Select Relationship"
-                  className="w-100, custom-select"
-                  options={relationshipOptions}
-                  value={newPatient.nextOfKinRelationship}
-                  onChange={(value) =>
-                    handleSelectChange("nextOfKinRelationship", value)
-                  }
-                  variant="borderless"
-                  size="large"
-                ></Select>
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Next of Kin Phone Number:"
-                name="nextOfKinPhoneNo"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "Please enter Next of Kin Phone Number",
-                //   },
-                // ]}
-              >
-                <Input
-                  placeholder="254 0000 00000"
-                  name="nextOfKinPhoneNo"
-                  value={newPatient.nextOfKinPhoneNo}
-                  onChange={handleInputChange}
-                  className=" custom-select"
-                  variant="borderless"
-                  size="large"
-                />
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Clinic:"
-                name="clinic"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Clinic",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select Clinic"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
-                  value={newPatient.clinic}
-                  onChange={(value) => handleSelectChange("clinic", value)}
-                  variant="borderless"
-                  onFocus={handleDisplayDropDown}
-                  size="large"
+              <div className="d-flex gap-2 justify-content-between">
+                <Form.Item
+                  name="gender"
+                  label="Gender"
+                  style={{ width: "100%" }}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select your gender!",
+                    },
+                  ]}
                 >
-                  <Select.Option value="">--Select Clinic--</Select.Option>
-                  {clinicsPayload &&
-                    clinicsPayload.map((clinic) => (
-                      <Select.Option key={clinic.No} value={clinic.No}>
-                        {clinic.Description}
+                  <Select placeholder="Select Gender">
+                    <Select.Option value="1">Male</Select.Option>
+                    <Select.Option value="2">Female</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name="dob"
+                  label="Date of Birth"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your date of birth!",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <DatePicker
+                    format="YYYY-MM-DD"
+                    style={{ width: "100%" }}
+                    placeholder="Select Date of Birth"
+                    defaultValue={moment()} // Set default date to current date
+                    value={newPatient.dob ? moment(newPatient.dob) : null}
+                    onChange={(date, dateString) =>
+                      handleDateChange(date, dateString)
+                    }
+                  />
+                  {dobError && <span style={{ color: "red" }}>{dobError}</span>}
+
+                  {age !== null && (
+                    <div className="text-success">
+                      Age: {age.years} years {age.months} months
+                    </div>
+                  )}
+                </Form.Item>
+              </div>
+              <div className="d-flex gap-2 justify-content-between">
+                <Form.Item
+                  name="idNumber"
+                  label="ID/Passport/Birth No:"
+                  style={{ width: "100%" }}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your ID/Passport/Birth No!",
+                    },
+                  ]}
+                >
+                  <Input placeholder="ID/Passport/Birth No:" />
+                </Form.Item>
+                <Form.Item
+                  name="nationality"
+                  label="Nationality"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your nationality!",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Select
+                    placeholder="Select Nationality"
+                    className="w-100 "
+                    value={newPatient.nationality}
+                    onChange={(value) =>
+                      handleSelectChange("nationality", value)
+                    }
+                    // variant="borderless"
+                    name="nationality"
+                    onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                  >
+                    <Select.Option value="">
+                      --Select Nationality--
+                    </Select.Option>
+                    {countriesPayload && countriesPayload.length > 0 ? (
+                      countriesPayload.map((country) => (
+                        <Select.Option key={country.Code} value={country.Code}>
+                          {country.Name}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No countries available
                       </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Doctor:"
-                name="doctor"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select Doctor",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select Doctor"
-                  className="w-100, custom-select"
-                  //  options={relationshipOptions}
-                  value={newPatient.doctor}
-                  onChange={(value) => handleSelectChange("doctor", value)}
-                  variant="borderless"
-                  size="large"
-                >
-                  <Select.Option value="">--Select Doctor--</Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-          <div className="row g-3 my-2 align-items-center justify-content-center">
-            <div className="col-12 col-md-6  text-primary">
-              <Form.Item
-                label="Payment Mode:"
-                name="paymentMode"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please choose Payment Mode",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select Payment Mode"
-                  className="w-100, custom-select"
-                  value={newPatient.paymentMode}
-                  onChange={(value) => handleSelectChange("paymentMode", value)}
-                  variant="borderless"
-                  size="large"
-                >
-                  <Select.Option value="1">Cash</Select.Option>
-                  <Select.Option value="2">Insurance</Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="col-12 col-md-6 text-primary">
-              <Form.Item
-                label="Patient Status:"
-                name="patientStatus"
-                rules={[
-                  { required: true, message: "Please select Patient Status" },
-                ]}
-              >
-                <Select
-                  placeholder="Select Patient Status"
-                  className="w-100, custom-select"
-                  value={newPatient.patientStatus}
-                  onChange={(value) =>
-                    handleSelectChange("patientStatus", value)
-                  }
-                  variant="borderless"
-                  size="large"
-                >
-                  <Select.Option value="0">Alive</Select.Option>
-                  <Select.Option value="1">Dead</Select.Option>
-                  <Select.Option value="2">Transfer</Select.Option>
-                </Select>
-              </Form.Item>
-            </div>
-          </div>
-
-          {/* Conditional rendering of insurance fields */}
-          {newPatient.paymentMode === "2" && (
-            <>
-              <div className="row g-3 my-2 align-items-center justify-content-center">
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Insurance Number:"
-                    name="insuranceNo"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter Insurance Number",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Enter Insurance Number"
-                      name="insuranceNo"
-                      value={newPatient.insuranceNo}
-                      onChange={handleInputChange}
-                      className="custom-input"
-                      variant="borderless"
-                      size="large"
-                    />
-                  </Form.Item>
-                </div>
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Insurance Name:"
-                    name="insuranceName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter Insurance Name",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Enter Insurance Name"
-                      name="insuranceName"
-                      value={newPatient.insuranceName}
-                      onChange={handleInputChange}
-                      className="custom-input"
-                      variant="borderless"
-                      size="large"
-                    />
-                  </Form.Item>
-                </div>
+                    )}
+                  </Select>{" "}
+                </Form.Item>
               </div>
-              <div className="row g-3 my-2 align-items-center justify-content-center">
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Principal Member Name:"
-                    name="insurancePrincipalMemberName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter Principal Member Name",
-                      },
-                    ]}
+              <div className="d-flex gap-2 justify-content-between">
+                <Form.Item
+                  label="County:"
+                  name="county"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select County",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Select
+                    placeholder="Select County"
+                    className="w-100 "
+                    //  options={relationshipOptions}
+                    value={newPatient.county}
+                    onChange={(value) => handleSelectChange("county", value)}
+                    onFocus={handleDisplayDropDown}
                   >
-                    <Input
-                      placeholder="Enter Principal Member Name"
-                      name="insurancePrincipalMemberName"
-                      value={newPatient.insurancePrincipalMemberName}
-                      onChange={handleInputChange}
-                      className="custom-input"
-                      variant="borderless"
-                      size="large"
-                    />
-                  </Form.Item>
-                </div>
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Membership No:"
-                    name="membershipNo"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter Membership Number",
-                      },
-                    ]}
+                    <Select.Option value="">--Select County--</Select.Option>
+                    {countiesPayload && countiesPayload.length > 0 ? (
+                      countiesPayload.map((county) => (
+                        <Select.Option key={county.Code} value={county.Code}>
+                          {county.Description}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No countries available
+                      </Select.Option>
+                    )}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  label="Sub County:"
+                  name="subCounty"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select nationality",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Select
+                    placeholder="Select Sub County"
+                    className="w-100"
+                    //  options={relationshipOptions}
+                    value={newPatient.nationality}
+                    onChange={(value) => handleSelectChange("county", value)}
+                    onFocus={handleDisplayDropDown}
                   >
-                    <Input
-                      placeholder="Enter Membership Number"
-                      name="membershipNo"
-                      value={newPatient.membershipNo}
-                      onChange={handleInputChange}
-                      className="custom-input"
-                      variant="borderless"
-                      size="large"
-                    />
-                  </Form.Item>
-                </div>
+                    <Select.Option value="">
+                      --Select Sub County--
+                    </Select.Option>
+                    {subCountiesPayload && subCountiesPayload.length > 0 ? (
+                      subCountiesPayload.map((subCounty) => (
+                        <Select.Option
+                          key={subCounty.SubCountyCode}
+                          value={subCounty.SubCountyCode}
+                        >
+                          {subCounty.Name}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No countries available
+                      </Select.Option>
+                    )}
+                  </Select>
+                </Form.Item>
               </div>
-              <div className="row g-3 my-2 align-items-center justify-content-center">
-                <div className="col-12  text-primary">
+              <div className="d-flex gap-2 justify-content-between">
+                <Form.Item
+                  label="Residence:"
+                  name="residence"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Enter your residence",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Input
+                    placeholder="Enter Residence"
+                    name="residence"
+                    value={newPatient.residence}
+                    onChange={handleInputChange}
+                    className=" "
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="address"
+                  label="Address"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input your address!",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Input placeholder="Address" style={{ width: "100%" }} />
+                </Form.Item>
+              </div>
+            </Form>
+          </Card>
+        </Col>
+        <Col xs={24} md={6}>
+          <Card style={{ width: "100%" }} className="card-header">
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              Patient Photo
+            </Typography.Title>
+            <div className="d-flex flex-column align-items-center justify-content-center">
+              <Avatar
+                size={128}
+                src={
+                  newPatient.photo
+                    ? newPatient.photo
+                    : "https://joeschmoe.io/api/v1/random"
+                }
+              />
+            </div>
+          </Card>
+          <Card style={{ width: "100%" }} className="card-header mt-3">
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              Consultation Details
+            </Typography.Title>
+            <div className="row g-3 my-2 align-items-center justify-content-center">
+              <div className="col-12 text-primary">
+                <Form.Item
+                  label="Clinic:"
+                  name="clinic"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select Clinic",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Select
+                    placeholder="Select Clinic"
+                    className="w-100"
+                    //  options={relationshipOptions}
+                    value={newPatient.clinic}
+                    onChange={(value) => handleSelectChange("clinic", value)}
+                    onFocus={handleDisplayDropDown}
+                  >
+                    <Select.Option value="">--Select Clinic--</Select.Option>
+                    {clinicsPayload &&
+                      clinicsPayload.map((clinic) => (
+                        <Select.Option key={clinic.No} value={clinic.No}>
+                          {clinic.Description}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </div>
+              <div className="col-12  text-primary">
+                <Form.Item
+                  label="Doctor:"
+                  name="doctor"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select Doctor",
+                    },
+                  ]}
+                  style={{ width: "100%" }}
+                >
+                  <Select
+                    placeholder="Select Doctor"
+                    className="w-100"
+                    //  options={relationshipOptions}
+                    value={newPatient.doctor}
+                    onChange={(value) => handleSelectChange("doctor", value)}
+                   
+                  >
+                    <Select.Option value="">--Select Doctor--</Select.Option>
+                  </Select>
+                </Form.Item>
+              </div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="mt-3" gutter={[16, 16]}>
+        <Col xs={24} md={18}>
+          <Card style={{ width: "100%" }} className="card-header">
+            <Form layout="vertical" onFinish={handleSubmit}>
+              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                Next of Kin
+              </Typography.Title>
+              <div className="row g-3 align-items-center justify-content-center">
+                <div className="col-12 col-md-6 text-primary">
                   <Form.Item
-                    label="Is Principal Member ?"
-                    name="isPrincipleMember"
+                    label="Next of Kin Name:"
+                    name="nextOfKinFullName"
                     // rules={[
                     //   {
                     //     required: true,
-                    //     message: "Please enter Scheme Name",
+                    //     message: "Please enter Next of Kin Name",
                     //   },
                     // ]}
+                    style={{ width: "100%" }}
                   >
-                    <Switch
-                      checked={newPatient.isPrincipleMember}
-                      onChange={(checked) =>
-                        handleSwitchChange("isPrincipleMember", checked)
+                    <Input
+                      placeholder="Enter Next of Kin Name"
+                      name="nextOfKinFullName"
+                      value={newPatient.nextOfKinFullName}
+                      onChange={handleInputChange}
+                    />
+                  </Form.Item>
+                </div>
+                <div className="col-12 col-md-6 text-primary">
+                  <Form.Item
+                    label="Next of Kin Relationship:"
+                    name="nextOfKinRelationship"
+                    // rules={[
+                    //   {
+                    //     required: true,
+                    //     message: "Please enter Next of Kin Name",
+                    //   },
+                    // ]}
+                    style={{ width: "100%" }}
+                  >
+                    <Select
+                      placeholder="Select Relationship"
+                      className="w-100"
+                      options={relationshipOptions}
+                      value={newPatient.nextOfKinRelationship}
+                      onChange={(value) =>
+                        handleSelectChange("nextOfKinRelationship", value)
                       }
-                      size="large"
-                      style={{ margin: "0 10px" }}
+                    ></Select>
+                  </Form.Item>
+                </div>
+              </div>
+              <div className="row g-3 align-items-center justify-content-center">
+                <div className="col-12 text-primary">
+                  <Form.Item
+                    label="Next of Kin Phone:"
+                    name="nextOfKinPhone"
+                    // rules={[
+                    //   {
+                    //     required: true,
+                    //     message: "Please enter Next of Kin Phone",
+                    //   },
+                    // ]}
+                    style={{ width: "100%" }}
+                  >
+                    <Input
+                      placeholder="Enter Next of Kin Phone"
+                      name="nextOfKinPhone"
+                      value={newPatient.nextOfKinPhone}
+                      onChange={handleInputChange}
                     />
                   </Form.Item>
                 </div>
               </div>
-            </>
-          )}
-
-          <div className="d-flex justify-content-center my-5 gap-3">
-            {!patientId ? (
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                type="primary"
-                size="large"
-              >
-                {loading ? <Spin /> : "Save Patient Details"}
-              </Button>
-            ) : (
-              <Button
-                onClick={handleCreateVisit}
-                disabled={visitLoading}
-                type="primary"
-                size="large"
-              >
-                {visitLoading ? <Spin /> : "Create Visit"}
-              </Button>
-            )}
-          </div>
-        </Form>
-      </div>
+            </Form>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="mt-3" gutter={[16, 16]}>
+        <Col xs={24} md={18}>
+          <Card style={{ width: "100%" }} className="card-header">
+            <Form layout="vertical" onFinish={handleSubmit}>
+              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                Billing Information
+              </Typography.Title>
+              <div className="row g-3  align-items-center justify-content-center">
+                <div className="col-12  text-primary">
+                  <Form.Item
+                    label="Payment Mode:"
+                    name="paymentMode"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please choose Payment Mode",
+                      },
+                    ]}
+                    style={{ width: "100%" }}
+                  >
+                    <Select
+                      placeholder="Select Payment Mode"
+                      className="w-100"
+                      value={newPatient.paymentMode}
+                      onChange={(value) =>
+                        handleSelectChange("paymentMode", value)
+                      }
+                    >
+                      <Select.Option value="1">Cash</Select.Option>
+                      <Select.Option value="2">Insurance</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </div>
+              </div>
+              {newPatient.paymentMode === "2" && (
+                <>
+                  <div className="row g-3  align-items-center justify-content-center">
+                    <div className="col-12 col-md-6 text-primary">
+                      <Form.Item
+                        label="Insurance Number:"
+                        name="insuranceNo"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter Insurance Number",
+                          },
+                        ]}
+                        style={{ width: "100%" }}
+                      >
+                        <Input
+                          placeholder="Enter Insurance Number"
+                          name="insuranceNo"
+                          value={newPatient.insuranceNo}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="col-12 col-md-6 text-primary">
+                      <Form.Item
+                        label="Insurance Name:"
+                        name="insuranceName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter Insurance Name",
+                          },
+                        ]}
+                        style={{ width: "100%" }}
+                      >
+                        <Input
+                          placeholder="Enter Insurance Name"
+                          name="insuranceName"
+                          value={newPatient.insuranceName}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div className="row g-3  align-items-center justify-content-center">
+                    <div className="col-12 col-md-6 text-primary">
+                      <Form.Item
+                        label="Principal Member Name:"
+                        name="insurancePrincipalMemberName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter Principal Member Name",
+                          },
+                        ]}
+                        style={{ width: "100%" }}
+                      >
+                        <Input
+                          placeholder="Enter Principal Member Name"
+                          name="insurancePrincipalMemberName"
+                          value={newPatient.insurancePrincipalMemberName}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Item>
+                    </div>
+                    <div className="col-12 col-md-6 text-primary">
+                      <Form.Item
+                        label="Membership No:"
+                        name="membershipNo"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter Membership Number",
+                          },
+                        ]}
+                        style={{ width: "100%" }}
+                      >
+                        <Input
+                          placeholder="Enter Membership Number"
+                          name="membershipNo"
+                          value={newPatient.membershipNo}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                  <div className="row g-3 align-items-center justify-content-center">
+                    <div className="col-12  text-primary">
+                      <Form.Item
+                        label="Is Principal Member ?"
+                        name="isPrincipleMember"
+                        // rules={[
+                        //   {
+                        //     required: true,
+                        //     message: "Please enter Scheme Name",
+                        //   },
+                        // ]}
+                      >
+                        <Switch
+                          checked={newPatient.isPrincipleMember}
+                          onChange={(checked) =>
+                            handleSwitchChange("isPrincipleMember", checked)
+                          }
+                          size="large"
+                          style={{ margin: "0 10px" }}
+                        />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </>
+              )}
+            </Form>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

@@ -18,7 +18,6 @@ const useSignIn = () => {
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
   const {userInfo: verifyOtpUserInfo, success: verifyOtpSuccess } = verifyOtpHandler;
 
-
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
   const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess , error: forgotPwdError } = loginHandler;
 
@@ -32,16 +31,10 @@ const useSignIn = () => {
 
   const handleVerifyOtp = async () => {
     console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken, userInfo?.branchCode);
-    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode?.branchCode)); // Pass branchCode here
-  
-    if (verifyOtpUserInfo) {
-      setOtp('');
-      setIsOtpRequired(false);
-      navigate("/Triage"); // Navigate to the next page after OTP verification
-    }
+    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode)); // Pass branchCode here
+    
+    
   };
-  
-
 
   const handleForgotPassword = async () => {
     await dispatch(forgotPassword(staffNo ));
@@ -66,10 +59,22 @@ const useSignIn = () => {
       // Reset OTP state before navigating
       setOtp('');
       setIsOtpRequired(false);
-      // Navigate to Doctor route after successful OTP verification
-      navigate("/Triage");
+
+
+      const role = verifyOtpUserInfo?.userData.departmentName;
+      console.log("Role:", role);
+
+      if (role === 'Reception') {
+        navigate('/reception');
+      } else if (role === 'Security') {
+        navigate('/Security');
+      } else if (role === 'Production') {
+        navigate('/Triage');
+      }
+
+
     }
-  }, [verifyOtpUserInfo]);
+  }, [verifyOtpUserInfo, navigate]);
 
   return {
     staffNo,
