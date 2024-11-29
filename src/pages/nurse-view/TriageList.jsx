@@ -1,4 +1,4 @@
-import { Card, Checkbox, Input, Radio, Table, Tabs } from 'antd'
+import { Card, Checkbox, Table, Tabs } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
+import TriageFilters from './TriageFilters';
 
 const TriageList = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
@@ -21,13 +22,21 @@ const TriageList = () => {
 
   const {loadingWaitingList, triageWaitingList} = useSelector((state) => state.getTriageWaitingList) || {};
 
-  const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
+  const {triageList} = useSelector((state) => state.getTriageList) || {};
 
-  console.log('triage lit in component', triageList);
+//combine triageWaitingList and triageList and filtering by status
+  const combinedTriageWaitingListAndTriageList = triageWaitingList
+  .map(user => {
+    const triage = triageList.find(t => t.PatientNo.trim() === user.PatientNo.trim());
+    return triage ? { ...user, status: triage.Status } : null;
+  })
+  .filter(record => {
+    return record && record.status.trim().toLowerCase() === 'closed';
+  });
 
-
-
-  const waitingListTableDataSource = triageWaitingList.map((item, index) => ({
+ 
+//extracting values from combinedTriageWaitingListAndTriageList
+  const waitingListTableDataSource = combinedTriageWaitingListAndTriageList.map((item, index) => ({
     key: index + 1,
     name: item.Names || `${item.Surname} ${item.MiddleName} ${item.LastName}`,
     regDate: item.DateRegistered,
@@ -37,6 +46,9 @@ const TriageList = () => {
     idNumber: item.IDNumber,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
+
+
+  //filtering waitingListTableDataSource
   const filterWaitingListTableDataSource = () =>{
     if(filterWaitingListType !== '' && searchQueryWaitingList.trim !== ''){
         return waitingListTableDataSource.filter((item) => {
@@ -54,12 +66,10 @@ const TriageList = () => {
     }
     return waitingListTableDataSource;
   }
+  
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(getTriageList())
   }, [dispatch]);
 
@@ -75,10 +85,15 @@ const TriageList = () => {
       rowScope: 'row',
       filterSearch: true, // Enable search
       filters: [
-      ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
-    ],
-    onFilter: (value, record) => record.name.includes(value),
-    filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
+        ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
+      ],
+      onFilter: (value, record) => record.name.includes(value),
+      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
+    },
+    {
+      title: 'ID Number',
+      dataIndex: 'idNumber',
+      rowScope: 'row',
     },
     {
       title: 'Reg Date',
@@ -101,11 +116,6 @@ const TriageList = () => {
       rowScope: 'row',
     },
     {
-      title: 'ID Number',
-      dataIndex: 'idNumber',
-      rowScope: 'row',
-    },
-    {
       title: 'Check In',
       dataIndex: 'checkIn',
       rowScope: 'row',
@@ -113,7 +123,7 @@ const TriageList = () => {
       render: () => <Checkbox value={'checkIn'}></Checkbox>
     },
   ];
-  const columns = [
+  const triageColumns = [
     {
       title: 'Index',
       dataIndex: 'key',
@@ -122,6 +132,24 @@ const TriageList = () => {
     {
       title: 'Patient Name',
       dataIndex: 'name',
+      rowScope: 'row',
+      filterSearch: true, // Enable search
+      filters: [
+        ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
+      ],
+      onFilter: (value, record) => record.name.includes(value),
+      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
+    },
+
+    {
+      title: 'Patient Number',
+      dataIndex: 'number',
+      rowScope: 'row',
+    },
+    
+    {
+      title: 'Reg Date',
+      dataIndex: 'regDate',
       rowScope: 'row',
     },
     {
@@ -135,8 +163,8 @@ const TriageList = () => {
       rowScope: 'row',
     },
     {
-      title: 'Patient Number',
-      dataIndex: 'number',
+      title: 'ID Number',
+      dataIndex: 'idNumber',
       rowScope: 'row',
     },
     {
@@ -149,7 +177,7 @@ const TriageList = () => {
         return (
           <a
             style={{ color: 'blue' }}
-            onClick={() => handleNavigate(record.key)}
+            onClick={() => handleNavigate(record.number)}
           >
             Add details
           </a>
@@ -158,70 +186,13 @@ const TriageList = () => {
     },
   ];
   
-  
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      sex: 'Female',
-      number: 18,
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 20,
-      sex: 'Male',
-      number: 13,
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      sex: 'Male',
-      number: 12,
-    },
-    {
-      key: '4',
-      name: 'Jim Red',
-      age: 18,
-      sex: 'Male',
-      number: 11,
-    },
-    {
-      key: '5',
-      name: 'Jake White',
-      age: 18,
-      sex: 'Female',
-      number: 10,
-    },
-  ];
-
   return (
     <Tabs style={{ padding: '10px 10px' }}>
         <Tabs.TabPane tab="Waiting List" key="waitingList">
-          <TriageSummeryCard waitingPatient={triageWaitingList}/>
+          <TriageSummeryCard waitingPatient={combinedTriageWaitingListAndTriageList}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <Radio.Group 
-                  defaultValue="a" 
-                  buttonStyle="solid"
-                  onChange={(e) => setFilterWaitingListType(e.target.value)}
-                  value={filterWaitingListType}
-                  >
-                  <Radio value='name'>Filter by name</Radio>
-                  <Radio value='idNumber'>Filter by ID</Radio>
-                  <Radio value='patientNo'>Filter by patient no</Radio>
-                </Radio.Group>
-                <Input 
-                  showCount maxLength={20} 
-                  type='search' 
-                  placeholder='Search' 
-                  style={{ width: '300px' }}
-                  onChange={(e) => setSearchQueryWaitingList(e.target.value)}
-                  />
-              </div>
+              <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
 
               {
                 loadingWaitingList ? 
@@ -245,9 +216,12 @@ const TriageList = () => {
           </Card>
         </Tabs.TabPane>
         <Tabs.TabPane tab="Patients in Triage" key="patientsInTriage">
-        <TriageSummeryCard waitingPatient={triageWaitingList}/>
+        <TriageSummeryCard waitingPatient={combinedTriageWaitingListAndTriageList}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
-              <Table columns={columns} dataSource={data} bordered size='middle'/>
+
+            <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
+
+              <Table columns={triageColumns} dataSource={filterWaitingListTableDataSource()} bordered size='middle'/>
           </Card>
         </Tabs.TabPane>
     </Tabs>

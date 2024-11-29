@@ -26,7 +26,7 @@ export const rootReducer = combineReducers({
     postDoctorTreatment:postDoctorTreatmentReducer,
     loadUserInfo:loadUserInfo,
     getTriageWaitingList:getTriageWaitingListReducer,
-    getTriageList:getTriageListReducer
+    getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer
 
 });

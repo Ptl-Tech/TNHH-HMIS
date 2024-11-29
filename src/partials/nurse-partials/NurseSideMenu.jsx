@@ -40,7 +40,7 @@ const sideMenuItems = [
     },
 
     {
-        key: "Patient-Registration",
+        key: "Triage-list",
         icon: <UserOutlined style={{ color: "#fff" }} />,
         label: "Patient Registration",
     },
@@ -63,7 +63,7 @@ const sideMenuItems = [
     "/Patient-Registration",
     "/Appointments",
     "/Impatient",
-    "/nurses",
+    "/Triage-list",
     "/procurement",
     "/Dental",
     "/Pharmacy",

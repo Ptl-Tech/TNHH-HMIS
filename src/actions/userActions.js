@@ -65,7 +65,7 @@ export const logout = () => (dispatch) => {
   try {
     // Clear user data from localStorage
     localStorage.removeItem("userInfo");
-localStorage.removeItem("branchCode");
+    localStorage.removeItem("branchCode");
     // Dispatch logout action to update state
     dispatch({ type: USER_LOGOUT });
 

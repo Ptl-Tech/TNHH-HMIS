@@ -1,6 +1,7 @@
-import { Button, Card, Col, Row, Select, Space, Table, Tabs, Typography } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { Button, Card, Col, Row, Select, Space, Table, Tabs } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { PlusOutlined, ExclamationOutlined } from '@ant-design/icons'
+import { hospitalBranchesTotalWards } from '../../constants/nurse-constants'
 
 const Impatient = () => {
 

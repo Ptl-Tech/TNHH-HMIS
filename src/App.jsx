@@ -75,7 +75,7 @@ function App() {
             <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
             <Route path="Triage" element={<TriageList />} />
             <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
-            <Route path="Impatient" element={<Impatient />} />
+            <Route path="Triage-list" element={<WaitingList />} />
             <Route path="Impatient/Ward" element={<ImpatientList />} />
             <Route path="Patient-list" element={<Patientlist />} />
             <Route path="New-Patients" element={<NewPatients />} />

@@ -23,7 +23,7 @@ export const getTriageList = () => async (dispatch, getState) => {
     };
 
     try {
-        const response = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAppointment&isList=true`, config);
+        const response = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true`, config);
         dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: response.data });
         console.log('response from API', response.data);
     } catch (error) {
