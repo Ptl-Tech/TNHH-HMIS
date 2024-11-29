@@ -32,7 +32,7 @@ import Signout from "../Auth/Signout";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const ReceptionLayout = () => {
+const TriageLayout = () => {
   const location = useLocation();
 
   // Extract the current route name from the location pathname
@@ -40,12 +40,12 @@ const ReceptionLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState(["/"]);
   const rootSubmenuKeys = [
-   "/reception"
+   "/Triage"
   ];
 
   const items = [
     {
-      key: "/reception",
+      key: "/Triage",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
       label: "Dashboard",
     },
@@ -53,13 +53,13 @@ const ReceptionLayout = () => {
       type: "divider",
     },
     {
-      key: "RegistrationGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+      key: "TriageGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Triage</span>,
       type: "group",
       children: [
         {
-          key: "Patient-list",
-          label: "Patients",
+          key: "Triage-list",
+          label: "Triage Waiting List",
           icon: <TeamOutlined style={{ color: "#fff" }} />,
         },
         // {
@@ -74,37 +74,37 @@ const ReceptionLayout = () => {
         // },
       ],
     },
-    {
-        type: "divider",
-      },
+    // {
+    //     type: "divider",
+    //   },
 
-    {
-      key: "BillingGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Billing</span>,
-      type: "group",
-      children: [
-        {
-          key: "Billing-list",
-          label: "Active Patient List",
-          icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        }
-      ]
-    },
-    {
-        type: "divider",
-    },
-    {
-        key: "AppointmentGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
-        type: "group",
-        children: [
-          {
-            key: "Appointments",
-            label: "Appointments",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          }
-        ]
-      },
+    // {
+    //   key: "BillingGroup",
+    //   label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+    //   type: "group",
+    //   children: [
+    //     {
+    //       key: "Billing-list",
+    //       label: "Billing",
+    //       icon: <FileTextOutlined style={{ color: "#fff" }} />,
+    //     }
+    //   ]
+    // },
+    // {
+    //     type: "divider",
+    // },
+    // {
+    //     key: "AppointmentGroup",
+    //     label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+    //     type: "group",
+    //     children: [
+    //       {
+    //         key: "Appointments",
+    //         label: "Appointments",
+    //         icon: <CalendarOutlined style={{ color: "#fff" }} />,
+    //       }
+    //     ]
+    //   },
   ];
   
   const onOpenChange = (keys) => {
@@ -228,4 +228,4 @@ const ReceptionLayout = () => {
   );
 };
 
-export default ReceptionLayout;
+export default TriageLayout;

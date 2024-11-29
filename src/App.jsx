@@ -35,6 +35,9 @@ import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
 import VisitorForm from "./pages/VisitorForm";
 import CreateVisitForm from "./pages/CreateVisitForm";
+import TriageLayout from "./Layouts/TriageLayout";
+import WaitingList from "./pages/WaitingList";
+import { roles } from "./constants/role";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -81,7 +84,7 @@ function App() {
           <Route path="/Nurse/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
-      <Route element={<PrivateRoute />}>
+      <Route element={<PrivateRoute allowedRoles={['Reception']} />}>
         <Route path="/reception" element={<ReceptionLayout />}>
           <Route index element={<ReceptionDashboard />} />
 
@@ -91,8 +94,10 @@ function App() {
           />
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
-          <Route path="/reception/create-visit/:patientNo" element={<CreateVisitForm />} />
-
+          <Route
+            path="/reception/create-visit/:patientNo"
+            element={<CreateVisitForm />}
+          />
         </Route>
       </Route>
       <Route element={<PrivateRoute />}>
@@ -121,10 +126,16 @@ function App() {
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
-      <Route element={<PrivateRoute />}>
+      <Route element={<PrivateRoute allowedRoles={['Security']} />}>
         <Route path="/Security" element={<SecurityLayout />}>
           <Route index element={<VisitorForm />} />
           <Route path="/Security/visitors-list" element={<VisitorList />} />
+        </Route>
+      </Route>
+      <Route element={<PrivateRoute allowedRoles={['Production']}/>}>
+        <Route path="/Triage" element={<TriageLayout />}>
+          <Route index element={<NurseObservation />} />
+          <Route path="/Triage/Triage-list" element={<WaitingList />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/login" />} />

@@ -13,7 +13,13 @@ import {
   SUB_COUNTIES_LIST_FAIL,
   CLINICS_LIST_REQUEST,
   CLINICS_LIST_SUCCESS,
-  CLINICS_LIST_FAIL
+  CLINICS_LIST_FAIL,
+  KINS_LIST_REQUEST,
+  KINS_LIST_SUCCESS,
+  KINS_LIST_FAIL,
+  INSURANCE_LIST_REQUEST,
+  INSURANCE_LIST_SUCCESS,
+  INSURANCE_LIST_FAIL
 
 } from "../constants/DropDownConstants";
 
@@ -34,7 +40,7 @@ export const listCountries = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -66,7 +72,7 @@ export const listCounties = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -98,7 +104,7 @@ export const listSubCounties = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -130,7 +136,7 @@ export const listClinics = () => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -147,6 +153,109 @@ export const listClinics = () => async (dispatch, getState) => {
     dispatch({ type: CLINICS_LIST_FAIL, payload: error.message });
   }
 };
+export const listKinsRelationships = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: KINS_LIST_REQUEST});
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyRelationships&isList=true`,
+      config
+    );
+
+    dispatch({ type: KINS_LIST_SUCCESS, payload: data });
+
+    console.log("data: ", data);
+  } catch (error) {
+    dispatch({ type: KINS_LIST_FAIL, payload: error.message });
+  }
+};
+
+
+export const listInsuranceOptions = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: INSURANCE_LIST_REQUEST});
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyCustomers&isList=true`,
+      config
+    );
+
+    dispatch({ type: INSURANCE_LIST_SUCCESS, payload: data });
+
+    console.log("data: ", data);
+  } catch (error) {
+    dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
+  }
+};
+
+export const listDoctors = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: INSURANCE_LIST_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyEmployees&isList=true`,
+      config
+    );
+
+    // Filter data to only include doctors
+    const doctors = data.filter(
+      (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
+    );
+
+    dispatch({ type: INSURANCE_LIST_SUCCESS, payload: doctors });
+
+    console.log("Filtered doctors data: ", doctors);
+  } catch (error) {
+    dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
+  }
+};
+
+
 export const branchesList = (patient) => async (dispatch, getState) => {
   try {
     dispatch({ type: PATIENT_REGISTER_REQUEST });
