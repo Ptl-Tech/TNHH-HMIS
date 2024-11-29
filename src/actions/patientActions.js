@@ -22,6 +22,9 @@ import {
   POST_TRIAGE_VISIT_REQUEST,
   POST_TRIAGE_VISIT_SUCCESS,
   POST_TRIAGE_VISIT_FAIL,
+  ACTIVE_lIST_REQUEST,
+  ACTIVE_LIST_SUCCESS,
+  ACTIVE_LIST_FAIL,
 } from "../constants/patientConstants";
 import { message } from "antd";
 import useAuth from "../hooks/useAuth";
@@ -188,6 +191,34 @@ export const listPatients = () => async (dispatch, getState) => {
     dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
+  }
+};
+
+
+export const activePatients = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: ACTIVE_lIST_REQUEST });
+
+    const {
+        otpVerify: { userInfo },
+    } = getState();
+ // Fetch branchCode from localStorage
+ const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+        headers: {
+            "Content-Type": "application/json",
+            staffNo: userInfo.userData.no, // Add staffNo as a custom header
+            sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+            branchCode: branchCode
+          },
+    };
+
+    const { data } = await axios.get(`${API}data/odatafilter?webservice=QyAppointmentHeader`, config);
+
+    dispatch({ type: ACTIVE_LIST_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({ type: ACTIVE_LIST_FAIL, payload: error.message });
   }
 };
 

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTriageVisit, listPatients } from "../actions/patientActions";
+import {
+  activePatients,
+  createTriageVisit,
+  listPatients,
+} from "../actions/patientActions";
 import {
   Table,
   Button,
@@ -16,6 +20,7 @@ import {
   Select,
   DatePicker,
   Avatar,
+  Tag,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
@@ -33,11 +38,11 @@ import { listInsuranceOptions } from "../actions/DropdownListActions";
 
 const { Search } = Input;
 
-const OutpatientList = () => {
+const ActivePatientList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, patients } = useSelector(
-    (state) => state.patientList
+    (state) => state.activePatients
   );
 
   const [searchParams, setSearchParams] = useState({
@@ -58,7 +63,7 @@ const OutpatientList = () => {
   const [appointmentId, setAppointmentId] = useState(null);
   const [age, setAge] = useState(null); // State to hold calculated age
   const [isRowVisible, setIsRowVisible] = useState(true);
-const [record, setRecord] = useState(null);
+
   const {
     loading: insuranceLoading,
     error: insuranceError,
@@ -72,7 +77,7 @@ const [record, setRecord] = useState(null);
   };
 
   useEffect(() => {
-    dispatch(listPatients());
+    dispatch(activePatients());
     dispatch(listInsuranceOptions());
   }, [dispatch]);
 
@@ -80,6 +85,8 @@ const [record, setRecord] = useState(null);
     if (patients.length) {
       handleFilterPatients();
     }
+
+    console.log("filteredPatients", filteredPatients);
   }, [patients, searchParams]); // Re-run filtering on data or search params change
 
   const handleSearchChange = (e, field) => {
@@ -97,10 +104,10 @@ const [record, setRecord] = useState(null);
         patient.Names.toLowerCase().includes(
           searchParams.firstName.toLowerCase()
         ) &&
-        patient.LastName.toLowerCase().includes(
-          searchParams.lastName.toLowerCase()
-        ) &&
-        patient.IDNumber.includes(searchParams.patientId) &&
+        // patient.LastName.toLowerCase().includes(
+        //   searchParams.lastName.toLowerCase()
+        // ) &&
+        // patient.IDNumber.includes(searchParams.patientId) &&
         patient.PatientNo.toString().includes(searchParams.patientNo)
       );
     });
@@ -108,12 +115,8 @@ const [record, setRecord] = useState(null);
   };
 
   const handleDispatch = (record) => {
-
-    const patient=record.PatientNo
-    dispatch(createTriageVisit(patient));
+    dispatch(createTriageVisit(record.PatientNo));
     setSelectedPatient(record);
-
-    console.log(patient);
   };
 
   const showModal = (record) => {
@@ -219,8 +222,24 @@ const [record, setRecord] = useState(null);
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+  const rowClassName = (record) => {
+    const turnaroundTime = record["Turn around Time"];
+    if (turnaroundTime > 60) {
+      return "danger-row"; // Red for critical
+    } else if (turnaroundTime > 45) {
+      return "warning-row"; // Yellow for warning
+    }
+    return "";
+  };
 
   const columns = [
+    {
+      title: "AppointmentNo",
+      dataIndex: "AppointmentNo",
+      key: "AppointmentNo",
+      sorter: (a, b) => a.AppointmentNo - b.AppointmentNo,
+    },
+
     {
       title: "Patient No",
       dataIndex: "PatientNo",
@@ -228,26 +247,50 @@ const [record, setRecord] = useState(null);
       sorter: (a, b) => a.PatientNo - b.PatientNo,
     },
     {
-      title: "First Name",
+      title: "Patient Name",
       dataIndex: "Names",
       key: "Names",
       sorter: (a, b) => a.Names.localeCompare(b.Names),
     },
-    {
-      title: "Last Name",
-      dataIndex: "LastName",
-      key: "LastName",
-      sorter: (a, b) => a.LastName.localeCompare(b.LastName),
-    },
+    //  { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
     {
-      title: "Date Registered",
-      dataIndex: "DateRegistered",
-      key: "DateRegistered",
+      title: "SpecialClinics",
+      dataIndex: "SpecialClinics",
+      key: "SpecialClinics",
+    },
+    {
+      title: "AppointmentDate",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
       render: (text) => new Date(text).toLocaleDateString(),
       sorter: (a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered),
+    },
+    { title: "Doctor", dataIndex: "Doctor", key: "Doctor" },
+    {
+      title: "AppointmentType",
+      dataIndex: "AppointmentType",
+      key: "AppointmentType",
+    },
+    { title: "DispatchTo", dataIndex: "DispatchTo", key: "DispatchTo" },
+    { title: "Time", dataIndex: "Time", key: "Time" },
+    { title: "Turn around Time", dataIndex: "Time", key: "Time" },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (status) => {
+        const statusColors = {
+          Rescheduled: "orange",
+          Cancelled: "red",
+          Dispatched: "blue",
+          New: "green",
+          Completed: "success",
+        };
+        return <Tag color={statusColors[status] || "default"}>{status}</Tag>;
+      },
     },
     {
       title: "Actions",
@@ -267,7 +310,7 @@ const [record, setRecord] = useState(null);
     <div className="">
       <h4 className="text-center p-3 text-dark">
         <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
-        Patient List
+        Active Patient List
       </h4>
       <div className="d-flex justify-content-between">
         <Button
@@ -340,6 +383,7 @@ const [record, setRecord] = useState(null);
             loading={loading}
             pagination={false}
             rowKey={(record) => record.id || Math.random()}
+            rowClassName={rowClassName}
             locale={{
               emptyText: "No data available",
             }}
@@ -376,7 +420,7 @@ const [record, setRecord] = useState(null);
       >
         {selectedPatient && (
           <div className="">
-            <Row gutter={[20, 20]} style={{ maxHeight: "calc(100vh - 200px)" }} className="equal-height-cards">
+            <Row gutter={[20, 20]} className="equal-height-cards">
               <Col xs={24} md={7}>
                 <Card bordered={true} className="card-header">
                   <div className="mb-3">
@@ -495,7 +539,7 @@ const [record, setRecord] = useState(null);
                   </div>
                 </Card>
               </Col>
-              <Col xs={24} md={6}  >
+              <Col xs={24} md={6}>
                 <Card style={{ width: "100%" }} className="card-header">
                   <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                     Patient Info
@@ -689,7 +733,7 @@ const [record, setRecord] = useState(null);
               </Col>
             </Row>
             <div>
-              <Row gutter={[16, 16]} style={{ width: "100%", maxHeight: "400px" }} className="mt-4" align="middle">
+              <Row gutter={[16, 16]} className="mt-4" align="middle">
                 <Col xs={24} md={18}>
                   <Card
                     className="card-header"
@@ -730,28 +774,28 @@ const [record, setRecord] = useState(null);
                         </div>
                       </div>
                     }
-
                     style={{ width: "100%", maxHeight: "400px", overflowY: "auto", scrollbarWidth: "thin" }}
+
                   >
                     {isRowVisible && (
                       <div className="d-flex flex-column align-items-center justify-content-center">
-                        {/* Display Avatar with Initials */}
-                        <Table
-                          columns={columns}
-                          dataSource={patientsToDisplay}
-                          loading={loading}
-                          pagination={false}
-                          rowKey={(record) => record.id || Math.random()}
-                          locale={{
-                            emptyText: "No data available",
-                          }}
-                        />
-                      </div>
+                      {/* Display Avatar with Initials */}
+                      <Table
+                        columns={columns}
+                        dataSource={patientsToDisplay}
+                        loading={loading}
+                        pagination={false}
+                        rowKey={(record) => record.id || Math.random()}
+                        locale={{
+                          emptyText: "No data available",
+                        }}
+                      />
+                    </div>
                     )}
                   </Card>
                 </Col>
                 <Col xs={24} md={6}>
-                  <Card style={{ width: "100%", }} className="card-header mt-4">
+                  <Card style={{ width: "100%" }} className="card-header mt-4">
                     <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                       Patient Billing Details
                     </Typography.Title>
@@ -835,4 +879,4 @@ const [record, setRecord] = useState(null);
   );
 };
 
-export default OutpatientList;
+export default ActivePatientList;

@@ -19,7 +19,10 @@ import {
   KINS_LIST_FAIL,
   INSURANCE_LIST_REQUEST,
   INSURANCE_LIST_SUCCESS,
-  INSURANCE_LIST_FAIL
+  INSURANCE_LIST_FAIL,
+  DOCTOR_LIST_REQUEST,
+  DOCTOR_LIST_SUCCESS,
+  DOCTOR_LIST_FAIL
 
 } from "../constants/DropDownConstants";
 
@@ -220,7 +223,7 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
 
 export const listDoctors = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: INSURANCE_LIST_REQUEST });
+    dispatch({ type: DOCTOR_LIST_REQUEST });
 
     const {
       otpVerify: { userInfo },
@@ -247,11 +250,11 @@ export const listDoctors = () => async (dispatch, getState) => {
       (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
     );
 
-    dispatch({ type: INSURANCE_LIST_SUCCESS, payload: doctors });
+    dispatch({ type: DOCTOR_LIST_SUCCESS, payload: doctors });
 
     console.log("Filtered doctors data: ", doctors);
   } catch (error) {
-    dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
+    dispatch({ type: DOCTOR_LIST_FAIL, payload: error.message });
   }
 };
 

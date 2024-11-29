@@ -130,6 +130,13 @@
   font-weight: bold; /* Optional */
 }
 
+.equal-height-cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+
 main {
   overflow-y: scroll !important;
   height: 100%;

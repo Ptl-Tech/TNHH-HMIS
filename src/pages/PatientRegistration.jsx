@@ -423,7 +423,7 @@ const PatientRegistration = () => {
     }
   }, [doctorsPayload, newPatient.clinic]);
   return (
-    <div className="container">
+    <div>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={7}>
           {/* <Typography.Title
@@ -434,7 +434,7 @@ const PatientRegistration = () => {
         </Typography.Title> */}
           <Card bordered={false} className="card-header">
             <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#003F6D" }}>
+              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                 General Information
               </Typography.Title>
               <Form.Item
@@ -508,7 +508,7 @@ const PatientRegistration = () => {
         </Col>
         <Col xs={24} md={11}>
           <Card bordered={false} className="card-header">
-            <Typography.Title level={5} style={{ color: "#003F6D" }}>
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
               Contact Information
             </Typography.Title>
             <Form layout="vertical" onFinish={handleSubmit}>
@@ -913,7 +913,7 @@ const PatientRegistration = () => {
                     value={newPatient.doctor}
                     onChange={handleInputChange}
                   />
-                  {/* <Select
+                  <Select
                     placeholder="Select Clinic"
                     className="w-100"
                     value={newPatient.doctor}
@@ -921,13 +921,13 @@ const PatientRegistration = () => {
                     onFocus={handleDisplayDropDown}
                   >
                     <Select.Option value="">--Select Clinic--</Select.Option>
-                    {clinicsPayload &&
-                      clinicsPayload.map((clinic) => (
-                        <Select.Option key={clinic.No} value={clinic.No}>
-                          {clinic.Description}
+                    {doctorsPayload &&
+                      doctorsPayload.map((doctor) => (
+                        <Select.Option key={doctor.No} value={doctor.No}>
+                          {doctor.No}
                         </Select.Option>
                       ))}
-                  </Select> */}
+                  </Select>
                 </Form.Item>
               </div>
             </div>

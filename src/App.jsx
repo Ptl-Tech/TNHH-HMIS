@@ -38,6 +38,7 @@ import CreateVisitForm from "./pages/CreateVisitForm";
 import TriageLayout from "./Layouts/TriageLayout";
 import WaitingList from "./pages/WaitingList";
 import { roles } from "./constants/role";
+import ActivePatientList from "./pages/ActivePatientList";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -94,6 +95,8 @@ function App() {
           />
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
+          <Route path="/reception/Active-Visits" element={<ActivePatientList />} />
+
           <Route
             path="/reception/create-visit/:patientNo"
             element={<CreateVisitForm />}

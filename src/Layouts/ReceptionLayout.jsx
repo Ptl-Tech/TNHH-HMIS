@@ -84,7 +84,7 @@ const ReceptionLayout = () => {
       type: "group",
       children: [
         {
-          key: "Billing-list",
+          key: "Active-Visits",
           label: "Active Patient List",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
         }
