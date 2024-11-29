@@ -135,6 +135,7 @@ export const listPatients = () => async (dispatch, getState) => {
 };
 
 
+
 export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: PATIENT_LIST_REQUEST });

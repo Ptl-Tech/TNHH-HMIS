@@ -6,6 +6,7 @@ import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingL
 import { loadUserInfo } from "../actions/loadUserInfo";
 import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
+import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -27,6 +28,7 @@ export const rootReducer = combineReducers({
     loadUserInfo:loadUserInfo,
     getTriageWaitingList:getTriageWaitingListReducer,
     getTriageList:getTriageListReducer,
-    triageWaitingList:triageWaitingListReducer
+    triageWaitingList:triageWaitingListReducer,
+    getPatientDetails:getPatientDetailsReducer,
 
 });
