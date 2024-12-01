@@ -1,4 +1,4 @@
-import { Card, Tabs, Button, Modal } from 'antd'
+import { Card, Tabs, Button, Modal, message } from 'antd'
 import { useEffect, useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons';
 import { useLocation } from 'react-router-dom';
@@ -13,25 +13,54 @@ import VitalsTable from './tables/triage-tables/VitalsTable';
 import AllergyAndMedicationTable from './tables/triage-tables/AllergyAndMedicationTable';
 import InjectionTable from './tables/triage-tables/Injection';
 import DressingTable from './tables/triage-tables/DressingTable';
+import { getTriageListDetails } from '../../actions/triage-actions/getTriageListDetailsSlice';
+import { postTriageListVitalsSlice } from '../../actions/triage-actions/postTriageListVitalsSlice';
+import { getVitalsLinesSlice } from '../../actions/triage-actions/getVitalsLinesSlice';
+import useAuth from '../../hooks/useAuth';
+import { getAllergiesAndMedicationsSlice } from '../../actions/triage-actions/getAllergiesAndMedicationsSlice';
+import { postAllergiesMedicationSlice } from '../../actions/triage-actions/postAllergiesMedicationSlice';
 
 
 const EvaluatePatientInTriage = () => {
   const [onModalOpen, setOnModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null);
   const dispatch = useDispatch();
-  const [ formData, setFormData ] = useState({});
+
+  const { patientDetails } = useSelector((state) => state.getPatientDetails);
+  const { triageListDetail }  = useSelector((state) => state.getTriageListDetails);
+  const {loading} = useSelector((state) => state.postTriageListVitals);
+  const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
+  const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
+
+  const userDetails = useAuth();
+
+  const staffNo = userDetails?.userData?.firstName
+  const observationNo = triageListDetail?.ObservationNo;
+
+ console.log('allergies and medication', allergiesMedication)
+
+  const [ formData, setFormData ] = useState({ });
 
   //getting the patientNo from the url
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const patientNo = searchParams.get('Patient_id');
 
-  const { patientDetails } = useSelector((state) => state.getPatientDetails);
 
   //dispatch an action to get the patient's details
   useEffect(() => {
-      patientNo && dispatch(getPatientDetails(patientNo));
-  }, [dispatch, patientNo])
+    if (patientNo) {
+      dispatch(getPatientDetails(patientNo));
+      dispatch(getTriageListDetails(patientNo));
+      dispatch(getVitalsLinesSlice(patientNo));
+    }
+  }, [dispatch, patientNo]);
+
+  useEffect(() => {
+    if (observationNo) {
+      dispatch(getAllergiesAndMedicationsSlice(observationNo));
+    }
+  }, [dispatch, observationNo]);
 
 
   const [activeTab, setActiveTab] = useState('vitals');
@@ -53,11 +82,13 @@ const EvaluatePatientInTriage = () => {
     switch (tabKey) {
       case 'vitals':
         return (
-          <FormVitals handleOnChange={handleOnChange} setFormData={setFormData}/>
+          <FormVitals handleOnChange={handleOnChange} setFormData={setFormData} 
+          triageListDetail={triageListDetail}
+          />
         );
       case 'allergy':
         return (
-          <AllergyAndMedication handleOnChange={handleOnChange} setFormData={setFormData} handleSelectChange={handleSelectChange} activeTab={activeTab} formData={formData} />
+          <AllergyAndMedication handleOnChange={handleOnChange} setFormData={setFormData} handleSelectChange={handleSelectChange} activeTab={activeTab} formData={formData} triageListDetail={triageListDetail} staffNo={staffNo}/>
         );
         case 'injections':
         return (
@@ -116,10 +147,98 @@ const handleSelectChange = (value, name) => {
   }));
 };
 
+const cleanValue = (value) => {
+  if (typeof value === "string") {
+    // Remove any non-numeric characters if applicable
+    return value.replace(/[^\d.-]/g, "");
+  }
+  return value;
+};
+
   const handleSaveModalData = () => {
-    console.log('Saving data for:', activeTab);
-    console.log('Data:', formData[activeTab]);
-    setOnModalOpen(false); // Close modal
+    // switch the active tab and call appropriate save action
+    switch(activeTab) {
+      case 'vitals':{
+        // Save vitals data
+       
+        const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02,respirationRate } = formData[activeTab];
+        const vitalsData = {
+          pulseRate,
+          Pain: parseInt(cleanValue(pain)),
+          Height: parseFloat(cleanValue(height)),
+          Weight: parseFloat(cleanValue(weight)),
+          Temperature: parseFloat(cleanValue(temperature)),
+          bloodPreasure,
+          sP02,
+          respirationRate,
+          patientNo,
+          observationNo,
+          type: 0,
+          myAction: "create"
+
+        };
+
+        dispatch(postTriageListVitalsSlice(vitalsData)).then((data)=>{
+          if(data?.status === "success"){
+            message.success(data?.status);
+            setFormData({});
+            setOnModalOpen(false);
+            dispatch(getVitalsLinesSlice(patientNo));
+          }else{
+            message.error('Error saving vitals data');
+            setFormData({});
+            setOnModalOpen(false);
+          }
+        })
+        
+        break;
+      }
+      case 'allergy':{
+        // Save allergy and medication data
+        const { complains, reasonForVisit, foodAllergy, drugAllergy} = formData[activeTab];
+        const allergyAndMedicationData = {
+          
+          complains,
+          reasonForVisit: parseInt(cleanValue(reasonForVisit)),
+          foodAllergy,
+          drugAllergy,
+          patientNo,
+          staffNo: staffNo,
+          observationNo,
+          assessedBy: staffNo,
+          myAction: "create"
+
+        };
+
+        dispatch(postAllergiesMedicationSlice(allergyAndMedicationData)).then((data)=>{
+          console.log('dispatching the data', data);
+          if(data?.status === "success"){
+            message.success(data?.status);
+            setFormData({});
+            setOnModalOpen(false);
+            dispatch(getAllergiesAndMedicationsSlice(observationNo));
+          }else{
+            message.error('Error saving vitals data');
+            setFormData({});
+            setOnModalOpen(false);
+          }
+        })
+        break;
+      }
+      case 'injections':{
+        // Save injections data
+        console.log(formData[activeTab]);
+        break;
+      }
+      case 'dressing':{
+        // Save dressing data
+        console.log(formData[activeTab]);
+        break;
+      }
+      default:
+        break;
+    }
+    // setOnModalOpen(false); // Close modal
   };
 
   return (
@@ -133,14 +252,14 @@ const handleSelectChange = (value, name) => {
               <PlusOutlined />
               Add Vitals
               </Button>
-              <VitalsTable handleOpenModal={handleOpenModal}/>
+              <VitalsTable handleOpenModal={handleOpenModal} vitalsLines={vitalsLines} loadingVitalsLines={loadingVitalsLines}/>
           </Tabs.TabPane>
           <Tabs.TabPane tab="Allergy and Medication" key="allergy">
             <Button type="primary" onClick={handleOpenModal}>
               <PlusOutlined />
               Add allergy and medication
             </Button>
-            <AllergyAndMedicationTable handleOpenModal={handleOpenModal}/>
+            <AllergyAndMedicationTable handleOpenModal={handleOpenModal} allergiesMedication={allergiesMedication} allergyMedicationLoading={allergyMedicationLoading}/>
           </Tabs.TabPane>
           <Tabs.TabPane tab="Injections" key="injections">
             <Button type="primary" onClick={handleOpenModal}>
@@ -166,6 +285,7 @@ const handleSelectChange = (value, name) => {
       onCancel={() => setOnModalOpen(false)}
       onOk={handleSaveModalData}
       width={800}
+      confirmLoading={loading}
     >
       {modalContent}
     </Modal>

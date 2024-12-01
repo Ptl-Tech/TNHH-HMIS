@@ -1,9 +1,19 @@
 import { Col, Form, Input, Row } from 'antd'
 import PropTypes from 'prop-types'
 
-const FormVitals = ({handleOnChange, setFormData}) => {
+const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
+  const patientNumber = triageListDetail?.PatientNo
+  const observationNumber = triageListDetail?.ObservationNo
   return (
-    <Form layout="vertical" validateTrigger="onChange">
+    <Form layout="vertical" validateTrigger="onChange"
+       initialValues={{
+        vitals: { 
+          patientNumber: patientNumber,
+          observationNumber: observationNumber
+        }
+
+      }}
+    >
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item 
@@ -15,6 +25,7 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                     name='observationNumber'
                     onChange={handleOnChange}
                     value={setFormData.observationNumber}
+                    disabled
                   />
                 </Form.Item>
               </Col>
@@ -28,6 +39,7 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                     name='patientNumber'
                     onChange={handleOnChange}
                     value={setFormData.patientNumber}
+                    disabled
                   />
                 </Form.Item>
               </Col>
@@ -46,11 +58,11 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Blood Pressure" name={['vitals', 'bloodPressure']}
+                <Form.Item label="Blood Pressure" name={['vitals', 'bloodPreasure']}
                   rules={[{ required: true, message: 'Please input blood pressure!' }]}
                   >
                   <Input type='text' 
-                      name='bloodPressure'
+                      name='bloodPreasure'
                       onChange={handleOnChange}
                       value={setFormData.bloodPressure}
                   />
@@ -62,7 +74,7 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                 <Form.Item label="Temperature" name={['vitals', 'temperature']}
                   rules={[{ required: true, message: 'Please input temperature!' }]}
                 >
-                  <Input type='text' 
+                  <Input type='number' 
                     name='temperature'
                     onChange={handleOnChange}
                     value={setFormData.temperature}
@@ -70,11 +82,11 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="SPO2" name={['vitals', 'spo2']}
+                <Form.Item label="SPO2" name={['vitals', 'sP02']}
                   rules={[{ required: true, message: 'Please input SOP2!' }]}
                 >
                   <Input type='text' 
-                    name='SPO2'
+                    name='sP02'
                     onChange={handleOnChange}
                     value={setFormData.SPO2}
                   />
@@ -87,7 +99,7 @@ const FormVitals = ({handleOnChange, setFormData}) => {
                 
                 rules={[{ required: true, message: 'Please input height!' }]}
                 >
-                  <Input type='text' 
+                  <Input type='number' 
                     name='height'
                     onChange={handleOnChange}
                     value={setFormData.height}
@@ -121,7 +133,7 @@ const FormVitals = ({handleOnChange, setFormData}) => {
               </Col>
               <Col span={12}>
                 <Form.Item label="Pain" name={['vitals', 'pain']}>
-                  <Input type='text' 
+                  <Input type='number' 
                     name='pain'
                     onChange={handleOnChange}
                     value={setFormData.pain}
@@ -142,4 +154,5 @@ FormVitals.propTypes = {
   setModalContent: PropTypes.func.isRequired,
   handleOnChange: PropTypes.func.isRequired,
   activeTab: PropTypes.string.isRequired,
+  triageListDetail: PropTypes.object.isRequired,
 };

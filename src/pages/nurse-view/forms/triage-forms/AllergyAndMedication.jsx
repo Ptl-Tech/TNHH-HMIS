@@ -1,7 +1,10 @@
 import { Col, Form, Input, Row, Select } from 'antd'
 import PropTypes from 'prop-types'
 
-const AllergyAndMedication = ({ setFormData, handleOnChange, handleSelectChange, formData, activeTab }) => {
+const AllergyAndMedication = ({ setFormData, handleOnChange, handleSelectChange, formData, activeTab, triageListDetail, staffNo }) => {
+
+  const patientNumber = triageListDetail?.PatientNo
+  const observationNumber = triageListDetail?.ObservationNo
 
     const selectReasonForVisit = [
         {
@@ -31,18 +34,30 @@ const AllergyAndMedication = ({ setFormData, handleOnChange, handleSelectChange,
       ]
 
   return (
-    <Form layout="vertical">
+    <Form layout="vertical"
+    validateTrigger="onChange"
+    initialValues={{
+      allergy: { 
+        patientNumber: patientNumber,
+        observationNumber: observationNumber,
+        assessedBy: staffNo
+      }
+
+    }}
+
+    >
         <Row gutter={16}>
         
         <Col span={12}>
             <Form.Item label="Observation No" 
-            name={['allergy', 'observationNo']}
+            name={['allergy', 'observationNumber']}
             rules={[{ required: true, message: 'Please input observation no!' }]}
             >
             <Input type='text' 
                 name='observationNumber'
                 onChange={handleOnChange}
                 value={setFormData.observationNumber}
+                disabled
             />
             </Form.Item>
         </Col>
@@ -55,6 +70,7 @@ const AllergyAndMedication = ({ setFormData, handleOnChange, handleSelectChange,
             name='assessedBy'
             onChange={handleOnChange}
             value={setFormData.assessedBy}
+            disabled
             />
             </Form.Item>
         </Col>
@@ -103,7 +119,7 @@ const AllergyAndMedication = ({ setFormData, handleOnChange, handleSelectChange,
             </Col>
             <Col span={12}>
             <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}>
-                <Input type='number' 
+                <Input type='text' 
                 onChange={handleOnChange}
                 value={setFormData.drugAllergy}
                 name='drugAllergy'
@@ -120,9 +136,11 @@ export default AllergyAndMedication
 
 //prop types validation
 AllergyAndMedication.propTypes = {
-    setFormData: PropTypes.array.isRequired,
+    setFormData: PropTypes.object.isRequired,
     handleOnChange: PropTypes.func.isRequired,
     handleSelectChange: PropTypes.func.isRequired,
-    formData: PropTypes.array.isRequired,
-    activeTab: PropTypes.string.isRequired
+    formData: PropTypes.object.isRequired,
+    activeTab: PropTypes.string.isRequired,
+    triageListDetail: PropTypes.object.isRequired,
+    staffNo: PropTypes.string.isRequired,
 }

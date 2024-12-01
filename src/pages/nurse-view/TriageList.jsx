@@ -38,12 +38,12 @@ const TriageList = () => {
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = combinedTriageWaitingListAndTriageList.map((item, index) => ({
     key: index + 1,
-    name: item.Names || `${item.Surname} ${item.MiddleName} ${item.LastName}`,
+    name: item?.Names || `${item?.Surname} ${item?.MiddleName} ${item?.LastName}`,
     regDate: item.DateRegistered,
-    age: item.AgeinYears,
-    sex: item.Gender,
-    number: item.PatientNo,
-    idNumber: item.IDNumber,
+    age: item?.AgeinYears,
+    sex: item?.Gender,
+    number: item?.PatientNo,
+    idNumber: item?.IDNumber,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
 

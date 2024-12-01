@@ -7,6 +7,12 @@ import { loadUserInfo } from "../actions/loadUserInfo";
 import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
+import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
+import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
+import { getVitalsLinesSlice } from "../actions/triage-actions/getVitalsLinesSlice";
+import { getVitalsLinesReducer } from "./triage-reducers/getVitalsLinesReducer";
+import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesMedicationReducer";
+import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -30,5 +36,10 @@ export const rootReducer = combineReducers({
     getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer,
     getPatientDetails:getPatientDetailsReducer,
+    getTriageListDetails:getTriageListDetailsReducer,
+    postTriageListVitals:postTriageListVitalsReducer,
+    getVitalsLines:getVitalsLinesReducer,
+    postAllergiesMedication:postAllergiesMedicationReducer,
+    getAllergiesAndMedications:getAllergiesAndMedicationReducer
 
 });

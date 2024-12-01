@@ -11,6 +11,7 @@ export const getTriageList = () => async (dispatch, getState) => {
    
     const config = configHelpers(getState);
     try {
+        dispatch({ type: GET_TRIAGE_LIST_REQUEST });
         const response = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true`, config);
         dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: response.data });
     } catch (error) {
