@@ -39,9 +39,7 @@ const ReceptionLayout = () => {
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState(["/"]);
-  const rootSubmenuKeys = [
-   "/reception"
-  ];
+  const rootSubmenuKeys = ["/reception"];
 
   const items = [
     {
@@ -54,7 +52,11 @@ const ReceptionLayout = () => {
     },
     {
       key: "RegistrationGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+      label: (
+        <span style={{ color: "#ac8342", fontWeight: "bold" }}>
+          Registration
+        </span>
+      ),
       type: "group",
       children: [
         {
@@ -75,38 +77,61 @@ const ReceptionLayout = () => {
       ],
     },
     {
-        type: "divider",
-      },
+      type: "divider",
+    },
 
     {
       key: "BillingGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Billing</span>,
+      label: (
+        <span style={{ color: "#ac8342", fontWeight: "bold" }}>Billing</span>
+      ),
       type: "group",
       children: [
         {
           key: "Active-Visits",
           label: "Active Patient List",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        }
-      ]
+        },
+      ],
     },
     {
-        type: "divider",
+      type: "divider",
     },
     {
-        key: "AppointmentGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
-        type: "group",
-        children: [
-          {
-            key: "Appointments",
-            label: "Appointments",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          }
-        ]
-      },
+      key: "VisitorsGroup",
+      label: (
+        <span style={{ color: "#ac8342", fontWeight: "bold" }}>Visitors</span>
+      ),
+      type: "group",
+      children: [
+        {
+          key: "visitors-list",
+          label: "Visitors",
+          icon: <UserOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "AppointmentGroup",
+      label: (
+        <span style={{ color: "#ac8342", fontWeight: "bold" }}>
+          Appointments
+        </span>
+      ),
+      type: "group",
+      children: [
+        {
+          key: "Appointments",
+          label: "Appointments",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
   ];
-  
+
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
     setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
@@ -180,50 +205,51 @@ const ReceptionLayout = () => {
             items={items} // Pass the items array here
           />
         </Sider>
-       <Layout className="site-layout">
-       <div className="site-layout">
-          <Breadcrumb
-            style={{
-              marginLeft: collapsed ? 80 : 230,
-              transition: "all 0.2s",
-              padding: 12,
-              color: "#67336d",
-            }}
-          >
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            {pathSegments.map((segment, index) => (
-              <Breadcrumb.Item key={index}>
-                {segment.charAt(0).toUpperCase() + segment.slice(1)}
-              </Breadcrumb.Item>
-            ))}{""}
-          </Breadcrumb>
-          <Content
-            className="contentStyle"
-            style={{
-              marginLeft: collapsed ? 80 : 230,
+        <Layout className="site-layout">
+          <div className="site-layout">
+            <Breadcrumb
+              style={{
+                marginLeft: collapsed ? 80 : 230,
+                transition: "all 0.2s",
+                padding: 12,
+                color: "#67336d",
+              }}
+            >
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              {pathSegments.map((segment, index) => (
+                <Breadcrumb.Item key={index}>
+                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                </Breadcrumb.Item>
+              ))}
+              {""}
+            </Breadcrumb>
+            <Content
+              className="contentStyle"
+              style={{
+                marginLeft: collapsed ? 80 : 230,
 
-              transition: "all 0.2s",
-              padding: 12,
-              minHeight: 680,
-              background: colorBgContainer,
-              borderRadius: 8,
-            }}
-          >
-            <Outlet />
-          </Content>
-        </div>
+                transition: "all 0.2s",
+                padding: 12,
+                minHeight: 680,
+                background: colorBgContainer,
+                borderRadius: 8,
+              }}
+            >
+              <Outlet />
+            </Content>
+          </div>
         </Layout>
       </Layout>
 
       <Footer
-    style={{
-      textAlign: "center",
-      color: "#67336d",
-    }}
-  >
-    HMIS @ {new Date().getFullYear()} Created by potestastechnologies
-  </Footer>
+        style={{
+          textAlign: "center",
+          color: "#67336d",
+        }}
+      >
+        HMIS @ {new Date().getFullYear()} Created by potestastechnologies
+      </Footer>
     </Layout>
   );
 };

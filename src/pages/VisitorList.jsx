@@ -1,61 +1,59 @@
-import React from "react";
-import { Table, Button, Modal, Form, Select, TimePicker, Input, Radio } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Select,
+  TimePicker,
+  Input,
+  Tag,
+  Row,
+  Col,
+  Card,
+  Typography,
+} from "antd";
 import { TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { getVisitorsList } from "../actions/visitorsActions";
 
 const VisitorList = () => {
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [editingVisitor, setEditingVisitor] = React.useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingVisitor, setEditingVisitor] = useState(null);
   const [statusForm] = Form.useForm();
-  const [searchType, setSearchType] = React.useState("visitorNumber");
-  const [searchValue, setSearchValue] = React.useState("");
-  const [visitors, setVisitors] = React.useState([
-    {
-      key: 1,
-      visitorNumber: "V001",
-      visitorName: "John Doe",
-      phoneNumber: "123-456-7890",
-      status: "arrived",
-      timeIn: "08:00",
-      timeOut: "10:00",
-    },
-    {
-      key: 2,
-      visitorNumber: "V002",
-      visitorName: "Jane Smith",
-      phoneNumber: "987-654-3210",
-      status: "pending",
-      timeIn: "09:30",
-      timeOut: null,
-    },
-    {
-      key: 3,
-      visitorNumber: "V003",
-      visitorName: "Alice Johnson",
-      phoneNumber: "555-555-5555",
-      status: "left",
-      timeIn: "10:00",
-      timeOut: "12:00",
-    },
-    {
-      key: 4,
-      visitorNumber: "V004",
-      visitorName: "Bob Brown",
-      phoneNumber: "444-444-4444",
-      status: "arrived",
-      timeIn: "11:00",
-      timeOut: null,
-    },
-  ]);
+  const [searchType, setSearchType] = useState("VisitorNumber");
+  const [searchValue, setSearchValue] = useState("");
+  const [showTable, setShowTable] = useState(false); // Control visibility of the table
+  const { loading, error, visitors } = useSelector(
+    (state) => state.visitorsList
+  );
+  const [filteredVisitors, setFilteredVisitors] = useState([]);
 
-  const [filteredVisitors, setFilteredVisitors] = React.useState(visitors);
+  // Assuming logged-in user's info is stored in the Redux store or context
+  const { userInfo } = useSelector((state) => state.otpVerify); // Replace with your actual user state path
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getVisitorsList());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setFilteredVisitors(visitors);
+  }, [visitors]);
 
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
-      setVisitors((prevVisitors) =>
+      setFilteredVisitors((prevVisitors) =>
         prevVisitors.map((visitor) =>
           visitor.key === editingVisitor.key
-            ? { ...visitor, ...values, timeIn: values.timeIn?.format("HH:mm"), timeOut: values.timeOut?.format("HH:mm") }
+            ? {
+                ...visitor,
+                ...values,
+                timeIn: values.timeIn?.format("HH:mm"),
+                timeOut: values.timeOut?.format("HH:mm"),
+              }
             : visitor
         )
       );
@@ -67,7 +65,7 @@ const VisitorList = () => {
   const handleEditStatus = (visitor) => {
     setEditingVisitor(visitor);
     statusForm.setFieldsValue({
-      status: visitor.status,
+      status: visitor.Status,
       timeIn: visitor.timeIn ? dayjs(visitor.timeIn, "HH:mm") : null,
       timeOut: visitor.timeOut ? dayjs(visitor.timeOut, "HH:mm") : null,
     });
@@ -76,84 +74,196 @@ const VisitorList = () => {
 
   const handleSearch = () => {
     const filtered = visitors.filter((visitor) =>
-      visitor[searchType].toLowerCase().includes(searchValue.toLowerCase())
+      visitor[searchType]?.toLowerCase().includes(searchValue.toLowerCase())
     );
     setFilteredVisitors(filtered);
+    setShowTable(true); // Show the table after searching
   };
 
   const columns = [
     {
+      title: "No",
+      dataIndex: "No",
+      key: "No",
+    },
+    {
       title: "Visitor Number",
-      dataIndex: "visitorNumber",
+      dataIndex: "VisitorNumber",
       key: "visitorNumber",
     },
     {
-      title: "Name",
-      dataIndex: "visitorName",
+      title: "Visitor Name",
+      dataIndex: "VisitorName",
       key: "visitorName",
     },
     {
+      title: "Purpose of Visit",
+      dataIndex: "PurposeofVisit",
+      key: "PurposeofVisit",
+    },
+    {
       title: "Phone Number",
-      dataIndex: "phoneNumber",
+      dataIndex: "PhoneNumber",
       key: "phoneNumber",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: "Date of Visit",
+      dataIndex: "CreatedDate",
+      key: "CreatedDate",
+      render: (CreatedDate) => dayjs(CreatedDate).format("DD/MM/YYYY"),
     },
     {
       title: "Time In",
-      dataIndex: "timeIn",
-      key: "timeIn",
+      dataIndex: "CreatedTime",
+      key: "CreatedTime",
+      render: (CreatedTime) => dayjs(CreatedTime).format("HH:mm"),
     },
     {
       title: "Time Out",
       dataIndex: "timeOut",
       key: "timeOut",
+      render: (timeOut) => dayjs(timeOut).format("HH:mm"),
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "status",
+      render: (status) => {
+        const statusColors = {
+          Arrived: "orange",
+          Entered: "red",
+          Received: "blue",
+          Cleared: "green",
+        };
+        return <Tag color={statusColors[status] || "default"}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Person to See",
+      dataIndex: "PersonToSee",
+      key: "personToSee",
+    },
+    {
+      title: "Visitor Category",
+      dataIndex: "VisitorCategory",
+      key: "visitorCategory",
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="primary" onClick={() => handleEditStatus(record)} ghost>
-          Update Status
-        </Button>
+        <>
+          {userInfo.userData?.departmentName === "Security" ? (
+            <Button
+              type="primary"
+              onClick={() => handleEditStatus(record)}
+              ghost
+            >
+              Update Status
+            </Button>
+          ) : userInfo.userData?.departmentName === "Reception" ? (
+            <Button
+              type="primary"
+              onClick={() => handleEditStatus(record)} // Opens modal for Reception with 'Convert to Patient' functionality
+              ghost
+            >
+              Convert to Patient
+            </Button>
+          ) : null}
+        </>
       ),
     },
   ];
 
+  const mappedVisitors = filteredVisitors.map((visitor, index) => ({
+    key: visitor.No,
+    No: visitor.No,
+    VisitorNumber: visitor.VisitorNumber,
+    VisitorName: visitor.VisitorName,
+    PurposeofVisit: visitor.PurposeofVisit,
+    PhoneNumber: visitor.PhoneNumber,
+    CreatedDate: visitor.CreatedDate,
+    Status: visitor.Status,
+    PersonToSee: visitor.PersonToSee,
+    VisitorCategory: visitor.VisitorCategory,
+    timeIn: visitor.CreatedTime,
+    timeOut: visitor.ClearedTime,
+  }));
+
   return (
     <div className="card">
       <div className="card-header">
-        <h5 className="card-title" style={{ color: "#ac8342", display: "flex", alignItems: "center" }}>
+        <h5
+          className="card-title"
+          style={{ color: "#ac8342", display: "flex", alignItems: "center" }}
+        >
           <TeamOutlined style={{ marginRight: 8, fontSize: "40px" }} />
           Visitor List
         </h5>
+      </div>
+      <Card className="card-header mb-4 mt-4 p-4">
+        <Typography.Text
+          style={{
+            color: "#003F6D",
+            fontWeight: "bold",
+            marginBottom: "16px",
+          }}
+        >
+          Find Visitor Details by:
+        </Typography.Text>
+        <Row gutter={16} className="mt-2">
+          <Col span={6}>
+            <Input
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              allowClear
+            />
+          </Col>
+          <Col span={6}>
+            <Select
+              value={searchType}
+              onChange={setSearchType}
+              style={{ width: "100%" }}
+            >
+              <Select.Option value="VisitorNumber">
+                Visitor Number
+              </Select.Option>
+              <Select.Option value="VisitorName">Visitor Name</Select.Option>
+              <Select.Option value="PhoneNumber">Phone Number</Select.Option>
+            </Select>
+          </Col>
+          <Col span={6}>
+            <Button
+              type="primary"
+              onClick={handleSearch}
+              style={{ width: "100%" }}
+            >
+              Search
+            </Button>
+          </Col>
+        </Row>
+      </Card>
 
-       
-      </div>
-      <div className="card-body">
-      <div className="my-4">
-          <Radio.Group
-            onChange={(e) => setSearchType(e.target.value)}
-            value={searchType}
-            style={{ marginRight: 16 }}
-          >
-            <Radio value="visitorNumber">ID Number</Radio>
-            <Radio value="visitorName">First Name</Radio>
-            <Radio value="phoneNumber">Last Name</Radio>
-          </Radio.Group>
-          <Input.Search
-            placeholder="Search..."
-            onChange={(e) => setSearchValue(e.target.value)}
-            onSearch={handleSearch}
-            style={{ width: 300 }}
-          />
-        </div>
-        
-        <Table columns={columns} dataSource={filteredVisitors} />
-      </div>
+      {/* Show the table only if there are filtered visitors or search was performed */}
+
+      <Table
+        columns={columns}
+        dataSource={
+          showTable && filteredVisitors.length > 0 ? mappedVisitors : []
+        } // Correct condition for showing data
+        loading={loading}
+        rowKey="key"
+        pagination={false}
+        bordered
+        size="medium"
+        style={{
+          width: "100%",
+          scrollbarColor: "#003F6D",
+          scrollbarWidth: "thin",
+        }}
+        scroll={{ x: "max-content", y: 400 }}
+      />
 
       <Modal
         title="Update Visitor Status"
@@ -168,9 +278,9 @@ const VisitorList = () => {
             rules={[{ required: true, message: "Please select status" }]}
           >
             <Select placeholder="Select Status">
-              <Select.Option value="arrived">Arrived</Select.Option>
-              <Select.Option value="pending">Pending</Select.Option>
-              <Select.Option value="left">Left</Select.Option>
+              <Select.Option value="Arrived">Arrived</Select.Option>
+              <Select.Option value="Pending">Pending</Select.Option>
+              <Select.Option value="Left">Left</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item
@@ -183,6 +293,7 @@ const VisitorList = () => {
           <Form.Item
             label="Time Out"
             name="timeOut"
+            rules={[{ required: true, message: "Please select time out" }]}
           >
             <TimePicker format="HH:mm" style={{ width: "100%" }} />
           </Form.Item>

@@ -1,9 +1,45 @@
-import React, { useState } from "react"; 
-import { Calendar, Card } from "antd"; 
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@ant-design/icons'; 
 import { FaUser } from "react-icons/fa6";
 import OutpatientList from "../pages/OutpatientList";
+import { getVisitorsList } from "../actions/visitorsActions";
+
 const ReceptionDashboard = () => {
+  const { loading, error, visitors } = useSelector(
+    (state) => state.visitorsList
+  );
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const [currentVisitorsCount, setCurrentVisitorsCount] = useState(0);
+
+  useEffect(() => {
+    dispatch(getVisitorsList());
+  }, [dispatch]);
+
+  // Calculate today's date
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+  // Filter visitors based on today's date
+  useEffect(() => {
+    if (visitors && visitors.length > 0) {
+      const currentVisitors = visitors.filter(visitor => {
+        const visitorDate = new Date(visitor.CreatedDate).toISOString().split('T')[0];
+        return visitorDate === today;
+      });
+
+      setCurrentVisitorsCount(currentVisitors.length);
+    }
+  }, [visitors, today]);
+
+  // Navigate to the visitor list page
+  const handleCardClick = () => {
+    navigate('/reception/visitors-list'); // Use navigate to go to the visitor list
+  };
+
   return (
     <div className="">
       <div className="card-title">
@@ -22,7 +58,7 @@ const ReceptionDashboard = () => {
               <div className="card-body">
                 <div className="card-title p-2">
                   <UsergroupAddOutlined style={{ marginRight: 8 }} />
-                  Today Patients List
+                  Active Patients List
                 </div>
                 <p className="text-white">15</p>
               </div>
@@ -47,13 +83,14 @@ const ReceptionDashboard = () => {
             <div
               className="card"
               style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              onClick={handleCardClick} // Add onClick handler here
             >
               <div className="card-body">
                 <div className="card-title p-2">
                   <FaUser style={{ marginRight: 8 }} />
-                  Billing List
+                  Current Visitors List
                 </div>
-                <p className="text-white">10</p>
+                <p className="text-white">{currentVisitorsCount}</p>
               </div>
             </div>
           </div>
@@ -71,7 +108,6 @@ const ReceptionDashboard = () => {
               </div>
             </div>
           </div>
-
         </div>
 
         <div className="mt-3">

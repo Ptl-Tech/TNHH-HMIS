@@ -1,8 +1,9 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
 import { activePatientsReducer, patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, postTriageVisitReducer } from "./patientReducer";
-import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer } from "./DropdownReducer";
+import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
+import { visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -22,10 +23,13 @@ export const rootReducer = combineReducers({
     getPatientByNo:patientByNoReducer,
     getInsurance:getInsuranceReducer,
     getDoctorsList:getdoctorListReducer,
+    getEmployees:getemployeesListReducer,
     postTriageVisit:postTriageVisitReducer,
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
-    triageWaitingList:triageWaitingListReducer
+    triageWaitingList:triageWaitingListReducer,
+    registerVisitor:visitorCreateReducer,
+    visitorsList:visitorListReducer
 
 });

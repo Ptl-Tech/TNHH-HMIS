@@ -96,6 +96,8 @@ function App() {
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
           <Route path="/reception/Active-Visits" element={<ActivePatientList />} />
+          <Route path="/reception/visitors-list" element={<VisitorList />} />
+
 
           <Route
             path="/reception/create-visit/:patientNo"

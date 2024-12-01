@@ -82,7 +82,7 @@ export const createPatient = (patient) => async (dispatch, getState) => {
   }
 };
 
-export const createTriageVisit = (patientId) => async (dispatch, getState) => {
+export const createTriageVisit = (visitData) => async (dispatch, getState) => {
   try {
     dispatch({ type: TRIAGE_VISIT_REQUEST });
 
@@ -103,7 +103,7 @@ export const createTriageVisit = (patientId) => async (dispatch, getState) => {
 
     const { data } = await axios.post(
       `${API}Reception/CreateVisit`,
-      { patientNo:patientId },
+      visitData,
       config
     );
 
@@ -120,50 +120,103 @@ export const createTriageVisit = (patientId) => async (dispatch, getState) => {
     // Return appointment data for further use
     return responseData.appointmentData.appointmentNo; // Return the full appointment data
   } catch (error) {
-    dispatch({ type: TRIAGE_VISIT_FAIL, payload: error.message });
+    const errorMessage = error.response?.data?.errors || "An unexpected error occurred.";
+    dispatch({ type: TRIAGE_VISIT_FAIL, payload: errorMessage });
+    message.error(errorMessage); // Display the error message using Ant Design
   }
 };
 
 
+// export const postTriageVisit = (patient) => async (dispatch, getState) => {
+//   try {
+//     dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
+
+//     const {
+//       otpVerify: { userInfo },
+//   } = getState();
+//  // Fetch branchCode from localStorage
+//  const branchCode = localStorage.getItem("branchCode");
+
+//     const config = {
+//       headers: {
+//         "Content-Type": "application/json",
+//         staffNo: userInfo.userData.no, // Add staffNo as a custom header
+//         sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+//         branchCode: branchCode
+//       },
+//     };
+
+//     const { data } = await axios.post(
+//       `${API}Reception/DispatchToTriage`,
+//       patient,
+//       config
+//     );
+
+//     // // Extract response details, including appointment data
+//     // const responseData = {
+//     //   status: data.status,
+//     //   appointmentNo: data.appointmentNo, // Assuming this is part of the response
+//     //   appointmentData: data.appointment, // The detailed appointment information
+//     // };
+
+//     // Dispatch success action
+//     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: responseData });
+
+//     // Return appointment data for further use
+//     // return responseData.appointmentNo; // Return the full appointment data
+//   } catch (error) {
+//     dispatch({ type: POST_TRIAGE_VISIT_FAIL, payload: error.message });
+//   }
+// };
+
 export const postTriageVisit = (appointmentId) => async (dispatch, getState) => {
   try {
-    dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
+    dispatch({ type:POST_TRIAGE_VISIT_REQUEST  });
 
     const {
       otpVerify: { userInfo },
-  } = getState();
- // Fetch branchCode from localStorage
- const branchCode = localStorage.getItem("branchCode");
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
 
     const config = {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
         sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-        branchCode: branchCode
+        branchCode: branchCode,
       },
     };
 
-    const { data } = await axios.post(
+    console.log("patient: ", appointmentId);
+
+    const response = await axios.post(
       `${API}Reception/DispatchToTriage`,
-      { appointmentNo:appointmentId },
+      { appointmentNo: appointmentId },
       config
     );
 
-    // // Extract response details, including appointment data
-    // const responseData = {
-    //   status: data.status,
-    //   appointmentNo: data.appointmentNo, // Assuming this is part of the response
-    //   appointmentData: data.appointment, // The detailed appointment information
-    // };
+   // Extract response details
+    const responseData = {
+      status: response.data.status,
+      msg: response.data.observationNo, // Assuming `msg` contains the patient ID
+    };
 
-    // Dispatch success action
-    dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: responseData });
+    setTimeout(() => {
+      console.log("Dispatched Payload:", responseData);
+    }, 2000);
 
-    // Return appointment data for further use
-    // return responseData.appointmentNo; // Return the full appointment data
+    dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
+    //message with success message and observationNo
+    message.success(`Dispatched with Obs No: ${responseData.observationNo}`, 5);
+
+
   } catch (error) {
-    dispatch({ type: POST_TRIAGE_VISIT_FAIL, payload: error.message });
+    dispatch({
+      type: POST_TRIAGE_VISIT_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
 
