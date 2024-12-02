@@ -19,6 +19,8 @@ import { getVitalsLinesSlice } from '../../actions/triage-actions/getVitalsLines
 import useAuth from '../../hooks/useAuth';
 import { getAllergiesAndMedicationsSlice } from '../../actions/triage-actions/getAllergiesAndMedicationsSlice';
 import { postAllergiesMedicationSlice } from '../../actions/triage-actions/postAllergiesMedicationSlice';
+import { postInjectionsSlice } from '../../actions/triage-actions/postInjectionsSlice';
+import { getInjectionsSlice } from '../../actions/triage-actions/getInjectionsSlice';
 
 
 const EvaluatePatientInTriage = () => {
@@ -31,6 +33,7 @@ const EvaluatePatientInTriage = () => {
   const {loading} = useSelector((state) => state.postTriageListVitals);
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
+  const {loadingInjections, injections} = useSelector((state) => state.getInjections);
 
   const userDetails = useAuth();
 
@@ -59,6 +62,12 @@ const EvaluatePatientInTriage = () => {
   useEffect(() => {
     if (observationNo) {
       dispatch(getAllergiesAndMedicationsSlice(observationNo));
+    }
+  }, [dispatch, observationNo]);
+
+  useEffect(() => {
+    if (observationNo) {
+      dispatch(getInjectionsSlice(observationNo));
     }
   }, [dispatch, observationNo]);
 
@@ -92,7 +101,10 @@ const EvaluatePatientInTriage = () => {
         );
         case 'injections':
         return (
-          <Injections handleOnChange={handleOnChange} setFormData={setFormData} handleDateChange={handleDateChange} handleTimeChange={handleTimeChange} activeTab={activeTab} formData={formData}/>
+          <Injections handleOnChange={handleOnChange} setFormData={setFormData} handleDateChange={handleDateChange} handleTimeChange={handleTimeChange} activeTab={activeTab} formData={formData}
+          handleSelectChange={handleSelectChange}
+          triageListDetail={triageListDetail}
+          />
         );
         case 'dressing':
         return (
@@ -195,6 +207,38 @@ const cleanValue = (value) => {
       }
       case 'allergy':{
         // Save allergy and medication data
+        const { injectionNo, injectionQuantity, injectionDate, injectionTime, injectionRemarks} = formData[activeTab];
+        const injectionsData = {
+          
+          injectionNo,
+          injectionQuantity,
+          injectionDate,
+          injectionTime,
+          injectionRemarks,
+          staffNo: staffNo,
+          observationNo,
+          posted: true,
+          myAction: "create"
+
+        };
+
+        dispatch(postInjectionsSlice(injectionsData)).then((data)=>{
+          console.log('dispatching the data', data);
+          if(data?.status === "success"){
+            message.success(data?.status);
+            setFormData({});
+            setOnModalOpen(false);
+            dispatch(getInjectionsSlice(observationNo));
+          }else{
+            message.error('Error saving vitals data');
+            setFormData({});
+            setOnModalOpen(false);
+          }
+        })
+        break;
+      }
+      case 'injections':{
+        // Save injections data
         const { complains, reasonForVisit, foodAllergy, drugAllergy} = formData[activeTab];
         const allergyAndMedicationData = {
           
@@ -223,11 +267,6 @@ const cleanValue = (value) => {
             setOnModalOpen(false);
           }
         })
-        break;
-      }
-      case 'injections':{
-        // Save injections data
-        console.log(formData[activeTab]);
         break;
       }
       case 'dressing':{
@@ -266,7 +305,7 @@ const cleanValue = (value) => {
               <PlusOutlined />
               Add injections
             </Button>
-            <InjectionTable handleOpenModal={handleOpenModal}/>
+            <InjectionTable handleOpenModal={handleOpenModal} loadingInjections={loadingInjections} injections={injections}/>
           </Tabs.TabPane>
           <Tabs.TabPane tab="Dressing" key="dressing">
             <Button type="primary" onClick={handleOpenModal}>

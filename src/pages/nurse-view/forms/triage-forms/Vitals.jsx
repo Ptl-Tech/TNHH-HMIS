@@ -5,7 +5,8 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
   const patientNumber = triageListDetail?.PatientNo
   const observationNumber = triageListDetail?.ObservationNo
   return (
-    <Form layout="vertical" validateTrigger="onChange"
+    <Form layout="vertical" 
+       validateTrigger="onChange"
        initialValues={{
         vitals: { 
           patientNumber: patientNumber,

@@ -35,7 +35,7 @@ import PastDoctorVisit from "./pages/nurse-view/PastDoctorVisit";
 import TriageList from "./pages/nurse-view/TriageList";
 import Dashboard from "./pages/nurse-view/Dashboard";
 import Impatient from "./pages/nurse-view/Impatient";
-import ImpatientList from "./pages/nurse-view/ImpatientList";
+import ImpatientList from "./pages/nurse-view/InpatientList";
 import ExaminePatientInTriage from "./pages/nurse-view/ExaminePatientInTriage";
 import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
@@ -71,12 +71,12 @@ function App() {
               path="Patient-Registration"
               element={<PatientRegistration />}
             />
-            <Route path="Appointments-list" element={<Appointment />} />
+            <Route path="Appointments" element={<Appointment />} />
             <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
             <Route path="Triage" element={<TriageList />} />
             <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
             <Route path="Triage-list" element={<WaitingList />} />
-            <Route path="Impatient/Ward" element={<ImpatientList />} />
+            <Route path="Inpatient" element={<ImpatientList />} />
             <Route path="Patient-list" element={<Patientlist />} />
             <Route path="New-Patients" element={<NewPatients />} />
             

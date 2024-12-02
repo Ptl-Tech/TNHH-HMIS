@@ -1,4 +1,4 @@
-import { Card, Checkbox, Table, Tabs } from 'antd'
+import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import TriageFilters from './TriageFilters';
+import { RightOutlined } from '@ant-design/icons';
 
 const TriageList = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
@@ -15,6 +16,7 @@ const TriageList = () => {
   const navigate = useNavigate();
 
   function handleNavigate(patientId) {
+    console.log('check in button clicked', patientId)
     navigate(`/Nurse/Triage/Patient?Patient_id=${patientId}`)
   }
 
@@ -24,19 +26,36 @@ const TriageList = () => {
 
   const {triageList} = useSelector((state) => state.getTriageList) || {};
 
+  
+
 //combine triageWaitingList and triageList and filtering by status
-  const combinedTriageWaitingListAndTriageList = triageWaitingList
-  .map(user => {
-    const triage = triageList.find(t => t.PatientNo.trim() === user.PatientNo.trim());
-    return triage ? { ...user, status: triage.Status } : null;
-  })
-  .filter(record => {
-    return record && record.status.trim().toLowerCase() === 'closed';
+  // const combinedTriageWaitingListAndTriageList = triageWaitingList
+  // .map(user => {
+  //   const triage = triageList.find(t => t.PatientNo.trim() === user.PatientNo.trim());
+  //   return triage ? { ...user, status: triage.Status } : null;
+  // })
+  // .filter(record => {
+  //   return record && record.status.trim().toLowerCase() === 'closed';
+  // });
+
+  // console.log('triage combined data', combinedTriageWaitingListAndTriageList)
+  // console.log('triage waiting list', triageWaitingList)
+  // console.log('triage waiting triage list', triageList)
+
+
+  const combinedData = triageList.map(triage => {
+    const matchingPatient = triageWaitingList.find(waiting => waiting.PatientNo === triage.PatientNo);
+    return {
+      ...triage,
+      ...matchingPatient,
+    };
   });
+
+  console.log('combined data', combinedData)
 
  
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = combinedTriageWaitingListAndTriageList.map((item, index) => ({
+  const waitingListTableDataSource = combinedData.map((item, index) => ({
     key: index + 1,
     name: item?.Names || `${item?.Surname} ${item?.MiddleName} ${item?.LastName}`,
     regDate: item.DateRegistered,
@@ -120,111 +139,38 @@ const TriageList = () => {
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: () => <Checkbox value={'checkIn'}></Checkbox>
+      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record.number)}><RightOutlined />Check In</Button>
     },
   ];
-  const triageColumns = [
-    {
-      title: 'Index',
-      dataIndex: 'key',
-      rowScope: 'row',
-    },
-    {
-      title: 'Patient Name',
-      dataIndex: 'name',
-      rowScope: 'row',
-      filterSearch: true, // Enable search
-      filters: [
-        ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
-      ],
-      onFilter: (value, record) => record.name.includes(value),
-      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    },
-
-    {
-      title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
-    },
-    
-    {
-      title: 'Reg Date',
-      dataIndex: 'regDate',
-      rowScope: 'row',
-    },
-    {
-      title: 'Age',
-      dataIndex: 'age',
-      rowScope: 'row',
-    },
-    {
-      title: 'Sex',
-      dataIndex: 'sex',
-      rowScope: 'row',
-    },
-    {
-      title: 'ID Number',
-      dataIndex: 'idNumber',
-      rowScope: 'row',
-    },
-    {
-      title: 'Check Out',
-      dataIndex: 'checkout',
-      rowScope: 'row',
-      fixed: 'right',
-      width: 200,
-      render: (_, record) => {
-        return (
-          <a
-            style={{ color: 'blue' }}
-            onClick={() => handleNavigate(record.number)}
-          >
-            Add details
-          </a>
-        );
-      },
-    },
-  ];
-  
+ 
   return (
-    <Tabs style={{ padding: '10px 10px' }}>
-        <Tabs.TabPane tab="Waiting List" key="waitingList">
-          <TriageSummeryCard waitingPatient={combinedTriageWaitingListAndTriageList}/>
+      <div style={{ padding: '10px 10px' }}>
+          <TriageSummeryCard waitingPatient={combinedData}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
-              <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
+          <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
 
-              {
-                loadingWaitingList ? 
-                (
-                  <Loading />
-                )
-                :
-                (
-                    <Table columns={waitingListColumns} 
-                    dataSource={filterWaitingListTableDataSource()} 
-                    bordered size='middle' 
-                    pagination={{
-                      position: ['bottom','right'],
-                      showSizeChanger: true,
-                      pageSize: 10,
-                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                    }} 
-                    />
-                )
-              }
+          {
+            loadingWaitingList ? 
+            (
+              <Loading />
+            )
+            :
+            (
+                <Table columns={waitingListColumns} 
+                dataSource={filterWaitingListTableDataSource()} 
+                bordered size='middle' 
+                pagination={{
+                  position: ['bottom','right'],
+                  showSizeChanger: true,
+                  pageSize: 10,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                }} 
+                />
+            )
+          }
           </Card>
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Patients in Triage" key="patientsInTriage">
-        <TriageSummeryCard waitingPatient={combinedTriageWaitingListAndTriageList}/>
-          <Card style={{ padding: '24px 10px 10px 10px' }}>
-
-            <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
-
-              <Table columns={triageColumns} dataSource={filterWaitingListTableDataSource()} bordered size='middle'/>
-          </Card>
-        </Tabs.TabPane>
-    </Tabs>
+      </div>
   )
 }
 
