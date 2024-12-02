@@ -2,8 +2,20 @@ import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
 import { activePatientsReducer, patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, postTriageVisitReducer } from "./patientReducer";
 import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer } from "./DropdownReducer";
+import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
+import { loadUserInfo } from "../actions/loadUserInfo";
+import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import { visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
+import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
+import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
+import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
+import { getVitalsLinesReducer } from "./triage-reducers/getVitalsLinesReducer";
+import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesMedicationReducer";
+import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
+import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
+import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
+import { getInjectionsReducer } from "./triage-reducers/getInjectionsReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -28,8 +40,20 @@ export const rootReducer = combineReducers({
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
-    triageWaitingList:triageWaitingListReducer,
+    loadUserInfo:loadUserInfo,
+    getTriageWaitingList:getTriageWaitingListReducer,
     registerVisitor:visitorCreateReducer,
-    visitorsList:visitorListReducer
+    visitorsList:visitorListReducer,
+    getTriageList:getTriageListReducer,
+    triageWaitingList:triageWaitingListReducer,
+    getPatientDetails:getPatientDetailsReducer,
+    getTriageListDetails:getTriageListDetailsReducer,
+    postTriageListVitals:postTriageListVitalsReducer,
+    getVitalsLines:getVitalsLinesReducer,
+    postAllergiesMedication:postAllergiesMedicationReducer,
+    getAllergiesAndMedications:getAllergiesAndMedicationReducer,
+    postInjections:postInjectionsReducer,
+    getInjectionNumber:getInjectionNumberReducer,
+    getInjections:getInjectionsReducer
 
 });

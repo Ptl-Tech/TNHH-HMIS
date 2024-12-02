@@ -1,0 +1,7 @@
+
+
+1. Commented Signout component in NurseLayout.js
+2. Removed <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />} from the Route in the App.jsx
+
+
+

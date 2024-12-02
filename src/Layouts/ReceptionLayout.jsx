@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   UserOutlined,
@@ -29,6 +29,8 @@ import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
 
 import Signout from "../Auth/Signout";
+import { useDispatch } from "react-redux";
+import { loadUserInfo } from "../actions/loadUserInfo";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -148,6 +150,14 @@ const ReceptionLayout = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  //persist state in the local storage
+
+// Destructure main properties
+  
+const dispatch = useDispatch();
+useEffect(() => {
+  dispatch(loadUserInfo())
+}, [dispatch]);
   return (
     <Layout>
       <Header className="headerstyle">

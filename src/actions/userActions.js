@@ -49,6 +49,7 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
       { otpCode },
       config
     );
+  
 
     dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
     localStorage.setItem("userInfo", JSON.stringify(data)); // Save updated user info after OTP verification
@@ -60,13 +61,11 @@ export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) =>
   }
 };
 
-
-
 export const logout = () => (dispatch) => {
   try {
     // Clear user data from localStorage
     localStorage.removeItem("userInfo");
-localStorage.removeItem("branchCode");
+    localStorage.removeItem("branchCode");
     // Dispatch logout action to update state
     dispatch({ type: USER_LOGOUT });
 

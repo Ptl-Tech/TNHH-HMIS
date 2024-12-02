@@ -31,9 +31,13 @@ const useSignIn = () => {
 
   const handleVerifyOtp = async () => {
     console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken, userInfo?.branchCode);
-    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode)); // Pass branchCode here
-    
-    
+    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode?.branchCode)); // Pass branchCode here
+  
+    if (verifyOtpUserInfo) {
+      setOtp('');
+      setIsOtpRequired(false);
+      navigate("/Nurse/Dashboard"); // Navigate to the next page after OTP verification
+    }
   };
 
   const handleForgotPassword = async () => {
@@ -59,20 +63,8 @@ const useSignIn = () => {
       // Reset OTP state before navigating
       setOtp('');
       setIsOtpRequired(false);
-
-
-      const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log("Role:", role);
-
-      if (role === 'Reception') {
-        navigate('/reception');
-      } else if (role === 'Security') {
-        navigate('/Security');
-      } else if (role === 'Production') {
-        navigate('/Triage');
-      }
-
-
+      // Navigate to Doctor route after successful OTP verification
+      navigate("/Nurse/Dashboard");
     }
   }, [verifyOtpUserInfo, navigate]);
 

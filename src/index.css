@@ -17,7 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
- background-color:  #0f5689;
+  background-color:  #0f5689;
   color: rgb(0, 35, 41);
   padding: 8px 12px 8px 12px;
   position: sticky;
@@ -29,13 +29,21 @@
 }
 
 .contentStyle {
-  min-height: 100dvh;
+  overflow-y: hidden !important;
   line-height: 22px;
-  color: #fff;
- // background-color: #fef9f7;
- // overflow-y: scroll !important;
-  height: 100%;
+  background-color: rgb(239, 239, 239);
+  /* color: #fff;
+  background-color: #fef9f7;
+  overflow-y: scroll !important; */
   
+}
+
+.footerStyle {
+  text-align: center;
+  color: black;
+  border-top: 1px solid rgb(228, 228, 228);
+  background-color: white;
+  height: 44 !important;
 }
 
 .sideStyle {
@@ -45,8 +53,16 @@
   color: #2f463d;
   background-color: #fff !important;
   position: fixed !important;
-  left: 0;
-  overflow-y: scroll !important;
+  left: 1;
+  overflow-y: auto !important;
+}
+
+.siderStyle{
+  line-height: 22px;
+  color: #2f463d;
+  background-color: #fff !important;
+  overflow-y: hidden !important;
+  padding: 30px 20px;  
 }
 .ant-card .ant-card-body {
   padding: 0px !important; 

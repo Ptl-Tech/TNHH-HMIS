@@ -24,13 +24,19 @@ import DischargeList from "./pages/DischargeList";
 import DischargeRequestList from "./pages/DischargeRequestList";
 import PharmacyOutPatient from "./pages/PharmacyOutPatient";
 import BedManager from "./pages/BedManager";
-import NurseDashboard from "./Dashboards/NurseDashboard";
 import DoctorDashboard from "./Dashboards/DoctorDashboard";
 import ForgotPwd from "./Auth/ForgotPwd";
 import ResetPwd from "./Auth/ResetPwd";
 import ViewProfile from "./Auth/ViewProfile";
 import ReceptionLayout from "./Layouts/ReceptionLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
+import Appointment from "./pages/nurse-view/Appointment";
+import PastDoctorVisit from "./pages/nurse-view/PastDoctorVisit";
+import TriageList from "./pages/nurse-view/TriageList";
+import Dashboard from "./pages/nurse-view/Dashboard";
+import Impatient from "./pages/nurse-view/Impatient";
+import ImpatientList from "./pages/nurse-view/InpatientList";
+import ExaminePatientInTriage from "./pages/nurse-view/ExaminePatientInTriage";
 import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
 import VisitorForm from "./pages/VisitorForm";
@@ -55,37 +61,51 @@ function App() {
         <Route path="/admin" element={<AdminLayout />} />{" "}
         {/* Admin page route */}
       </Route>
-      <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}>
-        <Route path="/Nurse" element={<NurseLayout />}>
-          <Route index element={<NurseDashboard />} />
-          <Route
-            path="/Nurse/Patient-Registration"
-            element={<PatientRegistration />}
-          />
-          <Route path="/Nurse/Patient-list" element={<Patientlist />} />
-          <Route path="/Nurse/New-Patients" element={<NewPatients />} />
-          <Route
-            path="/Nurse/Observation-Room/:id"
-            element={<NurseObservation />}
-          />
-          <Route
-            path="/Nurse/Outpatient-list"
-            element={<NurseOutpatientList />}
-          />
-          <Route
-            path="/Nurse/Patient-admissions"
-            element={<PatientAdmissions />}
-          />
-          <Route path="/Nurse/BedManagement" element={<BedManager />} />
 
-          <Route
-            path="/Nurse/Discharge-list"
-            element={<DischargeRequestList />}
-          />
-          <Route path="/Nurse/view-profile" element={<ViewProfile />} />
-        </Route>
+      {/* removed - <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}  - from the nurse route otp*/}
+      
+      <Route element={<PrivateRoute allowedRoles={[Roles.Nurse]} />}>
+      <Route path="/Nurse" element={<NurseLayout />}>
+            {/* <Route index element={<NurseDashboard />} /> */}
+            <Route path="Dashboard" element={<Dashboard />} />
+            <Route
+              path="Patient-Registration"
+              element={<PatientRegistration />}
+            />
+            <Route path="Appointments" element={<Appointment />} />
+            <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
+            <Route path="Triage" element={<TriageList />} />
+            <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
+            <Route path="Triage-list" element={<WaitingList />} />
+            <Route path="Inpatient" element={<ImpatientList />} />
+            <Route path="Patient-list" element={<Patientlist />} />
+            <Route path="New-Patients" element={<NewPatients />} />
+            
+            <Route
+              path="Observation-Room/:id"
+              element={<NurseObservation />}
+            />
+            <Route
+              path="Outpatient-list"
+              element={<NurseOutpatientList />}
+            />
+            <Route
+              path="Patient-admissions"
+              element={<PatientAdmissions />}
+            />
+            <Route path="BedManagement" element={<BedManager />} />
+
+            <Route
+              path="Discharge-list"
+              element={<DischargeRequestList />}
+            />
+            <Route path="view-profile" element={<ViewProfile />} />
       </Route>
-      <Route element={<PrivateRoute allowedRoles={['Reception']} />}>
+      </Route>
+
+
+      
+      <Route element={<PrivateRoute />}>
         <Route path="/reception" element={<ReceptionLayout />}>
           <Route index element={<ReceptionDashboard />} />
 
@@ -105,6 +125,8 @@ function App() {
           />
         </Route>
       </Route>
+
+
       <Route element={<PrivateRoute />}>
         <Route path="/Doctor" element={<DocLayout />}>
           <Route index element={<DoctorDashboard />} />
