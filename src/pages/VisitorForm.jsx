@@ -2,13 +2,16 @@ import { Button, Card, Form, Input, message, Select, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmployeesList } from "../actions/DropdownListActions";
-import { createVisitor } from "../actions/visitorsActions";
+import { admitVisitor, createVisitor } from "../actions/visitorsActions";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
     (state) => state.getEmployees );
     const { loading:regVisitorLoading, success:regVisitorSuccess, error:regVisitorError, data:regVisitorData } = useSelector(
       (state) => state.registerVisitor );
+
+      const { loading:admitVisitorLoading, success:admitVisitorSuccess, error:admitVisitorError, data:admitVisitorData } = useSelector(
+        (state) => state.admitVisitor );
 
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -64,41 +67,45 @@ const VisitorForm = () => {
       form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
     }
   };
-  const handleSubmit = () => {
-    if (newVisitor.visitorName) {
-      form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
+
+
+
+ const handleSubmit = async () => {
+    if (!newVisitor.visitorName || !newVisitor.visitorCategory) {
+      message.error("Please complete all required fields.");
+      return;
     }
-   
-    const visitorData={
-      myAction:"create",
-      visitorNo:"",
+
+    const visitorData = {
+      myAction: "create",
+      visitorNo: "",
       ...newVisitor,
+    };
+
+    try {
+      const visitorId = await dispatch(createVisitor(visitorData));
+      console.log("Visitor created with ID:", visitorId);
+      if (visitorId) {
+        message.success("Visitor created successfully!");
+        dispatch(admitVisitor(visitorId));
+        setVisitorPassCounter((prev) => prev + 1); // Increment counter
+        form.resetFields(); // Reset form fields
+        setNewVisitor({
+          visitorCategory: null,
+          personToVisit: "",
+          personToVisitNo: "",
+          idNumber: "",
+          phoneNumber: "",
+          carRegistrationNo: "",
+          department: "",
+          visitorName: "",
+          visitorPassNo: "",
+          purposeOfVisit: "",
+        });
+      }
+    } catch (error) {
+      message.error("Failed to create and admit visitor.");
     }
-
-    dispatch(createVisitor(visitorData));
-
-    if (regVisitorSuccess) {
-      message.success("Visitor added successfully!");
-      //auto generate visitor pass number
-      setVisitorPassCounter((prevCounter) => prevCounter + 1);
-      form.resetFields(); // Reset the form fields after submission
-
-    setNewVisitor({
-      visitorCategory: null,
-      personToVisit: "",
-      personToVisitNo: "",
-      idNumber: "",
-      phoneNumber: "",
-      carRegistrationNo: "",
-      department: "",
-      visitorName: "",
-      visitorPassNo: "",
-      purposeOfVisit: "",
-    });
-    }
-
-    console.log("Visitor Information:", newVisitor);
-    
   };
 
   useEffect(() => {

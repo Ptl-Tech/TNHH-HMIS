@@ -218,16 +218,16 @@ const PatientRegistration = () => {
         updatedPatient[name] = value;
 
         // Update Principal Member Name if switch is checked
-        if (
-          prev.isPrincipleMember &&
-          (name === "firstName" || name === "middleName" || name === "lastName")
-        ) {
-          updatedPatient.insurancePrinicipalMemberName = `${
-            updatedPatient.firstName
-          } ${updatedPatient.middleName || ""} ${
+        if (prev.isPrincipleMember && (name === "firstName" || name === "middleName" || name === "lastName")) {
+          updatedPatient.insurancePrinicipalMemberName = `${updatedPatient.firstName} ${updatedPatient.middleName || ""} ${
             updatedPatient.lastName
           }`.trim();
         }
+
+        // Update Membership No if switch is checked
+        // form.setFieldsValue({
+        //   membershipNo: updatedPatient.isPrincipleMember ? updatedPatient.idNumber : "",
+        // })
       }
 
       return updatedPatient;
@@ -410,7 +410,6 @@ const PatientRegistration = () => {
     dispatch(listInsuranceOptions());
     dispatch(listDoctors());
 
-    console.log("country list: ", countriesPayload);
   }, [dispatch]);
 
   useEffect(() => {
@@ -425,7 +424,7 @@ const PatientRegistration = () => {
       );
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
-  }, [doctorsPayload, newVisit.clinic]);
+  }, [doctorsPayload, newVisit.clinic, filteredDoctors, newVisit.doctor]);
 
   return (
     <div>

@@ -3,7 +3,7 @@ import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReduce
 import { activePatientsReducer, patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, postTriageVisitReducer } from "./patientReducer";
 import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
-import { visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
+import { admitVisitorReducer, visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -30,6 +30,7 @@ export const rootReducer = combineReducers({
     postDoctorTreatment:postDoctorTreatmentReducer,
     triageWaitingList:triageWaitingListReducer,
     registerVisitor:visitorCreateReducer,
-    visitorsList:visitorListReducer
+    visitorsList:visitorListReducer,
+    admitVisitor:admitVisitorReducer
 
 });

@@ -39,6 +39,8 @@ import TriageLayout from "./Layouts/TriageLayout";
 import WaitingList from "./pages/WaitingList";
 import { roles } from "./constants/role";
 import ActivePatientList from "./pages/ActivePatientList";
+import SecurityDashBoard from "./Dashboards/SecurityDashboard";
+import HistoryVisitorList from "./pages/HistoryVisitorList";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -133,8 +135,12 @@ function App() {
       </Route>
       <Route element={<PrivateRoute allowedRoles={['Security']} />}>
         <Route path="/Security" element={<SecurityLayout />}>
-          <Route index element={<VisitorForm />} />
+        <Route index element={<SecurityDashBoard />} />
+
+          <Route path="/Security/VisitorRegistration" element={<VisitorForm />} />
           <Route path="/Security/visitors-list" element={<VisitorList />} />
+          <Route path="/Security/History-list" element={<HistoryVisitorList />} />
+
         </Route>
       </Route>
       <Route element={<PrivateRoute allowedRoles={['Production']}/>}>

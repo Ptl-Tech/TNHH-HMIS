@@ -47,14 +47,57 @@ const SecurityLayout = () => {
   const items = [
     {
       key: "/Security",
-      label: "Visitor Registration",
-      icon: <UserOutlined style={{ color: "#fff" }} />,
+      icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+      label: "Dashboard",
     },
     {
-      key: "visitors-list",
-      label: "Visitors List",
-      icon: <TeamOutlined style={{ color: "#fff" }} />,
-    }
+      type: "divider",
+    },
+    
+    {
+      key: "RegistrationGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Registration</span>,
+      type: "group",
+      children: [
+        {
+          key: "/Security/VisitorRegistration",
+          label: "Visitor Registration",
+          icon: <UserOutlined style={{ color: "#fff" }} />,
+    
+        },
+        // {
+        //   key: "New-Patients",
+        //   label: "Patient List",
+        //   icon: <TeamOutlined style={{ color: "#fff" }} />,
+        // } 
+         
+      ],
+    },
+   
+    {
+      key: "ActiveListGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Active List</span>,
+      type: "group",
+      children: [
+        {
+          key: "visitors-list",
+          label: "Visitors List",
+          icon: <TeamOutlined style={{ color: "#fff" }} />,
+        }
+      ],
+    },
+    {
+key: "HistoryGroup",
+label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>History</span>,
+type: "group",
+children: [
+  {
+    key: "History-list",
+    label: "History",
+    icon: <HistoryOutlined style={{ color: "#fff" }} />,
+  }
+],
+    },
   ];
   
   
@@ -116,7 +159,7 @@ const SecurityLayout = () => {
           <Menu
             theme="light"
             mode="inline"
-            defaultSelectedKeys={["Security"]}
+            defaultSelectedKeys={["/Security"]}
             openKeys={openKeys}
             onOpenChange={onOpenChange}
             onClick={({ key }) => {
