@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { listPatients } from "../actions/patientActions";
+import { useNavigate } from "react-router-dom";
+import { createTriageVisit, listPatients, postTriageVisit } from "../actions/patientActions";
 import {
-  Table,
+  listClinics,
+  listDoctors,
+  listInsuranceOptions,
+} from "../actions/DropdownListActions";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  TeamOutlined,
+  EditOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+import {
   Button,
+  Card,
+  Col,
   Input,
-  Pagination,
+  Row,
+  Table,
+  Tooltip,
+  Typography,
   Modal,
   Form,
   Select,
-  DatePicker,
-  TimePicker,
 } from "antd";
-import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
-import * as XLSX from "xlsx"; // Import XLSX for Excel download
-import jsPDF from "jspdf";
-import "jspdf-autotable"; // Import the autotable plugin
-import dayjs from "dayjs";
-import { GiCancel } from "react-icons/gi";
-import { EyeOutlined, FileAddOutlined } from "@ant-design/icons";
-import { FaFileExcel, FaList } from "react-icons/fa";
-import { FaFilePdf } from "react-icons/fa6";
+import moment from "moment";
+
 const { Search } = Input;
-const { Option } = Select;
 
 const InpatientList = () => {
   const dispatch = useDispatch();
@@ -30,74 +37,120 @@ const InpatientList = () => {
   const { loading, error, patients } = useSelector(
     (state) => state.patientList
   );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+
+  const [searchParams, setSearchParams] = useState({
+    firstName: "",
+    lastName: "",
+    patientId: "",
+    patientNo: "",
+  });
+
+  const [showList, setShowList] = useState(false);
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [admissionNumber, setAdmissionNumber] = useState("ADM001");
-  const [isConfirmCancelVisible, setIsConfirmCancelVisible] = useState(false); // State for confirmation modal
+  const [isEditing, setIsEditing] = useState(false);
+  const [appointmentId, setAppointmentId] = useState(null);
+
+  const [isVisitCreated, setIsVisitCreated] = useState(false);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [newVisit, setNewVisit] = useState({
+    patientNo: "",
+    clinic: "",
+    doctor: "",
+  });
+
+  const {
+    loading: clinicsLoading,
+    error: clinicsError,
+    success: clinicsSuccess,
+    clinics: clinicsPayload,
+  } = useSelector((state) => state.clinics);
+
+  const {
+    loading: doctorsLoading,
+    error: doctorsError,
+    success: doctorsSuccess,
+    data: doctorsPayload,
+  } = useSelector((state) => state.getDoctorsList);
+
+  const [form] = Form.useForm();
+ 
 
   useEffect(() => {
-    setAdmissionNumber(
-      (prev) => `ADM${String(parseInt(prev.slice(3)) + 1).padStart(3, "0")}`
-    );
-  }, [selectedPatient]);
+    if (patients.length) {
+      handleFilterPatients();
+    }
+  }, [patients, searchParams]);
 
-  const columns = [
-    {
-      title: "Patient No",
-      dataIndex: "patientNo",
-      key: "patientNo",
-      render: (_, record, index) => (
-        <span>{(currentPage - 1) * pageSize + index + 1}</span>
-      ),
-    },
-    { title: "Adm No", dataIndex: "AdmNo", key: "AdmNo" },
-    { title: "First Name", dataIndex: "firstName", key: "firstName" },
-    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
-    // { title: "Patient No", dataIndex: "PatientNo", key: "PatientNo" },
-    { title: "Gender", dataIndex: "gender", key: "gender" },
-    { title: "Patient Type", dataIndex: "patientType", key: "patientType" },
-    { title: "ID Number", dataIndex: "idNumber", key: "idNumber" },
-    { title: "Insurance", dataIndex: "insurance", key: "insurance" },
-    { title: "Admission Date", dataIndex: "admissionDate", key: "admissionDate" },
-    {title:"Doctor",dataIndex:"doctor",key:"doctor"},
-    {title:"Room",dataIndex:"room",key:"room"},
-    {title:"Bed",dataIndex:"bed",key:"bed"},
-    {title:"Treatment No",dataIndex:"treatmentNo",key:"treatmentNo"},
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <>
-          <Button
-            type="primary"
-            onClick={() => showModal(record)}
-            style={{ marginRight: "10px" }}
-          >
-            <EyeOutlined />
-           View Details
-          </Button>
-          {/* <Button
-            type="primary"
-            onClick={() => handleCancelAdmission(record)}
-            danger
-          >
-            <GiCancel />
-           
-          </Button> */}
-        </>
-      ),
-    },
-  ];
+  const handleSearchChange = (e, field) => {
+    const value = e.target.value;
+    setSearchParams((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+    setShowList(true);
+  };
 
-  useEffect(() => {
-    dispatch(listPatients());
-  }, [dispatch]);
+  const handleDisplayDropDown = (e) => {
+    const { name, value } = e.target;
+    setSearchParams((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+    handleFilterPatients();
 
-  const handleSearch = (value) => {
-    setSearchQuery(value);
+    if (
+      name === "clinic" &&
+      clinicsPayload &&
+      name === "doctor" &&
+      doctorsPayload
+    ) {
+      dispatch(listClinics());
+      dispatch(listDoctors());
+    }
+  };
+
+  const handleCreateVisit = async() => {
+    // Logic for creating a visit
+    console.log("Visit created!", newVisit);
+    const visitData = {
+      patientNo: selectedPatient.PatientNo,
+      clinic: newVisit.clinic,
+      doctor: newVisit.doctor,
+    };
+    const appointmentId = await dispatch(createTriageVisit(visitData));
+
+    if(appointmentId) {
+      setAppointmentId(appointmentId);
+    }
+    console.log("Appointment ID:", appointmentId);
+
+    setIsVisitCreated(true);
+  };
+
+  const handleDispatchToTriage = () => {
+    // Logic for dispatching to triage
+    console.log("Dispatched to triage!", appointmentId);
+    setIsVisitCreated(false); // Reset state if needed
+
+    dispatch(postTriageVisit(appointmentId));
+  };
+
+  const handleFilterPatients = () => {
+    const filtered = patients.filter((patient) => {
+      return (
+        patient.Names.toLowerCase().includes(
+          searchParams.firstName.toLowerCase()
+        ) &&
+        patient.LastName.toLowerCase().includes(
+          searchParams.lastName.toLowerCase()
+        ) &&
+        patient.IDNumber.includes(searchParams.patientId) &&
+        patient.PatientNo.toString().includes(searchParams.patientNo)
+      );
+    });
+    setFilteredPatients(filtered);
   };
 
   const showModal = (patient) => {
@@ -105,253 +158,480 @@ const InpatientList = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-    console.log("Patient admitted with details:", selectedPatient);
-  };
-
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsEditing(false);
+    setSelectedPatient(null);
   };
+  const toggleEditMode = () => setIsEditing((prev) => !prev);
 
-  // Show confirmation modal for cancellation
-  const handleCancelAdmission = (patient) => {
-    setSelectedPatient(patient); // Set the selected patient for cancellation
-    setIsConfirmCancelVisible(true); // Show confirmation modal
+  useEffect(() => {
+    dispatch(listClinics());
+    dispatch(listDoctors());
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
+  
+    if (branchCode && doctorsPayload) {
+      // Determine the clinic to filter by
+      const clinicToFilterBy = selectedPatient?.SpecialClinics || newVisit.clinic; 
+  
+      // Filter doctors based on specialization and branch
+      const filtered = doctorsPayload.filter(
+        (doctor) =>
+          doctor.Specialization === clinicToFilterBy && // Match specialization with the clinic
+          doctor.GlobalDimension1Code === branchCode // Match branch code
+      );
+  
+      setFilteredDoctors(filtered); // Update the filtered doctors list
+    }
+  }, [
+    doctorsPayload,
+    selectedPatient?.SpecialClinics,
+    newVisit.clinic, // Include the new visit clinic in dependency
+    filteredDoctors,
+  ]);
+  
+  const columns = [
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+      sorter: (a, b) => a.PatientNo - b.PatientNo,
+    },
+    {
+      title: "First Name",
+      dataIndex: "Names",
+      key: "Names",
+      sorter: (a, b) => a.Names.localeCompare(b.Names),
+    },
+    {
+      title: "Last Name",
+      dataIndex: "LastName",
+      key: "LastName",
+      sorter: (a, b) => a.LastName.localeCompare(b.LastName),
+    },
+    { title: "Gender", dataIndex: "Gender", key: "Gender" },
+    { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
+    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    {
+      title: "Date Registered",
+      dataIndex: "DateRegistered",
+      key: "DateRegistered",
+      render: (text) => new Date(text).toLocaleDateString(),
+      sorter: (a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Tooltip title="View Details">
+            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
+              View Details
+            </Button>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+  const handleselectedPatient = () => {
+    navigate("/reception/Patient-Registration");
   };
-
-  // Handle the actual cancellation
-  const confirmCancelAdmission = () => {
-    console.log("Admission canceled for patient:", selectedPatient);
-    setIsConfirmCancelVisible(false); // Hide confirmation modal
-    // Add logic to handle admission cancellation here (e.g., API call to cancel admission)
-  };
-
-  const handleNewPatient = () => {
-    navigate("/Doctor/Outpatient-list"); // Redirect to new patient registration page
-  };
-
-  // Function to download data as Excel
-  const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(patients);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Patients");
-    XLSX.writeFile(workbook, "patients.xlsx");
-  };
-
-  // Function to download data as PDF
-  const downloadPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Patients List", 14, 16);
-
-    // Generate table
-    const tableData = patients.map((patient, index) => [
-      index + 1,
-      patient.firstName,
-      patient.lastName,
-      patient.gender,
-      patient.patientType,
-      patient.insurance,
-      patient.idNumber,
-      new Date(patient.createdAt).toLocaleString(),
-    ]);
-
-    // Define columns
-    const columns = [
-      "Patient No",
-      "First Name",
-      "Last Name",
-      "Gender",
-      "Patient Type",
-      "Insurance",
-      "ID Number",
-      "Date Registered",
-    ];
-    doc.autoTable({
-      head: [columns],
-      body: tableData,
-      startY: 20,
-    });
-
-    doc.save("patients.pdf");
-    console.log("PDF downloaded");
-  };
-
-  const filteredPatients = patients.filter(
-    (patient) =>
-      patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.idNumber.includes(searchQuery)
-  );
-
-  const totalPatients = filteredPatients.length;
-  const startRecord = (currentPage - 1) * pageSize + 1;
-  const endRecord = Math.min(currentPage * pageSize, totalPatients);
-  const patientsToDisplay = filteredPatients.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
 
   return (
-    <div className="container">
-      <h4 className="text-center p-3">In-Patients List</h4>
-      <Search
-        placeholder="Search by Name or ID Number"
-        onSearch={handleSearch}
-        style={{ marginBottom: "20px" }}
-      />
+    <div>
+      <h4 className="text-center p-3 text-dark">
+        <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
+       InPatient List
+      </h4>
       <div className="d-flex justify-content-between">
         <Button
           type="primary"
-          onClick={handleNewPatient}
-          style={{ marginBottom: "20px" }} // Add some spacing below the button
+          onClick={handleselectedPatient}
+          style={{ marginBottom: "20px" }}
         >
-          <FaList />
-          Patient List
+          Register New Patient
         </Button>
-        <div className="d-flex justify-content-end align-items-center">
-          <Button
-            type="default"
-            onClick={downloadPDF}
-            style={{
-              marginBottom: "20px",
-              backgroundColor: "brown",
-              color: "white",
-              border: "none",
-            }} // Add some spacing
-          >
-            <FaFilePdf />
-            Download PDF
-          </Button>
-          <Button
-            type="default"
-            onClick={downloadExcel}
-            style={{
-              marginBottom: "20px",
-              marginLeft: "10px",
-              backgroundColor: "green",
-              color: "white",
-              border: "none",
-            }} // Add some spacing
-          >
-            <FaFileExcel />
-            Download Excel
-          </Button>
-        </div>
+        {/* <Button style={{ marginBottom: "20px" }} type="primary">
+          <FileAddOutlined />
+          Admit Patient
+        </Button> */}
       </div>
-      <Table
-        columns={columns}
-        dataSource={patientsToDisplay}
-        loading={loading}
-        pagination={false}
-        rowKey={(record) => record.id}
-        size="small"
-        scroll={{ x: true }}
-      />
-      <Pagination
-        current={currentPage}
-        pageSize={pageSize}
-        total={totalPatients}
-        onChange={(page) => setCurrentPage(page)}
-        style={{
-          margin: "20px",
-          textAlign: "right",
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      />
-
-      <Modal
-        title="Admit Patient"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={800}
-        style={{ top: 10 }}
-        footer={[
-          <Button key="cancel" onClick={handleCancel}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            Admit
-          </Button>,
-        ]}
-      >
-        <div className="card">
-          <div className="card-header d-block">
-            <p>
-              <strong className="text-primary pr-3">Patient Names:</strong>
-              {selectedPatient?.firstName?.charAt(0).toUpperCase() +
-                selectedPatient?.firstName?.slice(1).toLowerCase()}{" "}
-              {selectedPatient?.lastName?.charAt(0).toUpperCase() +
-                selectedPatient?.lastName?.slice(1).toLowerCase()}
-            </p>
-            <p>
-              {" "}
-              <strong className="text-primary pr-3"> Gender:</strong>{" "}
-              {selectedPatient?.gender?.charAt(0).toUpperCase() +
-                selectedPatient?.gender?.slice(1).toLowerCase()}
-            </p>
-            <strong className="text-primary pr-3"> Patient Type:</strong>{" "}
-            {selectedPatient?.patientType}
-          </div>
-          <Form layout="vertical" className="pt-3 px-3">
-            <Form.Item label="Admission Number">
-              <Input
-                value={admissionNumber}
-                disabled
-                className="form-control bg-light text-danger"
-              />
-            </Form.Item>
-            <div className="d-flex justify-content-between align-items-center gap-3">
-           <Form.Item label="Date of Admission" className="w-100">
-              <DatePicker defaultValue={dayjs()} className="w-100" disabled />
-            </Form.Item>
-            <Form.Item label="Time of Admission" className="w-100">
-              <TimePicker defaultValue={dayjs()} className="w-100" disabled />
-            </Form.Item>
-           </div>
-            <Form.Item label="Area">
-              <Select defaultValue="Referral">
-                <Option value="Referral">Referral</Option>
-                <Option value="Inpatient">Inpatient</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Ward">
-              <Select>
-                <Option value="Ward 1">Ward 1</Option>
-                <Option value="Ward 2">Ward 2</Option>
-                <Option value="Ward 3">Ward 3</Option>
-                <Option value="Ward 4">Ward 4</Option>
-                <Option value="Ward 5">Ward 5</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="Bed Number">
-              <Input placeholder="Enter Bed Number" />
-            </Form.Item>
-            <Form.Item label="Doctor">
-              <Select>
-                <Option value="Dr. Smith">Dr. Smith</Option>
-                <Option value="Dr. Adams">Dr. Adams</Option>
-                <Option value="Dr. Lee">Dr. Lee</Option>
-                <Option value="Dr. Patel">Dr. Patel</Option>
-                <Option value="Dr. Johnson">Dr. Johnson</Option>
-              </Select>
-            </Form.Item>
-          </Form>
+      <Card className="card-header mb-4 mt-4 p-4">
+        <Typography.Text
+          style={{
+            color: "#003F6D",
+            fontWeight: "bold",
+            marginBottom: "16px",
+          }}
+        >
+          Find Patient Details by:
+        </Typography.Text>
+        <Row gutter={16} className="mt-2">
+          <Col span={6}>
+            <Input
+              placeholder="First Name"
+              value={searchParams.firstName}
+              onChange={(e) => handleSearchChange(e, "firstName")}
+              allowClear
+            />
+          </Col>
+          <Col span={6}>
+            <Input
+              placeholder="Last Name"
+              value={searchParams.lastName}
+              onChange={(e) => handleSearchChange(e, "lastName")}
+              allowClear
+            />
+          </Col>
+          <Col span={6}>
+            <Search
+              placeholder="Patient ID"
+              value={searchParams.patientId}
+              onChange={(e) => handleSearchChange(e, "patientId")}
+              allowClear
+              onSearch={handleFilterPatients}
+            />
+          </Col>
+          <Col span={6}>
+            <Input
+              placeholder="Patient No"
+              value={searchParams.patientNo}
+              onChange={(e) => handleSearchChange(e, "patientNo")}
+              allowClear
+            />
+          </Col>
+        </Row>
+      </Card>
+      {showList && (
+        <div className="mt-4">
+          <Table
+            columns={columns}
+            dataSource={filteredPatients}
+            pagination={{ pageSize: 10 }}
+          />
         </div>
-      </Modal>
-      
-      {/* Confirmation Modal for Cancel Admission */}
+      )}
+      {/* Modal for Patient Details */}
       <Modal
-        title="Confirm Cancellation"
-        visible={isConfirmCancelVisible}
-        onOk={confirmCancelAdmission}
-        onCancel={() => setIsConfirmCancelVisible(false)}
-        okText="Yes, Cancel"
-        cancelText="No, Go Back"
+        title={
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography.Title level={5} style={{ color: "#0f5689" }}>
+              Patient Details
+            </Typography.Title>
+            <Button
+              type="primary"
+              onClick={toggleEditMode}
+              style={{
+                marginBottom: "10px",
+                float: "right",
+                marginRight: "10px",
+              }}
+              icon={
+                isEditing ? (
+                  <CloseOutlined style={{ color: "red" }} />
+                ) : (
+                  <EditOutlined style={{ color: "green" }} />
+                )
+              }
+              ghost
+            >
+              {isEditing ? "Cancel" : "Edit"}
+            </Button>
+          </div>
+        }
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={
+          <div className="d-flex justify-content-end align-items-center mt-4">
+            {!isEditing && !isVisitCreated && (
+              <Button
+                type="primary"
+                onClick={handleCreateVisit}
+                style={{ float: "right", marginRight: "10px" }}
+              >
+                Create Visit
+              </Button>
+            )}
+            {isEditing && (
+              <Button
+                type="primary"
+                // onClick={handleSave} Add logic for saving edited patient details
+                style={{ float: "right", marginRight: "10px" }}
+              >
+                Save
+              </Button>
+            )}
+            {isVisitCreated && (
+              <Button
+                type="primary"
+                onClick={handleDispatchToTriage}
+                style={{ float: "right", marginRight: "10px" }}
+              >
+                Dispatch to Triage
+              </Button>
+            )}
+            <Button
+              type="primary"
+              onClick={handleCancel}
+              style={{ float: "right" }}
+            >
+              Close
+            </Button>
+          </div>
+        }
+        width={1200}
+        style={{ top: 20, height: "auto" }}
       >
-        <p>Are you sure you want to cancel the admission for {selectedPatient?.firstName} {selectedPatient?.lastName}?</p>
+        {selectedPatient && (
+          <div>
+            <div className="row">
+              <div className="col-12 col-md-3">
+                <Card className="card-header h-100 ">
+                  <Form layout="vertical">
+                    <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                      General Information
+                    </Typography.Title>
+                    <Form.Item label="Patient No" style={{ width: "100%" }}>
+                      <Input
+                        value={selectedPatient.PatientNo}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Patient Name">
+                      <Input
+                        value={selectedPatient.SearchName}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Gender">
+                      <Input
+                        value={selectedPatient.Gender}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="ID Number">
+                      <Input
+                        value={selectedPatient.IDNumber}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+
+                    <Form.Item label="Date of Birth">
+                      <Input
+                        value={moment(selectedPatient.DateOfBirth).format(
+                          "YYYY-MM-DD"
+                        )}
+                        disabled={!isEditing}
+                      />
+                      <span style={{ color: "green" }}>
+                        {`Age: ${moment().diff(
+                          moment(selectedPatient.DateOfBirth),
+                          "years"
+                        )} years and ${
+                          moment().diff(
+                            moment(selectedPatient.DateOfBirth),
+                            "months"
+                          ) % 12
+                        } months`}
+                      </span>
+                    </Form.Item>
+                  </Form>
+                </Card>
+              </div>
+              <div className="col-12 col-md-6">
+                <Card className="card-header">
+                  <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                    Contact Information
+                  </Typography.Title>
+                  <Form layout="vertical">
+                    <Form.Item label="Phone Number">
+                      <Input
+                        value={selectedPatient.TelephoneNo1}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Sub County">
+                      <Input
+                        value={selectedPatient.SubCountyName}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                  </Form>
+                </Card>
+                <Card className="card-header mt-3 " style={{ height: "480px" }}>
+                  <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                    Emergency Contact
+                  </Typography.Title>
+                  <Form layout="vertical">
+                    <Form.Item label=" Next of Kin Name">
+                      <Input
+                        value={selectedPatient.NextOfkinFullName}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Relationship">
+                      <Input
+                        value={selectedPatient.NextofkinRelationship}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Phone Number">
+                      <Input
+                        value={selectedPatient.NextOfkinAddress1}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                  </Form>
+                </Card>
+              </div>
+              <div className="col-12 col-md-3">
+                <Card className="card-header">
+                  <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                    Consultation Details
+                  </Typography.Title>
+                  <Form layout="vertical">
+                    <Form.Item label="Patient Type">
+                      <Input
+                        value={selectedPatient.PatientType}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Clinic" name="clinic">
+                      {isVisitCreated ? (
+                        <Input
+                          value={selectedPatient.SpecialClinics}
+                          disabled={!isEditing}
+                        />
+                      ) : (
+                        <Select
+                          value={selectedPatient.SpecialClinics || ""}
+                          name="clinic"
+                          onChange={(value) =>
+                            setNewVisit((prev) => ({
+                              ...prev,
+                              clinic: value,
+                            }))
+                          }
+                          style={{ width: "100%" }}
+                          onFocus={handleDisplayDropDown}
+                          // disabled={!isEditing}
+                        >
+                          <Select.Option value="">Select Clinic</Select.Option>
+                          {clinicsPayload.map((clinic) => (
+                            <Select.Option key={clinic.No} value={clinic.No}>
+                              {clinic.Description}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Form.Item>
+                    <Form.Item label="Doctor" name="doctor">
+                      <Select
+                        value={selectedPatient.doctor || ""} // Use empty string as default if no doctor is selected
+                        onChange={(value) =>
+                          setNewVisit((prev) => ({
+                            ...prev,
+                            doctor: value,
+                          }))
+                        }
+                        style={{ width: "100%" }}
+                        onFocus={handleDisplayDropDown}
+                      >
+                       <Select.Option value="">--Select Doctor--</Select.Option>
+                    {filteredDoctors &&
+                      filteredDoctors.map((doc) => (
+                        <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                          {doc.DoctorsName}
+                        </Select.Option>
+                      ))}
+                      </Select>
+                    </Form.Item>
+                  </Form>
+                </Card>
+                <Card className="card-header mt-3">
+                  <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                    Billing Information
+                  </Typography.Title>
+                  <Form layout="vertical">
+                    <Form.Item label="Patient Type">
+                      {selectedPatient.PatientType === "Cash" ? (
+                        <Input value="Cash" disabled={!isEditing} />
+                      ) : (
+                        <Input value="Insurance" disabled={!isEditing} />
+                      )}
+                    </Form.Item>
+                    {selectedPatient.PatientType === "Cash" ? (
+                      <Form.Item label="Cash Amount">
+                        <Input
+                          value={selectedPatient.TotalBilled}
+                          disabled={!isEditing}
+                        />
+                      </Form.Item>
+                    ) : (
+                      <>
+                        <Form.Item label="Insurance Name">
+                          <Input
+                            value={selectedPatient.InsuranceName}
+                            disabled={!isEditing}
+                          />
+                        </Form.Item>
+                        <Form.Item label="Insurance Number">
+                          <Input
+                            value={selectedPatient.SchemeName}
+                            disabled={!isEditing}
+                          />
+                        </Form.Item>
+                        <Form.Item label="Debtor Amount">
+                          <Input
+                            value={selectedPatient.DebtorAccount}
+                            disabled={!isEditing}
+                          />
+                        </Form.Item>
+                        <Form.Item label="Total Amount">
+                          <Input
+                            value={selectedPatient.TotalBilled}
+                            disabled={!isEditing}
+                          />
+                        </Form.Item>
+                      </>
+                    )}
+                  </Form>
+                </Card>
+              </div>
+            </div>
+            {/* <div className="row mt-4">
+              <div className="col-12 col-md-9">
+                <Card className="card-header">
+                  <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+                    Insurance Information
+                  </Typography.Title>
+                  <Form layout="vertical">
+                    <Form.Item label="Insurance Name">
+                      <Input
+                        value={selectedPatient.InsuranceName}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                    <Form.Item label="Insurance Number">
+                      <Input
+                        value={selectedPatient.InsuranceNo}
+                        disabled={!isEditing}
+                      />
+                    </Form.Item>
+                  </Form>
+                </Card>
+              </div>
+              <div className="col-12 col-md-3">
+               
+              </div>
+            </div> */}
+          </div>
+        )}
       </Modal>
     </div>
   );

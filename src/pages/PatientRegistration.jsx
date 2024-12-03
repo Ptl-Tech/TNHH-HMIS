@@ -13,11 +13,7 @@ import {
   Typography,
   Avatar,
 } from "antd";
-import {
-  relationshipOptions,
-  PatientypeOptions,
-  InsuranceOptions,
-} from "../constants/DropDownConstants";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -43,7 +39,7 @@ import { useForm } from "antd/es/form/Form";
 const PatientRegistration = () => {
   const dispatch = useDispatch();
   const createPatientState = useSelector((state) => state.createPatient);
-  const { loading, error, success } = createPatientState;
+  const { loading, error, success, payload } = createPatientState;
   const navigate = useNavigate();
   const form = useForm();
   const createTriageVisitState = useSelector(
@@ -54,6 +50,7 @@ const PatientRegistration = () => {
     loading: postTriageVisitLoading,
     error: postTriageVisitError,
     success: postTriageVisitSuccess,
+    payload: postTriageVisitPayload,
   } = useSelector((state) => state.postTriageVisit);
   const {
     loading: countriesLoading,
@@ -94,7 +91,7 @@ const PatientRegistration = () => {
     loading: doctorsLoading,
     error: doctorsError,
     success: doctorsSuccess,
-    doctors: doctorsPayload,
+    data: doctorsPayload,
   } = useSelector((state) => state.getDoctorsList);
 
   const {
@@ -143,8 +140,7 @@ const PatientRegistration = () => {
     county: "",
     schemeName: "",
     howYouKnewABoutUs: "",
-    doctor: "",
-    clinic: "",
+
     subCounty: "",
     residence: "",
     patientStatus: 0,
@@ -153,7 +149,11 @@ const PatientRegistration = () => {
   const [patientId, setPatientId] = useState(null);
   const [dobError, setDobError] = useState(""); // State for DOB error message
   const [appointmentId, setAppointmentId] = useState(null);
-
+  const [newVisit, setNewVisit] = useState({
+    patientNo: "",
+    clinic: "",
+    doctor: "",
+  });
   // Handle dropdown display for fetching country list
   const handleDisplayDropDown = (e) => {
     const { name, value } = e.target;
@@ -218,16 +218,16 @@ const PatientRegistration = () => {
         updatedPatient[name] = value;
 
         // Update Principal Member Name if switch is checked
-        if (
-          prev.isPrincipleMember &&
-          (name === "firstName" || name === "middleName" || name === "lastName")
-        ) {
-          updatedPatient.insurancePrinicipalMemberName = `${
-            updatedPatient.firstName
-          } ${updatedPatient.middleName || ""} ${
+        if (prev.isPrincipleMember && (name === "firstName" || name === "middleName" || name === "lastName")) {
+          updatedPatient.insurancePrinicipalMemberName = `${updatedPatient.firstName} ${updatedPatient.middleName || ""} ${
             updatedPatient.lastName
           }`.trim();
         }
+
+        // Update Membership No if switch is checked
+        // form.setFieldsValue({
+        //   membershipNo: updatedPatient.isPrincipleMember ? updatedPatient.idNumber : "",
+        // })
       }
 
       return updatedPatient;
@@ -295,14 +295,21 @@ const PatientRegistration = () => {
       const patientId = await dispatch(createPatient(patientData));
 
       if (patientId) {
-        setPatientId(patientId); // Store patient ID in state
-        console.log("Patient ID:", patientId);
+        setPatientId(patientId);
+
+        // Prepare the new visit data
+        const visitData = {
+          patientNo: patientId,
+          clinic: newVisit.clinic,
+          doctor: newVisit.doctor,
+        };
 
         // Dispatch the action to create a triage visit
-        const appointmentId = await dispatch(createTriageVisit(patientId));
+        const appointmentId = await dispatch(createTriageVisit(visitData));
 
         if (appointmentId) {
           setAppointmentId(appointmentId);
+          console.log("Triage visit created for Patient ID:", appointmentId);
         }
 
         // Check for success and payload in the response
@@ -320,21 +327,20 @@ const PatientRegistration = () => {
   };
 
   const handleTriageDispatch = async () => {
-    try {
-      // Dispatch the action with the appointmentId (which should be passed correctly)
-      const result = await dispatch(postTriageVisit(appointmentId));
+    console.log("Triage visit created for Patient ID:", appointmentId);
 
-      if (result) {
-        message.success("Triage visit updated successfully!");
-        console.log("Triage visit updated with Appointment ID:", appointmentId);
-      } else {
-        message.error(
-          "Failed to dispatch triage visit update. Please try again."
-        );
-      }
-    } catch (error) {
-      console.error("Error during triage dispatch:", error);
-      message.error("Failed to dispatch triage visit. Please try again.");
+    // Dispatch the action with the appointmentId (which should be passed correctly)
+    const result = await dispatch(postTriageVisit(appointmentId));
+
+    if (postTriageVisitSuccess) {
+      //reset form
+      form.resetFields();
+
+     
+    } else {
+      message.error(
+        "Failed to dispatch triage visit update. Please try again."
+      );
     }
   };
 
@@ -363,7 +369,7 @@ const PatientRegistration = () => {
   // };
 
   useEffect(() => {
-    if (visitSuccess && visitPayload) {
+    if (visitSuccess) {
       message.success("Patient registered successfully!");
       // console.log("Patient ID:", patientId);
       // navigate(`/reception/create-visit/${patientId}`, {
@@ -404,26 +410,24 @@ const PatientRegistration = () => {
     dispatch(listInsuranceOptions());
     dispatch(listDoctors());
 
-    console.log("country list: ", countriesPayload);
   }, [dispatch]);
 
-  // Fetch branch from localStorage
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const branchCode = userInfo?.userData?.shortcut_Dimension_1_Code;
+    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
 
     if (branchCode && doctorsPayload) {
-      // Filter doctors based on branch and responsibility center
+      // Filter doctors based on specialization and branch
       const filtered = doctorsPayload.filter(
         (doctor) =>
-          doctor.shortcut_Dimension_1_Code === branchCode &&
-          doctor.ResponsibilityCenter === newPatient.clinic
+          doctor.Specialization === newVisit.clinic && // Match specialization with selected clinic
+          doctor.GlobalDimension1Code === branchCode // Match branch code
       );
-      setFilteredDoctors(filtered);
+      setFilteredDoctors(filtered); // Update the filtered doctors list
     }
-  }, [doctorsPayload, newPatient.clinic]);
+  }, [doctorsPayload, newVisit.clinic, filteredDoctors, newVisit.doctor]);
+
   return (
-    <div className="container">
+    <div>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={7}>
           {/* <Typography.Title
@@ -434,7 +438,7 @@ const PatientRegistration = () => {
         </Typography.Title> */}
           <Card bordered={false} className="card-header">
             <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#003F6D" }}>
+              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                 General Information
               </Typography.Title>
               <Form.Item
@@ -508,7 +512,7 @@ const PatientRegistration = () => {
         </Col>
         <Col xs={24} md={11}>
           <Card bordered={false} className="card-header">
-            <Typography.Title level={5} style={{ color: "#003F6D" }}>
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
               Contact Information
             </Typography.Title>
             <Form layout="vertical" onFinish={handleSubmit}>
@@ -854,15 +858,7 @@ const PatientRegistration = () => {
               </div>
             </div>
 
-            <div className="d-flex my-2 flex-row align-items-center">
-              <Button
-                type="primary"
-                style={{ width: "100%" }}
-                onClick={handleTriageDispatch}
-              >
-                Dispatch to Triage
-              </Button>
-            </div>
+            <div className="d-flex my-2 flex-row align-items-center"></div>
           </Card>
 
           <Card style={{ width: "100%" }} className="card-header mt-3">
@@ -870,6 +866,7 @@ const PatientRegistration = () => {
               Consultation Details
             </Typography.Title>
             <div className="row g-3 my-2 align-items-center justify-content-center">
+              {/* Clinic Dropdown */}
               <div className="col-12 text-primary">
                 <Form.Item
                   label="Clinic:"
@@ -885,9 +882,11 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Clinic"
                     className="w-100"
-                    value={newPatient.clinic}
-                    onChange={(value) => handleSelectChange("clinic", value)}
+                    value={newVisit.clinic}
                     onFocus={handleDisplayDropDown}
+                    onChange={(value) =>
+                      setNewVisit((prev) => ({ ...prev, clinic: value }))
+                    }
                   >
                     <Select.Option value="">--Select Clinic--</Select.Option>
                     {clinicsPayload &&
@@ -899,35 +898,31 @@ const PatientRegistration = () => {
                   </Select>
                 </Form.Item>
               </div>
-              <div className="col-12  text-primary">
+
+              {/* Doctor Dropdown */}
+              <div className="col-12 text-primary">
                 <Form.Item
                   label="Doctor:"
                   name="doctor"
-                  required
                   style={{ width: "100%" }}
                 >
-                  <Input
+                  <Select
                     placeholder="Select Doctor"
-                    style={{ width: "100%" }}
-                    name="doctor"
-                    value={newPatient.doctor}
-                    onChange={handleInputChange}
-                  />
-                  {/* <Select
-                    placeholder="Select Clinic"
                     className="w-100"
-                    value={newPatient.doctor}
-                    onChange={(value) => handleSelectChange("doctor", value)}
+                    value={newVisit.doctor}
                     onFocus={handleDisplayDropDown}
+                    onChange={(value) =>
+                      setNewVisit((prev) => ({ ...prev, doctor: value }))
+                    }
                   >
-                    <Select.Option value="">--Select Clinic--</Select.Option>
-                    {clinicsPayload &&
-                      clinicsPayload.map((clinic) => (
-                        <Select.Option key={clinic.No} value={clinic.No}>
-                          {clinic.Description}
+                    <Select.Option value="">--Select Doctor--</Select.Option>
+                    {filteredDoctors &&
+                      filteredDoctors.map((doc) => (
+                        <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                          {doc.DoctorsName}
                         </Select.Option>
                       ))}
-                  </Select> */}
+                  </Select>
                 </Form.Item>
               </div>
             </div>
@@ -1129,13 +1124,13 @@ const PatientRegistration = () => {
                         handleSelectChange("paymentMode", value)
                       }
                     >
-                      <Select.Option value="1">Cash</Select.Option>
-                      <Select.Option value="2">Insurance</Select.Option>
+                      <Select.Option value="2">Cash</Select.Option>
+                      <Select.Option value="1">Insurance</Select.Option>
                     </Select>
                   </Form.Item>
                 </div>
               </div>
-              {newPatient.paymentMode === "2" && (
+              {newPatient.paymentMode === "1" && (
                 <>
                   <div className="row g-3  align-items-center justify-content-center">
                     <div className="col-12 col-md-6 text-primary">
@@ -1267,7 +1262,7 @@ const PatientRegistration = () => {
             </Form>
 
             {/* submit or save patient details */}
-            <div className="d-flex my-2 flex-row align-items-center justify-content-end">
+            <div className="d-flex my-2 gap-2 flex-row align-items-center justify-content-end">
               <Button
                 type="primary"
                 size="large"
@@ -1275,6 +1270,14 @@ const PatientRegistration = () => {
                 // style={{ width: "100%" }}
               >
                 Create Visit
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleTriageDispatch}
+                // style={{ width: "100%" }}
+              >
+                Dispatch to Triage
               </Button>
             </div>
           </Card>

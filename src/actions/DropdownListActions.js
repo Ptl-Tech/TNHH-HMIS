@@ -19,7 +19,13 @@ import {
   KINS_LIST_FAIL,
   INSURANCE_LIST_REQUEST,
   INSURANCE_LIST_SUCCESS,
-  INSURANCE_LIST_FAIL
+  INSURANCE_LIST_FAIL,
+  DOCTOR_LIST_REQUEST,
+  DOCTOR_LIST_SUCCESS,
+  DOCTOR_LIST_FAIL,
+  EMPLOYEES_LIST_REQUEST,
+  EMPLOYEES_LIST_SUCCESS,
+  EMPLYEES_LIST_FAIL
 
 } from "../constants/DropDownConstants";
 
@@ -218,9 +224,48 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
   }
 };
 
+
 export const listDoctors = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: INSURANCE_LIST_REQUEST });
+    dispatch({ type: DOCTOR_LIST_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyDoctorsSetup&isList=true`,
+      config
+    );
+
+    // // Filter data to only include doctors
+    // const doctors = data.filter(
+    //   (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
+    // );
+
+    dispatch({ type: DOCTOR_LIST_SUCCESS, payload: data });
+
+    console.log("Filtered DOCTORS data: ", data);
+  } catch (error) {
+    dispatch({ type: DOCTOR_LIST_FAIL, payload: error.message });
+  }
+};
+
+
+export const getEmployeesList = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: EMPLOYEES_LIST_REQUEST });
 
     const {
       otpVerify: { userInfo },
@@ -242,19 +287,18 @@ export const listDoctors = () => async (dispatch, getState) => {
       config
     );
 
-    // Filter data to only include doctors
-    const doctors = data.filter(
-      (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
-    );
+    // // Filter data to only include doctors
+    // const doctors = data.filter(
+    //   (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
+    // );
 
-    dispatch({ type: INSURANCE_LIST_SUCCESS, payload: doctors });
+    dispatch({ type: EMPLOYEES_LIST_SUCCESS, payload: data });
 
-    console.log("Filtered doctors data: ", doctors);
+    console.log("Filtered employees data: ", data);
   } catch (error) {
-    dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
+    dispatch({ type: EMPLYEES_LIST_FAIL, payload: error.message });
   }
 };
-
 
 export const branchesList = (patient) => async (dispatch, getState) => {
   try {

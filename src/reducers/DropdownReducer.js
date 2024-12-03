@@ -27,6 +27,10 @@ import {
   DOCTOR_LIST_SUCCESS,
   DOCTOR_LIST_FAIL,
   DOCTOR_LIST_RESET,
+  EMPLOYEES_LIST_REQUEST,
+  EMPLOYEES_LIST_SUCCESS,
+  EMPLYEES_LIST_FAIL,
+  EMPLOYEES_LIST_RESET,
 } from "../constants/DropDownConstants";
 
 export const countriesListReducer = (state = { countries: [] }, action) => {
@@ -120,6 +124,20 @@ export const getdoctorListReducer = (state = { data: [] }, action) => {
   }
 };
 
+export const getemployeesListReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case EMPLOYEES_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case EMPLOYEES_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case EMPLYEES_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case EMPLOYEES_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
 
 
 export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
