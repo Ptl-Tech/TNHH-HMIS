@@ -15,6 +15,11 @@ import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergies
 import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
 import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
 import { getInjectionsReducer } from "./triage-reducers/getInjectionsReducer";
+import { getStoreRequisitionHeadersReducer } from "./triage-reducers/getStoreRequisitionHeadersReducer";
+import { getItemsReducer } from "./triage-reducers/getItemsReducer";
+import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
+import { getDressingReducer } from "./triage-reducers/getDressingReducer";
+import { getItemUnitsOfMeasureReducer } from "./triage-reducers/getItemUnitsOfMeasureReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -45,6 +50,12 @@ export const rootReducer = combineReducers({
     getAllergiesAndMedications:getAllergiesAndMedicationReducer,
     postInjections:postInjectionsReducer,
     getInjectionNumber:getInjectionNumberReducer,
-    getInjections:getInjectionsReducer
+    getInjections:getInjectionsReducer,
+    getStoreRequisitionHeaders:getStoreRequisitionHeadersReducer,
+    getItems:getItemsReducer,
+    getItemUnits:getItemUnitsOfMeasureReducer,
+    postDressings:postDressingsReducer,
+    getDressing:getDressingReducer
+
 
 });

@@ -14,7 +14,7 @@ export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatc
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&query=${observationNo}=No eq ‘PTL’&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&query=${observationNo}=No eq ‘PTL’&isList=false`, config);
 
 
         console.log('response data', data)

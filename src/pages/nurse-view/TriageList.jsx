@@ -15,9 +15,8 @@ const TriageList = () => {
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
   const navigate = useNavigate();
 
-  function handleNavigate(patientId) {
-    console.log('check in button clicked', patientId)
-    navigate(`/Nurse/Triage/Patient?Patient_id=${patientId}`)
+  function handleNavigate(patientId, observationNo) {
+    navigate(`/Nurse/Triage/Patient?Patient_id=${patientId}&Ob_number=${observationNo}`);
   }
 
   const dispatch = useDispatch();
@@ -26,36 +25,31 @@ const TriageList = () => {
 
   const {triageList} = useSelector((state) => state.getTriageList) || {};
 
-  
+  console.log('triage waiting list', triageWaitingList)
+  console.log('triage waiting triage list', triageList)
 
 //combine triageWaitingList and triageList and filtering by status
-  // const combinedTriageWaitingListAndTriageList = triageWaitingList
-  // .map(user => {
-  //   const triage = triageList.find(t => t.PatientNo.trim() === user.PatientNo.trim());
-  //   return triage ? { ...user, status: triage.Status } : null;
-  // })
-  // .filter(record => {
-  //   return record && record.status.trim().toLowerCase() === 'closed';
-  // });
-
-  // console.log('triage combined data', combinedTriageWaitingListAndTriageList)
-  // console.log('triage waiting list', triageWaitingList)
-  // console.log('triage waiting triage list', triageList)
-
-
-  const combinedData = triageList.map(triage => {
-    const matchingPatient = triageWaitingList.find(waiting => waiting.PatientNo === triage.PatientNo);
+ 
+  const combinedTriageWaitingListAndTriageList = triageList.map((triage) => {
+    const matchingPatient = triageWaitingList.find(
+      (waiting) => waiting.PatientNo === triage.PatientNo
+    );
+  
     return {
       ...triage,
-      ...matchingPatient,
+      TriageStatus: triage.Status || "", // Ensure triage's Status is mapped to TriageStatus
+      ...(matchingPatient
+        ? {
+            ...matchingPatient,
+            WaitingListStatus: matchingPatient.Status || "", // Ensure waiting list's Status is mapped to WaitingListStatus
+          }
+        : {}),
     };
   });
 
-  console.log('combined data', combinedData)
-
  
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = combinedData.map((item, index) => ({
+  const waitingListTableDataSource = combinedTriageWaitingListAndTriageList.map((item, index) => ({
     key: index + 1,
     name: item?.Names || `${item?.Surname} ${item?.MiddleName} ${item?.LastName}`,
     regDate: item.DateRegistered,
@@ -63,6 +57,7 @@ const TriageList = () => {
     sex: item?.Gender,
     number: item?.PatientNo,
     idNumber: item?.IDNumber,
+    observationNo: item?.ObservationNo,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
 
@@ -115,6 +110,11 @@ const TriageList = () => {
       rowScope: 'row',
     },
     {
+      title: 'Observation No',
+      dataIndex: 'observationNo',
+      rowScope: 'row',
+    },
+    {
       title: 'Reg Date',
       dataIndex: 'regDate',
       rowScope: 'row',
@@ -139,13 +139,13 @@ const TriageList = () => {
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record.number)}><RightOutlined />Check In</Button>
+      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record?.number, record?.observationNo)}><RightOutlined />Check In</Button>
     },
   ];
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={combinedData}/>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>

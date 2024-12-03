@@ -35,7 +35,7 @@ const TriageSummeryCard = ({ waitingPatient }) => {
                     
                     <div style={{ marginLeft: '20px' }}>
                         <Typography.Title level={5} style={{color: 'gray'}}>
-                            Impatient in Triage
+                            Inpatient in Triage
                         </Typography.Title>
                         <Typography.Text style={{ fontSize: '12px', fontWeight: 'bold', }}>
                             20

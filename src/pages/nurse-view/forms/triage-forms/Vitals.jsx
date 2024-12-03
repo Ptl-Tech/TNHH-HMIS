@@ -1,20 +1,119 @@
-import { Col, Form, Input, Row } from 'antd'
-import PropTypes from 'prop-types'
+import { Button, Col, Form, Input, message, Row } from 'antd'
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
+import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
+import { useEffect } from 'react';
+import Loading from '../../../../partials/nurse-partials/Loading';
 
-const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
-  const patientNumber = triageListDetail?.PatientNo
-  const observationNumber = triageListDetail?.ObservationNo
-  return (
-    <Form layout="vertical" 
-       validateTrigger="onChange"
-       initialValues={{
-        vitals: { 
-          patientNumber: patientNumber,
-          observationNumber: observationNumber
+const FormVitals = ({ observationNumber, patientNumber}) => {
+
+  const dispatch = useDispatch();
+  const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
+  
+  useEffect(() => {
+    dispatch(getVitalsLinesSlice(patientNumber));
+  }, [dispatch, patientNumber]);
+
+  const onFinish = (values) => {
+    const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02, respirationRate } = values.vitals;
+
+    const createVitals = {
+      pulseRate,
+      Pain: parseInt(cleanValue(pain)),
+      Height: parseFloat(cleanValue(height)),
+      Weight: parseFloat(cleanValue(weight)),
+      Temperature: parseFloat(cleanValue(temperature)),
+      bloodPreasure,
+      sP02,
+      respirationRate,
+      patientNo: patientNumber,
+      observationNo:  observationNumber,
+      BMI: calculateBMI(height, weight),
+      type: 0,
+      myAction: "create"
+    };
+
+    const updateVitals = {
+      pulseRate,
+      Pain: parseInt(cleanValue(pain)),
+      Height: parseFloat(cleanValue(height)),
+      Weight: parseFloat(cleanValue(weight)),
+      Temperature: parseFloat(cleanValue(temperature)),
+      bloodPreasure,
+      sP02,
+      respirationRate,
+      patientNo: patientNumber,
+      observationNo:  observationNumber,
+      BMI: calculateBMI(height, weight),
+      type: 0,
+      myAction: "update"
+    };
+
+    //check if vitals exists ifs so update else create
+    
+    if(Object.keys(vitalsLines).length > 0) {
+    // update vitals
+    dispatch(postTriageListVitalsSlice(updateVitals)).then(()=>{
+      message.success('successfully updated vitals');
+    })
+    
+      
+    }else{
+      // create vitals
+      dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
+        if(data?.status === "success"){
+          message.success(data?.status);
+          // dispatch(getVitalsLinesSlice(patientNo));
+        }else{
+          message.error('Error saving vitals data');
         }
+      })
+    }
+  
+  };
+  
+  
+  const cleanValue = (value) => {
+    if (typeof value === "string") {
+      return value.replace(/[^\d.-]/g, "");
+    }
+    return value;
+  };
 
-      }}
-    >
+  const calculateBMI = (height, weight) => {
+    if (!height || !weight) {
+      return null; 
+    }
+    const heightInMeters = height / 100; 
+    const bmi = weight / (heightInMeters * heightInMeters);
+    return bmi.toFixed(2); 
+  };
+
+  return (
+   <div>
+    {
+      loadingVitalsLines ? (
+        <Loading />
+      ):(
+        <Form layout="vertical" 
+
+          onFinish={onFinish}
+          initialValues={{
+            vitals: {
+              observationNumber: observationNumber,
+              patientNumber: patientNumber,
+              pulseRate: vitalsLines?.PulseRate,
+              bloodPreasure: vitalsLines?.BloodPreasure,
+              temperature: vitalsLines?.Temperature,
+              sP02: vitalsLines?.SP02,
+              height: vitalsLines?.Height,
+              weight: vitalsLines?.Weight,
+              respirationRate: vitalsLines?.RespirationRate,
+              pain: vitalsLines?.Pain,
+            },
+          }}
+          >
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item 
@@ -23,9 +122,6 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                   rules={[{ required: true, message: 'Please input observation number!' }]} 
                 >
                   <Input type='text' 
-                    name='observationNumber'
-                    onChange={handleOnChange}
-                    value={setFormData.observationNumber}
                     disabled
                   />
                 </Form.Item>
@@ -38,8 +134,6 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                   >
                   <Input type='text' 
                     name='patientNumber'
-                    onChange={handleOnChange}
-                    value={setFormData.patientNumber}
                     disabled
                   />
                 </Form.Item>
@@ -53,8 +147,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 >
                   <Input type='text'
                     name='pulseRate'
-                    onChange={handleOnChange}
-                    value={setFormData.pulseRate}
+                    
                   />
                 </Form.Item>
               </Col>
@@ -64,8 +157,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                   >
                   <Input type='text' 
                       name='bloodPreasure'
-                      onChange={handleOnChange}
-                      value={setFormData.bloodPressure}
+                      
                   />
                 </Form.Item>
               </Col>
@@ -77,8 +169,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 >
                   <Input type='number' 
                     name='temperature'
-                    onChange={handleOnChange}
-                    value={setFormData.temperature}
+                    
                   />
                 </Form.Item>
               </Col>
@@ -88,8 +179,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 >
                   <Input type='text' 
                     name='sP02'
-                    onChange={handleOnChange}
-                    value={setFormData.SPO2}
+              
                   />
                 </Form.Item>
               </Col>
@@ -102,8 +192,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 >
                   <Input type='number' 
                     name='height'
-                    onChange={handleOnChange}
-                    value={setFormData.height}
+                    
                   />
                 </Form.Item>
               </Col>
@@ -113,8 +202,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 >
                   <Input type='number' 
                     name='weight'
-                    onChange={handleOnChange}
-                    value={setFormData.weight}
+                
                   />
                 </Form.Item>
               </Col>
@@ -127,8 +215,7 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                   <Input type='text' 
                   
                   name='respirationRate'
-                  onChange={handleOnChange}
-                  value={setFormData.respirationRate}
+                  
                   />
                 </Form.Item>
               </Col>
@@ -136,24 +223,27 @@ const FormVitals = ({handleOnChange, setFormData, triageListDetail}) => {
                 <Form.Item label="Pain" name={['vitals', 'pain']}>
                   <Input type='number' 
                     name='pain'
-                    onChange={handleOnChange}
-                    value={setFormData.pain}
+              
                   />
                 </Form.Item>
               </Col>
+              <Col span={12}>
+                <Form.Item >
+                    <Button type="primary" htmlType="submit">Save</Button>
+                </Form.Item>
+              </Col>
             </Row>
-          </Form>
+        </Form>
+      )
+    }
+   </div>
   )
 }
 
 export default FormVitals
 
-//props validation
+//prop type validation
 FormVitals.propTypes = {
-  setFormData: PropTypes.func.isRequired,
-  setOnModalOpen: PropTypes.func.isRequired,
-  setModalContent: PropTypes.func.isRequired,
-  handleOnChange: PropTypes.func.isRequired,
-  activeTab: PropTypes.string.isRequired,
-  triageListDetail: PropTypes.object.isRequired,
-};
+  observationNumber: PropTypes.string.isRequired,
+  patientNumber: PropTypes.string.isRequired,
+}

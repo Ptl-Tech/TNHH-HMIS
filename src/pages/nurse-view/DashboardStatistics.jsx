@@ -67,7 +67,7 @@ const DashboardStatistics = () => {
                   </Card>
               </Col>
            </Row>
-        </div>
+    </div>
 
   )
 }

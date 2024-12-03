@@ -14,7 +14,7 @@ export const getVitalsLinesSlice = (patientNo) => async (dispatch, getState) => 
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_VITAL_LINES_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&query=${patientNo}=No eq ‘PTL’&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&query=${patientNo}=No eq ‘PTL’&isList=false`, config);
 
 
         console.log('response data', data)

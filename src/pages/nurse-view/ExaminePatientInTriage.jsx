@@ -1,335 +1,117 @@
-import { Card, Tabs, Button, Modal, message } from 'antd'
-import { useEffect, useState } from 'react'
-import { PlusOutlined } from '@ant-design/icons';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
-import PatientDetailPage from './PatientDetailPage';
+import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Space, Button } from 'antd'
+import { UserOutlined, AlignCenterOutlined, BlockOutlined, BorderlessTableOutlined, GoldOutlined, RightOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
 import Injections from './forms/triage-forms/Injections';
 import Dressing from './forms/triage-forms/Dressing';
-import VitalsTable from './tables/triage-tables/VitalsTable';
-import AllergyAndMedicationTable from './tables/triage-tables/AllergyAndMedicationTable';
-import InjectionTable from './tables/triage-tables/Injection';
-import DressingTable from './tables/triage-tables/DressingTable';
-import { getTriageListDetails } from '../../actions/triage-actions/getTriageListDetailsSlice';
-import { postTriageListVitalsSlice } from '../../actions/triage-actions/postTriageListVitalsSlice';
-import { getVitalsLinesSlice } from '../../actions/triage-actions/getVitalsLinesSlice';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
 import useAuth from '../../hooks/useAuth';
-import { getAllergiesAndMedicationsSlice } from '../../actions/triage-actions/getAllergiesAndMedicationsSlice';
-import { postAllergiesMedicationSlice } from '../../actions/triage-actions/postAllergiesMedicationSlice';
-import { postInjectionsSlice } from '../../actions/triage-actions/postInjectionsSlice';
-import { getInjectionsSlice } from '../../actions/triage-actions/getInjectionsSlice';
 
 
 const EvaluatePatientInTriage = () => {
-  const [onModalOpen, setOnModalOpen] = useState(false)
-  const [modalContent, setModalContent] = useState(null);
+
+
+  const location = useLocation();
   const dispatch = useDispatch();
+  
+  // Parse the query parameters using URLSearchParams
+  const queryParams = new URLSearchParams(location.search);
+  const patientNo = queryParams.get('Patient_id');
+  const observationNo = queryParams.get('Ob_number');
+  const userDetails = useAuth();
+  const staffNo = userDetails?.userData?.firstName
+
+  useEffect(()=>{
+      dispatch(getPatientDetails(patientNo))
+  }, [dispatch, patientNo])
 
   const { patientDetails } = useSelector((state) => state.getPatientDetails);
-  const { triageListDetail }  = useSelector((state) => state.getTriageListDetails);
-  const {loading} = useSelector((state) => state.postTriageListVitals);
-  const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
-  const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
-  const {loadingInjections, injections} = useSelector((state) => state.getInjections);
 
-  const userDetails = useAuth();
+  const patientName = patientDetails?.SearchName || `${patientDetails?.Surname} ${patientDetails?.FirstName} ${patientDetails?.MiddleName}`;
 
-  const staffNo = userDetails?.userData?.firstName
-  const observationNo = triageListDetail?.ObservationNo;
-
- console.log('allergies and medication', allergiesMedication)
-
-  const [ formData, setFormData ] = useState({ });
-
-  //getting the patientNo from the url
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const patientNo = searchParams.get('Patient_id');
-
-
-  //dispatch an action to get the patient's details
-  useEffect(() => {
-    if (patientNo) {
-      dispatch(getPatientDetails(patientNo));
-      dispatch(getTriageListDetails(patientNo));
-      dispatch(getVitalsLinesSlice(patientNo));
-    }
-  }, [dispatch, patientNo]);
-
-  useEffect(() => {
-    if (observationNo) {
-      dispatch(getAllergiesAndMedicationsSlice(observationNo));
-    }
-  }, [dispatch, observationNo]);
-
-  useEffect(() => {
-    if (observationNo) {
-      dispatch(getInjectionsSlice(observationNo));
-    }
-  }, [dispatch, observationNo]);
-
-
-  const [activeTab, setActiveTab] = useState('vitals');
-
-  const handleTabChange = (key) => {
-    setActiveTab(key);
-    setOnModalOpen(false); // Close any open modal when switching tabs
-    setModalContent(null); // Reset modal content to avoid stale data
+  const handleDispatchToDoctor = () => {
+    console.log("Dispatching to Doctor");
   };
 
-
-  const handleOpenModal = () => {
-    const formFields = getFormFieldsForTab(activeTab); // Dynamically get form fields
-    setModalContent(formFields); // Update modal content
-    setOnModalOpen(true);
-  }
-
-  const getFormFieldsForTab = (tabKey) => {
-    switch (tabKey) {
-      case 'vitals':
-        return (
-          <FormVitals handleOnChange={handleOnChange} setFormData={setFormData} 
-          triageListDetail={triageListDetail}
-          />
-        );
-      case 'allergy':
-        return (
-          <AllergyAndMedication handleOnChange={handleOnChange} setFormData={setFormData} handleSelectChange={handleSelectChange} activeTab={activeTab} formData={formData} triageListDetail={triageListDetail} staffNo={staffNo}/>
-        );
-        case 'injections':
-        return (
-          <Injections handleOnChange={handleOnChange} setFormData={setFormData} handleDateChange={handleDateChange} handleTimeChange={handleTimeChange} activeTab={activeTab} formData={formData}
-          handleSelectChange={handleSelectChange}
-          triageListDetail={triageListDetail}
-          />
-        );
-        case 'dressing':
-        return (
-          <Dressing handleOnChange={handleOnChange} setFormData={setFormData}/>
-        );
-      default:
-        return null;
-    }
-  };
-
-
-  const handleOnChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [activeTab]: {
-        ...prevState[activeTab],
-        [name]: value,
-      },
-    }));
-  };
-
-
-// DatePicker handler (specific to date fields)
-const handleDateChange = (date, dateString, name) => {
-  setFormData((prevState) => ({
-    ...prevState,
-    [activeTab]: {
-      ...prevState[activeTab],
-      [name]: dateString, // Save formatted date
-    },
-  }));
-};
-
-const handleTimeChange = (time, timeString, name) => {
-  setFormData((prevState) => ({
-    ...prevState,
-    [activeTab]: {
-      ...prevState[activeTab],
-      [name]: timeString, // Save the formatted time
-    },
-  }));
-};
-
-const handleSelectChange = (value, name) => {
-  setFormData((prevState) => ({
-    ...prevState,
-    [activeTab]: {
-      ...prevState[activeTab],
-      [name]: value, // Save the selected value
-    },
-  }));
-};
-
-const cleanValue = (value) => {
-  if (typeof value === "string") {
-    // Remove any non-numeric characters if applicable
-    return value.replace(/[^\d.-]/g, "");
-  }
-  return value;
-};
-
-  const handleSaveModalData = () => {
-    // switch the active tab and call appropriate save action
-    switch(activeTab) {
-      case 'vitals':{
-        // Save vitals data
-       
-        const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02,respirationRate } = formData[activeTab];
-        const vitalsData = {
-          pulseRate,
-          Pain: parseInt(cleanValue(pain)),
-          Height: parseFloat(cleanValue(height)),
-          Weight: parseFloat(cleanValue(weight)),
-          Temperature: parseFloat(cleanValue(temperature)),
-          bloodPreasure,
-          sP02,
-          respirationRate,
-          patientNo,
-          observationNo,
-          type: 0,
-          myAction: "create"
-
-        };
-
-        dispatch(postTriageListVitalsSlice(vitalsData)).then((data)=>{
-          if(data?.status === "success"){
-            message.success(data?.status);
-            setFormData({});
-            setOnModalOpen(false);
-            dispatch(getVitalsLinesSlice(patientNo));
-          }else{
-            message.error('Error saving vitals data');
-            setFormData({});
-            setOnModalOpen(false);
-          }
-        })
-        
-        break;
-      }
-      case 'allergy':{
-        // Save allergy and medication data
-        const { injectionNo, injectionQuantity, injectionDate, injectionTime, injectionRemarks} = formData[activeTab];
-        const injectionsData = {
-          
-          injectionNo,
-          injectionQuantity,
-          injectionDate,
-          injectionTime,
-          injectionRemarks,
-          staffNo: staffNo,
-          observationNo,
-          posted: true,
-          myAction: "create"
-
-        };
-
-        dispatch(postInjectionsSlice(injectionsData)).then((data)=>{
-          console.log('dispatching the data', data);
-          if(data?.status === "success"){
-            message.success(data?.status);
-            setFormData({});
-            setOnModalOpen(false);
-            dispatch(getInjectionsSlice(observationNo));
-          }else{
-            message.error('Error saving vitals data');
-            setFormData({});
-            setOnModalOpen(false);
-          }
-        })
-        break;
-      }
-      case 'injections':{
-        // Save injections data
-        const { complains, reasonForVisit, foodAllergy, drugAllergy} = formData[activeTab];
-        const allergyAndMedicationData = {
-          
-          complains,
-          reasonForVisit: parseInt(cleanValue(reasonForVisit)),
-          foodAllergy,
-          drugAllergy,
-          patientNo,
-          staffNo: staffNo,
-          observationNo,
-          assessedBy: staffNo,
-          myAction: "create"
-
-        };
-
-        dispatch(postAllergiesMedicationSlice(allergyAndMedicationData)).then((data)=>{
-          console.log('dispatching the data', data);
-          if(data?.status === "success"){
-            message.success(data?.status);
-            setFormData({});
-            setOnModalOpen(false);
-            dispatch(getAllergiesAndMedicationsSlice(observationNo));
-          }else{
-            message.error('Error saving vitals data');
-            setFormData({});
-            setOnModalOpen(false);
-          }
-        })
-        break;
-      }
-      case 'dressing':{
-        // Save dressing data
-        console.log(formData[activeTab]);
-        break;
-      }
-      default:
-        break;
-    }
-    // setOnModalOpen(false); // Close modal
-  };
 
   return (
-    <>
-    <Card style={{ padding: '24px 10px 10px 10px' }}>
-          <PatientDetailPage patientDetails={patientDetails}/>
-          
-          <Tabs activeKey={activeTab} onChange={handleTabChange}>
-          <Tabs.TabPane tab="Vitals" key="vitals">
-            <Button type="primary" onClick={handleOpenModal}>
-              <PlusOutlined />
-              Add Vitals
-              </Button>
-              <VitalsTable handleOpenModal={handleOpenModal} vitalsLines={vitalsLines} loadingVitalsLines={loadingVitalsLines}/>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Allergy and Medication" key="allergy">
-            <Button type="primary" onClick={handleOpenModal}>
-              <PlusOutlined />
-              Add allergy and medication
-            </Button>
-            <AllergyAndMedicationTable handleOpenModal={handleOpenModal} allergiesMedication={allergiesMedication} allergyMedicationLoading={allergyMedicationLoading}/>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Injections" key="injections">
-            <Button type="primary" onClick={handleOpenModal}>
-              <PlusOutlined />
-              Add injections
-            </Button>
-            <InjectionTable handleOpenModal={handleOpenModal} loadingInjections={loadingInjections} injections={injections}/>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Dressing" key="dressing">
-            <Button type="primary" onClick={handleOpenModal}>
-              <PlusOutlined />
-              Add Dressing
-            </Button>
-            <DressingTable handleOpenModal={handleOpenModal}/>
-          </Tabs.TabPane>
-          </Tabs>
+    <div style={{ margin: '16px 10px' }}>
+           <Row gutter={8}>
+  
+              <Col span={16}>
+              <Card style={{ padding: '10px 16px' }}>
+                    <Tabs>
+                      <Tabs.TabPane tab="Vitals" key="1">
 
-    </Card>
-
-    <Modal
-      title="Patient Triage Details"
-      open={onModalOpen}
-      onCancel={() => setOnModalOpen(false)}
-      onOk={handleSaveModalData}
-      width={800}
-      confirmLoading={loading}
-    >
-      {modalContent}
-    </Modal>
-    </>
+                            <FormVitals observationNumber={observationNo} patientNumber={patientNo} />
+                      </Tabs.TabPane>
+                      <Tabs.TabPane tab="Allergies and Medication" key="2">
+                          <AllergyAndMedication observationNumber={observationNo} patientNumber={patientNo} staffNo={staffNo} />
+                      </Tabs.TabPane>
+                      <Tabs.TabPane tab="Injections" key="3">
+                          <Injections observationNumber={observationNo} staffNo={staffNo}/>
+                      </Tabs.TabPane>
+                      <Tabs.TabPane tab="Dressings" key="4">
+                          <Dressing observationNumber={observationNo}  staffNo={staffNo}/>
+                      </Tabs.TabPane>
+                    </Tabs>
+                </Card>
+              </Col>
+              <Col span={8}>
+                  <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <Avatar icon={<UserOutlined />} size={64}/>
+                    <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                          <Typography.Title level={5} style={{color: 'black'}}>{patientName}</Typography.Title>
+                          <Typography.Text style={{ fontSize: '14px', color:'gray' }}>DOB: {patientDetails?.DateOfBirth}</Typography.Text>
+                    </div>
+                  </div>
+                  <Divider />
+                  <Space style={{ display: 'flex', alignItems: 'baseline' }}>
+                      <AlignCenterOutlined />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>PatientNumber</Typography.Title>
+                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.PatientNo}</Typography.Text>
+                      </div>
+                  </Space>
+                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px' }}>
+                      <BlockOutlined />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Observation No</Typography.Title>
+                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{observationNo}</Typography.Text>
+                      </div>
+                  </Space>
+                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px', marginBottom: '10px' }}>
+                    <BorderlessTableOutlined />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Age</Typography.Title>
+                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{`${patientDetails?.AgeinYears} Years`}
+                        </Typography.Text>
+                      </div>
+                  </Space>
+                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px', marginBottom: '10px' }}>
+                    <GoldOutlined />
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Gender</Typography.Title>
+                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.Gender}</Typography.Text>
+                      </div>
+                  </Space>
+                  <Divider />
+                  <Button type="primary" onClick={()=>handleDispatchToDoctor(observationNo)} style={{width: '100%', marginBottom: '10px'}}>
+                    
+                    Dispatch to Doctor
+                    <RightOutlined />
+                  </Button>
+                  </Card>
+              </Col>
+           </Row>
+    </div>
   )
 }
 
 export default EvaluatePatientInTriage
+
+

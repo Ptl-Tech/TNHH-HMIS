@@ -21,7 +21,7 @@ export const postTriageListVitalsSlice = (vitals) => async (dispatch, getState) 
         );
 
         dispatch({ type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: response.data });
-        console.log('logging the response data', response.data);
+        // console.log('logging the response data', response.data);
         return response.data;
 
     }catch (error) {
