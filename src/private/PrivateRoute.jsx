@@ -20,12 +20,12 @@ const PrivateRoute = ({ allowedRoles }) => {
   }
 
   // Check if the user's departmentName matches allowedRoles
-  if (
-    allowedRoles &&
-    (!userInfo || !allowedRoles.includes(userInfo.userData.departmentName))
-  ) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  // if (
+  //   allowedRoles &&
+  //   (!userInfo || !allowedRoles.includes(userInfo.userData.departmentName))
+  // ) {
+  //   return <Navigate to="/login" state={{ from: location }} replace />;
+  // }
 
   return <Outlet />;
 };

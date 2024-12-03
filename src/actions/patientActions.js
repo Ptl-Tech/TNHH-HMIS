@@ -305,6 +305,7 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
 };
 
 
+
 export const activePatients = () => async (dispatch, getState) => {
   try {
     dispatch({ type: ACTIVE_lIST_REQUEST });
