@@ -77,6 +77,9 @@ const useSignIn = () => {
         case 'Doctor':
           navigate('/Doctor');
           break;
+        case 'Nurse':
+          navigate('/Nurse');
+          break;
         default:
           // Optional: Handle unknown roles or do nothing
           console.log('Invalid role');
