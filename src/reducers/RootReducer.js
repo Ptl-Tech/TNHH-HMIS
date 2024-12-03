@@ -1,11 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { otpVerifyReducer, userLoginReducer, userRegisterReducer,forgotPwdReducer,resetPwdReducer } from "./userReducer";
-import { patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer } from "./patientReducer";
-import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer } from "./DropdownReducer";
+import { activePatientsReducer, patientByNoReducer, patientCreateReducer, patientListReducer, patientTriageVisitCreateReducer, postDoctorTreatmentReducer, postPatientVitalsReducer, postTriageVisitReducer } from "./patientReducer";
+import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer } from "./DropdownReducer";
 import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 import { loadUserInfo } from "../actions/loadUserInfo";
 import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
+import { visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
 import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
 import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
 import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
@@ -32,14 +33,22 @@ export const rootReducer = combineReducers({
     countiesList:countiesListReducer,
     subCounties:subCountiesListReducer,
     clinics:clinicsListReducer,
+    kinsRelations:getrelationshipOptionsReducer,
     createTriageVisit:patientTriageVisitCreateReducer,
     patientList:patientListReducer,
+    activePatients:activePatientsReducer,
     getPatientByNo:patientByNoReducer,
+    getInsurance:getInsuranceReducer,
+    getDoctorsList:getdoctorListReducer,
+    getEmployees:getemployeesListReducer,
+    postTriageVisit:postTriageVisitReducer,
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
     loadUserInfo:loadUserInfo,
     getTriageWaitingList:getTriageWaitingListReducer,
+    registerVisitor:visitorCreateReducer,
+    visitorsList:visitorListReducer,
     getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer,
     getPatientDetails:getPatientDetailsReducer,

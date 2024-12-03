@@ -1,0 +1,80 @@
+import axios from "axios";
+import { REGISTER_VISITOR_FAIL, REGISTER_VISITOR_REQUEST, REGISTER_VISITOR_SUCCESS, VISITORS_LIST_FAIL, VISITORS_LIST_REQUEST, VISITORS_LIST_SUCCESS } from "../constants/visitorsConstants";
+import { message } from "antd";
+
+const API = "http://217.21.122.62:8085/";
+export const createVisitor = (visitor) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: REGISTER_VISITOR_REQUEST });
+  
+      const {
+        otpVerify: { userInfo },
+      } = getState();
+      const branchCode = localStorage.getItem("branchCode");
+  
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: userInfo.userData.no, // Add staffNo as a custom header
+          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          branchCode: branchCode,
+        },
+      };
+  
+      console.log("visitor: ", visitor);
+  
+      const {data} = await axios.post(
+        `${API}Security/GateCreateVisitor`,
+        visitor,
+        config
+      );
+  
+    //   // Extract response details
+    //   const responseData = {
+    //     status: response.data.status,
+    //     msg: response.data.patientNo, // Assuming `msg` contains the patient ID
+    //   };
+  
+    //   setTimeout(() => {
+    //     console.log("Dispatched Payload:", responseData);
+    //   }, 2000);
+      dispatch({ type: REGISTER_VISITOR_SUCCESS, payload: data });
+
+      // Return patient ID for further use
+     //  return responseData.msg; // `msg` contains the patient ID
+    } catch (error) {
+      dispatch({
+        type: REGISTER_VISITOR_FAIL,
+        payload: error.response?.data?.message || error.message,
+      });
+      message.error(error.message, 5);
+      throw error; // Rethrow error for `handleSubmit` to handle
+    }
+  };
+
+  export const getVisitorsList = () => async (dispatch, getState) => {
+    try {
+      dispatch({ type: VISITORS_LIST_REQUEST });
+  
+      const {
+          otpVerify: { userInfo },
+      } = getState();
+   // Fetch branchCode from localStorage
+   const branchCode = localStorage.getItem("branchCode");
+  
+      const config = {
+          headers: {
+              "Content-Type": "application/json",
+              staffNo: userInfo.userData.no, // Add staffNo as a custom header
+              sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+              branchCode: branchCode
+            },
+      };
+  
+      const { data } = await axios.get(`${API}data/odatafilter?webservice=QyVisitors`, config);
+  
+      dispatch({ type: VISITORS_LIST_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({ type: VISITORS_LIST_FAIL, payload: error.message });
+    }
+  };

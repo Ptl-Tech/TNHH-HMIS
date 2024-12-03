@@ -1,4 +1,4 @@
-import { PATIENT_REGISTER_REQUEST, PATIENT_REGISTER_SUCCESS, PATIENT_REGISTER_FAIL, PATIENT_REGISTER_RESET, TRIAGE_VISIT_REQUEST, TRIAGE_VISIT_SUCCESS, TRIAGE_VISIT_FAIL, TRIAGE_VISIT_RESET, PATIENT_LIST_REQUEST, PATIENT_LIST_SUCCESS, PATIENT_LIST_FAIL, PATIENT_LIST_RESET, TRIAGE_VISIT_LIST_REQUEST, TRIAGE_VISIT_LIST_SUCCESS, TRIAGE_VISIT_LIST_RESET, POST_PATIENT_VITALS_REQUEST, POST_PATIENT_VITALS_SUCCESS, POST_PATIENT_VITALS_FAIL, POST_PATIENT_VITALS_RESET, POST_DOCTOR_TREATMENT_REQUEST, POST_DOCTOR_TREATMENT_SUCCESS, POST_DOCTOR_TREATMENT_FAIL, POST_DOCTOR_TREATMENT_RESET } from "../constants/patientConstants";
+import { PATIENT_REGISTER_REQUEST, PATIENT_REGISTER_SUCCESS, PATIENT_REGISTER_FAIL, PATIENT_REGISTER_RESET, TRIAGE_VISIT_REQUEST, TRIAGE_VISIT_SUCCESS, TRIAGE_VISIT_FAIL, TRIAGE_VISIT_RESET, PATIENT_LIST_REQUEST, PATIENT_LIST_SUCCESS, PATIENT_LIST_FAIL, PATIENT_LIST_RESET, TRIAGE_VISIT_LIST_REQUEST, TRIAGE_VISIT_LIST_SUCCESS, TRIAGE_VISIT_LIST_RESET, POST_PATIENT_VITALS_REQUEST, POST_PATIENT_VITALS_SUCCESS, POST_PATIENT_VITALS_FAIL, POST_PATIENT_VITALS_RESET, POST_DOCTOR_TREATMENT_REQUEST, POST_DOCTOR_TREATMENT_SUCCESS, POST_DOCTOR_TREATMENT_FAIL, POST_DOCTOR_TREATMENT_RESET, POST_TRIAGE_VISIT_REQUEST, POST_TRIAGE_VISIT_SUCCESS, POST_TRIAGE_VISIT_FAIL, POST_TRIAGE_VISIT_RESET, ACTIVE_lIST_REQUEST, ACTIVE_LIST_SUCCESS, ACTIVE_LIST_FAIL, ACTIVE_LIST_RESET } from "../constants/patientConstants";
 
 
 export const patientCreateReducer = (state = { loading: false }, action) => {
@@ -32,6 +32,21 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
     }
   };
 
+  export const postTriageVisitReducer = (state = {}, action) => {
+    switch (action.type) {
+      case POST_TRIAGE_VISIT_REQUEST:
+        return { loading: true };
+      case POST_TRIAGE_VISIT_SUCCESS:
+        return { loading: false, success: true, appointmentId: action.payload };
+      case POST_TRIAGE_VISIT_FAIL:
+        return { loading: false, error: action.payload };
+      case POST_TRIAGE_VISIT_RESET:
+        return {};
+      default:
+        return state;
+    }
+  };
+
   export const patientListReducer = (state = { patients: [] }, action) => {
     switch (action.type) {
       case PATIENT_LIST_REQUEST:
@@ -46,6 +61,24 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
         return state;
     }
   }
+
+
+  export const activePatientsReducer = (state = { patients: [] }, action) => {
+    switch (action.type) {
+      case ACTIVE_lIST_REQUEST:
+        return { loading: true, patients: [] };
+      case ACTIVE_LIST_SUCCESS:
+        return { loading: false, patients: action.payload };
+      case ACTIVE_LIST_FAIL:
+        return { loading: false, error: action.payload };
+      case ACTIVE_LIST_RESET:
+        return { patients: [] };
+      default:
+        return state;
+    }
+  }
+
+
   export const patientByNoReducer = (state = { patient: {} }, action) => {
     switch (action.type) {
       case PATIENT_LIST_REQUEST:
@@ -59,20 +92,6 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
     }
   };
 
-  export const triageListReducer = (state = { patients: [] }, action) => {
-    switch (action.type) {
-      case TRIAGE_VISIT_LIST_REQUEST:
-        return { loading: true, patients: [] };
-      case TRIAGE_VISIT_LIST_SUCCESS:
-        return { loading: false, patients: action.payload };
-      case TRIAGE_VISIT_FAIL:
-        return { loading: false, error: action.payload };
-      case TRIAGE_VISIT_LIST_RESET:
-        return { patients: [] };
-      default:
-        return state;
-    }
-  }
 
   export const postPatientVitalsReducer = (state = {}, action) => {
     switch (action.type) {

@@ -13,18 +13,22 @@ import {
   Typography,
   Avatar,
 } from "antd";
-import {
-  relationshipOptions,
-  PatientypeOptions,
-  InsuranceOptions,
-} from "../constants/DropDownConstants";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPatient, createTriageVisit } from "../actions/patientActions";
+import {
+  createPatient,
+  createTriageVisit,
+  listPatients,
+  postTriageVisit,
+} from "../actions/patientActions";
 import {
   listClinics,
   listCounties,
   listCountries,
+  listDoctors,
+  listInsuranceOptions,
+  listKinsRelationships,
   listSubCounties,
 } from "../actions/DropdownListActions";
 
@@ -35,7 +39,7 @@ import { useForm } from "antd/es/form/Form";
 const PatientRegistration = () => {
   const dispatch = useDispatch();
   const createPatientState = useSelector((state) => state.createPatient);
-  const { loading, error, success } = createPatientState;
+  const { loading, error, success, payload } = createPatientState;
   const navigate = useNavigate();
   const form = useForm();
   const createTriageVisitState = useSelector(
@@ -43,11 +47,24 @@ const PatientRegistration = () => {
   );
 
   const {
+    loading: postTriageVisitLoading,
+    error: postTriageVisitError,
+    success: postTriageVisitSuccess,
+    payload: postTriageVisitPayload,
+  } = useSelector((state) => state.postTriageVisit);
+  const {
     loading: countriesLoading,
     error: countriesError,
     success: countriesSuccess,
     countries: countriesPayload,
   } = useSelector((state) => state.countriesList);
+
+  const {
+    loading: relationshipOptionsLoading,
+    error: relationshipOptionsError,
+    success: relationshipOptionsSuccess,
+    data: relationshipOptionsPayload,
+  } = useSelector((state) => state.kinsRelations);
 
   const {
     loading: countiesLoading,
@@ -71,13 +88,35 @@ const PatientRegistration = () => {
   } = useSelector((state) => state.clinics);
 
   const {
+    loading: doctorsLoading,
+    error: doctorsError,
+    success: doctorsSuccess,
+    data: doctorsPayload,
+  } = useSelector((state) => state.getDoctorsList);
+
+  const {
     loading: visitLoading,
     error: visitError,
     success: visitSuccess,
     payload: visitPayload,
   } = createTriageVisitState;
 
+  const {
+    loading: patientListLoading,
+    error: patientListError,
+    success: patientListSuccess,
+    patients: patientListPayload,
+  } = useSelector((state) => state.patientList);
+
+  const {
+    loading: insuranceLoading,
+    error: insuranceError,
+    success: insuranceSuccess,
+    data: insurancePayload,
+  } = useSelector((state) => state.getInsurance);
+
   const [age, setAge] = useState(null); // State to hold calculated age
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
 
   const [newPatient, setNewPatient] = useState({
     firstName: "",
@@ -101,8 +140,7 @@ const PatientRegistration = () => {
     county: "",
     schemeName: "",
     howYouKnewABoutUs: "",
-    doctor: "",
-    clinic: "",
+
     subCounty: "",
     residence: "",
     patientStatus: 0,
@@ -110,7 +148,12 @@ const PatientRegistration = () => {
 
   const [patientId, setPatientId] = useState(null);
   const [dobError, setDobError] = useState(""); // State for DOB error message
-
+  const [appointmentId, setAppointmentId] = useState(null);
+  const [newVisit, setNewVisit] = useState({
+    patientNo: "",
+    clinic: "",
+    doctor: "",
+  });
   // Handle dropdown display for fetching country list
   const handleDisplayDropDown = (e) => {
     const { name, value } = e.target;
@@ -124,40 +167,72 @@ const PatientRegistration = () => {
       name === "subCounty" &&
       subCountiesPayload &&
       name === "clinic" &&
-      clinicsPayload
+      clinicsPayload &&
+      name === "nextOfKinRelationship" &&
+      relationshipOptionsPayload &&
+      name === "insuranceName" &&
+      insurancePayload &&
+      name === "doctor" &&
+      doctorsPayload
     ) {
       dispatch(listCountries());
       dispatch(listCounties());
       dispatch(listSubCounties());
       dispatch(listClinics());
+      dispatch(listKinsRelationships());
+      dispatch(listInsuranceOptions());
+      dispatch(listDoctors());
     }
   };
   // Handle input changes for controlled inputs
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "phoneNumber") {
-      // Remove any non-numeric characters
-      let formattedValue = value.replace(/\D/g, "");
 
-      // Ensure it starts with '254' or convert '07...' to '2547...'
-      if (formattedValue.startsWith("0")) {
-        formattedValue = "254" + formattedValue.slice(1);
-      } else if (!formattedValue.startsWith("254")) {
-        formattedValue = "254" + formattedValue;
+    setNewPatient((prev) => {
+      const updatedPatient = { ...prev };
+
+      if (name === "phoneNumber") {
+        // Remove any non-numeric characters
+        let formattedValue = value.replace(/\D/g, "");
+
+        // Check if the number starts with '0'
+        if (formattedValue.startsWith("0")) {
+          // Convert '0...' to '254...'
+          formattedValue = "254" + formattedValue.slice(1);
+        }
+        // Ensure the number starts with '254' if not already prefixed
+        else if (
+          !formattedValue.startsWith("254") &&
+          formattedValue.length === 10
+        ) {
+          formattedValue = "254" + formattedValue;
+        }
+        // Trim to a maximum of 12 digits
+        if (formattedValue.length > 12) {
+          formattedValue = formattedValue.slice(0, 12);
+        }
+
+        updatedPatient[name] = formattedValue;
+      } else {
+        updatedPatient[name] = value;
+
+        // Update Principal Member Name if switch is checked
+        if (
+          prev.isPrincipleMember &&
+          (name === "firstName" || name === "middleName" || name === "lastName")
+        ) {
+          updatedPatient.insurancePrinicipalMemberName = `${
+            updatedPatient.firstName
+          } ${updatedPatient.middleName || ""} ${
+            updatedPatient.lastName
+          }`.trim();
+        }
       }
 
-      // Limit to a maximum of 12 characters (e.g., 254712345678)
-      if (formattedValue.length > 12) {
-        formattedValue = formattedValue.slice(0, 12);
-      }
-
-      // Update the state with the formatted phone number
-      setNewPatient((prev) => ({ ...prev, [name]: formattedValue }));
-    } else {
-      setNewPatient((prev) => ({ ...prev, [name]: value }));
-    }
+      return updatedPatient;
+    });
   };
-
   // Handle select and date changes
   const handleSelectChange = (name, value) => {
     // If the field is 'dob', format the value as 'YYYY-MM-DD'
@@ -192,7 +267,19 @@ const PatientRegistration = () => {
   };
 
   const handleSwitchChange = (name, value) => {
-    setNewPatient((prev) => ({ ...prev, [name]: value }));
+    setNewPatient((prev) => {
+      const updatedPatient = { ...prev, [name]: value };
+
+      if (name === "isPrincipleMember" && value) {
+        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName} ${
+          prev.middleName || ""
+        } ${prev.lastName}`.trim();
+      } else if (name === "isPrincipleMember" && !value) {
+        updatedPatient.insurancePrinicipalMemberName = ""; // Clear the name if unchecked
+      }
+
+      return updatedPatient;
+    });
   };
 
   const handleSubmit = async () => {
@@ -208,25 +295,52 @@ const PatientRegistration = () => {
       const patientId = await dispatch(createPatient(patientData));
 
       if (patientId) {
-        setPatientId(patientId); // Store patient ID in state
-        console.log("Patient ID:", patientId);
-        console.log("Patient ID:", patientId);
-        dispatch(createTriageVisit(patientId));
-        if (visitSuccess && visitPayload) {
-          message.success("Patient registered successfully!");
-          // Navigate to the visit creation page with the visit payload
-          navigate(`/reception/create-visit/${patientId}`, {
-            state: { patient: visitPayload },
-          });
-          console.log("Navigate to visit creation page with ID:", visitPayload);
-        } else {
-          message.error(visitError);
-          navigate("/reception/Patient-list");
+        setPatientId(patientId);
+
+        // Prepare the new visit data
+        const visitData = {
+          patientNo: patientId,
+          clinic: newVisit.clinic,
+          doctor: newVisit.doctor,
+        };
+
+        // Dispatch the action to create a triage visit
+        const appointmentId = await dispatch(createTriageVisit(visitData));
+
+        if (appointmentId) {
+          setAppointmentId(appointmentId);
+          console.log("Triage visit created for Patient ID:", appointmentId);
         }
+
+        // Check for success and payload in the response
+        if (visitSuccess && appointmentId) {
+          message.success("Patient registered successfully!");
+          console.log("Triage visit created for Patient ID:", appointmentId);
+        }
+      } else {
+        message.error("Patient registration failed. Please try again.");
       }
     } catch (error) {
       console.error("Error during patient registration:", error);
       message.error("Failed to register patient. Please try again.");
+    }
+  };
+
+  const handleTriageDispatch = async () => {
+    console.log("Triage visit created for Patient ID:", appointmentId);
+
+    // Dispatch the action with the appointmentId (which should be passed correctly)
+    const result = await dispatch(postTriageVisit(appointmentId));
+
+    if (postTriageVisitSuccess) {
+      //reset form
+      form.resetFields();
+
+     
+    } else {
+      message.error(
+        "Failed to dispatch triage visit update. Please try again."
+      );
     }
   };
 
@@ -255,16 +369,28 @@ const PatientRegistration = () => {
   // };
 
   useEffect(() => {
-    if (visitSuccess && visitPayload) {
+    if (visitSuccess) {
       message.success("Patient registered successfully!");
-      console.log("Patient ID:", patientId);
-      navigate(`/reception/create-visit/${patientId}`, {
-        state: { visitPayload },
-      });
+      // console.log("Patient ID:", patientId);
+      // navigate(`/reception/create-visit/${patientId}`, {
+      //   state: { visitPayload },
+      // });
       // Navigate to the visit creation page or perform additional actions
       console.log("Navigate to visit creation page with ID:", patientId);
     }
-  }, [visitSuccess, visitPayload, navigate]);
+  }, [visitSuccess, visitPayload, message]);
+
+  useEffect(() => {
+    if (postTriageVisitSuccess) {
+      message.success("Triage visit updated successfully!");
+      // console.log("Patient ID:", patientId);
+      // navigate(`/reception/create-visit/${patientId}`, {
+      //   state: { visitPayload },
+      // });
+      // Navigate to the visit creation page or perform additional actions
+      console.log("Navigate to visit creation page with ID:", patientId);
+    }
+  }, [postTriageVisitSuccess, message]);
 
   // // Effect to handle error or success side effects
   // useEffect(() => {
@@ -278,10 +404,31 @@ const PatientRegistration = () => {
     dispatch(listCountries());
     dispatch(listCounties());
     dispatch(listSubCounties());
+    dispatch(listKinsRelationships());
+    dispatch(listClinics());
+    dispatch(listPatients());
+    dispatch(listInsuranceOptions());
+    dispatch(listDoctors());
+
     console.log("country list: ", countriesPayload);
   }, [dispatch]);
+
+  useEffect(() => {
+    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
+
+    if (branchCode && doctorsPayload) {
+      // Filter doctors based on specialization and branch
+      const filtered = doctorsPayload.filter(
+        (doctor) =>
+          doctor.Specialization === newVisit.clinic && // Match specialization with selected clinic
+          doctor.GlobalDimension1Code === branchCode // Match branch code
+      );
+      setFilteredDoctors(filtered); // Update the filtered doctors list
+    }
+  }, [doctorsPayload, newVisit.clinic]);
+
   return (
-    <div className="container">
+    <div>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={7}>
           {/* <Typography.Title
@@ -292,44 +439,47 @@ const PatientRegistration = () => {
         </Typography.Title> */}
           <Card bordered={false} className="card-header">
             <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#003F6D" }}>
+              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                 General Information
               </Typography.Title>
               <Form.Item
+                label="First Name:"
                 name="firstName"
-                label="First Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your first name!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please enter first name" }]}
               >
-                <Input placeholder="First Name" />
+                {/* <label className="form-label">First Name:</label> */}
+                <Input
+                  placeholder="Enter First Name"
+                  name="firstName"
+                  value={newPatient.firstName}
+                  onChange={handleInputChange}
+                />
               </Form.Item>
               <Form.Item
-                name="lastName"
-                label="Last Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your last name!",
-                  },
-                ]}
-              >
-                <Input placeholder="Last Name" />
-              </Form.Item>
-              <Form.Item
+                label="Middle Name:"
                 name="middleName"
-                label="Middle Name"
                 rules={[
-                  {
-                    required: false,
-                    message: "Please input your middle name!",
-                  },
+                  { required: true, message: "Please enter middle name" },
                 ]}
               >
-                <Input placeholder="Middle Name" />
+                <Input
+                  placeholder="Enter Middle Name"
+                  name="middleName"
+                  value={newPatient.middleName}
+                  onChange={handleInputChange}
+                />
+              </Form.Item>
+              <Form.Item
+                label="Surname Name:"
+                name="lastName"
+                rules={[{ required: true, message: "Please enter last name" }]}
+              >
+                <Input
+                  placeholder="Enter Surname Name"
+                  name="lastName"
+                  value={newPatient.lastName}
+                  onChange={handleInputChange}
+                />
               </Form.Item>
               <Form.Item
                 name="registrationDate"
@@ -363,7 +513,7 @@ const PatientRegistration = () => {
         </Col>
         <Col xs={24} md={11}>
           <Card bordered={false} className="card-header">
-            <Typography.Title level={5} style={{ color: "#003F6D" }}>
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
               Contact Information
             </Typography.Title>
             <Form layout="vertical" onFinish={handleSubmit}>
@@ -373,22 +523,36 @@ const PatientRegistration = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter a valid phone number",
+                    message: "Please enter your phone number",
                   },
                   {
-                    pattern: /^2547\d{8}$/,
-                    message: "Phone number must be in the format 2547xxxxxxxx",
+                    validator: (_, value) => {
+                      // Validate length based on whether the input starts with '254'
+                      if (value.startsWith("254") && value.length === 12) {
+                        return Promise.resolve();
+                      } else if (
+                        !value.startsWith("254") &&
+                        value.length === 10
+                      ) {
+                        return Promise.resolve();
+                      }
+
+                      return Promise.reject(
+                        new Error("Phone number must be 10 or 12 digits long")
+                      );
+                    },
                   },
                 ]}
                 style={{ width: "100%" }}
               >
                 <Input
-                  placeholder="254 0000 00000"
+                  placeholder="Enter phone number "
                   name="phoneNumber"
                   value={newPatient.phoneNumber}
                   onChange={handleInputChange}
                 />
               </Form.Item>
+
               <div className="d-flex gap-2 justify-content-between">
                 <Form.Item
                   name="gender"
@@ -401,7 +565,12 @@ const PatientRegistration = () => {
                     },
                   ]}
                 >
-                  <Select placeholder="Select Gender">
+                  <Select
+                    placeholder="Select Gender"
+                    className="w-100"
+                    value={newPatient.gender}
+                    onChange={(value) => handleSelectChange("gender", value)}
+                  >
                     <Select.Option value="1">Male</Select.Option>
                     <Select.Option value="2">Female</Select.Option>
                   </Select>
@@ -421,6 +590,7 @@ const PatientRegistration = () => {
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     placeholder="Select Date of Birth"
+                    name="dob"
                     defaultValue={moment()} // Set default date to current date
                     value={newPatient.dob ? moment(newPatient.dob) : null}
                     onChange={(date, dateString) =>
@@ -446,10 +616,34 @@ const PatientRegistration = () => {
                       required: true,
                       message: "Please input your ID/Passport/Birth No!",
                     },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        if (!value) {
+                          return Promise.resolve();
+                        }
+                        const isRegistered = patientListPayload?.some(
+                          (patient) => patient.IDNumber === value
+                        );
+                        if (isRegistered) {
+                          return Promise.reject(
+                            new Error(
+                              "This ID/Passport/Birth No is already registered."
+                            )
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    }),
                   ]}
                 >
-                  <Input placeholder="ID/Passport/Birth No:" />
+                  <Input
+                    placeholder="ID/Passport/Birth No:"
+                    name="idNumber"
+                    value={newPatient.idNumber}
+                    onChange={handleInputChange}
+                  />
                 </Form.Item>
+
                 <Form.Item
                   name="nationality"
                   label="Nationality"
@@ -504,7 +698,6 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select County"
                     className="w-100 "
-                    //  options={relationshipOptions}
                     value={newPatient.county}
                     onChange={(value) => handleSelectChange("county", value)}
                     onFocus={handleDisplayDropDown}
@@ -537,7 +730,6 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Sub County"
                     className="w-100"
-                    //  options={relationshipOptions}
                     value={newPatient.nationality}
                     onChange={(value) => handleSelectChange("county", value)}
                     onFocus={handleDisplayDropDown}
@@ -602,24 +794,80 @@ const PatientRegistration = () => {
         <Col xs={24} md={6}>
           <Card style={{ width: "100%" }} className="card-header">
             <Typography.Title level={5} style={{ color: "#ED1C24" }}>
-              Patient Photo
+              Patient Info
             </Typography.Title>
             <div className="d-flex flex-column align-items-center justify-content-center">
+              {/* Display Avatar with Initials */}
               <Avatar
-                size={128}
-                src={
-                  newPatient.photo
-                    ? newPatient.photo
-                    : "https://joeschmoe.io/api/v1/random"
-                }
-              />
+                size={100}
+                style={{
+                  backgroundColor: "#87d068",
+                  fontSize: "2rem",
+                }}
+              >
+                {`${newPatient.firstName?.charAt(0) || ""}${
+                  newPatient.lastName?.charAt(0) || ""
+                }`}
+              </Avatar>
             </div>
+            {/* Display Patient Details */}
+            <div className="d-flex flex-column align-items-start mt-3 text-muted">
+              <div className="d-flex flex-row justify-content-between w-100">
+                <Typography.Text
+                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
+                >
+                  Date Registered:
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: "0.9rem" }}
+                  className="text-muted"
+                >
+                  {moment().format("DD/MM/YYYY")}
+                </Typography.Text>
+              </div>
+              <div className="d-flex flex-row justify-content-between w-100 mt-2">
+                <Typography.Text
+                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
+                >
+                  Age:
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: "0.9rem" }}
+                  className="text-muted"
+                >
+                  {newPatient.dob
+                    ? `${moment().diff(moment(newPatient.dob), "years")} years`
+                    : "N/A"}
+                </Typography.Text>
+              </div>
+              <div className="d-flex flex-row justify-content-between w-100 mt-2">
+                <Typography.Text
+                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
+                >
+                  Gender:
+                </Typography.Text>
+                <Typography.Text
+                  style={{ fontSize: "0.9rem" }}
+                  className="text-muted"
+                >
+                  {newPatient.gender === "1"
+                    ? "Male"
+                    : newPatient.gender === "2"
+                    ? "Female"
+                    : "N/A"}
+                </Typography.Text>
+              </div>
+            </div>
+
+            <div className="d-flex my-2 flex-row align-items-center"></div>
           </Card>
+
           <Card style={{ width: "100%" }} className="card-header mt-3">
             <Typography.Title level={5} style={{ color: "#ED1C24" }}>
               Consultation Details
             </Typography.Title>
             <div className="row g-3 my-2 align-items-center justify-content-center">
+              {/* Clinic Dropdown */}
               <div className="col-12 text-primary">
                 <Form.Item
                   label="Clinic:"
@@ -635,10 +883,11 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Clinic"
                     className="w-100"
-                    //  options={relationshipOptions}
-                    value={newPatient.clinic}
-                    onChange={(value) => handleSelectChange("clinic", value)}
+                    value={newVisit.clinic}
                     onFocus={handleDisplayDropDown}
+                    onChange={(value) =>
+                      setNewVisit((prev) => ({ ...prev, clinic: value }))
+                    }
                   >
                     <Select.Option value="">--Select Clinic--</Select.Option>
                     {clinicsPayload &&
@@ -650,27 +899,30 @@ const PatientRegistration = () => {
                   </Select>
                 </Form.Item>
               </div>
-              <div className="col-12  text-primary">
+
+              {/* Doctor Dropdown */}
+              <div className="col-12 text-primary">
                 <Form.Item
                   label="Doctor:"
                   name="doctor"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select Doctor",
-                    },
-                  ]}
                   style={{ width: "100%" }}
                 >
                   <Select
                     placeholder="Select Doctor"
                     className="w-100"
-                    //  options={relationshipOptions}
-                    value={newPatient.doctor}
-                    onChange={(value) => handleSelectChange("doctor", value)}
-                   
+                    value={newVisit.doctor}
+                    onFocus={handleDisplayDropDown}
+                    onChange={(value) =>
+                      setNewVisit((prev) => ({ ...prev, doctor: value }))
+                    }
                   >
                     <Select.Option value="">--Select Doctor--</Select.Option>
+                    {filteredDoctors &&
+                      filteredDoctors.map((doc) => (
+                        <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                          {doc.DoctorsName}
+                        </Select.Option>
+                      ))}
                   </Select>
                 </Form.Item>
               </div>
@@ -720,13 +972,34 @@ const PatientRegistration = () => {
                   >
                     <Select
                       placeholder="Select Relationship"
-                      className="w-100"
-                      options={relationshipOptions}
+                      className="w-100 "
                       value={newPatient.nextOfKinRelationship}
                       onChange={(value) =>
                         handleSelectChange("nextOfKinRelationship", value)
                       }
-                    ></Select>
+                      // variant="borderless"
+                      name="nextOfKinRelationship"
+                      onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                    >
+                      <Select.Option value="">
+                        --Select Relationship--
+                      </Select.Option>
+                      {relationshipOptionsPayload &&
+                      relationshipOptionsPayload.length > 0 ? (
+                        relationshipOptionsPayload.map((relation) => (
+                          <Select.Option
+                            key={relation.Code}
+                            value={relation.Code}
+                          >
+                            {relation.Description}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No data available
+                        </Select.Option>
+                      )}
+                    </Select>{" "}
                   </Form.Item>
                 </div>
               </div>
@@ -734,19 +1007,38 @@ const PatientRegistration = () => {
                 <div className="col-12 text-primary">
                   <Form.Item
                     label="Next of Kin Phone:"
-                    name="nextOfKinPhone"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Please enter Next of Kin Phone",
-                    //   },
-                    // ]}
+                    name="nextOfKinPhoneNo"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter your phone number",
+                      },
+                      {
+                        validator: (_, value) => {
+                          // Validate length based on whether the input starts with '254'
+                          if (value.startsWith("254") && value.length === 12) {
+                            return Promise.resolve();
+                          } else if (
+                            !value.startsWith("254") &&
+                            value.length === 10
+                          ) {
+                            return Promise.resolve();
+                          }
+
+                          return Promise.reject(
+                            new Error(
+                              "Phone number must be 10 or 12 digits long"
+                            )
+                          );
+                        },
+                      },
+                    ]}
                     style={{ width: "100%" }}
                   >
                     <Input
                       placeholder="Enter Next of Kin Phone"
-                      name="nextOfKinPhone"
-                      value={newPatient.nextOfKinPhone}
+                      name="nextOfKinPhoneNo"
+                      value={newPatient.nextOfKinPhoneNo}
                       onChange={handleInputChange}
                     />
                   </Form.Item>
@@ -755,11 +1047,60 @@ const PatientRegistration = () => {
             </Form>
           </Card>
         </Col>
+        <Col className="mt-3" xs={24} md={6}>
+          <Card style={{ width: "100%" }} className="card-header mt-3">
+            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              Billing Details
+            </Typography.Title>
+            {/* patient billing details based on mode of payment if cash show cash and what they are being billed for same for insurance */}
+            <div className="d-flex gap-2 flex-column">
+              <Typography.Text className="fw-medium">
+                Mode of Payment:
+                <Typography.Text className="text-muted px-2">
+                  {newPatient.paymentMode === "1"
+                    ? "Cash"
+                    : newPatient.paymentMode === "2"
+                    ? "Insurance"
+                    : "N/A"}
+                </Typography.Text>
+              </Typography.Text>
+              <Typography.Text className="fw-medium">
+                Patient Type:
+                <Typography.Text className="text-muted">
+                  {newPatient.paymentMode === "1"
+                    ? "Cash"
+                    : newPatient.paymentMode === "2"
+                    ? "Insurance"
+                    : "N/A"}
+                </Typography.Text>
+              </Typography.Text>
+              <Typography.Text className="fw-medium">
+                Billing:
+                <Typography.Text className="text-muted">
+                  {newPatient.patientType}
+                </Typography.Text>
+              </Typography.Text>
+              <Typography.Text className="fw-medium">
+                Amount:
+                <Typography.Text className="text-muted  ">0</Typography.Text>
+              </Typography.Text>
+            </div>
+            <div className="d-flex my-2 flex-row align-items-center">
+              <Button
+                type="primary"
+                style={{ width: "100%" }}
+                // onClick={handleUploadClick}
+              >
+                Bill Patient
+              </Button>
+            </div>
+          </Card>
+        </Col>
       </Row>
       <Row className="mt-3" gutter={[16, 16]}>
         <Col xs={24} md={18}>
           <Card style={{ width: "100%" }} className="card-header">
-            <Form layout="vertical" onFinish={handleSubmit}>
+            <Form layout="vertical">
               <Typography.Title level={5} style={{ color: "#ED1C24" }}>
                 Billing Information
               </Typography.Title>
@@ -784,17 +1125,17 @@ const PatientRegistration = () => {
                         handleSelectChange("paymentMode", value)
                       }
                     >
-                      <Select.Option value="1">Cash</Select.Option>
-                      <Select.Option value="2">Insurance</Select.Option>
+                      <Select.Option value="2">Cash</Select.Option>
+                      <Select.Option value="1">Insurance</Select.Option>
                     </Select>
                   </Form.Item>
                 </div>
               </div>
-              {newPatient.paymentMode === "2" && (
+              {newPatient.paymentMode === "1" && (
                 <>
                   <div className="row g-3  align-items-center justify-content-center">
                     <div className="col-12 col-md-6 text-primary">
-                      <Form.Item
+                      {/* <Form.Item
                         label="Insurance Number:"
                         name="insuranceNo"
                         rules={[
@@ -811,9 +1152,9 @@ const PatientRegistration = () => {
                           value={newPatient.insuranceNo}
                           onChange={handleInputChange}
                         />
-                      </Form.Item>
+                      </Form.Item> */}
                     </div>
-                    <div className="col-12 col-md-6 text-primary">
+                    <div className="col-12  text-primary">
                       <Form.Item
                         label="Insurance Name:"
                         name="insuranceName"
@@ -825,12 +1166,35 @@ const PatientRegistration = () => {
                         ]}
                         style={{ width: "100%" }}
                       >
-                        <Input
-                          placeholder="Enter Insurance Name"
-                          name="insuranceName"
+                        <Select
+                          placeholder="Select Insurance "
+                          className="w-100 "
                           value={newPatient.insuranceName}
-                          onChange={handleInputChange}
-                        />
+                          onChange={(value) =>
+                            handleSelectChange("insuranceName", value)
+                          }
+                          // variant="borderless"
+                          name="insuranceName"
+                          onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                        >
+                          <Select.Option value="">
+                            --Select Insurance--
+                          </Select.Option>
+                          {insurancePayload && insurancePayload.length > 0 ? (
+                            insurancePayload.map((insurance) => (
+                              <Select.Option
+                                key={insurance.No}
+                                value={insurance.No}
+                              >
+                                {insurance.Name}
+                              </Select.Option>
+                            ))
+                          ) : (
+                            <Select.Option value="" disabled>
+                              No data available
+                            </Select.Option>
+                          )}
+                        </Select>{" "}
                       </Form.Item>
                     </div>
                   </div>
@@ -838,7 +1202,7 @@ const PatientRegistration = () => {
                     <div className="col-12 col-md-6 text-primary">
                       <Form.Item
                         label="Principal Member Name:"
-                        name="insurancePrincipalMemberName"
+                        name="insurancePrinicipalMemberName"
                         rules={[
                           {
                             required: true,
@@ -849,9 +1213,10 @@ const PatientRegistration = () => {
                       >
                         <Input
                           placeholder="Enter Principal Member Name"
-                          name="insurancePrincipalMemberName"
-                          value={newPatient.insurancePrincipalMemberName}
+                          name="insurancePrinicipalMemberName"
+                          value={newPatient.insurancePrinicipalMemberName}
                           onChange={handleInputChange}
+                          disabled={newPatient.insurancePrinicipalMemberName} // Disable input when auto-populating
                         />
                       </Form.Item>
                     </div>
@@ -881,12 +1246,6 @@ const PatientRegistration = () => {
                       <Form.Item
                         label="Is Principal Member ?"
                         name="isPrincipleMember"
-                        // rules={[
-                        //   {
-                        //     required: true,
-                        //     message: "Please enter Scheme Name",
-                        //   },
-                        // ]}
                       >
                         <Switch
                           checked={newPatient.isPrincipleMember}
@@ -902,6 +1261,26 @@ const PatientRegistration = () => {
                 </>
               )}
             </Form>
+
+            {/* submit or save patient details */}
+            <div className="d-flex my-2 gap-2 flex-row align-items-center justify-content-end">
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleSubmit}
+                // style={{ width: "100%" }}
+              >
+                Create Visit
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleTriageDispatch}
+                // style={{ width: "100%" }}
+              >
+                Dispatch to Triage
+              </Button>
+            </div>
           </Card>
         </Col>
       </Row>
