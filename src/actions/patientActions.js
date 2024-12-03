@@ -25,6 +25,9 @@ import {
   ACTIVE_lIST_REQUEST,
   ACTIVE_LIST_SUCCESS,
   ACTIVE_LIST_FAIL,
+  CONVERT_TO_PATIENT_REQUEST,
+  CONVERT_TO_PATIENT_SUCCESS,
+  CONVERT_TO_PATIENT_FAIL,
 } from "../constants/patientConstants";
 import { message } from "antd";
 import useAuth from "../hooks/useAuth";
@@ -220,30 +223,84 @@ export const postTriageVisit = (appointmentId) => async (dispatch, getState) => 
   }
 };
 
-export const listPatients = () => async (dispatch, getState) => {
+export const listPatients = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: PATIENT_LIST_REQUEST });
 
     const {
-        otpVerify: { userInfo },
+      otpVerify: { userInfo },
     } = getState();
- // Fetch branchCode from localStorage
- const branchCode = localStorage.getItem("branchCode");
+
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
 
     const config = {
-        headers: {
-            "Content-Type": "application/json",
-            staffNo: userInfo.userData.no, // Add staffNo as a custom header
-            sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-            branchCode: branchCode
-          },
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode, // Include branchCode in headers
+      },
     };
 
     const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients`, config);
 
-    dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
+    // Filter the patients by branchCode matching GlobalDimension1Code
+    const filteredData = data.filter((patient) => patient.GlobalDimension1Code === branchCode  && patient.Inpatient===false);
+    
+
+    dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {
     dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
+  }
+};
+
+export const convertPatient = (visitorNo) => async (dispatch, getState) => {
+  try {
+    dispatch({ type:CONVERT_TO_PATIENT_REQUEST  });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    console.log("patient: ", visitorNo);
+
+    const {response} = await axios.post(
+      `${API}Reception/ConvertVisitorToPatient `,
+      { visitorNo: visitorNo },
+      config
+    );
+
+  //  // Extract response details
+  //   const responseData = {
+  //     status: response.data.status,
+  //     msg: response.data.observationNo, // Assuming `msg` contains the patient ID
+  //   };
+
+  //   setTimeout(() => {
+  //     console.log("Dispatched Payload:", responseData);
+  //   }, 2000);
+
+    dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: response });
+    //message with success message and observationNo
+
+  } catch (error) {
+    dispatch({
+      type: CONVERT_TO_PATIENT_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
 

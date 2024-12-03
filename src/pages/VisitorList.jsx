@@ -17,21 +17,30 @@ import { TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
+import { useNavigate } from "react-router-dom";
+import { convertPatient } from "../actions/patientActions";
 
 const VisitorList = () => {
+  const navigate=useNavigate();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingVisitor, setEditingVisitor] = useState(null);
   const [statusForm] = Form.useForm();
-  const [searchType, setSearchType] = useState("VisitorNumber");
-  const [searchValue, setSearchValue] = useState("");
-  const [showTable, setShowTable] = useState(false); // Control visibility of the table
+  const [searchParams, setSearchParams] = useState({
+    IdNumber: "",
+    VisitorName: "",
+    VisitorPhone: "",
+  });
+  const [showTable, setShowTable] = useState(false);
+
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
+
+  const {loading:convertLoading , error:convertError} = useSelector((state) => state.convertPatient);
+
   const [filteredVisitors, setFilteredVisitors] = useState([]);
 
-  // Assuming logged-in user's info is stored in the Redux store or context
-  const { userInfo } = useSelector((state) => state.otpVerify); // Replace with your actual user state path
+  const { userInfo } = useSelector((state) => state.otpVerify);
 
   const dispatch = useDispatch();
 
@@ -40,8 +49,24 @@ const VisitorList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    setFilteredVisitors(visitors);
+    filterVisitors();
   }, [visitors]);
+
+  const filterVisitors = () => {
+    let filtered = visitors.filter((visitor)=>{
+      return (
+        visitor.VisitorName.toLowerCase().includes(searchParams.VisitorName.toLowerCase()) &&
+        visitor.IDNumber.includes(searchParams.IdNumber) &&
+        visitor.PhoneNumber.includes(searchParams.VisitorPhone)
+      )
+    });
+  
+    setFilteredVisitors(filtered);
+
+    if (filtered.length > 0) {
+      setShowTable(true);
+    }
+  };
 
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
@@ -72,40 +97,53 @@ const VisitorList = () => {
     setModalVisible(true);
   };
 
-  const handleSearch = () => {
-    const filtered = visitors.filter((visitor) =>
-      visitor[searchType]?.toLowerCase().includes(searchValue.toLowerCase())
-    );
-    setFilteredVisitors(filtered);
-    setShowTable(true); // Show the table after searching
+  const handleSearchChange = (e, field) => {
+    const value = e.target.value;
+    setSearchParams((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+    filterVisitors();
+
+    // Hide table if all search parameters are cleared
+    if (!searchParams.IdNumber && !searchParams.VisitorName && !searchParams.VisitorPhone) {
+      setShowTable(false);
+    }
   };
 
+  const handleResetSearch = () => {
+    setSearchParams({
+      IdNumber: "",
+      VisitorName: "",
+      VisitorPhone: "",
+    });
+    setShowTable(false); // Hide table when search is cleared
+  };
+
+  
+   // Handle the conversion to a patient
+   const handleConvertToPatient = (visitor) => {
+    
+    const visitorNo= visitor.No;
+    console.log(visitorNo);
+
+    dispatch(convertPatient(visitorNo));
+    
+    // Pass the visitor's data to the patient registration page
+    navigate("/reception/Patient-Registration", {
+      state: { visitorData: visitor }, // Passing the visitor info to the registration page
+    });
+
+    console.log("Visitor Data:", visitor);
+  };
+
+
   const columns = [
-    {
-      title: "No",
-      dataIndex: "No",
-      key: "No",
-    },
-    {
-      title: "Visitor Number",
-      dataIndex: "VisitorNumber",
-      key: "visitorNumber",
-    },
-    {
-      title: "Visitor Name",
-      dataIndex: "VisitorName",
-      key: "visitorName",
-    },
-    {
-      title: "Purpose of Visit",
-      dataIndex: "PurposeofVisit",
-      key: "PurposeofVisit",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "PhoneNumber",
-      key: "phoneNumber",
-    },
+    { title: "No", dataIndex: "No", key: "No" },
+    { title: "Visitor Number", dataIndex: "VisitorNumber", key: "visitorNumber" },
+    { title: "Visitor Name", dataIndex: "VisitorName", key: "visitorName" },
+    { title: "Purpose of Visit", dataIndex: "PurposeofVisit", key: "PurposeofVisit" },
+    { title: "Phone Number", dataIndex: "PhoneNumber", key: "phoneNumber" },
     {
       title: "Date of Visit",
       dataIndex: "CreatedDate",
@@ -118,12 +156,12 @@ const VisitorList = () => {
       key: "CreatedTime",
       render: (CreatedTime) => dayjs(CreatedTime).format("HH:mm"),
     },
-    {
-      title: "Time Out",
-      dataIndex: "timeOut",
-      key: "timeOut",
-      render: (timeOut) => dayjs(timeOut).format("HH:mm"),
-    },
+    // {
+    //   title: "Time Out",
+    //   dataIndex: "timeOut",
+    //   key: "timeOut",
+    //   render: (timeOut) => dayjs(timeOut).format("HH:mm"),
+    // },
     {
       title: "Status",
       dataIndex: "Status",
@@ -138,16 +176,8 @@ const VisitorList = () => {
         return <Tag color={statusColors[status] || "default"}>{status}</Tag>;
       },
     },
-    {
-      title: "Person to See",
-      dataIndex: "PersonToSee",
-      key: "personToSee",
-    },
-    {
-      title: "Visitor Category",
-      dataIndex: "VisitorCategory",
-      key: "visitorCategory",
-    },
+    { title: "Person to See", dataIndex: "PersonToSee", key: "personToSee" },
+    { title: "Visitor Category", dataIndex: "VisitorCategory", key: "visitorCategory" },
     {
       title: "Action",
       key: "action",
@@ -164,7 +194,7 @@ const VisitorList = () => {
           ) : userInfo.userData?.departmentName === "Reception" ? (
             <Button
               type="primary"
-              onClick={() => handleEditStatus(record)} // Opens modal for Reception with 'Convert to Patient' functionality
+              onClick={() => handleConvertToPatient(record)} // Opens modal for Reception with 'Convert to Patient' functionality
               ghost
             >
               Convert to Patient
@@ -214,88 +244,75 @@ const VisitorList = () => {
         <Row gutter={16} className="mt-2">
           <Col span={6}>
             <Input
-              placeholder="Search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Id Number"
+              value={searchParams.IdNumber}
+              onChange={(e) => handleSearchChange(e, "IdNumber")}
               allowClear
             />
           </Col>
           <Col span={6}>
-            <Select
-              value={searchType}
-              onChange={setSearchType}
-              style={{ width: "100%" }}
-            >
-              <Select.Option value="VisitorNumber">
-                Visitor Number
-              </Select.Option>
-              <Select.Option value="VisitorName">Visitor Name</Select.Option>
-              <Select.Option value="PhoneNumber">Phone Number</Select.Option>
-            </Select>
+            <Input
+              placeholder="Visitor Name"
+              value={searchParams.VisitorName}
+              onChange={(e) => handleSearchChange(e, "VisitorName")}
+              allowClear
+            />
           </Col>
           <Col span={6}>
-            <Button
-              type="primary"
-              onClick={handleSearch}
-              style={{ width: "100%" }}
-            >
-              Search
-            </Button>
+            <Input
+              placeholder="Phone Number"
+              value={searchParams.VisitorPhone}
+              onChange={(e) => handleSearchChange(e, "VisitorPhone")}
+              allowClear
+            />
           </Col>
         </Row>
       </Card>
 
       {/* Show the table only if there are filtered visitors or search was performed */}
-
-      <Table
-        columns={columns}
-        dataSource={
-          showTable && filteredVisitors.length > 0 ? mappedVisitors : []
-        } // Correct condition for showing data
-        loading={loading}
-        rowKey="key"
-        pagination={false}
-        bordered
-        size="medium"
-        style={{
-          width: "100%",
-          scrollbarColor: "#003F6D",
-          scrollbarWidth: "thin",
-        }}
-        scroll={{ x: "max-content", y: 400 }}
-      />
+      {showTable && (
+        <Table
+          columns={columns}
+          dataSource={mappedVisitors}
+          pagination={{ pageSize: 10 }}
+          style={{ marginTop: "16px" }}
+        />
+      )}
 
       <Modal
-        title="Update Visitor Status"
+        title="Edit Status"
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
-        onOk={handleUpdateStatus}
+        footer={null}
       >
-        <Form form={statusForm} layout="vertical">
+        <Form
+          form={statusForm}
+          onFinish={handleUpdateStatus}
+          layout="vertical"
+        >
           <Form.Item
-            label="Status"
             name="status"
+            label="Status"
             rules={[{ required: true, message: "Please select status" }]}
           >
-            <Select placeholder="Select Status">
+            <Select>
               <Select.Option value="Arrived">Arrived</Select.Option>
-              <Select.Option value="Pending">Pending</Select.Option>
-              <Select.Option value="Left">Left</Select.Option>
+              <Select.Option value="Entered">Entered</Select.Option>
+              <Select.Option value="Received">Received</Select.Option>
+              <Select.Option value="Cleared">Cleared</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item
-            label="Time In"
-            name="timeIn"
-            rules={[{ required: true, message: "Please select time in" }]}
-          >
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+
+          <Form.Item name="timeIn" label="Time In">
+            <TimePicker format="HH:mm" />
           </Form.Item>
-          <Form.Item
-            label="Time Out"
-            name="timeOut"
-            rules={[{ required: true, message: "Please select time out" }]}
-          >
-            <TimePicker format="HH:mm" style={{ width: "100%" }} />
+          <Form.Item name="timeOut" label="Time Out">
+            <TimePicker format="HH:mm" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Update Status
+            </Button>
           </Form.Item>
         </Form>
       </Modal>

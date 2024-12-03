@@ -5,19 +5,26 @@ import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@an
 import { FaUser } from "react-icons/fa6";
 import OutpatientList from "../pages/OutpatientList";
 import { getVisitorsList } from "../actions/visitorsActions";
+import { listPatients } from "../actions/patientActions";
 
 const ReceptionDashboard = () => {
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
 
+  const { loading: patientLoading, error: patientError, patients } = useSelector(
+    (state) => state.patientList);
+  
+
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [currentVisitorsCount, setCurrentVisitorsCount] = useState(0);
+  const [activePatientsCount, setActivePatientsCount] = useState(0);
 
   useEffect(() => {
     dispatch(getVisitorsList());
+    dispatch(listPatients());
   }, [dispatch]);
 
   // Calculate today's date

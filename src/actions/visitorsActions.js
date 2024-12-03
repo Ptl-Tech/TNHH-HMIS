@@ -49,7 +49,7 @@ export const createVisitor = (visitor) => async (dispatch, getState) => {
         type: REGISTER_VISITOR_FAIL,
         payload: error.response?.data?.message || error.message,
       });
-      message.error(error.message, 5);
+    //  message.error(error.message, 5);
       throw error; // Rethrow error for `handleSubmit` to handle
     }
   };
@@ -101,7 +101,7 @@ export const createVisitor = (visitor) => async (dispatch, getState) => {
         type: ADMIT_VISITOR_FAIL,
         payload: error.response?.data?.message || error.message,
       });
-      message.error(error.message, 5);
+    //  message.error(error.message, 5);
       throw error; // Rethrow error for `handleSubmit` to handle
     }
   };

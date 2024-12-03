@@ -48,7 +48,7 @@ const SecurityLayout = () => {
     {
       key: "/Security",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      label: "Dashboard",
+      label: "Registration",
     },
     {
       type: "divider",
@@ -60,8 +60,8 @@ const SecurityLayout = () => {
       type: "group",
       children: [
         {
-          key: "/Security/VisitorRegistration",
-          label: "Visitor Registration",
+          key: "visitors-list",
+          label: "Visitor List",
           icon: <UserOutlined style={{ color: "#fff" }} />,
     
         },
@@ -74,30 +74,30 @@ const SecurityLayout = () => {
       ],
     },
    
-    {
-      key: "ActiveListGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Active List</span>,
-      type: "group",
-      children: [
-        {
-          key: "visitors-list",
-          label: "Visitors List",
-          icon: <TeamOutlined style={{ color: "#fff" }} />,
-        }
-      ],
-    },
-    {
-key: "HistoryGroup",
-label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>History</span>,
-type: "group",
-children: [
-  {
-    key: "History-list",
-    label: "History",
-    icon: <HistoryOutlined style={{ color: "#fff" }} />,
-  }
-],
-    },
+//     {
+//       key: "ActiveListGroup",
+//       label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Active List</span>,
+//       type: "group",
+//       children: [
+//         {
+//           key: "visitors-list",
+//           label: "Visitors List",
+//           icon: <TeamOutlined style={{ color: "#fff" }} />,
+//         }
+//       ],
+//     },
+//     {
+// key: "HistoryGroup",
+// label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>History</span>,
+// type: "group",
+// children: [
+//   {
+//     key: "History-list",
+//     label: "History",
+//     icon: <HistoryOutlined style={{ color: "#fff" }} />,
+//   }
+// ],
+//     },
   ];
   
   

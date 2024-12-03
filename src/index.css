@@ -136,6 +136,14 @@
   align-items: stretch;
 }
 
+.danger-row {
+  background-color: #ffccc7; /* Light red */
+}
+
+.warning-row {
+  background-color: #ffe58f; /* Light yellow */
+}
+
 
 main {
   overflow-y: scroll !important;
@@ -181,4 +189,39 @@ main {
 
 
   
+}
+
+/* Define the keyframes for the dot animation */
+@keyframes dot-blink {
+  0% {
+    content: "";
+  }
+  33% {
+    content: ".";
+  }
+  66% {
+    content: "..";
+  }
+  100% {
+    content: "...";
+  }
+}
+
+/* Style for loading dots */
+.loading-dots::after {
+  content: "";
+  animation: dot-blink 1.5s infinite steps(1);
+}
+
+
+@media (max-width: 1440px) {
+  .ant-modal {
+    width: 100% !important; /* Make modal take full width on medium screens and below */
+  }
+}
+
+@media (min-width: 1440px) {
+  .ant-modal {
+    width: 80% !important; /* Set the modal width to 80% for large screens */
+  }
 }
