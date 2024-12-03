@@ -45,6 +45,8 @@ import TriageLayout from "./Layouts/TriageLayout";
 import WaitingList from "./pages/WaitingList";
 import { roles } from "./constants/role";
 import ActivePatientList from "./pages/ActivePatientList";
+import TriageListPending from "./pages/TriageListPending";
+import TriageListClosed from "./pages/TriageListClosed";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -75,6 +77,8 @@ function App() {
             <Route path="Appointments" element={<Appointment />} />
             <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
             <Route path="Triage" element={<TriageList />} />
+            <Route path="PendingTriageList" element={<TriageListPending />} />
+            <Route path="ClosedTriageList" element={<TriageListClosed />} />
             <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
             <Route path="Triage-list" element={<WaitingList />} />
             <Route path="Inpatient" element={<ImpatientList />} />

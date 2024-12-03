@@ -1,39 +1,25 @@
-import { Button, Card, message, Table } from 'antd'
+import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
-import TriageSummeryCard from './TriageSummeryCard';
+import { getTriageWaitingList } from '../actions/triage-actions/getTriageWaitingListSlice';
+import TriageSummeryCard from './nurse-view/TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
-import Loading from '../../partials/nurse-partials/Loading'
-import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
-import TriageFilters from './TriageFilters';
+import Loading from '../partials/nurse-partials/Loading'
+import { getTriageList } from '../actions/triage-actions/getTriageListSlice';
+import TriageFilters from './nurse-view/TriageFilters';
 import { RightOutlined } from '@ant-design/icons';
-import { postCheckInPatientSlice } from '../../actions/triage-actions/postCheckInPatientSlice';
 
-const TriageList = () => {
+const TriageListPending = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
-  function handleNavigate(patientId, observationNo) {
-    dispatch(postCheckInPatientSlice({observationNo})).then((data)=>{
-      if(data?.status === 'success'){
-        message.success(data?.status);
-        navigate(`/Nurse/Triage/Patient?Patient_id=${patientId}&Ob_number=${observationNo}`);
-      }else{
-        message.error('An error occurred, please try again')
-      }
-    })
-  }
-
-  const openTriageList = triageList.filter((item)=>item.Status==='New')
+  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
 
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = openTriageList.map((item, index) => ({
+  const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
     key: index + 1,
     name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
@@ -123,7 +109,7 @@ const TriageList = () => {
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record?.number, record?.observationNo)}><RightOutlined />Check In</Button>
+      render: (_, record) => <Button type='primary'><RightOutlined />{record.Status}</Button>
     },
   ];
  
@@ -158,4 +144,4 @@ const TriageList = () => {
   )
 }
 
-export default TriageList
+export default TriageListPending

@@ -1,4 +1,4 @@
-import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Space, Button } from 'antd'
+import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Space, Button, message } from 'antd'
 import { UserOutlined, AlignCenterOutlined, BlockOutlined, BorderlessTableOutlined, GoldOutlined, RightOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
@@ -9,6 +9,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
 import useAuth from '../../hooks/useAuth';
+import { postDispatchToDoctorReducer } from '../../reducers/triage-reducers/postDispatchToDoctorReducer';
+import { postDispatchToDoctorSlice } from '../../actions/triage-actions/postDispatchToDoctorSlice';
 
 
 const EvaluatePatientInTriage = () => {
@@ -32,8 +34,16 @@ const EvaluatePatientInTriage = () => {
 
   const patientName = patientDetails?.SearchName || `${patientDetails?.Surname} ${patientDetails?.FirstName} ${patientDetails?.MiddleName}`;
 
-  const handleDispatchToDoctor = () => {
-    console.log("Dispatching to Doctor");
+  const handleDispatchToDoctor = (observationNumber) => {
+    dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
+      if(data?.message === 'success'){
+        message.success(data?.message)
+      }else if(data?.status === 'failed'){
+        message.error(data?.msg)
+      }else{
+        message.error('Something when wrong, try again');
+      }
+    })
   };
 
 
@@ -101,8 +111,7 @@ const EvaluatePatientInTriage = () => {
                   </Space>
                   <Divider />
                   <Button type="primary" onClick={()=>handleDispatchToDoctor(observationNo)} style={{width: '100%', marginBottom: '10px'}}>
-                    
-                    Dispatch to Doctor
+                      Dispatch to Doctor
                     <RightOutlined />
                   </Button>
                   </Card>
