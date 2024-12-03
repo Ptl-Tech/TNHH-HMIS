@@ -5,26 +5,20 @@ import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@an
 import { FaUser } from "react-icons/fa6";
 import OutpatientList from "../pages/OutpatientList";
 import { getVisitorsList } from "../actions/visitorsActions";
-import { listPatients } from "../actions/patientActions";
+import HistoryVisitorList from "../pages/HistoryVisitorList";
 
-const ReceptionDashboard = () => {
+const SecurityDashBoard = () => {
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
-
-  const { loading: patientLoading, error: patientError, patients } = useSelector(
-    (state) => state.patientList);
-  
 
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [currentVisitorsCount, setCurrentVisitorsCount] = useState(0);
-  const [activePatientsCount, setActivePatientsCount] = useState(0);
 
   useEffect(() => {
     dispatch(getVisitorsList());
-    dispatch(listPatients());
   }, [dispatch]);
 
   // Calculate today's date
@@ -57,7 +51,7 @@ const ReceptionDashboard = () => {
 
         <div className="row gap-3 gap-md-0">
           {/* Existing KPI Cards */}
-          <div className="col col-12 col-md-3">
+          <div className="col col-12 col-md-6">
             <div
               className="card"
               style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
@@ -65,28 +59,15 @@ const ReceptionDashboard = () => {
               <div className="card-body">
                 <div className="card-title p-2">
                   <UsergroupAddOutlined style={{ marginRight: 8 }} />
-                  Active Patients List
+                  History Visitor List
                 </div>
                 <p className="text-white">15</p>
               </div>
             </div>
           </div>
           {/* Additional KPI Cards */}
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: "#58586e", color: "#fafafa" }}
-            >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <FileDoneOutlined style={{ marginRight: 8 }} />
-                  Total Appointments
-                </div>
-                <p className="text-white">20</p>
-              </div>
-            </div>
-          </div>
-          <div className="col col-12 col-md-3">
+         
+          <div className="col col-12 col-md-6">
             <div
               className="card"
               style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
@@ -101,28 +82,15 @@ const ReceptionDashboard = () => {
               </div>
             </div>
           </div>
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: "#ac8342", color: "#fafafa" }}
-            >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <CheckCircleOutlined style={{ marginRight: 8 }} />
-                  Pharmacy List
-                </div>
-                <p className="text-white">5</p>
-              </div>
-            </div>
-          </div>
+         
         </div>
 
         <div className="mt-3">
-            <OutpatientList />
+            <HistoryVisitorList />
         </div>
       </div>
     </div>
   );
 };
 
-export default ReceptionDashboard;
+export default SecurityDashBoard;

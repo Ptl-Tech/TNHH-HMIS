@@ -16,10 +16,10 @@ const useSignIn = () => {
   const { userInfo } = loginHandler;
 
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
-  const {userInfo: verifyOtpUserInfo, success: verifyOtpSuccess } = verifyOtpHandler;
+  const { userInfo: verifyOtpUserInfo, success: verifyOtpSuccess } = verifyOtpHandler;
 
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
-  const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess , error: forgotPwdError } = loginHandler;
+  const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess, error: forgotPwdError } = loginHandler;
 
   const handleLogin = async () => {
     await dispatch(login(staffNo, password, branchCode));
@@ -31,40 +31,58 @@ const useSignIn = () => {
 
   const handleVerifyOtp = async () => {
     console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken, userInfo?.branchCode);
-    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode?.branchCode)); // Pass branchCode here
-  
-    if (verifyOtpUserInfo) {
-      setOtp('');
-      setIsOtpRequired(false);
-      navigate("/Nurse/Dashboard"); // Navigate to the next page after OTP verification
-    }
+    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode)); // Pass branchCode here
+
+
   };
 
   const handleForgotPassword = async () => {
-    await dispatch(forgotPassword(staffNo ));
+    await dispatch(forgotPassword(staffNo));
     console.log("User info:", userInfo);
-     
-    if(forgotPwdSuccess) {
+
+    if (forgotPwdSuccess) {
       navigate("/reset-password");
     }
   };
 
   // Effect to handle OTP modal visibility based on sessionToken
   useEffect(() => {
-    if (userInfo?.sessionToken  && !verifyOtpSuccess) {
+    if (userInfo?.sessionToken && !verifyOtpSuccess) {
       setIsOtpRequired(true); // Show OTP modal if sessionToken exists and OTP is not verified
     } else {
       setIsOtpRequired(false); // Close OTP modal after OTP verification
     }
   }, [userInfo?.sessionToken, verifyOtpSuccess]);
-  
+
   useEffect(() => {
     if (verifyOtpUserInfo) {
       // Reset OTP state before navigating
       setOtp('');
       setIsOtpRequired(false);
-      // Navigate to Doctor route after successful OTP verification
-      navigate("/Nurse/Dashboard");
+
+
+      const role = verifyOtpUserInfo?.userData.departmentName;
+
+
+      switch (role) {
+        case 'Reception':
+          navigate('/reception');
+          break;
+        case 'Security':
+          navigate('/Security');
+          break;
+        case 'Production':
+          navigate('/Triage');
+          break;
+        case 'Doctor':
+          navigate('/Doctor');
+          break;
+        default:
+          // Optional: Handle unknown roles or do nothing
+          console.log('Invalid role');
+      }
+
+
     }
   }, [verifyOtpUserInfo, navigate]);
 

@@ -47,40 +47,40 @@ const ReceptionLayout = () => {
     {
       key: "/reception",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      label: "Dashboard",
+      label: "Registration",
     },
     {
       type: "divider",
     },
-    {
-      key: "RegistrationGroup",
-      label: (
-        <span style={{ color: "#ac8342", fontWeight: "bold" }}>
-          Registration
-        </span>
-      ),
-      type: "group",
-      children: [
-        {
-          key: "Patient-list",
-          label: "Patients",
-          icon: <TeamOutlined style={{ color: "#fff" }} />,
-        },
-        // {
-        //   key: "Inpatient-list",
-        //   label: "Active Inpatient List",
-        //   icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
-        // },
-        // {
-        //   key: "Patient-admissions",
-        //   label: "Patient Admission",
-        //   icon: <FileAddOutlined style={{ color: "#fff" }} />,
-        // },
-      ],
-    },
-    {
-      type: "divider",
-    },
+    // {
+    //   key: "PatientsGroup",
+    //   label: (
+    //     <span style={{ color: "#ac8342", fontWeight: "bold" }}>
+    //       Registration
+    //     </span>
+    //   ),
+    //   type: "group",
+    //   children: [
+    //     {
+    //       key: "Patient-list",
+    //       label: "Patients",
+    //       icon: <TeamOutlined style={{ color: "#fff" }} />,
+    //     },
+    //     // {
+    //     //   key: "Inpatient-list",
+    //     //   label: "Active Inpatient List",
+    //     //   icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+    //     // },
+    //     // {
+    //     //   key: "Patient-admissions",
+    //     //   label: "Patient Admission",
+    //     //   icon: <FileAddOutlined style={{ color: "#fff" }} />,
+    //     // },
+    //   ],
+    // },
+    // {
+    //   type: "divider",
+    // },
 
     {
       key: "BillingGroup",
@@ -90,8 +90,13 @@ const ReceptionLayout = () => {
       type: "group",
       children: [
         {
-          key: "Active-Visits",
-          label: "Active Patient List",
+          key: "Active-OutPatient",
+          label: "Active OutPatient ",
+          icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "Active-Inpatient",
+          label: "Active InPatient ",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
         },
       ],

@@ -45,6 +45,8 @@ import TriageLayout from "./Layouts/TriageLayout";
 import WaitingList from "./pages/WaitingList";
 import { roles } from "./constants/role";
 import ActivePatientList from "./pages/ActivePatientList";
+import SecurityDashBoard from "./Dashboards/SecurityDashboard";
+import HistoryVisitorList from "./pages/HistoryVisitorList";
 import TriageListPending from "./pages/TriageListPending";
 import TriageListClosed from "./pages/TriageListClosed";
 
@@ -106,10 +108,7 @@ function App() {
             <Route path="view-profile" element={<ViewProfile />} />
       </Route>
       </Route>
-
-
-      
-      <Route element={<PrivateRoute />}>
+      <Route element={<PrivateRoute allowedRoles={['Reception']} />}>
         <Route path="/reception" element={<ReceptionLayout />}>
           <Route index element={<ReceptionDashboard />} />
 
@@ -119,9 +118,16 @@ function App() {
           />
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
-          <Route path="/reception/Active-Visits" element={<ActivePatientList />} />
-          <Route path="/reception/visitors-list" element={<VisitorList />} />
+          <Route
+            path="/reception/Active-Outpatient"
+            element={<OutpatientList />}
+          />
+          <Route
+            path="/reception/Active-Inpatient"
+            element={<InpatientList />}
+          />
 
+          <Route path="/reception/visitors-list" element={<VisitorList />} />
 
           <Route
             path="/reception/create-visit/:patientNo"
@@ -157,13 +163,18 @@ function App() {
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
-      <Route element={<PrivateRoute allowedRoles={['Security']} />}>
+      <Route element={<PrivateRoute allowedRoles={["Security"]} />}>
         <Route path="/Security" element={<SecurityLayout />}>
+
           <Route index element={<VisitorForm />} />
           <Route path="/Security/visitors-list" element={<VisitorList />} />
+          <Route
+            path="/Security/History-list"
+            element={<HistoryVisitorList />}
+          />
         </Route>
       </Route>
-      <Route element={<PrivateRoute allowedRoles={['Production']}/>}>
+      <Route element={<PrivateRoute allowedRoles={["Production"]} />}>
         <Route path="/Triage" element={<TriageLayout />}>
           <Route index element={<NurseObservation />} />
           <Route path="/Triage/Triage-list" element={<WaitingList />} />
