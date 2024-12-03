@@ -54,8 +54,6 @@ export const rootReducer = combineReducers({
     visitorsList:visitorListReducer,
     getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer,
-    registerVisitor:visitorCreateReducer,
-    visitorsList:visitorListReducer,
     admitVisitor:admitVisitorReducer,getPatientDetails:getPatientDetailsReducer,
     getTriageListDetails:getTriageListDetailsReducer,
     postTriageListVitals:postTriageListVitalsReducer,
@@ -72,5 +70,4 @@ export const rootReducer = combineReducers({
     getDressing:getDressingReducer,
     dispatchToDoctor:postDispatchToDoctorReducer,
     checkInPatient:postCheckInPatientReducer
-
 });
