@@ -1,5 +1,5 @@
-import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Space, Button, message } from 'antd'
-import { UserOutlined, AlignCenterOutlined, BlockOutlined, BorderlessTableOutlined, GoldOutlined, RightOutlined } from '@ant-design/icons';
+import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Button, message } from 'antd'
+import { UserOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
 import Injections from './forms/triage-forms/Injections';
@@ -9,9 +9,9 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
 import useAuth from '../../hooks/useAuth';
-import { postDispatchToDoctorReducer } from '../../reducers/triage-reducers/postDispatchToDoctorReducer';
 import { postDispatchToDoctorSlice } from '../../actions/triage-actions/postDispatchToDoctorSlice';
-
+import SkeletonLoading from '../../partials/nurse-partials/Skeleton';
+import LoadingParagraphs from '../../partials/nurse-partials/LoadingParagraphs';
 
 const EvaluatePatientInTriage = () => {
 
@@ -30,9 +30,12 @@ const EvaluatePatientInTriage = () => {
       dispatch(getPatientDetails(patientNo))
   }, [dispatch, patientNo])
 
-  const { patientDetails } = useSelector((state) => state.getPatientDetails);
+  const { loadingPatientDetails, patientDetails } = useSelector((state) => state.getPatientDetails);
 
-  const patientName = patientDetails?.SearchName || `${patientDetails?.Surname} ${patientDetails?.FirstName} ${patientDetails?.MiddleName}`;
+  const patientName = patientDetails?.SearchName 
+  || [patientDetails?.Surname, patientDetails?.FirstName, patientDetails?.MiddleName]
+      .filter(Boolean) // Remove null, undefined, or empty strings
+      .join(' '); // Join with a space
 
   const handleDispatchToDoctor = (observationNumber) => {
     dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
@@ -71,50 +74,64 @@ const EvaluatePatientInTriage = () => {
                 </Card>
               </Col>
               <Col span={8}>
-                  <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <Avatar icon={<UserOutlined />} size={64}/>
-                    <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                          <Typography.Title level={5} style={{color: 'black'}}>{patientName}</Typography.Title>
-                          <Typography.Text style={{ fontSize: '14px', color:'gray' }}>DOB: {patientDetails?.DateOfBirth}</Typography.Text>
-                    </div>
-                  </div>
-                  <Divider />
-                  <Space style={{ display: 'flex', alignItems: 'baseline' }}>
-                      <AlignCenterOutlined />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>PatientNumber</Typography.Title>
-                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.PatientNo}</Typography.Text>
+
+
+              {
+                loadingPatientDetails ? (
+                  <SkeletonLoading />
+                ) :(
+                      <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '12px' }}>
+                        <Avatar icon={<UserOutlined />} size={48}/>
+                        <div style={{ marginTop: '10px'}}>
+                              <Typography.Title level={5} style={{color: 'black', fontSize: '13px'}}>{patientName}</Typography.Title>
+                              <Typography.Text style={{ fontSize: '13px', color:'gray' }}>DOB: {patientDetails?.DateOfBirth}</Typography.Text>
+                        </div>
                       </div>
-                  </Space>
-                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px' }}>
-                      <BlockOutlined />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Observation No</Typography.Title>
-                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{observationNo}</Typography.Text>
-                      </div>
-                  </Space>
-                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px', marginBottom: '10px' }}>
-                    <BorderlessTableOutlined />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Age</Typography.Title>
-                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{`${patientDetails?.AgeinYears} Years`}
-                        </Typography.Text>
-                      </div>
-                  </Space>
-                  <Space style={{ display: 'flex', alignItems: 'baseline', marginTop: '10px', marginBottom: '10px' }}>
-                    <GoldOutlined />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black', fontWeight: 'bold' }}>Gender</Typography.Title>
-                        <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.Gender}</Typography.Text>
-                      </div>
-                  </Space>
-                  <Divider />
-                  <Button type="primary" onClick={()=>handleDispatchToDoctor(observationNo)} style={{width: '100%', marginBottom: '10px'}}>
-                      Dispatch to Doctor
-                    <RightOutlined />
-                  </Button>
+                      <Divider />
+                      <Button type="primary" onClick={()=>handleDispatchToDoctor(observationNo)} style={{width: '100%', marginBottom: '10px'}}>
+                          Dispatch patient to the Doctor
+                      </Button>
                   </Card>
+                ) 
+              }
+              
+                 {
+                  loadingPatientDetails ? (
+                    <LoadingParagraphs />
+                  ) : (
+                    <Card style={{ padding: '10px 16px', marginRight: '10px', marginTop: '10px' }}>
+                    <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
+                      Additional Information
+                    </Typography.Title>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>PatientNumber</Typography.Title>
+    
+                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.PatientNo}</Typography.Text>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', }}>
+                        
+                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black',}}>Observation No</Typography.Title>
+                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{observationNo}</Typography.Text>
+                    
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                    
+                      
+                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>Age</Typography.Title>
+                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{`${patientDetails?.AgeinYears} Years`}
+                          </Typography.Text>
+                        
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between'}}>
+                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>Gender</Typography.Title>
+                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.Gender}</Typography.Text>
+                      
+                    </div>
+                  </Card>
+                  )
+                 }
+                    
               </Col>
            </Row>
     </div>

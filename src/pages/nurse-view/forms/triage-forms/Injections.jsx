@@ -167,7 +167,7 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Form.Item>
             <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" htmlType="submit">Save</Button>
+                    <Button type="primary" htmlType="submit">Save injections</Button>
                 </Form.Item>
               </Col>
             </Col>

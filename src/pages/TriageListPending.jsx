@@ -8,16 +8,25 @@ import Loading from '../partials/nurse-partials/Loading'
 import { getTriageList } from '../actions/triage-actions/getTriageListSlice';
 import TriageFilters from './nurse-view/TriageFilters';
 import { RightOutlined } from '@ant-design/icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const TriageListPending = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
   const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
   const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
 
+  //get the current location path
+  const currentPath = location.pathname;
+
+const handleOnClick = (observationNo, patientNumber) =>{
+  observationNo && patientNumber && navigate(`/Nurse/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`)
+}
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
     key: index + 1,
@@ -109,13 +118,13 @@ const TriageListPending = () => {
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: (_, record) => <Button type='primary'><RightOutlined />{record.Status}</Button>
+      render: (_, record) => <Button type='primary' onClick={()=>handleOnClick(record.observationNo, record.number)}><RightOutlined />Dispatch to doctor</Button>
     },
   ];
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource}/>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} pendingTriageList={pendingTriageList}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>

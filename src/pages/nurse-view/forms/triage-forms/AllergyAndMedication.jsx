@@ -190,7 +190,7 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                     </Col>
                     <Col span={12}>
                         <Form.Item >
-                            <Button type="primary" htmlType="submit">Save</Button>
+                            <Button type="primary" htmlType="submit">Save allegies and medication</Button>
                         </Form.Item>
                     </Col>
                 </Row>

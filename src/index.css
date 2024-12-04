@@ -151,6 +151,9 @@
   flex-wrap: wrap;
   align-items: stretch;
 }
+.ant-menu-item-selected {
+  background-color: #ac8342 !important;
+}
 
 .danger-row {
   background-color: #ffccc7; /* Light red */

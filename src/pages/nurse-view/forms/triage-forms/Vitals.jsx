@@ -12,8 +12,8 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   
   useEffect(() => {
-    dispatch(getVitalsLinesSlice(patientNumber));
-  }, [dispatch, patientNumber]);
+    dispatch(getVitalsLinesSlice(observationNumber));
+  }, [dispatch, observationNumber]);
 
   const onFinish = (values) => {
     const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02, respirationRate } = values.vitals;
@@ -229,7 +229,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               </Col>
               <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" htmlType="submit">Save</Button>
+                    <Button type="primary" htmlType="submit">Save vitals</Button>
                 </Form.Item>
               </Col>
             </Row>

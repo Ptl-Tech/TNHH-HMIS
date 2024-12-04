@@ -1,4 +1,4 @@
-import { Button, Card, Table } from 'antd'
+import { Badge, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './nurse-view/TriageSummeryCard';
@@ -7,15 +7,20 @@ import Loading from '../partials/nurse-partials/Loading'
 import { getTriageList } from '../actions/triage-actions/getTriageListSlice';
 import TriageFilters from './nurse-view/TriageFilters';
 import { RightOutlined } from '@ant-design/icons';
+import { useLocation } from 'react-router-dom';
 
 const TriageListClosed = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
   const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
+
+  //get the current location path
+  const currentPath = location.pathname;
 
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = closedTriageList.map((item, index) => ({
@@ -107,13 +112,13 @@ const TriageListClosed = () => {
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: (_, record) => <Button type='primary'><RightOutlined />{record.status}</Button>
+      render: () => <Badge style={{ backgroundColor: '#52c41a' }}>closed</Badge>
     },
   ];
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource}/>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>

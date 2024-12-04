@@ -9,15 +9,12 @@ export const GET_VITAL_LINES_FAILURE = 'GET_VITAL_LINES_FAILURE';
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
-export const getVitalsLinesSlice = (patientNo) => async (dispatch, getState) => {
+export const getVitalsLinesSlice = (observationNo) => async (dispatch, getState) => {
    
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_VITAL_LINES_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&query=${patientNo}=No eq ‘PTL’&isList=false`, config);
-
-
-        console.log('response data', data)
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=true&query=$filter=ObservationNo eq '${observationNo}'`, config);
 
         Object.keys(data).length > 0 && dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data });
         Object.keys(data).length === 0 && (

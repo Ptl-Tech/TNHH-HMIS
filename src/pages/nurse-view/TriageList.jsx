@@ -1,7 +1,7 @@
 import { Button, Card, message, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
@@ -31,6 +31,9 @@ const TriageList = () => {
   }
 
   const openTriageList = triageList.filter((item)=>item.Status==='New')
+  const location = useLocation();
+   //get the current location path
+   const currentPath = location.pathname;
 
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = openTriageList.map((item, index) => ({
@@ -129,7 +132,7 @@ const TriageList = () => {
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource}/>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>

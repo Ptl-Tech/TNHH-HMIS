@@ -14,7 +14,7 @@ export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
   
       const config = apiHeaderConfig(getState);
       
-      const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyPatients&query=${patientNo}=No eq ‘PTL’&isList=false`, config);
+      const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
 
       // Check if a patient was found
       Object.keys(data).length > 0 && dispatch({ type: GET_PATIENT_DETAILS_SUCCESS, payload: data });

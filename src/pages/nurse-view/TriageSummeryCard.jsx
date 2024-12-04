@@ -7,99 +7,93 @@ import {
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const TriageSummeryCard = ({ waitingPatient }) => {
+const TriageSummeryCard = ({ waitingPatient, currentPath }) => {
+
+  const { triageList } = useSelector((state) => state.getTriageList) || {};
+
+  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
+  const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
+
+
+
+  const cardData = [
+    {
+      backgroundColor: "green",
+      icon: <HourglassOutlined />,
+      title: "Waiting Patients",
+      link: "/Nurse/Triage",
+      count: waitingPatient, // Replace with `waitingPatient?.length` or dynamic data
+    },
+    {
+      backgroundColor: "gray",
+      icon: <ClockCircleOutlined />,
+      title: "In Triage",
+      link: "/Nurse/PendingTriageList",
+      count: Object.keys(pendingTriageList).length || 0,
+    },
+    {
+      backgroundColor: "#0f5689",
+      icon: <StopOutlined />,
+      title: "Closed",
+      link: "/Nurse/ClosedTriageList",
+      count: Object.keys(closedTriageList).length || 0,
+    },
+  ];
+
+  const activeCard = 
+    {
+      borderLeft: "2px solid #ac8342",
+      backgroundColor: "#faf6e7",
+    }
+
+  
   return (
     <div style={{ display: "flex", marginBottom: "10px", gap: "10px" }}>
-      <Card style={{ flex: 1, padding: "10px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "grid",
-              placeItems: "center",
-              backgroundColor: "green",
-              borderRadius: "4px",
-              width: "30px",
-              height: "30px",
-              color: "white",
-            }}
-          >
-            <HourglassOutlined />
-          </div>
-
-          <div style={{ marginLeft: "20px" }}>
-            
-              <Typography.Title level={5} style={{ color: "gray" }}>
-                Waiting Patients
-              </Typography.Title>
-              <Typography.Text style={{ fontSize: "12px", fontWeight: "bold" }}>
-                <CountUp start={0} end={waitingPatient?.length} duration={1} />
-              </Typography.Text>
-            
-          </div>
-        </div>
-      </Card>
-
-      <Card style={{ flex: 1, padding: "10px 16px" }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "grid",
-              placeItems: "center",
-              backgroundColor: "gray",
-              borderRadius: "4px",
-              width: "30px",
-              height: "30px",
-              color: "white",
-            }}
-          >
-            <ClockCircleOutlined />
-          </div>
-
-          <div style={{ marginLeft: "20px" }}>
-            <Link to="PendingTriageList" style={{ textDecoration: "none" }}>
-              <Typography.Title level={5} style={{ color: "gray" }}>
-                In Triage
-              </Typography.Title>
-              <Typography.Text style={{ fontSize: "12px", fontWeight: "bold" }}>
-                20
-              </Typography.Text>
+        {cardData.map((card, index) => {
+            const isActive = currentPath === card.link;
+          return (
+            <Card key={index} style={{ flex: 1, padding: "10px 16px", ...(isActive ? activeCard : {})}}>
+            <Link to={card.link} style={{ textDecoration: "none" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "grid",
+                  placeItems: "center",
+                  backgroundColor: card.backgroundColor,
+                  borderRadius: "4px",
+                  width: "30px",
+                  height: "30px",
+                  color: "white",
+                }}
+              >
+                {card.icon}
+              </div>
+              <div style={{ marginLeft: "20px" }}>
+                
+                  <Typography.Title level={5} style={{ color: "gray" }}>
+                    {card.title}
+                  </Typography.Title>
+                  <Typography.Text
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <CountUp start={0} 
+                    end={card.count} 
+                    duration={1} 
+                    />
+                  </Typography.Text>
+               
+              </div>
+            </div>
             </Link>
-          </div>
-        </div>
-      </Card>
-
-      <Card
-        style={{ flex: 1, padding: "10px 16px" }}
-        Link="/Triage/ClosedTriageList"
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              display: "grid",
-              placeItems: "center",
-              backgroundColor: "#002329",
-              borderRadius: "4px",
-              width: "30px",
-              height: "30px",
-              color: "white",
-            }}
-          >
-            <StopOutlined />
-          </div>
-
-          <div style={{ marginLeft: "20px" }}>
-            <Link to="ClosedTriageList" style={{ textDecoration: "none" }}>
-              <Typography.Title level={5} style={{ color: "gray" }}>
-                Closed
-              </Typography.Title>
-              <Typography.Text style={{ fontSize: "12px", fontWeight: "bold" }}>
-                30
-              </Typography.Text>
-            </Link>
-          </div>
-        </div>
-      </Card>
+          </Card>
+          ) 
+        }
+      )}
     </div>
   );
 };
@@ -109,4 +103,5 @@ export default TriageSummeryCard;
 //props validation
 TriageSummeryCard.propTypes = {
   waitingPatient: PropTypes.array.isRequired,
+  currentPath: PropTypes.string.isRequired,
 };
