@@ -275,25 +275,22 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
 
     console.log("patient: ", visitorNo);
 
-    const {response} = await axios.post(
+  const {data} = await axios.post(
       `${API}Reception/ConvertVisitorToPatient `,
       { visitorNo: visitorNo },
       config
     );
 
   //  // Extract response details
-  //   const responseData = {
-  //     status: response.data.status,
-  //     msg: response.data.observationNo, // Assuming `msg` contains the patient ID
-  //   };
+    const responseData =data.patientNo;
 
-  //   setTimeout(() => {
-  //     console.log("Dispatched Payload:", responseData);
-  //   }, 2000);
+    setTimeout(() => {
+      console.log("Dispatched Payload:", responseData);
+    }, 2000);
 
-    dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: response });
+    dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: responseData });
     //message with success message and observationNo
-
+return responseData
   } catch (error) {
     dispatch({
       type: CONVERT_TO_PATIENT_FAIL,
