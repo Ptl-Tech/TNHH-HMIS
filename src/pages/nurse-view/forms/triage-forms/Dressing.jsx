@@ -16,6 +16,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
     const { items } = useSelector((state) => state.getItems);
     const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
     const { dressing } = useSelector((state) => state.getDressing);
+    const { dressingsLoading } = useSelector((state) => state.postDressings);
 
     const onFinish = (values) => {
         const { processNumber, itemNumber, unitsOfMeasure, quantity, injectionRemarks } = values.dressing;
@@ -181,7 +182,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
             </Form.Item>
             <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" htmlType="submit">Save dressings</Button>
+                    <Button type="primary" htmlType="submit" loading={dressingsLoading}>Save dressings</Button>
                 </Form.Item>
               </Col>
             </Col>

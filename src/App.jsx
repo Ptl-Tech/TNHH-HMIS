@@ -47,8 +47,8 @@ import { roles } from "./constants/role";
 import ActivePatientList from "./pages/ActivePatientList";
 import SecurityDashBoard from "./Dashboards/SecurityDashboard";
 import HistoryVisitorList from "./pages/HistoryVisitorList";
-import TriageListPending from "./pages/TriageListPending";
-import TriageListClosed from "./pages/TriageListClosed";
+import TriageListPending from "./pages/nurse-view/TriageListPending";
+import TriageListClosed from "./pages/nurse-view/TriageListClosed";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);

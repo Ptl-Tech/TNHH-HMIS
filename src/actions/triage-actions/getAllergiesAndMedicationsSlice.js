@@ -1,5 +1,4 @@
 
-import { message } from 'antd';
 import configHelpers  from '../../actions/configHelpers'
 import axios from "axios";
 
@@ -14,16 +13,11 @@ export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatc
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&query=${observationNo}=No eq ‘PTL’&isList=false`, config);
 
-
-        console.log('response data', data)
-
-        Object.keys(data).length > 0 && dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: "Patient not found" }),
-            message.warning("No patient found with the provided patient number.", 5)
-            );
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
+      
+        dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data })
+           
 
     } catch (error) {
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error.message });

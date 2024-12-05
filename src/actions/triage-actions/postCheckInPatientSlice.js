@@ -21,7 +21,7 @@ export const postCheckInPatientSlice = (observationNo) => async (dispatch, getSt
         );
 
         dispatch({ type: POST_CHECK_IN_PATIENT_SUCCESS, payload: response.data });
-        console.log('logging the response data', response.data);
+
         return response.data;
 
     }catch (error) {

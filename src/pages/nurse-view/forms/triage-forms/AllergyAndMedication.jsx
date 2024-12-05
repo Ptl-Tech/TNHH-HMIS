@@ -10,6 +10,8 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
     const dispatch = useDispatch();
     const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
 
+    const { postAllergyMedicationLoading } = useSelector((state) => state.postAllergiesMedication);
+
     useEffect(() => {
         dispatch(getAllergiesAndMedicationsSlice(patientNumber));
       }, [dispatch, patientNumber]);
@@ -190,7 +192,7 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                     </Col>
                     <Col span={12}>
                         <Form.Item >
-                            <Button type="primary" htmlType="submit">Save allegies and medication</Button>
+                            <Button type="primary" htmlType="submit" loading={postAllergyMedicationLoading}>Save allegies and medication</Button>
                         </Form.Item>
                     </Col>
                 </Row>

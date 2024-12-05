@@ -1,36 +1,42 @@
-import { Badge, Card, Table } from 'antd'
+import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import TriageSummeryCard from './nurse-view/TriageSummeryCard';
+import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
+import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
-import Loading from '../partials/nurse-partials/Loading'
-import { getTriageList } from '../actions/triage-actions/getTriageListSlice';
-import TriageFilters from './nurse-view/TriageFilters';
+import Loading from '../../partials/nurse-partials/Loading'
+import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
+import TriageFilters from './TriageFilters';
 import { RightOutlined } from '@ant-design/icons';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
 
-const TriageListClosed = () => {
+const TriageListPending = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
-  const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
+  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
 
   //get the current location path
   const currentPath = location.pathname;
 
+const handleOnClick = (observationNo, patientNumber) =>{
+  observationNo && patientNumber && navigate(`/Nurse/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`)
+}
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = closedTriageList.map((item, index) => ({
+  const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
     key: index + 1,
     name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
-    // age: item?.AgeinYears,
+    observationTime: item?.ObservationTime,
     // sex: item?.Gender,
     number: item?.PatientNo,
-    idNumber: item?.IDNumber,
     observationNo: item?.ObservationNo,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
@@ -54,15 +60,15 @@ const TriageListClosed = () => {
     }
     return waitingListTableDataSource;
   }
-  
 
   useEffect(() => {
+    dispatch(getTriageWaitingList());
     dispatch(getTriageList())
   }, [dispatch]);
 
   const waitingListColumns = [
     {
-      title: 'Index',
+      title: '#',
       dataIndex: 'key',
       rowScope: 'row',
     },
@@ -76,11 +82,11 @@ const TriageListClosed = () => {
       ],
       onFilter: (value, record) => record.name.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    },
-    {
-      title: 'ID Number',
-      dataIndex: 'idNumber',
-      rowScope: 'row',
+      render: (name, record) => (
+        <div style={{ color: getColorByWaitingTime(record.observationTime) }}>
+          {name}
+        </div>
+      )
     },
     {
       title: 'Observation No',
@@ -92,11 +98,17 @@ const TriageListClosed = () => {
       dataIndex: 'regDate',
       rowScope: 'row',
     },
-    // {
-    //   title: 'Age',
-    //   dataIndex: 'age',
-    //   rowScope: 'row',
-    // },
+    {
+      title: 'Waiting Time',
+      dataIndex: 'observationTime',
+      rowScope: 'row',
+      render: (_, record) => {
+        const combinedDateTime = `${record.regDate}T${record.observationTime}`;
+        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute'); // Calculate elapsed time in minutes
+
+        return <div style={{ color: getColorByWaitingTime(record.observationTime) }}>{formatElapsedTime(elapsedMinutes)}</div>;
+    },
+  },
     // {
     //   title: 'Sex',
     //   dataIndex: 'sex',
@@ -108,17 +120,17 @@ const TriageListClosed = () => {
       rowScope: 'row',
     },
     {
-      title: 'Status',
+      title: 'Check In',
       dataIndex: 'checkIn',
       rowScope: 'row',
       width: 200,
-      render: () => <Badge style={{ backgroundColor: '#52c41a' }}>closed</Badge>
+      render: (_, record) => <Button type='primary' onClick={()=>handleOnClick(record.observationNo, record.number)}><RightOutlined />Dispatch to doctor</Button>
     },
   ];
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} pendingTriageList={pendingTriageList}/>
           <Card style={{ padding: '24px 10px 10px 10px' }}>
 
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
@@ -147,4 +159,4 @@ const TriageListClosed = () => {
   )
 }
 
-export default TriageListClosed
+export default TriageListPending

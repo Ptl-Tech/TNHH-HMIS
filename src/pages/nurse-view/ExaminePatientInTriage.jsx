@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import { postDispatchToDoctorSlice } from '../../actions/triage-actions/postDispatchToDoctorSlice';
 import SkeletonLoading from '../../partials/nurse-partials/Skeleton';
 import LoadingParagraphs from '../../partials/nurse-partials/LoadingParagraphs';
+import { getVitalsLinesSlice } from '../../actions/triage-actions/getVitalsLinesSlice';
 
 const EvaluatePatientInTriage = () => {
 
@@ -38,15 +39,22 @@ const EvaluatePatientInTriage = () => {
       .join(' '); // Join with a space
 
   const handleDispatchToDoctor = (observationNumber) => {
-    dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
-      if(data?.message === 'success'){
-        message.success(data?.message)
-      }else if(data?.status === 'failed'){
-        message.error(data?.msg)
+    dispatch(getVitalsLinesSlice(observationNumber)).then((data)=>{
+      console.log('vital lines data', data);
+      if(data?.length > 0){
+          dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
+            if(data?.message === 'success'){
+              message.success(data?.message)
+            }else if(data?.status === 'failed'){
+              message.error(data?.msg)
+            }else{
+              message.error('Something when wrong, try again');
+            }
+          })
       }else{
-        message.error('Something when wrong, try again');
+        message.error('Please add vitals before dispatching to doctor');
       }
-    })
+    });
   };
 
 

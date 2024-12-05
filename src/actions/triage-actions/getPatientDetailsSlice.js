@@ -17,11 +17,8 @@ export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
       const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
 
       // Check if a patient was found
-      Object.keys(data).length > 0 && dispatch({ type: GET_PATIENT_DETAILS_SUCCESS, payload: data });
-      Object.keys(data).length === 0 && (
-        dispatch({ type: GET_PATIENT_DETAILS_FAILURE, payload: "Patient not found" }),
-        message.warning("No patient found with the provided patient number.", 5)
-        );
+     
+        dispatch({ type: GET_PATIENT_DETAILS_SUCCESS, payload: data })
 
     } catch (error) {
       dispatch({ type: GET_PATIENT_DETAILS_FAILURE, payload: error.message });

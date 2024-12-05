@@ -16,15 +16,8 @@ export const getItemsSlice = () => async (dispatch, getState) => {
         dispatch({ type: GET_ITEMS_REQUEST });
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyItems&isList=true`, config);
 
-
-        console.log('response data', data)
-
-        Object.keys(data).length > 0 && dispatch({ type: GET_ITEMS_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_ITEMS_FAILURE, payload: "Nothing found" }),
-            message.warning("No items found.", 5)
-            );
-
+        dispatch({ type: GET_ITEMS_SUCCESS, payload: data });
+     
     } catch (error) {
         dispatch({ type: GET_ITEMS_FAILURE, payload: error.message });
     }

@@ -23,7 +23,7 @@ export const postDispatchToDoctorSlice = (dispatchToDoctor) => async (dispatch, 
         );
 
         dispatch({ type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: response.data });
-        console.log('logging the response data', response.data);
+ 
         return response.data;
 
     }catch (error) {

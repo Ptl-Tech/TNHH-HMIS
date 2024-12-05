@@ -21,7 +21,7 @@ export const postDressingsSlice = (injections) => async (dispatch, getState) =>{
         );
 
         dispatch({ type: POST_DRESSINGS_SUCCESS, payload: response.data });
-        console.log('logging the response data', response.data);
+        
         return response.data;
 
     }catch (error) {

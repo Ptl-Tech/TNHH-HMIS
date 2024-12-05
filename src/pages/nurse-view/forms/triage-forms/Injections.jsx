@@ -14,6 +14,7 @@ const Injections = ({ observationNumber, staffNo }) => {
     const dispatch = useDispatch()
     const { injectionsNumber } = useSelector((state) => state.getInjectionNumber);
     const {loadingInjections, injections} = useSelector((state) => state.getInjections);
+    const { injectionsLoading } = useSelector((state) => state.getInjections);
 
     console.log(injectionsNumber)
 
@@ -167,7 +168,7 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Form.Item>
             <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" htmlType="submit">Save injections</Button>
+                    <Button type="primary" htmlType="submit" loading={injectionsLoading}>Save injections</Button>
                 </Form.Item>
               </Col>
             </Col>

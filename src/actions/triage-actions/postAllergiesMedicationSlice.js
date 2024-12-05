@@ -21,7 +21,7 @@ export const postAllergiesMedicationSlice = (allergiesMedication) => async (disp
         );
 
         dispatch({ type: POST_ALLERGIES_MEDICATION_SUCCESS, payload: response.data });
-        console.log('logging the response data', response.data);
+       
         return response.data;
 
     }catch (error) {

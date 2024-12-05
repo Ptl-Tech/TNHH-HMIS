@@ -10,6 +10,8 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
+  const { loading } = useSelector((state) => state.postTriageListVitals);
+ 
   
   useEffect(() => {
     dispatch(getVitalsLinesSlice(observationNumber));
@@ -104,13 +106,14 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               observationNumber: observationNumber,
               patientNumber: patientNumber,
               pulseRate: vitalsLines?.PulseRate,
-              bloodPreasure: vitalsLines?.BloodPreasure,
+              bloodPreasure: vitalsLines?.BloodPressure,
               temperature: vitalsLines?.Temperature,
               sP02: vitalsLines?.SP02,
               height: vitalsLines?.Height,
               weight: vitalsLines?.Weight,
               respirationRate: vitalsLines?.RespirationRate,
               pain: vitalsLines?.Pain,
+              bmi: vitalsLines?.BMI,
             },
           }}
           >
@@ -227,12 +230,27 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                   />
                 </Form.Item>
               </Col>
+            </Row>
+            <Row gutter={16}>
               <Col span={12}>
-                <Form.Item >
-                    <Button type="primary" htmlType="submit">Save vitals</Button>
+              <Form.Item label="BMI" name={['vitals', 'bmi']}
+              >
+                <Input type='text' 
+                
+                  name='bmi'
+                  disabled
+
+                />
+
                 </Form.Item>
               </Col>
             </Row>
+
+            <Col span={12}>
+                <Form.Item >
+                    <Button type="primary" loading={loading} htmlType="submit">Save vitals</Button>
+                </Form.Item>
+            </Col>
         </Form>
       )
     }

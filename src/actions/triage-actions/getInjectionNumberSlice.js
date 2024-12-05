@@ -15,15 +15,9 @@ export const getInjectionNumberSlice = () => async (dispatch, getState) => {
     try {
         dispatch({ type: GET_INJECTIONS_NUMBER_REQUEST });
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyInjectionsSetup&isList=true`, config);
-
-
-        console.log('response data', data)
-
-        Object.keys(data).length > 0 && dispatch({ type: GET_INJECTIONS_NUMBER_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_INJECTIONS_NUMBER_FAILURE, payload: "Patient not found" }),
-            message.warning("No patient found with the provided patient number.", 5)
-            );
+      
+        dispatch({ type: GET_INJECTIONS_NUMBER_SUCCESS, payload: data })
+          
 
     } catch (error) {
         dispatch({ type: GET_INJECTIONS_NUMBER_FAILURE, payload: error.message });

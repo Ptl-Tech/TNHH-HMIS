@@ -17,13 +17,7 @@ export const getStoreRequisitionHeadersSlice = () => async (dispatch, getState) 
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyStoreRequisitionHeaders&isList=true`, config);
 
 
-        console.log('response data', data)
-
-        Object.keys(data).length > 0 && dispatch({ type: GET_STORE_REQUISITION_HEADERS_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_STORE_REQUISITION_HEADERS_FAILURE, payload: "Nothing found" }),
-            message.warning("No requisition headers found.", 5)
-            );
+        dispatch({ type: GET_STORE_REQUISITION_HEADERS_SUCCESS, payload: data })
 
     } catch (error) {
         dispatch({ type: GET_STORE_REQUISITION_HEADERS_FAILURE, payload: error.message });

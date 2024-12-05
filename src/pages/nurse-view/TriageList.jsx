@@ -10,6 +10,8 @@ import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import TriageFilters from './TriageFilters';
 import { RightOutlined } from '@ant-design/icons';
 import { postCheckInPatientSlice } from '../../actions/triage-actions/postCheckInPatientSlice';
+import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
+import dayjs from 'dayjs';
 
 const TriageList = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
@@ -40,10 +42,9 @@ const TriageList = () => {
     key: index + 1,
     name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
-    // age: item?.AgeinYears,
+    observationTime: item?.ObservationTime,
     // sex: item?.Gender,
     number: item?.PatientNo,
-    idNumber: item?.IDNumber,
     observationNo: item?.ObservationNo,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
@@ -76,7 +77,7 @@ const TriageList = () => {
 
   const waitingListColumns = [
     {
-      title: 'Index',
+      title: '#',
       dataIndex: 'key',
       rowScope: 'row',
     },
@@ -90,11 +91,11 @@ const TriageList = () => {
       ],
       onFilter: (value, record) => record.name.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    },
-    {
-      title: 'ID Number',
-      dataIndex: 'idNumber',
-      rowScope: 'row',
+      render: (name, record) => (
+        <div style={{ color: getColorByWaitingTime(record.observationTime) }}>
+          {name}
+        </div>
+      )
     },
     {
       title: 'Observation No',
@@ -105,6 +106,18 @@ const TriageList = () => {
       title: 'Observation Date',
       dataIndex: 'regDate',
       rowScope: 'row',
+    },
+
+    {
+      title: 'Waiting Time',
+      dataIndex: 'observationTime',
+      rowScope: 'row',
+      render: (_, record) => {
+        const combinedDateTime = `${record.regDate}T${record.observationTime}`;
+        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute'); // Calculate elapsed time in minutes
+
+        return <div style={{ color: getColorByWaitingTime(record.observationTime) }}>{formatElapsedTime(elapsedMinutes)}</div>;
+    },
     },
     // {
     //   title: 'Age',

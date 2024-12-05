@@ -14,13 +14,11 @@ export const getVitalsLinesSlice = (observationNo) => async (dispatch, getState)
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_VITAL_LINES_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=true&query=$filter=ObservationNo eq '${observationNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
 
-        Object.keys(data).length > 0 && dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_VITAL_LINES_FAILURE, payload: "Patient not found" }),
-            message.warning("No patient found with the provided patient number.", 5)
-            );
+        dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data })
+
+        return data;
 
     } catch (error) {
         dispatch({ type: GET_VITAL_LINES_FAILURE, payload: error.message });

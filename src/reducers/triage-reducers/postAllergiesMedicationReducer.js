@@ -8,7 +8,7 @@ import {
 
 
 const initialState = {
-    allergyMedicationLoading: false,
+    postAllergyMedicationLoading: false,
     allergiesMedication: [],
     error: null,
 };
@@ -18,20 +18,20 @@ export const postAllergiesMedicationReducer = (state = initialState, action) => 
         case POST_ALLERGIES_MEDICATION_REQUEST:
             return {
                 ...state,
-                allergyMedicationLoading: true,
+                postAllergyMedicationLoading: true,
                 error: null,
             };
         case POST_ALLERGIES_MEDICATION_SUCCESS:
             return {
                 ...state,
-                allergyMedicationLoading: false,
+                postAllergyMedicationLoading: false,
                 allergiesMedication: action.payload,
                 error: null,
             };
         case POST_ALLERGIES_MEDICATION_FAIL:
             return {
                 ...state,
-                allergyMedicationLoading: false,
+                postAllergyMedicationLoading: false,
                 error: action.payload,
             };
         default:

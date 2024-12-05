@@ -17,13 +17,7 @@ export const getItemUnitsOfMeasureSlice = () => async (dispatch, getState) => {
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyItemUnitsOfMeasure&isList=true`, config);
 
 
-        console.log('response data', data)
-
-        Object.keys(data).length > 0 && dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_SUCCESS, payload: data });
-        Object.keys(data).length === 0 && (
-            dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_FAILURE, payload: "No records found" }),
-            message.warning("No records found", 5)
-            );
+        dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_SUCCESS, payload: data })
 
     } catch (error) {
         dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_FAILURE, payload: error.message });

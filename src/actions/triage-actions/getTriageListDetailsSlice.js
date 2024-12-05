@@ -15,11 +15,8 @@ export const getTriageListDetails = (patientNo) => async (dispatch, getState) =>
       const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTriageList&query=${patientNo}=No eq ‘PTL’&isList=false`, config);
 
       // Check if a patient was found
-      Object.keys(data).length > 0 && dispatch({ type: GET_TRIAGE_LIST_DETAILS_SUCCESS, payload: data });
-      Object.keys(data).length === 0 && (
-        dispatch({ type: GET_TRIAGE_LIST_DETAILS_FAILURE, payload: "Patient not found" }),
-        message.warning("No patient found with the provided patient number.", 5)
-        );
+     
+        dispatch({ type: GET_TRIAGE_LIST_DETAILS_SUCCESS, payload: data })
 
     } catch (error) {
       dispatch({ type: GET_TRIAGE_LIST_DETAILS_FAILURE, payload: error.message });
