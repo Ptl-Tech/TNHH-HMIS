@@ -35,6 +35,9 @@ const VisitorList = () => {
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
+  const { loading:patientsLoading, error:patientsError, patients } = useSelector(
+    (state) => state.patientList
+  );
 
   const {loading:convertLoading , error:convertError} = useSelector((state) => state.convertPatient);
 
@@ -121,22 +124,33 @@ const VisitorList = () => {
   };
 
   
-   // Handle the conversion to a patient
-   const handleConvertToPatient = (visitor) => {
-    
-    const visitorNo= visitor.No;
-    console.log(visitorNo);
-
-    dispatch(convertPatient(visitorNo));
-    
-    // Pass the visitor's data to the patient registration page
-    navigate("/reception/Patient-Registration", {
-      state: { visitorData: visitor }, // Passing the visitor info to the registration page
-    });
-
-    console.log("Visitor Data:", visitor);
+  const handleConvertToPatient = async (visitor) => {
+    try {
+      const visitorNo = visitor.No;
+      console.log("Visitor No:", visitorNo);
+  
+      const patientNo = await dispatch(convertPatient(visitorNo));
+  
+      if (patientNo && patients.some((patient) => patient.PatientNo === patientNo)) {
+        // Find the patient data
+        const patientData = patients.find((p) => p.PatientNo === patientNo);
+        // Patient exists; navigate to patient details page
+        navigate("/reception/Patient-Registration", {
+          state: { patientData },
+        });
+        console.log("Navigating to Patient Details Page with Patient Data:", patientData);
+      } else {
+        // Pass the visitor's data to the patient registration page
+        navigate("/reception/Patient-Registration", {
+          state: { visitorData: visitor }, // Passing the visitor info to the registration page
+        });
+        console.log("Navigating to Patient Registration Page with Visitor Data:", visitor);
+      }
+    } catch (error) {
+      console.error("Error converting visitor to patient:", error);
+    }
   };
-
+  
 
   const columns = [
     { title: "No", dataIndex: "No", key: "No" },

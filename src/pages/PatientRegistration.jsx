@@ -33,18 +33,23 @@ import {
 } from "../actions/DropdownListActions";
 
 import moment from "moment"; // Ensure you import moment
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
 
 const PatientRegistration = () => {
   const dispatch = useDispatch();
-  const createPatientState = useSelector((state) => state.createPatient);
-  const { loading, error, success, payload } = createPatientState;
   const navigate = useNavigate();
+  const location = useLocation();
   const form = useForm();
-  const createTriageVisitState = useSelector(
-    (state) => state.createTriageVisit
+  const { loading, error, success, payload } = useSelector(
+    (state) => state.createPatient
   );
+  const {
+    loading: visitLoading,
+    error: visitError,
+    success: visitSuccess,
+    payload: visitPayload,
+  } = useSelector((state) => state.createTriageVisit);
 
   const {
     loading: postTriageVisitLoading,
@@ -93,13 +98,6 @@ const PatientRegistration = () => {
     success: doctorsSuccess,
     data: doctorsPayload,
   } = useSelector((state) => state.getDoctorsList);
-
-  const {
-    loading: visitLoading,
-    error: visitError,
-    success: visitSuccess,
-    payload: visitPayload,
-  } = createTriageVisitState;
 
   const {
     loading: patientListLoading,
@@ -154,11 +152,56 @@ const PatientRegistration = () => {
     clinic: "",
     doctor: "",
   });
-  // Handle dropdown display for fetching country list
+  useEffect(() => {
+    if (location.state) {
+      const { patientData, visitorData } = location.state;
+      console.log("Patient Data:", patientData);
+      if (patientData) {
+        // Set patient data
+        setNewPatient({
+          firstName: patientData.firstName,
+          middleName: patientData.MiddleName,
+          lastName: patientData.LastName,
+          idNumber: patientData.IDNumber,
+          gender: patientData.Gender,
+          dob: patientData.DateOfBirth,
+          phoneNumber: patientData.TelephoneNo1,
+          paymentMode: patientData.PatientType,
+          nextOfKinFullName: patientData.NextOfkinFullName,
+          nextOfKinRelationship: patientData.NextofkinRelationship,
+          nextOfKinPhoneNo: patientData.NextOfkinAddress1,
+          patientType: patientData.PatientType2,
+          insuranceNo: patientData.InsuranceNo,
+          insuranceName: patientData.InsuranceName,
+          insurancePrinicipalMemberName: patientData.SearchName,
+          isPrincipleMember: patientData.Principal,
+          membershipNo: patientData.MembershipNo,
+          nationality: patientData.Nationality,
+          county: patientData.CountyWardName,
+          schemeName: patientData.SchemeName,
+          howYouKnewABoutUs: patientData.HowyouKnewAboutUs,
+          subCounty: patientData.SubCountyName,
+          residence: patientData.PlaceofBirthVillage,
+          patientStatus: patientData.Status,
+        });
+      } else if (visitorData) {
+        // Set visitor data
+        setNewPatient({
+          firstName: visitorData.VisitorName,
+          middleName: visitorData.middleName,
+          lastName: visitorData.lastName,
+          idNumber: visitorData.idNumber,
+          gender: visitorData.gender,
+          dob: visitorData.dob,
+          phoneNumber: visitorData.PhoneNumber,
+        });
+      }
+    }
+  }, [location.state]);
+
   const handleDisplayDropDown = (e) => {
     const { name, value } = e.target;
 
-    // Fetch country list if nationality dropdown is selected
     if (
       name === "nationality" &&
       countriesPayload &&
@@ -184,7 +227,6 @@ const PatientRegistration = () => {
       dispatch(listDoctors());
     }
   };
-  // Handle input changes for controlled inputs
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -218,8 +260,13 @@ const PatientRegistration = () => {
         updatedPatient[name] = value;
 
         // Update Principal Member Name if switch is checked
-        if (prev.isPrincipleMember && (name === "firstName" || name === "middleName" || name === "lastName")) {
-          updatedPatient.insurancePrinicipalMemberName = `${updatedPatient.firstName} ${updatedPatient.middleName || ""} ${
+        if (
+          prev.isPrincipleMember &&
+          (name === "firstName" || name === "middleName" || name === "lastName")
+        ) {
+          updatedPatient.insurancePrinicipalMemberName = `${
+            updatedPatient.firstName
+          } ${updatedPatient.middleName || ""} ${
             updatedPatient.lastName
           }`.trim();
         }
@@ -335,8 +382,6 @@ const PatientRegistration = () => {
     if (postTriageVisitSuccess) {
       //reset form
       form.resetFields();
-
-     
     } else {
       message.error(
         "Failed to dispatch triage visit update. Please try again."
@@ -392,13 +437,6 @@ const PatientRegistration = () => {
     }
   }, [postTriageVisitSuccess, message]);
 
-  // // Effect to handle error or success side effects
-  // useEffect(() => {
-  //   if (error) {
-  //     message.error(error);
-  //   }
-  // }, [error]);
-
   useEffect(() => {
     //fetch country list
     dispatch(listCountries());
@@ -409,7 +447,6 @@ const PatientRegistration = () => {
     dispatch(listPatients());
     dispatch(listInsuranceOptions());
     dispatch(listDoctors());
-
   }, [dispatch]);
 
   useEffect(() => {
@@ -430,15 +467,9 @@ const PatientRegistration = () => {
     <div>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={7}>
-          {/* <Typography.Title
-          level={3}
-          style={{ color: "#E89641", padding: "8px" }}
-        >
-          Patient Registration
-        </Typography.Title> */}
           <Card bordered={false} className="card-header">
             <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              <Typography.Title level={5} style={{ color: "#ac8342" }}>
                 General Information
               </Typography.Title>
               <Form.Item
@@ -449,9 +480,10 @@ const PatientRegistration = () => {
                 {/* <label className="form-label">First Name:</label> */}
                 <Input
                   placeholder="Enter First Name"
-                  name="firstName"
                   value={newPatient.firstName}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    handleInputChange("firstName", e.target.value)
+                  }
                 />
               </Form.Item>
               <Form.Item
@@ -512,7 +544,7 @@ const PatientRegistration = () => {
         </Col>
         <Col xs={24} md={11}>
           <Card bordered={false} className="card-header">
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
               Contact Information
             </Typography.Title>
             <Form layout="vertical" onFinish={handleSubmit}>
@@ -636,10 +668,12 @@ const PatientRegistration = () => {
                   ]}
                 >
                   <Input
-                    placeholder="ID/Passport/Birth No:"
+                    placeholder="Enter ID/Passport/Birth No"
                     name="idNumber"
                     value={newPatient.idNumber}
                     onChange={handleInputChange}
+                    style={{ width: "100%" }}
+                    className="w-100"
                   />
                 </Form.Item>
 
@@ -792,7 +826,7 @@ const PatientRegistration = () => {
         </Col>
         <Col xs={24} md={6}>
           <Card style={{ width: "100%" }} className="card-header">
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
               Patient Info
             </Typography.Title>
             <div className="d-flex flex-column align-items-center justify-content-center">
@@ -862,7 +896,7 @@ const PatientRegistration = () => {
           </Card>
 
           <Card style={{ width: "100%" }} className="card-header mt-3">
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
               Consultation Details
             </Typography.Title>
             <div className="row g-3 my-2 align-items-center justify-content-center">
@@ -933,7 +967,7 @@ const PatientRegistration = () => {
         <Col xs={24} md={18}>
           <Card style={{ width: "100%" }} className="card-header">
             <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              <Typography.Title level={5} style={{ color: "#ac8342" }}>
                 Next of Kin
               </Typography.Title>
               <div className="row g-3 align-items-center justify-content-center">
@@ -1048,7 +1082,7 @@ const PatientRegistration = () => {
         </Col>
         <Col className="mt-3" xs={24} md={6}>
           <Card style={{ width: "100%" }} className="card-header mt-3">
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
               Billing Details
             </Typography.Title>
             {/* patient billing details based on mode of payment if cash show cash and what they are being billed for same for insurance */}
@@ -1100,7 +1134,7 @@ const PatientRegistration = () => {
         <Col xs={24} md={18}>
           <Card style={{ width: "100%" }} className="card-header">
             <Form layout="vertical">
-              <Typography.Title level={5} style={{ color: "#ED1C24" }}>
+              <Typography.Title level={5} style={{ color: "#ac8342" }}>
                 Billing Information
               </Typography.Title>
               <div className="row g-3  align-items-center justify-content-center">
