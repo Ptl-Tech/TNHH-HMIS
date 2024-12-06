@@ -127,7 +127,7 @@
 .modal-title-content {
   background-color: #f5f5dc; /* Light greyish cream */
   padding: 20px;
-  //text-align: center; /* Center the title and logo */
+  text-align: center; /* Center the title and logo */
 }
 
 .modal-logo-container {
@@ -244,3 +244,37 @@ main {
     width: 80% !important; /* Set the modal width to 80% for large screens */
   }
 }
+
+/* NURSE MODULE STYLES */
+
+.admit-patient-card-container {
+  padding: 24px 10px 24px 10px;
+}
+
+.admit-patient-filter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  gap: 10px;
+}
+@media screen and (max-width: 768px) {
+  .admit-patient-filter-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+}
+
+@media screen and (max-width: 768px) {
+  .admit-patient-button-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.admit-patient-table{
+  margin-top: 30px;
+}
+
+/* END OF NURSE MODULE STYLES */

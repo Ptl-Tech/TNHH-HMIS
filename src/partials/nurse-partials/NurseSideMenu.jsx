@@ -17,33 +17,6 @@ const sideMenuItems = [
     label: "Dashboard",
   },
   {
-    key: "Nurse",
-    icon: <TeamOutlined style={{ color: "#fff" }} />,
-    label: "Nurse",
-    children: [
-      {
-        key: "Appointment",
-        label: "Appointment",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "Inpatient",
-        label: "Inpatient",
-        icon: <FileTextOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "Outpatient",
-        label: "Outpatient",
-        icon: <FileTextOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "Admit-Patient",
-        label: "Admit Patient",
-        icon: <ImportOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
-  {
     key: "Triage",
     icon: <FileTextOutlined style={{ color: "#fff" }} />,
     label: "Triage",
@@ -55,6 +28,29 @@ const sideMenuItems = [
       },
     ],
   },
+  {
+    key: "Nurse",
+    icon: <TeamOutlined style={{ color: "#fff" }} />,
+    label: "Nurse",
+    children: [
+      {
+        key: "Admit-patient",
+        label: "Admit Patient",
+        icon: <ImportOutlined style={{ color: "#fff" }} />,
+      },
+      {
+        key: "Ward-management",
+        label: "Ward Management",
+        icon: <FileTextOutlined style={{ color: "#fff" }} />,
+      },
+      {
+        key: "Inpatient",
+        label: "Inpatient",
+        icon: <FileTextOutlined style={{ color: "#fff" }} />,
+      },
+    ],
+  }
+ 
 ];
 
 

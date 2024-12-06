@@ -156,15 +156,18 @@ export const lastSixMonthsTotalPatientsLineGraphConfig = {
   export const hospitalBranchesTotalWards = [
     {
       name: 'Aspen',
-      path: 'Aspen'
+      path: 'Aspen',
+      label: 'Aspen'
     },
     {
       name: 'Birch',
-      path: 'Birch'
+      path: 'Birch',
+      label: 'Birch'
     },
     {
       name: 'Boardroom',
-      path: 'Boardroom'
+      path: 'Boardroom',
+      label: 'Boardroom'
     },
   ]
 

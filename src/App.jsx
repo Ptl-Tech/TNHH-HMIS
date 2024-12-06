@@ -30,11 +30,9 @@ import ResetPwd from "./Auth/ResetPwd";
 import ViewProfile from "./Auth/ViewProfile";
 import ReceptionLayout from "./Layouts/ReceptionLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
-import Appointment from "./pages/nurse-view/Appointment";
 import PastDoctorVisit from "./pages/nurse-view/PastDoctorVisit";
 import TriageList from "./pages/nurse-view/TriageList";
 import Dashboard from "./pages/nurse-view/Dashboard";
-import Impatient from "./pages/nurse-view/Impatient";
 import ImpatientList from "./pages/nurse-view/InpatientList";
 import ExaminePatientInTriage from "./pages/nurse-view/ExaminePatientInTriage";
 import SecurityLayout from "./Layouts/SecurityLayout";
@@ -49,6 +47,9 @@ import SecurityDashBoard from "./Dashboards/SecurityDashboard";
 import HistoryVisitorList from "./pages/HistoryVisitorList";
 import TriageListPending from "./pages/nurse-view/TriageListPending";
 import TriageListClosed from "./pages/nurse-view/TriageListClosed";
+import AdmitPatients from "./pages/nurse-view/AdmitPatients";
+import WardManagement from "./pages/nurse-view/WardManagement";
+import Inpatient from "./pages/nurse-view/Inpatient";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -76,16 +77,18 @@ function App() {
               path="Patient-Registration"
               element={<PatientRegistration />}
             />
-            <Route path="Appointments" element={<Appointment />} />
             <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
             <Route path="Triage" element={<TriageList />} />
             <Route path="PendingTriageList" element={<TriageListPending />} />
             <Route path="ClosedTriageList" element={<TriageListClosed />} />
             <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
             <Route path="Triage-list" element={<WaitingList />} />
-            <Route path="Inpatient" element={<ImpatientList />} />
             <Route path="Patient-list" element={<Patientlist />} />
             <Route path="New-Patients" element={<NewPatients />} />
+
+            <Route path="Inpatient" element={<Inpatient />} />
+            <Route path="Admit-patient" element={<AdmitPatients />} />
+            <Route path="Ward-management" element={<WardManagement />} />
             
             <Route
               path="Observation-Room/:id"
