@@ -171,5 +171,35 @@ export const lastSixMonthsTotalPatientsLineGraphConfig = {
     },
   ]
 
+  export const handOverNurse = [
+    {
+      name: 'Nurse 1',
+      path: 'Nurse 1',
+      label: 'Nurse 1'
+    },
+    {
+      name: 'Nurse 2',
+      path: 'Nurse 2',
+      label: 'Nurse 2'
+    },
+    {
+      name: 'Nurse 3',
+      path: 'Nurse 3',
+      label: 'Nurse 3'
+    },
+  ]
+
+  export const selectBed = [
+    {
+      name: 'Bed 1',
+      path: 'Bed 1',
+      label: 'Bed 1'
+    },
+    {
+      name: 'Bed 2',
+      path: 'Bed 2',
+      label: 'Bed 2'
+    }
+  ]
 
   

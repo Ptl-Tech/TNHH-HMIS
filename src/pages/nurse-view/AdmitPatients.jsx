@@ -1,12 +1,14 @@
 import { Card, Col, Row, Space, Typography, Button, Input, Table } from "antd"
 import { ProfileOutlined, PlusOutlined, CloseOutlined, PayCircleOutlined } from "@ant-design/icons"
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdmitPatients = () => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [selectedRow, setSelectedRow] = useState([]);
+    const navigate = useNavigate();
     const dataSource = [
         {
             key: '1',
@@ -97,11 +99,11 @@ const AdmitPatients = () => {
       
 
       const handleAdmitPatient = () => {
-        console.log('patient information', selectedRow);
+        selectedRow[0]?.patientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].patientNo}`);
       }
 
       const handlePatientCharges = () => {
-        console.log('patient information', selectedRow);
+        selectedRow[0]?.patientNo &&  navigate(`/Nurse/Admit-patient/Charges?PatientNo=${selectedRow[0].patientNo}`);
       }
       
 

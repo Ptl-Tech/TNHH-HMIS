@@ -50,6 +50,8 @@ import TriageListClosed from "./pages/nurse-view/TriageListClosed";
 import AdmitPatients from "./pages/nurse-view/AdmitPatients";
 import WardManagement from "./pages/nurse-view/WardManagement";
 import Inpatient from "./pages/nurse-view/Inpatient";
+import AdmitPatient from "./pages/nurse-view/AdmitPatient";
+import PatientCharges from "./pages/nurse-view/PatientCharges";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -88,6 +90,8 @@ function App() {
 
             <Route path="Inpatient" element={<Inpatient />} />
             <Route path="Admit-patient" element={<AdmitPatients />} />
+            <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
+            <Route path="Admit-patient/Charges" element={<PatientCharges />} />
             <Route path="Ward-management" element={<WardManagement />} />
             
             <Route
