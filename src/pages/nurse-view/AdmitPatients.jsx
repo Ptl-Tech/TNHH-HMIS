@@ -1,9 +1,12 @@
 import { Card, Col, Row, Space, Typography, Button, Input, Table } from "antd"
 import { ProfileOutlined, PlusOutlined, CloseOutlined, PayCircleOutlined } from "@ant-design/icons"
+import { useState } from "react";
 
 const AdmitPatients = () => {
 
-
+    const [selectedRowKey, setSelectedRowKey] = useState(null);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+    const [selectedRow, setSelectedRow] = useState([]);
     const dataSource = [
         {
             key: '1',
@@ -74,17 +77,33 @@ const AdmitPatients = () => {
         },
     ];
 
-    const rowSelection = () =>{
-        return {
-            onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-            },
-            getCheckboxProps: (record) => ({
-                disabled: record.name === 'Disabled User', // Column configuration not to be checked
-                name: record.name,
-            }),
-        };
-    }
+    const rowSelection = {
+        selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
+        onChange: (selectedRowKeys, selectedRows) => {
+          if (selectedRowKeys.length > 1) {
+            setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
+            setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
+          } else {
+            setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
+            setSelectedRow(selectedRows); // Update the selected row
+          }
+          setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
+        },
+        getCheckboxProps: (record) => ({
+          disabled: record.name === 'Disabled User', // Disable specific rows if needed
+        }),
+      };
+      
+      
+
+      const handleAdmitPatient = () => {
+        console.log('patient information', selectedRow);
+      }
+
+      const handlePatientCharges = () => {
+        console.log('patient information', selectedRow);
+      }
+      
 
   return (
         <Row style={{ margin: '20px 10px 10px 10px' }}>
@@ -98,9 +117,9 @@ const AdmitPatients = () => {
                     
                 <Card className="admit-patient-card-container">
                     <Space className="admit-patient-button-container">
-                        <Button type="primary"><PlusOutlined /> Admit Patient</Button>
-                        <Button color="danger" variant="outlined" ><CloseOutlined /> Cancel Admission</Button>
-                        <Button type="primary"><PayCircleOutlined /> Charges</Button>
+                        <Button type="primary" disabled={!selectedRowKey} onClick={handleAdmitPatient}><PlusOutlined /> Admit Patient</Button>
+                        <Button color="danger" variant="outlined" disabled={!selectedRowKey}><CloseOutlined /> Cancel Admission</Button>
+                        <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
                     </Space>
 
                     <div className='admit-patient-filter-container'>
