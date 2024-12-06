@@ -71,18 +71,14 @@ const useSignIn = () => {
         case 'Security':
           navigate('/Security');
           break;
-        case 'Production':
-          navigate('/Triage');
-          break;
         case 'Doctor':
           navigate('/Doctor');
           break;
         case 'Nurse':
-          navigate('/Nurse');
+          navigate('/Nurse/Dashboard');
           break;
         default:
           // Optional: Handle unknown roles or do nothing
-          navigate('/Nurse/Dashboard');
           console.log('Invalid role');
       }
 

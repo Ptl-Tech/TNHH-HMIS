@@ -23,7 +23,7 @@ const initialState = {
   userLogin: {
     ...initialLoginState, // Login state
   },
-  userOtpVerification: {
+  otpVerify: {
     ...initialOtpState, // OTP verification and portal session state
   },
 };

@@ -93,9 +93,10 @@ const NurseSideMenu = ({ collapsed, setCollapsed, openKeys, setOpenKeys }) => {
           navigate(key);
         }}
         style={{
-          paddingTop: "20px",
-          fontSize: "16px",
-          color: "#e6e7e8",
+          backgroundColor: "#0f5689",
+          height: "100vh",
+          paddingBottom: "90px",
+          color: "#fff",
         }}
         items={sideMenuItems}
       />
