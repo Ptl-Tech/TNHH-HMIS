@@ -62,7 +62,6 @@ const useSignIn = () => {
 
 
       const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log(role);
 
 
       switch (role) {
