@@ -9,10 +9,11 @@ import CountUp from "react-countup";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const TriageSummeryCard = ({ waitingPatient, currentPath }) => {
+const TriageSummeryCard = ({ currentPath }) => {
 
   const { triageList } = useSelector((state) => state.getTriageList) || {};
 
+  const openTriageList = triageList.filter((item)=>item.Status==='New')
   const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
   const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
 
@@ -24,7 +25,7 @@ const TriageSummeryCard = ({ waitingPatient, currentPath }) => {
       icon: <HourglassOutlined />,
       title: "Waiting Patients",
       link: "/Nurse/Triage",
-      count: waitingPatient, // Replace with `waitingPatient?.length` or dynamic data
+      count: Object.keys(openTriageList).length || 0, // Replace with `waitingPatient?.length` or dynamic data
     },
     {
       backgroundColor: "gray",
@@ -102,6 +103,6 @@ export default TriageSummeryCard;
 
 //props validation
 TriageSummeryCard.propTypes = {
-  waitingPatient: PropTypes.array.isRequired,
+  openTriageList: PropTypes.array.isRequired,
   currentPath: PropTypes.string.isRequired,
 };

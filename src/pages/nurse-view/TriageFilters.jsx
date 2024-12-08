@@ -1,35 +1,29 @@
-import { Input, Radio } from 'antd'
-import PropTypes from 'prop-types'
+import { Card, Input } from 'antd'
 
-const TriageFilters = ({ setFilterWaitingListType, filterWaitingListType, setSearchQueryWaitingList}) => {
+const TriageFilters = () => {
   return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <Radio.Group 
-        defaultValue="a" 
-        buttonStyle="solid"
-        onChange={(e) => setFilterWaitingListType(e.target.value)}
-        value={filterWaitingListType}
-        >
-        <Radio value='name'>Filter by name</Radio>
-        <Radio value='idNumber'>Filter by ID</Radio>
-        <Radio value='patientNo'>Filter by patient no</Radio>
-        </Radio.Group>
-        <Input 
-        showCount maxLength={20} 
-        type='search' 
-        placeholder='Search' 
-        style={{ width: '300px' }}
-        onChange={(e) => setSearchQueryWaitingList(e.target.value)}
-        />
-    </div>
+    <Card style={{ padding: '10px 16px', marginBottom: '10px' }}>
+          <div className='admit-patient-filter-container'>
+                  <Input placeholder="search by name" 
+                      allowClear
+                      showCount
+                      showSearch
+                  />
+                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+                  <Input placeholder="search by patient no" 
+                      allowClear
+                      showCount
+                      showSearch
+                  />
+                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+                  <Input placeholder="search by id number" 
+                      allowClear
+                      showCount
+                      showSearch
+                  />
+              </div>
+    </Card>
   )
 }
 
 export default TriageFilters
-
-//props validation
-TriageFilters.propTypes = {
-    setFilterWaitingListType: PropTypes.func.isRequired,
-    filterWaitingListType: PropTypes.string.isRequired,
-    setSearchQueryWaitingList: PropTypes.func.isRequired,
-}

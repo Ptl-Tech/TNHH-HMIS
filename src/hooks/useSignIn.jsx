@@ -79,6 +79,7 @@ const useSignIn = () => {
           break;
         default:
           // Optional: Handle unknown roles or do nothing
+          navigate('/Nurse/Dashboard');
           console.log('Invalid role');
       }
 

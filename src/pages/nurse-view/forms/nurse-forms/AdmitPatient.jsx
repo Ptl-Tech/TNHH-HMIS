@@ -11,7 +11,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Admission Number"
                   name='admissionNumber' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                   <Input type='text' 
                     disabled
@@ -22,7 +22,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Patient Number" 
                   name='patientNumber'
-                  style={{ fontWeight: 'bold'}}
+                  
                   >
                   <Input type='text' 
                     name='patientNumber'
@@ -37,7 +37,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Patient Name"
                   name='patientName' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                   <Input type='text' 
                     disabled
@@ -48,7 +48,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Admission Date" 
                   name='admissionDate'
-                  style={{ fontWeight: 'bold'}}
+               
                   >
                   <Input type='text' 
                     name='patientNumber'
@@ -63,7 +63,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Admission Area"
                   name='admissionArea' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                   <Input type='text' 
                     disabled
@@ -74,7 +74,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Admission Nurse" 
                   name='admissionNurse'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Input type='text' 
                     name='patientNumber'
@@ -89,7 +89,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Select Ward"
                   name='selectWard' 
-                  style={{ fontWeight: 'bold'}}
+                 
                 >
                 <Select 
                 key={'location'}
@@ -107,7 +107,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Handover Nurse" 
                   name='handoverNurse'
-                  style={{ fontWeight: 'bold'}}
+                  
                   >
                   <Select 
                 key={'location'}
@@ -128,7 +128,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Admission Reason"
                   name='admissionReason' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                 <TextArea type='text' />
 
@@ -138,7 +138,7 @@ const AdmitPatientForm = () => {
                 <Form.Item 
                   label="Select Bed" 
                   name='selectBed'
-                  style={{ fontWeight: 'bold'}}
+                  
                   >
                   <Select 
                 key={'location'}

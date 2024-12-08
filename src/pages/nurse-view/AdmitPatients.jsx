@@ -123,7 +123,9 @@ const AdmitPatients = () => {
                         <Button color="danger" variant="outlined" disabled={!selectedRowKey}><CloseOutlined /> Cancel Admission</Button>
                         <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
                     </Space>
+                </Card>
 
+                <Card style={{ marginTop: '10px', padding: '10px 16px' }}>
                     <div className='admit-patient-filter-container'>
                         <Input placeholder="search by name" 
                             allowClear

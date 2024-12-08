@@ -144,22 +144,24 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Pulse Rate"
+                <Form.Item label="Pulse Rate (bpm)"
                   name={['vitals', 'pulseRate']}
                   rules={[{ required: true, message: 'Please input pulse rate!' }]}
                 >
                   <Input type='text'
                     name='pulseRate'
+                    placeholder='eg 70'
                     
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Blood Pressure" name={['vitals', 'bloodPreasure']}
+                <Form.Item label="Blood Pressure (mmHg)" name={['vitals', 'bloodPreasure']}
                   rules={[{ required: true, message: 'Please input blood pressure!' }]}
                   >
                   <Input type='text' 
                       name='bloodPreasure'
+                      placeholder='eg 120/80'
                       
                   />
                 </Form.Item>
@@ -167,21 +169,23 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Temperature" name={['vitals', 'temperature']}
+                <Form.Item label="Temperature (&deg;C)" name={['vitals', 'temperature']}
                   rules={[{ required: true, message: 'Please input temperature!' }]}
                 >
                   <Input type='number' 
                     name='temperature'
+                     placeholder='eg: 32.7'
                     
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="SPO2" name={['vitals', 'sP02']}
+                <Form.Item label="SPO2 (%)" name={['vitals', 'sP02']}
                   rules={[{ required: true, message: 'Please input SOP2!' }]}
                 >
                   <Input type='text' 
                     name='sP02'
+                    placeholder='eg 98%'
               
                   />
                 </Form.Item>
@@ -189,22 +193,24 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Height" name={['vitals', 'height']}
+                <Form.Item label="Height (cm)" name={['vitals', 'height']}
                 
                 rules={[{ required: true, message: 'Please input height!' }]}
                 >
                   <Input type='number' 
                     name='height'
+                    placeholder='eg 170'
                     
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Weight" name={['vitals', 'weight']}
+                <Form.Item label="Weight (kg)" name={['vitals', 'weight']}
                   rules={[{ required: true, message: 'Please input weight!' }]}
                 >
                   <Input type='number' 
                     name='weight'
+                    placeholder='eg 70'
                 
                   />
                 </Form.Item>
@@ -212,12 +218,13 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Respiration Rate" name={['vitals', 'respirationRate']}
+                <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
                   rules={[{ required: true, message: 'Please input respiration rate!' }]}
                 >
                   <Input type='text' 
                   
                   name='respirationRate'
+                  placeholder='eg 18'
                   
                   />
                 </Form.Item>
@@ -226,6 +233,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 <Form.Item label="Pain" name={['vitals', 'pain']}>
                   <Input type='number' 
                     name='pain'
+                    placeholder='eg 1'
               
                   />
                 </Form.Item>

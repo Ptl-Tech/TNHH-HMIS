@@ -48,7 +48,7 @@ export const rootReducer = combineReducers({
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
-    loadUserInfo:loadUserInfo,
+    // loadUserInfo:loadUserInfo,
     getTriageWaitingList:getTriageWaitingListReducer,
     registerVisitor:visitorCreateReducer,
     visitorsList:visitorListReducer,

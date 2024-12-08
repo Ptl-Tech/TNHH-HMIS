@@ -1,5 +1,5 @@
-import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Button, message } from 'antd'
-import { UserOutlined } from '@ant-design/icons';
+import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Button, message, Space } from 'antd'
+import { UserOutlined, DiffOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
 import Injections from './forms/triage-forms/Injections';
@@ -41,14 +41,12 @@ const EvaluatePatientInTriage = () => {
   const handleDispatchToDoctor = (observationNumber) => {
     dispatch(getVitalsLinesSlice(observationNumber)).then((data)=>{
       console.log('vital lines data', data);
-      if(data?.length > 0){
+      if(Object.keys(data).length > 0){
           dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
-            if(data?.message === 'success'){
-              message.success(data?.message)
-            }else if(data?.status === 'failed'){
-              message.error(data?.msg)
+            if(Object.keys(data).length > 0){
+              message.success('Patient dispatched to doctor successfully');
             }else{
-              message.error('Something when wrong, try again');
+              message.error('An error occurred, please try again');
             }
           })
       }else{
@@ -60,9 +58,15 @@ const EvaluatePatientInTriage = () => {
 
   return (
     <div style={{ margin: '16px 10px' }}>
-           <Row gutter={8}>
+          <Space className="inpatient-header">
+          <DiffOutlined />
+            <Typography.Text className="inpatient-header-text">
+                Triage Observation Form
+            </Typography.Text>
+          </Space>
+           <Row gutter={8} className='inpatient-card-container'>
   
-              <Col span={16}>
+              <Col xs={24} md={24} lg={16} xl={16}>
               <Card style={{ padding: '10px 16px' }}>
                     <Tabs>
                       <Tabs.TabPane tab="Vitals" key="1">
@@ -81,7 +85,7 @@ const EvaluatePatientInTriage = () => {
                     </Tabs>
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col xs={24} md={24} lg={8} xl={8}>
 
 
               {

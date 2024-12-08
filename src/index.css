@@ -242,19 +242,6 @@ main {
   animation: dot-blink 1.5s infinite steps(1);
 }
 
-
-/* @media (max-width: 1440px) {
-  .ant-modal {
-    width: 100% !important; /* Make modal take full width on medium screens and below */
-  }
-} */
-
-/* @media (min-width: 1440px) {
-  .ant-modal {
-    width: 80% !important; /* Set the modal width to 80% for large screens */
-  }
-}
-
 /* NURSE MODULE STYLES */
 
 .admit-patient-card-container {
@@ -265,7 +252,8 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   gap: 10px;
 }
 @media screen and (max-width: 768px) {
@@ -287,5 +275,123 @@ main {
   margin-top: 30px;
 }
 
+.inpatient-header{
+  display: flex;
+  color: #0f5689;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.inpatient-header .inpatient-header-text{
+  font-weight: bold;
+  color: #0f5689;
+  font-size: 16px;
+}
+.inpatient-card-container{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.inpatient-card-container .inpatient-card-left-col .card{
+  padding: 10px 16px
+}
+.inpatient-card-container .inpatient-card-right-col .card{
+  padding: 10px 16px
+}
+.inpatient-card-right-col .inpatient-details-container-1{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.inpatient-card-right-col .patient-name{
+  font-weight: bold;
+  color: #0f5689;
+  font-size: 16px;
+}
+.inpatient-card-right-col .patient-id{
+  color: gray;
+  font-size: 14px;
+}
+.inpatient-card-right-col .inpatient-details-container-2{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.inpatient-details-container-2 .patient-hospital-number-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.inpatient-details-container-2 .patient-age-gender-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-hospital-number-container .hospital-number-header{
+  font-size: 14px;
+}
+.patient-hospital-number-container .hospital-number{
+  font-size: 14px;
+  color: gray;
+}
+.patient-age-gender-container .age-and-gender{
+  font-size: 14px;
+  color: gray;
+}
+.inpatient-details-container-2 .age-and-gender-container{
+  display: flex;
+  flex-direction: column;
+}
+.age-and-gender-container .age-and-gender-header{
+  font-size: 14px;
+}
+.age-and-gender-container .age-and-gender{
+  font-size: 14px;
+  color: gray;
+}
+.print-button-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .print-button-container{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+}
+
+@media (max-width: 992px) {
+  .inpatient-card-container {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+}
+
+.allergies-card{
+  margin-top: 10px;
+  padding: 10px 16px;
+}
+.allergies-item-list-title{
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.treatment-card-buttons{
+  display: flex;
+  gap: 10px;
+}
+.treatment-card-patient-treatment-info{
+  margin-top: 10px;
+  padding: 10px 16px;
+}
 
 /* END OF NURSE MODULE STYLES */

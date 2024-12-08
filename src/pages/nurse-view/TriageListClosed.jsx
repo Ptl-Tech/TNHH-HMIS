@@ -1,4 +1,4 @@
-import { Button, Card, Table } from 'antd'
+import { Button, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './TriageSummeryCard';
@@ -66,6 +66,16 @@ const TriageListClosed = () => {
       rowScope: 'row',
     },
     {
+      title: 'Observation No',
+      dataIndex: 'observationNo',
+      rowScope: 'row',
+    },
+    {
+      title: 'Patient Number',
+      dataIndex: 'number',
+      rowScope: 'row',
+    },
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -81,31 +91,13 @@ const TriageListClosed = () => {
       dataIndex: 'idNumber',
       rowScope: 'row',
     },
-    {
-      title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
-    },
+   
     {
       title: 'Observation Date',
       dataIndex: 'regDate',
       rowScope: 'row',
     },
-    // {
-    //   title: 'Age',
-    //   dataIndex: 'age',
-    //   rowScope: 'row',
-    // },
-    // {
-    //   title: 'Sex',
-    //   dataIndex: 'sex',
-    //   rowScope: 'row',
-    // },
-    {
-      title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
-    },
+    
     {
       title: 'Status',
       dataIndex: 'checkIn',
@@ -118,8 +110,7 @@ const TriageListClosed = () => {
   return (
       <div style={{ padding: '10px 10px' }}>
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
-          <Card style={{ padding: '24px 10px 10px 10px' }}>
-
+          
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
 
           {
@@ -141,7 +132,6 @@ const TriageListClosed = () => {
                 />
             )
           }
-          </Card>
       </div>
   )
 }

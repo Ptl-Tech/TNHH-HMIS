@@ -1,4 +1,4 @@
-import { Button, Card, Table } from 'antd'
+import { Button, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
@@ -73,6 +73,16 @@ const handleOnClick = (observationNo, patientNumber) =>{
       rowScope: 'row',
     },
     {
+      title: 'Observation No',
+      dataIndex: 'observationNo',
+      rowScope: 'row',
+    },
+    {
+      title: 'Patient Number',
+      dataIndex: 'number',
+      rowScope: 'row',
+    },
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -88,11 +98,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
         </div>
       )
     },
-    {
-      title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
-    },
+    
     {
       title: 'Observation Date',
       dataIndex: 'regDate',
@@ -109,16 +115,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
         return <div style={{ color: getColorByWaitingTime(record.observationTime) }}>{formatElapsedTime(elapsedMinutes)}</div>;
     },
   },
-    // {
-    //   title: 'Sex',
-    //   dataIndex: 'sex',
-    //   rowScope: 'row',
-    // },
-    {
-      title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
-    },
+  
     {
       title: 'Check In',
       dataIndex: 'checkIn',
@@ -131,8 +128,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
   return (
       <div style={{ padding: '10px 10px' }}>
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} pendingTriageList={pendingTriageList}/>
-          <Card style={{ padding: '24px 10px 10px 10px' }}>
-
+          
           <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
 
           {
@@ -154,7 +150,6 @@ const handleOnClick = (observationNo, patientNumber) =>{
                 />
             )
           }
-          </Card>
       </div>
   )
 }

@@ -3,7 +3,8 @@ import Sider from "antd/es/layout/Sider";
 import { useNavigate } from "react-router-dom";
 import {
   AppstoreOutlined,
-  CalendarOutlined,
+  RadiusUprightOutlined,
+  PicCenterOutlined,
   FileTextOutlined,
   ImportOutlined,
   TeamOutlined,
@@ -46,7 +47,12 @@ const sideMenuItems = [
       {
         key: "Inpatient",
         label: "Inpatient",
-        icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        icon: <PicCenterOutlined style={{ color: "#fff" }} />,
+      },
+      {
+        key: "Past-doctor-visit",
+        label: "Past Doctor Visits",
+        icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
       },
     ],
   }

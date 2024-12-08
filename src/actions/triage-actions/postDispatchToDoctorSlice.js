@@ -10,8 +10,6 @@ const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.6
 
 export const postDispatchToDoctorSlice = (dispatchToDoctor) => async (dispatch, getState) =>{
 
-    console.log('patient information', dispatchToDoctor);
-
     try{
 
         dispatch({ type: POST_DISPATCH_TO_DOCTOR_REQUEST });

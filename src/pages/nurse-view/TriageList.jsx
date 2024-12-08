@@ -1,4 +1,4 @@
-import { Button, Card, message, Table } from 'antd'
+import { Button, message, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -82,6 +82,16 @@ const TriageList = () => {
       rowScope: 'row',
     },
     {
+      title: 'Observation No',
+      dataIndex: 'observationNo',
+      rowScope: 'row',
+    },
+    {
+      title: 'Patient Number',
+      dataIndex: 'number',
+      rowScope: 'row',
+    },
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -97,11 +107,7 @@ const TriageList = () => {
         </div>
       )
     },
-    {
-      title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
-    },
+    
     {
       title: 'Observation Date',
       dataIndex: 'regDate',
@@ -119,21 +125,7 @@ const TriageList = () => {
         return <div style={{ color: getColorByWaitingTime(record.observationTime) }}>{formatElapsedTime(elapsedMinutes)}</div>;
     },
     },
-    // {
-    //   title: 'Age',
-    //   dataIndex: 'age',
-    //   rowScope: 'row',
-    // },
-    // {
-    //   title: 'Sex',
-    //   dataIndex: 'sex',
-    //   rowScope: 'row',
-    // },
-    {
-      title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
-    },
+    
     {
       title: 'Check In',
       dataIndex: 'checkIn',
@@ -145,10 +137,11 @@ const TriageList = () => {
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath}/>
-          <Card style={{ padding: '24px 10px 10px 10px' }}>
+          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} openTriageList={openTriageList}/>
+         
 
-          <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
+            <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
+          
 
           {
             loadingTriageList ? 
@@ -169,7 +162,6 @@ const TriageList = () => {
                 />
             )
           }
-          </Card>
       </div>
   )
 }

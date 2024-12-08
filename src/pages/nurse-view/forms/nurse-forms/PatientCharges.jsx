@@ -11,7 +11,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Admission Number"
                   name='admissionNumber' 
-                  style={{ fontWeight: 'bold'}}
+                 
                 >
                   <Input type='text' 
                     disabled
@@ -22,7 +22,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Patient Number" 
                   name='patientNumber'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Input type='text' 
                     name='patientNumber'
@@ -37,7 +37,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Select Transaction Type"
                   name='transactionType' 
-                  style={{ fontWeight: 'bold'}}
+                 
                 >
                 <Select 
                 key={'location'}
@@ -55,7 +55,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Transaction Code" 
                   name='transactionCode'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Select 
                 key={'location'}
@@ -76,7 +76,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Admission Area"
                   name='admissionArea' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                   <Input type='text' 
                     disabled
@@ -87,7 +87,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Admission Nurse" 
                   name='admissionNurse'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Input type='text' 
                     name='patientNumber'
@@ -102,7 +102,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Select Doctor"
                   name='selectDoctor' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                 <Select 
                 key={'location'}
@@ -120,7 +120,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Select Department" 
                   name='selectDepartment'
-                  style={{ fontWeight: 'bold'}}
+                  
                   >
                   <Select 
                 key={'location'}
@@ -141,7 +141,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Amount"
                   name='amount' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                 <Input type='text' 
                 
@@ -154,7 +154,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Quantity" 
                   name='Quantity'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Input type='number' />
                 </Form.Item>
@@ -165,7 +165,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Remarks"
                   name='remarks' 
-                  style={{ fontWeight: 'bold'}}
+                  
                 >
                 <TextArea type='text' 
                 
@@ -177,7 +177,7 @@ const PatientChargesForm = () => {
                 <Form.Item 
                   label="Revenue Code" 
                   name='revenueCode'
-                  style={{ fontWeight: 'bold'}}
+                 
                   >
                   <Select 
                 key={'location'}
@@ -201,7 +201,7 @@ const PatientChargesForm = () => {
             </Form.Item>
         </Space>
         </Form>
-        </Card>
+    </Card>
   )
 }
 

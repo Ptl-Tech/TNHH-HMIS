@@ -54,6 +54,10 @@ import WardManagement from "./pages/nurse-view/WardManagement";
 import Inpatient from "./pages/nurse-view/Inpatient";
 import AdmitPatient from "./pages/nurse-view/AdmitPatient";
 import PatientCharges from "./pages/nurse-view/PatientCharges";
+import ReleaseBed from "./pages/nurse-view/ReleaseBed";
+import TransferBed from "./pages/nurse-view/TransferBed ";
+import InpatientCard from "./pages/nurse-view/InpatientCard";
+import TreatmentCard from "./pages/nurse-view/TreatmentCard";
 
 function App() {
   const userLogin = useSelector((state) => state.otpVerify);
@@ -81,7 +85,9 @@ function App() {
               path="Patient-Registration"
               element={<PatientRegistration />}
             />
-            <Route path="Past-Doctor-Visit" element={<PastDoctorVisit />} />
+            <Route path="Past-doctor-visit" element={<PastDoctorVisit />} />
+            <Route path="Past-doctor-visit/Patient" element={<TreatmentCard />} />
+
             <Route path="Triage" element={<TriageList />} />
             <Route path="PendingTriageList" element={<TriageListPending />} />
             <Route path="ClosedTriageList" element={<TriageListClosed />} />
@@ -95,6 +101,9 @@ function App() {
             <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
             <Route path="Admit-patient/Charges" element={<PatientCharges />} />
             <Route path="Ward-management" element={<WardManagement />} />
+            <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
+            <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
+            <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
             
             <Route
               path="Observation-Room/:id"
