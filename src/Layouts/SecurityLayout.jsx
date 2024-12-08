@@ -166,10 +166,10 @@ const SecurityLayout = () => {
               navigate(key);
             }}
             style={{
-              backgroundColor: "#ffffff",
+            backgroundColor: "#0f5689",
               height: "100vh",
               paddingBottom: "90px",
-              color: "#67336d",
+              color: "#fff",
             }}
             items={items} // Pass the items array here
           />

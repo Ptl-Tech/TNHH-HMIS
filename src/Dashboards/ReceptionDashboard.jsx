@@ -6,6 +6,7 @@ import { FaUser } from "react-icons/fa6";
 import OutpatientList from "../pages/OutpatientList";
 import { getVisitorsList } from "../actions/visitorsActions";
 import { listPatients } from "../actions/patientActions";
+import VisitorList from "../pages/VisitorList";
 
 const ReceptionDashboard = () => {
   const { loading, error, visitors } = useSelector(
@@ -118,7 +119,8 @@ const ReceptionDashboard = () => {
         </div>
 
         <div className="mt-3">
-            <OutpatientList />
+          {/* <VisitorList/> */}
+            {/* <OutpatientList /> */}
         </div>
       </div>
     </div>

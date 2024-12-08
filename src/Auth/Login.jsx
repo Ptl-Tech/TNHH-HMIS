@@ -17,8 +17,8 @@ const Login = () => {
     setPassword,
     otp,
     setOtp,
-    branchCode,
-    setBranchCode,
+    // branchCode,
+    // setBranchCode,
     isOtpRequired,
     handleLogin,
     handleVerifyOtp,
@@ -92,7 +92,7 @@ const Login = () => {
 
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
-                  Email<span className="text-danger">*</span>
+                  Staff No<span className="text-danger">*</span>
                 </label>
                 <Input
                   size="large"
@@ -127,7 +127,7 @@ const Login = () => {
                   placeholder="Enter your password"
                 />
               </div>
-              <div className="mb-3 text-start">
+              {/* <div className="mb-3 text-start">
       <label htmlFor="branchCode" className="form-label">
         Branch <span className="text-danger">*</span>
       </label>
@@ -142,7 +142,7 @@ const Login = () => {
         placeholder="Select Branch" // Placeholder text for the dropdown
         style={{ width: "100%", color: "black" }}
       />
-    </div>
+    </div> */}
               <div className="py-2 d-flex align-items-center">
                 <input
                   className="form-check-input me-2"

@@ -1,154 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  UserOutlined,
-  CheckSquareOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  BellFilled,
-  TeamOutlined,
-  UserSwitchOutlined,
-  FileTextOutlined,
-  HistoryOutlined,
-  FileAddOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
-import {
   AppstoreOutlined,
-  MailOutlined,
-  SettingOutlined,
+  UserOutlined,
+  FileTextOutlined,
+  CalendarOutlined,
+  TeamOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
 } from "@ant-design/icons";
-
-import { Layout, Menu, theme, Button, Avatar, Badge, Breadcrumb } from "antd";
-import { FaUserDoctor, FaEyeDropper, FaRadiation } from "react-icons/fa6";
-import { GiSoapExperiment } from "react-icons/gi";
-import { TbDental } from "react-icons/tb";
-import { LuBaby } from "react-icons/lu";
+import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
+import { FaUserGroup } from "react-icons/fa6";
 import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
-
 import Signout from "../Auth/Signout";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const ReceptionLayout = () => {
   const location = useLocation();
-
-  // Extract the current route name from the location pathname
-  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const [openKeys, setOpenKeys] = useState(["/"]);
-  const rootSubmenuKeys = ["/reception"];
+  const [openKeys, setOpenKeys] = useState([]);
+  const [selectedKey, setSelectedKey] = useState(location.pathname);
 
+  // Define the menu items
   const items = [
     {
       key: "/reception",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      label: "Registration",
-    },
-    {
-      type: "divider",
-    },
-    // {
-    //   key: "PatientsGroup",
-    //   label: (
-    //     <span style={{ color: "#ac8342", fontWeight: "bold" }}>
-    //       Registration
-    //     </span>
-    //   ),
-    //   type: "group",
-    //   children: [
-    //     {
-    //       key: "Patient-list",
-    //       label: "Patients",
-    //       icon: <TeamOutlined style={{ color: "#fff" }} />,
-    //     },
-    //     // {
-    //     //   key: "Inpatient-list",
-    //     //   label: "Active Inpatient List",
-    //     //   icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
-    //     // },
-    //     // {
-    //     //   key: "Patient-admissions",
-    //     //   label: "Patient Admission",
-    //     //   icon: <FileAddOutlined style={{ color: "#fff" }} />,
-    //     // },
-    //   ],
-    // },
-    // {
-    //   type: "divider",
-    // },
+      label: "Dashboard",
 
+    },
     {
-      key: "BillingGroup",
-      label: (
-        <span style={{ color: "#ac8342", fontWeight: "bold" }}>Billing</span>
-      ),
-      type: "group",
+      key: "/reception/visitors-list",
+      icon: <UserOutlined style={{ color: "#fff" }} />,
+      label: "Visitors",
+      // children: [
+      //   {
+      //     key: "/reception/visitors/list",
+      //     label: "Visitors",
+      //     icon: <UserOutlined style={{ color: "#fff" }} />,
+      //   },
+      // ],
+    },
+    {
+      key: "/reception/patient-list",
+      icon: <FaUserGroup style={{ color: "#fff" }} />,
+      label: "Patient List",
       children: [
         {
-          key: "Active-OutPatient",
+          key: "/reception/Patient-list",
           label: "Active OutPatient ",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
         },
-        {
-          key: "Active-Inpatient",
-          label: "Active InPatient ",
-          icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        },
+        // {
+        //   key: "/reception/InPatient-list",
+        //   label: "Active InPatient ",
+        //   icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        // },
       ],
     },
     {
-      type: "divider",
-    },
-    {
-      key: "VisitorsGroup",
-      label: (
-        <span style={{ color: "#ac8342", fontWeight: "bold" }}>Visitors</span>
-      ),
-      type: "group",
+      key: "/reception/appointments",
+      icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      label: "Appointments",
       children: [
         {
-          key: "visitors-list",
-          label: "Visitors",
-          icon: <UserOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "AppointmentGroup",
-      label: (
-        <span style={{ color: "#ac8342", fontWeight: "bold" }}>
-          Appointments
-        </span>
-      ),
-      type: "group",
-      children: [
-        {
-          key: "Appointments",
+          key: "/reception/appointments/list",
           label: "Appointments",
           icon: <CalendarOutlined style={{ color: "#fff" }} />,
         },
       ],
     },
+   
   ];
 
+  // Handle open submenu logic
   const onOpenChange = (keys) => {
-    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
-    setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    if (latestOpenKey && rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      setOpenKeys(keys);
-      setCollapsed(true);
-    } else {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    }
+    setOpenKeys(keys.length === 0 ? [] : [keys[keys.length - 1]]);
   };
 
-  const navigate = useNavigate();
+  // Handle menu item click
+  const handleMenuClick = ({ key }) => {
+    navigate(key);
+    setSelectedKey(key); // Update the selected key when menu item is clicked
+  };
+
+  useEffect(() => {
+    // Update the selected key when the route changes
+    setSelectedKey(location.pathname);
+  }, [location]);
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -195,55 +138,68 @@ const ReceptionLayout = () => {
           <Menu
             theme="light"
             mode="inline"
-            defaultSelectedKeys={["/reception"]}
+            selectedKeys={[selectedKey]}
             openKeys={openKeys}
             onOpenChange={onOpenChange}
-            onClick={({ key }) => {
-              navigate(key);
-            }}
+            onClick={handleMenuClick}
             style={{
-              backgroundColor: "#0f5689",
+              backgroundColor: "transparent",
               height: "100vh",
               paddingBottom: "90px",
               color: "#fff",
             }}
-            items={items} // Pass the items array here
-          />
+          >
+            {items.map((item) =>
+              item.children ? (
+                <Menu.SubMenu
+                  key={item.key}
+                  icon={item.icon}
+                  title={item.label}
+                  className="menu-item"
+                >
+                  {item.children.map((child) => (
+                    <Menu.Item key={child.key} className="menu-subitem">
+                      {child.label}
+                    </Menu.Item>
+                  ))}
+                </Menu.SubMenu>
+              ) : (
+                <Menu.Item key={item.key} icon={item.icon} className="menu-item">
+                  {item.label}
+                </Menu.Item>
+              )
+            )}
+          </Menu>
         </Sider>
-        <Layout className="site-layout">
-          <div className="site-layout">
-            <Breadcrumb
-              style={{
-                marginLeft: collapsed ? 80 : 230,
-                transition: "all 0.2s",
-                padding: 12,
-                color: "#67336d",
-              }}
-            >
-              <Breadcrumb.Item>Home</Breadcrumb.Item>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              {pathSegments.map((segment, index) => (
-                <Breadcrumb.Item key={index}>
-                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
-                </Breadcrumb.Item>
-              ))}
-              {""}
-            </Breadcrumb>
-            <Content
-              className="contentStyle"
-              style={{
-                marginLeft: collapsed ? 80 : 230,
 
-                transition: "all 0.2s",
-                padding: 12,
-                minHeight: 680,
-                background: colorBgContainer,
-                borderRadius: 8,
-              }}
-            >
-              <Outlet />
-            </Content>
-          </div>
+        <Layout className="site-layout">
+          <Breadcrumb
+            style={{
+              marginLeft: collapsed ? 80 : 230,
+              transition: "all 0.2s",
+              padding: 12,
+              color: "#67336d",
+            }}
+          >
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>List</Breadcrumb.Item>
+            {/* Dynamic breadcrumb based on URL */}
+            <Breadcrumb.Item>{location.pathname.split("/").pop()}</Breadcrumb.Item>
+          </Breadcrumb>
+
+          <Content
+            className="contentStyle"
+            style={{
+              marginLeft: collapsed ? 80 : 230,
+              transition: "all 0.2s",
+              padding: 12,
+              minHeight: 680,
+              background: colorBgContainer,
+              borderRadius: 8,
+            }}
+          >
+            <Outlet />
+          </Content>
         </Layout>
       </Layout>
 

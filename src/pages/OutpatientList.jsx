@@ -26,6 +26,7 @@ import {
   Modal,
   Form,
   Select,
+  message,
 } from "antd";
 import moment from "moment";
 
@@ -123,6 +124,7 @@ const OutpatientList = () => {
 
     if(appointmentId) {
       setAppointmentId(appointmentId);
+      message.success("Visit created successfully.");
     }
     console.log("Appointment ID:", appointmentId);
 
@@ -135,6 +137,10 @@ const OutpatientList = () => {
     setIsVisitCreated(false); // Reset state if needed
 
     dispatch(postTriageVisit(appointmentId));
+
+    if(appointmentId) {
+      message.success("Patient dispatched to triage.");
+    }
   };
 
   const handleFilterPatients = () => {
@@ -243,7 +249,8 @@ const OutpatientList = () => {
   };
 
   return (
-    <div>
+   
+   <div>
       <h4 className="text-center p-3 text-dark">
         <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
         Patient List

@@ -12,6 +12,7 @@ import {
   Col,
   Card,
   Typography,
+  message,
 } from "antd";
 import { TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -21,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { convertPatient } from "../actions/patientActions";
 
 const VisitorList = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingVisitor, setEditingVisitor] = useState(null);
   const [statusForm] = Form.useForm();
@@ -31,15 +32,20 @@ const VisitorList = () => {
     VisitorPhone: "",
   });
   const [showTable, setShowTable] = useState(false);
+  const currentDate = dayjs().format("DD/MM/YYYY");
 
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
-  const { loading:patientsLoading, error:patientsError, patients } = useSelector(
-    (state) => state.patientList
-  );
+  const {
+    loading: patientsLoading,
+    error: patientsError,
+    patients,
+  } = useSelector((state) => state.patientList);
 
-  const {loading:convertLoading , error:convertError} = useSelector((state) => state.convertPatient);
+  const { loading: convertLoading, error: convertError } = useSelector(
+    (state) => state.convertPatient
+  );
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
 
@@ -54,22 +60,15 @@ const VisitorList = () => {
   useEffect(() => {
     filterVisitors();
   }, [visitors]);
-
-  const filterVisitors = () => {
-    let filtered = visitors.filter((visitor)=>{
-      return (
-        visitor.VisitorName.toLowerCase().includes(searchParams.VisitorName.toLowerCase()) &&
-        visitor.IDNumber.includes(searchParams.IdNumber) &&
-        visitor.PhoneNumber.includes(searchParams.VisitorPhone)
-      )
-    });
-  
-    setFilteredVisitors(filtered);
-
-    if (filtered.length > 0) {
-      setShowTable(true);
+  useEffect(() => {
+    if (visitors) {
+      // Filter visitors by current date
+      const todayVisitors = visitors.filter((visitor) =>
+        dayjs(visitor.CreatedDate).isSame(currentDate, "day")
+      );
+      setFilteredVisitors(todayVisitors);
     }
-  };
+  }, [visitors, currentDate]);
 
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
@@ -99,64 +98,105 @@ const VisitorList = () => {
     });
     setModalVisible(true);
   };
-
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
+    const updatedSearchParams = {
+      ...searchParams,
       [field]: value,
-    }));
-    filterVisitors();
+    };
+    setSearchParams(updatedSearchParams);
 
-    // Hide table if all search parameters are cleared
-    if (!searchParams.IdNumber && !searchParams.VisitorName && !searchParams.VisitorPhone) {
+    // Filter visitors and decide whether to show the table
+    const isAnyFieldFilled =
+      updatedSearchParams.IdNumber ||
+      updatedSearchParams.VisitorName ||
+      updatedSearchParams.VisitorPhone;
+
+    if (isAnyFieldFilled) {
+      setShowTable(true);
+      filterVisitors(updatedSearchParams);
+    } else {
       setShowTable(false);
+      setFilteredVisitors([]); // Clear the filtered visitors when no search
     }
   };
 
-  const handleResetSearch = () => {
-    setSearchParams({
-      IdNumber: "",
-      VisitorName: "",
-      VisitorPhone: "",
+  const filterVisitors = (searchCriteria) => {
+    const filtered = visitors.filter((visitor) => {
+      return (
+        (!searchCriteria?.VisitorName ||
+          visitor.VisitorName?.toLowerCase().includes(
+            searchCriteria.VisitorName.toLowerCase()
+          )) &&
+        (!searchCriteria?.IdNumber ||
+          visitor.IDNumber?.includes(searchCriteria.IdNumber)) &&
+        (!searchCriteria?.VisitorPhone ||
+          visitor.PhoneNumber?.includes(searchCriteria.VisitorPhone))
+      );
     });
-    setShowTable(false); // Hide table when search is cleared
+    setFilteredVisitors(filtered);
   };
 
-  
   const handleConvertToPatient = async (visitor) => {
     try {
       const visitorNo = visitor.No;
       console.log("Visitor No:", visitorNo);
-  
+
+      // Dispatch the conversion action to fetch the patient number
       const patientNo = await dispatch(convertPatient(visitorNo));
-  
-      if (patientNo && patients.some((patient) => patient.PatientNo === patientNo)) {
-        // Find the patient data
-        const patientData = patients.find((p) => p.PatientNo === patientNo);
-        // Patient exists; navigate to patient details page
-        navigate("/reception/Patient-Registration", {
-          state: { patientData },
-        });
-        console.log("Navigating to Patient Details Page with Patient Data:", patientData);
+
+      if (patientNo) {
+        const existingPatient = patients.find(
+          (patient) => patient.PatientNo === patientNo
+        );
+
+        if (existingPatient) {
+          // Patient found; navigate to the patient details page
+          message.success("Patient converted successfully.", 5);
+          navigate(`/reception/Add-Appointment/${patientNo}`, {
+            state: { existingPatient },
+          });
+          console.log(
+            "Navigating to Patient Details Page with Patient Data:",
+            existingPatient
+          );
+        } else {
+          // Patient not found; navigate to the registration page
+          message.warning(
+            "Patient not found. Please register the patient first.",
+            5
+          );
+          navigate("/reception/Patient-Registration", {
+            state: { visitorData: visitor, patientNumber: patientNo }, // Passing the visitor info to the registration page
+          });
+          console.log(
+            "Navigating to Patient Registration Page with Visitor Data:",
+            visitor
+          );
+        }
       } else {
-        // Pass the visitor's data to the patient registration page
-        navigate("/reception/Patient-Registration", {
-          state: { visitorData: visitor }, // Passing the visitor info to the registration page
-        });
-        console.log("Navigating to Patient Registration Page with Visitor Data:", visitor);
+        // No patient number returned from the action
+        message.warning("Unable to retrieve patient number.", 5);
       }
     } catch (error) {
       console.error("Error converting visitor to patient:", error);
+      message.error("An error occurred while processing the request.", 5);
     }
   };
-  
 
   const columns = [
     { title: "No", dataIndex: "No", key: "No" },
-    { title: "Visitor Number", dataIndex: "VisitorNumber", key: "visitorNumber" },
+    // {
+    //   title: "Visitor Number",
+    //   dataIndex: "VisitorNumber",
+    //   key: "visitorNumber",
+    // },
     { title: "Visitor Name", dataIndex: "VisitorName", key: "visitorName" },
-    { title: "Purpose of Visit", dataIndex: "PurposeofVisit", key: "PurposeofVisit" },
+    {
+      title: "Purpose of Visit",
+      dataIndex: "PurposeofVisit",
+      key: "PurposeofVisit",
+    },
     { title: "Phone Number", dataIndex: "PhoneNumber", key: "phoneNumber" },
     {
       title: "Date of Visit",
@@ -191,7 +231,11 @@ const VisitorList = () => {
       },
     },
     { title: "Person to See", dataIndex: "PersonToSee", key: "personToSee" },
-    { title: "Visitor Category", dataIndex: "VisitorCategory", key: "visitorCategory" },
+    {
+      title: "Visitor Category",
+      dataIndex: "VisitorCategory",
+      key: "visitorCategory",
+    },
     {
       title: "Action",
       key: "action",
@@ -222,7 +266,7 @@ const VisitorList = () => {
   const mappedVisitors = filteredVisitors.map((visitor, index) => ({
     key: visitor.No,
     No: visitor.No,
-    VisitorNumber: visitor.VisitorNumber,
+    // VisitorNumber: visitor.VisitorNumber,
     VisitorName: visitor.VisitorName,
     PurposeofVisit: visitor.PurposeofVisit,
     PhoneNumber: visitor.PhoneNumber,
@@ -235,17 +279,17 @@ const VisitorList = () => {
   }));
 
   return (
-    <div className="card">
-      <div className="card-header">
+    <div className="card mt-4">
+      <div className="">
         <h5
-          className="card-title"
-          style={{ color: "#ac8342", display: "flex", alignItems: "center" }}
+          // className="card-title"
+          style={{ color: "#ac8342", textAlign: "center", padding: "10px" }}
         >
-          <TeamOutlined style={{ marginRight: 8, fontSize: "40px" }} />
+          {/* <TeamOutlined style={{ marginRight: 8, fontSize: "40px" }} /> */}
           Visitor List
         </h5>
       </div>
-      <Card className="card-header mb-4 mt-4 p-4">
+      <Card className="card-header mb-4  p-4">
         <Typography.Text
           style={{
             color: "#003F6D",
@@ -256,7 +300,7 @@ const VisitorList = () => {
           Find Visitor Details by:
         </Typography.Text>
         <Row gutter={16} className="mt-2">
-          <Col span={6}>
+          <Col span={8}>
             <Input
               placeholder="Id Number"
               value={searchParams.IdNumber}
@@ -264,7 +308,7 @@ const VisitorList = () => {
               allowClear
             />
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Input
               placeholder="Visitor Name"
               value={searchParams.VisitorName}
@@ -272,7 +316,7 @@ const VisitorList = () => {
               allowClear
             />
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Input
               placeholder="Phone Number"
               value={searchParams.VisitorPhone}
@@ -284,14 +328,22 @@ const VisitorList = () => {
       </Card>
 
       {/* Show the table only if there are filtered visitors or search was performed */}
-      {showTable && (
-        <Table
-          columns={columns}
-          dataSource={mappedVisitors}
-          pagination={{ pageSize: 10 }}
-          style={{ marginTop: "16px" }}
-        />
-      )}
+     {showTable && filteredVisitors.length > 0 ? (
+  <Table
+    columns={columns}
+    dataSource={filteredVisitors}
+    pagination={{ pageSize: 10 }}
+    style={{ marginTop: "16px" }}
+    bordered
+    size="small"
+  />
+) : showTable && filteredVisitors.length === 0 ? (
+  <div style={{ marginTop: "16px", textAlign: "center" }}>
+    <Typography.Text type="secondary">
+      No visitors found matching your search criteria.
+    </Typography.Text>
+  </div>
+) : null}
 
       <Modal
         title="Edit Status"
@@ -299,11 +351,7 @@ const VisitorList = () => {
         onCancel={() => setModalVisible(false)}
         footer={null}
       >
-        <Form
-          form={statusForm}
-          onFinish={handleUpdateStatus}
-          layout="vertical"
-        >
+        <Form form={statusForm} onFinish={handleUpdateStatus} layout="vertical">
           <Form.Item
             name="status"
             label="Status"

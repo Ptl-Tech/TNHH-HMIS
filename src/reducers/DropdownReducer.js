@@ -31,6 +31,10 @@ import {
   EMPLOYEES_LIST_SUCCESS,
   EMPLYEES_LIST_FAIL,
   EMPLOYEES_LIST_RESET,
+  MARKETING_LIST_REQUEST,
+  MARKETING_LIST_SUCCESS,
+  MARKETING_LIST_FAIL,
+  MARKETING_LIST_RESET,
 } from "../constants/DropDownConstants";
 
 export const countriesListReducer = (state = { countries: [] }, action) => {
@@ -103,6 +107,21 @@ export const getInsuranceReducer = (state = { data: [] }, action) => {
     case INSURANCE_LIST_FAIL:
       return { loading: false, error: action.payload };
     case INSURANCE_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+export const getmarketingStrategiesReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case MARKETING_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case MARKETING_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case MARKETING_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case MARKETING_LIST_RESET:
       return { data: [] };
     default:
       return state;

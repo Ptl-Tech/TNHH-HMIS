@@ -6,10 +6,10 @@ import { USER_LOGIN_REQUEST, USER_LOGIN_SUCCESS, USER_LOGIN_FAIL, USER_LOGOUT, U
 const API = "http://217.21.122.62:8085/"
 console.log("Base URL: ", API)
 
-export const login = (staffNo, password, branchCode) => async (dispatch) => {
+export const login = (staffNo, password) => async (dispatch) => {
   try {
     dispatch({ type: USER_LOGIN_REQUEST });
-    const config = { headers: { "Content-Type": "application/json", branchCode: branchCode } };
+    const config = { headers: { "Content-Type": "application/json", } };
     const { data } = await axios.post(
       `${API}Authentication/Login`,
       { staffNo, password },
@@ -18,47 +18,54 @@ export const login = (staffNo, password, branchCode) => async (dispatch) => {
 
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
     localStorage.setItem("userInfo", JSON.stringify(data));
-    localStorage.setItem("branchCode", branchCode);
-  } catch (errors) {
-    dispatch({
-      type: USER_LOGIN_FAIL,
-      payload: errors.response?.data?.message || errors.message,
-    });
-  }
-};
-
-// Verify OTP action
-export const verifyOtp = (staffNo, otpCode, sessionToken) => async (dispatch) => {
-  try {
-    dispatch({ type: OTP_VERIFY_REQUEST });
-
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        "staffNo": staffNo,  // Add staffNo as a custom header
-        "sessionToken": sessionToken,  // Add sessionToken as a Bearer token
-        "branchCode": branchCode,  // Retrieve branchCode from localStorage if not passed directly
-      },
-    };
-
-    const { data } = await axios.post(
-      `${API}Authentication/OTPLogin`,
-      { otpCode },
-      config
-    );
-
-    dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
-    localStorage.setItem("userInfo", JSON.stringify(data)); // Save updated user info after OTP verification
   } catch (error) {
     dispatch({
-      type: OTP_VERIFY_FAIL,
+      type: USER_LOGIN_FAIL,
       payload: error.response?.data?.message || error.message,
     });
   }
 };
+
+export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (dispatch) => {
+  try {
+    dispatch({ type: OTP_VERIFY_REQUEST });
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo,
+        sessionToken,
+        branchCode,
+      },
+    };
+
+    const { data } = await axios.post(`${API}Authentication/OTPLogin`, { otpCode }, config);
+
+    dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
+
+    // Extract branch code from userInfo.userData
+    const extractedBranchCode = data.userData?.shortcut_Dimension_1_Code || branchCode;
+
+    // Save updated OTP state and user info to localStorage
+    const otpState = {
+      isVerified: true,
+      portalSession: data.portalSession,
+      staffNo: data.staffNo,
+    };
+
+    localStorage.setItem("otpVerifyState", JSON.stringify(otpState));
+    localStorage.setItem("userInfo", JSON.stringify(data));
+    localStorage.setItem("branchCode", extractedBranchCode); // Save extracted branch code
+
+  } catch (error) {
+    dispatch({
+      type: OTP_VERIFY_FAIL,
+      payload: error.response?.data?.errors || error.errors,
+    });
+  }
+};
+
+
 
 
 
