@@ -72,9 +72,9 @@ const PatientRegistration = () => {
   } = useSelector((state) => state.marketingList);
 
   const dispatch = useDispatch();
-const navigate=useNavigate();  
-const { state } = useLocation(); // Access the state passed via navigate
-const { visitorData,patientNumber } = state || {}; // Destructure patient data if available
+  const navigate = useNavigate();
+  const { state } = useLocation(); // Access the state passed via navigate
+  const { visitorData, patientNumber } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [age, setAge] = useState(null); // State to hold calculated age
@@ -240,27 +240,27 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
   };
   const handleSavePatient = async (e) => {
     e.preventDefault();
-  
+
     // Validate the entire form
     const errors = validateForm(newPatient);
     setErrors(errors);
-  
+
     // If there are any validation errors, show a warning
     if (Object.keys(errors).length > 0) {
       message.warning("Please fill in all the required fields correctly.");
-      return; // Prevent form submission if there are errors
+      return; 
     }
-  
+
     // Determine the action (create or edit) based on the patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
-  
+
     // Prepare patient data
     const patientData = {
-      firstName: newPatient.firstName || visitorData.VisitorName,
-      lastName: newPatient.lastName,
-      middleName: newPatient.middleName,
-      idNumber: newPatient.idNumber,
-      phoneNumber: newPatient.phoneNumber || visitorData.VisitorNumber,
+      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0],
+      lastName: newPatient.lastName ||visitorData.VisitorName?.split(" ")[2],
+      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1],
+      idNumber: newPatient.idNumber || visitorData?.IDNumber,
+      phoneNumber: newPatient.phoneNumber || visitorData?.PhoneNumber,
       email: newPatient.email,
       gender: newPatient.gender,
       dob: newPatient.dob,
@@ -277,17 +277,21 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
       membershipNo: newPatient.membershipNo,
       insuranceName: newPatient.insuranceName,
       howYouKnewABoutUs: newPatient.howYouKnewABoutUs,
-      myAction: "edit", // Determine action dynamically
+      myAction: isEditAction ? "edit" : "create", 
       patientNo: patientNumber, // Include patientNo only if editing
     };
-  
+
     try {
       // Dispatch the patient creation or update action
       const responsedata = await dispatch(createPatient(patientData));
       const patientId = responsedata?.patientNo;
-  
+
       if (patientId) {
-        message.success(isEditAction ? "Patient updated successfully." : "Patient created successfully.");
+        message.success(
+          isEditAction
+            ? "Patient updated successfully."
+            : "Patient created successfully."
+        );
         // Navigate to Add Appointment page and pass patientId
         navigate(`/reception/Add-Appointment/${patientId}`, {
           state: { patientData: newPatient },
@@ -295,14 +299,14 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
       } else {
         message.error("Failed to save patient data. Please try again.");
       }
-  
+
       console.log(patientId);
     } catch (error) {
       console.error("Error saving patient data:", error);
       message.error("An unexpected error occurred. Please try again.");
     }
   };
-  
+
   // Define the validateForm function
   const validateForm = (patient) => {
     const errors = {};
@@ -360,7 +364,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                     name="idNumber"
                     placeholder="ID Number"
                     style={{ width: "100%" }}
-                    value={newPatient.idNumber}
+                    value={newPatient.idNumber || visitorData?.IDNumber}
                     onChange={handleInputChange}
                   />
                   {errors.idNumber && (
@@ -377,7 +381,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                     name="firstName"
                     placeholder="First Name"
                     style={{ width: "100%" }}
-                    value={newPatient.firstName|| visitorData?.VisitorName}
+                    value={newPatient.firstName || visitorData.VisitorName?.split(" ")[0]}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -389,7 +393,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                     name="middleName"
                     placeholder="Middle Name"
                     style={{ width: "100%" }}
-                    value={newPatient.middleName}
+                    value={newPatient.middleName || visitorData.VisitorName?.split(" ")[1]}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -403,7 +407,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                     name="lastName"
                     placeholder="Last Name"
                     style={{ width: "100%" }}
-                    value={newPatient.lastName}
+                    value={newPatient.lastName || visitorData.VisitorName?.split(" ")[2]}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -457,7 +461,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                   <Input
                     placeholder="Enter phone number"
                     name="phoneNumber"
-                    value={newPatient.phoneNumber||visitorData?.VisitorNumber}
+                    value={newPatient.phoneNumber || visitorData?.PhoneNumber}
                     onChange={handleInputChange}
                   />
                   {errors.phoneNumber && (
@@ -696,8 +700,18 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                       fontWeight: "bold",
                     }}
                   >
-                    {`${newPatient.firstName?.charAt(0).toUpperCase() || ""}${
-                      newPatient.lastName?.charAt(0).toUpperCase() || ""
+                    {`${
+                      newPatient.firstName?.charAt(0).toUpperCase() ||
+                      visitorData.VisitorName?.split(" ")[0]
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ""
+                    }${
+                      newPatient.lastName?.charAt(0).toUpperCase() ||
+                      visitorData.VisitorName?.split(" ")[1]
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ""
                     }`}
                   </Avatar>
                 </div>
@@ -733,7 +747,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                       // variant="borderless"
                       name="insuranceName"
                       onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                      disabled={newPatient.paymentMode !== "1"}
+                      disabled={newPatient.paymentMode !== "2"}
                     >
                       <Select.Option value="">
                         --Select Insurance--
@@ -763,7 +777,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                       name="membershipNo"
                       value={newPatient.membershipNo}
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "1"}
+                      disabled={newPatient.paymentMode !== "2"}
                     />
                   </div>
                 </div>
@@ -777,7 +791,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                       name="schemeName"
                       value={newPatient.schemeName}
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "1"}
+                      disabled={newPatient.paymentMode !== "2"}
                     />
                   </div>
                   <div className="col-12 ">
@@ -790,7 +804,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                       value={newPatient.insurancePrinicipalMemberName}
                       onChange={handleInputChange}
                       disabled={
-                        newPatient.paymentMode !== "1" &&
+                        newPatient.paymentMode !== "2" &&
                         newPatient.isPrincipleMember
                       }
                       readOnly
@@ -810,7 +824,7 @@ const { visitorData,patientNumber } = state || {}; // Destructure patient data i
                     }
                     size="large"
                     style={{ margin: "0 10px" }}
-                    disabled={newPatient.paymentMode !== "1"}
+                    disabled={newPatient.paymentMode !== "2"}
                   />
                 </div>
               </div>

@@ -106,7 +106,7 @@ const navigate=useNavigate();
       const appointmentId = await dispatch(createTriageVisit(visitData));
   
       if (!appointmentId) {
-        message.error("Patient registration failed!");
+  //      message.error("Patient registration failed!");
         return;
       }
   
@@ -167,11 +167,9 @@ const navigate=useNavigate();
               </h4>
             </div>
             <div>
-              <Dropdown overlay={dispatchMenu} trigger={["click"]}>
-                <Button type="primary" size="large" className="pr-3 mr-3">
+            <Button type="primary" size="large" className="pr-3 mr-3" onClick={dispatchPatient}>
                   Dispatch Patient
                 </Button>
-              </Dropdown>
             </div>
           </div>
 

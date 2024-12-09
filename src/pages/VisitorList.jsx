@@ -192,6 +192,8 @@ const VisitorList = () => {
     //   key: "visitorNumber",
     // },
     { title: "Visitor Name", dataIndex: "VisitorName", key: "visitorName" },
+    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+
     {
       title: "Purpose of Visit",
       dataIndex: "PurposeofVisit",
