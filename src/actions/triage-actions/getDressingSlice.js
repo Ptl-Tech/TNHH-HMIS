@@ -15,7 +15,7 @@ export const getDressingSlice = (observationNo) => async (dispatch, getState) =>
     try {
         dispatch({ type: GET_DRESSING_REQUEST });
         
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyDressings&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyDressings&isList=true&query=$filter=ObservationNo eq '${observationNo}'`, config);
 
         dispatch({ type: GET_DRESSING_SUCCESS, payload: data })
 

@@ -137,6 +137,7 @@ const OutpatientList = () => {
     dispatch(postTriageVisit(appointmentId));
   };
 
+
   const handleFilterPatients = () => {
     const filtered = patients.filter((patient) => {
       return (

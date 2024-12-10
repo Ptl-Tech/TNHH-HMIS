@@ -9,7 +9,7 @@ import {
 
 const initialState = {
     postAllergyMedicationLoading: false,
-    allergiesMedication: [],
+    postAllergiesMedication: [],
     error: null,
 };
 
@@ -25,7 +25,7 @@ export const postAllergiesMedicationReducer = (state = initialState, action) => 
             return {
                 ...state,
                 postAllergyMedicationLoading: false,
-                allergiesMedication: action.payload,
+                postAllergiesMedication: action.payload,
                 error: null,
             };
         case POST_ALLERGIES_MEDICATION_FAIL:

@@ -394,4 +394,9 @@ main {
   padding: 10px 16px;
 }
 
+.ant-table-wrapper .ant-table-row-expand-icon{
+  color: #0f5689 !important;
+  border: 1px solid #0f5689 !important;
+}
+
 /* END OF NURSE MODULE STYLES */

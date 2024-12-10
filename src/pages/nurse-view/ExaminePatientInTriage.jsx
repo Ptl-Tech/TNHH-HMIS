@@ -67,23 +67,22 @@ const EvaluatePatientInTriage = () => {
            <Row gutter={8} className='inpatient-card-container'>
   
               <Col xs={24} md={24} lg={16} xl={16}>
-              <Card style={{ padding: '10px 16px' }}>
-                    <Tabs>
-                      <Tabs.TabPane tab="Vitals" key="1">
-
-                            <FormVitals observationNumber={observationNo} patientNumber={patientNo} />
-                      </Tabs.TabPane>
-                      <Tabs.TabPane tab="Allergies and Medication" key="2">
-                          <AllergyAndMedication observationNumber={observationNo} patientNumber={patientNo} staffNo={staffNo} />
-                      </Tabs.TabPane>
-                      <Tabs.TabPane tab="Injections" key="3">
-                          <Injections observationNumber={observationNo} staffNo={staffNo}/>
-                      </Tabs.TabPane>
-                      <Tabs.TabPane tab="Dressings" key="4">
-                          <Dressing observationNumber={observationNo}  staffNo={staffNo}/>
-                      </Tabs.TabPane>
-                    </Tabs>
-                </Card>
+                  <Card style={{ padding: '10px 16px' }}>
+                        <Tabs>
+                          <Tabs.TabPane tab="Vitals" key="1">
+                                <FormVitals observationNumber={observationNo} patientNumber={patientNo} />
+                          </Tabs.TabPane>
+                          <Tabs.TabPane tab="Allergies and Medication" key="2">
+                              <AllergyAndMedication observationNumber={observationNo} patientNumber={patientNo} staffNo={staffNo} />
+                          </Tabs.TabPane>
+                          <Tabs.TabPane tab="Injections" key="3">
+                              <Injections observationNumber={observationNo} staffNo={staffNo}/>
+                          </Tabs.TabPane>
+                          <Tabs.TabPane tab="Dressings" key="4">
+                              <Dressing observationNumber={observationNo}  staffNo={staffNo}/>
+                          </Tabs.TabPane>
+                        </Tabs>
+                  </Card>
               </Col>
               <Col xs={24} md={24} lg={8} xl={8}>
 

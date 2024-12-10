@@ -1,17 +1,20 @@
-import { Button, Col, Form, Input, message, Row } from 'antd'
+import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import { useEffect } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
+import { SaveOutlined } from '@ant-design/icons';
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
 
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
- 
+
+  console.log('vitals lines', vitalsLines);
+
   
   useEffect(() => {
     dispatch(getVitalsLinesSlice(observationNumber));
@@ -23,9 +26,9 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     const createVitals = {
       pulseRate,
       Pain: parseInt(cleanValue(pain)),
-      Height: parseFloat(cleanValue(height)),
-      Weight: parseFloat(cleanValue(weight)),
-      Temperature: parseFloat(cleanValue(temperature)),
+      height: parseFloat(cleanValue(height)),
+      weight: parseFloat(cleanValue(weight)),
+      temperature: parseFloat(cleanValue(temperature)),
       bloodPreasure,
       sP02,
       respirationRate,
@@ -39,9 +42,9 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     const updateVitals = {
       pulseRate,
       Pain: parseInt(cleanValue(pain)),
-      Height: parseFloat(cleanValue(height)),
-      Weight: parseFloat(cleanValue(weight)),
-      Temperature: parseFloat(cleanValue(temperature)),
+      height: parseFloat(cleanValue(height)),
+      weight: parseFloat(cleanValue(weight)),
+      temperature: parseFloat(cleanValue(temperature)),
       bloodPreasure,
       sP02,
       respirationRate,
@@ -72,6 +75,10 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
         }
       })
     }
+
+    // get vitals
+
+    dispatch(getVitalsLinesSlice(observationNumber));
   
   };
   
@@ -92,19 +99,65 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     return bmi.toFixed(2); 
   };
 
+  const columns = [
+    {
+      title: 'Pulse Rate',
+      dataIndex: 'pulseRate',
+      key: 'pulseRate',
+    },
+    {
+      title: 'Pain',
+      dataIndex: 'pain',
+      key: 'pain',
+    },
+    {
+      title: 'Height',
+      dataIndex: 'height',
+      key: 'height',
+    },
+    {
+      title: 'Weight',
+      dataIndex: 'weight',
+      key: 'weight',
+    },
+    {
+      title: 'Temperature',
+      dataIndex: 'temperature',
+      key: 'temperature',
+    },
+
+  ]
+
+  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI } = vitalsLines;
+  
+  const dataSource = [
+    {
+      key: ObservationNo,
+      pulseRate: PulseRate,
+      pain: Pain,
+      height: Height,
+      weight: Weight,
+      temperature: Temperature,
+      bloodPreasure: BloodPressure,
+      sP02: SP02,
+      respirationRate: RespirationRate,
+      bmi: BMI,
+    }
+  ]
+
   return (
    <div>
     {
       loadingVitalsLines ? (
         <Loading />
       ):(
+        
+      <div>
         <Form layout="vertical" 
 
           onFinish={onFinish}
           initialValues={{
             vitals: {
-              observationNumber: observationNumber,
-              patientNumber: patientNumber,
               pulseRate: vitalsLines?.PulseRate,
               bloodPreasure: vitalsLines?.BloodPressure,
               temperature: vitalsLines?.Temperature,
@@ -113,35 +166,10 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               weight: vitalsLines?.Weight,
               respirationRate: vitalsLines?.RespirationRate,
               pain: vitalsLines?.Pain,
-              bmi: vitalsLines?.BMI,
+              bmi: vitalsLines?.BMI
             },
           }}
           >
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item 
-                  label="Observation Number"
-                  name={['vitals', 'observationNumber']}
-                  rules={[{ required: true, message: 'Please input observation number!' }]} 
-                >
-                  <Input type='text' 
-                    disabled
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item 
-                  label="Patient Number" 
-                  name={['vitals', 'patientNumber']}
-                  rules={[{ required: true, message: 'Please input patient number!' }]}
-                  >
-                  <Input type='text' 
-                    name='patientNumber'
-                    disabled
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Pulse Rate (bpm)"
@@ -256,10 +284,42 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
             <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" loading={loading} htmlType="submit">Save vitals</Button>
+                    <Button type="primary" loading={loading} htmlType="submit">
+                      <SaveOutlined />
+                      {
+                        vitalsLines && Object.keys(vitalsLines).length > 0 ? 'Update vitals' : 'Save vitals'
+                      }
+                    </Button>
                 </Form.Item>
             </Col>
         </Form>
+        
+
+        {
+          vitalsLines && Object.keys(vitalsLines).length > 0 && 
+          (
+            <div style={{ marginTop: '10px' }}>
+            <Divider />
+            <Table columns={columns} 
+            dataSource={dataSource} 
+            pagination={false}
+            expandable={{
+              expandedRowRender: (record) => (
+                <p style={{ margin: 0 }}>
+
+                  Blood Preasure : {record.bloodPreasure}, 
+                  SP02 : {record.sP02}, 
+                  Respiration Rate : {record.respirationRate}, 
+                  BMI : {record.bmi.toFixed(2)}
+                </p>
+              ),
+              rowExpandable: (record) => record.name !== 'Not Expandable',
+            }}
+            />
+            </div>
+          )
+        }
+        </div>
       )
     }
    </div>

@@ -8,8 +8,8 @@ import {
 
 
 const initialState = {
-    injectionsLoading: false,
-    injections: [],
+    postInjectionsLoading: false,
+    postInjections: [],
     error: null,
 };
 
@@ -18,20 +18,20 @@ export const postInjectionsReducer = (state = initialState, action) => {
         case POST_INJECTIONS_REQUEST:
             return {
                 ...state,
-                injectionsLoading: true,
+                postInjectionsLoading: true,
                 error: null,
             };
         case POST_INJECTIONS_SUCCESS:
             return {
                 ...state,
-                injectionsLoading: false,
-                injections: action.payload,
+                postInjectionsLoading: false,
+                postInjections: action.payload,
                 error: null,
             };
         case POST_INJECTIONS_FAIL:
             return {
                 ...state,
-                injectionsLoading: false,
+                postInjectionsLoading: false,
                 error: action.payload,
             };
         default:
