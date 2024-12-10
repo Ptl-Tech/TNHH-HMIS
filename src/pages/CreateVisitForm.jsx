@@ -23,7 +23,7 @@ const CreateVisitForm = () => {
   const { state } = useLocation(); // Access the state passed via navigate
   const { patientData, existingPatient } = state || {}; // Destructure patient data if available
   const dispatch = useDispatch();
-const navigate=useNavigate();
+  const navigate = useNavigate();
   const {
     loading: insuranceLoading,
     error: insuranceError,
@@ -69,7 +69,7 @@ const navigate=useNavigate();
   });
 
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-
+  const [appointmentId, setAppointmentId] = useState(null);
   useEffect(() => {
     dispatch(listInsuranceOptions());
     dispatch(listClinics()); // Ensure clinics are loaded
@@ -94,48 +94,60 @@ const navigate=useNavigate();
     }
   }, [doctorsPayload, newVisit.clinic]);
 
-  const dispatchPatient = async (value) => {
+  const savepatientVisit = async (value) => {
     const visitData = {
       patientNo: patientData?.patientNo || existingPatient?.PatientNo,
       clinic: newVisit.clinic,
       doctor: newVisit.doctor,
     };
-  
+
     try {
       // Create Triage Visit
       const appointmentId = await dispatch(createTriageVisit(visitData));
-  
+
       if (!appointmentId) {
-  //      message.error("Patient registration failed!");
+        //      message.error("Patient registration failed!");
         return;
       }
-  
-      // Post Triage Visit
-  
-      if (appointmentId) {
-        await dispatch(postTriageVisit(appointmentId));
 
+      // Post Triage Visit
+
+      if (appointmentId) {
         message.success("Visit created successfully!");
-         navigate("/reception/visitors-list");
+        setAppointmentId(appointmentId);
 
         console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
-        message.error("Failed to post to triage!");
+        message.error("Failed to create visit!");
       }
     } catch (error) {
       console.error("Error dispatching patient:", error);
-      message.error("An unexpected error occurred. Please try again.");
+      message.error("Failed to create visit!");
     }
+  };
 
-    
+  const dispatchPatient = async (appointmentId) => {
+    if (!appointmentId) {
+      message.error("Appointment ID is required!");
+      return;
+    }
+  
+    try {
+      console.log("Dispatching patient with appointment ID:", appointmentId);
+      await dispatch(postTriageVisit(appointmentId));
+      message.success("Patient has been dispatched successfully!");
+      navigate("/reception/visitors-list");
+    } catch (error) {
+      console.error("Error dispatching patient:", error);
+      message.error("Failed to dispatch patient!");
+    }
   };
   
-
   const dispatchMenu = (
     <Menu onClick={(e) => dispatchPatient(e.key)}>
       <Menu.Item key="triage">Triage</Menu.Item>
       {/* <Menu.Item key="pharmacy">Pharmacy</Menu.Item> */}
-     {/* <Menu.Item key="doctor">Doctor</Menu.Item> */}
+      {/* <Menu.Item key="doctor">Doctor</Menu.Item> */}
     </Menu>
   );
 
@@ -166,10 +178,23 @@ const navigate=useNavigate();
                 Appointment Card
               </h4>
             </div>
-            <div>
-            <Button type="primary" size="large" className="pr-3 mr-3" onClick={dispatchPatient}>
-                  Dispatch Patient
-                </Button>
+            <div className=" d-flex align-items-center justify-content-end gap-3">
+              <Button
+                type="primary"
+                size="large"
+                className="pr-3 mr-3"
+                onClick={savepatientVisit}
+              >
+                Create Visit
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                className="pr-3 mr-3"
+                onClick={() => dispatchPatient(appointmentId)}
+              >
+                Dispatch Patient
+              </Button>
             </div>
           </div>
 
@@ -231,7 +256,7 @@ const navigate=useNavigate();
                       <Input
                         label="Patient Type"
                         value={
-                          patientData?.patientType ||
+                          patientData?.paymentMode==="2" ?"Cash " : "Insurance" ||
                           existingPatient?.PatientType
                         }
                         disabled

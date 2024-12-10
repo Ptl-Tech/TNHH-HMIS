@@ -8,41 +8,43 @@ import {
   TeamOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  UserSwitchOutlined,
+  FileAddOutlined,
+  HistoryOutlined,
+  ClockCircleOutlined
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
 import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
 import Signout from "../Auth/Signout";
+import { BiCoinStack } from "react-icons/bi";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const ReceptionLayout = () => {
+const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
   const [selectedKey, setSelectedKey] = useState(location.pathname);
+  const [menuItems, setMenuItems] = useState([]);
 
-  // Define the menu items
-  const items = [
+
+useEffect(() => {
+  const userInfo=JSON.parse(localStorage.getItem('userInfo'));  
+  const department=userInfo?.userData?.departmentName;
+
+  const receptionRoutes = [
     {
       key: "/reception",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
       label: "Dashboard",
-
     },
     {
       key: "/reception/visitors-list",
       icon: <UserOutlined style={{ color: "#fff" }} />,
       label: "Visitors",
-      // children: [
-      //   {
-      //     key: "/reception/visitors/list",
-      //     label: "Visitors",
-      //     icon: <UserOutlined style={{ color: "#fff" }} />,
-      //   },
-      // ],
     },
     {
       key: "/reception/patient-list",
@@ -51,14 +53,9 @@ const ReceptionLayout = () => {
       children: [
         {
           key: "/reception/Patient-list",
-          label: "Active OutPatient ",
+          label: "Active OutPatient",
           icon: <FileTextOutlined style={{ color: "#fff" }} />,
         },
-        // {
-        //   key: "/reception/InPatient-list",
-        //   label: "Active InPatient ",
-        //   icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        // },
       ],
     },
     {
@@ -73,8 +70,101 @@ const ReceptionLayout = () => {
         },
       ],
     },
-   
+    {
+      key: "/reception/billing",
+      icon: <BiCoinStack style={{ color: "#fff" }} />,
+      label: "Billing",
+      children: [
+        {
+          key: "/reception/cash-List",
+          label: "Cash Patients",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "/reception/insurance-List",
+          label: "Insurance Patients",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
   ];
+  
+  // Define the menu items
+  const doctorRoutes = [
+    {
+      key: "/Doctor",
+      icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+      label: "Dashboard",
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "RegistrationGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+      type: "group",
+      children: [
+        {
+          key: "Outpatient-list",
+          label: "Patients",
+          icon: <TeamOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "Inpatient-list",
+          label: "Active Inpatient List",
+          icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "Patient-admissions",
+          label: "Patient Admission",
+          icon: <FileAddOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+    {
+        type: "divider",
+      },
+    {
+      key: "TriageGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Triage</span>,
+      type: "group",
+      children: [
+        {
+          key: "triage",
+          label: "Triage List",
+          icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "past-doctor-visit",
+          label: "Past Doctor Visit",
+          icon: <HistoryOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+    {
+        type: "divider",
+      },
+    {
+      key: "AppointmentsGroup",
+      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
+      type: "group",
+      children: [
+        {
+          key: "Appointments-list",
+          label: "Appointments",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "Upcoming-appointments",
+          label: "Upcoming Appointments",
+          icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+  ];
+
+  setMenuItems(department === "Reception" ? receptionRoutes : doctorRoutes);
+},[]);
 
   // Handle open submenu logic
   const onOpenChange = (keys) => {
@@ -135,41 +225,22 @@ const ReceptionLayout = () => {
           collapsed={collapsed}
           breakpoint="lg"
         >
-          <Menu
-            theme="light"
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-            onClick={handleMenuClick}
-            style={{
-              backgroundColor: "transparent",
-              height: "100vh",
-              paddingBottom: "90px",
-              color: "#fff",
-            }}
-          >
-            {items.map((item) =>
-              item.children ? (
-                <Menu.SubMenu
-                  key={item.key}
-                  icon={item.icon}
-                  title={item.label}
-                  className="menu-item"
-                >
-                  {item.children.map((child) => (
-                    <Menu.Item key={child.key} className="menu-subitem">
-                      {child.label}
-                    </Menu.Item>
-                  ))}
-                </Menu.SubMenu>
-              ) : (
-                <Menu.Item key={item.key} icon={item.icon} className="menu-item">
-                  {item.label}
-                </Menu.Item>
-              )
-            )}
-          </Menu>
+        <Menu
+  theme="light"
+  mode="inline"
+  selectedKeys={[selectedKey]}
+  openKeys={openKeys}
+  onOpenChange={onOpenChange}
+  onClick={handleMenuClick}
+  style={{
+    backgroundColor: "transparent",
+    height: "100vh",
+    paddingBottom: "90px",
+    color: "#fff",
+  }}
+  items={menuItems} // Pass items here
+/>
+
         </Sider>
 
         <Layout className="site-layout">
@@ -215,4 +286,4 @@ const ReceptionLayout = () => {
   );
 };
 
-export default ReceptionLayout;
+export default MainLayout;

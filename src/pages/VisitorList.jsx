@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
   Button,
@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
 import { useNavigate } from "react-router-dom";
 import { convertPatient } from "../actions/patientActions";
+import { render } from "react-dom";
 
 const VisitorList = () => {
   const navigate = useNavigate();
@@ -31,8 +32,8 @@ const VisitorList = () => {
     VisitorName: "",
     VisitorPhone: "",
   });
-  const [showTable, setShowTable] = useState(false);
-  const currentDate = dayjs().format("DD/MM/YYYY");
+
+  const currentDate = dayjs().format("YYYY-MM-DD");
 
   const { loading, error, visitors } = useSelector(
     (state) => state.visitorsList
@@ -52,23 +53,29 @@ const VisitorList = () => {
   const { userInfo } = useSelector((state) => state.otpVerify);
 
   const dispatch = useDispatch();
+  const [showTable, setShowTable] = useState(userInfo
+    .userData.departmentName === "Reception"
+    ? true
+    : false
+  );
 
   useEffect(() => {
     dispatch(getVisitorsList());
   }, [dispatch]);
 
   useEffect(() => {
-    filterVisitors();
-  }, [visitors]);
-  useEffect(() => {
-    if (visitors) {
-      // Filter visitors by current date
-      const todayVisitors = visitors.filter((visitor) =>
-        dayjs(visitor.CreatedDate).isSame(currentDate, "day")
-      );
-      setFilteredVisitors(todayVisitors);
-    }
-  }, [visitors, currentDate]);
+    filterVisitors(searchParams);
+  }, [visitors, searchParams]);
+  
+  const Visitors = useMemo(() => {
+    return visitors.filter(visitor => dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
+      visitor.Status === "Entered" &&
+      (!searchParams.VisitorName || visitor.VisitorName?.toLowerCase().includes(searchParams.VisitorName.toLowerCase())) &&
+      (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
+      (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
+    );
+  }, [visitors, searchParams, currentDate]);
+  
 
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
@@ -113,7 +120,10 @@ const VisitorList = () => {
       updatedSearchParams.VisitorPhone;
 
     if (isAnyFieldFilled) {
-      setShowTable(true);
+      //if userInfor is set to reception, show the table
+      if(userInfo.userData.departmentName === "Reception"){
+        setShowTable(true);
+      };
       filterVisitors(updatedSearchParams);
     } else {
       setShowTable(false);
@@ -123,6 +133,14 @@ const VisitorList = () => {
 
   const filterVisitors = (searchCriteria) => {
     const filtered = visitors.filter((visitor) => {
+      if (visitor.Status !== "Entered" ) {
+        return false;
+      }
+        // Exclude visitors where CreatedDate is before the current date
+        if(visitor.CreatedDate < currentDate){
+          return false;
+        }
+      
       return (
         (!searchCriteria?.VisitorName ||
           visitor.VisitorName?.toLowerCase().includes(
@@ -185,15 +203,11 @@ const VisitorList = () => {
   };
 
   const columns = [
-    { title: "No", dataIndex: "No", key: "No" },
-    // {
-    //   title: "Visitor Number",
-    //   dataIndex: "VisitorNumber",
-    //   key: "visitorNumber",
-    // },
+
+    { title: "Index", dataIndex: "index", key: "index" ,render: (text, record, index) => index + 1 },
+    { title: "Visitor No", dataIndex: "No", key: "No" },
     { title: "Visitor Name", dataIndex: "VisitorName", key: "visitorName" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
-
     {
       title: "Purpose of Visit",
       dataIndex: "PurposeofVisit",
@@ -208,16 +222,21 @@ const VisitorList = () => {
     },
     {
       title: "Time In",
-      dataIndex: "CreatedTime",
-      key: "CreatedTime",
-      render: (CreatedTime) => dayjs(CreatedTime).format("HH:mm"),
+      dataIndex: "InitiatedByTime",
+      key: "InitiatedByTime",
+      render: (InitiatedByTime) => {
+        if (!InitiatedByTime) return "Invalid Time"; // Handle missing or invalid data gracefully
+        // Create a valid Date object from the time string
+        const time = new Date(`1970-01-01T${InitiatedByTime}`);
+        // Format the time to 12-hour format with AM/PM
+        return time.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
     },
-    // {
-    //   title: "Time Out",
-    //   dataIndex: "timeOut",
-    //   key: "timeOut",
-    //   render: (timeOut) => dayjs(timeOut).format("HH:mm"),
-    // },
+
     {
       title: "Status",
       dataIndex: "Status",
@@ -264,21 +283,6 @@ const VisitorList = () => {
       ),
     },
   ];
-
-  const mappedVisitors = filteredVisitors.map((visitor, index) => ({
-    key: visitor.No,
-    No: visitor.No,
-    // VisitorNumber: visitor.VisitorNumber,
-    VisitorName: visitor.VisitorName,
-    PurposeofVisit: visitor.PurposeofVisit,
-    PhoneNumber: visitor.PhoneNumber,
-    CreatedDate: visitor.CreatedDate,
-    Status: visitor.Status,
-    PersonToSee: visitor.PersonToSee,
-    VisitorCategory: visitor.VisitorCategory,
-    timeIn: visitor.CreatedTime,
-    timeOut: visitor.ClearedTime,
-  }));
 
   return (
     <div className="card mt-4">
@@ -330,22 +334,24 @@ const VisitorList = () => {
       </Card>
 
       {/* Show the table only if there are filtered visitors or search was performed */}
-     {showTable && filteredVisitors.length > 0 ? (
-  <Table
-    columns={columns}
-    dataSource={filteredVisitors}
-    pagination={{ pageSize: 10 }}
-    style={{ marginTop: "16px" }}
-    bordered
-    size="small"
-  />
-) : showTable && filteredVisitors.length === 0 ? (
-  <div style={{ marginTop: "16px", textAlign: "center" }}>
-    <Typography.Text type="secondary">
-      No visitors found matching your search criteria.
-    </Typography.Text>
-  </div>
-) : null}
+      {showTable && filteredVisitors.length > 0 ? (
+        <Table
+          columns={columns}
+          loading={loading}
+
+          dataSource={filteredVisitors}
+          pagination={{ pageSize: 10 }}
+          style={{ marginTop: "16px" }}
+          bordered
+          size="small"
+        />
+      ) : showTable && filteredVisitors.length === 0 ? (
+        <div style={{ marginTop: "16px", textAlign: "center" }}>
+          <Typography.Text type="secondary">
+            No visitors found matching your search criteria.
+          </Typography.Text>
+        </div>
+      ) : null}
 
       <Modal
         title="Edit Status"

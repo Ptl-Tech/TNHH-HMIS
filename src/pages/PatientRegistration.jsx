@@ -288,13 +288,11 @@ const PatientRegistration = () => {
 
       if (patientId) {
         message.success(
-          isEditAction
-            ? "Patient updated successfully."
-            : "Patient created successfully."
+          "Patient Saved Successfully"
         );
         // Navigate to Add Appointment page and pass patientId
         navigate(`/reception/Add-Appointment/${patientId}`, {
-          state: { patientData: newPatient },
+          state: { patientData: patientData,  },
         });
       } else {
         message.error("Failed to save patient data. Please try again.");

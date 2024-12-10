@@ -11,18 +11,26 @@ import {
   Table,
   Typography,
   Pagination,
+  message,
 } from "antd";
 import { EyeOutlined, TeamOutlined, DownOutlined } from "@ant-design/icons";
-import { appmntList } from "../actions/patientActions";
+import { appmntList, postTriageVisit } from "../actions/patientActions";
 
 const ActiveAppmnts = () => {
   const { loading, patients } = useSelector((state) => state.appmntList);
+  const {
+    loading: postTriageVisitLoading,
+    error: postTriageVisitError,
+    success: postTriageVisitSuccess,
+    payload: postTriageVisitPayload,
+  } = useSelector((state) => state.postTriageVisit);
+
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);  // Keeping AppointmentNo as selected key
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -63,10 +71,38 @@ const ActiveAppmnts = () => {
     setFilteredPatients(filtered);
   };
 
-  const handleMenuClick = ({ key }) => {
-    console.log(`Dispatching patients to: ${key}`);
-    console.log("Selected Patients:", selectedRowKeys);
-    // Implement your dispatch logic here.
+  const handleMenuClick = async ({ key }) => {
+    if (key === "Triage") {
+      if (selectedRowKeys.length === 0) {
+        message.error("Please select a patient first.");
+        return;
+      }
+
+      const appointmentId = selectedRowKeys[0]; // Using AppointmentNo as Appointment ID
+      await dispatchPatient(appointmentId);
+    } else {
+      console.log(`Dispatching patients to: ${key}`);
+      console.log("Selected Patients:", selectedRowKeys);
+      // Handle dispatch logic for other menu options
+    }
+  };
+
+  const dispatchPatient = async (appointmentId) => {
+    if (!appointmentId) {
+      message.error("Appointment ID is required!");
+      return;
+    }
+
+    try {
+      console.log("Dispatching patient with appointment ID:", appointmentId);
+      await dispatch(postTriageVisit(appointmentId));
+      message.success("Patient has been dispatched successfully!");
+      // Navigate to a different page after successful dispatch, if needed
+      // navigate("/reception/visitors-list");
+    } catch (error) {
+      console.error("Error dispatching patient:", error);
+      message.error("Failed to dispatch patient!");
+    }
   };
 
   const handlePaginationChange = (page, pageSize) => {
@@ -93,7 +129,7 @@ const ActiveAppmnts = () => {
       key: "SearchNames",
     },
     {
-      title: "Appointment No",
+      title: "Appointment No",  // Using AppointmentNo as key
       dataIndex: "AppointmentNo",
       key: "AppointmentNo",
     },
@@ -111,22 +147,22 @@ const ActiveAppmnts = () => {
       },
     },
     {
-    title: "Appointment Time",
-    dataIndex: "AppointmentTime",
-    key: "AppointmentTime",
-    render: (text, record) => {
-      // Combine AppointmentDate and AppointmentTime to create a valid Date object
-      const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
-      const dateTime = new Date(dateTimeString);
+      title: "Appointment Time",
+      dataIndex: "AppointmentTime",
+      key: "AppointmentTime",
+      render: (text, record) => {
+        // Combine AppointmentDate and AppointmentTime to create a valid Date object
+        const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
+        const dateTime = new Date(dateTimeString);
 
-      // Format time to AM/PM
-      return dateTime.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true, 
-      });
+        // Format time to AM/PM
+        return dateTime.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true, 
+        });
+      },
     },
-  },
     {
       title: "Gender",
       dataIndex: "Gender",
@@ -153,7 +189,7 @@ const ActiveAppmnts = () => {
       key: "Status",
     },
   ];
-  
+
   const startIdx = (pagination.current - 1) * pagination.pageSize;
   const endIdx = startIdx + pagination.pageSize;
   const paginatedData = filteredPatients.slice(startIdx, endIdx);
@@ -204,7 +240,7 @@ const ActiveAppmnts = () => {
           loading={loading}
           dataSource={paginatedData.map((patient) => ({
             ...patient,
-            key: patient.PatientNo,
+            key: patient.AppointmentNo,  // Set AppointmentNo as the unique key
           }))}
           rowSelection={{
             selectedRowKeys,

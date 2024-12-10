@@ -220,7 +220,7 @@ export const postTriageVisit = (appointmentId) => async (dispatch, getState) => 
       type: POST_TRIAGE_VISIT_FAIL,
       payload: error.response?.data?.message || error.errors,
     });
-    message.error(error.message, 5);
+    // message.error(error.message, 5);
     throw error; // Rethrow error for `handleSubmit` to handle
   }
 };

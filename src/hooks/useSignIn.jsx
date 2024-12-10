@@ -39,6 +39,8 @@ console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
       console.log('Role:', role);
       if (role === 'Reception') {
         navigate('/reception');
+      } else if (role === 'Doctor') {
+        navigate('/Doctor');
       } else if (role === 'Security') {
         navigate('/Security');
       } else if (role === 'Production') {
@@ -78,6 +80,8 @@ console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
       console.log('Role:', role);
       if (role === 'Reception') {
         navigate('/reception');
+      } else if (role === 'Doctor') {
+        navigate('/Doctor');
       } else if (role === 'Security') {
         navigate('/Security');
       } else if (role === 'Production') {
