@@ -6,19 +6,20 @@ import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVital
 import { useEffect } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
+import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/updateTriageListVitalsSlice';
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
 
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
-
-  console.log('vitals lines', vitalsLines);
-
   
   useEffect(() => {
-    dispatch(getVitalsLinesSlice(observationNumber));
-  }, [dispatch, observationNumber]);
+    if (!vitalsLines.length) {
+      dispatch(getVitalsLinesSlice(observationNumber));
+    }
+  }, [dispatch, observationNumber, vitalsLines.length]);
+  
 
   const onFinish = (values) => {
     const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02, respirationRate } = values.vitals;
@@ -51,16 +52,17 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
       patientNo: patientNumber,
       observationNo:  observationNumber,
       BMI: calculateBMI(height, weight),
-      type: 0,
-      myAction: "update"
+      type: 1,
     };
 
     //check if vitals exists ifs so update else create
     
     if(Object.keys(vitalsLines).length > 0) {
     // update vitals
-    dispatch(postTriageListVitalsSlice(updateVitals)).then(()=>{
+    dispatch(updateTriageListVitalsSlice(updateVitals)).then(()=>{
       message.success('successfully updated vitals');
+    }).error((error) => {
+      message.error('Error updating vitals');
     })
     
       
@@ -166,7 +168,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               weight: vitalsLines?.Weight,
               respirationRate: vitalsLines?.RespirationRate,
               pain: vitalsLines?.Pain,
-              bmi: vitalsLines?.BMI
+              bmi: vitalsLines?.BMI ? vitalsLines.BMI.toFixed(2) : "0.0"
             },
           }}
           >

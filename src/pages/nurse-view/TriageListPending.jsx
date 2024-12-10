@@ -1,7 +1,6 @@
 import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
@@ -85,7 +84,6 @@ const handleOnClick = (observationNo, patientNumber) =>{
 }
 
   useEffect(() => {
-    dispatch(getTriageWaitingList());
     dispatch(getTriageList())
   }, [dispatch]);
 

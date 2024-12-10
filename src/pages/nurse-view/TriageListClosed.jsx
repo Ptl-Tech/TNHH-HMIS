@@ -19,7 +19,7 @@ const TriageListClosed = () => {
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
-  const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
+  const closedTriageList = triageList.filter((item)=>item.Status==='Closed') || {};
 
   //get the current location path
   const currentPath = location.pathname;

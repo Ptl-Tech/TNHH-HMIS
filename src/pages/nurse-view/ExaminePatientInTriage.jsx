@@ -40,7 +40,6 @@ const EvaluatePatientInTriage = () => {
 
   const handleDispatchToDoctor = (observationNumber) => {
     dispatch(getVitalsLinesSlice(observationNumber)).then((data)=>{
-      console.log('vital lines data', data);
       if(Object.keys(data).length > 0){
           dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
             if(Object.keys(data).length > 0){

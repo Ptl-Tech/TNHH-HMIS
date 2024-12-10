@@ -375,7 +375,16 @@ main {
     gap: 10px;
   }
 }
+.dashboard-statistics-container{
+  display: flex;
+}
 
+@media screen and (max-width: 768px) {
+  .dashboard-statistics-container{
+    gap: 10px;
+  }
+  
+}
 .allergies-card{
   margin-top: 10px;
   padding: 10px 16px;

@@ -2,7 +2,6 @@ import { Button, Card, message, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
@@ -26,7 +25,7 @@ const TriageList = () => {
   const dispatch = useDispatch();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
-  const openTriageList = triageList.filter((item)=>item.Status==='New')
+  const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
   const location = useLocation();
    //get the current location path
    const currentPath = location.pathname;
@@ -93,7 +92,6 @@ const TriageList = () => {
   };
 
   useEffect(() => {
-    dispatch(getTriageWaitingList());
     dispatch(getTriageList())
   }, [dispatch]);
 
