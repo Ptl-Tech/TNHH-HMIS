@@ -7,6 +7,8 @@ import { lastSixMonthsTotalPatientsLineGraphConfig } from '../../constants/nurse
 import PropTypes from "prop-types";
 
 const DashboardStatistics = ({ userDetails }) => {
+
+
   return (
     
     <div style={{ marginTop: '16px' }}>
@@ -17,7 +19,7 @@ const DashboardStatistics = ({ userDetails }) => {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <Avatar icon={<UserOutlined />} size={64}/>
                         <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                              <Typography.Title level={5} style={{color: 'black'}}>
+                              <Typography.Title level={5} style={{color: '#0f5689', fontSize: '18px', fontWeight: 'bold'}}>
                                 {
                                   userDetails?.userData?.firstName
                                 }

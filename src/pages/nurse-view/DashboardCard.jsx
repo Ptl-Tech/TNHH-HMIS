@@ -2,18 +2,20 @@
 import { Card, Typography } from 'antd'
 import PropTypes from 'prop-types';
 import CountUp from 'react-countup';
+import { useNavigate } from 'react-router-dom'
 
 const DashboardCard = ({card}) => {
+    const navigate = useNavigate();
   return (
-
-    <Card style={{ flex: 1, padding: '10px 16px'}} >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+<div className='dashboard-card'>
+<Card style={{ padding: '10px 16px', backgroundColor: card?.backgroundColor, color: card?.color, cursor: 'pointer'}} onClick={() => navigate(card?.link)}>
+        <div style={{ display: 'flex', alignItems: 'top', justifyContent: 'space-between' }}>
             
             <div>
-                <Typography.Title level={5} style={{color: 'gray'}}>
+                <Typography.Title level={5} style={{color: card?.color}}>
                     {card?.title}
                 </Typography.Title>
-                <Typography.Text style={{ fontSize: '20px', fontWeight: 600}}>
+                <Typography.Text style={{ fontSize: '20px', fontWeight: 600, color: card?.color}}>
                     <CountUp start={0} 
                     end={card?.value} 
                     duration={1} 
@@ -21,7 +23,7 @@ const DashboardCard = ({card}) => {
                 </Typography.Text>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontSize: '28px', fontWeight: 600 }}>
                 {
                     card?.icon
                 }
@@ -29,6 +31,8 @@ const DashboardCard = ({card}) => {
             
         </div>
     </Card>
+</div>
+    
   )
 }
 
@@ -40,6 +44,9 @@ DashboardCard.propTypes = {
         title: PropTypes.string.isRequired,
         value: PropTypes.number.isRequired,
         subtitle: PropTypes.string.isRequired,
-        icon: PropTypes.node.isRequired
+        icon: PropTypes.node.isRequired,
+        backgroundColor: PropTypes.string.isRequired,
+        color: PropTypes.string.isRequired,
+        link: PropTypes.func.isReuired
     })
 }
