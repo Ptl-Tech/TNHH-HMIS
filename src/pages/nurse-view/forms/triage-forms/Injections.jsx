@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, Form, Input, message, Row, Select, TimePicker } from 'antd'
+import { Button, Col, DatePicker, Form, Input, message, Row, Select, TimePicker, Divider, Table } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 const format = 'HH:mm';
 import dayjs from 'dayjs';
@@ -9,14 +9,13 @@ import { getInjectionNumberSlice } from '../../../../actions/triage-actions/getI
 import { postInjectionsSlice } from '../../../../actions/triage-actions/postInjectionsSlice';
 import { getInjectionsSlice } from '../../../../actions/triage-actions/getInjectionsSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
+import { SaveOutlined } from '@ant-design/icons';
 
 const Injections = ({ observationNumber, staffNo }) => {
     const dispatch = useDispatch()
     const { injectionsNumber } = useSelector((state) => state.getInjectionNumber);
-    const {loadingInjections, injections} = useSelector((state) => state.getInjections);
-    const { injectionsLoading } = useSelector((state) => state.getInjections);
-
-    console.log(injectionsNumber)
+    const {getInjectionsLoading, getInjections} = useSelector((state) => state.getInjections);
+    const { postInjectionsLoading } = useSelector((state) => state.postInjections);
 
     useEffect(() => {
         dispatch(getInjectionNumberSlice())
@@ -46,73 +45,82 @@ const Injections = ({ observationNumber, staffNo }) => {
             posted: true,
             myAction: "create"
         }
+      
 
-        const updateInjection = {
-            injectionNo,
-            injectionDate: values.injectionDate
-            ? {
-                year: values.injectionDate.year(),
-                month: values.injectionDate.month() + 1, // Month is zero-based
-                day: values.injectionDate.date(),
-              }
-            : null,
-            injectionQuantity,
-            injectionTime: injectionTime.format(format),
-            injectionRemarks,
-            observationNo: observationNumber,
-            staffNo: staffNo,
-            posted: true,
-            myAction: "create"
-        }
-
-        if(Object.keys(injections).length > 0) {
-            // update vitals
-            dispatch(postInjectionsSlice(updateInjection)).then(()=>{
-              message.success('successfully updated allergies');
-            })
-            
-              
-            }else{
-              // create vitals
-              dispatch(postInjectionsSlice(createInjection)).then(()=>{
+        dispatch(postInjectionsSlice(createInjection)).then(()=>{
                 
-                  message.success('Injections has been saved');
-              })
-            }
-    }
+          message.success('Injections has been saved');
+        }).catch((error)=>{
+            message.error(error.message);
+        })
+
+        
+      }
+
+      const columns = [
+        {
+          title: 'Injection No',
+          dataIndex: 'InjectionNo',
+          key: 'InjectionNo',
+        },
+        {
+          title: 'Injection Date',
+          dataIndex: 'InjectionDate',
+          key: 'InjectionDate',
+        },
+        {
+          title: 'Injection Quantity',
+          dataIndex: 'InjectionQuantity',
+          key: 'InjectionQuantity',
+        },
+      ];
+      
+      
+      const [ InjectionNo, InjectionDate, InjectionTime, InjectionQuantity, InjectionRemarks, ObservationNo] = getInjections
+      const dataSource = [
+        {
+          key: ObservationNo,
+          InjectionNo,
+          InjectionDate,
+          InjectionTime,
+          InjectionQuantity,
+          InjectionRemarks,
+          ObservationNo
+        }
+    ]
 
 
   return (
     <div>
         {
-            loadingInjections ? (
+            getInjectionsLoading ? (
                 <Loading />
             ):(
-                <Form layout="vertical"
+
+        <div>
+        <Form layout="vertical"
         validateTrigger="onChange"
         onFinish={onFinish}
           initialValues={{
             injections: {
-              observationNumber: observationNumber,
-              injectionNo: injections?.InjectionNo || '',
-              injectionDate: injections?.injectionDate || '',
-              injectionQuantity: injections?.InjectionQuantity || '',
-              injectionTime: injections?.InjectionTime || '',
-              injectionRemarks: injections?.InjectionRemarks || '',
+              observationNumber: '',
+              injectionNo: '',
+              injectionDate: '',
+              injectionQuantity: '',
+              injectionTime: '',
+              injectionRemarks: '',
             },
           }}
-    >
+          >
+      
         <Row gutter={16}>
             <Col span={12}>
-            <Form.Item label="Observation No" name={['injections', 'observationNumber']}
-                rules={[{ required: true, message: 'Please input observation no!' }]}
-            >
-                <Input type='text' 
-              
-                name='observationNumber'
-                disabled
-                />
-            </Form.Item>
+                <Form.Item label="Injection Quantity" name={['injections', 'injectionQuantity']}>
+                    <Input type='number' 
+                
+                    name='injectionQuantity'
+                    />
+                </Form.Item>
             </Col>
             <Col span={12}>
             <Form.Item label="Injection No" name={['injections', 'injectionNo']}
@@ -132,10 +140,9 @@ const Injections = ({ observationNumber, staffNo }) => {
         </Row>
         <Row gutter={16}>
             <Col span={12}>
-            <Form.Item label="Injection Quantity" name={['injections', 'injectionQuantity']}>
-                <Input type='number' 
-               
-                name='injectionQuantity'
+            <Form.Item label="Injection time" name={['injections', 'injectionTime']}>
+                <TimePicker defaultValue={dayjs('12:08', format)} format={format} style={{ width: '100%' }} 
+                     
                 />
             </Form.Item>
             </Col>
@@ -149,13 +156,6 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Row>
             <Row gutter={16}>
             <Col span={24}>
-            <Form.Item label="Injection time" name={['injections', 'injectionTime']}>
-                <TimePicker defaultValue={dayjs('12:08', format)} format={format} style={{ width: '100%' }} 
-                     
-                />
-            </Form.Item>
-            </Col>
-            <Col span={24}>
             <Form.Item label="Injection Remarks" name={['injections', 'injectionRemarks']}>
                 <TextArea 
                 autoSize={{
@@ -168,12 +168,40 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Form.Item>
             <Col span={12}>
                 <Form.Item >
-                    <Button type="primary" htmlType="submit" loading={injectionsLoading}>Save injections</Button>
+                    <Button type="primary" htmlType="submit" loading={postInjectionsLoading}>
+                        <SaveOutlined />
+                        Save injections
+                    </Button>
                 </Form.Item>
               </Col>
             </Col>
         </Row>
-    </Form>
+        </Form>
+
+        {
+          getInjections && Object.keys(getInjections).length > 0 && (
+          <div style={{ marginTop: '10px' }}>
+            <Divider />
+            <Table columns={columns} 
+            dataSource={dataSource} 
+            pagination={false}
+            expandable={{
+              expandedRowRender: (record) => (
+                <p style={{ margin: 0 }}>
+
+                  Injection Remarks : {record.InjectionRemarks},
+                  Injection Time : {record.InjectionTime},
+                </p>
+              ),
+              rowExpandable: (record) => record.name !== 'Not Expandable',
+            }}
+            />
+          </div>
+          )
+        }
+
+        </div>
+
             )
         }
     </div>

@@ -1,42 +1,38 @@
-import { Line } from '@ant-design/charts'
-import { Card, Space, Typography } from 'antd'
-import { ArrowUpOutlined } from '@ant-design/icons'; 
+
+import { Card, Typography } from 'antd'
 import PropTypes from 'prop-types';
+import CountUp from 'react-countup';
+import { useNavigate } from 'react-router-dom'
 
 const DashboardCard = ({card}) => {
+    const navigate = useNavigate();
   return (
-
-    <Card style={{ flex: 1, padding: '10px 16px'}} >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+<div className='dashboard-card'>
+<Card style={{ padding: '10px 16px', backgroundColor: card?.backgroundColor, color: card?.color, cursor: 'pointer'}} onClick={() => navigate(card?.link)}>
+        <div style={{ display: 'flex', alignItems: 'top', justifyContent: 'space-between' }}>
             
             <div>
-                <Typography.Title level={5} style={{color: 'gray'}}>
+                <Typography.Title level={5} style={{color: card?.color}}>
                     {card?.title}
                 </Typography.Title>
-                <Typography.Text style={{ fontSize: '20px', fontWeight: 600}}>
-                    {card?.value}
+                <Typography.Text style={{ fontSize: '20px', fontWeight: 600, color: card?.color}}>
+                    <CountUp start={0} 
+                    end={card?.value} 
+                    duration={1} 
+                    />
                 </Typography.Text>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography.Text style={{ fontSize: '14px', color: '#0d6efd', fontWeight: 600}}>+12%</Typography.Text>
-                <Line {...card?.lineGraphConfig} />
+            <div style={{ fontSize: '28px', fontWeight: 600 }}>
+                {
+                    card?.icon
+                }
             </div>
             
         </div>
-
-        <Space style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{display: 'grid', placeItems: 'center', backgroundColor: 'green', borderRadius: '50%', width: '18px', height: '18px'}}>
-                    <ArrowUpOutlined style={{ color: 'white', fontSize: '10px' }} />
-                </div>
-                <Typography.Text style={{ fontSize: '12px', color: 'green', fontWeight: 'bold'}}>
-                    {card.increasePercentage}
-                </Typography.Text>
-                <Typography.Text style={{ fontSize: '12px', color:'gray' }}>
-                    {card?.subtitle}
-                </Typography.Text>
-        </Space>
     </Card>
+</div>
+    
   )
 }
 
@@ -47,9 +43,10 @@ DashboardCard.propTypes = {
     card: PropTypes.shape({
         title: PropTypes.string.isRequired,
         value: PropTypes.number.isRequired,
-        increasePercentage
-        : PropTypes.string.isRequired,
         subtitle: PropTypes.string.isRequired,
-        lineGraphConfig: PropTypes.object.isRequired,
+        icon: PropTypes.node.isRequired,
+        backgroundColor: PropTypes.string.isRequired,
+        color: PropTypes.string.isRequired,
+        link: PropTypes.func.isReuired
     })
 }

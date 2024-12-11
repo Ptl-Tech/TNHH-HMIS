@@ -5,9 +5,9 @@ export const getColorByWaitingTime = (observationDateTime) => {
     const observationTimeParsed = dayjs(observationDateTime); // Parse the observation date-time
     const waitingTimeMinutes = currentTime.diff(observationTimeParsed, 'minute'); // Calculate the difference in minutes
   
-    if (waitingTimeMinutes <= 10) {
+    if (waitingTimeMinutes <= 60) {
       return 'green';
-    } else if (waitingTimeMinutes <= 20) {
+    } else if (waitingTimeMinutes <= 120) {
       return 'orange';
     } else {
       return 'red';

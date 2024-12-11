@@ -1,44 +1,65 @@
-import { useState } from "react"; 
-import moment from 'moment';
-import { totalNursesLineGraphConfig, totalDoctorsLineGraphConfig, totalPatientsLineGraphConfig, totalAppointmentsLineGraphConfig } from "../../constants/nurse-constants";
+
+import { useEffect } from "react";
 import DashboardCard from "./DashboardCard";
 import DashboardStatistics from "./DashboardStatistics";
+import { UserOutlined, HourglassOutlined, SafetyOutlined, UserAddOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from "react-redux";
+import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
+import useAuth from "../../hooks/useAuth";
 const Dashboard = () => {
-  const [date, setDate] = useState(moment()); // Initialize date with moment
 
-  // Sample data for the simple line chart
+  const dispatch = useDispatch();
 
+  const userDetails = useAuth();  // Use the custom hook to get user info
 
+  useEffect(() => {
+    dispatch(getTriageList());
+  }, [dispatch]);
+  
+
+  const {triageList} = useSelector((state) => state.getTriageList) || {};
+  const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
+  const closedTriageList = triageList.filter((item)=>item.Status==='Closed') || {};
+  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
+  // Sample data for the cards
   const cardData = [
     {
-      title: "Total Doctors",
-      value: 120,
-      increasePercentage: "+12%",
+      title: "Triage Waiting Patients",
+      value: openTriageList.length,
       subtitle: "Increase in 30 days",
-      lineGraphConfig: totalDoctorsLineGraphConfig
+      icon: <HourglassOutlined />,
+      color: '#fff' ,// You can set the color here
+      backgroundColor: '#0f5689', // You can set the background color here,
+      link: '/Nurse/Triage' // You can set the link here
     },
     {
-      title: "Total Nurses",
-      value: 50,
-      increasePercentage: "+14%",
+      title: "Patients in Triage",
+      value: pendingTriageList.length,
       subtitle: "Increase in 30 days",
-      lineGraphConfig: totalNursesLineGraphConfig
+      icon: <SafetyOutlined />,
+      color: '#000' ,// You can set the color here
+      backgroundColor: '#b0afaf', // You can set the background color here
+      link: '/Nurse/PendingTriageList'
     },
     {
-      title: "Total Patients",
-      value: 100,
-      increasePercentage: "+12%",
+      title: "Out patients",
+      value: closedTriageList.length,
       subtitle: "Increase in 30 days",
-      lineGraphConfig: totalPatientsLineGraphConfig
+      icon: <UserOutlined />,
+      color: '#fff' ,// You can set the color here
+      backgroundColor: '#ac8342 ', // You can set the background color here
+      link: '/Reception/Patient-list'
     },
     {
-      title: "Appointments",
+      title: "In patients",
       value: 250,
-      increasePercentage: "+12%",
       subtitle: "Increase in 30 days",
-      lineGraphConfig: totalAppointmentsLineGraphConfig
+      icon: <UserAddOutlined />,
+      color: '#000' ,// You can set the color here
+      backgroundColor: '#b0afaf' // You can set the background color here
     }
   ]
+
 
   return (
     <div style={{ padding: '10px 10px' }}>
@@ -50,7 +71,7 @@ const Dashboard = () => {
           }
         </div>
 
-        <DashboardStatistics/> 
+        <DashboardStatistics userDetails={userDetails}/> 
     </div>
   );
 };

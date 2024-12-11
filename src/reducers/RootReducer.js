@@ -4,6 +4,7 @@ import { activePatientsReducer, appmntListReducer, convertPatientReducer, patien
 import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer, getmarketingStrategiesReducer } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import { admitVisitorReducer, visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
+import { updateTriageListVitalsReducer } from "./triage-reducers/updateTriageListVitalsReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -30,10 +31,30 @@ export const rootReducer = combineReducers({
    // triageList:triageListReducer,
     postPatientVitals:postPatientVitalsReducer,
     postDoctorTreatment:postDoctorTreatmentReducer,
+    // loadUserInfo:loadUserInfo,
+    getTriageWaitingList:getTriageWaitingListReducer,
+    registerVisitor:visitorCreateReducer,
+    visitorsList:visitorListReducer,
+    getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer,
     registerVisitor:visitorCreateReducer,
     visitorsList:visitorListReducer,
-    admitVisitor:admitVisitorReducer,
+    admitVisitor:admitVisitorReducer,getPatientDetails:getPatientDetailsReducer,
+    getTriageListDetails:getTriageListDetailsReducer,
+    postTriageListVitals:postTriageListVitalsReducer,
+    getVitalsLines:getVitalsLinesReducer,
+    postAllergiesMedication:postAllergiesMedicationReducer,
+    getAllergiesAndMedications:getAllergiesAndMedicationReducer,
+    postInjections:postInjectionsReducer,
+    getInjectionNumber:getInjectionNumberReducer,
+    getInjections:getInjectionsReducer,
+    getStoreRequisitionHeaders:getStoreRequisitionHeadersReducer,
+    getItems:getItemsReducer,
+    getItemUnits:getItemUnitsOfMeasureReducer,
+    postDressings:postDressingsReducer,
+    getDressing:getDressingReducer,
+    dispatchToDoctor:postDispatchToDoctorReducer,
+    checkInPatient:postCheckInPatientReducer,
     appmntList:appmntListReducer,
 
 });

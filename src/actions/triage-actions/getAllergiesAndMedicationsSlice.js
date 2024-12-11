@@ -17,6 +17,8 @@ export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatc
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
       
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data })
+
+        console.log('logging the response data', data);
            
 
     } catch (error) {

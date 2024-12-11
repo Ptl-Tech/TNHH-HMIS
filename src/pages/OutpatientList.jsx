@@ -143,6 +143,7 @@ const OutpatientList = () => {
     }
   };
 
+
   const handleFilterPatients = () => {
     const filtered = patients.filter((patient) => {
       return (

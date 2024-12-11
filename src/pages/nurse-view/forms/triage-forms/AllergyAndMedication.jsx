@@ -1,20 +1,23 @@
-import { Button, Col, Form, Input, message, Row, Select } from 'antd'
+import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllergiesAndMedicationsSlice } from '../../../../actions/triage-actions/getAllergiesAndMedicationsSlice';
 import { postAllergiesMedicationSlice } from '../../../../actions/triage-actions/postAllergiesMedicationSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
+import { SaveOutlined } from '@ant-design/icons';
 
 const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
     const dispatch = useDispatch();
     const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
 
+    console.log('allergy and medication', allergiesMedication);
+
     const { postAllergyMedicationLoading } = useSelector((state) => state.postAllergiesMedication);
 
     useEffect(() => {
-        dispatch(getAllergiesAndMedicationsSlice(patientNumber));
-      }, [dispatch, patientNumber]);
+        dispatch(getAllergiesAndMedicationsSlice(observationNumber));
+      }, [dispatch, observationNumber]);
 
     const cleanValue = (value) => {
         if (typeof value === "string") {
@@ -23,11 +26,10 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
         return value;
       };
     const onFinish = (values) =>{
-        const { complains, reasonForVisit, foodAllergy, drugAllergy } = values.allergy;
+        const { complains, foodAllergy, drugAllergy } = values.allergy;
         const createAllergyAndMedicationData = {
           
-            complains,
-            reasonForVisit: parseInt(cleanValue(reasonForVisit)),
+            complaints: complains,
             foodAllergy,
             drugAllergy,
             patientNo: patientNumber,
@@ -37,65 +39,51 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
             myAction: "create"
           };
 
-          const updateAllergyAndMedicationData = {
-          
-            complains,
-            reasonForVisit: parseInt(cleanValue(reasonForVisit)),
-            foodAllergy,
-            drugAllergy,
-            patientNo: patientNumber,
-            staffNo: staffNo,
-            observationNo: observationNumber,
-            assessedBy: staffNo,
-            myAction: "update"
-          };
-
-          if(Object.keys(allergiesMedication).length > 0) {
-            // update vitals
-            dispatch(postAllergiesMedicationSlice(updateAllergyAndMedicationData)).then(()=>{
-              message.success('successfully updated allergies');
-            })
-            
-              
+          dispatch(postAllergiesMedicationSlice(createAllergyAndMedicationData)).then((data)=>{
+            if(data?.status === "success"){
+              message.success(data?.status);
+              // dispatch(getVitalsLinesSlice(patientNo));
             }else{
-              // create vitals
-              dispatch(postAllergiesMedicationSlice(createAllergyAndMedicationData)).then((data)=>{
-                if(data?.status === "success"){
-                  message.success(data?.status);
-                  // dispatch(getVitalsLinesSlice(patientNo));
-                }else{
-                  message.error('Error saving vitals data');
-                }
-              })
+              message.error('Error saving allergies and medication');
             }
+          })
+
+            dispatch(getAllergiesAndMedicationsSlice(observationNumber));
 
     }
-    const selectReasonForVisit = [
-        {
-          value: 0,
-          label: '',
-        },
-    
-        {
-          value: 1,
-          label: 'Patient not improving',
-        },
-        {
-          value: 2,
-          label: 'Patient Deteriorating',
-        },
-    
-        {
-          value: 3,
-          label: 'New Presentation',
-        },
-    
-        {
-          value: 4,
-          label: 'Follow Up',
-        },
-    
+
+    const columns = [
+
+      {
+        title: 'Assessed By',
+        dataIndex: 'assessedBy',
+        key: 'assessedBy',
+      },
+      {
+        title: 'Complains',
+        dataIndex: 'complains',
+        key: 'complains',
+      },
+      {
+        title: 'Food Allergy',
+        dataIndex: 'foodAllergy',
+        key: 'foodAllergy',
+      },
       ]
+
+
+     const { AssessedBy, Complaints, DrugAllergy, FoodAllergy, observationNo } = allergiesMedication
+
+     const dataSource = [
+
+      {
+        key: observationNo,
+        assessedBy: AssessedBy,
+        complains: Complaints,
+        foodAllergy: FoodAllergy,
+        drugAllergy: DrugAllergy,
+      }
+     ]
 
   return (
     <div>
@@ -103,100 +91,96 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
             allergyMedicationLoading ? (
                 <Loading />
             ):(
+              <div>
+                
                 <Form layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                    allergy: {
-                    observationNumber: observationNumber,
-                    patientNumber: patientNumber,
-                    assessedBy: staffNo,
-                    complains: '',
-                    reasonForVisit: '',
-                    foodAllergy: '',
-                    drugAllergy: '',
-                    },
-                }}
-            >
-                <Row gutter={16}>
-                
-                <Col span={12}>
-                    <Form.Item label="Observation No" 
-                    name={['allergy', 'observationNumber']}
-                    rules={[{ required: true, message: 'Please input observation no!' }]}
-                    >
-                    <Input type='text' 
-                        name='observationNumber'
-                        disabled
-                        
-                    />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item label="Assessed by" 
-                    name={['allergy', 'assessedBy']}
-                    rules={[{ required: true, message: 'Please input your name!' }]}
-                    >
-                    <Input type='text' 
-                    name='assessedBy'
-                    disabled
-                    
-                    />
-                    </Form.Item>
-                </Col>
-                </Row>
+                  onFinish={onFinish}
+                  initialValues={{
+                      allergy: {
+                      assessedBy: allergiesMedication?.AssessedBy || staffNo,
+                      complains: '',
+                      foodAllergy: '',
+                      drugAllergy: '',
+                      },
+                  }}
+              >
+                  <Row gutter={16}>
 
-                <Row gutter={16}>
-                
-                <Col span={12}>
-                    <Form.Item label="Complains" 
-                    name={['allergy', 'complains']}
-                    >
-                    <Input type='text' 
-                        name='complains'
-                        
-                    />
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                <Form.Item label="Reason for visit" 
-                    name={['allergy', 'reasonForVisit']}
-                    rules={[{ required: true, message: 'Please input your name!' }]}
-                    >
-                    <Select
-                        key={'location'}
-                        style={{ width: '100%' }}
-                        optionFilterProp="label"
-                        options={selectReasonForVisit} 
-                        
-                    >
-                    </Select>
-                    </Form.Item>
-                </Col>
-                </Row>
+                  <Col span={12}>
+                      <Form.Item label="Assessed by" 
+                      name={['allergy', 'assessedBy']}
+                      rules={[{ required: true, message: 'Please input your name!' }]}
+                      >
+                      <Input type='text' 
+                      name='assessedBy'
+                      disabled
+                      
+                      />
+                      </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                      <Form.Item label="Complains" 
+                      name={['allergy', 'complains']}
+                      >
+                      <Input type='text' 
+                          name='complains'
+                          
+                      />
+                      </Form.Item>
+                  </Col>
+                  </Row>
+                  <Row gutter={16}>
+                      <Col span={12}>
+                      <Form.Item label="Food Allergy" name={['allergy', 'foodAllergy']}>
+                          <Input type='text' 
+                          
+                          name='foodAllergy'
+                          />
+                      </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                      <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}>
+                          <Input type='text' 
+                          name='drugAllergy'
+                          />
+                      </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                          <Form.Item >
+                              <Button type="primary" htmlType="submit" loading={postAllergyMedicationLoading}><SaveOutlined /> 
+                              {
+                                allergiesMedication && Object.keys(allergiesMedication).length > 0 ? 'Add allergies and medication' : 'Save allergies and medication'
+                              }
+                                  
+                              </Button>
+                          </Form.Item>
+                      </Col>
+                  </Row>
+              </Form>
 
-                <Row gutter={16}>
-                    <Col span={12}>
-                    <Form.Item label="Food Allergy" name={['allergy', 'foodAllergy']}>
-                        <Input type='text' 
-                        
-                        name='foodAllergy'
-                        />
-                    </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                    <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}>
-                        <Input type='text' 
-                        name='drugAllergy'
-                        />
-                    </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                        <Form.Item >
-                            <Button type="primary" htmlType="submit" loading={postAllergyMedicationLoading}>Save allegies and medication</Button>
-                        </Form.Item>
-                    </Col>
-                </Row>
-            </Form>
+              {
+                allergiesMedication && Object.keys(allergiesMedication).length > 0 && (
+                  <div style={{ marginTop: '10px' }}>
+                  <Divider />
+                  <Table columns={columns} 
+                  dataSource={dataSource} 
+                  pagination={false}
+                  expandable={{
+                    expandedRowRender: (record) => (
+                      <p style={{ margin: 0 }}>
+    
+                        Drug Allergy : {record.drugAllergy} 
+                      </p>
+                    ),
+                    rowExpandable: (record) => record.name !== 'Not Expandable',
+                  }}
+                  />
+                  </div>
+                )
+              }
+
+              </div>
+              
             )
         }
 

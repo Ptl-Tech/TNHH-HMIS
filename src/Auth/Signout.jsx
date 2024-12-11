@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Menu, Dropdown, Avatar } from 'antd';
 import { FaUserAlt } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';

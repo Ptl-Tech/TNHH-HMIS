@@ -17,7 +17,7 @@ export const getAllergiesAndMedicationReducer = (state = initialState, action) =
         case GET_ALLERGIES_AND_MEDICATIONS_SUCCESS:
             return { ...state, loadingGetAllergiesAndMedications: false, allergiesMedication: action.payload };
         case GET_ALLERGIES_AND_MEDICATIONS_FAILURE:
-            return { ...state, loadingGetAllergiesAndMedications: false, vitalsLines: action.payload };
+            return { ...state, loadingGetAllergiesAndMedications: false, allergiesMedication: action.payload };
         default:
             return state;
     }

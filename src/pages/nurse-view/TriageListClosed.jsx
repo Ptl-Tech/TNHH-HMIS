@@ -5,18 +5,21 @@ import TriageSummeryCard from './TriageSummeryCard';
 import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
-import TriageFilters from './TriageFilters';
 import { useLocation } from 'react-router-dom';
+import Search from 'antd/es/transfer/search';
 
 const TriageListClosed = () => {
-  const [filterWaitingListType, setFilterWaitingListType] = useState('');
-  const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
+  const [searchParams, setSearchParams] = useState({
+    name: "",
+    patientNo: "",
+    observationNo: "",
+  });
   const dispatch = useDispatch();
   const location = useLocation();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
 
-  const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
+  const closedTriageList = triageList.filter((item)=>item.Status==='Closed') || {};
 
   //get the current location path
   const currentPath = location.pathname;
@@ -33,26 +36,44 @@ const TriageListClosed = () => {
     observationNo: item?.ObservationNo,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
+  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
 
   //filtering waitingListTableDataSource
-  const filterWaitingListTableDataSource = () =>{
-    if(filterWaitingListType !== '' && searchQueryWaitingList.trim !== ''){
-        return waitingListTableDataSource.filter((item) => {
-          if(filterWaitingListType === 'name'){
-            return item.name.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
-          }
-          if(filterWaitingListType === 'idNumber'){
-            return item.idNumber.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
-          }
-          if(filterWaitingListType === 'patientNo'){
-            return item.number.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
-          }
-          return false;
-        })
+
+  const handleSearchChange = (e, field) => {
+    const value = e.target.value;
+    setSearchParams((prevState) => ({
+      ...prevState,
+      [field]: value,
+    }));
+    handleFilterPatients({ ...searchParams, [field]: value });
+  };
+
+  const handleFilterPatients = () => {
+    // Check if any search input has a value
+    const isSearching = Object.values(searchParams).some((value) => value.trim() !== "");
+  
+    if (isSearching) {
+      // Filter only when there's input
+      const filtered = waitingListTableDataSource.filter((patient) => {
+        const name = patient.name?.toLowerCase() || ""; // Handle undefined values
+        const observationNo = patient.observationNo?.toLowerCase() || "";
+        const number = patient.number?.toString() || "";
+  
+        return (
+          name.includes(searchParams.name.toLowerCase()) &&
+          observationNo.includes(searchParams.observationNo.toLowerCase()) &&
+          number.includes(searchParams.patientNo.toLowerCase())
+        );
+      });
+  
+      setFilteredPatients(filtered);
+    } else {
+      // Show all records when no search criteria are provided
+      setFilteredPatients(waitingListTableDataSource);
     }
-    return waitingListTableDataSource;
-  }
+  };
   
 
   useEffect(() => {
@@ -66,6 +87,16 @@ const TriageListClosed = () => {
       rowScope: 'row',
     },
     {
+      title: 'Observation No',
+      dataIndex: 'observationNo',
+      rowScope: 'row',
+    },
+    {
+      title: 'Patient Number',
+      dataIndex: 'number',
+      rowScope: 'row',
+    },
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -76,36 +107,13 @@ const TriageListClosed = () => {
       onFilter: (value, record) => record.name.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
     },
-    {
-      title: 'ID Number',
-      dataIndex: 'idNumber',
-      rowScope: 'row',
-    },
-    {
-      title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
-    },
+   
     {
       title: 'Observation Date',
       dataIndex: 'regDate',
       rowScope: 'row',
     },
-    // {
-    //   title: 'Age',
-    //   dataIndex: 'age',
-    //   rowScope: 'row',
-    // },
-    // {
-    //   title: 'Sex',
-    //   dataIndex: 'sex',
-    //   rowScope: 'row',
-    // },
-    {
-      title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
-    },
+    
     {
       title: 'Status',
       dataIndex: 'checkIn',
@@ -118,9 +126,31 @@ const TriageListClosed = () => {
   return (
       <div style={{ padding: '10px 10px' }}>
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
-          <Card style={{ padding: '24px 10px 10px 10px' }}>
-
-          <TriageFilters setFilterWaitingListType={setFilterWaitingListType} filterWaitingListType={filterWaitingListType} setSearchQueryWaitingList={setSearchQueryWaitingList}/>
+          
+          <Card style={{ padding: '10px 16px', marginBottom: '10px' }}>
+          <div className='admit-patient-filter-container'>
+                  <Search placeholder="search by name" 
+                      allowClear
+                      value={searchParams.name}
+                      onChange={(e) => handleSearchChange(e, "name")}
+                      onSearch={handleFilterPatients}
+                  />
+                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+                  <Search placeholder="search by observation no" 
+                      allowClear
+                      value={searchParams.idNumber}
+                      onChange={(e) => handleSearchChange(e, "observationNo")}
+                      onSearch={handleFilterPatients}
+                  />
+                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+                  <Search placeholder="search by patient no" 
+                      allowClear
+                      value={searchParams.patientNo}
+                      onChange={(e) => handleSearchChange(e, "patientNo")}
+                      onSearch={handleFilterPatients}
+                  />
+              </div>
+          </Card>
 
           {
             loadingTriageList ? 
@@ -130,7 +160,7 @@ const TriageListClosed = () => {
             :
             (
                 <Table columns={waitingListColumns} 
-                dataSource={filterWaitingListTableDataSource()} 
+                dataSource={filteredPatients} 
                 bordered size='middle' 
                 pagination={{
                   position: ['bottom','right'],
@@ -141,7 +171,6 @@ const TriageListClosed = () => {
                 />
             )
           }
-          </Card>
       </div>
   )
 }
