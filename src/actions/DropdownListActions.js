@@ -25,7 +25,10 @@ import {
   DOCTOR_LIST_FAIL,
   EMPLOYEES_LIST_REQUEST,
   EMPLOYEES_LIST_SUCCESS,
-  EMPLYEES_LIST_FAIL
+  EMPLYEES_LIST_FAIL,
+  MARKETING_LIST_REQUEST,
+  MARKETING_LIST_SUCCESS,
+  MARKETING_LIST_FAIL
 
 } from "../constants/DropDownConstants";
 
@@ -221,6 +224,38 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
     console.log("data: ", data);
   } catch (error) {
     dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
+  }
+};
+
+export const marketingStrategies = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: MARKETING_LIST_REQUEST});
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyMarketingStrategies&isList=true`,
+      config
+    );
+
+    dispatch({ type: MARKETING_LIST_SUCCESS, payload: data });
+
+    console.log("data: ", data);
+  } catch (error) {
+    dispatch({ type: MARKETING_LIST_FAIL, payload: error.message });
   }
 };
 

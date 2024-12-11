@@ -1,60 +1,96 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  UserOutlined,
-  CheckSquareOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  BellFilled,
-  TeamOutlined,
-  UserSwitchOutlined,
-  FileTextOutlined,
-  HistoryOutlined,
-  FileAddOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-} from "@ant-design/icons";
-import {
   AppstoreOutlined,
-  MailOutlined,
-  SettingOutlined,
+  UserOutlined,
+  FileTextOutlined,
+  CalendarOutlined,
+  TeamOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  UserSwitchOutlined,
+  FileAddOutlined,
+  HistoryOutlined,
+  ClockCircleOutlined
 } from "@ant-design/icons";
-
-import { Layout, Menu, theme, Button, Avatar, Badge, Breadcrumb } from "antd";
-import { FaUserDoctor, FaEyeDropper, FaRadiation } from "react-icons/fa6";
-import { GiSoapExperiment } from "react-icons/gi";
-import { TbDental } from "react-icons/tb";
-import { LuBaby } from "react-icons/lu";
+import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
+import { FaUserGroup } from "react-icons/fa6";
 import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
-
 import Signout from "../Auth/Signout";
+import { BiCoinStack } from "react-icons/bi";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const DocLayout = () => {
+const MainLayout = () => {
   const location = useLocation();
-
-  // Extract the current route name from the location pathname
-  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const [openKeys, setOpenKeys] = useState(["/"]);
-  const rootSubmenuKeys = [
-    "/Doctor",
-    "/appointements",
-    "/doctors",
-    "/procurement",
-    "/Dental",
-    "/Pharmacy",
-    "/Radiology",
-    "/theatre",
-    "/Laboratory",
-    "/dialysis",
-    "/MCH",
-    "/Physio",
-  ];
+  const [openKeys, setOpenKeys] = useState([]);
+  const [selectedKey, setSelectedKey] = useState(location.pathname);
+  const [menuItems, setMenuItems] = useState([]);
 
-  const items = [
+
+useEffect(() => {
+  const userInfo=JSON.parse(localStorage.getItem('userInfo'));  
+  const department=userInfo?.userData?.departmentName;
+
+  const receptionRoutes = [
+    {
+      key: "/reception",
+      icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+      label: "Dashboard",
+    },
+    {
+      key: "/reception/visitors-list",
+      icon: <UserOutlined style={{ color: "#fff" }} />,
+      label: "Visitors",
+    },
+    {
+      key: "/reception/patient-list",
+      icon: <FaUserGroup style={{ color: "#fff" }} />,
+      label: "Patient List",
+      children: [
+        {
+          key: "/reception/Patient-list",
+          label: "Active OutPatient",
+          icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+    {
+      key: "/reception/appointments",
+      icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      label: "Appointments",
+      children: [
+        {
+          key: "/reception/appointments/list",
+          label: "Appointments",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+    {
+      key: "/reception/billing",
+      icon: <BiCoinStack style={{ color: "#fff" }} />,
+      label: "Billing",
+      children: [
+        {
+          key: "/reception/cash-List",
+          label: "Cash Patients",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+        {
+          key: "/reception/insurance-List",
+          label: "Insurance Patients",
+          icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        },
+      ],
+    },
+  ];
+  
+  // Define the menu items
+  const doctorRoutes = [
     {
       key: "/Doctor",
       icon: <AppstoreOutlined style={{ color: "#fff" }} />,
@@ -126,19 +162,26 @@ const DocLayout = () => {
       ],
     },
   ];
-  
+
+  setMenuItems(department === "Reception" ? receptionRoutes : doctorRoutes);
+},[]);
+
+  // Handle open submenu logic
   const onOpenChange = (keys) => {
-    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
-    setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    if (latestOpenKey && rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      setOpenKeys(keys);
-      setCollapsed(true);
-    } else {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-    }
+    setOpenKeys(keys.length === 0 ? [] : [keys[keys.length - 1]]);
   };
 
-  const navigate = useNavigate();
+  // Handle menu item click
+  const handleMenuClick = ({ key }) => {
+    navigate(key);
+    setSelectedKey(key); // Update the selected key when menu item is clicked
+  };
+
+  useEffect(() => {
+    // Update the selected key when the route changes
+    setSelectedKey(location.pathname);
+  }, [location]);
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -182,26 +225,25 @@ const DocLayout = () => {
           collapsed={collapsed}
           breakpoint="lg"
         >
-          <Menu
-            theme="light"
-            mode="inline"
-            defaultSelectedKeys={["/Doctor"]}
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-            onClick={({ key }) => {
-              navigate(key);
-            }}
-            style={{
-              backgroundColor: "#ffffff",
-              height: "100vh",
-              paddingBottom: "90px",
-              color: "#67336d",
-            }}
-            items={items} // Pass the items array here
-          />
+        <Menu
+  theme="light"
+  mode="inline"
+  selectedKeys={[selectedKey]}
+  openKeys={openKeys}
+  onOpenChange={onOpenChange}
+  onClick={handleMenuClick}
+  style={{
+    backgroundColor: "transparent",
+    height: "100vh",
+    paddingBottom: "90px",
+    color: "#fff",
+  }}
+  items={menuItems} // Pass items here
+/>
+
         </Sider>
-       <Layout className="site-layout">
-       <div className="site-layout">
+
+        <Layout className="site-layout">
           <Breadcrumb
             style={{
               marginLeft: collapsed ? 80 : 230,
@@ -212,17 +254,14 @@ const DocLayout = () => {
           >
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>List</Breadcrumb.Item>
-            {pathSegments.map((segment, index) => (
-              <Breadcrumb.Item key={index}>
-                {segment.charAt(0).toUpperCase() + segment.slice(1)}
-              </Breadcrumb.Item>
-            ))}{""}
+            {/* Dynamic breadcrumb based on URL */}
+            <Breadcrumb.Item>{location.pathname.split("/").pop()}</Breadcrumb.Item>
           </Breadcrumb>
+
           <Content
             className="contentStyle"
             style={{
               marginLeft: collapsed ? 80 : 230,
-
               transition: "all 0.2s",
               padding: 12,
               minHeight: 680,
@@ -232,20 +271,19 @@ const DocLayout = () => {
           >
             <Outlet />
           </Content>
-        </div>
         </Layout>
       </Layout>
 
       <Footer
-    style={{
-      textAlign: "center",
-      color: "#67336d",
-    }}
-  >
-    HMIS @ {new Date().getFullYear()} Created by potestastechnologies
-  </Footer>
+        style={{
+          textAlign: "center",
+          color: "#67336d",
+        }}
+      >
+        HMIS @ {new Date().getFullYear()} Created by potestastechnologies
+      </Footer>
     </Layout>
   );
 };
 
-export default DocLayout;
+export default MainLayout;

@@ -1,13 +1,14 @@
-import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const PrivateRoute = ({ allowedRoles }) => {
-  const { isLoggedIn, isVerified, userInfo } = useSelector((state) => ({
+const PrivateRoute = ({ allowedDepartments }) => {
+  const { isLoggedIn, isVerified } = useSelector((state) => ({
     isLoggedIn: state.userLogin?.isLoggedIn,
     isVerified: state.otpVerify?.isVerified,
-    userInfo: JSON.parse(localStorage.getItem('userInfo')), // Assuming userInfo is stored in localStorage
   }));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const department = userInfo?.userData?.departmentName;
 
   const location = useLocation();
 
@@ -19,13 +20,9 @@ const PrivateRoute = ({ allowedRoles }) => {
     return <Navigate to="/otp-verification" state={{ from: location }} replace />;
   }
 
-  // Check if the user's departmentName matches allowedRoles
-  // if (
-  //   allowedRoles &&
-  //   (!userInfo || !allowedRoles.includes(userInfo.userData.departmentName))
-  // ) {
-  //   return <Navigate to="/login" state={{ from: location }} replace />;
-  // }
+  if (!allowedDepartments.includes(department)) {
+    return <Navigate to="/login" replace />;
+  }
 
   return <Outlet />;
 };

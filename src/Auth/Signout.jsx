@@ -13,6 +13,7 @@ const Signout = () => {
   const navigate = useNavigate();
   const userDetails = useAuth();  // Use the custom hook to get user info
   console.log("User details:", userDetails);
+  const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
 
   const handleMenuClick = (e) => {
     if (e.key === 'signout' ) {
@@ -47,8 +48,13 @@ const Signout = () => {
   return (
     <Dropdown overlay={menu} trigger={['click']}>
       <div className="d-flex justify-content-end align-items-center py-3">
-        <Avatar icon={<FaUserAlt />} style={{ fontSize: 22, color: '#fff', marginRight: '10px' }} />
+        <Avatar icon={<FaUserAlt />} style={{ fontSize: '30px', color: '#fff', marginRight: '10px' }} />
+        <div className="d-block">
+        <h6 className="text-white">{branchCode && `Branch : ${branchCode}`}</h6>
+
         <h6 className="text-white">{getSalutation()}</h6>
+
+        </div>
       </div>
     </Dropdown>
   );

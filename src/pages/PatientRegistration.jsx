@@ -1,69 +1,36 @@
 import {
-  Button,
-  DatePicker,
-  Input,
-  Select,
-  Form,
-  message,
-  Spin,
-  Switch,
-  Row,
-  Col,
-  Card,
-  Typography,
   Avatar,
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  Select,
+  Switch,
 } from "antd";
-
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  createPatient,
-  createTriageVisit,
-  listPatients,
-  postTriageVisit,
-} from "../actions/patientActions";
-import {
-  listClinics,
   listCounties,
   listCountries,
-  listDoctors,
   listInsuranceOptions,
   listKinsRelationships,
   listSubCounties,
+  marketingStrategies,
 } from "../actions/DropdownListActions";
-
-import moment from "moment"; // Ensure you import moment
-import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "antd/es/form/Form";
+import { createPatient, listPatients } from "../actions/patientActions";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PatientRegistration = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const form = useForm();
-  const { loading, error, success, payload } = useSelector(
-    (state) => state.createPatient
-  );
-  const {
-    loading: visitLoading,
-    error: visitError,
-    success: visitSuccess,
-    payload: visitPayload,
-  } = useSelector((state) => state.createTriageVisit);
-
-  const {
-    loading: postTriageVisitLoading,
-    error: postTriageVisitError,
-    success: postTriageVisitSuccess,
-    payload: postTriageVisitPayload,
-  } = useSelector((state) => state.postTriageVisit);
   const {
     loading: countriesLoading,
     error: countriesError,
     success: countriesSuccess,
     countries: countriesPayload,
   } = useSelector((state) => state.countriesList);
-
   const {
     loading: relationshipOptionsLoading,
     error: relationshipOptionsError,
@@ -84,28 +51,12 @@ const PatientRegistration = () => {
     success: subCountiesSuccess,
     subCounties: subCountiesPayload,
   } = useSelector((state) => state.subCounties);
-
-  const {
-    loading: clinicsLoading,
-    error: clinicsError,
-    success: clinicsSuccess,
-    clinics: clinicsPayload,
-  } = useSelector((state) => state.clinics);
-
-  const {
-    loading: doctorsLoading,
-    error: doctorsError,
-    success: doctorsSuccess,
-    data: doctorsPayload,
-  } = useSelector((state) => state.getDoctorsList);
-
   const {
     loading: patientListLoading,
     error: patientListError,
     success: patientListSuccess,
     patients: patientListPayload,
   } = useSelector((state) => state.patientList);
-
   const {
     loading: insuranceLoading,
     error: insuranceError,
@@ -113,173 +64,105 @@ const PatientRegistration = () => {
     data: insurancePayload,
   } = useSelector((state) => state.getInsurance);
 
-  const [age, setAge] = useState(null); // State to hold calculated age
-  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const {
+    loading: marketingStrategiesLoading,
+    error: marketingStrategiesError,
+    success: marketingStrategiesSuccess,
+    data: marketingStrategiesPayload,
+  } = useSelector((state) => state.marketingList);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { state } = useLocation(); // Access the state passed via navigate
+  const { visitorData, patientNumber } = state || {}; // Destructure patient data if available
+  const [filteredCountries, setFilteredCountries] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [age, setAge] = useState(null); // State to hold calculated age
+  const [dobError, setDobError] = useState(""); // State for DOB error message
+  const [errors, setErrors] = useState({});
   const [newPatient, setNewPatient] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
-    idNumber: "",
-    gender: 0,
+    gender: "",
     dob: "",
+    nationality: "",
+    county: "",
+    idNumber: "",
     phoneNumber: "",
-    paymentMode: 0,
+    paymentMode: "",
+    nextOfKinRelationShip: "",
     nextOfKinFullName: "",
-    nextOfKinRelationship: "",
     nextOfKinPhoneNo: "",
-    patientType: "",
     insuranceNo: "",
     insuranceName: "",
     insurancePrinicipalMemberName: "",
     isPrincipleMember: false,
     membershipNo: "",
-    nationality: "",
-    county: "",
     schemeName: "",
     howYouKnewABoutUs: "",
-
     subCounty: "",
+    email: "",
     residence: "",
     patientStatus: 0,
   });
-
-  const [patientId, setPatientId] = useState(null);
-  const [dobError, setDobError] = useState(""); // State for DOB error message
-  const [appointmentId, setAppointmentId] = useState(null);
-  const [newVisit, setNewVisit] = useState({
-    patientNo: "",
-    clinic: "",
-    doctor: "",
-  });
   useEffect(() => {
-    if (location.state) {
-      const { patientData, visitorData } = location.state;
-      console.log("Patient Data:", patientData);
-      if (patientData) {
-        // Set patient data
-        setNewPatient({
-          firstName: patientData.firstName,
-          middleName: patientData.MiddleName,
-          lastName: patientData.LastName,
-          idNumber: patientData.IDNumber,
-          gender: patientData.Gender,
-          dob: patientData.DateOfBirth,
-          phoneNumber: patientData.TelephoneNo1,
-          paymentMode: patientData.PatientType,
-          nextOfKinFullName: patientData.NextOfkinFullName,
-          nextOfKinRelationship: patientData.NextofkinRelationship,
-          nextOfKinPhoneNo: patientData.NextOfkinAddress1,
-          patientType: patientData.PatientType2,
-          insuranceNo: patientData.InsuranceNo,
-          insuranceName: patientData.InsuranceName,
-          insurancePrinicipalMemberName: patientData.SearchName,
-          isPrincipleMember: patientData.Principal,
-          membershipNo: patientData.MembershipNo,
-          nationality: patientData.Nationality,
-          county: patientData.CountyWardName,
-          schemeName: patientData.SchemeName,
-          howYouKnewABoutUs: patientData.HowyouKnewAboutUs,
-          subCounty: patientData.SubCountyName,
-          residence: patientData.PlaceofBirthVillage,
-          patientStatus: patientData.Status,
-        });
-      } else if (visitorData) {
-        // Set visitor data
-        setNewPatient({
-          firstName: visitorData.VisitorName,
-          middleName: visitorData.middleName,
-          lastName: visitorData.lastName,
-          idNumber: visitorData.idNumber,
-          gender: visitorData.gender,
-          dob: visitorData.dob,
-          phoneNumber: visitorData.PhoneNumber,
-        });
-      }
-    }
-  }, [location.state]);
+    dispatch(listCountries());
+    dispatch(listCounties());
+    dispatch(listSubCounties());
+    dispatch(listKinsRelationships());
+    dispatch(listInsuranceOptions());
+    dispatch(marketingStrategies());
+    dispatch(listPatients());
+  }, [dispatch]);
 
-  const handleDisplayDropDown = (e) => {
-    const { name, value } = e.target;
-
-    if (
-      name === "nationality" &&
-      countriesPayload &&
-      name === "county" &&
-      countiesPayload &&
-      name === "subCounty" &&
-      subCountiesPayload &&
-      name === "clinic" &&
-      clinicsPayload &&
-      name === "nextOfKinRelationship" &&
-      relationshipOptionsPayload &&
-      name === "insuranceName" &&
-      insurancePayload &&
-      name === "doctor" &&
-      doctorsPayload
-    ) {
-      dispatch(listCountries());
-      dispatch(listCounties());
-      dispatch(listSubCounties());
-      dispatch(listClinics());
-      dispatch(listKinsRelationships());
-      dispatch(listInsuranceOptions());
-      dispatch(listDoctors());
+  useEffect(() => {
+    if (countriesPayload) {
+      setFilteredCountries(countriesPayload);
     }
+  }, [countriesPayload]);
+
+  // Handle search input
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+
+    // If the search term is empty, show the entire list
+    if (!value.trim()) {
+      setFilteredCountries(countriesPayload);
+      return;
+    }
+
+    // Otherwise, filter countries based on the search term
+    const filtered = countriesPayload.filter((country) =>
+      country.Name.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredCountries(filtered);
   };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setNewPatient((prev) => ({ ...prev, [name]: value }));
 
-    setNewPatient((prev) => {
-      const updatedPatient = { ...prev };
+    if (name === "idNumber") {
+      // Validate the idNumber immediately when it changes
+      const isRegistered = patientListPayload?.some(
+        (existingPatient) => existingPatient.IDNumber === value
+      );
 
-      if (name === "phoneNumber") {
-        // Remove any non-numeric characters
-        let formattedValue = value.replace(/\D/g, "");
-
-        // Check if the number starts with '0'
-        if (formattedValue.startsWith("0")) {
-          // Convert '0...' to '254...'
-          formattedValue = "254" + formattedValue.slice(1);
-        }
-        // Ensure the number starts with '254' if not already prefixed
-        else if (
-          !formattedValue.startsWith("254") &&
-          formattedValue.length === 10
-        ) {
-          formattedValue = "254" + formattedValue;
-        }
-        // Trim to a maximum of 12 digits
-        if (formattedValue.length > 12) {
-          formattedValue = formattedValue.slice(0, 12);
-        }
-
-        updatedPatient[name] = formattedValue;
+      // Update the errors state based on the ID number validation
+      if (isRegistered) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          idNumber: "This Patient is already registered.",
+        }));
       } else {
-        updatedPatient[name] = value;
-
-        // Update Principal Member Name if switch is checked
-        if (
-          prev.isPrincipleMember &&
-          (name === "firstName" || name === "middleName" || name === "lastName")
-        ) {
-          updatedPatient.insurancePrinicipalMemberName = `${
-            updatedPatient.firstName
-          } ${updatedPatient.middleName || ""} ${
-            updatedPatient.lastName
-          }`.trim();
-        }
-
-        // Update Membership No if switch is checked
-        // form.setFieldsValue({
-        //   membershipNo: updatedPatient.isPrincipleMember ? updatedPatient.idNumber : "",
-        // })
+        setErrors((prevErrors) => {
+          const { idNumber, ...rest } = prevErrors; // Remove the previous error
+          return rest; // Return the remaining errors
+        });
       }
-
-      return updatedPatient;
-    });
+    }
   };
+
   // Handle select and date changes
   const handleSelectChange = (name, value) => {
     // If the field is 'dob', format the value as 'YYYY-MM-DD'
@@ -303,7 +186,6 @@ const PatientRegistration = () => {
 
     if (years < 2) {
       setDobError("Patient must be at least 2 years old.");
-      dispatch(listClinics());
 
       setAge(null);
     } else {
@@ -312,15 +194,17 @@ const PatientRegistration = () => {
       setNewPatient((prev) => ({ ...prev, dob: dateString }));
     }
   };
-
   const handleSwitchChange = (name, value) => {
     setNewPatient((prev) => {
       const updatedPatient = { ...prev, [name]: value };
 
       if (name === "isPrincipleMember" && value) {
+        // Set the insurancePrincipalMemberName in uppercase
         updatedPatient.insurancePrinicipalMemberName = `${prev.firstName} ${
           prev.middleName || ""
-        } ${prev.lastName}`.trim();
+        } ${prev.lastName}`
+          .trim()
+          .toUpperCase();
       } else if (name === "isPrincipleMember" && !value) {
         updatedPatient.insurancePrinicipalMemberName = ""; // Clear the name if unchecked
       }
@@ -329,299 +213,230 @@ const PatientRegistration = () => {
     });
   };
 
-  const handleSubmit = async () => {
-    try {
-      // Prepare the new patient data
-      const patientData = {
-        ...newPatient,
-        myAction: "create", // Set action as 'create'
-        patientNo: "", // Set patientNo as empty for new patient creation
-      };
+  const handleDisplayDropDown = (e) => {
+    const { name, value } = e.target;
+    setNewPatient((prev) => ({ ...prev, [name]: value }));
 
-      // Dispatch `createPatient` and get the returned patient ID
-      const patientId = await dispatch(createPatient(patientData));
+    if (
+      name === "nationality" &&
+      countriesPayload &&
+      name === "county" &&
+      countiesPayload &&
+      name === "subCounty" &&
+      subCountiesPayload &&
+      name === "nextOfKinRelationship" &&
+      relationshipOptionsPayload &&
+      name === "insuranceName" &&
+      insurancePayload &&
+      name === "howYouKnewABoutUs"
+    ) {
+      dispatch(listCountries());
+      dispatch(listCounties());
+      dispatch(listSubCounties());
+      dispatch(listKinsRelationships());
+      dispatch(listInsuranceOptions());
+      dispatch(marketingStrategies());
+    }
+  };
+  const handleSavePatient = async (e) => {
+    e.preventDefault();
+
+    // Validate the entire form
+    const errors = validateForm(newPatient);
+    setErrors(errors);
+
+    // If there are any validation errors, show a warning
+    if (Object.keys(errors).length > 0) {
+      message.warning("Please fill in all the required fields correctly.");
+      return; 
+    }
+
+    // Determine the action (create or edit) based on the patientNumber
+    const isEditAction = !!patientNumber && patientNumber.trim() !== "";
+
+    // Prepare patient data
+    const patientData = {
+      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0],
+      lastName: newPatient.lastName ||visitorData.VisitorName?.split(" ")[2],
+      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1],
+      idNumber: newPatient.idNumber || visitorData?.IDNumber,
+      phoneNumber: newPatient.phoneNumber || visitorData?.PhoneNumber,
+      email: newPatient.email,
+      gender: newPatient.gender,
+      dob: newPatient.dob,
+      nationality: newPatient.nationality,
+      county: newPatient.county,
+      subCounty: newPatient.subCounty,
+      residence: newPatient.residence,
+      nextOfKinFullName: newPatient.nextOfKinFullName,
+      nextOfKinRelationship: newPatient.nextOfKinRelationShip,
+      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo,
+      paymentMode: newPatient.paymentMode,
+      insuranceNo: newPatient.insuranceNo,
+      isPrincipleMember: newPatient.isPrincipleMember,
+      membershipNo: newPatient.membershipNo,
+      insuranceName: newPatient.insuranceName,
+      howYouKnewABoutUs: newPatient.howYouKnewABoutUs,
+      myAction: isEditAction ? "edit" : "create", 
+      patientNo: patientNumber, // Include patientNo only if editing
+    };
+
+    try {
+      // Dispatch the patient creation or update action
+      const responsedata = await dispatch(createPatient(patientData));
+      const patientId = responsedata?.patientNo;
 
       if (patientId) {
-        setPatientId(patientId);
-
-        // Prepare the new visit data
-        const visitData = {
-          patientNo: patientId,
-          clinic: newVisit.clinic,
-          doctor: newVisit.doctor,
-        };
-
-        // Dispatch the action to create a triage visit
-        const appointmentId = await dispatch(createTriageVisit(visitData));
-
-        if (appointmentId) {
-          setAppointmentId(appointmentId);
-          console.log("Triage visit created for Patient ID:", appointmentId);
-        }
-
-        // Check for success and payload in the response
-        if (visitSuccess && appointmentId) {
-          message.success("Patient registered successfully!");
-          console.log("Triage visit created for Patient ID:", appointmentId);
-        }
+        message.success(
+          "Patient Saved Successfully"
+        );
+        // Navigate to Add Appointment page and pass patientId
+        navigate(`/reception/Add-Appointment/${patientId}`, {
+          state: { patientData: patientData,  },
+        });
       } else {
-        message.error("Patient registration failed. Please try again.");
+        message.error("Failed to save patient data. Please try again.");
       }
+
+      console.log(patientId);
     } catch (error) {
-      console.error("Error during patient registration:", error);
-      message.error("Failed to register patient. Please try again.");
+      console.error("Error saving patient data:", error);
+      message.error("An unexpected error occurred. Please try again.");
     }
   };
 
-  const handleTriageDispatch = async () => {
-    console.log("Triage visit created for Patient ID:", appointmentId);
+  // Define the validateForm function
+  const validateForm = (patient) => {
+    const errors = {};
 
-    // Dispatch the action with the appointmentId (which should be passed correctly)
-    const result = await dispatch(postTriageVisit(appointmentId));
-
-    if (postTriageVisitSuccess) {
-      //reset form
-      form.resetFields();
-    } else {
-      message.error(
-        "Failed to dispatch triage visit update. Please try again."
-      );
+    // Example validation rules
+    if (!patient.firstName || patient.firstName.trim() === "") {
+      errors.firstName = "First name is required.";
     }
+    if (!patient.lastName || patient.lastName.trim() === "") {
+      errors.lastName = "Last name is required.";
+    }
+    if (!patient.phoneNumber || patient.phoneNumber.trim() === "") {
+      errors.phoneNumber = "Phone number is required.";
+    } else if (!/^\d{10,12}$/.test(patient.phoneNumber)) {
+      errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
+    }
+    if (!patient.nationality || patient.nationality.trim() === "") {
+      errors.nationality = "Nationality is required.";
+    }
+    // Validate idNumber if it is provided
+    if (patient.idNumber) {
+      const isRegistered = patientListPayload?.some(
+        (existingPatient) => existingPatient.IDNumber === patient.idNumber
+      );
+      if (isRegistered) {
+        errors.idNumber = "This ID/Passport/Birth No is already registered.";
+      }
+    }
+
+    // Add more validation rules as necessary
+    return errors;
   };
-
-  // const handleCreateVisit = async (patientId) => {
-  //   try {
-  //     // Dispatch the action to create a triage visit
-  //     await dispatch(createTriageVisit(patientId));
-
-  //     // Check for success and payload in the response
-  //     if (visitSuccess && visitPayload) {
-  //       message.success("Patient registered successfully!");
-  //       console.log("Patient ID:", patientId);
-
-  //       // Navigate to the visit creation page with the visit payload
-  //       navigate(`/reception/create-visit/${patientId}`, {
-  //         state: { visitPayload: visitPayload },
-  //       });
-  //       console.log("Navigate to visit creation page with ID:", patientId);
-  //     } else {
-  //       throw new Error("Visit creation failed.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during visit creation:", error);
-  //     message.error("Failed to create a visit. Please try again.");
-  //   }
-  // };
-
-  useEffect(() => {
-    if (visitSuccess) {
-      message.success("Patient registered successfully!");
-      // console.log("Patient ID:", patientId);
-      // navigate(`/reception/create-visit/${patientId}`, {
-      //   state: { visitPayload },
-      // });
-      // Navigate to the visit creation page or perform additional actions
-      console.log("Navigate to visit creation page with ID:", patientId);
-    }
-  }, [visitSuccess, visitPayload, message]);
-
-  useEffect(() => {
-    if (postTriageVisitSuccess) {
-      message.success("Triage visit updated successfully!");
-      // console.log("Patient ID:", patientId);
-      // navigate(`/reception/create-visit/${patientId}`, {
-      //   state: { visitPayload },
-      // });
-      // Navigate to the visit creation page or perform additional actions
-      console.log("Navigate to visit creation page with ID:", patientId);
-    }
-  }, [postTriageVisitSuccess, message]);
-
-  useEffect(() => {
-    //fetch country list
-    dispatch(listCountries());
-    dispatch(listCounties());
-    dispatch(listSubCounties());
-    dispatch(listKinsRelationships());
-    dispatch(listClinics());
-    dispatch(listPatients());
-    dispatch(listInsuranceOptions());
-    dispatch(listDoctors());
-  }, [dispatch]);
-
-  useEffect(() => {
-    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
-
-    if (branchCode && doctorsPayload) {
-      // Filter doctors based on specialization and branch
-      const filtered = doctorsPayload.filter(
-        (doctor) =>
-          doctor.Specialization === newVisit.clinic && // Match specialization with selected clinic
-          doctor.GlobalDimension1Code === branchCode // Match branch code
-      );
-      setFilteredDoctors(filtered); // Update the filtered doctors list
-    }
-  }, [doctorsPayload, newVisit.clinic, filteredDoctors, newVisit.doctor]);
 
   return (
     <div>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={7}>
-          <Card bordered={false} className="card-header">
-            <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#ac8342" }}>
-                General Information
-              </Typography.Title>
-              <Form.Item
-                label="First Name:"
-                name="firstName"
-                rules={[{ required: true, message: "Please enter first name" }]}
-              >
-                {/* <label className="form-label">First Name:</label> */}
-                <Input
-                  placeholder="Enter First Name"
-                  value={newPatient.firstName}
-                  onChange={(e) =>
-                    handleInputChange("firstName", e.target.value)
-                  }
-                />
-              </Form.Item>
-              <Form.Item
-                label="Middle Name:"
-                name="middleName"
-                rules={[
-                  { required: true, message: "Please enter middle name" },
-                ]}
-              >
-                <Input
-                  placeholder="Enter Middle Name"
-                  name="middleName"
-                  value={newPatient.middleName}
-                  onChange={handleInputChange}
-                />
-              </Form.Item>
-              <Form.Item
-                label="Surname Name:"
-                name="lastName"
-                rules={[{ required: true, message: "Please enter last name" }]}
-              >
-                <Input
-                  placeholder="Enter Surname Name"
-                  name="lastName"
-                  value={newPatient.lastName}
-                  onChange={handleInputChange}
-                />
-              </Form.Item>
-              <Form.Item
-                name="registrationDate"
-                label="Registration Date"
-                rules={[]}
-              >
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  style={{ width: "100%" }}
-                  placeholder="Select Date"
-                  defaultValue={moment()} // Set default date to current date
-                />{" "}
-              </Form.Item>
-              <Form.Item
-                name="visitType"
-                label="Visit Type"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a visit type!",
-                  },
-                ]}
-              >
-                <Select placeholder="Select Visit Type">
-                  <Select.Option value="1">Revisit</Select.Option>
-                  <Select.Option value="2">New Consultation</Select.Option>
-                </Select>
-              </Form.Item>
-            </Form>
-          </Card>
-        </Col>
-        <Col xs={24} md={11}>
-          <Card bordered={false} className="card-header">
-            <Typography.Title level={5} style={{ color: "#ac8342" }}>
-              Contact Information
-            </Typography.Title>
-            <Form layout="vertical" onFinish={handleSubmit}>
-              <Form.Item
-                label="Phone Number:"
-                name="phoneNumber"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter your phone number",
-                  },
-                  {
-                    validator: (_, value) => {
-                      // Validate length based on whether the input starts with '254'
-                      if (value.startsWith("254") && value.length === 12) {
-                        return Promise.resolve();
-                      } else if (
-                        !value.startsWith("254") &&
-                        value.length === 10
-                      ) {
-                        return Promise.resolve();
-                      }
+      <h4 style={{ textAlign: "center", color: "#E89641" }}>
+        Patient Registration {patientNumber}
+      </h4>
+      <div className="row">
+        <div className="col-12 col-md-8">
+          <Card title="Patient Information" style={{ width: "100%" }}>
+            <Form
+              name="basic"
+              initialValues={{ remember: true }}
+              autoComplete="off"
+            >
+              <div className="row px-3 py-2  align-items-center justify-content-between">
+                <div className="col-12 col-md-4 ">
+                  <label className="py-1">
+                    ID/Passport/Birth No:
+                    <span className="text-danger px-1 fs-6">*</span>
+                  </label>
 
-                      return Promise.reject(
-                        new Error("Phone number must be 10 or 12 digits long")
-                      );
-                    },
-                  },
-                ]}
-                style={{ width: "100%" }}
-              >
-                <Input
-                  placeholder="Enter phone number "
-                  name="phoneNumber"
-                  value={newPatient.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </Form.Item>
-
-              <div className="d-flex gap-2 justify-content-between">
-                <Form.Item
-                  name="gender"
-                  label="Gender"
-                  style={{ width: "100%" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select your gender!",
-                    },
-                  ]}
-                >
+                  <Input
+                    name="idNumber"
+                    placeholder="ID Number"
+                    style={{ width: "100%" }}
+                    value={newPatient.idNumber || visitorData?.IDNumber}
+                    onChange={handleInputChange}
+                  />
+                  {errors.idNumber && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.idNumber}
+                    </span>
+                  )}
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    First Name:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Input
+                    name="firstName"
+                    placeholder="First Name"
+                    style={{ width: "100%" }}
+                    value={newPatient.firstName || visitorData.VisitorName?.split(" ")[0]}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Middle Name:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Input
+                    name="middleName"
+                    placeholder="Middle Name"
+                    style={{ width: "100%" }}
+                    value={newPatient.middleName || visitorData.VisitorName?.split(" ")[1]}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <div className="row px-3 py-2  align-items-center justify-content-between">
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Last Name:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Input
+                    name="lastName"
+                    placeholder="Last Name"
+                    style={{ width: "100%" }}
+                    value={newPatient.lastName || visitorData.VisitorName?.split(" ")[2]}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="col-12 col-md-4 ">
+                  <label className="py-1">
+                    Gender:
+                    <span className="text-danger px-1 fs-6">*</span>
+                  </label>
                   <Select
-                    placeholder="Select Gender"
+                    placeholder="--Select Gender--"
                     className="w-100"
                     value={newPatient.gender}
                     onChange={(value) => handleSelectChange("gender", value)}
                   >
-                    <Select.Option value="1">Male</Select.Option>
-                    <Select.Option value="2">Female</Select.Option>
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  name="dob"
-                  label="Date of Birth"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your date of birth!",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
+                    <Select.Option value="">--Select Gender-- </Select.Option>
+                    <Select.Option key={1} value={1}>
+                      Male
+                    </Select.Option>
+                    <Select.Option key={2} value={2}>
+                      Female
+                    </Select.Option>
+                  </Select>{" "}
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Date of Birth:<span className="text-danger px-1">*</span>
+                  </label>
                   <DatePicker
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     placeholder="Select Date of Birth"
-                    name="dob"
                     defaultValue={moment()} // Set default date to current date
                     value={newPatient.dob ? moment(newPatient.dob) : null}
                     onChange={(date, dateString) =>
@@ -629,81 +444,65 @@ const PatientRegistration = () => {
                     }
                   />
                   {dobError && <span style={{ color: "red" }}>{dobError}</span>}
-
                   {age !== null && (
                     <div className="text-success">
                       Age: {age.years} years {age.months} months
                     </div>
-                  )}
-                </Form.Item>
+                  )}{" "}
+                </div>
               </div>
-              <div className="d-flex gap-2 justify-content-between">
-                <Form.Item
-                  name="idNumber"
-                  label="ID/Passport/Birth No:"
-                  style={{ width: "100%" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your ID/Passport/Birth No!",
-                    },
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        if (!value) {
-                          return Promise.resolve();
-                        }
-                        const isRegistered = patientListPayload?.some(
-                          (patient) => patient.IDNumber === value
-                        );
-                        if (isRegistered) {
-                          return Promise.reject(
-                            new Error(
-                              "This ID/Passport/Birth No is already registered."
-                            )
-                          );
-                        }
-                        return Promise.resolve();
-                      },
-                    }),
-                  ]}
-                >
+              <div className="row px-3 py-2 align-items-center justify-content-between">
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Phone Number:<span className="text-danger px-1">*</span>
+                  </label>
                   <Input
-                    placeholder="Enter ID/Passport/Birth No"
-                    name="idNumber"
-                    value={newPatient.idNumber}
+                    placeholder="Enter phone number"
+                    name="phoneNumber"
+                    value={newPatient.phoneNumber || visitorData?.PhoneNumber}
                     onChange={handleInputChange}
-                    style={{ width: "100%" }}
-                    className="w-100"
                   />
-                </Form.Item>
-
-                <Form.Item
-                  name="nationality"
-                  label="Nationality"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your nationality!",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
+                  {errors.phoneNumber && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.phoneNumber}
+                    </span>
+                  )}
+                </div>
+                <div className="col-12 col-md-4 ">
+                  <label className="py-1">
+                    Email:
+                    <span className="text-danger px-1 fs-6">*</span>
+                  </label>
+                  <Input
+                    placeholder="Email"
+                    type="email"
+                    name="email"
+                    style={{ width: "100%" }}
+                    value={newPatient.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Nationality:<span className="text-danger px-1">*</span>
+                  </label>
                   <Select
-                    placeholder="Select Nationality"
-                    className="w-100 "
+                    placeholder="Select nationality"
+                    name="nationality"
+                    className="w-100"
                     value={newPatient.nationality}
+                    showSearch
+                    onSearch={handleSearch}
                     onChange={(value) =>
                       handleSelectChange("nationality", value)
                     }
-                    // variant="borderless"
-                    name="nationality"
-                    onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                    filterOption={false} // Disables default filtering
                   >
                     <Select.Option value="">
                       --Select Nationality--
                     </Select.Option>
-                    {countriesPayload && countriesPayload.length > 0 ? (
-                      countriesPayload.map((country) => (
+                    {filteredCountries && filteredCountries.length > 0 ? (
+                      filteredCountries.map((country) => (
                         <Select.Option key={country.Code} value={country.Code}>
                           {country.Name}
                         </Select.Option>
@@ -713,26 +512,20 @@ const PatientRegistration = () => {
                         No countries available
                       </Select.Option>
                     )}
-                  </Select>{" "}
-                </Form.Item>
+                  </Select>
+                </div>
               </div>
-              <div className="d-flex gap-2 justify-content-between">
-                <Form.Item
-                  label="County:"
-                  name="county"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select County",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
+              <div className="row px-3 py-2 align-items-center ">
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    County:<span className="text-danger px-1">*</span>
+                  </label>
                   <Select
                     placeholder="Select County"
                     className="w-100 "
                     value={newPatient.county}
                     onChange={(value) => handleSelectChange("county", value)}
+                    name="county"
                     onFocus={handleDisplayDropDown}
                   >
                     <Select.Option value="">--Select County--</Select.Option>
@@ -748,23 +541,17 @@ const PatientRegistration = () => {
                       </Select.Option>
                     )}
                   </Select>
-                </Form.Item>
-                <Form.Item
-                  label="Sub County:"
-                  name="subCounty"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select nationality",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Sub County:<span className="text-danger px-1">*</span>
+                  </label>
                   <Select
                     placeholder="Select Sub County"
                     className="w-100"
-                    value={newPatient.nationality}
-                    onChange={(value) => handleSelectChange("county", value)}
+                    value={newPatient.subCounty}
+                    name="subCounty"
+                    onChange={(value) => handleSelectChange("subCounty", value)}
                     onFocus={handleDisplayDropDown}
                   >
                     <Select.Option value="">
@@ -785,246 +572,191 @@ const PatientRegistration = () => {
                       </Select.Option>
                     )}
                   </Select>
-                </Form.Item>
-              </div>
-              <div className="d-flex gap-2 justify-content-between">
-                <Form.Item
-                  label="Residence:"
-                  name="residence"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Enter your residence",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Residence:<span className="text-danger px-1">*</span>
+                  </label>
                   <Input
-                    placeholder="Enter Residence"
+                    placeholder="Enter residence"
                     name="residence"
                     value={newPatient.residence}
                     onChange={handleInputChange}
-                    className=" "
                   />
-                </Form.Item>
-                <Form.Item
-                  name="address"
-                  label="Address"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input your address!",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
-                  <Input placeholder="Address" style={{ width: "100%" }} />
-                </Form.Item>
+                </div>
+              </div>
+              <div className="row px-3 py-2  align-items-center ">
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Kin's Name:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Input
+                    placeholder="Kin's Name"
+                    name="nextOfKinFullName"
+                    value={newPatient.nextOfKinFullName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="col-12 col-md-4 ">
+                  <label className="py-1">
+                    Kin's Relationship:
+                    <span className="text-danger px-1">*</span>
+                  </label>
+                  <Select
+                    placeholder="Select Relationship"
+                    className="w-100 "
+                    value={newPatient.nextOfKinRelationShip}
+                    onChange={(value) =>
+                      handleSelectChange("nextOfKinRelationShip", value)
+                    }
+                    // variant="borderless"
+                    name="nextOfKinRelationShip"
+                    onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                  >
+                    <Select.Option value="">
+                      --Select Relationship--
+                    </Select.Option>
+                    {relationshipOptionsPayload &&
+                    relationshipOptionsPayload.length > 0 ? (
+                      relationshipOptionsPayload.map((relation) => (
+                        <Select.Option
+                          key={relation.Code}
+                          value={relation.Code}
+                        >
+                          {relation.Description}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No data available
+                      </Select.Option>
+                    )}
+                  </Select>{" "}
+                </div>
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Kin's Phone Number:
+                    <span className="text-danger px-1">*</span>
+                  </label>
+                  <Input
+                    placeholder="Kin's phone number"
+                    name="nextOfKinPhoneNo"
+                    value={newPatient.nextOfKinPhoneNo}
+                    onChange={handleInputChange}
+                    type="number"
+                  />
+                </div>
+              </div>
+              <div className="row px-3 py-2 mb-4 align-items-center">
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    How did you hear about us:
+                    <span className="text-danger px-1">*</span>
+                  </label>
+                  <Select
+                    placeholder="Select"
+                    className="w-100 "
+                    value={newPatient.howYouKnewABoutUs}
+                    onChange={(value) =>
+                      handleSelectChange("howYouKnewABoutUs", value)
+                    }
+                    name="howYouKnewABoutUs"
+                    onFocus={handleDisplayDropDown}
+                  >
+                    {marketingStrategiesPayload &&
+                    marketingStrategiesPayload.length > 0 ? (
+                      marketingStrategiesPayload.map((list) => (
+                        <Select.Option key={list.Code} value={list.Code}>
+                          {list.Description}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No List available
+                      </Select.Option>
+                    )}
+                  </Select>{" "}
+                </div>
               </div>
             </Form>
           </Card>
-        </Col>
-        <Col xs={24} md={6}>
-          <Card style={{ width: "100%" }} className="card-header">
-            <Typography.Title level={5} style={{ color: "#ac8342" }}>
-              Patient Info
-            </Typography.Title>
-            <div className="d-flex flex-column align-items-center justify-content-center">
-              {/* Display Avatar with Initials */}
-              <Avatar
-                size={100}
-                style={{
-                  backgroundColor: "#87d068",
-                  fontSize: "2rem",
-                }}
-              >
-                {`${newPatient.firstName?.charAt(0) || ""}${
-                  newPatient.lastName?.charAt(0) || ""
-                }`}
-              </Avatar>
-            </div>
-            {/* Display Patient Details */}
-            <div className="d-flex flex-column align-items-start mt-3 text-muted">
-              <div className="d-flex flex-row justify-content-between w-100">
-                <Typography.Text
-                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
-                >
-                  Date Registered:
-                </Typography.Text>
-                <Typography.Text
-                  style={{ fontSize: "0.9rem" }}
-                  className="text-muted"
-                >
-                  {moment().format("DD/MM/YYYY")}
-                </Typography.Text>
-              </div>
-              <div className="d-flex flex-row justify-content-between w-100 mt-2">
-                <Typography.Text
-                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
-                >
-                  Age:
-                </Typography.Text>
-                <Typography.Text
-                  style={{ fontSize: "0.9rem" }}
-                  className="text-muted"
-                >
-                  {newPatient.dob
-                    ? `${moment().diff(moment(newPatient.dob), "years")} years`
-                    : "N/A"}
-                </Typography.Text>
-              </div>
-              <div className="d-flex flex-row justify-content-between w-100 mt-2">
-                <Typography.Text
-                  style={{ fontSize: "0.9rem", fontWeight: "medium" }}
-                >
-                  Gender:
-                </Typography.Text>
-                <Typography.Text
-                  style={{ fontSize: "0.9rem" }}
-                  className="text-muted"
-                >
-                  {newPatient.gender === "1"
-                    ? "Male"
-                    : newPatient.gender === "2"
-                    ? "Female"
-                    : "N/A"}
-                </Typography.Text>
-              </div>
-            </div>
-
-            <div className="d-flex my-2 flex-row align-items-center"></div>
-          </Card>
-
-          <Card style={{ width: "100%" }} className="card-header mt-3">
-            <Typography.Title level={5} style={{ color: "#ac8342" }}>
-              Consultation Details
-            </Typography.Title>
-            <div className="row g-3 my-2 align-items-center justify-content-center">
-              {/* Clinic Dropdown */}
-              <div className="col-12 text-primary">
-                <Form.Item
-                  label="Clinic:"
-                  name="clinic"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select Clinic",
-                    },
-                  ]}
-                  style={{ width: "100%" }}
-                >
-                  <Select
-                    placeholder="Select Clinic"
-                    className="w-100"
-                    value={newVisit.clinic}
-                    onFocus={handleDisplayDropDown}
-                    onChange={(value) =>
-                      setNewVisit((prev) => ({ ...prev, clinic: value }))
-                    }
+        </div>
+        <div className="col-12 col-md-4">
+          <Card title="Billing Details" style={{ width: "100%" }}>
+            <Form
+              name="basic"
+              initialValues={{ remember: true }}
+              autoComplete="off"
+            >
+              <div className="row px-3 py-2 g-3 align-items-center">
+                <div className="d-flex my-3 align-items-center justify-content-center">
+                  <Avatar
+                    size={100}
+                    style={{
+                      backgroundColor: "#87d068",
+                      fontSize: "2rem",
+                      fontWeight: "bold",
+                    }}
                   >
-                    <Select.Option value="">--Select Clinic--</Select.Option>
-                    {clinicsPayload &&
-                      clinicsPayload.map((clinic) => (
-                        <Select.Option key={clinic.No} value={clinic.No}>
-                          {clinic.Description}
-                        </Select.Option>
-                      ))}
-                  </Select>
-                </Form.Item>
-              </div>
-
-              {/* Doctor Dropdown */}
-              <div className="col-12 text-primary">
-                <Form.Item
-                  label="Doctor:"
-                  name="doctor"
-                  style={{ width: "100%" }}
-                >
-                  <Select
-                    placeholder="Select Doctor"
-                    className="w-100"
-                    value={newVisit.doctor}
-                    onFocus={handleDisplayDropDown}
-                    onChange={(value) =>
-                      setNewVisit((prev) => ({ ...prev, doctor: value }))
-                    }
-                  >
-                    <Select.Option value="">--Select Doctor--</Select.Option>
-                    {filteredDoctors &&
-                      filteredDoctors.map((doc) => (
-                        <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
-                          {doc.DoctorsName}
-                        </Select.Option>
-                      ))}
-                  </Select>
-                </Form.Item>
-              </div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row className="mt-3" gutter={[16, 16]}>
-        <Col xs={24} md={18}>
-          <Card style={{ width: "100%" }} className="card-header">
-            <Form layout="vertical" onFinish={handleSubmit}>
-              <Typography.Title level={5} style={{ color: "#ac8342" }}>
-                Next of Kin
-              </Typography.Title>
-              <div className="row g-3 align-items-center justify-content-center">
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Next of Kin Name:"
-                    name="nextOfKinFullName"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Please enter Next of Kin Name",
-                    //   },
-                    // ]}
-                    style={{ width: "100%" }}
-                  >
-                    <Input
-                      placeholder="Enter Next of Kin Name"
-                      name="nextOfKinFullName"
-                      value={newPatient.nextOfKinFullName}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Item>
+                    {`${
+                      newPatient.firstName?.charAt(0).toUpperCase() ||
+                      visitorData.VisitorName?.split(" ")[0]
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ""
+                    }${
+                      newPatient.lastName?.charAt(0).toUpperCase() ||
+                      visitorData.VisitorName?.split(" ")[1]
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ""
+                    }`}
+                  </Avatar>
                 </div>
-                <div className="col-12 col-md-6 text-primary">
-                  <Form.Item
-                    label="Next of Kin Relationship:"
-                    name="nextOfKinRelationship"
-                    // rules={[
-                    //   {
-                    //     required: true,
-                    //     message: "Please enter Next of Kin Name",
-                    //   },
-                    // ]}
-                    style={{ width: "100%" }}
+                <div className="col-12">
+                  <label className="py-1">
+                    Patient Type:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Select
+                    placeholder="Select Payment Mode"
+                    className="w-100"
+                    value={newPatient.paymentMode}
+                    onChange={(value) =>
+                      handleSelectChange("paymentMode", value)
+                    }
                   >
+                    <Select.Option value="">--Select--</Select.Option>
+                    <Select.Option value={2}>Cash</Select.Option>
+                    <Select.Option value={1}>Insurance</Select.Option>
+                  </Select>{" "}
+                </div>
+                <div className="row g-2">
+                  <div className="col-12 col-md-6">
+                    <label className="py-1">
+                      Insurance Name:<span className="text-danger px-1">*</span>
+                    </label>
                     <Select
-                      placeholder="Select Relationship"
+                      placeholder="Select Insurance "
                       className="w-100 "
-                      value={newPatient.nextOfKinRelationship}
+                      value={newPatient.insuranceName}
                       onChange={(value) =>
-                        handleSelectChange("nextOfKinRelationship", value)
+                        handleSelectChange("insuranceName", value)
                       }
                       // variant="borderless"
-                      name="nextOfKinRelationship"
+                      name="insuranceName"
                       onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                      disabled={newPatient.paymentMode !== "2"}
                     >
                       <Select.Option value="">
-                        --Select Relationship--
+                        --Select Insurance--
                       </Select.Option>
-                      {relationshipOptionsPayload &&
-                      relationshipOptionsPayload.length > 0 ? (
-                        relationshipOptionsPayload.map((relation) => (
+                      {insurancePayload && insurancePayload.length > 0 ? (
+                        insurancePayload.map((insurance) => (
                           <Select.Option
-                            key={relation.Code}
-                            value={relation.Code}
+                            key={insurance.No}
+                            value={insurance.No}
                           >
-                            {relation.Description}
+                            {insurance.Name}
                           </Select.Option>
                         ))
                       ) : (
@@ -1032,291 +764,83 @@ const PatientRegistration = () => {
                           No data available
                         </Select.Option>
                       )}
-                    </Select>{" "}
-                  </Form.Item>
-                </div>
-              </div>
-              <div className="row g-3 align-items-center justify-content-center">
-                <div className="col-12 text-primary">
-                  <Form.Item
-                    label="Next of Kin Phone:"
-                    name="nextOfKinPhoneNo"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your phone number",
-                      },
-                      {
-                        validator: (_, value) => {
-                          // Validate length based on whether the input starts with '254'
-                          if (value.startsWith("254") && value.length === 12) {
-                            return Promise.resolve();
-                          } else if (
-                            !value.startsWith("254") &&
-                            value.length === 10
-                          ) {
-                            return Promise.resolve();
-                          }
-
-                          return Promise.reject(
-                            new Error(
-                              "Phone number must be 10 or 12 digits long"
-                            )
-                          );
-                        },
-                      },
-                    ]}
-                    style={{ width: "100%" }}
-                  >
-                    <Input
-                      placeholder="Enter Next of Kin Phone"
-                      name="nextOfKinPhoneNo"
-                      value={newPatient.nextOfKinPhoneNo}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Item>
-                </div>
-              </div>
-            </Form>
-          </Card>
-        </Col>
-        <Col className="mt-3" xs={24} md={6}>
-          <Card style={{ width: "100%" }} className="card-header mt-3">
-            <Typography.Title level={5} style={{ color: "#ac8342" }}>
-              Billing Details
-            </Typography.Title>
-            {/* patient billing details based on mode of payment if cash show cash and what they are being billed for same for insurance */}
-            <div className="d-flex gap-2 flex-column">
-              <Typography.Text className="fw-medium">
-                Mode of Payment:
-                <Typography.Text className="text-muted px-2">
-                  {newPatient.paymentMode === "1"
-                    ? "Cash"
-                    : newPatient.paymentMode === "2"
-                    ? "Insurance"
-                    : "N/A"}
-                </Typography.Text>
-              </Typography.Text>
-              <Typography.Text className="fw-medium">
-                Patient Type:
-                <Typography.Text className="text-muted">
-                  {newPatient.paymentMode === "1"
-                    ? "Cash"
-                    : newPatient.paymentMode === "2"
-                    ? "Insurance"
-                    : "N/A"}
-                </Typography.Text>
-              </Typography.Text>
-              <Typography.Text className="fw-medium">
-                Billing:
-                <Typography.Text className="text-muted">
-                  {newPatient.patientType}
-                </Typography.Text>
-              </Typography.Text>
-              <Typography.Text className="fw-medium">
-                Amount:
-                <Typography.Text className="text-muted  ">0</Typography.Text>
-              </Typography.Text>
-            </div>
-            <div className="d-flex my-2 flex-row align-items-center">
-              <Button
-                type="primary"
-                style={{ width: "100%" }}
-                // onClick={handleUploadClick}
-              >
-                Bill Patient
-              </Button>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row className="mt-3" gutter={[16, 16]}>
-        <Col xs={24} md={18}>
-          <Card style={{ width: "100%" }} className="card-header">
-            <Form layout="vertical">
-              <Typography.Title level={5} style={{ color: "#ac8342" }}>
-                Billing Information
-              </Typography.Title>
-              <div className="row g-3  align-items-center justify-content-center">
-                <div className="col-12  text-primary">
-                  <Form.Item
-                    label="Payment Mode:"
-                    name="paymentMode"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please choose Payment Mode",
-                      },
-                    ]}
-                    style={{ width: "100%" }}
-                  >
-                    <Select
-                      placeholder="Select Payment Mode"
-                      className="w-100"
-                      value={newPatient.paymentMode}
-                      onChange={(value) =>
-                        handleSelectChange("paymentMode", value)
-                      }
-                    >
-                      <Select.Option value="2">Cash</Select.Option>
-                      <Select.Option value="1">Insurance</Select.Option>
                     </Select>
-                  </Form.Item>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <label className="py-1">
+                      Membership No:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Enter Membership Number"
+                      name="membershipNo"
+                      value={newPatient.membershipNo}
+                      onChange={handleInputChange}
+                      disabled={newPatient.paymentMode !== "2"}
+                    />
+                  </div>
+                </div>
+                <div className="row g-2 mb-3">
+                  <div className="col-12">
+                    <label className="py-1">
+                      Scheme Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Enter Insurance Number"
+                      name="schemeName"
+                      value={newPatient.schemeName}
+                      onChange={handleInputChange}
+                      disabled={newPatient.paymentMode !== "2"}
+                    />
+                  </div>
+                  <div className="col-12 ">
+                    <label className="py-1">
+                      Principal Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Enter Principal Name"
+                      name="insurancePrinicipalMemberName"
+                      value={newPatient.insurancePrinicipalMemberName}
+                      onChange={handleInputChange}
+                      disabled={
+                        newPatient.paymentMode !== "2" &&
+                        newPatient.isPrincipleMember
+                      }
+                      readOnly
+                      style={{ cursor: "not-allowed" }}
+                    />
+                  </div>
+                </div>
+                <div className="col-12 mb-4">
+                  <label className="py-1">
+                    Principle Member ?{" "}
+                    <span className="text-danger px-1">*</span>
+                  </label>
+                  <Switch
+                    checked={newPatient.isPrincipleMember}
+                    onChange={(checked) =>
+                      handleSwitchChange("isPrincipleMember", checked)
+                    }
+                    size="large"
+                    style={{ margin: "0 10px" }}
+                    disabled={newPatient.paymentMode !== "2"}
+                  />
                 </div>
               </div>
-              {newPatient.paymentMode === "1" && (
-                <>
-                  <div className="row g-3  align-items-center justify-content-center">
-                    <div className="col-12 col-md-6 text-primary">
-                      {/* <Form.Item
-                        label="Insurance Number:"
-                        name="insuranceNo"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter Insurance Number",
-                          },
-                        ]}
-                        style={{ width: "100%" }}
-                      >
-                        <Input
-                          placeholder="Enter Insurance Number"
-                          name="insuranceNo"
-                          value={newPatient.insuranceNo}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Item> */}
-                    </div>
-                    <div className="col-12  text-primary">
-                      <Form.Item
-                        label="Insurance Name:"
-                        name="insuranceName"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter Insurance Name",
-                          },
-                        ]}
-                        style={{ width: "100%" }}
-                      >
-                        <Select
-                          placeholder="Select Insurance "
-                          className="w-100 "
-                          value={newPatient.insuranceName}
-                          onChange={(value) =>
-                            handleSelectChange("insuranceName", value)
-                          }
-                          // variant="borderless"
-                          name="insuranceName"
-                          onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                        >
-                          <Select.Option value="">
-                            --Select Insurance--
-                          </Select.Option>
-                          {insurancePayload && insurancePayload.length > 0 ? (
-                            insurancePayload.map((insurance) => (
-                              <Select.Option
-                                key={insurance.No}
-                                value={insurance.No}
-                              >
-                                {insurance.Name}
-                              </Select.Option>
-                            ))
-                          ) : (
-                            <Select.Option value="" disabled>
-                              No data available
-                            </Select.Option>
-                          )}
-                        </Select>{" "}
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div className="row g-3  align-items-center justify-content-center">
-                    <div className="col-12 col-md-6 text-primary">
-                      <Form.Item
-                        label="Principal Member Name:"
-                        name="insurancePrinicipalMemberName"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter Principal Member Name",
-                          },
-                        ]}
-                        style={{ width: "100%" }}
-                      >
-                        <Input
-                          placeholder="Enter Principal Member Name"
-                          name="insurancePrinicipalMemberName"
-                          value={newPatient.insurancePrinicipalMemberName}
-                          onChange={handleInputChange}
-                          disabled={newPatient.insurancePrinicipalMemberName} // Disable input when auto-populating
-                        />
-                      </Form.Item>
-                    </div>
-                    <div className="col-12 col-md-6 text-primary">
-                      <Form.Item
-                        label="Membership No:"
-                        name="membershipNo"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please enter Membership Number",
-                          },
-                        ]}
-                        style={{ width: "100%" }}
-                      >
-                        <Input
-                          placeholder="Enter Membership Number"
-                          name="membershipNo"
-                          value={newPatient.membershipNo}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                  <div className="row g-3 align-items-center justify-content-center">
-                    <div className="col-12  text-primary">
-                      <Form.Item
-                        label="Is Principal Member ?"
-                        name="isPrincipleMember"
-                      >
-                        <Switch
-                          checked={newPatient.isPrincipleMember}
-                          onChange={(checked) =>
-                            handleSwitchChange("isPrincipleMember", checked)
-                          }
-                          size="large"
-                          style={{ margin: "0 10px" }}
-                        />
-                      </Form.Item>
-                    </div>
-                  </div>
-                </>
-              )}
             </Form>
-
-            {/* submit or save patient details */}
-            <div className="d-flex my-2 gap-2 flex-row align-items-center justify-content-end">
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleSubmit}
-                // style={{ width: "100%" }}
-              >
-                Create Visit
-              </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleTriageDispatch}
-                // style={{ width: "100%" }}
-              >
-                Dispatch to Triage
-              </Button>
-            </div>
           </Card>
-        </Col>
-      </Row>
+        </div>
+
+        <div className="d-flex align-items-center justify-content-end mt-3">
+          <Button
+            type="primary"
+            className="mx-2"
+            onClick={handleSavePatient}
+            // loading={savingPatient}
+          >
+            Save Patient
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

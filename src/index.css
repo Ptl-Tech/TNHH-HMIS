@@ -26,7 +26,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color:  #0f5689;
+ background-color:  #0f5689;
   color: rgb(0, 35, 41);
   padding: 8px 12px 8px 12px;
   position: sticky;
@@ -37,22 +37,15 @@
   z-index:1;
 }
 
-.contentStyle {
-  overflow-y: hidden !important;
-  line-height: 22px;
-  background-color: rgb(239, 239, 239);
-  /* color: #fff;
-  background-color: #fef9f7;
-  overflow-y: scroll !important; */
-  
-}
 
-.footerStyle {
-  text-align: center;
-  color: black;
-  border-top: 1px solid rgb(228, 228, 228);
-  background-color: white;
-  height: 44 !important;
+.contentStyle {
+  min-height: 100dvh;
+  line-height: 22px;
+  color: #fff;
+ // background-color: #fef9f7;
+ // overflow-y: scroll !important;
+  height: 100%;
+  
 }
 
 .sideStyle {
@@ -62,16 +55,8 @@
   color: #fff;
   background-color: #0f5689 !important;
   position: fixed !important;
-  left: 1;
-  overflow-y: auto !important;
-}
-
-.siderStyle{
-  line-height: 22px;
-  color: #2f463d;
-  background-color: #fff !important;
-  overflow-y: hidden !important;
-  padding: 30px 20px;  
+  left: 0;
+  overflow-y: scroll !important;
 }
 .ant-card .ant-card-body {
   padding: 0px !important; 
@@ -137,7 +122,7 @@
 .modal-title-content {
   background-color: #f5f5dc; /* Light greyish cream */
   padding: 20px;
-  text-align: center; /* Center the title and logo */
+  //text-align: center; /* Center the title and logo */
 }
 
 .modal-logo-container {
@@ -160,9 +145,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-}
-.ant-menu-item-selected {
-  background-color: #ac8342 !important;
 }
 
 .danger-row {
@@ -253,38 +235,4 @@ main {
   .ant-modal {
     width: 80% !important; /* Set the modal width to 80% for large screens */
   }
-}
-
-/* NURSE MODULE STYLES */
-
-.admit-patient-card-container {
-  padding: 24px 10px 24px 10px;
-}
-
-.admit-patient-filter-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 30px;
-  gap: 10px;
-}
-@media screen and (max-width: 768px) {
-  .admit-patient-filter-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-}
-
-@media screen and (max-width: 768px) {
-  .admit-patient-button-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.admit-patient-table{
-  margin-top: 30px;
-}
-
-/* END OF NURSE MODULE STYLES */
+} */

@@ -28,6 +28,9 @@ import {
   CONVERT_TO_PATIENT_REQUEST,
   CONVERT_TO_PATIENT_SUCCESS,
   CONVERT_TO_PATIENT_FAIL,
+  APPMNT_LIST_REQUEST,
+  APPMNT_LIST_SUCCESS,
+  APPMNT_LIST_FAIL,
 } from "../constants/patientConstants";
 import { message } from "antd";
 import useAuth from "../hooks/useAuth";
@@ -65,7 +68,7 @@ export const createPatient = (patient) => async (dispatch, getState) => {
     // Extract response details
     const responseData = {
       status: response.data.status,
-      msg: response.data.patientNo, // Assuming `msg` contains the patient ID
+      data: response.data, // Assuming `msg` contains the patient ID
     };
 
     setTimeout(() => {
@@ -74,7 +77,7 @@ export const createPatient = (patient) => async (dispatch, getState) => {
     }, 2000);
 
     // Return patient ID for further use
-    return responseData.msg; // `msg` contains the patient ID
+    return responseData.data; // `msg` contains the patient ID
   } catch (error) {
     dispatch({
       type: PATIENT_REGISTER_FAIL,
@@ -210,15 +213,14 @@ export const postTriageVisit = (appointmentId) => async (dispatch, getState) => 
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
     //message with success message and observationNo
-    message.success(`Dispatched with Obs No: ${responseData.observationNo}`, 5);
 
 
   } catch (error) {
     dispatch({
       type: POST_TRIAGE_VISIT_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: error.response?.data?.message || error.errors,
     });
-    message.error(error.message, 5);
+    // message.error(error.message, 5);
     throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
@@ -252,6 +254,38 @@ export const listPatients = () => async (dispatch, getState) => {
     dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {
     dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
+  }
+};
+
+export const appmntList = () => async (dispatch, getState) => { 
+  try {
+    dispatch({ type: APPMNT_LIST_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode, // Include branchCode in headers
+      },
+    };
+
+    const { data } = await axios.get(`${API}data/odatafilter?webservice=QyAppointmentHeader`, config);
+
+    // Filter the patients by branchCode matching GlobalDimension1Code
+    const filteredData = data.filter((patient) => patient.Branch === branchCode);
+    
+
+    dispatch({ type: APPMNT_LIST_SUCCESS, payload: filteredData });
+  } catch (error) {
+    dispatch({ type: APPMNT_LIST_FAIL, payload: error.message });
   }
 };
 

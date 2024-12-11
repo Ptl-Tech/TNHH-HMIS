@@ -8,6 +8,12 @@ export const branches = [
   { value: "WESTLANDS", label: "Westlands Branch" },
 ];
 
+export const paymentmodeOptions = [
+  { value: "1", label: "Corporate" },
+
+  { value: "2", label: "Cash" },
+]
+
 export const COUNTRIES_LIST_REQUEST = "COUNTRIES_LIST_REQUEST";
 export const COUNTRIES_LIST_SUCCESS = "COUNTRIES_LIST_SUCCESS";
 export const COUNTRIES_LIST_FAIL = "COUNTRIES_LIST_FAIL";
@@ -41,6 +47,11 @@ export const INSURANCE_LIST_REQUEST = "INSURANCE_LIST_REQUEST";
 export const INSURANCE_LIST_SUCCESS = "INSURANCE_LIST_SUCCESS";
 export const INSURANCE_LIST_FAIL = "INSURANCE_LIST_FAIL";
 export const INSURANCE_LIST_RESET = "INSURANCE_LIST_RESET";
+
+export const MARKETING_LIST_REQUEST = "MARKETING_LIST_REQUEST";
+export const MARKETING_LIST_SUCCESS = "MARKETING_LIST_SUCCESS";
+export const MARKETING_LIST_FAIL = "MARKETING_LIST_FAIL";
+export const MARKETING_LIST_RESET = "MARKETING_LIST_RESET";
 
 export const DOCTOR_LIST_REQUEST = "DOCTOR_LIST_REQUEST";
 export const DOCTOR_LIST_SUCCESS = "DOCTOR_LIST_SUCCESS";

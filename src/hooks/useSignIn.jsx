@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { forgotPassword, login, verifyOtp } from '../actions/userActions';
+import { message } from 'antd';
 
 const useSignIn = () => {
   const [staffNo, setStaffNo] = useState('');
@@ -9,82 +10,85 @@ const useSignIn = () => {
   const [branchCode, setBranchCode] = useState('');
   const [otp, setOtp] = useState('');
   const [isOtpRequired, setIsOtpRequired] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Extract state from Redux store
   const loginHandler = useSelector((state) => state.userLogin);
-  const { userInfo } = loginHandler;
+  const { userInfo, loading, error } = loginHandler;
 
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
-  const { userInfo: verifyOtpUserInfo, success: verifyOtpSuccess } = verifyOtpHandler;
+  const { userInfo: verifyOtpUserInfo, success: verifyOtpSuccess, error: verifyOtpError } = verifyOtpHandler;
 
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
-  const { userInfo: forgotPwdUserInfo, success: forgotPwdSuccess, error: forgotPwdError } = loginHandler;
+  const { success: forgotPwdSuccess, error: forgotPwdError } = forgotPwdHandler;
 
+  // Handle login action
   const handleLogin = async () => {
     await dispatch(login(staffNo, password, branchCode));
-    console.log("User info:", userInfo);
-    if (userInfo?.sessionToken) {
-      setIsOtpRequired(true); // Show OTP modal when sessionToken exists
-    }
   };
 
+  // Handle OTP verification
   const handleVerifyOtp = async () => {
-    console.log('Verifying OTP with:', staffNo, otp, userInfo?.sessionToken, userInfo?.branchCode);
-    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode)); // Pass branchCode here
-
+    await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode));
+console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
+    // After OTP verification, navigate based on user role
+    if (verifyOtpSuccess) {
+      const role = verifyOtpUserInfo?.userData.departmentName;
+      console.log('Role:', role);
+      if (role === 'Reception') {
+        navigate('/reception');
+      } else if (role === 'Doctor') {
+        navigate('/Doctor');
+      } else if (role === 'Security') {
+        navigate('/Security');
+      } else if (role === 'Production') {
+        navigate('/Triage');
+      }
+    }else{
+      setIsOtpRequired(true);
+    }
 
   };
 
+
+  // Handle forgot password action
   const handleForgotPassword = async () => {
     await dispatch(forgotPassword(staffNo));
-    console.log("User info:", userInfo);
-
     if (forgotPwdSuccess) {
       navigate("/reset-password");
     }
   };
 
-  // Effect to handle OTP modal visibility based on sessionToken
+  // Monitor login state for OTP requirement
   useEffect(() => {
     if (userInfo?.sessionToken && !verifyOtpSuccess) {
-      setIsOtpRequired(true); // Show OTP modal if sessionToken exists and OTP is not verified
+      setIsOtpRequired(true); // OTP required after successful login
     } else {
-      setIsOtpRequired(false); // Close OTP modal after OTP verification
+      setIsOtpRequired(false);
     }
   }, [userInfo?.sessionToken, verifyOtpSuccess]);
 
+  // After OTP verification, navigate based on user role
   useEffect(() => {
-    if (verifyOtpUserInfo) {
-      // Reset OTP state before navigating
-      setOtp('');
-      setIsOtpRequired(false);
-
+    if (verifyOtpUserInfo?.userData) {
+      setOtp(''); // Clear OTP input
+      setIsOtpRequired(false); // Hide OTP modal
 
       const role = verifyOtpUserInfo?.userData.departmentName;
-
-
-      switch (role) {
-        case 'Reception':
-          navigate('/reception');
-          break;
-        case 'Security':
-          navigate('/Security');
-          break;
-        case 'Doctor':
-          navigate('/Doctor');
-          break;
-        case 'Nurse':
-          navigate('/Nurse/Dashboard');
-          break;
-        default:
-          // Optional: Handle unknown roles or do nothing
-          console.log('Invalid role');
+      console.log('Role:', role);
+      if (role === 'Reception') {
+        navigate('/reception');
+      } else if (role === 'Doctor') {
+        navigate('/Doctor');
+      } else if (role === 'Security') {
+        navigate('/Security');
+      } else if (role === 'Production') {
+        navigate('/Triage');
       }
-
-
     }
-  }, [verifyOtpUserInfo, navigate]);
+  }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);
 
   return {
     staffNo,
@@ -99,8 +103,10 @@ const useSignIn = () => {
     isOtpRequired,
     handleLogin,
     handleVerifyOtp,
-    loading: loginHandler.loading,
-    error: loginHandler.error,
+    loading,
+    error,
+    forgotPwdError,
+    setIsOtpRequired
   };
 };
 

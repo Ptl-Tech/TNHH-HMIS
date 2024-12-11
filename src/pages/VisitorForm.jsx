@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmployeesList } from "../actions/DropdownListActions";
-import { admitVisitor, createVisitor } from "../actions/visitorsActions";
+import { admitVisitor, createVisitor, getVisitorsList } from "../actions/visitorsActions";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
@@ -43,6 +43,7 @@ const VisitorForm = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loadingVisitorCheck, setLoadingVisitorCheck] = useState(false);
   const [visitorSearchTimeout, setVisitorSearchTimeout] = useState(null);
+  const[existingVisitor, setExistingVisitor] = useState(null);
   const [visitorExistsError, setVisitorExistsError] = useState(""); // To store error message for existing visitor check
   const [isEditing, setIsEditing] = useState(false);
   const [newVisitor, setNewVisitor] = useState({
@@ -96,10 +97,30 @@ const VisitorForm = () => {
       }));
       form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
     }
+
+    // Additional logic for autopopulating fields
+    if (name === "reasonForVisit") {
+      if (value === "1") {
+        // Medication
+        setNewVisitor((prevState) => ({
+          ...prevState,
+          purposeOfVisit: "Medication",
+          visitorCategory: "",
+          personToVisit: "",
+        }));
+
+        form.setFieldsValue({
+          purposeOfVisit: "Medication",
+          visitorCategory: "",
+          personToVisit: "",
+        });
+        message.info("Purpose of visit set to Medication.");
+      }
+    }
   };
 
   const handleSubmit = async () => {
-    if (!newVisitor.visitorName || !newVisitor.visitorCategory) {
+    if ( !newVisitor.reasonForVisit) {
       message.error("Please complete all required fields.");
       return;
     }
@@ -115,32 +136,34 @@ const VisitorForm = () => {
     };
 
     const visitorId = await dispatch(createVisitor(visitorData));
-      console.log("Visitor created with ID:", visitorId);
-      if (visitorId) {
-        message.success("Visitor created successfully!");
-        dispatch(admitVisitor(visitorId));
-        setVisitorPassCounter((prev) => prev + 1); // Increment counter
-        form.resetFields(); // Reset form fields
-        setNewVisitor({
-          visitorCategory: null,
-          personToVisit: "",
-          personToVisitNo: "",
-          idNumber: "",
-          phoneNumber: "",
-          carRegistrationNo: "",
-          department: "",
-          visitorName: "",
-          visitorPassNo: "",
-          purposeOfVisit: "",
-        });
+    console.log("Visitor created with ID:", visitorId);
+    if (visitorId) {
+      message.success("Visitor created successfully!");
+      dispatch(admitVisitor(visitorId));
+      setVisitorPassCounter((prev) => prev + 1); // Increment counter
+      form.resetFields(); // Reset form fields
+      setNewVisitor({
+        visitorCategory: null,
+        personToVisit: "",
+        personToVisitNo: "",
+        idNumber: "",
+        phoneNumber: "",
+        carRegistrationNo: "",
+        department: "",
+        visitorName: "",
+        visitorPassNo: "",
+        purposeOfVisit: "",
+        reasonForVisit: "",
+      });
 
-        setVisitorExistsError("");
-      }
+      setVisitorExistsError("");
+    }
   };
 
   useEffect(() => {
     dispatch(getEmployeesList());
-    console.log(data);
+dispatch(getVisitorsList());
+    console.log(visitors);
   }, [dispatch]);
 
   const handleIdNumberChange = (e) => {
@@ -161,6 +184,8 @@ const VisitorForm = () => {
         );
         if (existingVisitor) {
           // Fill in the details if the visitor exists
+setExistingVisitor(existingVisitor);
+
           setNewVisitor((prevState) => ({
             ...prevState,
             visitorName: existingVisitor.VisitorName,
@@ -170,7 +195,8 @@ const VisitorForm = () => {
             personToVisitNo: existingVisitor.PersonToVisitNo,
             purposeOfVisit: existingVisitor.PurposeOfVisit,
             visitorCategory: existingVisitor.VisitorCategory,
-            visitorPassNo:generateVisitorPassNo()
+            reasonForVisit: existingVisitor.ReasonForVisit,
+            visitorPassNo: generateVisitorPassNo(),
           }));
           form.setFieldsValue({
             visitorName: existingVisitor.VisitorName,
@@ -180,11 +206,13 @@ const VisitorForm = () => {
             personToVisitNo: existingVisitor.PersonToVisitNo,
             purposeOfVisit: existingVisitor.PurposeOfVisit,
             visitorCategory: existingVisitor.VisitorCategory,
-            visitorPassNo:generateVisitorPassNo()
+            reasonForVisit: existingVisitor.ReasonForVisit,
+            visitorPassNo: generateVisitorPassNo(),
           });
           setVisitorExistsError("Patient already exists"); // Clear any previous error
         } else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
+          form.resetFields();
         }
         setLoadingVisitorCheck(false);
       }, 500) // Debounce delay (500ms)
@@ -194,15 +222,141 @@ const VisitorForm = () => {
     <div>
       <div className="row p-md-2 gap-4 gap-md-0">
         <Typography.Title level={3} style={{ color: "#003F6D" }}>
-          Visitor Form
+          Visitor Card
         </Typography.Title>
-        <div className="col-12 col-md-5">
+        <div className="col-12 col-md-6">
           <Card
             className="card-header"
             style={{ height: "500px", overflow: "auto" }}
           >
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
-              General Information
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
+              Personal Details
+            </Typography.Title>
+            <Form form={form} layout="vertical">
+              <Form.Item
+                label="Reason for visit:"
+                name="reasonForVsit"
+                rules={[
+                  { required: true, message: "Please select a category!" },
+                ]}
+              >
+                <Select
+                  placeholder="Select category"
+                  value={newVisitor.reasonForVisit}
+                  onChange={(value) =>
+                    handleInputChange("reasonForVisit", value)
+                  }
+                >
+                  <Select.Option value="1">Medication</Select.Option>
+                  <Select.Option value="2">Official</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="ID Number:"
+                name="idNumber"
+                rules={[
+                  { required: true, message: "Please enter the ID number!" },
+                ]}
+                help={
+                  visitorExistsError && (
+                    <span
+                      style={{
+                        color:
+                          visitorExistsError === "Patient already exists"
+                            ? "green"
+                            : "red",
+                      }}
+                    >
+                      {visitorExistsError}
+                    </span>
+                  )
+                }
+              >
+                <Input
+                  placeholder="Enter ID number"
+                  value={newVisitor.idNumber || existingVisitor?.IDNumber}
+                  onChange={handleIdNumberChange}
+                  suffix={
+                    loadingVisitorCheck ? (
+                      <span style={{ marginLeft: 8 }}>
+                        <span className="loading-dots">...</span>
+                      </span>
+                    ) : (
+                      <span />
+                    )
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label="Visitor's Name:"
+                name="visitorName"
+                rules={[{ required: true, message: "Please enter the name!" }]}
+              >
+                <Input
+                  placeholder="Enter name"
+                  value={newVisitor.visitorName || existingVisitor?.VisitorName}
+                  onChange={(e) =>
+                    handleInputChange("visitorName", e.target.value)
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label="Phone Number:"
+                name="phoneNumber"
+                rules={[
+                  { required: true, message: "Please enter the phone number!" },
+                ]}
+              >
+                <Input
+                  placeholder="Enter phone number"
+                  value={newVisitor.phoneNumber || existingVisitor?.PhoneNumber}
+                  onChange={(e) =>
+                    handleInputChange("phoneNumber", e.target.value)
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label="Car Registration:"
+                name="carRegistrationNo"
+                rules={[
+                  {
+                    required: false,
+                    message: "Please enter the car registration number!",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Enter car registration number"
+                  value={newVisitor.carRegistrationNo || existingVisitor?.CarRegNumber}
+                  onChange={(e) =>
+                    handleInputChange("carRegistrationNo", e.target.value)
+                  }
+                />
+              </Form.Item>
+              {/* <Form.Item
+                label="Visitor Pass No:"
+                name="visitorPassNo"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  value={newVisitor.visitorPassNo}
+                  onChange={(e) =>
+                    handleInputChange("visitorPassNo", e.target.value)
+                  }
+                  readOnly
+                  disabled
+                />
+              </Form.Item> */}
+            </Form>
+          </Card>
+        </div>
+        <div className="col-12 col-md-6">
+          <Card
+            className="card-header"
+            style={{ height: "500px", overflow: "auto" }}
+          >
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
+              Person to Visit Information
             </Typography.Title>
 
             <Form form={form} layout="vertical">
@@ -215,12 +369,17 @@ const VisitorForm = () => {
               >
                 <Select
                   placeholder="Select Visitor Category"
-                  value={newVisitor.visitorCategory}
+                  value={
+                    newVisitor.reasonForVisit !== "2"
+                      ? undefined
+                      : newVisitor.visitorCategory
+                  } // Clear value if reasonForVisit is Medication
                   onChange={(value) =>
                     handleInputChange("visitorCategory", value)
                   }
-                  disabled={!visitorExistsError}
-
+                  disabled={
+                    newVisitor.reasonForVisit !== "2" && !visitorExistsError
+                  }
                 >
                   <Select.Option value="2">Employee</Select.Option>
                   <Select.Option value="1">Patient</Select.Option>
@@ -247,11 +406,10 @@ const VisitorForm = () => {
                     <Select.Option value="">--Select Name--</Select.Option>
                     {data && data.length > 0 ? (
                       data.map((employee, index) => (
-                        <Select.Option key={index} value={employee?.No} >
+                        <Select.Option key={index} value={employee?.No}>
                           {`${employee.FirstName || ""} ${
                             employee.MiddleName || ""
                           } ${employee.LastName || ""}`.trim()}
-                          
                         </Select.Option>
                       ))
                     ) : (
@@ -276,6 +434,10 @@ const VisitorForm = () => {
                     value={newVisitor.personToVisit}
                     onChange={(e) =>
                       handleInputChange("personToVisit", e.target.value)
+                    }
+                    disabled={
+                      newVisitor.visitorCategory !== "1" &&
+                      newVisitor.visitorCategory !== "0"
                     }
                   />
                 </Form.Item>
@@ -340,105 +502,16 @@ const VisitorForm = () => {
                   onChange={(e) =>
                     handleInputChange("purposeOfVisit", e.target.value)
                   }
-                />
-              </Form.Item>
-            </Form>
-          </Card>
-        </div>
-        <div className="col-12 col-md-7">
-          <Card
-            className="card-header"
-            style={{ height: "500px", overflow: "auto" }}
-          >
-            <Typography.Title level={5} style={{ color: "#ED1C24" }}>
-              Visitors Information
-            </Typography.Title>
-            <Form form={form} layout="vertical">
-            <Form.Item
-                label="ID Number:"
-                name="idNumber"
-                rules={[
-                  { required: true, message: "Please enter the ID number!" },
-                ]}
-                help={visitorExistsError && (
-                  <span style={{ color: visitorExistsError === "Patient already exists" ? "green" : "red" }}>
-                    {visitorExistsError}
-                  </span>
-                )}
-              >
-                <Input
-                  placeholder="Enter ID number"
-                  value={newVisitor.idNumber}
-                  onChange={handleIdNumberChange}
-                  suffix={
-                    loadingVisitorCheck ? (
-                      <span style={{ marginLeft: 8 }}>
-                        <span className="loading-dots">...</span>
-                      </span>
-                    ) : (
-                      <span />
-                    )
+                  disabled={
+                    newVisitor.visitorCategory !== "1" &&
+                    newVisitor.visitorCategory !== "0"
                   }
-                />
-              </Form.Item>
-              <Form.Item
-                label="Visitor's Name:"
-                name="visitorName"
-                rules={[{ required: true, message: "Please enter the name!" }]}
-              >
-                <Input
-                  placeholder="Enter name"
-                  value={newVisitor.visitorName}
-                  onChange={(e) =>
-                    handleInputChange("visitorName", e.target.value)
-                  }
-                />
-              </Form.Item>
-              <Form.Item
-                label="Phone Number:"
-                name="phoneNumber"
-                rules={[
-                  { required: true, message: "Please enter the phone number!" },
-                ]}
-              >
-                <Input
-                  placeholder="Enter phone number"
-                  value={newVisitor.phoneNumber}
-                  onChange={(e) =>
-                    handleInputChange("phoneNumber", e.target.value)
-                  }
-                />
-              </Form.Item>
-              <Form.Item
-                label="Car Registration:"
-                name="carRegistrationNo"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the car registration number!",
-                  },
-                ]}
-              >
-                <Input
-                  placeholder="Enter car registration number"
-                  value={newVisitor.carRegistrationNo}
-                  onChange={(e) =>
-                    handleInputChange("carRegistrationNo", e.target.value)
-                  }
-                />
-              </Form.Item>
-              <Form.Item
-                label="Visitor Pass No:"
-                name="visitorPassNo"
-                rules={[{ required: true }]}
-              >
-                <Input
-                  value={newVisitor.visitorPassNo}
-                  onChange={(e) =>
-                    handleInputChange("visitorPassNo", e.target.value)
-                  }
-                  readOnly
-                  disabled
+                  style={{
+                    color: "#ff4500", // Custom text color
+                    backgroundColor: "#f9f9f9", // Light background for better contrast
+                    fontWeight: "bold", // Bold for better visibility
+                    //    border: "1px solid primary", // Optional: Custom border
+                  }}
                 />
               </Form.Item>
             </Form>
