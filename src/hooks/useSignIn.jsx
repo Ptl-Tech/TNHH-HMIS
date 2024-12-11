@@ -32,7 +32,9 @@ const useSignIn = () => {
   // Handle OTP verification
   const handleVerifyOtp = async () => {
     await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode));
-console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
+
+    console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
+
     // After OTP verification, navigate based on user role
     if (verifyOtpSuccess) {
       const role = verifyOtpUserInfo?.userData.departmentName;
@@ -45,6 +47,8 @@ console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
         navigate('/Security');
       } else if (role === 'Production') {
         navigate('/Triage');
+      } else if (role === 'Nurse') {
+        navigate('/Nurse')
       }
     }else{
       setIsOtpRequired(true);

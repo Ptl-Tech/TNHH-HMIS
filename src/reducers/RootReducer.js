@@ -5,6 +5,26 @@ import { countiesListReducer, countriesListReducer, subCountiesListReducer, clin
 import { triageWaitingListReducer } from "./TriageReducers";
 import { admitVisitorReducer, visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
 import { updateTriageListVitalsReducer } from "./triage-reducers/updateTriageListVitalsReducer";
+import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
+
+// Triage reducers
+import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
+import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
+import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
+import { getVitalsLinesReducer } from "./triage-reducers/getVitalsLinesReducer";
+import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesMedicationReducer";
+import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
+import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
+import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
+import { getInjectionsReducer } from "./triage-reducers/getInjectionsReducer";
+import { getStoreRequisitionHeadersReducer } from "./triage-reducers/getStoreRequisitionHeadersReducer";
+import { getItemsReducer } from "./triage-reducers/getItemsReducer";
+import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
+import { getDressingReducer } from "./triage-reducers/getDressingReducer";
+import { getItemUnitsOfMeasureReducer } from "./triage-reducers/getItemUnitsOfMeasureReducer";
+import { postDispatchToDoctorReducer } from "./triage-reducers/postDispatchToDoctorReducer";
+import { postCheckInPatientReducer } from "./triage-reducers/postCheckinPatientReducer"; 
+import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -37,8 +57,6 @@ export const rootReducer = combineReducers({
     visitorsList:visitorListReducer,
     getTriageList:getTriageListReducer,
     triageWaitingList:triageWaitingListReducer,
-    registerVisitor:visitorCreateReducer,
-    visitorsList:visitorListReducer,
     admitVisitor:admitVisitorReducer,getPatientDetails:getPatientDetailsReducer,
     getTriageListDetails:getTriageListDetailsReducer,
     postTriageListVitals:postTriageListVitalsReducer,
