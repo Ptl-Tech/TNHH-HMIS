@@ -11,7 +11,10 @@ import {
   UserSwitchOutlined,
   FileAddOutlined,
   HistoryOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  PicCenterOutlined,
+  RadiusUprightOutlined,
+  ImportOutlined
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -31,140 +34,222 @@ const MainLayout = () => {
   const [menuItems, setMenuItems] = useState([]);
 
 
-useEffect(() => {
-  const userInfo=JSON.parse(localStorage.getItem('userInfo'));  
-  const department=userInfo?.userData?.departmentName;
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const department = userInfo?.userData?.departmentName;
 
-  const receptionRoutes = [
-    {
-      key: "/reception",
-      icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      label: "Dashboard",
-    },
-    {
-      key: "/reception/visitors-list",
-      icon: <UserOutlined style={{ color: "#fff" }} />,
-      label: "Visitors",
-    },
-    {
-      key: "/reception/patient-list",
-      icon: <FaUserGroup style={{ color: "#fff" }} />,
-      label: "Patient List",
-      children: [
-        {
-          key: "/reception/Patient-list",
-          label: "Active OutPatient",
-          icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-    {
-      key: "/reception/appointments",
-      icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      label: "Appointments",
-      children: [
-        {
-          key: "/reception/appointments/list",
-          label: "Appointments",
-          icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-    {
-      key: "/reception/billing",
-      icon: <BiCoinStack style={{ color: "#fff" }} />,
-      label: "Billing",
-      children: [
-        {
-          key: "/reception/cash-List",
-          label: "Cash Patients",
-          icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        },
-        {
-          key: "/reception/insurance-List",
-          label: "Insurance Patients",
-          icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-  ];
-  
-  // Define the menu items
-  const doctorRoutes = [
-    {
-      key: "/Doctor",
-      icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      label: "Dashboard",
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "RegistrationGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
-      type: "group",
-      children: [
-        {
-          key: "Outpatient-list",
-          label: "Patients",
-          icon: <TeamOutlined style={{ color: "#fff" }} />,
-        },
-        {
-          key: "Inpatient-list",
-          label: "Active Inpatient List",
-          icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
-        },
-        {
-          key: "Patient-admissions",
-          label: "Patient Admission",
-          icon: <FileAddOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-    {
+    const receptionRoutes = [
+      {
+        key: "/reception",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
+      {
+        key: "/reception/visitors-list",
+        icon: <UserOutlined style={{ color: "#fff" }} />,
+        label: "Visitors",
+      },
+      {
+        key: "/reception/patient-list",
+        icon: <FaUserGroup style={{ color: "#fff" }} />,
+        label: "Patient List",
+        children: [
+          {
+            key: "/reception/Patient-list",
+            label: "Active OutPatient",
+            icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/reception/appointments",
+        icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        label: "Appointments",
+        children: [
+          {
+            key: "/reception/appointments/list",
+            label: "Appointments",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/reception/billing",
+        icon: <BiCoinStack style={{ color: "#fff" }} />,
+        label: "Billing",
+        children: [
+          {
+            key: "/reception/cash-List",
+            label: "Cash Patients",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/insurance-List",
+            label: "Insurance Patients",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+    ];
+
+    const nurseRoutes = [
+      {
+        key: "/Nurse",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
+      {
+        key: "Triage",
+        icon: <FileTextOutlined style={{ color: "#fff" }} />,
+        label: "Triage",
+        children: [
+          {
+            key: "Triage",
+            label: "Triage List",
+            icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "Nurse",
+        icon: <TeamOutlined style={{ color: "#fff" }} />,
+        label: "Nurse",
+        children: [
+          {
+            key: "Admit-patient",
+            label: "Admit Patient",
+            icon: <ImportOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Ward-management",
+            label: "Ward Management",
+            icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Inpatient",
+            label: "Inpatient",
+            icon: <PicCenterOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Past-doctor-visit",
+            label: "Past Doctor Visits",
+            icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      }
+    ];
+
+    // Define the menu items
+    const doctorRoutes = [
+      {
+        key: "/Doctor",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
+      {
         type: "divider",
       },
-    {
-      key: "TriageGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Triage</span>,
-      type: "group",
-      children: [
-        {
-          key: "triage",
-          label: "Triage List",
-          icon: <FileTextOutlined style={{ color: "#fff" }} />,
-        },
-        {
-          key: "past-doctor-visit",
-          label: "Past Doctor Visit",
-          icon: <HistoryOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-    {
+      {
+        key: "RegistrationGroup",
+        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
+        type: "group",
+        children: [
+          {
+            key: "Outpatient-list",
+            label: "Patients",
+            icon: <TeamOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Inpatient-list",
+            label: "Active Inpatient List",
+            icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Patient-admissions",
+            label: "Patient Admission",
+            icon: <FileAddOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
         type: "divider",
       },
-    {
-      key: "AppointmentsGroup",
-      label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
-      type: "group",
-      children: [
-        {
-          key: "Appointments-list",
-          label: "Appointments",
-          icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        },
-        {
-          key: "Upcoming-appointments",
-          label: "Upcoming Appointments",
-          icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
-        },
-      ],
-    },
-  ];
+      {
+        key: "TriageGroup",
+        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Triage</span>,
+        type: "group",
+        children: [
+          {
+            key: "triage",
+            label: "Triage List",
+            icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "past-doctor-visit",
+            label: "Past Doctor Visit",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "AppointmentsGroup",
+        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
+        type: "group",
+        children: [
+          {
+            key: "Appointments-list",
+            label: "Appointments",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Upcoming-appointments",
+            label: "Upcoming Appointments",
+            icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+    ];
+    // Security Routes
+    const securityRoutes = [
+      {
+        key: "/Security",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Registration",
+      },
+      {
+        type: "divider",
+      },
+      
+      {
+        key: "RegistrationGroup",
+        label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Registration</span>,
+        type: "group",
+        children: [
+          {
+            key: "visitors-list",
+            label: "Visitor List",
+            icon: <UserOutlined style={{ color: "#fff" }} />,
+      
+          },           
+        ],
+      },
+    ];
+    
+    // Set the menu items based on the user's department
+    if (department === "Reception") {
+      setMenuItems(receptionRoutes);
+    } else if (department === "Nurse") {
+      setMenuItems(nurseRoutes);
+    } else if (department === "Doctor") {
+      setMenuItems(doctorRoutes);
+    } else if(department === "Security"){
+      setMenuItems(securityRoutes);
+    }
 
-  setMenuItems(department === "Reception" ? receptionRoutes : doctorRoutes);
-},[]);
+  }, []);
 
   // Handle open submenu logic
   const onOpenChange = (keys) => {
@@ -225,21 +310,21 @@ useEffect(() => {
           collapsed={collapsed}
           breakpoint="lg"
         >
-        <Menu
-  theme="light"
-  mode="inline"
-  selectedKeys={[selectedKey]}
-  openKeys={openKeys}
-  onOpenChange={onOpenChange}
-  onClick={handleMenuClick}
-  style={{
-    backgroundColor: "transparent",
-    height: "100vh",
-    paddingBottom: "90px",
-    color: "#fff",
-  }}
-  items={menuItems} // Pass items here
-/>
+          <Menu
+            theme="light"
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            openKeys={openKeys}
+            onOpenChange={onOpenChange}
+            onClick={handleMenuClick}
+            style={{
+              backgroundColor: "transparent",
+              height: "100vh",
+              paddingBottom: "90px",
+              color: "#fff",
+            }}
+            items={menuItems} // Pass items here
+          />
 
         </Sider>
 

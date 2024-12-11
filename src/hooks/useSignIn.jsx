@@ -34,26 +34,7 @@ const useSignIn = () => {
     await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode));
 
     console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
-
-    // After OTP verification, navigate based on user role
-    if (verifyOtpSuccess) {
-      const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log('Role:', role);
-      if (role === 'Reception') {
-        navigate('/reception');
-      } else if (role === 'Doctor') {
-        navigate('/Doctor');
-      } else if (role === 'Security') {
-        navigate('/Security');
-      } else if (role === 'Production') {
-        navigate('/Triage');
-      } else if (role === 'Nurse') {
-        navigate('/Nurse')
-      }
-    }else{
-      setIsOtpRequired(true);
-    }
-
+    console.log('verifyOtpUserSuccess:', verifyOtpSuccess);
   };
 
 
@@ -88,8 +69,8 @@ const useSignIn = () => {
         navigate('/Doctor');
       } else if (role === 'Security') {
         navigate('/Security');
-      } else if (role === 'Production') {
-        navigate('/Triage');
+      } else if (role === 'Nurse') {
+        navigate('/Nurse')
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);

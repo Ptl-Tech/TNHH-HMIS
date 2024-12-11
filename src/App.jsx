@@ -1,10 +1,7 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Auth/Login";
 import Register from "./Auth/Register";
 import PrivateRoute from "./private/PrivateRoute";
-import { Roles } from "./utils/role";
 import PatientRegistration from "./pages/PatientRegistration";
 import OutpatientList from "./pages/OutpatientList";
 import InpatientList from "./pages/InpatientList";
@@ -13,11 +10,10 @@ import ResetPwd from "./Auth/ResetPwd";
 import ViewProfile from "./Auth/ViewProfile";
 import MainLayout from "./Layouts/MainLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
-import SecurityLayout from "./Layouts/SecurityLayout";
+// import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
 import VisitorForm from "./pages/VisitorForm";
 import CreateVisitForm from "./pages/CreateVisitForm";
-import { roles } from "./constants/role";
 
 import HistoryVisitorList from "./pages/HistoryVisitorList";
 import ActiveAppmnts from "./pages/ActiveAppmnts";
@@ -155,8 +151,8 @@ function App() {
         </Route>
       </Route>
 
-      <Route element={<PrivateRoute allowedRoles={["Security"]} />}>
-        <Route path="/Security" element={<SecurityLayout />}>
+      <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
+        <Route path="/Security" element={<MainLayout />}>
           <Route index element={<VisitorForm />} />
           <Route path="/Security/visitors-list" element={<VisitorList />} />
           <Route
