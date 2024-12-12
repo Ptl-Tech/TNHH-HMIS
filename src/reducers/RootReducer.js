@@ -4,6 +4,7 @@ import { activePatientsReducer, appmntListReducer, convertPatientReducer, patien
 import { countiesListReducer, countriesListReducer, subCountiesListReducer, clinicsListReducer, getrelationshipOptionsReducer, getInsuranceReducer, getdoctorListReducer, getemployeesListReducer, getmarketingStrategiesReducer } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import { admitVisitorReducer, visitorCreateReducer, visitorListReducer } from "./visitorsReducer";
+import { treatmentListReducer } from "./doc-reducers/OutPatientReducers";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -35,5 +36,6 @@ export const rootReducer = combineReducers({
     visitorsList:visitorListReducer,
     admitVisitor:admitVisitorReducer,
     appmntList:appmntListReducer,
+    docTreatmentList:treatmentListReducer
 
 });

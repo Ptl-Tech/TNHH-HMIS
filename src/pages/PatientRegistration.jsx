@@ -73,6 +73,8 @@ const PatientRegistration = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
+
   const { state } = useLocation(); // Access the state passed via navigate
   const { visitorData, patientNumber } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
@@ -208,7 +210,6 @@ const PatientRegistration = () => {
       } else if (name === "isPrincipleMember" && !value) {
         updatedPatient.insurancePrinicipalMemberName = ""; // Clear the name if unchecked
       }
-
       return updatedPatient;
     });
   };
@@ -241,16 +242,7 @@ const PatientRegistration = () => {
   const handleSavePatient = async (e) => {
     e.preventDefault();
 
-    // Validate the entire form
-    const errors = validateForm(newPatient);
-    setErrors(errors);
-
-    // If there are any validation errors, show a warning
-    if (Object.keys(errors).length > 0) {
-      message.warning("Please fill in all the required fields correctly.");
-      return; 
-    }
-
+    
     // Determine the action (create or edit) based on the patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
 
@@ -281,6 +273,17 @@ const PatientRegistration = () => {
       patientNo: patientNumber, // Include patientNo only if editing
     };
 
+
+    // Validate the entire form
+    // const errors = validateForm(newPatient);
+    // setErrors(errors);
+
+    // // If there are any validation errors, show a warning
+    // if (Object.keys(errors).length > 0) {
+    //   message.warning("Please fill in all required fields.");
+    //   return;
+    // }
+
     try {
       // Dispatch the patient creation or update action
       const responsedata = await dispatch(createPatient(patientData));
@@ -306,37 +309,37 @@ const PatientRegistration = () => {
   };
 
   // Define the validateForm function
-  const validateForm = (patient) => {
-    const errors = {};
+  // const validateForm = (patient ||) => {
+  //   const errors = {};
 
-    // Example validation rules
-    if (!patient.firstName || patient.firstName.trim() === "") {
-      errors.firstName = "First name is required.";
-    }
-    if (!patient.lastName || patient.lastName.trim() === "") {
-      errors.lastName = "Last name is required.";
-    }
-    if (!patient.phoneNumber || patient.phoneNumber.trim() === "") {
-      errors.phoneNumber = "Phone number is required.";
-    } else if (!/^\d{10,12}$/.test(patient.phoneNumber)) {
-      errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
-    }
-    if (!patient.nationality || patient.nationality.trim() === "") {
-      errors.nationality = "Nationality is required.";
-    }
-    // Validate idNumber if it is provided
-    if (patient.idNumber) {
-      const isRegistered = patientListPayload?.some(
-        (existingPatient) => existingPatient.IDNumber === patient.idNumber
-      );
-      if (isRegistered) {
-        errors.idNumber = "This ID/Passport/Birth No is already registered.";
-      }
-    }
+  //   // Example validation rules
+  //   if (!patient.firstName || patient.firstName.trim() === ""|| visitorData.VisitorName?.split(" ")[0]) {
+  //     errors.firstName = "First name is required.";
+  //   }
+  //   if (!patient.lastName || patient.lastName.trim() === "" || visitorData.VisitorName?.split(" ")[2]) {
+  //     errors.lastName = "Last name is required.";
+  //   }
+  //   if (!patient.phoneNumber || patient.phoneNumber.trim() === "" ||visitorData?.PhoneNumber) {
+  //     errors.phoneNumber = "Phone number is required.";
+  //   } else if (!/^\d{10,12}$/.test(patient.phoneNumber || visitorData?.PhoneNumber)) {
+  //     errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
+  //   }
+  //   if (!patient.nationality || patient.nationality.trim() === "") {
+  //     errors.nationality = "Nationality is required.";
+  //   }
+  //   // Validate idNumber if it is provided
+  //   if (patient.idNumber) {
+  //     const isRegistered = patientListPayload?.some(
+  //       (existingPatient) => existingPatient.IDNumber === patient.idNumber || visitorData?.IDNumber
+  //     );
+  //     if (isRegistered) {
+  //       errors.idNumber = "This ID/Passport/Birth No is already registered.";
+  //     }
+  //   }
 
-    // Add more validation rules as necessary
-    return errors;
-  };
+  //   // Add more validation rules as necessary
+  //   return errors;
+  // };
 
   return (
     <div>
@@ -350,6 +353,7 @@ const PatientRegistration = () => {
               name="basic"
               initialValues={{ remember: true }}
               autoComplete="off"
+              form={form}
             >
               <div className="row px-3 py-2  align-items-center justify-content-between">
                 <div className="col-12 col-md-4 ">
@@ -464,7 +468,7 @@ const PatientRegistration = () => {
                   />
                   {errors.phoneNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.phoneNumber}
+                      {errors.phoneNumber || visitorData?.PhoneNumber}
                     </span>
                   )}
                 </div>
@@ -745,7 +749,7 @@ const PatientRegistration = () => {
                       // variant="borderless"
                       name="insuranceName"
                       onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={newPatient.paymentMode === "2"}
                     >
                       <Select.Option value="">
                         --Select Insurance--
@@ -775,7 +779,7 @@ const PatientRegistration = () => {
                       name="membershipNo"
                       value={newPatient.membershipNo}
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={newPatient.paymentMode === "2"}
                     />
                   </div>
                 </div>
@@ -789,7 +793,7 @@ const PatientRegistration = () => {
                       name="schemeName"
                       value={newPatient.schemeName}
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={newPatient.paymentMode === "2"}
                     />
                   </div>
                   <div className="col-12 ">
@@ -802,7 +806,8 @@ const PatientRegistration = () => {
                       value={newPatient.insurancePrinicipalMemberName}
                       onChange={handleInputChange}
                       disabled={
-                        newPatient.paymentMode !== "2" &&
+                     newPatient.paymentMode === "2"
+                        &&
                         newPatient.isPrincipleMember
                       }
                       readOnly
@@ -822,7 +827,7 @@ const PatientRegistration = () => {
                     }
                     size="large"
                     style={{ margin: "0 10px" }}
-                    disabled={newPatient.paymentMode !== "2"}
+                    disabled={newPatient.paymentMode === "2"}
                   />
                 </div>
               </div>

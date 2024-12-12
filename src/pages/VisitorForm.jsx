@@ -11,7 +11,11 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmployeesList } from "../actions/DropdownListActions";
-import { admitVisitor, createVisitor, getVisitorsList } from "../actions/visitorsActions";
+import {
+  admitVisitor,
+  createVisitor,
+  getVisitorsList,
+} from "../actions/visitorsActions";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
@@ -43,7 +47,7 @@ const VisitorForm = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loadingVisitorCheck, setLoadingVisitorCheck] = useState(false);
   const [visitorSearchTimeout, setVisitorSearchTimeout] = useState(null);
-  const[existingVisitor, setExistingVisitor] = useState(null);
+  const [existingVisitor, setExistingVisitor] = useState(null);
   const [visitorExistsError, setVisitorExistsError] = useState(""); // To store error message for existing visitor check
   const [isEditing, setIsEditing] = useState(false);
   const [newVisitor, setNewVisitor] = useState({
@@ -57,6 +61,7 @@ const VisitorForm = () => {
     visitorName: "",
     visitorPassNo: "",
     purposeOfVisit: "",
+    reasonForVisit: "",
   });
 
   // Generate the visitor pass number using the visitorPassCounter
@@ -105,7 +110,7 @@ const VisitorForm = () => {
         setNewVisitor((prevState) => ({
           ...prevState,
           purposeOfVisit: "Medication",
-          visitorCategory: "",
+          // visitorCategory: "",
           personToVisit: "",
         }));
 
@@ -120,10 +125,6 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = async () => {
-    if ( !newVisitor.reasonForVisit) {
-      message.error("Please complete all required fields.");
-      return;
-    }
 
     if (newVisitor.visitorCategory === "0") {
       newVisitor.personToVisit = "";
@@ -162,7 +163,7 @@ const VisitorForm = () => {
 
   useEffect(() => {
     dispatch(getEmployeesList());
-dispatch(getVisitorsList());
+    dispatch(getVisitorsList());
     console.log(visitors);
   }, [dispatch]);
 
@@ -184,7 +185,7 @@ dispatch(getVisitorsList());
         );
         if (existingVisitor) {
           // Fill in the details if the visitor exists
-setExistingVisitor(existingVisitor);
+          setExistingVisitor(existingVisitor);
 
           setNewVisitor((prevState) => ({
             ...prevState,
@@ -212,7 +213,6 @@ setExistingVisitor(existingVisitor);
           setVisitorExistsError("Patient already exists"); // Clear any previous error
         } else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
-          form.resetFields();
         }
         setLoadingVisitorCheck(false);
       }, 500) // Debounce delay (500ms)
@@ -327,7 +327,10 @@ setExistingVisitor(existingVisitor);
               >
                 <Input
                   placeholder="Enter car registration number"
-                  value={newVisitor.carRegistrationNo || existingVisitor?.CarRegNumber}
+                  value={
+                    newVisitor.carRegistrationNo ||
+                    existingVisitor?.CarRegNumber
+                  }
                   onChange={(e) =>
                     handleInputChange("carRegistrationNo", e.target.value)
                   }
@@ -436,8 +439,7 @@ setExistingVisitor(existingVisitor);
                       handleInputChange("personToVisit", e.target.value)
                     }
                     disabled={
-                      newVisitor.visitorCategory !== "1" &&
-                      newVisitor.visitorCategory !== "0"
+                    newVisitor.reasonForVisit !== "2" && !visitorExistsError
                     }
                   />
                 </Form.Item>
@@ -472,7 +474,7 @@ setExistingVisitor(existingVisitor);
                 <Input
                   placeholder="Auto-populated department"
                   name="department"
-                  value={newVisitor.department}
+                  value={newVisitor.department || newVisitor.department===""?"":newVisitor.department}
                   onChange={(e) =>
                     handleInputChange("department", e.target.value)
                   }
@@ -502,10 +504,10 @@ setExistingVisitor(existingVisitor);
                   onChange={(e) =>
                     handleInputChange("purposeOfVisit", e.target.value)
                   }
-                  disabled={
-                    newVisitor.visitorCategory !== "1" &&
-                    newVisitor.visitorCategory !== "0"
-                  }
+                  // disabled={
+                  //   newVisitor.visitorCategory !== "1" &&
+                  //   newVisitor.visitorCategory !== "0"
+                  // }
                   style={{
                     color: "#ff4500", // Custom text color
                     backgroundColor: "#f9f9f9", // Light background for better contrast

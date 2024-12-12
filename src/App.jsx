@@ -24,6 +24,7 @@ import ActiveAppmnts from "./pages/ActiveAppmnts";
 import CashPatients from "./pages/CashPatients";
 import InsurancePatients from "./pages/InsurancePatients";
 import PatientCard from "./pages/doctorsViews/PatientCard";
+import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
 
 function App() {
   return (
@@ -70,14 +71,14 @@ function App() {
       </Route>
       <Route element={<PrivateRoute allowedDepartments={["Doctor"]} />}>
         <Route path="/Doctor" element={<MainLayout />}>
-          <Route index element={<PatientCard />} />
+          <Route index element={<DocOutPatient />} />
 
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
       
-      <Route element={<PrivateRoute allowedRoles={["Security"]} />}>
-        <Route path="/Security" element={<SecurityLayout />}>
+      <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
+        <Route path="/Security" element={<MainLayout />}>
           <Route index element={<VisitorForm />} />
           <Route path="/Security/visitors-list" element={<VisitorList />} />
           <Route
