@@ -112,6 +112,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
         injectionRemarks: '',
     },
     }}
+    autoComplete="off"
 
     >
     <Row gutter={16}>

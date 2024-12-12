@@ -10,6 +10,8 @@ import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
 
+  const [form] = Form.useForm();
+
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
@@ -53,6 +55,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
       observationNo:  observationNumber,
       BMI: calculateBMI(height, weight),
       type: 1,
+      myAction: "update"
     };
 
     //check if vitals exists ifs so update else create
@@ -77,10 +80,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
         }
       })
     }
-
-    // get vitals
-
-    dispatch(getVitalsLinesSlice(observationNumber));
   
   };
   
@@ -99,6 +98,16 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     const heightInMeters = height / 100; 
     const bmi = weight / (heightInMeters * heightInMeters);
     return bmi.toFixed(2); 
+  };
+
+  const handleValuesChange = (_, allValues) => {
+    const { height, weight } = allValues.vitals || {};
+    if (height && weight) {
+      const bmi = calculateBMI(height, weight);
+      form.setFieldsValue({
+        vitals: { ...allValues.vitals, bmi }, // Update BMI field
+      });
+    }
   };
 
   const columns = [
@@ -157,40 +166,99 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
       <div>
         <Form layout="vertical" 
 
+          form={form}
           onFinish={onFinish}
           initialValues={{
             vitals: {
-              pulseRate: vitalsLines?.PulseRate,
-              bloodPreasure: vitalsLines?.BloodPressure,
-              temperature: vitalsLines?.Temperature,
-              sP02: vitalsLines?.SP02,
-              height: vitalsLines?.Height,
-              weight: vitalsLines?.Weight,
-              respirationRate: vitalsLines?.RespirationRate,
-              pain: vitalsLines?.Pain,
+              pulseRate: vitalsLines?.PulseRate ? vitalsLines.PulseRate : '',
+              bloodPreasure: vitalsLines?.BloodPressure ? vitalsLines.BloodPressure : '',
+              temperature: vitalsLines?.Temperature ? vitalsLines.Temperature : '',
+              sP02: vitalsLines?.SP02 ? vitalsLines.SP02 : '',
+              height: vitalsLines?.Height ? vitalsLines.Height : '',
+              weight: vitalsLines?.Weight ? vitalsLines.Weight : '',
+              respirationRate: vitalsLines?.RespirationRate ? vitalsLines.RespirationRate : '',
+              pain: vitalsLines?.Pain ? vitalsLines.Pain : 0,
               bmi: vitalsLines?.BMI ? vitalsLines.BMI.toFixed(2) : "0.0"
             },
+            
           }}
+          autoComplete="off"
+          onValuesChange={handleValuesChange}
           >
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Pulse Rate (bpm)"
                   name={['vitals', 'pulseRate']}
-                  rules={[{ required: true, message: 'Please input pulse rate!' }]}
+                  
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input pulse rate!',
+                    },
+                    {
+                      pattern: /^[0-9]+$/, // Validate numeric input
+                      message: 'Pulse rate must be a valid number!',
+                    },
+                    {
+                      validator: (_, value) => {
+                        if (!value) {
+                          return Promise.resolve(); // Skip if no value (handled by required rule)
+                        }
+                        if (value < 40 || value > 180) {
+                          return Promise.reject(new Error('Pulse rate must be between 40 and 180 bpm!'));
+                        }
+                        return Promise.resolve(); // Valid input
+                      },
+                    },
+                  ]}
                 >
                   <Input type='text'
-                    name='pulseRate'
+          
                     placeholder='eg 70'
                     
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Blood Pressure (mmHg)" name={['vitals', 'bloodPreasure']}
-                  rules={[{ required: true, message: 'Please input blood pressure!' }]}
+                <Form.Item label="Blood Pressure (mmHg)" 
+                  name={['vitals', 'bloodPreasure']}
+                  validateTrigger={['onBlur', 'onChange']}
+                  rules={[
+                    { required: true, message: 'Blood Pressure is required!' },
+                    {
+                      validator(_, value) {
+                        if (!value) {
+                          return Promise.reject(new Error('Blood Pressure is required!'));
+                        }
+          
+                        const regex = /^\d{2,3}\/\d{2,3}$/; // Pattern to match "120/80"
+                        if (!regex.test(value)) {
+                          return Promise.reject(
+                            new Error('Enter a valid format (e.g., 120/80)')
+                          );
+                        }
+          
+                        const [systolic, diastolic] = value.split('/').map(Number);
+                        if (
+                          systolic < 90 ||
+                          systolic > 200 ||
+                          diastolic < 60 ||
+                          diastolic > 120
+                        ) {
+                          return Promise.reject(
+                            new Error(
+                              'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
+                            )
+                          );
+                        }
+          
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
                   >
                   <Input type='text' 
-                      name='bloodPreasure'
+                     
                       placeholder='eg 120/80'
                       
                   />
@@ -200,10 +268,33 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Temperature (&deg;C)" name={['vitals', 'temperature']}
-                  rules={[{ required: true, message: 'Please input temperature!' }]}
+                  validateTrigger={['onBlur', 'onChange']}
+                  rules={[
+                    { required: true, message: 'Please input temperature!' },
+                    {
+                      validator(_, value) {
+                        if (value === undefined || value === null || value === '') {
+                          return Promise.reject(new Error('Temperature is required!'));
+                        }
+                
+                        const temperature = parseFloat(value);
+                        if (isNaN(temperature)) {
+                          return Promise.reject(new Error('Temperature must be a number!'));
+                        }
+                
+                        if (temperature < 35.0 || temperature > 42.0) {
+                          return Promise.reject(
+                            new Error('Temperature must be between 35.0°C and 42.0°C.')
+                          );
+                        }
+                
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
                 >
                   <Input type='number' 
-                    name='temperature'
+                   
                      placeholder='eg: 32.7'
                     
                   />
@@ -211,7 +302,34 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               </Col>
               <Col span={12}>
                 <Form.Item label="SPO2 (%)" name={['vitals', 'sP02']}
-                  rules={[{ required: true, message: 'Please input SOP2!' }]}
+                    validateTrigger={['onBlur', 'onChange']}
+                    rules={[
+                      { required: true, message: 'Please input SPO2!' },
+                      {
+                        validator(_, value) {
+                          if (value === undefined || value === null || value.trim() === '') {
+                            return Promise.reject(new Error('SPO2 is required!'));
+                          }
+                  
+                          // Ensure value is a valid percentage
+                          const percentageMatch = value.match(/^(\d{1,2}|100)%$/);
+                          if (!percentageMatch) {
+                            return Promise.reject(
+                              new Error('SPO2 must be a valid percentage (e.g., 98%).')
+                            );
+                          }
+                  
+                          const numericValue = parseInt(percentageMatch[1], 10);
+                          if (numericValue < 0 || numericValue > 100) {
+                            return Promise.reject(
+                              new Error('SPO2 must be between 0% and 100%.')
+                            );
+                          }
+                  
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
                 >
                   <Input type='text' 
                     name='sP02'
@@ -225,10 +343,23 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="Height (cm)" name={['vitals', 'height']}
                 
-                rules={[{ required: true, message: 'Please input height!' }]}
+                validateTrigger={['onBlur', 'onChange']}
+                rules={[
+                  { required: true, message: 'Please input height!' },
+                  {
+                    type: 'number', 
+                    min: 30, 
+                    max: 300, 
+                    transform(value) {
+                      return value ? Number(value) : null;
+                    },
+                    message: 'Height must be between 30 cm and 300 cm!',
+                  },
+                 
+                ]}
                 >
                   <Input type='number' 
-                    name='height'
+                    
                     placeholder='eg 170'
                     
                   />
@@ -236,10 +367,23 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               </Col>
               <Col span={12}>
                 <Form.Item label="Weight (kg)" name={['vitals', 'weight']}
-                  rules={[{ required: true, message: 'Please input weight!' }]}
+                  validateTrigger={['onBlur', 'onChange']}
+                  rules={[
+                    { required: true, message: 'Please input weight!' },
+                    {
+                      type: 'number',
+                      min: 1,
+                      max: 500,
+                      transform(value) {
+                        return value ? Number(value) : null;
+                      },
+                      message: 'Weight must be between 1 kg and 500 kg!',
+                    },
+                    
+                  ]}
                 >
                   <Input type='number' 
-                    name='weight'
+                  
                     placeholder='eg 70'
                 
                   />
@@ -249,7 +393,21 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
-                  rules={[{ required: true, message: 'Please input respiration rate!' }]}
+                   rules={[
+                    { required: true, message: 'Please input respiration rate!' },
+                    {
+                      pattern: /^[0-9]+$/,
+                      message: 'Respiration rate must be a valid number!',
+                    },
+                    {
+                      validator(_, value) {
+                        if (!value || (value >= 12 && value <= 25)) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Respiration rate must be between 12 and 25 bpm!'));
+                      },
+                    },
+                  ]}
                 >
                   <Input type='text' 
                   
@@ -260,9 +418,24 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Pain" name={['vitals', 'pain']}>
+                <Form.Item label="Pain" name={['vitals', 'pain']}
+                validationTrigger={['onBlur', 'onChange']}
+                rules={[
+                  { required: true, message: 'Please input pain level!' },
+                  {
+                    validator(_, value) {
+                      if (value === 0 || value === 1) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Pain level must be 0 or 1!'));
+                    },
+                  },
+                ]}
+
+                >
+                
                   <Input type='number' 
-                    name='pain'
+                   
                     placeholder='eg 1'
               
                   />
@@ -275,7 +448,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               >
                 <Input type='text' 
                 
-                  name='bmi'
+                 
                   disabled
 
                 />

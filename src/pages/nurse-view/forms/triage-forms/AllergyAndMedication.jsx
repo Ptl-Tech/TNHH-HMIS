@@ -103,6 +103,7 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                       drugAllergy: '',
                       },
                   }}
+                  autoComplete="off"
               >
                   <Row gutter={16}>
 

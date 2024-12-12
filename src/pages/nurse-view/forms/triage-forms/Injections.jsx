@@ -111,6 +111,7 @@ const Injections = ({ observationNumber, staffNo }) => {
               injectionRemarks: '',
             },
           }}
+          autoComplete="off"
           >
       
         <Row gutter={16}>
