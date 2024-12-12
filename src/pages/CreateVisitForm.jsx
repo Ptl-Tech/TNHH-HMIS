@@ -17,7 +17,7 @@ import {
   listInsuranceOptions,
   listClinics,
 } from "../actions/DropdownListActions";
-import { createTriageVisit, postTriageVisit } from "../actions/patientActions";
+import { createPatient, createTriageVisit, postTriageVisit } from "../actions/patientActions";
 
 const CreateVisitForm = () => {
   const { state } = useLocation(); // Access the state passed via navigate
@@ -58,6 +58,13 @@ const CreateVisitForm = () => {
     payload: postTriageVisitPayload,
   } = useSelector((state) => state.postTriageVisit);
 
+  const {
+    loading: editPatientLoading,
+    success: editPatientSuccess,
+    error: editPatientError,
+    data: editPatientPayload,
+  } = useSelector((state) => state.createPatient);
+
   const [newVisit, setNewVisit] = useState({
     clinic: "",
     doctor: "",
@@ -66,6 +73,9 @@ const CreateVisitForm = () => {
     membershipNo: "",
     patientType: "",
     appointmentType: "",
+    insuranceNo: "",
+    gender:"",
+    dob:"",
   });
 
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -94,38 +104,62 @@ const CreateVisitForm = () => {
     }
   }, [doctorsPayload, newVisit.clinic]);
 
-  const savepatientVisit = async (value) => {
-    const visitData = {
-      patientNo: patientData?.patientNo || existingPatient?.PatientNo,
-      clinic: newVisit.clinic,
-      doctor: newVisit.doctor,
-    };
-
+  // const editPatient = async () => {
+  //   const patientDataToEdit = {
+  //     myAction: "edit",
+  //     patientNo: patientData?.patientNo || existingPatient?.PatientNo,
+  //     membershipNo: newVisit.membershipNo,
+  //     insuranceName: newVisit.insuranceName,
+  //     patientType: newVisit.patientType,
+  //     gender:patientData?.gender||existingPatient?.Gender,
+  //     dob:patientData?.dob||existingPatient?.dateOfBirth
+  //   };
+  
+  //   try {
+  //     const response = await dispatch(createPatient(patientDataToEdit));
+  //     if (response) {
+  //       message.success("Patient details updated successfully!");
+  //     } else {
+  //       message.error("Failed to update patient details!");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating patient details:", error);
+  //     message.error("Error occurred while updating patient details!");
+  //   }
+  // };
+  
+  const savepatientVisit = async () => {
     try {
-      // Create Triage Visit
+      // // Step 1: Handle patient creation/edit if new data is provided
+      // if (!existingPatient || newVisit.membershipNo || newVisit.insuranceNo || newVisit.patientType) {
+      //   await editPatient(); // Update or create patient details
+      // }
+  
+      // Step 2: Create Triage Visit
+      const visitData = {
+        patientNo: patientData?.patientNo || existingPatient?.PatientNo,
+        clinic: newVisit.clinic,
+        doctor: newVisit.doctor,
+        appointmentType: newVisit.appointmentType,
+      };
+  
       const appointmentId = await dispatch(createTriageVisit(visitData));
-
-      if (!appointmentId) {
-        //      message.error("Patient registration failed!");
-        return;
-      }
-
-      // Post Triage Visit
-
+  
       if (appointmentId) {
         message.success("Visit created successfully!");
         setAppointmentId(appointmentId);
-
+  
+        // Step 3: Optionally dispatch the visit (triage)
         console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
         message.error("Failed to create visit!");
       }
     } catch (error) {
-      console.error("Error dispatching patient:", error);
-      message.error("Failed to create visit!");
+      console.error("Error creating visit:", error);
+      message.error("Error occurred while creating visit!");
     }
   };
-
+  
   const dispatchPatient = async (appointmentId) => {
     if (!appointmentId) {
       message.error("Appointment ID is required!");

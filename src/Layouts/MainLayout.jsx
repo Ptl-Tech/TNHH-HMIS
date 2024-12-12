@@ -14,7 +14,10 @@ import {
   ClockCircleOutlined,
   PicCenterOutlined,
   RadiusUprightOutlined,
-  ImportOutlined
+  ImportOutlined,
+  MedicineBoxOutlined,
+  ExperimentOutlined,
+  RadarChartOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -22,6 +25,7 @@ import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
 import Signout from "../Auth/Signout";
 import { BiCoinStack } from "react-icons/bi";
+import { FaUserFriends } from "react-icons/fa";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -310,22 +314,21 @@ const MainLayout = () => {
           collapsed={collapsed}
           breakpoint="lg"
         >
-          <Menu
-            theme="light"
-            mode="inline"
-            selectedKeys={[selectedKey]}
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-            onClick={handleMenuClick}
-            style={{
-              backgroundColor: "transparent",
-              height: "100vh",
-              paddingBottom: "90px",
-              color: "#fff",
-            }}
-            items={menuItems} // Pass items here
-          />
-
+            <Menu
+                      theme="light"
+                      mode="inline"
+                      selectedKeys={[selectedKey]}
+                      openKeys={openKeys}
+                      onOpenChange={onOpenChange}
+                      onClick={handleMenuClick}
+                      style={{
+                        backgroundColor: "transparent",
+                        height: "100vh",
+                        paddingBottom: "90px",
+                        color: "#fff",
+                      }}
+                      items={menuItems} // Pass items here
+                    />
         </Sider>
 
         <Layout className="site-layout">
@@ -340,7 +343,9 @@ const MainLayout = () => {
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>List</Breadcrumb.Item>
             {/* Dynamic breadcrumb based on URL */}
-            <Breadcrumb.Item>{location.pathname.split("/").pop()}</Breadcrumb.Item>
+            <Breadcrumb.Item>
+              {location.pathname.split("/").pop()}
+            </Breadcrumb.Item>
           </Breadcrumb>
 
           <Content

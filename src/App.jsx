@@ -45,6 +45,7 @@ import NurseOutpatientList from "./pages/NurseOutpatientList";
 import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
+import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
 
 function App() {
   return (
@@ -145,7 +146,7 @@ function App() {
 
       <Route element={<PrivateRoute allowedDepartments={["Doctor"]} />}>
         <Route path="/Doctor" element={<MainLayout />}>
-          <Route index element={<PatientCard />} />
+          <Route index element={<DocOutPatient />} />
 
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
