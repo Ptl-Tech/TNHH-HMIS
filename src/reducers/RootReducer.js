@@ -23,7 +23,7 @@ import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
 import { getDressingReducer } from "./triage-reducers/getDressingReducer";
 import { getItemUnitsOfMeasureReducer } from "./triage-reducers/getItemUnitsOfMeasureReducer";
 import { postDispatchToDoctorReducer } from "./triage-reducers/postDispatchToDoctorReducer";
-import { postCheckInPatientReducer } from "./triage-reducers/postCheckinPatientReducer"; 
+import { postCheckInPatientReducer } from "./triage-reducers/postCheckInPatientReducer"; 
 import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 
 export const rootReducer = combineReducers({
