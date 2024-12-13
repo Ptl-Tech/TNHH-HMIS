@@ -79,10 +79,10 @@ const OutpatientList = () => {
     const filtered = patients.filter((patient) => {
       return (
         patient.Names.toLowerCase().includes(
-          searchParams.firstName.toLowerCase()
+          searchParams.SearchName.toLowerCase()
         ) &&
         patient.LastName.toLowerCase().includes(
-          searchParams.lastName.toLowerCase()
+          searchParams.SearchName.toLowerCase()
         ) &&
         patient.IDNumber.includes(searchParams.patientId) &&
         patient.PatientNo.toString().includes(searchParams.patientNo)

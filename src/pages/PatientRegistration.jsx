@@ -242,15 +242,15 @@ const PatientRegistration = () => {
   const handleSavePatient = async (e) => {
     e.preventDefault();
 
-    
     // Determine the action (create or edit) based on the patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
 
     // Prepare patient data
     const patientData = {
-      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0],
-      lastName: newPatient.lastName ||visitorData.VisitorName?.split(" ")[2],
-      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1],
+      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0] || visitorData?.firstName,
+      lastName: newPatient.lastName || visitorData.VisitorName?.split(" ")[2] || visitorData?.lastName,
+      middleName:
+        newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
       idNumber: newPatient.idNumber || visitorData?.IDNumber,
       phoneNumber: newPatient.phoneNumber || visitorData?.PhoneNumber,
       email: newPatient.email,
@@ -270,10 +270,9 @@ const PatientRegistration = () => {
       membershipNo: newPatient.membershipNo,
       insuranceName: newPatient.insuranceName,
       howYouKnewABoutUs: newPatient.howYouKnewABoutUs,
-      myAction: isEditAction ? "edit" : "create", 
+      myAction: isEditAction ? "edit" : "create",
       patientNo: patientNumber, // Include patientNo only if editing
     };
-
 
     // Validate the entire form
     // const errors = validateForm(newPatient);
@@ -291,12 +290,10 @@ const PatientRegistration = () => {
       const patientId = responsedata?.patientNo;
 
       if (patientId) {
-        message.success(
-          "Patient Saved Successfully"
-        );
+        message.success("Patient Saved Successfully");
         // Navigate to Add Appointment page and pass patientId
         navigate(`/reception/Add-Appointment/${patientId}`, {
-          state: { patientData: patientData,  },
+          state: { patientData: patientData },
         });
       } else {
         message.error("Failed to save patient data. Please try again.");
@@ -367,8 +364,13 @@ const PatientRegistration = () => {
                     name="idNumber"
                     placeholder="ID Number"
                     style={{ width: "100%" }}
-                    value={newPatient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber}
+                    value={
+                      newPatient.idNumber ||
+                      visitorData?.IDNumber ||
+                      patientDet?.IDNumber
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                   {errors.idNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
@@ -384,8 +386,13 @@ const PatientRegistration = () => {
                     name="firstName"
                     placeholder="First Name"
                     style={{ width: "100%" }}
-                    value={newPatient.firstName || visitorData?.VisitorName?.split(" ")[0] || patientDet?.SearchName?.split(" ")[0]}
+                    value={
+                      newPatient.firstName ||
+                      visitorData?.VisitorName?.split(" ")[0] ||
+                      patientDet?.SearchName?.split(" ")[0]
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                 </div>
                 <div className="col-12 col-md-4">
@@ -396,8 +403,13 @@ const PatientRegistration = () => {
                     name="middleName"
                     placeholder="Middle Name"
                     style={{ width: "100%" }}
-                    value={newPatient.middleName || visitorData?.VisitorName?.split(" ")[1] || patientDet?.SearchName?.split(" ")[1]}
+                    value={
+                      newPatient.middleName ||
+                      visitorData?.VisitorName?.split(" ")[1] ||
+                      patientDet?.SearchName?.split(" ")[1]
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                 </div>
               </div>
@@ -410,8 +422,13 @@ const PatientRegistration = () => {
                     name="lastName"
                     placeholder="Last Name"
                     style={{ width: "100%" }}
-                    value={newPatient.lastName || visitorData?.VisitorName?.split(" ")[2] || patientDet?.SearchName?.split(" ")[2]}
+                    value={
+                      newPatient.lastName ||
+                      visitorData?.VisitorName?.split(" ")[2] ||
+                      patientDet?.SearchName?.split(" ")[2]
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -421,8 +438,12 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="--Select Gender--"
-                    className="w-100"
-                    value={newPatient.gender || visitorData?.Gender || patientDet?.Gender}
+                    className="w-100 text-center fw-bold"
+                    value={
+                      newPatient.gender ||
+                      visitorData?.Gender ||
+                      patientDet?.Gender
+                    }
                     onChange={(value) => handleSelectChange("gender", value)}
                   >
                     <Select.Option value="">--Select Gender-- </Select.Option>
@@ -442,11 +463,18 @@ const PatientRegistration = () => {
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     placeholder="Select Date of Birth"
-                    defaultValue={moment()} // Set default date to current date
-                    value={newPatient.dob ? moment(newPatient.dob) || visitorData?.dateOfBirth || patientDet?.dateOfBirth : null}
+                    //defaultValue={moment()} // Set default date to current date
+                    value={
+                      newPatient.dob
+                        ? moment(newPatient.dob) ||
+                          visitorData?.dateOfBirth ||
+                          patientDet?.DateOfBirth
+                        : null
+                    }
                     onChange={(date, dateString) =>
                       handleDateChange(date, dateString)
                     }
+                    className="text-center fw-bold"
                   />
                   {dobError && <span style={{ color: "red" }}>{dobError}</span>}
                   {age !== null && (
@@ -464,8 +492,13 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Enter phone number"
                     name="phoneNumber"
-                    value={newPatient.phoneNumber || visitorData?.PhoneNumber || patientDet?.PhoneNumber}
+                    value={
+                      newPatient.phoneNumber ||
+                      visitorData?.PhoneNumber ||
+                      patientDet?.TelephoneNo1
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                   {errors.phoneNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
@@ -485,6 +518,7 @@ const PatientRegistration = () => {
                     style={{ width: "100%" }}
                     value={newPatient.email || patientDet?.Email}
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                 </div>
                 <div className="col-12 col-md-4">
@@ -494,7 +528,7 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select nationality"
                     name="nationality"
-                    className="w-100"
+                    className="w-100 fw-bold text-center"
                     value={newPatient.nationality || patientDet?.Nationality}
                     showSearch
                     onSearch={handleSearch}
@@ -527,8 +561,8 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select County"
-                    className="w-100 "
-                    value={newPatient.county}
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.county || patientDet?.CountyWardName}
                     onChange={(value) => handleSelectChange("county", value)}
                     name="county"
                     onFocus={handleDisplayDropDown}
@@ -553,8 +587,8 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select Sub County"
-                    className="w-100"
-                    value={newPatient.subCounty}
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.subCounty || patientDet?.SubCountyName}
                     name="subCounty"
                     onChange={(value) => handleSelectChange("subCounty", value)}
                     onFocus={handleDisplayDropDown}
@@ -587,6 +621,8 @@ const PatientRegistration = () => {
                     name="residence"
                     value={newPatient.residence}
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
+
                   />
                 </div>
               </div>
@@ -598,8 +634,13 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Kin's Name"
                     name="nextOfKinFullName"
-                    value={newPatient.nextOfKinFullName}
+                    value={
+                      newPatient.nextOfKinFullName ||
+                      patientDet?.NextOfkinFullName
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
+
                   />
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -609,8 +650,11 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select Relationship"
-                    className="w-100 "
-                    value={newPatient.nextOfKinRelationShip}
+                    className="w-100 fw-bold text-center"
+                    value={
+                      newPatient.nextOfKinRelationShip ||
+                      patientDet?.NextofkinRelationship
+                    }
                     onChange={(value) =>
                       handleSelectChange("nextOfKinRelationShip", value)
                     }
@@ -646,7 +690,12 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Kin's phone number"
                     name="nextOfKinPhoneNo"
-                    value={newPatient.nextOfKinPhoneNo}
+                    value={
+                      newPatient.nextOfKinPhoneNo ||
+                      patientDet?.NextOfkinAddress1
+                    }
+                    className="text-center fw-bold"
+
                     onChange={handleInputChange}
                     type="number"
                   />
@@ -743,7 +792,7 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select Insurance "
                       className="w-100 "
-                      value={newPatient.insuranceNo}
+                      value={newPatient.insuranceNo || patientDet?.InsuranceNo}
                       onChange={(value) =>
                         handleSelectChange("insuranceNo", value)
                       }
@@ -778,9 +827,14 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Membership Number"
                       name="membershipNo"
-                      value={newPatient.membershipNo}
+                      value={
+                        newPatient.membershipNo || patientDet?.MembershipNo
+                      }
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode === "2"}
+                      disabled={
+                        newPatient.paymentMode === "2" ||
+                        patientDet?.MembershipNo
+                      }
                     />
                   </div>
                 </div>
@@ -792,7 +846,7 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Insurance Number"
                       name="schemeName"
-                      value={newPatient.schemeName}
+                      value={newPatient.schemeName || patientDet?.SchemeName}
                       onChange={handleInputChange}
                       disabled={newPatient.paymentMode === "2"}
                     />
@@ -804,15 +858,17 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Principal Name"
                       name="insurancePrinicipalMemberName"
-                      value={newPatient.insurancePrinicipalMemberName}
+                      value={
+                        newPatient.insurancePrinicipalMemberName ||
+                        patientDet?.InsurancePrinicipalMemberName ||
+                        ""
+                      }
                       onChange={handleInputChange}
                       disabled={
-                     newPatient.paymentMode === "2"
-                        &&
+                        newPatient.paymentMode === "2" &&
                         newPatient.isPrincipleMember
                       }
-                      readOnly
-                      style={{ cursor: "not-allowed" }}
+                      //style={{ cursor: "not-allowed" }}
                     />
                   </div>
                 </div>
@@ -822,7 +878,9 @@ const PatientRegistration = () => {
                     <span className="text-danger px-1">*</span>
                   </label>
                   <Switch
-                    checked={newPatient.isPrincipleMember}
+                    checked={
+                      newPatient.isPrincipleMember || patientDet?.Principal
+                    }
                     onChange={(checked) =>
                       handleSwitchChange("isPrincipleMember", checked)
                     }

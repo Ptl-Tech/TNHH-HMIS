@@ -62,6 +62,9 @@ const VisitorForm = () => {
     visitorPassNo: "",
     purposeOfVisit: "",
     reasonForVisit: "",
+    firstName:"",
+    middleName:"",
+    lastName:"",
   });
 
   // Generate the visitor pass number using the visitorPassCounter
@@ -70,7 +73,30 @@ const VisitorForm = () => {
   };
 
   const handleInputChange = (name, value) => {
-    
+    if (name === "visitorName") {
+      const nameParts = value.split(" ").filter(Boolean); // Split and remove extra spaces
+      const [firstName, middleName, lastName] = [
+        nameParts[0] || "",
+        nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "",
+        nameParts.length > 1 ? nameParts[nameParts.length - 1] : "",
+      ];
+  
+      setNewVisitor((prevState) => ({
+        ...prevState,
+        visitorName: value,
+        firstName,
+        middleName,
+        lastName,
+      }));
+    } else {
+      setNewVisitor((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+
+    form.setFieldsValue({ [name]: value });
+
     // If 'personToVisit' is updated, auto-update 'department'
     if (name === "personToVisit" && data) {
       const selectedEmployee = data.find((employee) => employee.No === value);
@@ -129,11 +155,12 @@ const VisitorForm = () => {
     if (newVisitor.visitorCategory === "0") {
       newVisitor.personToVisit = "";
     }
+    const { visitorName, ...restVisitorData } = newVisitor; // Exclude visitorName
 
     const visitorData = {
       myAction: "create",
       visitorNo: "",
-      ...newVisitor,
+...restVisitorData
     };
 
     const visitorId = await dispatch(createVisitor(visitorData));
@@ -155,6 +182,9 @@ const VisitorForm = () => {
         visitorPassNo: "",
         purposeOfVisit: "",
         reasonForVisit: "",
+        FirstName: "",
+        MiddleName: "",
+        LastName: "",
       });
 
       setVisitorExistsError("");
