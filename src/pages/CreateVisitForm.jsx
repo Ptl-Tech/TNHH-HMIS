@@ -64,7 +64,6 @@ const CreateVisitForm = () => {
     error: editPatientError,
     data: editPatientPayload,
   } = useSelector((state) => state.createPatient);
-
   const [newVisit, setNewVisit] = useState({
     clinic: "",
     doctor: "",
@@ -153,6 +152,11 @@ const CreateVisitForm = () => {
         console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
         message.error("Failed to create visit!");
+        setAppointmentId(null);
+        setNewVisit({});
+       // patientData={};
+      //  existingPatient={};
+        navigate("/reception/visitors-list");
       }
     } catch (error) {
       console.error("Error creating visit:", error);

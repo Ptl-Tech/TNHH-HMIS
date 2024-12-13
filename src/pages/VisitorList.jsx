@@ -35,9 +35,11 @@ const VisitorList = () => {
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
-  const { loading: visitorLoading, error, visitors } = useSelector(
-    (state) => state.visitorsList
-  );
+  const {
+    loading: visitorLoading,
+    error,
+    visitors,
+  } = useSelector((state) => state.visitorsList);
   const {
     loading: patientsLoading,
     error: patientsError,
@@ -52,12 +54,10 @@ const VisitorList = () => {
   const { userInfo } = useSelector((state) => state.otpVerify);
   const [patientInfo, setPatientInfo] = useState({ type: null, data: null });
   const [loading, setLoading] = useState(false);
-const [IsNewPatient, setIsNewPatient] = useState(false);
+  const [IsNewPatient, setIsNewPatient] = useState(false);
   const dispatch = useDispatch();
-  const [showTable, setShowTable] = useState(userInfo
-    .userData.departmentName === "Reception"
-    ? true
-    : false
+  const [showTable, setShowTable] = useState(
+    userInfo.userData.departmentName === "Reception" ? true : false
   );
 
   useEffect(() => {
@@ -67,16 +67,23 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
   useEffect(() => {
     filterVisitors(searchParams);
   }, [visitors, searchParams]);
-  
+
   const Visitors = useMemo(() => {
-    return visitors.filter(visitor => dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
-      visitor.Status === "Entered" && visitor.Status !== "Converted to Patient" &&
-      (!searchParams.VisitorName || visitor.VisitorName?.toLowerCase().includes(searchParams.VisitorName.toLowerCase())) &&
-      (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
-      (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
+    return visitors.filter(
+      (visitor) =>
+        dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
+        visitor.Status === "Entered" &&
+        visitor.Status !== "Converted to Patient" &&
+        (!searchParams.VisitorName ||
+          visitor.VisitorName?.toLowerCase().includes(
+            searchParams.VisitorName.toLowerCase()
+          )) &&
+        (!searchParams.IdNumber ||
+          visitor.IDNumber?.includes(searchParams.IdNumber)) &&
+        (!searchParams.VisitorPhone ||
+          visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
     );
   }, [visitors, searchParams, currentDate]);
-  
 
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
@@ -122,9 +129,9 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
 
     if (isAnyFieldFilled) {
       //if userInfor is set to reception, show the table
-      if(userInfo.userData.departmentName === "Security"){
+      if (userInfo.userData.departmentName === "Security") {
         setShowTable(true);
-      };
+      }
       filterVisitors(updatedSearchParams);
     } else {
       setShowTable(false);
@@ -134,14 +141,14 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
 
   const filterVisitors = (searchCriteria) => {
     const filtered = visitors.filter((visitor) => {
-      if (visitor.Status !== "Entered" ) {
+      if (visitor.Status !== "Entered") {
         return false;
       }
-        // Exclude visitors where CreatedDate is before the current date
-        if(visitor.CreatedDate !== currentDate){
-          return false;
-        }
-      
+      // Exclude visitors where CreatedDate is before the current date
+      if (visitor.CreatedDate !== currentDate) {
+        return false;
+      }
+
       return (
         (!searchCriteria?.VisitorName ||
           visitor.VisitorName?.toLowerCase().includes(
@@ -156,54 +163,64 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
     setFilteredVisitors(filtered);
   };
   const handleConvertToPatient = async (visitor) => {
-    setLoading(true);
     try {
-      const response = await dispatch(convertPatient(visitor.No));
-      if (response) {
+      const visitorNo = visitor.No;
+      console.log("Visitor No:", visitorNo);
+
+      // Dispatch the conversion action to fetch the patient number
+      const patientNo = await dispatch(convertPatient(visitorNo));
+
+      if (patientNo) {
         const existingPatient = patients.find(
-          (patient) => patient.PatientNo === response
+          (patient) => patient.PatientNo === patientNo
         );
 
         if (existingPatient) {
-          setPatientInfo({ type: "existing", data: existingPatient });
-          message.success("Existing patient found.");
-          navigate(`/reception/Add-Appointment/${response}`, {
-            state: { patientData: existingPatient },
+          // Patient found
+          message.success("Patient converted successfully.", 5);
+          navigate(`/reception/Add-Appointment/${patientNo}`, {
+            state: { existingPatient },
           });
         } else {
-          setPatientInfo({ type: "new", data: { ...visitor, PatientNo: response } });
-          message.warning("Register new patient.");
+          // No existing patient, navigate to patient registration page
+          message.warning(
+            "Patient not found. Please register the patient first.",
+            5
+          );
           navigate("/reception/Patient-Registration", {
-            state: { visitorData: visitor, patientNumber: response },
+            state: { visitorData: visitor, patientNumber: patientNo },
           });
         }
       } else {
-        message.error("Failed to convert visitor to patient.");
+        // No patient number returned from the action
+        message.warning("Unable to retrieve patient number.", 5);
       }
     } catch (error) {
-      message.error("An error occurred.");
-    } finally {
-      setLoading(false);
+      console.error("Error converting visitor to patient:", error);
+      message.error("An error occurred while processing the request.", 5);
     }
   };
 
-  const getButtonText = (visitor) => {
-    if (
-      patientInfo.type === "existing" &&
-      patientInfo.data.PatientNo === visitor.No
-    ) {
-      return "Create Visit";
-    }
-    if (patientInfo.type === "new") {
-      return "Register Patient";
-    }
-    return "Convert to Patient";
-  };
+  // const getButtonText = (visitor) => {
+  //   if (
+  //     patientInfo.type === "existing" &&
+  //     patientInfo.data.PatientNo === visitor.No
+  //   ) {
+  //     return "Create Visit";
+  //   }
+  //   if (patientInfo.type === "new") {
+  //     return "Register Patient";
+  //   }
+  //   return "Convert to Patient";
+  // };
 
-  
   const columns = [
-
-    { title: "Index", dataIndex: "index", key: "index" ,render: (text, record, index) => index + 1 },
+    {
+      title: "Index",
+      dataIndex: "index",
+      key: "index",
+      render: (text, record, index) => index + 1,
+    },
     { title: "Visitor No", dataIndex: "No", key: "No" },
     { title: "Visitor Name", dataIndex: "VisitorName", key: "visitorName" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
@@ -213,7 +230,7 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
       key: "PurposeofVisit",
     },
     { title: "Phone Number", dataIndex: "PhoneNumber", key: "phoneNumber" },
-        { title: "Patient No", dataIndex: "Patient_No_", key: "Patient_No_" },
+    { title: "Patient No", dataIndex: "Patient_No_", key: "Patient_No_" },
 
     {
       title: "Date of Visit",
@@ -258,21 +275,20 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
       dataIndex: "VisitorCategory",
       key: "visitorCategory",
     },
- // Action column in the table
- {
-  title: "Action",
-  key: "action",
-  render: (text, visitor) => (
-    <Button
-      type="primary"
-      loading={loading}
-      onClick={() => handleConvertToPatient(visitor)}
-    >
-      {getButtonText(visitor)}
-    </Button>
-  ),
-},
-
+    // Action column in the table
+    {
+      title: "Action",
+      key: "action",
+      render: (text, visitor) => (
+        <Button
+          type="primary"
+          loading={loading}
+          onClick={() => handleConvertToPatient(visitor)}
+        >
+          Convert to Patient
+        </Button>
+      ),
+    },
   ];
 
   return (
@@ -329,11 +345,10 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
         <Table
           columns={columns}
           loading={visitorLoading}
-
           dataSource={filteredVisitors}
           pagination={{ pageSize: 10 }}
           style={{ marginTop: "16px" }}
-          rowKey={(row) => row.No}
+       //   rowKey={(row) => row.No}
           bordered
           size="small"
         />
