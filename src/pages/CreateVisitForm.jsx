@@ -64,7 +64,6 @@ const CreateVisitForm = () => {
     error: editPatientError,
     data: editPatientPayload,
   } = useSelector((state) => state.createPatient);
-
   const [newVisit, setNewVisit] = useState({
     clinic: "",
     doctor: "",
@@ -74,8 +73,8 @@ const CreateVisitForm = () => {
     patientType: "",
     appointmentType: "",
     insuranceNo: "",
-    gender:"",
-    dob:"",
+    gender: "",
+    dob: "",
   });
 
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -114,7 +113,7 @@ const CreateVisitForm = () => {
   //     gender:patientData?.gender||existingPatient?.Gender,
   //     dob:patientData?.dob||existingPatient?.dateOfBirth
   //   };
-  
+
   //   try {
   //     const response = await dispatch(createPatient(patientDataToEdit));
   //     if (response) {
@@ -127,45 +126,50 @@ const CreateVisitForm = () => {
   //     message.error("Error occurred while updating patient details!");
   //   }
   // };
-  
+
   const savepatientVisit = async () => {
     try {
       // // Step 1: Handle patient creation/edit if new data is provided
       // if (!existingPatient || newVisit.membershipNo || newVisit.insuranceNo || newVisit.patientType) {
       //   await editPatient(); // Update or create patient details
       // }
-  
+
       // Step 2: Create Triage Visit
       const visitData = {
-        patientNo: patientData?.patientNo || existingPatient?.PatientNo|| patientData?.PatientNo,
+        patientNo: patientData?.patientNo || existingPatient?.PatientNo || patientData?.PatientNo,
         clinic: newVisit.clinic,
         doctor: newVisit.doctor,
         appointmentType: newVisit.appointmentType,
       };
-  
+
       const appointmentId = await dispatch(createTriageVisit(visitData));
-  
+
       if (appointmentId) {
         message.success("Visit created successfully!");
         setAppointmentId(appointmentId);
-  
+
         // Step 3: Optionally dispatch the visit (triage)
         console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
         message.error("Failed to create visit!");
+        setAppointmentId(null);
+        setNewVisit({});
+        // patientData={};
+        //  existingPatient={};
+        navigate("/reception/visitors-list");
       }
     } catch (error) {
       console.error("Error creating visit:", error);
       message.error("Error occurred while creating visit!");
     }
   };
-  
+
   const dispatchPatient = async (appointmentId) => {
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
     }
-  
+
     try {
       console.log("Dispatching patient with appointment ID:", appointmentId);
       await dispatch(postTriageVisit(appointmentId));
@@ -176,7 +180,7 @@ const CreateVisitForm = () => {
       message.error("Failed to dispatch patient!");
     }
   };
-  
+
   const dispatchMenu = (
     <Menu onClick={(e) => dispatchPatient(e.key)}>
       <Menu.Item key="triage">Triage</Menu.Item>
@@ -219,7 +223,7 @@ const CreateVisitForm = () => {
                 className="pr-3 mr-3"
                 onClick={savepatientVisit}
               >
-               Save 
+                Save
               </Button>
               <Button
                 type="primary"
@@ -290,8 +294,8 @@ const CreateVisitForm = () => {
                       <Input
                         label="Patient Type"
                         value={
-                          patientData?.paymentMode==="2" ?"Cash " : "Insurance" ||
-                          existingPatient?.PatientType
+                          patientData?.paymentMode === "2" ? "Cash " : "Insurance" ||
+                            existingPatient?.PatientType
                         }
                         disabled
                         className="text-dark fw-medium"
@@ -458,15 +462,13 @@ const CreateVisitForm = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        {`${
-                          patientData?.firstName?.charAt(0) ||
+                        {`${patientData?.firstName?.charAt(0) ||
                           existingPatient?.LastName?.charAt(0) ||
                           ""
-                        }${
-                          patientData?.lastName?.charAt(0) ||
+                          }${patientData?.lastName?.charAt(0) ||
                           existingPatient?.LastName?.charAt(1).toUpperCase() ||
                           ""
-                        }`}
+                          }`}
                       </Avatar>
                     </div>
                     {/* Add dynamic data fields for patientType, settlementType, clinic, doctor */}
