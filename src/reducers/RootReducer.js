@@ -76,7 +76,7 @@ export const rootReducer = combineReducers({
     dispatchToDoctor:postDispatchToDoctorReducer,
     checkInPatient:postCheckInPatientReducer,
     appmntList:appmntListReducer,
-    docTreatmentList:treatmentListReducer
+    docTreatmentList:treatmentListReducer,
     getPatientList:getPatientListReducer,
 
 });

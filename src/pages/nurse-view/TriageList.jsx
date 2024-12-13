@@ -45,7 +45,7 @@ const TriageList = () => {
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = openTriageList.map((item, index) => ({
     key: index + 1,
-    name: item?.Names || `Patient name here`,
+    // name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
     observationTime: item?.ObservationTime,
     // sex: item?.Gender,
@@ -113,7 +113,7 @@ const TriageList = () => {
       dataIndex: 'number',
       rowScope: 'row',
     },
-    {
+    /* {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -128,7 +128,7 @@ const TriageList = () => {
           {name}
         </div>
       )
-    },
+    }, */
     
     {
       title: 'Observation Date',

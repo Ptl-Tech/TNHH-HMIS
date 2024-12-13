@@ -34,7 +34,7 @@ const TriageListPending = () => {
   //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
     key: index + 1,
-    name: item?.Names || `Patient name here`,
+    // name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
     observationTime: item?.ObservationTime,
     // sex: item?.Gender,
@@ -103,7 +103,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
       dataIndex: 'number',
       rowScope: 'row',
     },
-    {
+    /* {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -118,7 +118,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
           {name}
         </div>
       )
-    },
+    }, */
     
     {
       title: 'Observation Date',
