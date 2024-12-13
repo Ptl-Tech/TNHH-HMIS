@@ -92,8 +92,10 @@ const TriageList = () => {
   };
 
   useEffect(() => {
-    dispatch(getTriageList())
-  }, [dispatch]);
+    if (!openTriageList.length){
+      dispatch(getTriageList())
+    }
+  }, [openTriageList, dispatch]);
 
   const waitingListColumns = [
     {
@@ -160,7 +162,7 @@ const TriageList = () => {
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} openTriageList={openTriageList}/>
          
 
-          <Card style={{ padding: '10px 16px', marginBottom: '10px' }}>
+          <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
           <div className='admit-patient-filter-container'>
                   <Search placeholder="search by name" 
                       allowClear

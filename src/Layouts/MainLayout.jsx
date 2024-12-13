@@ -336,8 +336,9 @@ const MainLayout = () => {
             style={{
               marginLeft: collapsed ? 80 : 230,
               transition: "all 0.2s",
-              padding: 12,
+              padding: '10px 20px',
               color: "#67336d",
+              fontWeight: "bold",
             }}
           >
             <Breadcrumb.Item>Home</Breadcrumb.Item>
@@ -354,7 +355,6 @@ const MainLayout = () => {
               marginLeft: collapsed ? 80 : 230,
               transition: "all 0.2s",
               padding: 12,
-              minHeight: 680,
               background: colorBgContainer,
               borderRadius: 8,
             }}

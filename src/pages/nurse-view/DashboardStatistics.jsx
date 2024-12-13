@@ -5,11 +5,31 @@ import { Link } from "react-router-dom";
 import { Line } from "@ant-design/charts";
 import { lastSixMonthsTotalPatientsLineGraphConfig } from '../../constants/nurse-constants';
 import PropTypes from "prop-types";
+import moment from "moment";
 
-const DashboardStatistics = ({ userDetails }) => {
+const DashboardStatistics = ({ userDetails, chartData }) => {
+
+  const config = {
+    data: chartData,
+    xField: 'date',
+    yField: 'count',
+    seriesField: 'type', // Differentiates between Outpatients and Inpatients
+    point: {
+      size: 5,
+      shape: 'circle',
+    },
+    xAxis: {
+      label: {
+        formatter: (text) => moment(text).format('MMM DD'),
+      },
+    },
+    smooth: true,
+    color: ['#1890ff', '#ff4d4f'], // Assign distinct colors for the two lines
+  };
 
 
   return (
+    
     
     <div style={{ marginTop: '16px' }}>
            <Row gutter={16} className="dashboard-statistics-container">
@@ -82,7 +102,7 @@ const DashboardStatistics = ({ userDetails }) => {
                     </div>
                     <Divider/>
                     <div>
-                      <Line {...lastSixMonthsTotalPatientsLineGraphConfig}/>
+                      <Line {...config}/>
                     </div>
                   </Card>
               </Col>
@@ -101,5 +121,6 @@ DashboardStatistics.propTypes = {
       firstName: PropTypes.string.isRequired,
       departmentName: PropTypes.string.isRequired,
     })
-  })
+  }),
+  chartData: PropTypes.object.isRequired
 }

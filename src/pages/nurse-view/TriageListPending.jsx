@@ -150,7 +150,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
       <div style={{ padding: '10px 10px' }}>
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} pendingTriageList={pendingTriageList}/>
           
-          <Card style={{ padding: '10px 16px', marginBottom: '10px' }}>
+          <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
           <div className='admit-patient-filter-container'>
                   <Search placeholder="search by name" 
                       allowClear
