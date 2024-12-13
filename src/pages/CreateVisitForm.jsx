@@ -137,7 +137,7 @@ const CreateVisitForm = () => {
   
       // Step 2: Create Triage Visit
       const visitData = {
-        patientNo: patientData?.patientNo || existingPatient?.PatientNo,
+        patientNo: patientData?.patientNo || existingPatient?.PatientNo|| patientData?.PatientNo,
         clinic: newVisit.clinic,
         doctor: newVisit.doctor,
         appointmentType: newVisit.appointmentType,

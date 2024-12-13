@@ -213,6 +213,8 @@ const [IsNewPatient, setIsNewPatient] = useState(false);
       key: "PurposeofVisit",
     },
     { title: "Phone Number", dataIndex: "PhoneNumber", key: "phoneNumber" },
+        { title: "Patient No", dataIndex: "Patient_No_", key: "Patient_No_" },
+
     {
       title: "Date of Visit",
       dataIndex: "CreatedDate",
