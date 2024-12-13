@@ -33,6 +33,7 @@ import {
   message,
 } from "antd";
 import moment from "moment";
+import dayjs from "dayjs";
 
 const { Search } = Input;
 
@@ -56,12 +57,13 @@ const OutpatientList = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [isVisitCreated, setIsVisitCreated] = useState(false);
+  const currentDate = dayjs().format("YYYY-MM-DD");
 
   const [form] = Form.useForm();
   useEffect(() => {
     // Filter only "Cash" patients and those with isActivated: true
     const filteredPatients = patients.filter(
-      (patient) => patient.Activated === true
+      (patient) => patient.Inpatient === false
     );
     setFilteredPatients(filteredPatients);
   }, [patients]);
@@ -78,19 +80,23 @@ const OutpatientList = () => {
   const handleFilterPatients = () => {
     const filtered = patients.filter((patient) => {
       return (
-        patient.Names.toLowerCase().includes(
-          searchParams.SearchName.toLowerCase()
-        ) &&
-        patient.LastName.toLowerCase().includes(
-          searchParams.SearchName.toLowerCase()
-        ) &&
+        patient.Names.toLowerCase().includes(searchParams.firstName.toLowerCase()) &&
+        patient.LastName.toLowerCase().includes(searchParams.lastName.toLowerCase()) &&
         patient.IDNumber.includes(searchParams.patientId) &&
         patient.PatientNo.toString().includes(searchParams.patientNo)
       );
     });
     setFilteredPatients(filtered);
   };
+  
+  const handleselectedPatient = () => {
+    if(record.Activated) {
+      navigate("/reception/Patient-Registration");
+    }else{
+      navigate(`/reception/Patient-Registration/${record.PatientNo}`);
+    }
 
+  };
 
   const columns = [
     {
@@ -120,27 +126,42 @@ const OutpatientList = () => {
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <Tooltip title="View Details">
-            <Button
-              icon={<EyeOutlined />}
-              onClick={() =>
-                navigate("/reception/Patient-Registration", {
-                  state: { patientDet: record }, // Correctly passing the patient record
-                })
-              }
-            >
-              View Details
-            </Button>
-          </Tooltip>
+          {record.Activated ? (
+            // If the patient is active, show "View Details"
+            <Tooltip title="View Details">
+              <Button
+                icon={<EyeOutlined />}
+                onClick={() =>
+                  navigate("/reception/Patient-Registration", {
+                    state: { patientDet: record }, // Correctly passing the patient record
+                  })
+                }
+              >
+                View Details
+              </Button>
+            </Tooltip>
+          ) : (
+            // If the patient is not active, show "Create Visit"
+            <Tooltip title="Create Visit">
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() =>
+                  // Handle creating a visit for this patient
+                  navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
+                    state: { patientDet: record }, // Pass patient data to the create visit page
+                  })
+                }
+              >
+                Create Visit
+              </Button>
+            </Tooltip>
+          )}
         </div>
       ),
-    }
+    },
     
   ];
 
-  const handleselectedPatient = () => {
-    navigate("/reception/Patient-Registration");
-  };
 
   return (
     <div>
