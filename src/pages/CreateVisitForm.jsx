@@ -209,7 +209,7 @@ const CreateVisitForm = () => {
                 style={{ color: "#E89641" }}
                 id="appointment-card"
               >
-                Appointment Card
+                Visit Card
               </h4>
             </div>
             <div className=" d-flex align-items-center justify-content-end gap-3">
@@ -219,7 +219,7 @@ const CreateVisitForm = () => {
                 className="pr-3 mr-3"
                 onClick={savepatientVisit}
               >
-                Create Visit
+               Save 
               </Button>
               <Button
                 type="primary"
@@ -244,7 +244,7 @@ const CreateVisitForm = () => {
                       <Input
                         label="Patient No"
                         value={
-                          patientData?.patientNo || existingPatient?.PatientNo
+                          patientData?.patientNo || existingPatient?.PatientNo || patientData?.PatientNo
                         }
                         disabled
                         className="text-success fw-bold"

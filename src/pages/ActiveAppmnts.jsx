@@ -15,9 +15,12 @@ import {
 } from "antd";
 import { EyeOutlined, TeamOutlined, DownOutlined } from "@ant-design/icons";
 import { appmntList, postTriageVisit } from "../actions/patientActions";
+import dayjs from "dayjs";
 
 const ActiveAppmnts = () => {
   const { loading, patients } = useSelector((state) => state.appmntList);
+  const currentDate = dayjs().format("YYYY-MM-DD");
+
   const {
     loading: postTriageVisitLoading,
     error: postTriageVisitError,
@@ -43,12 +46,11 @@ const ActiveAppmnts = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
     const filtered = patients.filter((patient) => {
       const appointmentDate = new Date(patient.AppointmentDate)
         .toISOString()
         .split("T")[0];
-      return appointmentDate === today;
+      return appointmentDate === currentDate && patient.Status === "New";
     });
     setFilteredPatients(filtered);
   }, [patients]);

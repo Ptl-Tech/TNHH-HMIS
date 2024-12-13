@@ -57,7 +57,7 @@ const VisitorForm = () => {
     idNumber: "",
     phoneNumber: "",
     carRegistrationNo: "",
-    department: "",
+    department: "Reception", // Default value
     visitorName: "",
     visitorPassNo: "",
     purposeOfVisit: "",
@@ -80,7 +80,7 @@ const VisitorForm = () => {
       const selectedEmployee = data.find((employee) => employee.No === value);
       if (selectedEmployee) {
         const updatedDepartment =
-          selectedEmployee.Shortcut_Dimension_2_Code || "";
+          selectedEmployee.Shortcut_Dimension_2_Code || "Reception";
         const personToVisitNo = selectedEmployee.No || "";
         setNewVisitor((prevState) => ({
           ...prevState,
@@ -110,13 +110,12 @@ const VisitorForm = () => {
         setNewVisitor((prevState) => ({
           ...prevState,
           purposeOfVisit: "Medication",
-          // visitorCategory: "",
+          // : "",
           personToVisit: "",
         }));
 
         form.setFieldsValue({
           purposeOfVisit: "Medication",
-          visitorCategory: "",
           personToVisit: "",
         });
         message.info("Purpose of visit set to Medication.");
@@ -150,7 +149,7 @@ const VisitorForm = () => {
         idNumber: "",
         phoneNumber: "",
         carRegistrationNo: "",
-        department: "",
+        department: "Reception",
         visitorName: "",
         visitorPassNo: "",
         purposeOfVisit: "",
@@ -372,11 +371,7 @@ const VisitorForm = () => {
               >
                 <Select
                   placeholder="Select Visitor Category"
-                  value={
-                    newVisitor.reasonForVisit !== "2"
-                      ? undefined
-                      : newVisitor.visitorCategory
-                  } // Clear value if reasonForVisit is Medication
+                  value={newVisitor.visitorCategory}
                   onChange={(value) =>
                     handleInputChange("visitorCategory", value)
                   }
@@ -474,7 +469,7 @@ const VisitorForm = () => {
                 <Input
                   placeholder="Auto-populated department"
                   name="department"
-                  value={newVisitor.department || newVisitor.department===""?"":newVisitor.department}
+                  value={newVisitor.department || "Reception"} // Default to "Reception"
                   onChange={(e) =>
                     handleInputChange("department", e.target.value)
                   }

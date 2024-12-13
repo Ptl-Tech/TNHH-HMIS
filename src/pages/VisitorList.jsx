@@ -49,9 +49,8 @@ const VisitorList = () => {
   );
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
-
   const { userInfo } = useSelector((state) => state.otpVerify);
-
+const[existingPatient, setExistingPatient] = useState(null);
   const dispatch = useDispatch();
   const [showTable, setShowTable] = useState(userInfo
     .userData.departmentName === "Reception"
@@ -69,7 +68,7 @@ const VisitorList = () => {
   
   const Visitors = useMemo(() => {
     return visitors.filter(visitor => dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
-      visitor.Status === "Entered" &&
+      visitor.Status === "Entered" && visitor.Status !== "Converted to Patient" &&
       (!searchParams.VisitorName || visitor.VisitorName?.toLowerCase().includes(searchParams.VisitorName.toLowerCase())) &&
       (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
       (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
@@ -121,7 +120,7 @@ const VisitorList = () => {
 
     if (isAnyFieldFilled) {
       //if userInfor is set to reception, show the table
-      if(userInfo.userData.departmentName === "Reception"){
+      if(userInfo.userData.departmentName === "Security"){
         setShowTable(true);
       };
       filterVisitors(updatedSearchParams);
@@ -137,7 +136,7 @@ const VisitorList = () => {
         return false;
       }
         // Exclude visitors where CreatedDate is before the current date
-        if(visitor.CreatedDate < currentDate){
+        if(visitor.CreatedDate !== currentDate){
           return false;
         }
       
@@ -159,38 +158,32 @@ const VisitorList = () => {
     try {
       const visitorNo = visitor.No;
       console.log("Visitor No:", visitorNo);
-
+  
       // Dispatch the conversion action to fetch the patient number
       const patientNo = await dispatch(convertPatient(visitorNo));
-
+  
       if (patientNo) {
         const existingPatient = patients.find(
           (patient) => patient.PatientNo === patientNo
         );
-
+  
         if (existingPatient) {
-          // Patient found; navigate to the patient details page
+          // Patient found
+          setExistingPatient(existingPatient);
           message.success("Patient converted successfully.", 5);
           navigate(`/reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });
-          console.log(
-            "Navigating to Patient Details Page with Patient Data:",
-            existingPatient
-          );
         } else {
-          // Patient not found; navigate to the registration page
+          // No existing patient, navigate to patient registration page
+          setExistingPatient(null);  // Clear any previous patient data
           message.warning(
             "Patient not found. Please register the patient first.",
             5
           );
           navigate("/reception/Patient-Registration", {
-            state: { visitorData: visitor, patientNumber: patientNo }, // Passing the visitor info to the registration page
+            state: { visitorData: visitor, patientNumber: patientNo },
           });
-          console.log(
-            "Navigating to Patient Registration Page with Visitor Data:",
-            visitor
-          );
         }
       } else {
         // No patient number returned from the action
@@ -201,7 +194,6 @@ const VisitorList = () => {
       message.error("An error occurred while processing the request.", 5);
     }
   };
-
   const columns = [
 
     { title: "Index", dataIndex: "index", key: "index" ,render: (text, record, index) => index + 1 },
@@ -276,7 +268,7 @@ const VisitorList = () => {
               onClick={() => handleConvertToPatient(record)} // Opens modal for Reception with 'Convert to Patient' functionality
               ghost
             >
-              Convert to Patient
+              {existingPatient ? "Create Appointment" : "Convert to Patient"}
             </Button>
           ) : null}
         </>
@@ -314,14 +306,14 @@ const VisitorList = () => {
               allowClear
             />
           </Col>
-          <Col span={8}>
+          {/* <Col span={8}>
             <Input
               placeholder="Visitor Name"
               value={searchParams.VisitorName}
               onChange={(e) => handleSearchChange(e, "VisitorName")}
               allowClear
             />
-          </Col>
+          </Col> */}
           <Col span={8}>
             <Input
               placeholder="Phone Number"
