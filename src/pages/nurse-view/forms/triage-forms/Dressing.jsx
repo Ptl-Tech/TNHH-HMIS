@@ -117,7 +117,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
     >
     <Row gutter={16}>
         <Col span={12}>
-            <Form.Item label="Quantity" name={['dressing', 'quantity']}>
+            <Form.Item label="Quantity" name={['dressing', 'quantity']}
+                hasFeedback
+            >
             <Input type='number' 
         
             />
@@ -126,6 +128,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
         <Col span={12}>
         <Form.Item label="Process No" name={['dressing', 'processNumber']}
             rules={[{ required: true, message: 'Please input process no!' }]}
+            hasFeedback
         >
          <Select 
             key={'location'}
@@ -143,6 +146,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
         <Row gutter={16}>
         <Col span={12}>
         <Form.Item label="Item No" name={['dressing', 'itemNumber']}
+            hasFeedback
             rules={[{ required: true, message: 'Please input item no!' }]}
         >
              <Select 
@@ -158,7 +162,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
         </Form.Item>
         </Col>
         <Col span={12}>
-        <Form.Item label="Unit of measure" name={['dressing', 'unitsOfMeasure']}>
+        <Form.Item label="Unit of measure" name={['dressing', 'unitsOfMeasure']}
+            hasFeedback
+        >
         <Select 
             key={'location'}
             style={{ width: '100%' }}
@@ -176,7 +182,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
     
         <Row>
         <Col span={24}>
-        <Form.Item label="Dressing Remarks" name={['dressing', 'injectionRemarks']}>
+        <Form.Item label="Dressing Remarks" name={['dressing', 'injectionRemarks']}
+            hasFeedback
+        >
         <TextArea 
         autoSize={{
             minRows: 3,

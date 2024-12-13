@@ -92,8 +92,10 @@ const TriageList = () => {
   };
 
   useEffect(() => {
-    dispatch(getTriageList())
-  }, [dispatch]);
+    if (!openTriageList.length){
+      dispatch(getTriageList())
+    }
+  }, [openTriageList, dispatch]);
 
   const waitingListColumns = [
     {

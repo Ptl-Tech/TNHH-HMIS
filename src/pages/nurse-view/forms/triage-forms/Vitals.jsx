@@ -15,73 +15,105 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
+
+  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI} = vitalsLines;
+
+  console.log('vitalsLines', PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate);
   
   useEffect(() => {
     if (!vitalsLines.length) {
       dispatch(getVitalsLinesSlice(observationNumber));
     }
   }, [dispatch, observationNumber, vitalsLines.length]);
-  
 
-  const onFinish = (values) => {
-    const { pulseRate, pain, height, weight, temperature, bloodPreasure, sP02, respirationRate } = values.vitals;
-
-    const createVitals = {
-      pulseRate,
-      Pain: parseInt(cleanValue(pain)),
-      height: parseFloat(cleanValue(height)),
-      weight: parseFloat(cleanValue(weight)),
-      temperature: parseFloat(cleanValue(temperature)),
-      bloodPreasure,
-      sP02,
-      respirationRate,
-      patientNo: patientNumber,
-      observationNo:  observationNumber,
-      BMI: calculateBMI(height, weight),
-      type: 0,
-      myAction: "create"
-    };
-
-    const updateVitals = {
-      pulseRate,
-      Pain: parseInt(cleanValue(pain)),
-      height: parseFloat(cleanValue(height)),
-      weight: parseFloat(cleanValue(weight)),
-      temperature: parseFloat(cleanValue(temperature)),
-      bloodPreasure,
-      sP02,
-      respirationRate,
-      patientNo: patientNumber,
-      observationNo:  observationNumber,
-      BMI: calculateBMI(height, weight),
-      type: 1,
-      myAction: "update"
-    };
-
-    //check if vitals exists ifs so update else create
-    
-    if(Object.keys(vitalsLines).length > 0) {
-    // update vitals
-    dispatch(updateTriageListVitalsSlice(updateVitals)).then(()=>{
-      message.success('successfully updated vitals');
-    }).error((error) => {
-      message.error('Error updating vitals');
-    })
-    
-      
-    }else{
-      // create vitals
-      dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
-        if(data?.status === "success"){
-          message.success(data?.status);
-          // dispatch(getVitalsLinesSlice(patientNo));
-        }else{
-          message.error('Error saving vitals data');
-        }
-      })
+  useEffect(() => {
+    if (vitalsLines) {
+      form.setFieldsValue({
+        vitals: {
+          pulseRate: PulseRate || '',
+          pain: Pain || '',
+          height: Height || '',
+          weight: Weight || '',
+          temperature: Temperature || '',
+          bloodPreasure: BloodPressure || '',
+          sP02: SP02,
+          respirationRate: RespirationRate || '',
+          bmi: BMI ? BMI.toFixed(2) : "0.0",
+        },
+      });
     }
+    }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
   
-  };
+
+    const onFinish = async (values) => {
+      try {
+        const {
+          pulseRate,
+          pain,
+          height,
+          weight,
+          temperature,
+          bloodPreasure,
+          sP02,
+          respirationRate,
+        } = values.vitals;
+    
+        // Transform values
+        const transformedValues = {
+          pulseRate,
+          pain: parseInt(cleanValue(pain)),
+          height: parseFloat(cleanValue(height)),
+          weight: parseFloat(cleanValue(weight)),
+          temperature: parseFloat(cleanValue(temperature)),
+          bloodPreasure,
+          sP02,
+          respirationRate,
+          BMI: calculateBMI(height, weight),
+        };
+    
+        // Common payload properties
+        const baseVitals = {
+          ...transformedValues,
+          patientNo: patientNumber,
+          observationNo: observationNumber,
+        };
+    
+        // Create or update logic
+        if (vitalsLines && Object.keys(vitalsLines).length > 0) {
+          // Update vitals
+          const updateVitals = {
+            ...baseVitals,
+            type: 1,
+            myAction: "edit",
+          };
+    
+          await dispatch(updateTriageListVitalsSlice(updateVitals));
+          message.success("Successfully updated vitals");
+        } else {
+          // Create vitals
+          const createVitals = {
+            ...baseVitals,
+            type: 0,
+            myAction: "create",
+          };
+    
+          const response = await dispatch(postTriageListVitalsSlice(createVitals));
+          if (response?.status === "success") {
+            message.success("Vitals successfully created");
+          } else {
+            message.error("Error saving vitals data");
+          }
+        }
+    
+        // Reload vitals list after successful operation
+        dispatch(getVitalsLinesSlice(observationNumber));
+      } catch (error) {
+        // Generic error handling
+        message.error("An error occurred while saving vitals data.");
+        console.error("Error saving vitals:", error);
+      }
+    };
+    
   
   
   const cleanValue = (value) => {
@@ -139,8 +171,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
   ]
 
-  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI } = vitalsLines;
-  
   const dataSource = [
     {
       key: ObservationNo,
@@ -170,15 +200,15 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           onFinish={onFinish}
           initialValues={{
             vitals: {
-              pulseRate: vitalsLines?.PulseRate ? vitalsLines.PulseRate : '',
-              bloodPreasure: vitalsLines?.BloodPressure ? vitalsLines.BloodPressure : '',
-              temperature: vitalsLines?.Temperature ? vitalsLines.Temperature : '',
-              sP02: vitalsLines?.SP02 ? vitalsLines.SP02 : '',
-              height: vitalsLines?.Height ? vitalsLines.Height : '',
-              weight: vitalsLines?.Weight ? vitalsLines.Weight : '',
-              respirationRate: vitalsLines?.RespirationRate ? vitalsLines.RespirationRate : '',
-              pain: vitalsLines?.Pain ? vitalsLines.Pain : 0,
-              bmi: vitalsLines?.BMI ? vitalsLines.BMI.toFixed(2) : "0.0"
+              pulseRate: '',
+              bloodPreasure: '',
+              temperature: '',
+              sP02: '',
+              height: '',
+              weight: '',
+              respirationRate: '',
+              pain: 0,
+              bmi: "0.0"
             },
             
           }}
@@ -189,6 +219,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="Pulse Rate (bpm)"
                   name={['vitals', 'pulseRate']}
+                  hasFeedback
                   
                   rules={[
                     {
@@ -223,14 +254,12 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 <Form.Item label="Blood Pressure (mmHg)" 
                   name={['vitals', 'bloodPreasure']}
                   validateTrigger={['onBlur', 'onChange']}
+                  hasFeedback
                   rules={[
                     { required: true, message: 'Blood Pressure is required!' },
                     {
                       validator(_, value) {
-                        if (!value) {
-                          return Promise.reject(new Error('Blood Pressure is required!'));
-                        }
-          
+                        
                         const regex = /^\d{2,3}\/\d{2,3}$/; // Pattern to match "120/80"
                         if (!regex.test(value)) {
                           return Promise.reject(
@@ -269,6 +298,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="Temperature (&deg;C)" name={['vitals', 'temperature']}
                   validateTrigger={['onBlur', 'onChange']}
+                  hasFeedback
                   rules={[
                     { required: true, message: 'Please input temperature!' },
                     {
@@ -303,6 +333,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="SPO2 (%)" name={['vitals', 'sP02']}
                     validateTrigger={['onBlur', 'onChange']}
+                    hasFeedback
                     rules={[
                       { required: true, message: 'Please input SPO2!' },
                       {
@@ -344,6 +375,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 <Form.Item label="Height (cm)" name={['vitals', 'height']}
                 
                 validateTrigger={['onBlur', 'onChange']}
+                hasFeedback
                 rules={[
                   { required: true, message: 'Please input height!' },
                   {
@@ -368,6 +400,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="Weight (kg)" name={['vitals', 'weight']}
                   validateTrigger={['onBlur', 'onChange']}
+                  hasFeedback
                   rules={[
                     { required: true, message: 'Please input weight!' },
                     {
@@ -393,6 +426,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
+                  hasFeedback
                    rules={[
                     { required: true, message: 'Please input respiration rate!' },
                     {
@@ -420,11 +454,12 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               <Col span={12}>
                 <Form.Item label="Pain" name={['vitals', 'pain']}
                 validationTrigger={['onBlur', 'onChange']}
+                hasFeedback
                 rules={[
                   { required: true, message: 'Please input pain level!' },
                   {
                     validator(_, value) {
-                      if (value === 0 || value === 1) {
+                      if (value === '0' || value === '1') {
                         return Promise.resolve();
                       }
                       return Promise.reject(new Error('Pain level must be 0 or 1!'));
@@ -434,7 +469,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
                 >
                 
-                  <Input type='number' 
+                  <Input type='text' 
                    
                     placeholder='eg 1'
               
