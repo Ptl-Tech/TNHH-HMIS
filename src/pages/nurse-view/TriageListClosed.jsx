@@ -27,7 +27,7 @@ const TriageListClosed = () => {
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = closedTriageList.map((item, index) => ({
     key: index + 1,
-    name: item?.Names || `Patient name here`,
+    // name: item?.Names || `Patient name here`,
     regDate: item.ObservationDate,
     // age: item?.AgeinYears,
     // sex: item?.Gender,
@@ -96,7 +96,7 @@ const TriageListClosed = () => {
       dataIndex: 'number',
       rowScope: 'row',
     },
-    {
+   /*  {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -106,7 +106,7 @@ const TriageListClosed = () => {
       ],
       onFilter: (value, record) => record.name.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    },
+    }, */
    
     {
       title: 'Observation Date',
@@ -127,7 +127,7 @@ const TriageListClosed = () => {
       <div style={{ padding: '10px 10px' }}>
           <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
           
-          <Card style={{ padding: '10px 16px', marginBottom: '10px' }}>
+          <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
           <div className='admit-patient-filter-container'>
                   <Search placeholder="search by name" 
                       allowClear

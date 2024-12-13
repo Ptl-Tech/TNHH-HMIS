@@ -103,6 +103,7 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                       drugAllergy: '',
                       },
                   }}
+                  autoComplete="off"
               >
                   <Row gutter={16}>
 
@@ -121,6 +122,7 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                   <Col span={12}>
                       <Form.Item label="Complains" 
                       name={['allergy', 'complains']}
+                      hasFeedback
                       >
                       <Input type='text' 
                           name='complains'
@@ -131,7 +133,9 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                   </Row>
                   <Row gutter={16}>
                       <Col span={12}>
-                      <Form.Item label="Food Allergy" name={['allergy', 'foodAllergy']}>
+                      <Form.Item label="Food Allergy" name={['allergy', 'foodAllergy']}
+                        hasFeedback
+                      >
                           <Input type='text' 
                           
                           name='foodAllergy'
@@ -139,7 +143,9 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                       </Form.Item>
                       </Col>
                       <Col span={12}>
-                      <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}>
+                      <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}
+                        hasFeedback
+                      >
                           <Input type='text' 
                           name='drugAllergy'
                           />

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { HomeOutlined } from '@ant-design/icons';
 
 
-const NurseBreadcrumb = ({ pathSegments }) => {
+const MainBreadcrumb = ({ pathSegments }) => {
   return (
     
         <Breadcrumb
@@ -34,9 +34,9 @@ const NurseBreadcrumb = ({ pathSegments }) => {
   )
 }
 
-export default NurseBreadcrumb
+export default MainBreadcrumb
 
 //propType validation
-NurseBreadcrumb.propTypes = {
+MainBreadcrumb.propTypes = {
     pathSegments: PropTypes.array.isRequired,
 };

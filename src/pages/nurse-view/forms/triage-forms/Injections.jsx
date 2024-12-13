@@ -111,11 +111,16 @@ const Injections = ({ observationNumber, staffNo }) => {
               injectionRemarks: '',
             },
           }}
+          autoComplete="off"
           >
       
         <Row gutter={16}>
             <Col span={12}>
-                <Form.Item label="Injection Quantity" name={['injections', 'injectionQuantity']}>
+                <Form.Item label="Injection Quantity" name={['injections', 'injectionQuantity']}
+                 hasFeedback
+                
+                >
+                    
                     <Input type='number' 
                 
                     name='injectionQuantity'
@@ -124,6 +129,7 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Col>
             <Col span={12}>
             <Form.Item label="Injection No" name={['injections', 'injectionNo']}
+                hasFeedback
                 rules={[{ required: true, message: 'Please input injection no!' }]}
             >
             <Select 
@@ -140,14 +146,18 @@ const Injections = ({ observationNumber, staffNo }) => {
         </Row>
         <Row gutter={16}>
             <Col span={12}>
-            <Form.Item label="Injection time" name={['injections', 'injectionTime']}>
+            <Form.Item label="Injection time" name={['injections', 'injectionTime']}
+             hasFeedback
+            >
                 <TimePicker defaultValue={dayjs('12:08', format)} format={format} style={{ width: '100%' }} 
                      
                 />
             </Form.Item>
             </Col>
             <Col span={12}>
-            <Form.Item label="Injection Date" name={['injections', 'injectionDate']}>
+            <Form.Item label="Injection Date" name={['injections', 'injectionDate']}
+              hasFeedback
+            >
             <DatePicker style={{ width: '100%' }}
             
             />
@@ -156,7 +166,9 @@ const Injections = ({ observationNumber, staffNo }) => {
             </Row>
             <Row gutter={16}>
             <Col span={24}>
-            <Form.Item label="Injection Remarks" name={['injections', 'injectionRemarks']}>
+            <Form.Item label="Injection Remarks" name={['injections', 'injectionRemarks']}
+              hasFeedback
+            >
                 <TextArea 
                 autoSize={{
                     minRows: 3,
