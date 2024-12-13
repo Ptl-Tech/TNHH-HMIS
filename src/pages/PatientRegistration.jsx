@@ -389,7 +389,9 @@ const PatientRegistration = () => {
                     value={
                       newPatient.firstName ||
                       visitorData?.VisitorName?.split(" ")[0] ||
-                      patientDet?.SearchName?.split(" ")[0]
+                      patientDet?.SearchName?.split(" ")[0]||
+                      patientDet?.FirstName?.split(" ")[0]
+
                     }
                     onChange={handleInputChange}
                     className="text-center fw-bold"

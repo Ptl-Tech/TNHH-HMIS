@@ -101,6 +101,10 @@ const ActiveAppmnts = () => {
       message.success("Patient has been dispatched successfully!");
       // Navigate to a different page after successful dispatch, if needed
       // navigate("/reception/visitors-list");
+//filter the selected patient from the table
+      const filteredPatients = patients.filter((patient) => patient.AppointmentNo !== appointmentId);
+      setFilteredPatients(filteredPatients);
+
     } catch (error) {
       console.error("Error dispatching patient:", error);
       message.error("Failed to dispatch patient!");
