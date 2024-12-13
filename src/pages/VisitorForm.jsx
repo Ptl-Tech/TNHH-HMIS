@@ -70,11 +70,7 @@ const VisitorForm = () => {
   };
 
   const handleInputChange = (name, value) => {
-    setNewVisitor((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-
+    
     // If 'personToVisit' is updated, auto-update 'department'
     if (name === "personToVisit" && data) {
       const selectedEmployee = data.find((employee) => employee.No === value);
@@ -94,33 +90,38 @@ const VisitorForm = () => {
       }
     }
 
-    if (name === "visitorName") {
-      // Only generate if category is 'Employee'
-      setNewVisitor((prevState) => ({
-        ...prevState,
-        visitorPassNo: generateVisitorPassNo(), // Generate a new visitor pass number
-      }));
-      form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
-    }
+    // if (name === "visitorName") {
+    //   // Only generate if category is 'Employee'
+    //   setNewVisitor((prevState) => ({
+    //     ...prevState,
+    //     visitorPassNo: generateVisitorPassNo(), // Generate a new visitor pass number
+    //   }));
+    //   form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
+    // }
 
-    // Additional logic for autopopulating fields
-    if (name === "reasonForVisit") {
-      if (value === "1") {
-        // Medication
-        setNewVisitor((prevState) => ({
-          ...prevState,
-          purposeOfVisit: "Medication",
-          // : "",
-          personToVisit: "",
-        }));
+    // // Additional logic for autopopulating fields
+    // if (name === "reasonForVisit") {
+    //   if (value === "1") {
+    //     // Medication
+    //     setNewVisitor((prevState) => ({
+    //       ...prevState,
+    //       purposeOfVisit: "Medication",
+    //       // : "",
+    //       personToVisit: "",
+    //     }));
 
-        form.setFieldsValue({
-          purposeOfVisit: "Medication",
-          personToVisit: "",
-        });
-        message.info("Purpose of visit set to Medication.");
-      }
-    }
+    //     form.setFieldsValue({
+    //       purposeOfVisit: "Medication",
+    //       personToVisit: "",
+    //     });
+    //     message.info("Purpose of visit set to Medication.");
+    //   }
+    // }
+
+    setNewVisitor((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -188,25 +189,25 @@ const VisitorForm = () => {
 
           setNewVisitor((prevState) => ({
             ...prevState,
-            visitorName: existingVisitor.VisitorName,
+            visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            personToVisit: existingVisitor.PersonToSee,
-            personToVisitNo: existingVisitor.PersonToVisitNo,
-            purposeOfVisit: existingVisitor.PurposeOfVisit,
-            visitorCategory: existingVisitor.VisitorCategory,
-            reasonForVisit: existingVisitor.ReasonForVisit,
+            // personToVisit: existingVisitor.PersonToSee,
+            // personToVisitNo: existingVisitor.PersonToVisitNo,
+            // purposeOfVisit: existingVisitor.PurposeOfVisit,
+            // visitorCategory: existingVisitor.VisitorCategory,
+            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
           }));
           form.setFieldsValue({
-            visitorName: existingVisitor.VisitorName,
+            visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            personToVisit: existingVisitor.PersonToSee,
-            personToVisitNo: existingVisitor.PersonToVisitNo,
-            purposeOfVisit: existingVisitor.PurposeOfVisit,
-            visitorCategory: existingVisitor.VisitorCategory,
-            reasonForVisit: existingVisitor.ReasonForVisit,
+            // personToVisit: existingVisitor.PersonToSee,
+            // personToVisitNo: existingVisitor.PersonToVisitNo,
+            // purposeOfVisit: existingVisitor.PurposeOfVisit,
+            // visitorCategory: existingVisitor.VisitorCategory,
+            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
           });
           setVisitorExistsError("Patient already exists"); // Clear any previous error
@@ -287,12 +288,14 @@ const VisitorForm = () => {
                 />
               </Form.Item>
               <Form.Item
-                label="Visitor's Name:"
+                label="Visitor Name:"
                 name="visitorName"
-                rules={[{ required: true, message: "Please enter the name!" }]}
+                rules={[
+                  { required: true, message: "Please enter the visitor name!" },
+                ]}
               >
                 <Input
-                  placeholder="Enter name"
+                  placeholder="Enter visitor name"
                   value={newVisitor.visitorName || existingVisitor?.VisitorName}
                   onChange={(e) =>
                     handleInputChange("visitorName", e.target.value)
@@ -434,7 +437,7 @@ const VisitorForm = () => {
                       handleInputChange("personToVisit", e.target.value)
                     }
                     disabled={
-                    newVisitor.reasonForVisit !== "2" && !visitorExistsError
+                      newVisitor.visitorCategory !== "1" && !visitorExistsError
                     }
                   />
                 </Form.Item>
@@ -505,7 +508,7 @@ const VisitorForm = () => {
                   // }
                   style={{
                     color: "#ff4500", // Custom text color
-                    backgroundColor: "#f9f9f9", // Light background for better contrast
+                 //   backgroundColor: "#f9f9f9", // Light background for better contrast
                     fontWeight: "bold", // Bold for better visibility
                     //    border: "1px solid primary", // Optional: Custom border
                   }}

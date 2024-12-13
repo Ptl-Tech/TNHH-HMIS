@@ -35,7 +35,7 @@ const VisitorList = () => {
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
-  const { loading, error, visitors } = useSelector(
+  const { loading: visitorLoading, error, visitors } = useSelector(
     (state) => state.visitorsList
   );
   const {
@@ -50,7 +50,9 @@ const VisitorList = () => {
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
   const { userInfo } = useSelector((state) => state.otpVerify);
-const[existingPatient, setExistingPatient] = useState(null);
+  const [patientInfo, setPatientInfo] = useState({ type: null, data: null });
+  const [loading, setLoading] = useState(false);
+const [IsNewPatient, setIsNewPatient] = useState(false);
   const dispatch = useDispatch();
   const [showTable, setShowTable] = useState(userInfo
     .userData.departmentName === "Reception"
@@ -153,47 +155,52 @@ const[existingPatient, setExistingPatient] = useState(null);
     });
     setFilteredVisitors(filtered);
   };
-
   const handleConvertToPatient = async (visitor) => {
+    setLoading(true);
     try {
-      const visitorNo = visitor.No;
-      console.log("Visitor No:", visitorNo);
-  
-      // Dispatch the conversion action to fetch the patient number
-      const patientNo = await dispatch(convertPatient(visitorNo));
-  
-      if (patientNo) {
+      const response = await dispatch(convertPatient(visitor.No));
+      if (response) {
         const existingPatient = patients.find(
-          (patient) => patient.PatientNo === patientNo
+          (patient) => patient.PatientNo === response
         );
-  
+
         if (existingPatient) {
-          // Patient found
-          setExistingPatient(existingPatient);
-          message.success("Patient converted successfully.", 5);
-          navigate(`/reception/Add-Appointment/${patientNo}`, {
-            state: { existingPatient },
+          setPatientInfo({ type: "existing", data: existingPatient });
+          message.success("Existing patient found.");
+          navigate(`/reception/Add-Appointment/${response}`, {
+            state: { patientData: existingPatient },
           });
         } else {
-          // No existing patient, navigate to patient registration page
-          setExistingPatient(null);  // Clear any previous patient data
-          message.warning(
-            "Patient not found. Please register the patient first.",
-            5
-          );
+          setPatientInfo({ type: "new", data: { ...visitor, PatientNo: response } });
+          message.warning("Register new patient.");
           navigate("/reception/Patient-Registration", {
-            state: { visitorData: visitor, patientNumber: patientNo },
+            state: { visitorData: visitor, patientNumber: response },
           });
         }
       } else {
-        // No patient number returned from the action
-        message.warning("Unable to retrieve patient number.", 5);
+        message.error("Failed to convert visitor to patient.");
       }
     } catch (error) {
-      console.error("Error converting visitor to patient:", error);
-      message.error("An error occurred while processing the request.", 5);
+      message.error("An error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const getButtonText = (visitor) => {
+    if (
+      patientInfo.type === "existing" &&
+      patientInfo.data.PatientNo === visitor.No
+    ) {
+      return "Create Visit";
+    }
+    if (patientInfo.type === "new") {
+      return "Register Patient";
+    }
+    return "Convert to Patient";
+  };
+
+  
   const columns = [
 
     { title: "Index", dataIndex: "index", key: "index" ,render: (text, record, index) => index + 1 },
@@ -249,31 +256,21 @@ const[existingPatient, setExistingPatient] = useState(null);
       dataIndex: "VisitorCategory",
       key: "visitorCategory",
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <>
-          {userInfo.userData?.departmentName === "Security" ? (
-            <Button
-              type="primary"
-              onClick={() => handleEditStatus(record)}
-              ghost
-            >
-              Update Status
-            </Button>
-          ) : userInfo.userData?.departmentName === "Reception" ? (
-            <Button
-              type="primary"
-              onClick={() => handleConvertToPatient(record)} // Opens modal for Reception with 'Convert to Patient' functionality
-              ghost
-            >
-              {existingPatient ? "Create Appointment" : "Convert to Patient"}
-            </Button>
-          ) : null}
-        </>
-      ),
-    },
+ // Action column in the table
+ {
+  title: "Action",
+  key: "action",
+  render: (text, visitor) => (
+    <Button
+      type="primary"
+      loading={loading}
+      onClick={() => handleConvertToPatient(visitor)}
+    >
+      {getButtonText(visitor)}
+    </Button>
+  ),
+},
+
   ];
 
   return (
@@ -329,11 +326,12 @@ const[existingPatient, setExistingPatient] = useState(null);
       {showTable && filteredVisitors.length > 0 ? (
         <Table
           columns={columns}
-          loading={loading}
+          loading={visitorLoading}
 
           dataSource={filteredVisitors}
           pagination={{ pageSize: 10 }}
           style={{ marginTop: "16px" }}
+          rowKey={(row) => row.No}
           bordered
           size="small"
         />
