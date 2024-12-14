@@ -14,10 +14,12 @@ import {
   message,
 } from "antd";
 import { EyeOutlined, TeamOutlined, DownOutlined } from "@ant-design/icons";
-import { appmntList, postTriageVisit } from "../actions/patientActions";
+import { appmntList, postTriageVisit } from "../../actions/patientActions";
 import dayjs from "dayjs";
+import { IoAddOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
-const ActiveAppmnts = () => {
+const DispatchedAppmnts = () => {
   const { loading, patients } = useSelector((state) => state.appmntList);
   const currentDate = dayjs().format("YYYY-MM-DD");
 
@@ -40,7 +42,7 @@ const ActiveAppmnts = () => {
   });
 
   const dispatch = useDispatch();
-
+const navigate=useNavigate();
   useEffect(() => {
     dispatch(appmntList());
   }, [dispatch]);
@@ -50,7 +52,7 @@ const ActiveAppmnts = () => {
       const appointmentDate = new Date(patient.AppointmentDate)
         .toISOString()
         .split("T")[0];
-      return appointmentDate === currentDate && patient.Status === "New";
+      return appointmentDate === currentDate && patient.Status === "Dispatched";
     });
     setFilteredPatients(filtered);
   }, [patients]);
@@ -102,7 +104,7 @@ const ActiveAppmnts = () => {
       // Navigate to a different page after successful dispatch, if needed
       // navigate("/reception/visitors-list");
 //filter the selected patient from the table
-      const filteredPatients = paginatedData.filter((patient) => patient.AppointmentNo !== appointmentId);
+      const filteredPatients = patients.filter((patient) => patient.AppointmentNo !== appointmentId);
       setFilteredPatients(filteredPatients);
 
     } catch (error) {
@@ -204,7 +206,7 @@ const ActiveAppmnts = () => {
     <div>
       <h4 className="text-center p-3 text-dark">
         <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
-        Appointment List
+        Dispatched Patients List
       </h4>
 
       <Card className="card-header mb-4 mt-4 p-4">
@@ -236,11 +238,21 @@ const ActiveAppmnts = () => {
       </Card>
 
       <div className="mt-4">
-        <Dropdown overlay={menu}>
-          <Button type="primary" style={{ marginBottom: "16px" }}>
-            Dispatch to <DownOutlined />
-          </Button>
-        </Dropdown>
+      <Button
+  type="primary"
+  style={{ marginBottom: "16px" }}
+  onClick={() => {
+    if (selectedRowKeys.length > 0) {
+      const selectedPatientNo = selectedRowKeys[0]; // Assuming single selection
+      navigate(`/reception/Add-Appointment/${selectedPatientNo}`);
+    } else {
+      navigate("/reception/Add-Appointment");
+    }
+  }}
+>
+  Create New Visit <IoAddOutline />
+</Button>
+
         <Table
           columns={columns}
           loading={loading}
@@ -279,4 +291,4 @@ const ActiveAppmnts = () => {
   );
 };
 
-export default ActiveAppmnts;
+export default DispatchedAppmnts;

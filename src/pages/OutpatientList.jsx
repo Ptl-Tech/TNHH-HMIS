@@ -44,28 +44,19 @@ const OutpatientList = () => {
     (state) => state.patientList
   );
 
-  const [searchParams, setSearchParams] = useState({
-    firstName: "",
-    lastName: "",
-    patientId: "",
-    patientNo: "",
-  });
-
+  const [searchParams, setSearchParams] = useState("");
   const [showList, setShowList] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const [isVisitCreated, setIsVisitCreated] = useState(false);
+ 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
-  const [form] = Form.useForm();
   useEffect(() => {
-    // Filter only "Cash" patients and those with isActivated: true
-    const filteredPatients = patients.filter(
-      (patient) => patient.Inpatient === false
-    );
-    setFilteredPatients(filteredPatients);
+    // Filter non-inpatient patients
+    if (patients.length > 0) {
+      setFilteredPatients(
+        patients.filter((patient) => !patient.Inpatient)
+      );
+    }
   }, [patients]);
 
   const handleSearchChange = (e, field) => {
@@ -75,25 +66,33 @@ const OutpatientList = () => {
       [field]: value,
     }));
     setShowList(true);
+if (value === "" ||allowClear) {
+      setFilteredPatients(patients.filter((patient) => !patient.Inpatient));
+    }
+
   };
 
-  const handleFilterPatients = () => {
-    const filtered = patients.filter((patient) => {
-      return (
-        patient.Names.toLowerCase().includes(searchParams.firstName.toLowerCase()) &&
-        patient.LastName.toLowerCase().includes(searchParams.lastName.toLowerCase()) &&
-        patient.IDNumber.includes(searchParams.patientId) &&
-        patient.PatientNo.toString().includes(searchParams.patientNo)
-      );
-    });
+  const handleFilterPatients = (value) => {
+const searchParams= value.toLowerCase();
+setSearchParams(searchParams);
+setFilteredPatients(patients.filter((patient) => {
+  return (
+    patient.SearchName.toLowerCase().includes(searchParams.patientNames.toLowerCase()) &&
+    patient.IDNumber.includes(searchParams.patientId) &&
+    patient.PatientNo.toString().includes(searchParams.patientNo)
+  );
+}))
+
+    
     setFilteredPatients(filtered);
+   // setShowList(true);
   };
   
   const handleselectedPatient = () => {
     if(record.Activated) {
       navigate("/reception/Patient-Registration");
     }else{
-      navigate(`/reception/Patient-Registration/${record.PatientNo}`);
+      navigate(`/reception/Patient-Registration/${record.PatientNo}`, { state: { existingPatient: record } });
     }
 
   };
@@ -148,7 +147,7 @@ const OutpatientList = () => {
                 onClick={() =>
                   // Handle creating a visit for this patient
                   navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
-                    state: { patientDet: record }, // Pass patient data to the create visit page
+                    state: { existingPatient: record }, // Pass patient data to the create visit page
                   })
                 }
               >
@@ -195,20 +194,12 @@ const OutpatientList = () => {
         <Row gutter={16} className="mt-2">
           <Col span={6}>
             <Input
-              placeholder="First Name"
-              value={searchParams.firstName}
-              onChange={(e) => handleSearchChange(e, "firstName")}
+              placeholder="Patient Name"
+              value={searchParams.SearchName}
+              onChange={(e) => handleSearchChange(e, "SearchName")}
               allowClear
             />
-          </Col>
-          <Col span={6}>
-            <Input
-              placeholder="Last Name"
-              value={searchParams.lastName}
-              onChange={(e) => handleSearchChange(e, "lastName")}
-              allowClear
-            />
-          </Col>
+          </Col>          
           <Col span={6}>
             <Search
               placeholder="Patient ID"

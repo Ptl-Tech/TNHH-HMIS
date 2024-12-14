@@ -60,8 +60,13 @@ const MainLayout = () => {
         children: [
           {
             key: "/reception/Patient-list",
-            label: "Active OutPatient",
+            label: "OutPatient List",
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/converted-patients",
+            label: "Converted Patients",
+            icon: <UserOutlined style={{ color: "#fff" }} />,
           },
         ],
       },
@@ -72,7 +77,12 @@ const MainLayout = () => {
         children: [
           {
             key: "/reception/appointments/list",
-            label: "Appointments",
+            label: " New Appointments",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/appointments/Dispatched",
+            label: "Dispatched List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
         ],
@@ -205,7 +215,7 @@ const MainLayout = () => {
         children: [
           {
             key: "Appointments-list",
-            label: "Appointments",
+            label: "Appointments List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
           {

@@ -18,11 +18,11 @@ import {
 import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
-import { getVisitorsList } from "../actions/visitorsActions";
+import { getVisitorsList } from "../../actions/visitorsActions";
 import { useNavigate } from "react-router-dom";
-import { convertPatient, listPatients } from "../actions/patientActions";
+import { convertPatient, listPatients } from "../../actions/patientActions";
 
-const VisitorList = () => {
+const ConvertedPatients = () => {
   const navigate = useNavigate();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingVisitor, setEditingVisitor] = useState(null);
@@ -43,10 +43,6 @@ const VisitorList = () => {
   const { loading: patientsLoading, patients } = useSelector(
     (state) => state.patientList
   );
-  const { loading: convertLoading } = useSelector(
-    (state) => state.convertPatient
-  );
-
   const { loading, patients:visitPatients } = useSelector((state) => state.appmntList);
 
 
@@ -66,22 +62,20 @@ const VisitorList = () => {
 
   // Use useMemo to filter visitors based on search parameters
   const filteredVisitorsMemo = useMemo(() => {
-    
-    return visitors.filter((visitor) => {
+    // Filter out dispatched visitors
+    const filtered = visitors.filter((visitor) => {
       const patient = visitPatients.find(
         (patient) => patient.PatientNo === visitor.Patient_No_
       );
   
       // If a patient is found and has been dispatched, don't include them
-      if (patient && patient.Status === "New") {
+      if (patient && patient.Status === "Dispatched") {
         return false;
       }
   
       return (
-        
         dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
-       visitor.Status !== "Converted to Patient" &&
-        visitor.Status !== "Cleared" &&
+        visitor.Status === "Converted to Patient" &&
         (!searchParams.VisitorName ||
           visitor.VisitorName?.toLowerCase().includes(
             searchParams.VisitorName.toLowerCase()
@@ -92,8 +86,9 @@ const VisitorList = () => {
           visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
       );
     });
-  }, [visitors, searchParams, currentDate]);
-
+    return filtered;
+  }, [visitors, searchParams, currentDate, visitPatients]);
+  
   const handleUpdateStatus = () => {
     statusForm.validateFields().then((values) => {
       setFilteredVisitors((prevVisitors) =>
@@ -148,11 +143,12 @@ const VisitorList = () => {
 
   // Define globally accessible function to determine button text
   const getButtonText = (visitor) => {
-    const patient = patients.find(
-      (patient) => patient.IDNumber === visitor.IDNumber
-    );
-    return patient ? "Create New Visit" : "Convert to Patient";
-  };
+  const patient = visitPatients.find(
+    (patient) => patient.PatientNo === visitor.Patient_No_ && patient.Status !== "Dispatched" 
+  );
+  return patient ? "Dispatch Patient" : "Create New Appointment";
+};
+
 
   const handleConvertToPatient = async (visitor) => {
     try {
@@ -167,8 +163,6 @@ const VisitorList = () => {
           navigate(`/reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });
-//filter the 
-
         } else {
           message.warning(
             "Patient not found. Please register the patient first.",
@@ -276,7 +270,7 @@ const VisitorList = () => {
         >
           <TeamOutlined style={{ marginRight: 8 }} />{" "}
           {/* Icon before the text */}
-          Visitor List
+          Converted Patient List
         </h5>
         <Button
           icon={<ReloadOutlined />}
@@ -369,4 +363,4 @@ const VisitorList = () => {
   );
 };
 
-export default VisitorList;
+export default ConvertedPatients;

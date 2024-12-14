@@ -46,6 +46,8 @@ import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
 import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
+import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
+import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
 
 function App() {
   return (
@@ -115,16 +117,25 @@ function App() {
             path="/reception/Patient-Registration"
             element={<PatientRegistration />}
           />
-          <Route
-            path="/reception/Add-Appointment/:patientNo"
-            element={<CreateVisitForm />}
-          />
+      <Route
+  path="/reception/Add-Appointment/:patientNo?"
+  element={<CreateVisitForm />}
+/>
+
 
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
           <Route
             path="/reception/appointments/list"
             element={<ActiveAppmnts />}
+          />
+          <Route
+            path="/reception/converted-patients"
+            element={<ConvertedPatients />}
+          />
+              <Route
+            path="/reception/appointments/Dispatched"
+            element={<DispatchedAppmnts />}
           />
 
           <Route path="/reception/cash-List" element={<CashPatients />} />

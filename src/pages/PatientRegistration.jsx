@@ -249,10 +249,9 @@ const PatientRegistration = () => {
     const patientData = {
       firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0] || visitorData?.firstName,
       lastName: newPatient.lastName || visitorData.VisitorName?.split(" ")[2] || visitorData?.lastName,
-      middleName:
-        newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
+      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
       idNumber: newPatient.idNumber || visitorData?.IDNumber,
-      phoneNumber: newPatient.phoneNumber || visitorData?.PhoneNumber,
+      phoneNumber:newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1,
       email: newPatient.email,
       gender: newPatient.gender,
       dob: newPatient.dob,
@@ -274,9 +273,9 @@ const PatientRegistration = () => {
       patientNo: patientNumber, // Include patientNo only if editing
     };
 
-    // Validate the entire form
-    // const errors = validateForm(newPatient);
-    // setErrors(errors);
+   // Validate the entire form
+    const errors = validateForm(newPatient);
+    setErrors(errors);
 
     // // If there are any validation errors, show a warning
     // if (Object.keys(errors).length > 0) {
@@ -307,37 +306,61 @@ const PatientRegistration = () => {
   };
 
   // Define the validateForm function
-  // const validateForm = (patient ||) => {
-  //   const errors = {};
+  const validateForm = (patient,  visitorData,  patientDet) => {
+    const errors = {};
+  
+    // // First Name Validation
+    // if (!patient.firstName || patient.firstName.trim() === "" ) {
+    //   errors.firstName = "First name is required.";
+    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[0]) {
+    //   // If visitor data exists and first name is missing
+    //   errors.firstName = "Visitor first name is required.";
+    // }
+  
+    // // Last Name Validation
+    // if (!patient.lastName || patient.lastName.trim() === "") {
+    //   errors.lastName = "Last name is required.";
+    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[1]) {
+    //   // If visitor data exists and last name is missing
+    //   errors.lastName = "Visitor last name is required.";
+    // }
+  
+    // Phone Number Validation
+    // const phoneNumber = patient.phoneNumber || newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1
+    // if (!phoneNumber || phoneNumber.trim() === "") {
+    //   errors.phoneNumber = "Phone number is required.";
+    // } else if (!/^\d{10,12}$/.test(phoneNumber)) {
+    //   errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
+    // }
+  
+    // Nationality Validation
+    if (!patient.nationality || patient.nationality.trim() === "") {
+      errors.nationality = "Nationality is required.";
+    }
+  
+    // Email Validation
+    const email = patient.email || visitorData?.Email || newPatient.email;
+    if (!email || email.trim() === "") {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Email must be a valid email address.";
+    }
+  
+    // ID Number Validation
+    if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber) {
+      const isRegistered = patientListPayload?.some(
+        (existingPatient) => existingPatient.IDNumber === patient.idNumber || visitorData?.IDNumber === patient.idNumber
+      );
+      if (isRegistered) {
+        errors.idNumber = "This ID/Passport/Birth No is already registered.";
+      }
+    }
+  
+    return errors;
+  };
+  
 
-  //   // Example validation rules
-  //   if (!patient.firstName || patient.firstName.trim() === ""|| visitorData.VisitorName?.split(" ")[0]) {
-  //     errors.firstName = "First name is required.";
-  //   }
-  //   if (!patient.lastName || patient.lastName.trim() === "" || visitorData.VisitorName?.split(" ")[2]) {
-  //     errors.lastName = "Last name is required.";
-  //   }
-  //   if (!patient.phoneNumber || patient.phoneNumber.trim() === "" ||visitorData?.PhoneNumber) {
-  //     errors.phoneNumber = "Phone number is required.";
-  //   } else if (!/^\d{10,12}$/.test(patient.phoneNumber || visitorData?.PhoneNumber)) {
-  //     errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
-  //   }
-  //   if (!patient.nationality || patient.nationality.trim() === "") {
-  //     errors.nationality = "Nationality is required.";
-  //   }
-  //   // Validate idNumber if it is provided
-  //   if (patient.idNumber) {
-  //     const isRegistered = patientListPayload?.some(
-  //       (existingPatient) => existingPatient.IDNumber === patient.idNumber || visitorData?.IDNumber
-  //     );
-  //     if (isRegistered) {
-  //       errors.idNumber = "This ID/Passport/Birth No is already registered.";
-  //     }
-  //   }
-
-  //   // Add more validation rules as necessary
-  //   return errors;
-  // };
+ 
 
   return (
     <div>
@@ -396,6 +419,11 @@ const PatientRegistration = () => {
                     onChange={handleInputChange}
                     className="text-center fw-bold"
                   />
+                  {errors.firstName && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.firstName}
+                    </span>
+                  )}
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
@@ -413,6 +441,11 @@ const PatientRegistration = () => {
                     onChange={handleInputChange}
                     className="text-center fw-bold"
                   />
+                  {errors.middleName && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.middleName}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="row px-3 py-2  align-items-center justify-content-between">
@@ -504,8 +537,9 @@ const PatientRegistration = () => {
                   />
                   {errors.phoneNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.phoneNumber || visitorData?.PhoneNumber}
-                    </span>
+                      {errors.phoneNumber}
+                      
+                                          </span>
                   )}
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -518,10 +552,15 @@ const PatientRegistration = () => {
                     type="email"
                     name="email"
                     style={{ width: "100%" }}
-                    value={newPatient.email || patientDet?.Email}
+                    value={newPatient.email || patientDet?.Email }
                     onChange={handleInputChange}
                     className="text-center fw-bold"
                   />
+                  {errors.email && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.email}
+                    </span>
+                  )}
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
@@ -765,7 +804,10 @@ const PatientRegistration = () => {
                       visitorData?.VisitorName?.split(" ")[1]
                         ?.charAt(0)
                         .toUpperCase() ||
-                      ""
+                      ""||visitorData?.VisitorName?.split(" ")[2]
+                      ?.charAt(0)
+                      .toUpperCase() ||
+                    ""
                     }`}
                   </Avatar>
                 </div>

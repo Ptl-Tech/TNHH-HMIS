@@ -62,9 +62,9 @@ const VisitorForm = () => {
     visitorPassNo: "",
     purposeOfVisit: "",
     reasonForVisit: "",
-    firstName:"",
-    middleName:"",
-    lastName:"",
+    firstName: "",
+    middleName: "",
+    lastName: "",
   });
 
   // Generate the visitor pass number using the visitorPassCounter
@@ -80,7 +80,7 @@ const VisitorForm = () => {
         nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "",
         nameParts.length > 1 ? nameParts[nameParts.length - 1] : "",
       ];
-  
+
       setNewVisitor((prevState) => ({
         ...prevState,
         visitorName: value,
@@ -151,7 +151,6 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = async () => {
-
     if (newVisitor.visitorCategory === "0") {
       newVisitor.personToVisit = "";
     }
@@ -160,7 +159,7 @@ const VisitorForm = () => {
     const visitorData = {
       myAction: "create",
       visitorNo: "",
-...restVisitorData
+      ...restVisitorData,
     };
 
     const visitorId = await dispatch(createVisitor(visitorData));
@@ -216,7 +215,7 @@ const VisitorForm = () => {
         if (existingVisitor) {
           // Fill in the details if the visitor exists
           setExistingVisitor(existingVisitor);
-
+          message.info("Visitor Information already exists");
           setNewVisitor((prevState) => ({
             ...prevState,
             visitorName: existingVisitor?.VisitorName,
@@ -243,6 +242,29 @@ const VisitorForm = () => {
           setVisitorExistsError("Patient already exists"); // Clear any previous error
         } else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
+          setNewVisitor((prevState) => ({
+            ...prevState,
+            visitorName: "",
+            phoneNumber: "",
+            carRegistrationNo: "",
+            // personToVisit: "",
+            // personToVisitNo: "",
+            // purposeOfVisit: "",
+            // visitorCategory: "",
+            // reasonForVisit: "",
+            visitorPassNo: "",
+          }));
+          form.setFieldsValue({
+            visitorName: "",
+            phoneNumber: "",
+            carRegistrationNo: "",
+            // personToVisit: "",
+            // personToVisitNo: "",
+            // purposeOfVisit: "",
+            // visitorCategory: "",
+            // reasonForVisit: "",
+            visitorPassNo: "",
+          });
         }
         setLoadingVisitorCheck(false);
       }, 500) // Debounce delay (500ms)
@@ -538,7 +560,7 @@ const VisitorForm = () => {
                   // }
                   style={{
                     color: "#ff4500", // Custom text color
-                 //   backgroundColor: "#f9f9f9", // Light background for better contrast
+                    //   backgroundColor: "#f9f9f9", // Light background for better contrast
                     fontWeight: "bold", // Bold for better visibility
                     //    border: "1px solid primary", // Optional: Custom border
                   }}
