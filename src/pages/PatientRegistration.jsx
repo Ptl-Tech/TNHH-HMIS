@@ -411,7 +411,7 @@ const PatientRegistration = () => {
                     style={{ width: "100%" }}
                     value={
                       newPatient.firstName ||
-                      visitorData??.VisitorName?.split(" ")[0] ||
+                      visitorData?.VisitorName?.split(" ")[0] ||
                       patientDet?.SearchName?.split(" ")[0]||
                       patientDet?.FirstName?.split(" ")[0]
 
@@ -435,7 +435,7 @@ const PatientRegistration = () => {
                     style={{ width: "100%" }}
                     value={
                       newPatient.middleName ||
-                      visitorData??.VisitorName?.split(" ")[1] ||
+                      visitorData?.VisitorName?.split(" ")[1] ||
                       patientDet?.SearchName?.split(" ")[1]
                     }
                     onChange={handleInputChange}
@@ -459,7 +459,7 @@ const PatientRegistration = () => {
                     style={{ width: "100%" }}
                     value={
                       newPatient.lastName ||
-                      visitorData??.VisitorName?.split(" ")[2] ||
+                      visitorData?.VisitorName?.split(" ")[2] ||
                       patientDet?.SearchName?.split(" ")[2]
                     }
                     onChange={handleInputChange}
