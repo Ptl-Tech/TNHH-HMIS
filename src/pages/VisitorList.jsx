@@ -129,7 +129,7 @@ const VisitorList = () => {
           (patient) => patient.PatientNo === patientNo
         );
         if (existingPatient) {
-          message.success("Create new Appointment.", 5);
+          message.success("Create New Patient Visit.", 5);
           navigate(`/reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });

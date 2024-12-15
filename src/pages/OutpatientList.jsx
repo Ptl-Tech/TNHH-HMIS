@@ -178,15 +178,16 @@ const OutpatientList = () => {
           </Col>
         </Row>
       </Card>
-      {isSearching && (
-        <div className="mt-4">
-          <Table
-            columns={columns}
-            dataSource={filteredPatients}
-            pagination={{ pageSize: 10 }}
-          />
-        </div>
-      )}
+      {showList && (
+  <div className="mt-4">
+    <Table
+      columns={columns}
+      dataSource={filteredPatients}
+      pagination={{ pageSize: 10 }}
+    />
+  </div>
+)}
+
     </div>
   );
 };
