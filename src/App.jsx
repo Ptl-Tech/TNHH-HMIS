@@ -12,7 +12,7 @@ import MainLayout from "./Layouts/MainLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
 // import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
-import VisitorForm from "./pages/VisitorForm";
+import VisitorForm from "./pages/security-views/VisitorForm";
 import CreateVisitForm from "./pages/CreateVisitForm";
 
 import HistoryVisitorList from "./pages/HistoryVisitorList";
@@ -48,6 +48,7 @@ import PatientAdmissions from "./pages/PatientAdmissions";
 import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
 import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
 import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
+import SecVisitorList from "./pages/security-views/SecVisitorList";
 
 function App() {
   return (
@@ -166,7 +167,7 @@ function App() {
       <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
         <Route path="/Security" element={<MainLayout />}>
           <Route index element={<VisitorForm />} />
-          <Route path="/Security/visitors-list" element={<VisitorList />} />
+          <Route path="/Security/visitors-list" element={<SecVisitorList />} />
           <Route
             path="/Security/History-list"
             element={<HistoryVisitorList />}

@@ -95,7 +95,22 @@ const CreateVisitForm = () => {
     dispatch(appmntList());
   }, [dispatch]);
 
-
+  useEffect(() => {
+    // Reset form data when the component is unmounted or location changes
+    setNewVisit({
+      clinic: "",
+      doctor: "",
+      settlementType: "",
+      insuranceName: "",
+      membershipNo: "",
+      patientType: "",
+      appointmentType: "",
+      insuranceNo: "",
+      gender: "",
+      dob: "",
+    });
+  }, [location]);
+  
   useEffect(() => {
     const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
     if (branchCode && doctorsPayload) {

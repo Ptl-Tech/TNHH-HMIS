@@ -2,21 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-  createTriageVisit,
-  listPatients,
-  postTriageVisit,
-} from "../actions/patientActions";
-import {
-  listClinics,
-  listDoctors,
-  listInsuranceOptions,
-} from "../actions/DropdownListActions";
-import {
   PlusOutlined,
   EyeOutlined,
   TeamOutlined,
-  EditOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -27,10 +15,6 @@ import {
   Table,
   Tooltip,
   Typography,
-  Modal,
-  Form,
-  Select,
-  message,
 } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -40,18 +24,18 @@ const { Search } = Input;
 const OutpatientList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, patients } = useSelector(
-    (state) => state.patientList
-  );
+  const { patients } = useSelector((state) => state.patientList);
 
-  const [searchParams, setSearchParams] = useState("");
-  const [showList, setShowList] = useState(false);
+  const [searchParams, setSearchParams] = useState({
+    SearchName: "",
+    patientId: "",
+    patientNo: "",
+  });
   const [filteredPatients, setFilteredPatients] = useState([]);
- 
-  const currentDate = dayjs().format("YYYY-MM-DD");
+  const [showList, setShowList] = useState(false);
 
   useEffect(() => {
-    // Filter non-inpatient patients
+    // Filter non-inpatient patients when patients data changes
     if (patients.length > 0) {
       setFilteredPatients(
         patients.filter((patient) => !patient.Inpatient)
@@ -66,35 +50,19 @@ const OutpatientList = () => {
       [field]: value,
     }));
     setShowList(true);
-if (value === "" ||allowClear) {
-      setFilteredPatients(patients.filter((patient) => !patient.Inpatient));
-    }
-
+    filterPatients({ ...searchParams, [field]: value });
   };
 
-  const handleFilterPatients = (value) => {
-const searchParams= value.toLowerCase();
-setSearchParams(searchParams);
-setFilteredPatients(patients.filter((patient) => {
-  return (
-    patient.SearchName.toLowerCase().includes(searchParams.patientNames.toLowerCase()) &&
-    patient.IDNumber.includes(searchParams.patientId) &&
-    patient.PatientNo.toString().includes(searchParams.patientNo)
-  );
-}))
-
-    
+  const filterPatients = (params) => {
+    const { SearchName, patientId, patientNo } = params;
+    const filtered = patients.filter((patient) => {
+      return (
+        patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
+        patient.IDNumber.includes(patientId) &&
+        patient.PatientNo.toString().includes(patientNo)
+      );
+    });
     setFilteredPatients(filtered);
-   // setShowList(true);
-  };
-  
-  const handleselectedPatient = () => {
-    if(record.Activated) {
-      navigate("/reception/Patient-Registration");
-    }else{
-      navigate(`/reception/Patient-Registration/${record.PatientNo}`, { state: { existingPatient: record } });
-    }
-
   };
 
   const columns = [
@@ -108,7 +76,7 @@ setFilteredPatients(patients.filter((patient) => {
       title: "Patient Name",
       dataIndex: "SearchName",
       key: "SearchName",
-      sorter: (a, b) => a.Names.localeCompare(b.SearchName),
+      sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
     },
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
@@ -126,13 +94,12 @@ setFilteredPatients(patients.filter((patient) => {
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
           {record.Activated ? (
-            // If the patient is active, show "View Details"
             <Tooltip title="View Details">
               <Button
                 icon={<EyeOutlined />}
                 onClick={() =>
                   navigate("/reception/Patient-Registration", {
-                    state: { patientDet: record }, // Correctly passing the patient record
+                    state: { patientDet: record },
                   })
                 }
               >
@@ -140,14 +107,12 @@ setFilteredPatients(patients.filter((patient) => {
               </Button>
             </Tooltip>
           ) : (
-            // If the patient is not active, show "Create Visit"
             <Tooltip title="Create Visit">
               <Button
                 icon={<PlusOutlined />}
                 onClick={() =>
-                  // Handle creating a visit for this patient
                   navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
-                    state: { existingPatient: record }, // Pass patient data to the create visit page
+                    state: { existingPatient: record },
                   })
                 }
               >
@@ -158,9 +123,7 @@ setFilteredPatients(patients.filter((patient) => {
         </div>
       ),
     },
-    
   ];
-
 
   return (
     <div>
@@ -171,15 +134,11 @@ setFilteredPatients(patients.filter((patient) => {
       <div className="d-flex justify-content-between">
         <Button
           type="primary"
-          onClick={handleselectedPatient}
+          onClick={() => navigate("/reception/Patient-Registration")}
           style={{ marginBottom: "20px" }}
         >
           Register New Patient
         </Button>
-        {/* <Button style={{ marginBottom: "20px" }} type="primary">
-          <FileAddOutlined />
-          Admit Patient
-        </Button> */}
       </div>
       <Card className="card-header mb-4 mt-4 p-4">
         <Typography.Text
@@ -199,14 +158,14 @@ setFilteredPatients(patients.filter((patient) => {
               onChange={(e) => handleSearchChange(e, "SearchName")}
               allowClear
             />
-          </Col>          
+          </Col>
           <Col span={6}>
-            <Search
+            <Input
               placeholder="Patient ID"
               value={searchParams.patientId}
               onChange={(e) => handleSearchChange(e, "patientId")}
               allowClear
-              onSearch={handleFilterPatients}
+              onSearch={() => filterPatients(searchParams)}
             />
           </Col>
           <Col span={6}>
@@ -219,7 +178,7 @@ setFilteredPatients(patients.filter((patient) => {
           </Col>
         </Row>
       </Card>
-      {showList && (
+      {isSearching && (
         <div className="mt-4">
           <Table
             columns={columns}

@@ -202,7 +202,7 @@ const PatientRegistration = () => {
 
       if (name === "isPrincipleMember" && value) {
         // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName} ${
+        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName ||visitorData?.VisitorName} ${
           prev.middleName || ""
         } ${prev.lastName}`
           .trim()
@@ -252,23 +252,24 @@ const PatientRegistration = () => {
       middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
       idNumber: newPatient.idNumber || visitorData?.IDNumber,
       phoneNumber:newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1,
-      email: newPatient.email,
-      gender: newPatient.gender,
-      dob: newPatient.dob,
-      nationality: newPatient.nationality,
-      county: newPatient.county,
-      subCounty: newPatient.subCounty,
+      email: newPatient.email || patientDet?.Email,
+      gender: newPatient.gender || patientDet.Gender,
+      dob: newPatient.dob || patientDet.DateOfBirth,
+      nationality: newPatient.nationality || patientDet.Nationality,
+      county: newPatient.county || patientDet.County,
+      subCounty: newPatient.subCounty || patientDet.SubCountyName,
       residence: newPatient.residence,
-      nextOfKinFullName: newPatient.nextOfKinFullName,
-      nextOfKinRelationship: newPatient.nextOfKinRelationShip,
-      schemeName: newPatient.schemeName,
-      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo,
-      paymentMode: newPatient.paymentMode,
-      insuranceNo: newPatient.insuranceNo,
-      isPrincipleMember: newPatient.isPrincipleMember,
-      membershipNo: newPatient.membershipNo,
-      insuranceName: newPatient.insuranceName,
-      howYouKnewABoutUs: newPatient.howYouKnewABoutUs,
+      nextOfKinFullName: newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
+      nextOfKinRelationship: newPatient.nextOfKinRelationShip || patientDet?.NextofkinRelationship,
+      schemeName: newPatient.schemeName || patientDet?.SchemeName,
+      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo,
+      paymentMode: newPatient.paymentMode || patientDet?.PatientType,
+      insuranceNo: newPatient.insuranceNo ||patientDet?.InsuranceNo,
+      insurancePrinicipalMemberName: newPatient.insurancePrinicipalMemberName || patientDet?.SearchName,
+      isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal,
+      membershipNo: newPatient.membershipNo || patientDet?.MembershipNo,
+      insuranceName: newPatient.insuranceName || patientDet?.InsuranceName,
+      howYouKnewABoutUs: newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs,
       myAction: isEditAction ? "edit" : "create",
       patientNo: patientNumber, // Include patientNo only if editing
     };
@@ -364,9 +365,21 @@ const PatientRegistration = () => {
 
   return (
     <div>
+      <div className="d-flex justify-content-between align-items-center">
       <h4 style={{ textAlign: "center", color: "#E89641" }}>
-        Patient Registration {patientNumber}
+        Patient Registration {patientNumber || patientDet?.PatientNo}
       </h4>
+      {/* if patientdet exists show edit button */}
+      {patientDet && (
+    <Button 
+      type="primary" 
+      style={{ margin: "20px" }} 
+      //onClick={() => handleEditPatient(patientDet)}
+    >
+      Edit
+    </Button>
+  )}
+      </div>
       <div className="row">
         <div className="col-12 col-md-8">
           <Card title="Patient Information" style={{ width: "100%" }}>
@@ -904,7 +917,7 @@ const PatientRegistration = () => {
                       name="insurancePrinicipalMemberName"
                       value={
                         newPatient.insurancePrinicipalMemberName ||
-                        patientDet?.InsurancePrinicipalMemberName ||
+                        patientDet?.InsurancePrinicipalMemberName ||  
                         ""
                       }
                       onChange={handleInputChange}

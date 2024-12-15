@@ -1,128 +1,107 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Button,
-  Modal,
-  Form,
-  Select,
-  TimePicker,
-  Input,
-  Tag,
+  Card,
   Row,
   Col,
-  Card,
+  Input,
+  Tag,
   Typography,
   message,
-  List,
 } from "antd";
 import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
-import { useNavigate } from "react-router-dom";
 import { convertPatient, listPatients } from "../actions/patientActions";
+import { useNavigate } from "react-router-dom";
+import Loading from "../partials/nurse-partials/Loading";
+import dayjs from "dayjs";
 
 const VisitorList = () => {
   const navigate = useNavigate();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingVisitor, setEditingVisitor] = useState(null);
-  const [statusForm] = Form.useForm();
+  const dispatch = useDispatch();
+
   const [searchParams, setSearchParams] = useState({
     IdNumber: "",
     VisitorName: "",
     VisitorPhone: "",
   });
+  const [filteredVisitors, setFilteredVisitors] = useState([]);
+  const [filterLoading, setFilterLoading] = useState(false);
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
-  const {
-    loading: visitorLoading,
-    error,
-    visitors,
-  } = useSelector((state) => state.visitorsList);
+  const { loading: visitorsLoading, visitors } = useSelector(
+    (state) => state.visitorsList
+  );
   const { loading: patientsLoading, patients } = useSelector(
     (state) => state.patientList
   );
-  const { loading: convertLoading } = useSelector(
-    (state) => state.convertPatient
-  );
 
-  const { loading, patients:visitPatients } = useSelector((state) => state.appmntList);
+  const loading = visitorsLoading || patientsLoading || filterLoading;
 
-
-  const [filteredVisitors, setFilteredVisitors] = useState([]);
-  const { userInfo } = useSelector((state) => state.otpVerify);
-  const [showTable, setShowTable] = useState(
-    userInfo.userData.departmentName === "Reception" ? true : false
-  );
-
-  const dispatch = useDispatch();
-
+  // Fetch initial data
   useEffect(() => {
     dispatch(getVisitorsList());
-    dispatch(convertPatient());
     dispatch(listPatients());
   }, [dispatch]);
 
-  // Use useMemo to filter visitors based on search parameters
-  const filteredVisitorsMemo = useMemo(() => {
-    
-    return visitors.filter((visitor) => {
-      const patient = visitPatients.find(
-        (patient) => patient.PatientNo === visitor.Patient_No_
-      );
-  
-      // If a patient is found and has been dispatched, don't include them
-      if (patient && patient.Status === "New") {
-        return false;
-      }
-  
-      return (
-        
-        dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
-       visitor.Status !== "Converted to Patient" &&
-        visitor.Status !== "Cleared" &&
-        (!searchParams.VisitorName ||
-          visitor.VisitorName?.toLowerCase().includes(
-            searchParams.VisitorName.toLowerCase()
-          )) &&
-        (!searchParams.IdNumber ||
-          visitor.IDNumber?.includes(searchParams.IdNumber)) &&
-        (!searchParams.VisitorPhone ||
-          visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
-      );
-    });
-  }, [visitors, searchParams, currentDate]);
+  // Apply filters
+  useEffect(() => {
+    const applyFilters = () => {
+      setFilterLoading(true);
 
-  const handleUpdateStatus = () => {
-    statusForm.validateFields().then((values) => {
-      setFilteredVisitors((prevVisitors) =>
-        prevVisitors.map((visitor) =>
-          visitor.key === editingVisitor.key
-            ? {
-                ...visitor,
-                ...values,
-                timeIn: values.timeIn?.format("HH:mm"),
-                timeOut: values.timeOut?.format("HH:mm"),
-              }
-            : visitor
-        )
-      );
-      setModalVisible(false);
-      setEditingVisitor(null);
-    });
-  };
+      // Filter visitors based on the criteria
+      const filtered = visitors.filter((visitor) => {
+        const isToday = visitor.InitiatedDate === currentDate;
+        const allowedStatuses = visitor.Status === "Entered";
 
-  const handleEditStatus = (visitor) => {
-    setEditingVisitor(visitor);
-    statusForm.setFieldsValue({
-      status: visitor.Status,
-      timeIn: visitor.timeIn ? dayjs(visitor.timeIn, "HH:mm") : null,
-      timeOut: visitor.timeOut ? dayjs(visitor.timeOut, "HH:mm") : null,
-    });
-    setModalVisible(true);
-  };
+        if(!isToday ){
+          return false 
+        }
 
+        if(!allowedStatuses){
+          return false 
+        }
+
+        const isPatient = patients.some(
+          (patient) => patient.IDNumber === visitor.IDNumber
+        );
+
+        if(isToday && !isPatient && allowedStatuses){
+          return true
+        }
+
+        // Filter logic: visitor initiated today, has entered status, and matches search params
+        return (
+          isToday &&
+          allowedStatuses &&
+          (!searchParams.VisitorName ||
+            visitor.VisitorName?.toLowerCase().includes(
+              searchParams.VisitorName.toLowerCase()
+            )) &&
+          (!searchParams.IdNumber ||
+            visitor.IDNumber?.includes(searchParams.IdNumber)) &&
+          (!searchParams.VisitorPhone ||
+            visitor.PhoneNumber?.includes(searchParams.VisitorPhone)) &&
+            visitor.Status !== "Converted to Patient"&&
+
+          (isPatient || visitor.Status !== "Converted to Patient") 
+        );
+      });
+
+      setFilteredVisitors(filtered);
+      setFilterLoading(false);
+    };
+
+    // Run filters when visitors or patients data change
+    if (visitors.length && patients.length) {
+      applyFilters();
+    }
+  }, [visitors, patients, searchParams, currentDate]);
+
+  // Trigger search change and update search parameters
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
     const updatedSearchParams = {
@@ -130,23 +109,9 @@ const VisitorList = () => {
       [field]: value,
     };
     setSearchParams(updatedSearchParams);
-
-    const isAnyFieldFilled =
-      updatedSearchParams.IdNumber ||
-      updatedSearchParams.VisitorName ||
-      updatedSearchParams.VisitorPhone;
-
-    // If any field is filled, show table and filter visitors
-    if (isAnyFieldFilled) {
-      setShowTable(true);
-      setFilteredVisitors(filteredVisitorsMemo); // Update the table with filtered visitors
-    } else if(allowClear) {
-      setShowTable(false); // Hide table if no search is applied
-      setFilteredVisitors(filteredVisitorsMemo)
-    }
   };
 
-  // Define globally accessible function to determine button text
+  // Determine button text based on visitor status
   const getButtonText = (visitor) => {
     const patient = patients.find(
       (patient) => patient.IDNumber === visitor.IDNumber
@@ -154,6 +119,7 @@ const VisitorList = () => {
     return patient ? "Create New Visit" : "Convert to Patient";
   };
 
+  // Handle conversion of visitor to patient
   const handleConvertToPatient = async (visitor) => {
     try {
       const patientNo = await dispatch(convertPatient(visitor.No));
@@ -167,8 +133,6 @@ const VisitorList = () => {
           navigate(`/reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });
-//filter the 
-
         } else {
           message.warning(
             "Patient not found. Please register the patient first.",
@@ -185,6 +149,7 @@ const VisitorList = () => {
       message.error("An error occurred while processing the request.", 5);
     }
   };
+
   const columns = [
     {
       title: "Index",
@@ -196,30 +161,15 @@ const VisitorList = () => {
     { title: "Visitor Name", dataIndex: "VisitorName", key: "VisitorName" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
     {
-      title: "Purpose of Visit",
-      dataIndex: "PurposeofVisit",
-      key: "PurposeofVisit",
+      title: "Phone Number",
+      dataIndex: "PhoneNumber",
+      key: "PhoneNumber",
     },
-    { title: "Phone Number", dataIndex: "PhoneNumber", key: "PhoneNumber" },
     {
       title: "Date of Visit",
-      dataIndex: "CreatedDate",
-      key: "CreatedDate",
+      dataIndex: "InitiatedDate",
+      key: "InitiatedDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
-    },
-    {
-      title: "Time In",
-      dataIndex: "InitiatedByTime",
-      key: "InitiatedByTime",
-      render: (time) => {
-        if (!time) return "Invalid Time";
-        const validTime = new Date(`1970-01-01T${time}`);
-        return validTime.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-      },
     },
     {
       title: "Status",
@@ -239,19 +189,13 @@ const VisitorList = () => {
       title: "Action",
       key: "action",
       render: (_, visitor) => {
-        // Get the button text
         const buttonText = getButtonText(visitor);
-
-        // Dynamically set button style based on whether the visitor has an appointment (or is converted)
         const isCreatedVisit = buttonText === "Create New Visit";
-
-        // Set the ghost variable
         const ghost = isCreatedVisit;
 
         return (
           <Button
-            ghost={ghost} // Use the ghost variable
-            //  loading={convertLoading}
+            ghost={ghost}
             onClick={() => handleConvertToPatient(visitor)}
             type="primary"
           >
@@ -264,33 +208,21 @@ const VisitorList = () => {
 
   return (
     <div className="card mt-4">
-      <div className="d-flex justify-content-between align-items-center w-100">
-        <h5
-          style={{
-            color: "#ac8342",
-            textAlign: "center",
-            padding: "10px",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <TeamOutlined style={{ marginRight: 8 }} />{" "}
-          {/* Icon before the text */}
-          Visitor List
+      <div className="d-flex justify-content-between align-items-center m-4 text-dark ">
+        <h5 style={{ color: "#ac8342", textAlign: "center" }}>
+          <TeamOutlined style={{ marginRight: 8 }} />
+          Current Visitors List
         </h5>
         <Button
           icon={<ReloadOutlined />}
           type="primary"
-          onClick={() => dispatch(getVisitorsList(filteredVisitorsMemo))}
-          style={{ marginRight: 16 }}
+          onClick={() => dispatch(getVisitorsList())}
         >
           Refresh
         </Button>
       </div>
       <Card className="card-header mb-4 p-4">
-        <Typography.Text
-          style={{ color: "#003F6D", fontWeight: "bold", marginBottom: "16px" }}
-        >
+        <Typography.Text style={{ color: "#003F6D", fontWeight: "bold" }}>
           Find Visitor Details by:
         </Typography.Text>
         <Row gutter={16} className="mt-2">
@@ -320,51 +252,17 @@ const VisitorList = () => {
           </Col>
         </Row>
       </Card>
-      {showTable && filteredVisitorsMemo.length > 0 ? (
+      {loading ? (
+        <Loading />
+      ) : (
         <Table
           columns={columns}
-          dataSource={filteredVisitorsMemo}
-          pagination={{ pageSize: 10 }}
-          style={{ marginTop: "16px" }}
+          dataSource={filteredVisitors}
           bordered
           size="small"
+          style={{ marginTop: "16px" }}
         />
-      ) : (
-        <div style={{ textAlign: "center", padding: "20px" }}>
-          No visitors found for the selected search criteria.
-        </div>
       )}
-
-      <Modal
-        title="Update Visitor Status"
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onOk={handleUpdateStatus}
-        okText="Update Status"
-        cancelText="Cancel"
-        width={500}
-      >
-        <Form form={statusForm} layout="vertical">
-          <Form.Item
-            name="status"
-            label="Status"
-            initialValue={editingVisitor?.Status}
-          >
-            <Select>
-              <Select.Option value="Entered">Entered</Select.Option>
-              <Select.Option value="Exited">Exited</Select.Option>
-              <Select.Option value="Cleared">Cleared</Select.Option>
-              <Select.Option value="Cancelled">Cancelled</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="timeIn" label="Time In">
-            <TimePicker format="HH:mm" />
-          </Form.Item>
-          <Form.Item name="timeOut" label="Time Out">
-            <TimePicker format="HH:mm" />
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };
