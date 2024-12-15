@@ -49,7 +49,6 @@ import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
 import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
 import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
 import SecVisitorList from "./pages/security-views/SecVisitorList";
-
 function App() {
   return (
     <Routes>

@@ -154,6 +154,7 @@ const CreateVisitForm = () => {
       //   await editPatient(); // Update or create patient details
       // }
 
+
       // Step 2: Create Triage Visit
       const visitData = {
         patientNo:
