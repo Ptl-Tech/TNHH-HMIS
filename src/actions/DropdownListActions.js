@@ -290,8 +290,7 @@ export const listDoctors = () => async (dispatch, getState) => {
     // );
 
     dispatch({ type: DOCTOR_LIST_SUCCESS, payload: data });
-
-    console.log("Filtered DOCTORS data: ", data);
+    
   } catch (error) {
     dispatch({ type: DOCTOR_LIST_FAIL, payload: error.message });
   }

@@ -1,5 +1,5 @@
 import { Button, Card, message, Table } from 'antd'
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TriageSummeryCard from './TriageSummeryCard';
@@ -11,6 +11,7 @@ import { postCheckInPatientSlice } from '../../actions/triage-actions/postCheckI
 import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
 import dayjs from 'dayjs';
 import Search from 'antd/es/transfer/search';
+import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 
 const TriageList = () => {
   
@@ -25,7 +26,33 @@ const TriageList = () => {
   const dispatch = useDispatch();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
-  const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
+  // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
+
+  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+  
+  const openTriageList = useMemo(() => {
+    return triageList.filter((item) => item.Status === 'New');
+  }, [triageList]);
+
+  const formattedTriageWaitingList = triageWaitingList.map(patient => {
+    return {
+        PatientNo: patient.PatientNo,
+        SearchName: patient.SearchName,
+    }
+  });
+
+  const combinedList = openTriageList.map(room => {
+    // Find the matching patient in the formattedTriageWaitingList
+    const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
+
+    // Combine room data with the matching patient's data
+    return {
+        ...room, // Include all fields from the room object
+        PatientNo: room.PatientNo,
+        SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
+    };
+  });
+  
   const location = useLocation();
    //get the current location path
    const currentPath = location.pathname;
@@ -43,17 +70,32 @@ const TriageList = () => {
 
 
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = openTriageList.map((item, index) => ({
+  const waitingListTableDataSource = combinedList.map((item, index) => ({
     key: index + 1,
-    name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
-    observationTime: item?.ObservationTime,
+    name: item?.SearchName || ``,
+    regDate: item.ObservationDate || '',
+    observationTime: item?.ObservationTime || '',
     // sex: item?.Gender,
-    number: item?.PatientNo,
-    observationNo: item?.ObservationNo,
+    number: item?.PatientNo || '',
+    observationNo: item?.ObservationNo || '',
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);  
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: filteredPatients.length,
+});
+
+const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+};
+
+const paginatedData = filteredPatients.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -96,6 +138,13 @@ const TriageList = () => {
       dispatch(getTriageList())
     }
   }, [openTriageList, dispatch]);
+
+  useEffect(() => {
+          
+          if(!triageWaitingList.length) {
+              dispatch(getTriageWaitingList());
+          }
+      }, [dispatch, triageWaitingList.length]);
 
   const waitingListColumns = [
     {
@@ -199,11 +248,17 @@ const TriageList = () => {
                 dataSource={filteredPatients} 
                 bordered size='middle' 
                 pagination={{
-                  position: ['bottom','right'],
+                  ...pagination,
                   showSizeChanger: true,
-                  pageSize: 10,
+                  showQuickJumper: true,
+                  position: ['bottom', 'right'],
                   showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                }} 
+                  onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                  onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                  style: {
+                      marginTop: '30px',
+                  }
+              }}
                 />
             )
           }

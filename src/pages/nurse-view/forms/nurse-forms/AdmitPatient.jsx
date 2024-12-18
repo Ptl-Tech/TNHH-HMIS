@@ -78,7 +78,7 @@ const AdmitPatientForm = () => {
     <Card style={{ margin: '20px 10px 10px 10px' }}>
         <Form layout="vertical" className="admit-patient-card-container">
         <Row gutter={16}>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
                 <Form.Item 
                   label="Admission Number"
                   name='admissionNumber' 
@@ -89,7 +89,7 @@ const AdmitPatientForm = () => {
                   />
                 </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
                 <Form.Item 
                   label="Select Ward"
                   name='selectWard' 
@@ -105,19 +105,19 @@ const AdmitPatientForm = () => {
                 </Select>
                 </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
             <Form.Item label="Admission Date" name="admissionDate" >
                 <DatePicker placeholder="Admission Date" style={{ width: '100%' }} />
             </Form.Item>
             </Col>  
         </Row>
         <Row gutter={16}>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Admission Time" name='admissionTime'>
                   <TimePicker placeholder="Admission Time" style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Select Bed" name='Select Bed' >
                 <Select 
                       options={selectBed} 
@@ -127,24 +127,24 @@ const AdmitPatientForm = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Doctor" name='Doctor'>
                   <Input  />
               </Form.Item>
             </Col>
         </Row>
         <Row gutter={16}>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Admission Area" name='admissionArea'>
                   <Input  />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Patient Name" name='patientName' >
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Admission Type" name='AdmissionType'>
                   <Select 
                     options={
@@ -164,29 +164,29 @@ const AdmitPatientForm = () => {
             </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Admission Reason" name='admissionReason'>
                   <Input />
               </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Patient Number" name='patientNumber'>
                   <Input />
               </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Diagnosis Code" name='diagnosisCode'>
                   <Input />
               </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Branch" name='branch'>
                   <Input />
               </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item label="Expected Date of Discharge" name='expectedDateOfDischarge'>
                   <DatePicker placeholder="Expected Date of Discharge" style={{ width: '100%' }} />
               </Form.Item>

@@ -44,6 +44,20 @@ const TriageListPending = () => {
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);  
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: filteredPatients.length,
+});
+
+const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+};
+
+const paginatedData = filteredPatients.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -186,11 +200,17 @@ const handleOnClick = (observationNo, patientNumber) =>{
                 dataSource={filteredPatients} 
                 bordered size='middle' 
                 pagination={{
-                  position: ['bottom','right'],
+                  ...pagination,
                   showSizeChanger: true,
-                  pageSize: 10,
+                  showQuickJumper: true,
+                  position: ['bottom', 'right'],
                   showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                }} 
+                  onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                  onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                  style: {
+                      marginTop: '30px',
+                  }
+              }} 
                 />
             )
           }
