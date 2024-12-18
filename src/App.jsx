@@ -45,6 +45,11 @@ import NurseOutpatientList from "./pages/NurseOutpatientList";
 import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
+import DischargeList from "./pages/nurse-view/DischargeList";
+import DischargeCard from "./pages/nurse-view/DischargeCard";
+import Admissions from "./pages/nurse-view/Admissions";
+import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
+import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 
 function App() {
   return (
@@ -75,12 +80,19 @@ function App() {
 
           <Route path="Inpatient" element={<Inpatient />} />
           <Route path="Admit-patient" element={<AdmitPatients />} />
+          <Route path="Discharge-list" element={<DischargeList />} />
+          <Route path="Discharge-list/Discharge-card" element={<DischargeCard />} />
+
           <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
           <Route path="Admit-patient/Charges" element={<PatientCharges />} />
           <Route path="Ward-management" element={<WardManagement />} />
           <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
           <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
+
+          <Route path="Admissions" element={<Admissions />} />
+          <Route path="Admission-requests" element={<AdmissionRequests />} />
+          <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
 
           <Route
             path="Observation-Room/:id"

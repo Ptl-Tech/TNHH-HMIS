@@ -11,13 +11,14 @@ export const updateTriageListVitalsSlice = (vitals) => async (dispatch, getState
     try {
       dispatch({ type: UPDATE_TRIAGE_LIST_VITALS_REQUEST });
   
-      const updatedVitals = { ...vitals, myAction: "update" }; // Add myAction
+      const updatedVitals = { ...vitals }; // Add myAction
       const config = apiHeaderConfig(getState);
+
+      console.log('Updated Vitals:', updatedVitals);
   
       const response = await axios.post(`${API_URL}/Triage/Vitals`, updatedVitals, config);
   
       dispatch({ type: UPDATE_TRIAGE_LIST_VITALS_SUCCESS, payload: response.data });
-      console.log("Updated vitals:", response.data);
       return response.data;
   
     } catch (error) {
