@@ -7,6 +7,7 @@ import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import { useLocation } from 'react-router-dom';
 import Search from 'antd/es/transfer/search';
+import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 
 const TriageListClosed = () => {
   const [searchParams, setSearchParams] = useState({
@@ -18,22 +19,41 @@ const TriageListClosed = () => {
   const location = useLocation();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
-
+  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
   const closedTriageList = triageList.filter((item)=>item.Status==='Closed') || {};
+
+  const formattedTriageWaitingList = triageWaitingList.map(patient => {
+    return {
+        PatientNo: patient.PatientNo,
+        SearchName: patient.SearchName,
+    }
+  });
+
+  const combinedList = closedTriageList.map(room => {
+    // Find the matching patient in the formattedTriageWaitingList
+    const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
+
+    // Combine room data with the matching patient's data
+    return {
+        ...room, // Include all fields from the room object
+        PatientNo: room.PatientNo,
+        SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
+    };
+  });
 
   //get the current location path
   const currentPath = location.pathname;
 
 //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = closedTriageList.map((item, index) => ({
+  const waitingListTableDataSource = combinedList.map((item, index) => ({
     key: index + 1,
-    name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
+    name: item?.SearchName || ``,
+    regDate: item.ObservationDate || ``,
     // age: item?.AgeinYears,
     // sex: item?.Gender,
-    number: item?.PatientNo,
-    idNumber: item?.IDNumber,
-    observationNo: item?.ObservationNo,
+    number: item?.PatientNo || ``,
+    idNumber: item?.IDNumber  || ``,
+    observationNo: item?.ObservationNo  || ``,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
@@ -92,8 +112,12 @@ const paginatedData = filteredPatients.slice(
   
 
   useEffect(() => {
-    dispatch(getTriageList())
+      dispatch(getTriageList())
   }, [dispatch]);
+
+  useEffect(() => {
+      dispatch(getTriageWaitingList());
+    }, [dispatch]);
 
   const waitingListColumns = [
     {

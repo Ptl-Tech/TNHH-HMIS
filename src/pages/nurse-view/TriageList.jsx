@@ -1,5 +1,5 @@
 import { Button, Card, message, Table } from 'antd'
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TriageSummeryCard from './TriageSummeryCard';
@@ -30,9 +30,9 @@ const TriageList = () => {
 
   const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
   
-  const openTriageList = useMemo(() => {
-    return triageList.filter((item) => item.Status === 'New');
-  }, [triageList]);
+  
+  const openTriageList = triageList.filter((item) => item.Status === 'New');
+
 
   const formattedTriageWaitingList = triageWaitingList.map(patient => {
     return {
