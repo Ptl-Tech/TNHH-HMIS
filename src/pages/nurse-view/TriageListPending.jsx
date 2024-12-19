@@ -136,7 +136,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
       dataIndex: 'number',
       rowScope: 'row',
     },
-    {
+    /* {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -151,7 +151,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
           {name}
         </div>
       )
-    },
+    }, */
     
     {
       title: 'Observation Date',

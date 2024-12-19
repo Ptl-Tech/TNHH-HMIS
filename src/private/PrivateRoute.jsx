@@ -21,7 +21,7 @@ const PrivateRoute = ({ allowedDepartments }) => {
     return <Navigate to="/otp-verification" state={{ from: location }} replace />;
   }
 
-  if (!allowedDepartments.includes(department)) {
+  if (!allowedDepartments?.includes(department)) {
     return <Navigate to="/login" replace />;
   }
 

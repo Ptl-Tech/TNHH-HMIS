@@ -12,7 +12,7 @@ import MainLayout from "./Layouts/MainLayout";
 import ReceptionDashboard from "./Dashboards/ReceptionDashboard";
 // import SecurityLayout from "./Layouts/SecurityLayout";
 import VisitorList from "./pages/VisitorList";
-import VisitorForm from "./pages/VisitorForm";
+import VisitorForm from "./pages/security-views/VisitorForm";
 import CreateVisitForm from "./pages/CreateVisitForm";
 
 import HistoryVisitorList from "./pages/HistoryVisitorList";
@@ -45,12 +45,10 @@ import NurseOutpatientList from "./pages/NurseOutpatientList";
 import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
-import DischargeList from "./pages/nurse-view/DischargeList";
-import DischargeCard from "./pages/nurse-view/DischargeCard";
-import Admissions from "./pages/nurse-view/Admissions";
-import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
-import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
-
+import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
+import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
+import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
+import SecVisitorList from "./pages/security-views/SecVisitorList";
 function App() {
   return (
     <Routes>
@@ -126,16 +124,25 @@ function App() {
             path="/reception/Patient-Registration"
             element={<PatientRegistration />}
           />
-          <Route
-            path="/reception/Add-Appointment/:patientNo"
-            element={<CreateVisitForm />}
-          />
+      <Route
+  path="/reception/Add-Appointment/:patientNo?"
+  element={<CreateVisitForm />}
+/>
+
 
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
           <Route
             path="/reception/appointments/list"
             element={<ActiveAppmnts />}
+          />
+          <Route
+            path="/reception/converted-patients"
+            element={<ConvertedPatients />}
+          />
+              <Route
+            path="/reception/appointments/Dispatched"
+            element={<DispatchedAppmnts />}
           />
 
           <Route path="/reception/cash-List" element={<CashPatients />} />
@@ -157,7 +164,7 @@ function App() {
 
       <Route element={<PrivateRoute allowedDepartments={["Doctor"]} />}>
         <Route path="/Doctor" element={<MainLayout />}>
-          <Route index element={<PatientCard />} />
+          <Route index element={<DocOutPatient />} />
 
           <Route path="/Doctor/view-profile" element={<ViewProfile />} />
         </Route>
@@ -166,7 +173,7 @@ function App() {
       <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
         <Route path="/Security" element={<MainLayout />}>
           <Route index element={<VisitorForm />} />
-          <Route path="/Security/visitors-list" element={<VisitorList />} />
+          <Route path="/Security/visitors-list" element={<SecVisitorList />} />
           <Route
             path="/Security/History-list"
             element={<HistoryVisitorList />}

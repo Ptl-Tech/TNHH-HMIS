@@ -15,8 +15,9 @@ import {
   PicCenterOutlined,
   RadiusUprightOutlined,
   ImportOutlined,
-  SolutionOutlined,
-  InteractionOutlined
+  MedicineBoxOutlined,
+  ExperimentOutlined,
+  RadarChartOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -24,6 +25,7 @@ import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";
 import Signout from "../Auth/Signout";
 import { BiCoinStack } from "react-icons/bi";
+import { FaUserFriends } from "react-icons/fa";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -58,8 +60,13 @@ const MainLayout = () => {
         children: [
           {
             key: "/reception/Patient-list",
-            label: "Active OutPatient",
+            label: "OutPatient List",
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/converted-patients",
+            label: "Converted Patients",
+            icon: <UserOutlined style={{ color: "#fff" }} />,
           },
         ],
       },
@@ -70,7 +77,12 @@ const MainLayout = () => {
         children: [
           {
             key: "/reception/appointments/list",
-            label: "Appointments",
+            label: " New Appointments",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/appointments/Dispatched",
+            label: "Dispatched List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
         ],
@@ -158,73 +170,147 @@ const MainLayout = () => {
 
     // Define the menu items
     const doctorRoutes = [
+      // {
+      //   key: "/Doctor",
+      //   icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+      //   label: "Dashboard",
+      // },
       {
-        key: "/Doctor",
-        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-        label: "Dashboard",
-      },
-      {
-        type: "divider",
-      },
-      {
-        key: "RegistrationGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Registration</span>,
-        type: "group",
+        key: "patient-list",
+        icon: <FaUserFriends style={{ color: "#fff" }} />,
+        label: "Patients",
         children: [
           {
-            key: "Outpatient-list",
-            label: "Patients",
+            key: "outpatient-list",
+            label: "OutPatients",
             icon: <TeamOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "Inpatient-list",
-            label: "Active Inpatient List",
+            key: "inpatient-list",
+            label: "In-Patient List",
             icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "Patient-admissions",
-            label: "Patient Admission",
+            key: "patient-admission-list",
+            label: "Patient Admission List",
             icon: <FileAddOutlined style={{ color: "#fff" }} />,
           },
-        ],
-      },
-      {
-        type: "divider",
-      },
-      {
-        key: "TriageGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Triage</span>,
-        type: "group",
-        children: [
           {
-            key: "triage",
-            label: "Triage List",
-            icon: <FileTextOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "past-doctor-visit",
-            label: "Past Doctor Visit",
+            key: "past-doctor-visit-list",
+            label: "Past Doctor Visits",
             icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
         ],
       },
       {
-        type: "divider",
-      },
-      {
-        key: "AppointmentsGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "bold" }}>Appointments</span>,
-        type: "group",
+        key: "/doctors/appointments",
+        icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        label: "Appointments",
         children: [
           {
-            key: "Appointments-list",
+            key: "/reception/appointments/list",
             label: "Appointments",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "Upcoming-appointments",
+            key: "upcoming-appointments",
             label: "Upcoming Appointments",
             icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/doctor/discharge",
+        icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+        label: "Discharge List",
+        children: [
+          {
+            key: "discharge-requests",
+            label: "Discharge Requests",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "discharges-list",
+            label: "Discharges List",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/doctor/pharmacy",
+        icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+        label: "Pharmacy",
+        children: [
+          {
+            key: "pharmacy-outpatient",
+            label: "Pharmacy List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "pharmacy-inpatient",
+            label: "Pharmacy List InPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "pharmacy-history",
+            label: "Pharmacy History",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "pharmacy-returns",
+            label: "Pharmacy List Returns",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/doctor/radiology",
+        icon: <RadarChartOutlined style={{ color: "#fff" }} />,
+        label: "Radiology",
+        children: [
+          {
+            key: "radiology-outpatient",
+            label: "Radiology List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "radiology-inpatient",
+            label: "Radiology List InPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "radiology-walkin",
+            label: "Walk-in Radiology",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "radiology-history",
+            label: "Radiology History",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
+        key: "/doctor/lab",
+        icon: <ExperimentOutlined style={{ color: "#fff" }} />,
+        label: "Lab",
+        children: [
+          {
+            key: "lab-outpatient",
+            label: "Lab List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "lab-inpatient",
+            label: "Lab List InPatient",
+            key: "Appointments-list",
+            label: "Appointments List",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "lab-history",
+            label: "Lab History",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
         ],
       },
@@ -239,7 +325,7 @@ const MainLayout = () => {
       {
         type: "divider",
       },
-      
+
       {
         key: "RegistrationGroup",
         label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Registration</span>,
@@ -249,12 +335,12 @@ const MainLayout = () => {
             key: "visitors-list",
             label: "Visitor List",
             icon: <UserOutlined style={{ color: "#fff" }} />,
-      
-          },           
+
+          },
         ],
       },
     ];
-    
+
     // Set the menu items based on the user's department
     if (department === "Reception") {
       setMenuItems(receptionRoutes);
@@ -262,7 +348,7 @@ const MainLayout = () => {
       setMenuItems(nurseRoutes);
     } else if (department === "Doctor") {
       setMenuItems(doctorRoutes);
-    } else if(department === "Security"){
+    } else if (department === "Security") {
       setMenuItems(securityRoutes);
     }
 
@@ -342,7 +428,6 @@ const MainLayout = () => {
             }}
             items={menuItems} // Pass items here
           />
-
         </Sider>
 
         <Layout className="site-layout">
@@ -358,7 +443,9 @@ const MainLayout = () => {
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>List</Breadcrumb.Item>
             {/* Dynamic breadcrumb based on URL */}
-            <Breadcrumb.Item>{location.pathname.split("/").pop()}</Breadcrumb.Item>
+            <Breadcrumb.Item>
+              {location.pathname.split("/").pop()}
+            </Breadcrumb.Item>
           </Breadcrumb>
 
           <Content

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { USER_LOGIN_REQUEST, USER_LOGIN_SUCCESS, USER_LOGIN_FAIL, USER_LOGOUT, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, OTP_VERIFY_REQUEST, OTP_VERIFY_SUCCESS, OTP_VERIFY_FAIL, FORGOT_PWD_REQUEST, FORGOT_PWD_SUCCESS, FORGOT_PWD_FAIL, RESET_PWD_REQUEST, RESET_PWD_SUCCESS, RESET_PWD_FAIL } from "../constants/userConstants";
+import { message } from "antd";
 
 
 
@@ -62,6 +63,7 @@ export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (
       type: OTP_VERIFY_FAIL,
       payload: error.response?.data?.errors || error.errors,
     });
+    message.error(error.response?.data?.errors || error.errors);
   }
 };
 

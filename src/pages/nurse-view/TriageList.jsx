@@ -72,9 +72,10 @@ const TriageList = () => {
 //extracting values from combinedTriageWaitingListAndTriageList
   const waitingListTableDataSource = combinedList.map((item, index) => ({
     key: index + 1,
+    // name: item?.Names || `Patient name here`,
+    regDate: item.ObservationDate,
+    observationTime: item?.ObservationTime,
     name: item?.SearchName || ``,
-    regDate: item.ObservationDate || '',
-    observationTime: item?.ObservationTime || '',
     // sex: item?.Gender,
     number: item?.PatientNo || '',
     observationNo: item?.ObservationNo || '',
@@ -162,7 +163,7 @@ const paginatedData = filteredPatients.slice(
       dataIndex: 'number',
       rowScope: 'row',
     },
-    {
+    /* {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -177,7 +178,7 @@ const paginatedData = filteredPatients.slice(
           {name}
         </div>
       )
-    },
+    }, */
     
     {
       title: 'Observation Date',

@@ -126,6 +126,7 @@ export const createVisitor = (visitor) => async (dispatch, getState) => {
       };
   
       const { data } = await axios.get(`${API}data/odatafilter?webservice=QyVisitors`, config);
+      // const filteredData = data.filter((patient) => patient.GlobalDimension1Code === branchCode );
   
       dispatch({ type: VISITORS_LIST_SUCCESS, payload: data });
     } catch (error) {

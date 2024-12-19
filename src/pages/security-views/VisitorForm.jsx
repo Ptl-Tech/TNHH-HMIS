@@ -10,8 +10,12 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getEmployeesList } from "../actions/DropdownListActions";
-import { admitVisitor, createVisitor, getVisitorsList } from "../actions/visitorsActions";
+import { getEmployeesList } from "../../actions/DropdownListActions";
+import {
+  admitVisitor,
+  createVisitor,
+  getVisitorsList,
+} from "../../actions/visitorsActions";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
@@ -43,7 +47,7 @@ const VisitorForm = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loadingVisitorCheck, setLoadingVisitorCheck] = useState(false);
   const [visitorSearchTimeout, setVisitorSearchTimeout] = useState(null);
-  const[existingVisitor, setExistingVisitor] = useState(null);
+  const [existingVisitor, setExistingVisitor] = useState(null);
   const [visitorExistsError, setVisitorExistsError] = useState(""); // To store error message for existing visitor check
   const [isEditing, setIsEditing] = useState(false);
   const [newVisitor, setNewVisitor] = useState({
@@ -53,10 +57,14 @@ const VisitorForm = () => {
     idNumber: "",
     phoneNumber: "",
     carRegistrationNo: "",
-    department: "",
+    department: "Reception", // Default value
     visitorName: "",
     visitorPassNo: "",
     purposeOfVisit: "",
+    reasonForVisit: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
   });
 
   // Generate the visitor pass number using the visitorPassCounter
@@ -65,17 +73,36 @@ const VisitorForm = () => {
   };
 
   const handleInputChange = (name, value) => {
-    setNewVisitor((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    if (name === "visitorName") {
+      const nameParts = value.split(" ").filter(Boolean); // Split and remove extra spaces
+      const [firstName, middleName, lastName] = [
+        nameParts[0] || "",
+        nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "",
+        nameParts.length > 1 ? nameParts[nameParts.length - 1] : "",
+      ];
+
+      setNewVisitor((prevState) => ({
+        ...prevState,
+        visitorName: value,
+        firstName,
+        middleName,
+        lastName,
+      }));
+    } else {
+      setNewVisitor((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+
+    form.setFieldsValue({ [name]: value });
 
     // If 'personToVisit' is updated, auto-update 'department'
     if (name === "personToVisit" && data) {
       const selectedEmployee = data.find((employee) => employee.No === value);
       if (selectedEmployee) {
         const updatedDepartment =
-          selectedEmployee.Shortcut_Dimension_2_Code || "";
+          selectedEmployee.Shortcut_Dimension_2_Code || "Reception";
         const personToVisitNo = selectedEmployee.No || "";
         setNewVisitor((prevState) => ({
           ...prevState,
@@ -89,50 +116,50 @@ const VisitorForm = () => {
       }
     }
 
-    if (name === "visitorName") {
-      // Only generate if category is 'Employee'
-      setNewVisitor((prevState) => ({
-        ...prevState,
-        visitorPassNo: generateVisitorPassNo(), // Generate a new visitor pass number
-      }));
-      form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
-    }
+    // if (name === "visitorName") {
+    //   // Only generate if category is 'Employee'
+    //   setNewVisitor((prevState) => ({
+    //     ...prevState,
+    //     visitorPassNo: generateVisitorPassNo(), // Generate a new visitor pass number
+    //   }));
+    //   form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
+    // }
 
-    // Additional logic for autopopulating fields
-    if (name === "reasonForVisit") {
-      if (value === "1") {
-        // Medication
-        setNewVisitor((prevState) => ({
-          ...prevState,
-          purposeOfVisit: "Medication",
-          visitorCategory: "",
-          personToVisit: "",
-        }));
+    // // Additional logic for autopopulating fields
+    // if (name === "reasonForVisit") {
+    //   if (value === "1") {
+    //     // Medication
+    //     setNewVisitor((prevState) => ({
+    //       ...prevState,
+    //       purposeOfVisit: "Medication",
+    //       // : "",
+    //       personToVisit: "",
+    //     }));
 
-        form.setFieldsValue({
-          purposeOfVisit: "Medication",
-          visitorCategory: "",
-          personToVisit: "",
-        });
-        message.info("Purpose of visit set to Medication.");
-      }
-    }
+    //     form.setFieldsValue({
+    //       purposeOfVisit: "Medication",
+    //       personToVisit: "",
+    //     });
+    //     message.info("Purpose of visit set to Medication.");
+    //   }
+    // }
+
+    setNewVisitor((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async () => {
-    if ( !newVisitor.reasonForVisit) {
-      message.error("Please complete all required fields.");
-      return;
-    }
-
     if (newVisitor.visitorCategory === "0") {
       newVisitor.personToVisit = "";
     }
+    const { visitorName, ...restVisitorData } = newVisitor; // Exclude visitorName
 
     const visitorData = {
       myAction: "create",
       visitorNo: "",
-      ...newVisitor,
+      ...restVisitorData,
     };
 
     const visitorId = await dispatch(createVisitor(visitorData));
@@ -149,11 +176,14 @@ const VisitorForm = () => {
         idNumber: "",
         phoneNumber: "",
         carRegistrationNo: "",
-        department: "",
+        department: "Reception",
         visitorName: "",
         visitorPassNo: "",
         purposeOfVisit: "",
         reasonForVisit: "",
+        FirstName: "",
+        MiddleName: "",
+        LastName: "",
       });
 
       setVisitorExistsError("");
@@ -162,7 +192,7 @@ const VisitorForm = () => {
 
   useEffect(() => {
     dispatch(getEmployeesList());
-dispatch(getVisitorsList());
+    dispatch(getVisitorsList());
     console.log(visitors);
   }, [dispatch]);
 
@@ -184,35 +214,57 @@ dispatch(getVisitorsList());
         );
         if (existingVisitor) {
           // Fill in the details if the visitor exists
-setExistingVisitor(existingVisitor);
-
+          setExistingVisitor(existingVisitor);
+          message.info("Visitor Information already exists");
           setNewVisitor((prevState) => ({
             ...prevState,
-            visitorName: existingVisitor.VisitorName,
+            visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            personToVisit: existingVisitor.PersonToSee,
-            personToVisitNo: existingVisitor.PersonToVisitNo,
-            purposeOfVisit: existingVisitor.PurposeOfVisit,
-            visitorCategory: existingVisitor.VisitorCategory,
-            reasonForVisit: existingVisitor.ReasonForVisit,
+            // personToVisit: existingVisitor.PersonToSee,
+            // personToVisitNo: existingVisitor.PersonToVisitNo,
+            // purposeOfVisit: existingVisitor.PurposeOfVisit,
+            // visitorCategory: existingVisitor.VisitorCategory,
+            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
           }));
           form.setFieldsValue({
-            visitorName: existingVisitor.VisitorName,
+            visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            personToVisit: existingVisitor.PersonToSee,
-            personToVisitNo: existingVisitor.PersonToVisitNo,
-            purposeOfVisit: existingVisitor.PurposeOfVisit,
-            visitorCategory: existingVisitor.VisitorCategory,
-            reasonForVisit: existingVisitor.ReasonForVisit,
+            // personToVisit: existingVisitor.PersonToSee,
+            // personToVisitNo: existingVisitor.PersonToVisitNo,
+            // purposeOfVisit: existingVisitor.PurposeOfVisit,
+            // visitorCategory: existingVisitor.VisitorCategory,
+            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
           });
           setVisitorExistsError("Patient already exists"); // Clear any previous error
         } else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
-          form.resetFields();
+          setNewVisitor((prevState) => ({
+            ...prevState,
+            visitorName: "",
+            phoneNumber: "",
+            carRegistrationNo: "",
+            // personToVisit: "",
+            // personToVisitNo: "",
+            // purposeOfVisit: "",
+            // visitorCategory: "",
+            // reasonForVisit: "",
+            visitorPassNo: "",
+          }));
+          form.setFieldsValue({
+            visitorName: "",
+            phoneNumber: "",
+            carRegistrationNo: "",
+            // personToVisit: "",
+            // personToVisitNo: "",
+            // purposeOfVisit: "",
+            // visitorCategory: "",
+            // reasonForVisit: "",
+            visitorPassNo: "",
+          });
         }
         setLoadingVisitorCheck(false);
       }, 500) // Debounce delay (500ms)
@@ -288,12 +340,14 @@ setExistingVisitor(existingVisitor);
                 />
               </Form.Item>
               <Form.Item
-                label="Visitor's Name:"
+                label="Visitor Name:"
                 name="visitorName"
-                rules={[{ required: true, message: "Please enter the name!" }]}
+                rules={[
+                  { required: true, message: "Please enter the visitor name!" },
+                ]}
               >
                 <Input
-                  placeholder="Enter name"
+                  placeholder="Enter visitor name"
                   value={newVisitor.visitorName || existingVisitor?.VisitorName}
                   onChange={(e) =>
                     handleInputChange("visitorName", e.target.value)
@@ -327,7 +381,10 @@ setExistingVisitor(existingVisitor);
               >
                 <Input
                   placeholder="Enter car registration number"
-                  value={newVisitor.carRegistrationNo || existingVisitor?.CarRegNumber}
+                  value={
+                    newVisitor.carRegistrationNo ||
+                    existingVisitor?.CarRegNumber
+                  }
                   onChange={(e) =>
                     handleInputChange("carRegistrationNo", e.target.value)
                   }
@@ -369,11 +426,7 @@ setExistingVisitor(existingVisitor);
               >
                 <Select
                   placeholder="Select Visitor Category"
-                  value={
-                    newVisitor.reasonForVisit !== "2"
-                      ? undefined
-                      : newVisitor.visitorCategory
-                  } // Clear value if reasonForVisit is Medication
+                  value={newVisitor.visitorCategory}
                   onChange={(value) =>
                     handleInputChange("visitorCategory", value)
                   }
@@ -436,8 +489,7 @@ setExistingVisitor(existingVisitor);
                       handleInputChange("personToVisit", e.target.value)
                     }
                     disabled={
-                      newVisitor.visitorCategory !== "1" &&
-                      newVisitor.visitorCategory !== "0"
+                      newVisitor.visitorCategory !== "1" && !visitorExistsError
                     }
                   />
                 </Form.Item>
@@ -472,7 +524,7 @@ setExistingVisitor(existingVisitor);
                 <Input
                   placeholder="Auto-populated department"
                   name="department"
-                  value={newVisitor.department}
+                  value={newVisitor.department || "Reception"} // Default to "Reception"
                   onChange={(e) =>
                     handleInputChange("department", e.target.value)
                   }
@@ -502,13 +554,13 @@ setExistingVisitor(existingVisitor);
                   onChange={(e) =>
                     handleInputChange("purposeOfVisit", e.target.value)
                   }
-                  disabled={
-                    newVisitor.visitorCategory !== "1" &&
-                    newVisitor.visitorCategory !== "0"
-                  }
+                  // disabled={
+                  //   newVisitor.visitorCategory !== "1" &&
+                  //   newVisitor.visitorCategory !== "0"
+                  // }
                   style={{
                     color: "#ff4500", // Custom text color
-                    backgroundColor: "#f9f9f9", // Light background for better contrast
+                    //   backgroundColor: "#f9f9f9", // Light background for better contrast
                     fontWeight: "bold", // Bold for better visibility
                     //    border: "1px solid primary", // Optional: Custom border
                   }}

@@ -73,8 +73,10 @@ const PatientRegistration = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
+
   const { state } = useLocation(); // Access the state passed via navigate
-  const { visitorData, patientNumber } = state || {}; // Destructure patient data if available
+  const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [age, setAge] = useState(null); // State to hold calculated age
@@ -200,7 +202,7 @@ const PatientRegistration = () => {
 
       if (name === "isPrincipleMember" && value) {
         // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName} ${
+        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName ||visitorData?.VisitorName} ${
           prev.middleName || ""
         } ${prev.lastName}`
           .trim()
@@ -208,7 +210,6 @@ const PatientRegistration = () => {
       } else if (name === "isPrincipleMember" && !value) {
         updatedPatient.insurancePrinicipalMemberName = ""; // Clear the name if unchecked
       }
-
       return updatedPatient;
     });
   };
@@ -241,45 +242,47 @@ const PatientRegistration = () => {
   const handleSavePatient = async (e) => {
     e.preventDefault();
 
-    // Validate the entire form
-    const errors = validateForm(newPatient);
-    setErrors(errors);
-
-    // If there are any validation errors, show a warning
-    if (Object.keys(errors).length > 0) {
-      message.warning("Please fill in all the required fields correctly.");
-      return; 
-    }
-
     // Determine the action (create or edit) based on the patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
 
     // Prepare patient data
     const patientData = {
-      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0],
-      lastName: newPatient.lastName ||visitorData.VisitorName?.split(" ")[2],
-      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1],
+      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0] || visitorData?.firstName,
+      lastName: newPatient.lastName || visitorData.VisitorName?.split(" ")[2] || visitorData?.lastName,
+      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
       idNumber: newPatient.idNumber || visitorData?.IDNumber,
-      phoneNumber: newPatient.phoneNumber || visitorData?.PhoneNumber,
-      email: newPatient.email,
-      gender: newPatient.gender,
-      dob: newPatient.dob,
-      nationality: newPatient.nationality,
-      county: newPatient.county,
-      subCounty: newPatient.subCounty,
+      phoneNumber:newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1,
+      email: newPatient.email || patientDet?.Email,
+      gender: newPatient.gender || patientDet.Gender,
+      dob: newPatient.dob || patientDet.DateOfBirth,
+      nationality: newPatient.nationality || patientDet.Nationality,
+      county: newPatient.county || patientDet.County,
+      subCounty: newPatient.subCounty || patientDet.SubCountyName,
       residence: newPatient.residence,
-      nextOfKinFullName: newPatient.nextOfKinFullName,
-      nextOfKinRelationship: newPatient.nextOfKinRelationShip,
-      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo,
-      paymentMode: newPatient.paymentMode,
-      insuranceNo: newPatient.insuranceNo,
-      isPrincipleMember: newPatient.isPrincipleMember,
-      membershipNo: newPatient.membershipNo,
-      insuranceName: newPatient.insuranceName,
-      howYouKnewABoutUs: newPatient.howYouKnewABoutUs,
-      myAction: isEditAction ? "edit" : "create", 
+      nextOfKinFullName: newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
+      nextOfKinRelationship: newPatient.nextOfKinRelationShip || patientDet?.NextofkinRelationship,
+      schemeName: newPatient.schemeName || patientDet?.SchemeName,
+      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo,
+      paymentMode: newPatient.paymentMode || patientDet?.PatientType,
+      insuranceNo: newPatient.insuranceNo ||patientDet?.InsuranceNo,
+      insurancePrinicipalMemberName: newPatient.insurancePrinicipalMemberName || patientDet?.SearchName,
+      isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal,
+      membershipNo: newPatient.membershipNo || patientDet?.MembershipNo,
+      insuranceName: newPatient.insuranceName || patientDet?.InsuranceName,
+      howYouKnewABoutUs: newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs,
+      myAction: isEditAction ? "edit" : "create",
       patientNo: patientNumber, // Include patientNo only if editing
     };
+
+   // Validate the entire form
+    const errors = validateForm(newPatient);
+    setErrors(errors);
+
+    // // If there are any validation errors, show a warning
+    // if (Object.keys(errors).length > 0) {
+    //   message.warning("Please fill in all required fields.");
+    //   return;
+    // }
 
     try {
       // Dispatch the patient creation or update action
@@ -287,12 +290,10 @@ const PatientRegistration = () => {
       const patientId = responsedata?.patientNo;
 
       if (patientId) {
-        message.success(
-          "Patient Saved Successfully"
-        );
+        message.success("Patient Saved Successfully");
         // Navigate to Add Appointment page and pass patientId
         navigate(`/reception/Add-Appointment/${patientId}`, {
-          state: { patientData: patientData,  },
+          state: { patientData: patientData },
         });
       } else {
         message.error("Failed to save patient data. Please try again.");
@@ -306,43 +307,79 @@ const PatientRegistration = () => {
   };
 
   // Define the validateForm function
-  const validateForm = (patient) => {
+  const validateForm = (patient,  visitorData,  patientDet) => {
     const errors = {};
-
-    // Example validation rules
-    if (!patient.firstName || patient.firstName.trim() === "") {
-      errors.firstName = "First name is required.";
-    }
-    if (!patient.lastName || patient.lastName.trim() === "") {
-      errors.lastName = "Last name is required.";
-    }
-    if (!patient.phoneNumber || patient.phoneNumber.trim() === "") {
-      errors.phoneNumber = "Phone number is required.";
-    } else if (!/^\d{10,12}$/.test(patient.phoneNumber)) {
-      errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
-    }
+  
+    // // First Name Validation
+    // if (!patient.firstName || patient.firstName.trim() === "" ) {
+    //   errors.firstName = "First name is required.";
+    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[0]) {
+    //   // If visitor data exists and first name is missing
+    //   errors.firstName = "Visitor first name is required.";
+    // }
+  
+    // // Last Name Validation
+    // if (!patient.lastName || patient.lastName.trim() === "") {
+    //   errors.lastName = "Last name is required.";
+    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[1]) {
+    //   // If visitor data exists and last name is missing
+    //   errors.lastName = "Visitor last name is required.";
+    // }
+  
+    // Phone Number Validation
+    // const phoneNumber = patient.phoneNumber || newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1
+    // if (!phoneNumber || phoneNumber.trim() === "") {
+    //   errors.phoneNumber = "Phone number is required.";
+    // } else if (!/^\d{10,12}$/.test(phoneNumber)) {
+    //   errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
+    // }
+  
+    // Nationality Validation
     if (!patient.nationality || patient.nationality.trim() === "") {
       errors.nationality = "Nationality is required.";
     }
-    // Validate idNumber if it is provided
-    if (patient.idNumber) {
+  
+    // Email Validation
+    const email = patient.email || visitorData?.Email || newPatient.email;
+    if (!email || email.trim() === "") {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Email must be a valid email address.";
+    }
+  
+    // ID Number Validation
+    if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber) {
       const isRegistered = patientListPayload?.some(
-        (existingPatient) => existingPatient.IDNumber === patient.idNumber
+        (existingPatient) => existingPatient.IDNumber === patient.idNumber || visitorData?.IDNumber === patient.idNumber
       );
       if (isRegistered) {
         errors.idNumber = "This ID/Passport/Birth No is already registered.";
       }
     }
-
-    // Add more validation rules as necessary
+  
     return errors;
   };
+  
+
+ 
 
   return (
     <div>
+      <div className="d-flex justify-content-between align-items-center">
       <h4 style={{ textAlign: "center", color: "#E89641" }}>
-        Patient Registration {patientNumber}
+        Patient Registration {patientNumber || patientDet?.PatientNo}
       </h4>
+      {/* if patientdet exists show edit button */}
+      {patientDet && (
+    <Button 
+      type="primary" 
+      style={{ margin: "20px" }} 
+      //onClick={() => handleEditPatient(patientDet)}
+    >
+      Edit
+    </Button>
+  )}
+      </div>
       <div className="row">
         <div className="col-12 col-md-8">
           <Card title="Patient Information" style={{ width: "100%" }}>
@@ -350,6 +387,7 @@ const PatientRegistration = () => {
               name="basic"
               initialValues={{ remember: true }}
               autoComplete="off"
+              form={form}
             >
               <div className="row px-3 py-2  align-items-center justify-content-between">
                 <div className="col-12 col-md-4 ">
@@ -362,8 +400,13 @@ const PatientRegistration = () => {
                     name="idNumber"
                     placeholder="ID Number"
                     style={{ width: "100%" }}
-                    value={newPatient.idNumber || visitorData?.IDNumber}
+                    value={
+                      newPatient.idNumber ||
+                      visitorData?.IDNumber ||
+                      patientDet?.IDNumber
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                   {errors.idNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
@@ -379,9 +422,21 @@ const PatientRegistration = () => {
                     name="firstName"
                     placeholder="First Name"
                     style={{ width: "100%" }}
-                    value={newPatient.firstName || visitorData.VisitorName?.split(" ")[0]}
+                    value={
+                      newPatient.firstName ||
+                      visitorData?.VisitorName?.split(" ")[0] ||
+                      patientDet?.SearchName?.split(" ")[0]||
+                      patientDet?.FirstName?.split(" ")[0]
+
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
+                  {errors.firstName && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.firstName}
+                    </span>
+                  )}
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
@@ -391,9 +446,19 @@ const PatientRegistration = () => {
                     name="middleName"
                     placeholder="Middle Name"
                     style={{ width: "100%" }}
-                    value={newPatient.middleName || visitorData.VisitorName?.split(" ")[1]}
+                    value={
+                      newPatient.middleName ||
+                      visitorData?.VisitorName?.split(" ")[1] ||
+                      patientDet?.SearchName?.split(" ")[1]
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
+                  {errors.middleName && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.middleName}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="row px-3 py-2  align-items-center justify-content-between">
@@ -405,8 +470,13 @@ const PatientRegistration = () => {
                     name="lastName"
                     placeholder="Last Name"
                     style={{ width: "100%" }}
-                    value={newPatient.lastName || visitorData.VisitorName?.split(" ")[2]}
+                    value={
+                      newPatient.lastName ||
+                      visitorData?.VisitorName?.split(" ")[2] ||
+                      patientDet?.SearchName?.split(" ")[2]
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -416,8 +486,12 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="--Select Gender--"
-                    className="w-100"
-                    value={newPatient.gender}
+                    className="w-100 text-center fw-bold"
+                    value={
+                      newPatient.gender ||
+                      visitorData?.Gender ||
+                      patientDet?.Gender
+                    }
                     onChange={(value) => handleSelectChange("gender", value)}
                   >
                     <Select.Option value="">--Select Gender-- </Select.Option>
@@ -437,11 +511,18 @@ const PatientRegistration = () => {
                     format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     placeholder="Select Date of Birth"
-                    defaultValue={moment()} // Set default date to current date
-                    value={newPatient.dob ? moment(newPatient.dob) : null}
+                    //defaultValue={moment()} // Set default date to current date
+                    value={
+                      newPatient.dob
+                        ? moment(newPatient.dob) ||
+                          visitorData?.dateOfBirth ||
+                          patientDet?.DateOfBirth
+                        : null
+                    }
                     onChange={(date, dateString) =>
                       handleDateChange(date, dateString)
                     }
+                    className="text-center fw-bold"
                   />
                   {dobError && <span style={{ color: "red" }}>{dobError}</span>}
                   {age !== null && (
@@ -459,13 +540,19 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Enter phone number"
                     name="phoneNumber"
-                    value={newPatient.phoneNumber || visitorData?.PhoneNumber}
+                    value={
+                      newPatient.phoneNumber ||
+                      visitorData?.PhoneNumber ||
+                      patientDet?.TelephoneNo1
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
                   {errors.phoneNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
                       {errors.phoneNumber}
-                    </span>
+                      
+                                          </span>
                   )}
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -478,9 +565,15 @@ const PatientRegistration = () => {
                     type="email"
                     name="email"
                     style={{ width: "100%" }}
-                    value={newPatient.email}
+                    value={newPatient.email || patientDet?.Email }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
                   />
+                  {errors.email && (
+                    <span style={{ color: "red", fontSize: "0.875rem" }}>
+                      {errors.email}
+                    </span>
+                  )}
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
@@ -489,8 +582,8 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select nationality"
                     name="nationality"
-                    className="w-100"
-                    value={newPatient.nationality}
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.nationality || patientDet?.Nationality}
                     showSearch
                     onSearch={handleSearch}
                     onChange={(value) =>
@@ -522,8 +615,8 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select County"
-                    className="w-100 "
-                    value={newPatient.county}
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.county || patientDet?.CountyWardName}
                     onChange={(value) => handleSelectChange("county", value)}
                     name="county"
                     onFocus={handleDisplayDropDown}
@@ -548,8 +641,8 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select Sub County"
-                    className="w-100"
-                    value={newPatient.subCounty}
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.subCounty || patientDet?.SubCountyName}
                     name="subCounty"
                     onChange={(value) => handleSelectChange("subCounty", value)}
                     onFocus={handleDisplayDropDown}
@@ -582,6 +675,8 @@ const PatientRegistration = () => {
                     name="residence"
                     value={newPatient.residence}
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
+
                   />
                 </div>
               </div>
@@ -593,8 +688,13 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Kin's Name"
                     name="nextOfKinFullName"
-                    value={newPatient.nextOfKinFullName}
+                    value={
+                      newPatient.nextOfKinFullName ||
+                      patientDet?.NextOfkinFullName
+                    }
                     onChange={handleInputChange}
+                    className="text-center fw-bold"
+
                   />
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -604,8 +704,11 @@ const PatientRegistration = () => {
                   </label>
                   <Select
                     placeholder="Select Relationship"
-                    className="w-100 "
-                    value={newPatient.nextOfKinRelationShip}
+                    className="w-100 fw-bold text-center"
+                    value={
+                      newPatient.nextOfKinRelationShip ||
+                      patientDet?.NextofkinRelationship
+                    }
                     onChange={(value) =>
                       handleSelectChange("nextOfKinRelationShip", value)
                     }
@@ -641,7 +744,12 @@ const PatientRegistration = () => {
                   <Input
                     placeholder="Kin's phone number"
                     name="nextOfKinPhoneNo"
-                    value={newPatient.nextOfKinPhoneNo}
+                    value={
+                      newPatient.nextOfKinPhoneNo ||
+                      patientDet?.NextOfkinAddress1
+                    }
+                    className="text-center fw-bold"
+
                     onChange={handleInputChange}
                     type="number"
                   />
@@ -700,16 +808,19 @@ const PatientRegistration = () => {
                   >
                     {`${
                       newPatient.firstName?.charAt(0).toUpperCase() ||
-                      visitorData.VisitorName?.split(" ")[0]
+                      visitorData?.VisitorName?.split(" ")[0]
                         ?.charAt(0)
                         .toUpperCase() ||
                       ""
                     }${
                       newPatient.lastName?.charAt(0).toUpperCase() ||
-                      visitorData.VisitorName?.split(" ")[1]
+                      visitorData?.VisitorName?.split(" ")[1]
                         ?.charAt(0)
                         .toUpperCase() ||
-                      ""
+                      ""||visitorData?.VisitorName?.split(" ")[2]
+                      ?.charAt(0)
+                      .toUpperCase() ||
+                    ""
                     }`}
                   </Avatar>
                 </div>
@@ -720,7 +831,7 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Payment Mode"
                     className="w-100"
-                    value={newPatient.paymentMode}
+                    value={newPatient.paymentMode || patientDet?.PatientType}
                     onChange={(value) =>
                       handleSelectChange("paymentMode", value)
                     }
@@ -738,14 +849,14 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select Insurance "
                       className="w-100 "
-                      value={newPatient.insuranceName}
+                      value={newPatient.insuranceNo || patientDet?.InsuranceNo}
                       onChange={(value) =>
-                        handleSelectChange("insuranceName", value)
+                        handleSelectChange("insuranceNo", value)
                       }
                       // variant="borderless"
-                      name="insuranceName"
+                      name="insuranceNo"
                       onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={newPatient.paymentMode === "2"}
                     >
                       <Select.Option value="">
                         --Select Insurance--
@@ -773,9 +884,14 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Membership Number"
                       name="membershipNo"
-                      value={newPatient.membershipNo}
+                      value={
+                        newPatient.membershipNo || patientDet?.MembershipNo
+                      }
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={
+                        newPatient.paymentMode === "2" ||
+                        patientDet?.MembershipNo
+                      }
                     />
                   </div>
                 </div>
@@ -787,9 +903,9 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Insurance Number"
                       name="schemeName"
-                      value={newPatient.schemeName}
+                      value={newPatient.schemeName || patientDet?.SchemeName}
                       onChange={handleInputChange}
-                      disabled={newPatient.paymentMode !== "2"}
+                      disabled={newPatient.paymentMode === "2"}
                     />
                   </div>
                   <div className="col-12 ">
@@ -799,14 +915,17 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter Principal Name"
                       name="insurancePrinicipalMemberName"
-                      value={newPatient.insurancePrinicipalMemberName}
+                      value={
+                        newPatient.insurancePrinicipalMemberName ||
+                        patientDet?.InsurancePrinicipalMemberName ||  
+                        ""
+                      }
                       onChange={handleInputChange}
                       disabled={
-                        newPatient.paymentMode !== "2" &&
+                        newPatient.paymentMode === "2" &&
                         newPatient.isPrincipleMember
                       }
-                      readOnly
-                      style={{ cursor: "not-allowed" }}
+                      //style={{ cursor: "not-allowed" }}
                     />
                   </div>
                 </div>
@@ -816,13 +935,15 @@ const PatientRegistration = () => {
                     <span className="text-danger px-1">*</span>
                   </label>
                   <Switch
-                    checked={newPatient.isPrincipleMember}
+                    checked={
+                      newPatient.isPrincipleMember || patientDet?.Principal
+                    }
                     onChange={(checked) =>
                       handleSwitchChange("isPrincipleMember", checked)
                     }
                     size="large"
                     style={{ margin: "0 10px" }}
-                    disabled={newPatient.paymentMode !== "2"}
+                    disabled={newPatient.paymentMode === "2"}
                   />
                 </div>
               </div>

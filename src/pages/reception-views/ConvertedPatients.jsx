@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
   Button,
-  Card,
-  Row,
-  Col,
+  Modal,
+  Form,
   Input,
   Tag,
+  Row,
+  Col,
+  Card,
   Typography,
   message,
 } from "antd";
 import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { getVisitorsList } from "../actions/visitorsActions";
-import { convertPatient, listPatients } from "../actions/patientActions";
-import { useNavigate } from "react-router-dom";
-import Loading from "../partials/nurse-partials/Loading";
 import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { getVisitorsList } from "../../actions/visitorsActions";
+import { convertPatient, listPatients } from "../../actions/patientActions";
+import { useNavigate } from "react-router-dom";
+import Loading from "../../partials/nurse-partials/Loading";
 
-const VisitorList = () => {
+const ConvertedPatients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -32,12 +34,8 @@ const VisitorList = () => {
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
-  const { loading: visitorsLoading, visitors } = useSelector(
-    (state) => state.visitorsList
-  );
-  const { loading: patientsLoading, patients } = useSelector(
-    (state) => state.patientList
-  );
+  const { loading: visitorsLoading, visitors } = useSelector((state) => state.visitorsList);
+  const { loading: patientsLoading, patients } = useSelector((state) => state.patientList);
 
   const loading = visitorsLoading || patientsLoading || filterLoading;
 
@@ -51,85 +49,52 @@ const VisitorList = () => {
   useEffect(() => {
     const applyFilters = () => {
       setFilterLoading(true);
-
-      // Filter visitors based on the criteria
       const filtered = visitors.filter((visitor) => {
-        const isToday = visitor.InitiatedDate === currentDate;
-        const allowedStatuses = visitor.Status === "Entered";
-
-        if(!isToday ){
-          return false 
-        }
-
-        if(!allowedStatuses){
-          return false 
-        }
-
-        const isPatient = patients.some(
-          (patient) => patient.IDNumber === visitor.IDNumber
+        const isPatientActivated = patients.some(
+          (patient) => patient.IDNumber === visitor.IDNumber && patient.Activated
         );
 
-        if(isToday && !isPatient && allowedStatuses){
-          return true
-        }
+        // Exclude activated patients
+        if (isPatientActivated) return false;
 
-        // Filter logic: visitor initiated today, has entered status, and matches search params
         return (
-          isToday &&
-          allowedStatuses &&
+          dayjs(visitor.CreatedDate).isSame(currentDate, "day") &&
+          visitor.Status === "Converted to Patient" &&
           (!searchParams.VisitorName ||
             visitor.VisitorName?.toLowerCase().includes(
               searchParams.VisitorName.toLowerCase()
             )) &&
-          (!searchParams.IdNumber ||
-            visitor.IDNumber?.includes(searchParams.IdNumber)) &&
-          (!searchParams.VisitorPhone ||
-            visitor.PhoneNumber?.includes(searchParams.VisitorPhone)) &&
-            visitor.Status !== "Converted to Patient"&&
-
-          (isPatient || visitor.Status !== "Converted to Patient") 
+          (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
+          (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
         );
       });
-
       setFilteredVisitors(filtered);
+
+
       setFilterLoading(false);
     };
 
-    // Run filters when visitors or patients data change
     if (visitors.length && patients.length) {
       applyFilters();
     }
   }, [visitors, patients, searchParams, currentDate]);
 
-  // Trigger search change and update search parameters
   const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    const updatedSearchParams = {
+    setSearchParams({
       ...searchParams,
-      [field]: value,
-    };
-    setSearchParams(updatedSearchParams);
+      [field]: e.target.value,
+    });
   };
 
-  // Determine button text based on visitor status
-  const getButtonText = (visitor) => {
-    const patient = patients.find(
-      (patient) => patient.IDNumber === visitor.IDNumber
-    );
-    return patient ? "Create New Visit" : "Convert to Patient";
-  };
-
-  // Handle conversion of visitor to patient
   const handleConvertToPatient = async (visitor) => {
     try {
       const patientNo = await dispatch(convertPatient(visitor.No));
-
       if (patientNo) {
         const existingPatient = patients.find(
           (patient) => patient.PatientNo === patientNo
         );
         if (existingPatient) {
-          message.success("Create New Patient Visit.", 5);
+          message.success("Create new Appointment.", 5);
           navigate(`/reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });
@@ -167,8 +132,8 @@ const VisitorList = () => {
     },
     {
       title: "Date of Visit",
-      dataIndex: "InitiatedDate",
-      key: "InitiatedDate",
+      dataIndex: "CreatedDate",
+      key: "CreatedDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
@@ -188,21 +153,14 @@ const VisitorList = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, visitor) => {
-        const buttonText = getButtonText(visitor);
-        const isCreatedVisit = buttonText === "Create New Visit";
-        const ghost = isCreatedVisit;
-
-        return (
-          <Button
-            ghost={ghost}
-            onClick={() => handleConvertToPatient(visitor)}
-            type="primary"
-          >
-            {buttonText}
-          </Button>
-        );
-      },
+      render: (_, visitor) => (
+        <Button
+          onClick={() => handleConvertToPatient(visitor)}
+          type="primary"
+        >
+          Convert to Patient
+        </Button>
+      ),
     },
   ];
 
@@ -211,7 +169,7 @@ const VisitorList = () => {
       <div className="d-flex justify-content-between align-items-center m-4 text-dark ">
         <h5 style={{ color: "#ac8342", textAlign: "center" }}>
           <TeamOutlined style={{ marginRight: 8 }} />
-          Current Visitors List
+          Converted Patient List
         </h5>
         <Button
           icon={<ReloadOutlined />}
@@ -252,19 +210,23 @@ const VisitorList = () => {
           </Col>
         </Row>
       </Card>
-      {loading ? (
-        <Loading />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredVisitors}
-          bordered
-          size="small"
-          style={{ marginTop: "16px" }}
-        />
-      )}
+      {
+  loading ? (
+    <Loading />
+  ) : (
+    <Table
+      columns={columns}
+      dataSource={filteredVisitors} // Use the memoized filtered list here
+      pagination={{ pageSize: 10 }}
+      bordered
+      size="small"
+      style={{ marginTop: "16px" }}
+    />
+  )
+}
+
     </div>
   );
 };
 
-export default VisitorList;
+export default ConvertedPatients;
