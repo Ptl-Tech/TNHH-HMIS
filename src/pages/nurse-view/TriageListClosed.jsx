@@ -2,7 +2,6 @@ import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './TriageSummeryCard';
-import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import { useLocation } from 'react-router-dom';
