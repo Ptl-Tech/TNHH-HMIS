@@ -7,6 +7,7 @@ import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import { useLocation } from 'react-router-dom';
 import Search from 'antd/es/transfer/search';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
+import { SearchOutlined } from '@ant-design/icons';
 
 const TriageListClosed = () => {
   const [searchParams, setSearchParams] = useState({
@@ -136,7 +137,7 @@ const paginatedData = filteredPatients.slice(
       dataIndex: 'number',
       rowScope: 'row',
     },
-   /*  {
+   {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -146,7 +147,7 @@ const paginatedData = filteredPatients.slice(
       ],
       onFilter: (value, record) => record.name.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    }, */
+    }, 
    
     {
       title: 'Observation Date',

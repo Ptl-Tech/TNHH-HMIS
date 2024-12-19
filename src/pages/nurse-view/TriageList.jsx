@@ -163,7 +163,7 @@ const paginatedData = filteredPatients.slice(
       dataIndex: 'number',
       rowScope: 'row',
     },
-    /* {
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -178,7 +178,7 @@ const paginatedData = filteredPatients.slice(
           {name}
         </div>
       )
-    }, */
+    },
     
     {
       title: 'Observation Date',

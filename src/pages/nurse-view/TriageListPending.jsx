@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
 import Search from 'antd/es/transfer/search';
-
+import { SearchOutlined } from '@ant-design/icons';
 const TriageListPending = () => {
   
 
@@ -135,7 +135,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
       dataIndex: 'number',
       rowScope: 'row',
     },
-    /* {
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -150,7 +150,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
           {name}
         </div>
       )
-    }, */
+    }, 
     
     {
       title: 'Observation Date',

@@ -19,7 +19,6 @@ import HistoryVisitorList from "./pages/HistoryVisitorList";
 import ActiveAppmnts from "./pages/ActiveAppmnts";
 import CashPatients from "./pages/CashPatients";
 import InsurancePatients from "./pages/InsurancePatients";
-import PatientCard from "./pages/doctorsViews/PatientCard";
 import AdmitPatient from "./pages/nurse-view/AdmitPatient";
 import PatientCharges from "./pages/nurse-view/PatientCharges";
 import ReleaseBed from "./pages/nurse-view/ReleaseBed";
@@ -49,6 +48,11 @@ import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
 import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
 import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
 import SecVisitorList from "./pages/security-views/SecVisitorList";
+import Admissions from "./pages/nurse-view/Admissions";
+import DischargeList from "./pages/nurse-view/DischargeList";
+import DischargeCard from "./pages/nurse-view/DischargeCard";
+import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
+import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 function App() {
   return (
     <Routes>

@@ -18,6 +18,8 @@ import {
   MedicineBoxOutlined,
   ExperimentOutlined,
   RadarChartOutlined,
+  SolutionOutlined,
+  InteractionOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -303,8 +305,6 @@ const MainLayout = () => {
           {
             key: "lab-inpatient",
             label: "Lab List InPatient",
-            key: "Appointments-list",
-            label: "Appointments List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
           {
