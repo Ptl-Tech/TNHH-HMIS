@@ -1,138 +1,69 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Select, message, Typography } from "antd";
+import { FileTextOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 const DoctorNotes = () => {
-  const [signOptions, setSignOptions] = useState([]); // Always initialize as an empty array
-  const [systemOptions, setSystemOptions] = useState([]); // Same for systemOptions
-  const [action, setAction] = useState("add"); // Store the selected action
+  const [signOptions, setSignOptions] = useState([]);
+  const [systemOptions, setSystemOptions] = useState([]);
+  const [action, setAction] = useState("add");
 
-  // Fetch setup data for signs and systems (Replace with your API logic)
+  // Fetch data for signs and systems
   useEffect(() => {
-    // Fetch QySignsSetup (Sign Numbers)
     axios
       .get("/api/QySignsSetup")
       .then((response) => {
-        if (Array.isArray(response.data)) {
-          setSignOptions(response.data); // Only set if it's an array
-        } else {
-          console.error(
-            "Expected an array for signOptions, but got:",
-            response.data
-          );
-          setSignOptions([]); // Fallback to empty array
-        }
+        console.log("Signs API response:", response.data);
+        setSignOptions(Array.isArray(response.data) ? response.data : []);
       })
       .catch((error) => {
         console.error("Error fetching signs:", error);
         message.error("Failed to fetch signs data.");
-        setSignOptions([]); // Fallback to empty array
       });
 
-    // Fetch QyHMSSystems (Systems)
     axios
       .get("/api/QyHMSSystems")
       .then((response) => {
-        if (Array.isArray(response.data)) {
-          setSystemOptions(response.data); // Only set if it's an array
-        } else {
-          console.error(
-            "Expected an array for systemOptions, but got:",
-            response.data
-          );
-          setSystemOptions([]); // Fallback to empty array
-        }
+        console.log("Systems API response:", response.data);
+        setSystemOptions(Array.isArray(response.data) ? response.data : []);
       })
       .catch((error) => {
         console.error("Error fetching systems:", error);
         message.error("Failed to fetch systems data.");
-        setSystemOptions([]); // Fallback to empty array
       });
   }, []);
 
-  const onFinishSigns = (values) => {
-    // Call POST for PatientSigns
-    axios
-      .post("/Doctor/PatientSigns", {
-        myAction: action,
-        treatmentNo: values.treatmentNo,
-        signNo: values.signNo,
-        system: values.system,
-      })
-      .then((response) => {
-        message.success("Patient Signs Saved Successfully");
-      })
-      .catch((error) => {
-        message.error("Error saving Patient Signs");
-        console.error(error);
-      });
-  };
+  const onFinish = (values) => {
+    const requestBody = {
+      myAction: action,
+      ...values,
+    };
 
-  const onFinishSymptoms = (values) => {
-    // Call POST for PatientSymptoms
     axios
-      .post("/Doctor/PatientSymptoms", {
-        myAction: action,
-        treatmentNo: values.treatmentNo,
-        symptomCode: values.symptomCode,
-        system: values.system,
-        duration: values.duration,
-        description: values.description,
-        characteristics: values.characteristics,
-      })
-      .then((response) => {
-        message.success("Patient Symptoms Saved Successfully");
-      })
+      .post("/Doctor/SavePatientData", requestBody)
+      .then(() => message.success("Data saved successfully"))
       .catch((error) => {
-        message.error("Error saving Patient Symptoms");
-        console.error(error);
+        console.error("Error saving data:", error);
+        message.error("Error saving data");
       });
   };
 
   return (
     <div>
-      <Typography.Title level={4}>Patient Signs and Symptoms</Typography.Title>
-
-      <Typography.Title
-        level={5}
-        style={{
-          color: "#0F5689",
-          fontSize: "16px",
-          marginBottom: "12px",
-        }}
-      >
-        Patient Signs
+      <Typography.Title level={4} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <FileTextOutlined />
+        Patient Signs and Symptoms
       </Typography.Title>
 
-      <Form
-        name="patientSigns"
-        onFinish={onFinishSigns}
-        initialValues={{ myAction: "add" }} // default action
-      >
-        <Form.Item
-          name="myAction"
-          label="Action"
-          rules={[{ required: true, message: "Please select an action!" }]}
-        >
-           <div>
-            <Button
-            type='primary'
-              onClick={() => setAction('add')}
-              style={{ marginRight: 8 }}
-            >
+      <Form name="patientData" onFinish={onFinish} layout="vertical">
+        <Form.Item>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+            <Button type="primary" onClick={() => setAction("add")}>
               Add
             </Button>
             <Button
-              type="default"
-              onClick={() => setAction('update')}
-              style={{ marginRight: 8 }}
-              
-            >
-              Update
-            </Button>
-            <Button
-              type={action === 'delete' ? 'primary' : 'default'}
-              onClick={() => setAction('delete')}
+              type={action === "delete" ? "primary" : "default"}
+              onClick={() => setAction("delete")}
               danger
             >
               Delete
@@ -140,12 +71,14 @@ const DoctorNotes = () => {
           </div>
         </Form.Item>
 
+        <Typography.Title level={5} style={{ color: "#0F5689", fontSize: "16px", marginBottom: "12px" }}>
+          <UserOutlined /> Patient Signs
+        </Typography.Title>
+
         <Form.Item
           name="treatmentNo"
           label="Treatment Number"
-          rules={[
-            { required: true, message: "Please enter treatment number!" },
-          ]}
+          rules={[{ required: true, message: "Please enter treatment number!" }]}
         >
           <Input />
         </Form.Item>
@@ -156,54 +89,18 @@ const DoctorNotes = () => {
           rules={[{ required: true, message: "Please select a sign!" }]}
         >
           <Select>
-            {signOptions.map((option) => (
-              <Select.Option key={option.signNo} value={option.signNo}>
-                {option.signName}
-              </Select.Option>
-            ))}
+            {Array.isArray(signOptions) &&
+              signOptions.map((option) => (
+                <Select.Option key={option.signNo} value={option.signNo}>
+                  {option.signName}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
-        <Form.Item
-          name="system"
-          label="System"
-          rules={[{ required: true, message: "Please select a system!" }]}
-        >
-          <Select>
-            {systemOptions.map((option) => (
-              <Select.Option key={option.systemId} value={option.systemId}>
-                {option.systemName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
-
-      <Typography.Title
-        level={5}
-        style={{
-          color: "#0F5689",
-          fontSize: "16px",
-          marginBottom: "12px",
-        }}
-      >
-        Patient Symptoms
-      </Typography.Title>
-
-      <Form
-        name="patientSymptoms"
-        onFinish={onFinishSymptoms}
-        initialValues={{ myAction: "add" }} // default action
-      >
-        <Form.Item
-          name="treatmentNo"
-          label="Treatment Number"
-          rules={[
-            { required: true, message: "Please enter treatment number!" },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+        <Typography.Title level={5} style={{ color: "#0F5689", fontSize: "16px", marginBottom: "12px" }}>
+          Patient Symptoms
+        </Typography.Title>
 
         <Form.Item
           name="symptomCode"
@@ -211,14 +108,12 @@ const DoctorNotes = () => {
           rules={[{ required: true, message: "Please select a symptom!" }]}
         >
           <Select>
-            {signOptions.map((option) => (
-              <Select.Option
-                key={option.symptomCode}
-                value={option.symptomCode}
-              >
-                {option.symptomName}
-              </Select.Option>
-            ))}
+            {Array.isArray(signOptions) &&
+              signOptions.map((option) => (
+                <Select.Option key={option.symptomCode} value={option.symptomCode}>
+                  {option.symptomName}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 
@@ -228,11 +123,12 @@ const DoctorNotes = () => {
           rules={[{ required: true, message: "Please select a system!" }]}
         >
           <Select>
-            {systemOptions.map((option) => (
-              <Select.Option key={option.systemId} value={option.systemId}>
-                {option.systemName}
-              </Select.Option>
-            ))}
+            {Array.isArray(systemOptions) &&
+              systemOptions.map((option) => (
+                <Select.Option key={option.systemId} value={option.systemId}>
+                  {option.systemName}
+                </Select.Option>
+              ))}
           </Select>
         </Form.Item>
 

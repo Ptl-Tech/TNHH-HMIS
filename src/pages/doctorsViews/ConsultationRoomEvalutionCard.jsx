@@ -34,6 +34,7 @@ import Theatre from "./Doctor-Forms/Theatre";
 import AdmitPatientForm from "./Doctor-Forms/AdmitPatient";
 import TCA_Appointment from "./Doctor-Forms/TCA_Appointment";
 import Referrals from "./Doctor-Forms/Referrals";
+import ObservationRoom from "./Doctor-Forms/ObservationRoom";
 
 const ConsultationRoomEvalutionCard = () => {
   const location = useLocation();
@@ -86,28 +87,17 @@ const ConsultationRoomEvalutionCard = () => {
   };
 
   const tabs = [
-    {
-      key: "1",
-      label: "Allergy and Medication",
-      content: <AllergyAndMedication />,
-    },
-    { key: "2", label: "Injections", content: <Injections /> },
-    { key: "3", label: "Observation Room", content: <Dressing /> },
-    { key: "4", label: "Vitals", content: <FormVitals /> },
-    { key: "5", label: "Doctor Notes", content: <DoctorNotes /> },
-    { key: "6", label: "Lab Results", content: <LabResults /> },
-    { key: "7", label: "Radiology", content: <Imaging /> },
-    { key: "8", label: "Diagnosis", content: <Diagnosis /> },
-    { key: "9", label: "Medication", content: <Medication /> },
-    {
-      key: "10",
-      label: "Outpatient Procedures",
-      content: <OutPatientProcedures />,
-    },
-    { key: "11", label: "Theatre", content: <Theatre /> },
-    { key: "12", label: "Admit Patient", content: <AdmitPatientForm /> },
-    { key: "13", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },
-    { key: "14", label: "Referrals", content: <Referrals /> },
+  
+    { key: "1", label: "Observation Room", content: <ObservationRoom /> },
+    { key: "2", label: "Doctor Notes", content: <DoctorNotes /> },
+    { key: "3", label: "Lab Results", content: <LabResults /> },
+    { key: "4", label: "Radiology", content: <Imaging /> },
+    { key: "5", label: "Diagnosis", content: <Diagnosis /> },
+    { key: "6", label: "Medication", content: <Medication /> },  
+    { key: "7", label: "Theatre", content: <Theatre /> },
+    { key: "8", label: "Admit Patient", content: <AdmitPatientForm /> },
+    { key: "9", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },
+    { key: "10", label: "Referrals", content: <Referrals /> },
   ];
 
   return (
@@ -146,44 +136,53 @@ const ConsultationRoomEvalutionCard = () => {
             <SkeletonLoading />
           ) : (
             <Card
+            style={{
+              padding: "10px 16px",
+              background: "#F9F9F9",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <div
               style={{
-                padding: "10px 16px",
-           //     marginTop: "10px",
-                background: "#F9F9F9",
-                borderRadius: "8px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "start",
+                gap: "12px",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "start",
-                  gap: "12px",
-                }}
-              >
-                <Avatar icon={<UserOutlined />} size={48} />
-                <div style={{ marginTop: "10px" }}>
-                  <Typography.Title
-                    level={5}
-                    style={{ color: "black", fontSize: "13px" }}
-                  >
-                    {patientName}
-                  </Typography.Title>
-                  <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
-                    DOB: {patientDetails?.DateOfBirth}
-                  </Typography.Text>
-                </div>
+              <Avatar icon={<UserOutlined />} size={48} />
+              <div style={{ marginTop: "10px" }}>
+                <Typography.Title
+                  level={5}
+                  style={{ color: "black", fontSize: "13px" }}
+                >
+                  {patientName}
+                </Typography.Title>
+                <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
+                  DOB: {patientDetails?.DateOfBirth}
+                </Typography.Text>
               </div>
-              <Divider />
+            </div>
+            <Divider />
+            <div style={{ display: "flex", gap: "8px", flexDirection: "column" }}>
               <Button
                 type="primary"
-                onClick={() => handleDispatchAction(observationNo)}
+                onClick={() => handleMarkAsCompleted(observationNo)}
                 style={{ width: "100%", marginBottom: "10px" }}
               >
-                Dispatch patient to the Doctor
+                Mark as Completed
               </Button>
-            </Card>
+              <Button
+                type="default"
+                onClick={() => handleTransferPatient(observationNo)}
+                style={{ width: "100%" }}
+              >
+                Transfer/Assign Patient
+              </Button>
+            </div>
+          </Card>
+          
           )}
 
           {loadingPatientDetails ? (
@@ -317,111 +316,96 @@ const ConsultationRoomEvalutionCard = () => {
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             }}
+          >
+            <Typography.Title
+              level={5}
+              style={{
+                color: "#0f5689",
+                fontSize: "14px",
+                margin: "10px 0 10px 0",
+              }}
+            >
+              Settlement Information
+            </Typography.Title>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+              }}
             >
               <Typography.Title
                 level={5}
-                style={{
-                  color: "#0f5689",
-                  fontSize: "14px",
-                  margin: "10px 0 10px 0",
-                }}
+                style={{ fontSize: "14px", color: "black" }}
               >
-                Settlement Information
+                Settlement Type
               </Typography.Title>
-              <div
+          
+              <Typography.Text
                 style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
+                  fontSize: "12px",
+                  color: "gray",
+                  fontWeight: "bold",
                 }}
               >
-                <Typography.Title
-                  level={5}
-                  style={{ fontSize: "14px", color: "black" }}
-                >
-                  Settlement Type
-                </Typography.Title>
-
-                <Typography.Text
-                  style={{
-                    fontSize: "12px",
-                    color: "gray",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {patientDetails?.PatientType}
-                </Typography.Text>
-              </div>
-              <div
+                {patientDetails?.PatientType}
+              </Typography.Text>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography.Title
+                level={5}
+                style={{ fontSize: "14px", color: "black" }}
+              >
+                Insurance
+              </Typography.Title>
+              <Typography.Text
                 style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
+                  fontSize: "12px",
+                  color: "gray",
+                  fontWeight: "bold",
                 }}
               >
-                <Typography.Title
-                  level={5}
-                  style={{ fontSize: "14px", color: "black" }}
-                >
-                  Insurance
-                </Typography.Title>
-                <Typography.Text
-                  style={{
-                    fontSize: "12px",
-                    color: "gray",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {patientDetails?.SchemeName || "N/A"}
-                </Typography.Text>
-              </div>
-              <div
+                {patientDetails?.SchemeName || "N/A"}
+              </Typography.Text>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography.Title
+                level={5}
+                style={{ fontSize: "14px", color: "black" }}
+              >
+                Patient Bill Balance:
+              </Typography.Title>
+              <Typography.Text
                 style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
+                  fontSize: "12px",
+                  color: "gray",
+                  fontWeight: "bold",
                 }}
               >
-                <Typography.Title
-                  level={5}
-                  style={{ fontSize: "14px", color: "black" }}
-                >
-                  Patient Bill Balance:
-                </Typography.Title>
-                <Typography.Text
-                  style={{
-                    fontSize: "12px",
-                    color: "gray",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {` KSH. ${patientDetails?.TotalBilled} `}
-                </Typography.Text>
-              </div>
-              {/* <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography.Title
-                  level={5}
-                  style={{ fontSize: "14px", color: "black" }}
-                >
-                  Gender
-                </Typography.Title>
-                <Typography.Text
-                  style={{
-                    fontSize: "12px",
-                    color: "gray",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {patientDetails?.Gender}
-                </Typography.Text>
-              </div> */}
-            </Card>
+                {` KSH. ${patientDetails?.TotalBilled} `}
+              </Typography.Text>
+            </div>
+            <Button
+              type="primary"
+              style={{ marginTop: "10px", width: "100%" }}
+              onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
+            >
+              Print Interim Invoice
+            </Button>
+          </Card>
+          
           )}
         </Col>
       </Row>

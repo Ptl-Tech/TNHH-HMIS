@@ -46,11 +46,11 @@ const Imaging = () => {
       dataIndex: "treatmentNo",
       key: "treatmentNo",
     },
-    {
-      title: "Line No",
-      dataIndex: "lineNo",
-      key: "lineNo",
-    },
+    // {
+    //   title: "Line No",
+    //   dataIndex: "lineNo",
+    //   key: "lineNo",
+    // },
     {
       title: "Test Package Code",
       dataIndex: "testPackageCode",
@@ -126,6 +126,8 @@ const Imaging = () => {
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
+        width={800}
+        style={{ top: 20 }}
       >
         <Form form={form} onFinish={handleAddRecord}>
           <Form.Item
@@ -138,13 +140,13 @@ const Imaging = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="lineNo"
             label="Line Number"
             rules={[{ required: true, message: "Please input line number!" }]}
           >
             <Input type="number" />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="testPackageCode"
