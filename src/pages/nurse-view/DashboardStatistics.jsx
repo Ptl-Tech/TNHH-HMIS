@@ -44,7 +44,9 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                                   userDetails?.userData?.firstName
                                 }
                               </Typography.Title>
-                              <Typography.Text style={{ fontSize: '14px', color:'gray' }}>Registered Nurse</Typography.Text>
+                              <Typography.Text style={{ fontSize: '14px', color:'gray' }}>Registered {
+                              userDetails?.userData?.departmentName || 'N/A'
+                            }</Typography.Text>
                         </div>
                       </div>
                       <Divider />
