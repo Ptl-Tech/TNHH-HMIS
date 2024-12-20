@@ -53,6 +53,7 @@ import DischargeList from "./pages/nurse-view/DischargeList";
 import DischargeCard from "./pages/nurse-view/DischargeCard";
 import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
 import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
+import DischargeRequests from "./pages/nurse-view/DischargeRequests";
 function App() {
   return (
     <Routes>
@@ -95,6 +96,8 @@ function App() {
           <Route path="Admissions" element={<Admissions />} />
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
+
+          <Route path="Discharge-requests" element={<DischargeRequests />} />
 
           <Route
             path="Observation-Room/:id"

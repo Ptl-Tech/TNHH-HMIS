@@ -20,6 +20,7 @@ import {
   RadarChartOutlined,
   SolutionOutlined,
   InteractionOutlined,
+  RetweetOutlined
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -155,6 +156,11 @@ const MainLayout = () => {
             key: "Ward-management",
             label: "Ward Management",
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Discharge-requests",
+            label: "Discharge Requests",
+            icon: <RetweetOutlined style={{ color: "#fff" }} />,
           },
           {
             key: "Discharge-list",

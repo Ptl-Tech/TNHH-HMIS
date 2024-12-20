@@ -1,9 +1,11 @@
 import { Card, Col, Row, Space, Typography, Button, Table } from "antd"
-import { ProfileOutlined, PlusOutlined, CloseOutlined, PayCircleOutlined } from "@ant-design/icons"
+import { ProfileOutlined, PlusOutlined, CloseOutlined, PayCircleOutlined, PrinterOutlined, FileExclamationOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchFilters from "./SearchFilters";
 import { useSelector } from "react-redux";
+import { exportToExcel, printToPDF } from "../../utils/helpers";
+
 
 const AdmitPatients = () => {
 
@@ -113,8 +115,6 @@ const AdmitPatients = () => {
         (state) => state.patientList
       );
 
-      console.log('patients', patients)
-      
 
   return (
         <Row style={{ margin: '20px 10px 10px 10px' }}>
@@ -127,11 +127,17 @@ const AdmitPatients = () => {
                 </Space>
                     
                 <Card className="admit-patient-card-container">
-                    <Space className="admit-patient-button-container">
-                        <Button type="primary" disabled={!selectedRowKey} onClick={handleAdmitPatient}><PlusOutlined /> Admit Patient</Button>
-                        <Button color="danger" variant="outlined" disabled={!selectedRowKey}><CloseOutlined /> Cancel Admission</Button>
-                        <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
-                    </Space>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Space className="admit-patient-button-container">
+                            <Button type="primary" disabled={!selectedRowKey} onClick={handleAdmitPatient}><PlusOutlined /> Admit Patient</Button>
+                            <Button color="danger" variant="outlined" disabled={!selectedRowKey}><CloseOutlined /> Cancel Admission</Button>
+                            <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
+                        </Space>
+                        <Space className="admit-patient-button-container">
+                            <Button type="primary" onClick={()=>exportToExcel(dataSource, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
+                            <Button type="primary" onClick={()=>printToPDF(dataSource, 'Admission request success list')}><PrinterOutlined /> Print PDF</Button>
+                        </Space>
+                    </div>
                 </Card>
 
                <SearchFilters />
