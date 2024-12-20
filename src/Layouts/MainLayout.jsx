@@ -172,18 +172,18 @@ const MainLayout = () => {
 
     // Define the menu items
     const doctorRoutes = [
-      // {
-      //   key: "/Doctor",
-      //   icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      //   label: "Dashboard",
-      // },
+      {
+        key: "/Doctor",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
       {
         key: "patient-list",
         icon: <FaUserFriends style={{ color: "#fff" }} />,
         label: "Patients",
         children: [
           {
-            key: "outpatient-list",
+            key: "/Doctor/Consultation-List",
             label: "OutPatients",
             icon: <TeamOutlined style={{ color: "#fff" }} />,
           },

@@ -26,8 +26,8 @@ const DoctorDashboard = () => {
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
     (state) => state.getDoctorVisitList
   ) || {};
-  const openTreatmentList = treatmentList.filter((item)=>item.Status==='New') || {};
-  const pendingTreatmentList = treatmentList.filter((item)=>item.Status==='Pending')
+  const openTreatmentList = treatmentList?.filter((item)=>item.Status==='New') || {};
+  const pendingTreatmentList = treatmentList?.filter((item)=>item.Status==='Pending')
   const { allPatientLList } = useSelector((state) => state.getPatientList) || {};
 
   const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};
@@ -38,7 +38,7 @@ const DoctorDashboard = () => {
   const cardData = [
     {
       title: " Waiting List Patients",
-      value: openTreatmentList.length,
+      value: openTreatmentList?.length,
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
       color: '#fff' ,// You can set the color here
@@ -47,7 +47,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "Consultation Room Patients",
-      value: pendingTreatmentList.length,
+      value: pendingTreatmentList?.length,
       subtitle: "Increase in 30 days",
       icon: <SafetyOutlined />,
       color: '#000' ,// You can set the color here
@@ -56,7 +56,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "Out patients",
-      value: filterInPatients.length,
+      value: filterInPatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserOutlined />,
       color: '#fff' ,// You can set the color here
@@ -65,7 +65,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "In patients",
-      value: filterOutPatients.length,
+      value: filterOutPatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
       color: '#000' ,// You can set the color here

@@ -44,15 +44,17 @@ import NurseOutpatientList from "./pages/NurseOutpatientList";
 import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
-import DocOutPatient from "./pages/doctorsViews/DocOutPatient";
+import DocOutPatient from "./pages/doctorsViews/DoctorVisits";
 import DispatchedAppmnts from "./pages/reception-views/DispatchedAppmnts";
 import ConvertedPatients from "./pages/reception-views/ConvertedPatients";
 import SecVisitorList from "./pages/security-views/SecVisitorList";
-import Admissions from "./pages/nurse-view/Admissions";
-import DischargeList from "./pages/nurse-view/DischargeList";
-import DischargeCard from "./pages/nurse-view/DischargeCard";
-import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
-import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
+import AddAllergies from "./pages/doctorsViews/AddAllergies";
+import FormVitals from "./pages/doctorsViews/Vitals";
+import Vitals from "./pages/doctorsViews/Vitals";
+import DoctorVisits from "./pages/doctorsViews/DoctorVisits";
+import ConsultationRoomEvalutionCard from "./pages/doctorsViews/ConsultationRoomEvalutionCard";
+import DoctorDashboard from "./pages/doctorsViews/DoctorDashboard";
+import TreamentListPending from "./pages/doctorsViews/TreamentListPending";
 function App() {
   return (
     <Routes>
@@ -65,7 +67,8 @@ function App() {
         <Route path="/Nurse" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
 
-          {/* Routes */}<Route
+          {/* Routes */}
+          <Route
             path="Patient-Registration"
             element={<PatientRegistration />}
           />
@@ -82,41 +85,23 @@ function App() {
 
           <Route path="Inpatient" element={<Inpatient />} />
           <Route path="Admit-patient" element={<AdmitPatients />} />
-          <Route path="Discharge-list" element={<DischargeList />} />
-          <Route path="Discharge-list/Discharge-card" element={<DischargeCard />} />
-
           <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
           <Route path="Admit-patient/Charges" element={<PatientCharges />} />
           <Route path="Ward-management" element={<WardManagement />} />
           <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
-          <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
+          <Route
+            path="Ward-management/Transfer-bed"
+            element={<TransferBed />}
+          />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
 
-          <Route path="Admissions" element={<Admissions />} />
-          <Route path="Admission-requests" element={<AdmissionRequests />} />
-          <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
-
-          <Route
-            path="Observation-Room/:id"
-            element={<NurseObservation />}
-          />
-          <Route
-            path="Outpatient-list"
-            element={<NurseOutpatientList />}
-          />
-          <Route
-            path="Patient-admissions"
-            element={<PatientAdmissions />}
-          />
+          <Route path="Observation-Room/:id" element={<NurseObservation />} />
+          <Route path="Outpatient-list" element={<NurseOutpatientList />} />
+          <Route path="Patient-admissions" element={<PatientAdmissions />} />
           <Route path="BedManagement" element={<BedManager />} />
 
-          <Route
-            path="Discharge-list"
-            element={<DischargeRequestList />}
-          />
+          <Route path="Discharge-list" element={<DischargeRequestList />} />
           <Route path="view-profile" element={<ViewProfile />} />
-
-
         </Route>
       </Route>
 
@@ -128,11 +113,10 @@ function App() {
             path="/reception/Patient-Registration"
             element={<PatientRegistration />}
           />
-      <Route
-  path="/reception/Add-Appointment/:patientNo?"
-  element={<CreateVisitForm />}
-/>
-
+          <Route
+            path="/reception/Add-Appointment/:patientNo?"
+            element={<CreateVisitForm />}
+          />
 
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
@@ -144,7 +128,7 @@ function App() {
             path="/reception/converted-patients"
             element={<ConvertedPatients />}
           />
-              <Route
+          <Route
             path="/reception/appointments/Dispatched"
             element={<DispatchedAppmnts />}
           />
@@ -168,9 +152,18 @@ function App() {
 
       <Route element={<PrivateRoute allowedDepartments={["Doctor"]} />}>
         <Route path="/Doctor" element={<MainLayout />}>
-          <Route index element={<DocOutPatient />} />
+          <Route index element={<DoctorDashboard/>} />
+          <Route path="/Doctor/Consultation-List" element={<DoctorVisits />} />
+          <Route path="/Doctor/PendingTreatmentList" element={<TreamentListPending />} />
 
-          <Route path="/Doctor/view-profile" element={<ViewProfile />} />
+          <Route path="/Doctor/Consultation/Patient" element={<ConsultationRoomEvalutionCard />} />
+
+          {/* <Route path="treatmentCard/:TreatmentNo" element={<PatientCard />}>
+            <Route path="add-allergies" element={<AddAllergies />} />
+            <Route path="add-vitals" element={<Vitals />} />
+          </Route> */}
+
+          <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
 
@@ -186,7 +179,6 @@ function App() {
       </Route>
 
       <Route path="*" element={<Navigate to="/login" />} />
-
     </Routes>
     // <Routes>
     //   <Route path="/login" element={<Login />} />
@@ -350,7 +342,6 @@ function App() {
 
     //   <Route path="*" element={<Navigate to="/login" />} />
     // </Routes>
-
   );
 }
 

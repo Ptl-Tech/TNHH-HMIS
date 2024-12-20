@@ -1,7 +1,6 @@
 import { Button, Card, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TriageSummeryCard from "./TriageSummeryCard";
 import { SearchOutlined } from "@ant-design/icons";
 import Loading from "../../partials/nurse-partials/Loading";
 import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
@@ -28,7 +27,7 @@ const TreamentListPending = () => {
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.getDoctorVisitList) || {};
 
-  const pendingTreatmentList = treatmentList.filter(
+  const pendingTreatmentList = treatmentList?.filter(
     (item) => item.Status === "Pending"
   );
 
@@ -37,7 +36,7 @@ const TreamentListPending = () => {
 
   //extracting values from combinedTriageWaitingListAndTriageList
  
-  const waitingListTableDataSource = openDoctorVisitList?.map((item, index) => ({
+  const waitingListTableDataSource = pendingTreatmentList?.map((item, index) => ({
     key: index + 1,
     treatmentNo: item?.TreatmentNo,
     patientNo: item?.PatientNo,
@@ -213,7 +212,7 @@ const TreamentListPending = () => {
         </div>
       </Card>
 
-      {loadingTriageList ? (
+      {treatmentListLoading ? (
         <Loading />
       ) : (
         <Table
