@@ -23,7 +23,7 @@ const DoctorVisits = () => {
 
 ;
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
-    (state) => state.getDoctorVisitList
+    (state) => state.docTreatmentList
   ) || {};
 
   const openDoctorVisitList = treatmentList?.filter((item) => item.Status === 'New');

@@ -25,7 +25,7 @@ const TreamentListPending = () => {
 
   
   const { loading: treatmentListLoading, patients: treatmentList } =
-    useSelector((state) => state.getDoctorVisitList) || {};
+    useSelector((state) => state.docTreatmentList) || {};
 
   const pendingTreatmentList = treatmentList?.filter(
     (item) => item.Status === "Pending"

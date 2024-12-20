@@ -24,7 +24,7 @@ const DoctorDashboard = () => {
   
 
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
-    (state) => state.getDoctorVisitList
+    (state) => state.docTreatmentList
   ) || {};
   const openTreatmentList = treatmentList?.filter((item)=>item.Status==='New') || {};
   const pendingTreatmentList = treatmentList?.filter((item)=>item.Status==='Pending')

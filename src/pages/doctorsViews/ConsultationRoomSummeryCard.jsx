@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 const ConsultationRoomSummeryCard = ({ currentPath = "/" }) => {
   const { patients: treatmentList = [] } =
-    useSelector((state) => state.getDoctorVisitList) || {};
+    useSelector((state) => state.docTreatmentList) || {};
 
   const openConsultationList = treatmentList.filter((item) => item.Status === "New");
   const pendingConsultationList = treatmentList.filter((item) => item.Status === "Pending");
