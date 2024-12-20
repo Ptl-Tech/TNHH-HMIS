@@ -56,6 +56,9 @@ import ConsultationRoomEvalutionCard from "./pages/doctorsViews/ConsultationRoom
 import DoctorDashboard from "./pages/doctorsViews/DoctorDashboard";
 import TreamentListPending from "./pages/doctorsViews/TreamentListPending";
 import DischargeRequests from "./pages/nurse-view/DischargeRequests";
+import Admissions from "./pages/nurse-view/Admissions";
+import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
+import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 function App() {
   return (
     <Routes>
