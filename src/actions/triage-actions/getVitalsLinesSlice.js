@@ -17,6 +17,7 @@ export const getVitalsLinesSlice = (observationNo) => async (dispatch, getState)
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
 
         dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data })
+        console.log('logging the response data', data);
 
         return data;
 
