@@ -18,6 +18,8 @@ import {
   MedicineBoxOutlined,
   ExperimentOutlined,
   RadarChartOutlined,
+  SolutionOutlined,
+  InteractionOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -113,7 +115,7 @@ const MainLayout = () => {
         label: "Dashboard",
       },
       {
-        key: "Triage",
+        
         icon: <FileTextOutlined style={{ color: "#fff" }} />,
         label: "Triage",
         children: [
@@ -130,9 +132,24 @@ const MainLayout = () => {
         label: "Nurse",
         children: [
           {
+            key: "Admissions",
+            label: "Admissions",
+            icon: <SolutionOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Admission-requests",
+            label: "Admission Requests",
+            icon: <InteractionOutlined style={{ color: "#fff" }} />, 
+          },
+          {
             key: "Admit-patient",
             label: "Admit Patient",
             icon: <ImportOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "Inpatient",
+            label: "Inpatient",
+            icon: <PicCenterOutlined style={{ color: "#fff" }} />,
           },
           {
             key: "Ward-management",
@@ -140,9 +157,9 @@ const MainLayout = () => {
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "Inpatient",
-            label: "Inpatient",
-            icon: <PicCenterOutlined style={{ color: "#fff" }} />,
+            key: "Discharge-list",
+            label: "Discharge Patient",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
           {
             key: "Past-doctor-visit",
@@ -288,8 +305,6 @@ const MainLayout = () => {
           {
             key: "lab-inpatient",
             label: "Lab List InPatient",
-            key: "Appointments-list",
-            label: "Appointments List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
           {

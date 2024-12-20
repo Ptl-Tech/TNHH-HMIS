@@ -2,7 +2,6 @@ import { Button, Card, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './TriageSummeryCard';
-import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import { EditOutlined } from '@ant-design/icons';
@@ -10,7 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
 import Search from 'antd/es/transfer/search';
-
+import { SearchOutlined } from '@ant-design/icons';
 const TriageListPending = () => {
   
 
@@ -25,25 +24,58 @@ const TriageListPending = () => {
   const navigate = useNavigate();
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
-
+  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
   const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
+
+  const formattedTriageWaitingList = triageWaitingList.map(patient => {
+    return {
+        PatientNo: patient.PatientNo,
+        SearchName: patient.SearchName,
+    }
+  });
+
+  const combinedList = pendingTriageList.map(room => {
+    // Find the matching patient in the formattedTriageWaitingList
+    const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
+
+    // Combine room data with the matching patient's data
+    return {
+        ...room, // Include all fields from the room object
+        PatientNo: room.PatientNo,
+        SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
+    };
+  });
 
   //get the current location path
   const currentPath = location.pathname;
 
   //extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
+  const waitingListTableDataSource = combinedList.map((item, index) => ({
     key: index + 1,
-    // name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
-    observationTime: item?.ObservationTime,
+    name: item?.SearchName || ``,
+    regDate: item.ObservationDate || ``,
+    observationTime: item?.ObservationTime || ``,
     // sex: item?.Gender,
-    number: item?.PatientNo,
-    observationNo: item?.ObservationNo,
+    number: item?.PatientNo || ``,
+    observationNo: item?.ObservationNo || ``,
   })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);  
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: filteredPatients.length,
+});
+
+const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+};
+
+const paginatedData = filteredPatients.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -103,7 +135,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
       dataIndex: 'number',
       rowScope: 'row',
     },
-    /* {
+    {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
@@ -118,7 +150,7 @@ const handleOnClick = (observationNo, patientNumber) =>{
           {name}
         </div>
       )
-    }, */
+    }, 
     
     {
       title: 'Observation Date',
@@ -186,11 +218,17 @@ const handleOnClick = (observationNo, patientNumber) =>{
                 dataSource={filteredPatients} 
                 bordered size='middle' 
                 pagination={{
-                  position: ['bottom','right'],
+                  ...pagination,
                   showSizeChanger: true,
-                  pageSize: 10,
+                  showQuickJumper: true,
+                  position: ['bottom', 'right'],
                   showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                }} 
+                  onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                  onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                  style: {
+                      marginTop: '30px',
+                  }
+              }} 
                 />
             )
           }

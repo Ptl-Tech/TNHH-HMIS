@@ -27,6 +27,7 @@ import { postCheckInPatientReducer } from "./triage-reducers/postCheckInPatientR
 import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
 import { treatmentListReducer } from "./doc-reducers/OutPatientReducers";
 import { getPatientListReducer } from "./nurse-reducers/getPatientListReducer";
+import { getConsultationRoomListReducer } from "./nurse-reducers/getConsultationRoomReducer";
 
 export const rootReducer = combineReducers({
     userLogin:userLoginReducer,
@@ -78,5 +79,7 @@ export const rootReducer = combineReducers({
     appmntList:appmntListReducer,
     docTreatmentList:treatmentListReducer,
     getPatientList:getPatientListReducer,
+    getConsultationRoom:getConsultationRoomListReducer,
+
 
 });

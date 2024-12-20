@@ -16,9 +16,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
 
-  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI} = vitalsLines;
-
-  console.log('vitalsLines', PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate);
+  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
   
   useEffect(() => {
     if (!vitalsLines.length) {
@@ -83,9 +81,12 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           // Update vitals
           const updateVitals = {
             ...baseVitals,
+            lineNo: LineNo,
             type: 1,
             myAction: "edit",
           };
+
+          console.log("Update Vitals:", updateVitals);
     
           await dispatch(updateTriageListVitalsSlice(updateVitals));
           message.success("Successfully updated vitals");

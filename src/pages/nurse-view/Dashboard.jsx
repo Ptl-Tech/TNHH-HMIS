@@ -31,7 +31,6 @@ const Dashboard = () => {
   const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};
   const filterOutPatients = allPatientLList.filter((item)=>item.Inpatient===false) || {};
 
-  console.log('Inpatients', filterInPatients);
   // Sample data for the cards
   const cardData = [
     {

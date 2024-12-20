@@ -1,16 +1,12 @@
 import { Card, Input, Space, Table, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 
 
-const Impatient = () => {
+const DischargeList = () => {
 
-    const dispatch = useDispatch();
-
-const dataSource = [
+  
+  const dataSource = [
     {
         key: '1',
         admNo: 'ADM0001',
@@ -84,34 +80,15 @@ const columns = [
 const navigate = useNavigate();
 
 const handleNavigate = (patientNo, admNo) => {
-  navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${patientNo}&AdmNo=${admNo}`);
+  navigate(`/Nurse/Discharge-list/Discharge-card?PatientNo=${patientNo}&AdmNo=${admNo}`);
 }
-
-  useEffect(() => {
-    dispatch(getPatientListSlice());
-  }, [dispatch]); 
-
-
-  const { allPatientLList } = useSelector((state) => state.getPatientList) || {};
-
-  const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};
-  console.log('filtered patients', filterInPatients);
-
-  const { PatientNo } = filterInPatients;
-
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
+        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
             <ProfileOutlined />
             <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Current Inpatients
+                Discharge List
             </Typography.Text>
-            <Space style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: '3px', top: '2px'}}>
-               <span style={{ color: 'black', fontSize: '14px', fontWeight: 'bold'}}>Total Patients</span>
-               <span style={{ backgroundColor: '#0f5689', borderRadius: '50%', width: '25px', height: '25px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white'}}>
-                { filterInPatients.length || 0 }
-                </span>
-            </Space>
           </Space>
 
           <Card style={{ padding: '10px 10px 10px 10px'}}>
@@ -146,4 +123,4 @@ const handleNavigate = (patientNo, admNo) => {
   )
 }
 
-export default Impatient
+export default DischargeList
