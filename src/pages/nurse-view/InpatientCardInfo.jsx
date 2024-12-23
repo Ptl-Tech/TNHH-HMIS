@@ -14,8 +14,8 @@ const InpatientCardInfo = () => {
       ]
       
   return (
-    <>
-        <Card className="card">
+    <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
+        <Card className="card" style={{ width: '100%' }}>
             <div className="inpatient-details-container-1">
                 <Typography.Text className="patient-name">
                     Patrick Mwakasila Mwakasila
@@ -28,23 +28,25 @@ const InpatientCardInfo = () => {
             <Divider/>
 
             <div className="inpatient-details-container-2">
-            <div className="patient-hospital-number-container">
-                <Typography.Text className="hospital-number-header">
-                Hospital No
-                </Typography.Text>
-                <Typography.Text className="hospital-number">
-                    123456789 
-                </Typography.Text>
-            </div>
-            <Divider type="vertical" style={{ height: '40px' }} />
-            <div className="patient-age-gender-container">
-                <Typography.Text className="age-and-gender-header">
-                Age and Gender
-                </Typography.Text>
-                <Typography.Text className="age-and-gender">
-                    25 years, Male
-                </Typography.Text>
-            </div>
+                <div className="patient-hospital-number-container">
+                    <Typography.Text className="hospital-number-header">
+                    Hospital No
+                    </Typography.Text>
+                    <Typography.Text className="hospital-number">
+                        123456789 
+                    </Typography.Text>
+                </div>
+                
+                <Divider type="vertical" style={{ height: '40px' }} />
+
+                <div className="patient-age-gender-container">
+                    <Typography.Text className="age-and-gender-header">
+                    Age and Gender
+                    </Typography.Text>
+                    <Typography.Text className="age-and-gender">
+                        25 years, Male
+                    </Typography.Text>
+                </div>
             </div>
 
             <Divider />
@@ -58,7 +60,7 @@ const InpatientCardInfo = () => {
 
         </Card>
 
-        <Card className="allergies-card">
+        <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none' }}>
         
             <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
             itemLayout="horizontal"
@@ -73,7 +75,7 @@ const InpatientCardInfo = () => {
             </List>
 
         </Card>
-    </>
+    </div>
   )
 }
 

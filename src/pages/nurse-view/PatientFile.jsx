@@ -57,7 +57,9 @@ const PatientFile = () => {
                     'Charges',
                     'Consumables',
                 ].map((item, index) => (
-                    <Button key={index} type="primary" style={{ backgroundColor: '#0f5689' }} onClick={()=>handleOnClick(item)}>
+                    <Button key={index} 
+                     type='primary' 
+                     onClick={()=>handleOnClick(item)}>
                         {item}
                     </Button>
                 ))

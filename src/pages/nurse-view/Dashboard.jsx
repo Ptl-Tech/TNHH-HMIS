@@ -95,10 +95,6 @@ const chartData = last30Days.reverse().flatMap((date) => [
   { date, type: 'Inpatient', count: inPatientCountsByDate[date] || 0 },
 ]);
 
-// Example: Chart Data for Ant Design
-console.log(chartData);
-
-
 
   return (
     <div style={{ padding: '10px 10px' }}>

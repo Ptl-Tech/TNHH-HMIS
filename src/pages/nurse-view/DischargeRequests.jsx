@@ -65,7 +65,7 @@ const DischargeRequests = () => {
             dataIndex: 'action',
             key: 'action',
             render: (_, record) => {
-                return <Button type="primary" onClick={() => showModal(record)}>Admission</Button>
+                return <Button type="primary" onClick={() => showModal(record)}>Discharge</Button>
             }
         }
     ];

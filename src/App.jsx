@@ -41,7 +41,6 @@ import WaitingList from "./pages/WaitingList";
 // import NewPatients from "./pages/NewPatients";
 import NurseObservation from "./pages/NurseObservation";
 import NurseOutpatientList from "./pages/NurseOutpatientList";
-import DischargeRequestList from "./pages/DischargeRequestList";
 import BedManager from "./pages/BedManager";
 import PatientAdmissions from "./pages/PatientAdmissions";
 import DocOutPatient from "./pages/doctorsViews/DoctorVisits";
@@ -59,6 +58,7 @@ import DischargeRequests from "./pages/nurse-view/DischargeRequests";
 import Admissions from "./pages/nurse-view/Admissions";
 import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
 import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
+import DischargeList from "./pages/nurse-view/DischargeList";
 function App() {
   return (
     <Routes>
@@ -113,7 +113,7 @@ function App() {
           <Route path="Patient-admissions" element={<PatientAdmissions />} />
           <Route path="BedManagement" element={<BedManager />} />
 
-          <Route path="Discharge-list" element={<DischargeRequestList />} />
+          <Route path="Discharge-list" element={<DischargeList />} />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>

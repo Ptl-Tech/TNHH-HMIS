@@ -115,9 +115,11 @@ const handleOnClick = (observationNo, patientNumber) =>{
   observationNo && patientNumber && navigate(`/Nurse/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`)
 }
 
-  useEffect(() => {
-    dispatch(getTriageList())
-  }, [dispatch]);
+useEffect(() => {
+  if (!triageList?.length) {
+      dispatch(getTriageList());
+  }
+}, [triageList, dispatch]);
 
   const waitingListColumns = [
     {

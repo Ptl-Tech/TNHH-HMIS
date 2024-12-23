@@ -62,7 +62,6 @@ const useSignIn = () => {
       setIsOtpRequired(false); // Hide OTP modal
 
       const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log('Role:', role);
       if (role === 'Reception') {
         navigate('/reception');
       } else if (role === 'Doctor') {

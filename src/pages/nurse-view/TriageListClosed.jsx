@@ -114,12 +114,18 @@ const paginatedData = filteredPatients.slice(
   
 
   useEffect(() => {
-      dispatch(getTriageList())
-  }, [dispatch]);
+    if (!triageList?.length) {
+        dispatch(getTriageList());
+    }
+}, [triageList, dispatch]);
+
 
   useEffect(() => {
-      dispatch(getTriageWaitingList());
-    }, [dispatch]);
+          
+      if(!triageWaitingList?.length) {
+          dispatch(getTriageWaitingList());
+      }
+  }, [dispatch, triageWaitingList.length]);
 
   const waitingListColumns = [
     {

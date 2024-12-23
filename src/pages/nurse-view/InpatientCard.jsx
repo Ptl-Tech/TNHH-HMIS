@@ -13,14 +13,12 @@ const InpatientCard = () => {
                 Inpatient Card
             </Typography.Text>
           </Space>
-          <Row gutter={8}
-          className="inpatient-card-container">
-              <Col xs={24} md={24} lg={16} xl={16} className="inpatient-card-left-col">
-                <InpatientCardContent/>
+          <Row gutter={8} className="inpatient-card-container">
+              <Col xs={24} md={24} lg={24} xl={24} className="inpatient-card-left-col">
+                <InpatientCardInfo/>
               </Col>
-              <Col xs={24} md={24} lg={8} xl={8} className="inpatient-card-right-col">
-                <InpatientCardInfo />
-                
+              <Col xs={24} md={24} lg={24} xl={24} className="inpatient-card-left-col">
+                <InpatientCardContent/>
               </Col>
           </Row>
     </div>

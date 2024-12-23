@@ -20,7 +20,8 @@ import {
   RadarChartOutlined,
   SolutionOutlined,
   InteractionOutlined,
-  RetweetOutlined
+  RetweetOutlined,
+  LayoutOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -29,6 +30,7 @@ import smallLogo from "../assets/images/smallLogo.png";
 import Signout from "../Auth/Signout";
 import { BiCoinStack } from "react-icons/bi";
 import { FaUserFriends } from "react-icons/fa";
+import DynamicBreadcrumb from "./DynamicBreadcrumb";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -116,7 +118,7 @@ const MainLayout = () => {
         label: "Dashboard",
       },
       {
-        
+       
         icon: <FileTextOutlined style={{ color: "#fff" }} />,
         label: "Triage",
         children: [
@@ -128,9 +130,9 @@ const MainLayout = () => {
         ],
       },
       {
-        key: "Nurse",
-        icon: <TeamOutlined style={{ color: "#fff" }} />,
-        label: "Nurse",
+        
+        icon: <SolutionOutlined style={{ color: "#fff" }} />,
+        label: "Admissions",
         children: [
           {
             key: "Admissions",
@@ -147,16 +149,39 @@ const MainLayout = () => {
             label: "Admit Patient",
             icon: <ImportOutlined style={{ color: "#fff" }} />,
           },
+          
+          
+        ],
+      },
+      {
+        
+        icon: <PicCenterOutlined style={{ color: "#fff" }} />,
+        label: "Inpatients",
+        children: [
           {
             key: "Inpatient",
-            label: "Inpatient",
+            label: "Inpatient-list",
             icon: <PicCenterOutlined style={{ color: "#fff" }} />,
           },
+        ]
+      },
+      {
+        
+        icon: <LayoutOutlined style={{ color: "#fff" }} />,
+        label: "Ward Management",
+        children: [
           {
             key: "Ward-management",
-            label: "Ward Management",
-            icon: <FileTextOutlined style={{ color: "#fff" }} />,
+            label: "Manage Wards",
+            icon: <LayoutOutlined style={{ color: "#fff" }} />,
           },
+        ]
+      },
+      {
+        
+        icon: <RetweetOutlined style={{ color: "#fff" }} />,
+        label: "Discharges",
+        children: [
           {
             key: "Discharge-requests",
             label: "Discharge Requests",
@@ -167,12 +192,19 @@ const MainLayout = () => {
             label: "Discharge Patient",
             icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
+        ]
+      },
+      {
+        
+        icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
+        label: "Past Doctor Visits",
+        children: [
           {
             key: "Past-doctor-visit",
-            label: "Past Doctor Visits",
+            label: "Past Doctor Visit List",
             icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
-          },
-        ],
+          } 
+        ]
       }
     ];
 
@@ -437,22 +469,10 @@ const MainLayout = () => {
         </Sider>
 
         <Layout className="site-layout">
-          <Breadcrumb
-            style={{
-              marginLeft: collapsed ? 80 : 230,
-              transition: "all 0.2s",
-              padding: '10px 20px',
-              color: "#67336d",
-              fontWeight: "bold",
-            }}
-          >
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            {/* Dynamic breadcrumb based on URL */}
-            <Breadcrumb.Item>
-              {location.pathname.split("/").pop()}
-            </Breadcrumb.Item>
-          </Breadcrumb>
+          
+          {/* import the dynamic breadcrumb component here */}
+
+          <DynamicBreadcrumb collapsed={collapsed} />
 
           <Content
             className="contentStyle"

@@ -135,17 +135,18 @@ const paginatedData = filteredPatients.slice(
   };
 
   useEffect(() => {
-    if (!openTriageList.length){
-      dispatch(getTriageList())
+    if (!triageList?.length) {
+        dispatch(getTriageList());
     }
-  }, [openTriageList, dispatch]);
+}, [triageList, dispatch]);
+
 
   useEffect(() => {
           
-          if(!triageWaitingList.length) {
-              dispatch(getTriageWaitingList());
-          }
-      }, [dispatch, triageWaitingList.length]);
+      if(!triageWaitingList?.length) {
+          dispatch(getTriageWaitingList());
+      }
+  }, [dispatch, triageWaitingList.length]);
 
   const waitingListColumns = [
     {
