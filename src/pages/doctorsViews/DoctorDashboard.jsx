@@ -51,18 +51,10 @@ const DoctorDashboard = () => {
       subtitle: "Increase in 30 days",
       icon: <SafetyOutlined />,
       color: '#000' ,// You can set the color here
-      backgroundColor: '#b0afaf', // You can set the background color here
+      backgroundColor: '#ac8342 ', // You can set the background color here
       link: '/Doctor/PendingTreatmentList'
     },
-    {
-      title: "Out patients",
-      value: filterInPatients?.length,
-      subtitle: "Increase in 30 days",
-      icon: <UserOutlined />,
-      color: '#fff' ,// You can set the color here
-      backgroundColor: '#ac8342 ', // You can set the background color here
-      link: '/Reception/Patient-list'
-    },
+    
     {
       title: "In patients",
       value: filterInPatients?.length,
