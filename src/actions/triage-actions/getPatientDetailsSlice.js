@@ -11,6 +11,7 @@ const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.6
 export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
     try {
       dispatch({ type: GET_PATIENT_DETAILS_REQUEST });
+      console.log("patient details", patientNo)
   
       const config = apiHeaderConfig(getState);
       

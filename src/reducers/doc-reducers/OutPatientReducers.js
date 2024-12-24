@@ -14,3 +14,20 @@ export const treatmentListReducer = (state = { patients: [] }, action) => {
         return state;
     }
   }
+
+
+  export const PatientDeetsReducer = (state = { patient: {}, loading: false, error: null }, action) => {
+    switch (action.type) {
+      case OUTPATIENT_LIST_REQUEST:
+        return { ...state, loading: true };  // Keep previous state, just update loading
+      case OUTPATIENT_LIST_SUCCESS:
+        return { loading: false, patient: action.payload };  // Successfully fetched data
+      case OUTPATIENT_LIST_FAIL:
+        return { loading: false, error: action.payload };  // Handle failure
+      case OUTPATIENT_LIST_RESET:
+        return { patient: {}, loading: false, error: null };  // Reset state
+      default:
+        return state;  // Ensure default return
+    }
+  };
+  

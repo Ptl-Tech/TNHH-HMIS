@@ -1,0 +1,88 @@
+import axios from "axios";
+
+const API = "http://217.21.122.62:8085/";
+
+export const REQUEST_LAB_TEST = "REQUEST_LAB_TEST";
+export const REQUEST_LAB_TEST_SUCCESS = "REQUEST_LAB_TEST_SUCCESS";
+export const REQUEST_LAB_TEST_FAIL = "REQUEST_LAB_TEST_FAIL";
+
+export const VIEW_PATIENT_LAB_TEST = "VIEW_PATIENT_LAB_TEST";
+export const VIEW_PATIENT_LAB_TEST_SUCCESS = "VIEW_PATIENT_LAB_TEST_SUCCESS";
+export const VIEW_PATIENT_LAB_TEST_FAIL = "VIEW_PATIENT_LAB_TEST_FAIL";
+
+export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: REQUEST_LAB_TEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, 
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}Doctor/RequestPatientRadiologyTests`,
+      {
+        treatmentNo: treatmentId,
+      },
+      config
+    );
+
+    const responseData = {
+      status: response.data.status,
+      data: response.data,
+    };
+
+    setTimeout(() => {
+      dispatch({ type: REQUEST_LAB_TEST_SUCCESS, payload: responseData });
+    }, 2000);
+
+    return responseData.data; 
+  } catch (error) {
+    dispatch({
+      type: REQUEST_LAB_TEST_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error;
+  }
+};
+
+export const getPatientLabTest = (treatmentId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: VIEW_PATIENT_LAB_TEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}'`,
+      config
+    );
+
+    dispatch({ type: VIEW_PATIENT_LAB_TEST_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({ type: VIEW_PATIENT_LAB_TEST_FAIL, payload: error.message });
+  }
+};
+

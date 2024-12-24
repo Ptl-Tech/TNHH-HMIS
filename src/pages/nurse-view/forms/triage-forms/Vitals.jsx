@@ -15,7 +15,10 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
-
+  const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
+    (state) => state.docTreatmentList
+  ) || {};
+  
   const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
   
   useEffect(() => {
@@ -24,6 +27,8 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     }
   }, [dispatch, observationNumber, vitalsLines.length]);
 
+
+  console.log("observationNumber", observationNumber);
   useEffect(() => {
     if (vitalsLines) {
       form.setFieldsValue({

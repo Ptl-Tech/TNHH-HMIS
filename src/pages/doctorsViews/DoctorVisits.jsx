@@ -1,40 +1,60 @@
-import { Button, Card, message, Table } from 'antd';
+import { Button, Card, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckOutlined, SearchOutlined } from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
-import { postCheckInPatientSlice } from '../../actions/Doc-actions/postCheckInPatientSlice';
+import { listPatients } from '../../actions/patientActions';
 import Loading from '../../partials/nurse-partials/Loading';
 import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
 import Search from 'antd/es/transfer/search';
 
 const DoctorVisits = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const location = useLocation();
-  const currentPath = location.pathname; // Get the current URL path
+  const currentPath = location.pathname;
+  
   const [searchParams, setSearchParams] = useState({
     name: "",
     patientNo: "",
     treatmentNo: "",
   });
-
-;
+  
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
     (state) => state.docTreatmentList
   ) || {};
 
+  const { patients } = useSelector((state) => state.patientList);
+
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
+
   const openDoctorVisitList = treatmentList?.filter((item) => item.Status === 'New');
 
-  const waitingListTableDataSource = openDoctorVisitList?.map((item, index) => ({
-    key: index + 1,
-    treatmentNo: item?.TreatmentNo,
-    patientNo: item?.PatientNo,
-    treatmentDate: item?.TreatmentDate,
-    treatmentTime: item?.TreatmentTime,
-  })).sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
+  // Pre-populate treatment list with patient details
+  const openDoctorVisitListWithPatientDetails = openDoctorVisitList?.map((item) => {
+    const patient = patients.find((patient) => patient.PatientNo === item.PatientNo);
+    return {
+      ...item,
+      SearchName: patient?.SearchName,
+      IDNumber: patient?.IDNumber,
+    };
+  });
+
+  const waitingListTableDataSource = openDoctorVisitListWithPatientDetails
+    ?.map((item, index) => ({
+      key: index + 1,
+      treatmentNo: item?.TreatmentNo,
+      patientNo: item?.PatientNo,
+      treatmentDate: item?.TreatmentDate,
+      treatmentTime: item?.TreatmentTime,
+      searchName: item?.SearchName,
+      idNumber: item?.IDNumber,
+    }))
+    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
@@ -89,6 +109,24 @@ const DoctorVisits = () => {
       dataIndex: 'patientNo',
       key: 'patientNo',
     },
+    // {
+    //   title: 'Search Name',
+    //   dataIndex: 'searchName',
+    //   key: 'searchName',
+    //   render: (_, record) => {
+    //     const patient = patients?.find((patient) => patient.PatientNo === record.patientNo);
+    //     return patient ? patient.SearchName : "Name not found"; // Check for undefined patient
+    //   },
+    // },
+    // {
+    //   title: 'ID Number',
+    //   dataIndex: 'idNumber',
+    //   key: 'idNumber',
+    //   render: (_, record) => {
+    //     const patient = patients?.find((patient) => patient.PatientNo === record.patientNo);
+    //     return patient ? patient.IDNumber : "ID not found"; // Check for undefined patient
+    //   },
+    // },
     {
       title: 'Treatment Date',
       dataIndex: 'treatmentDate',
@@ -97,13 +135,13 @@ const DoctorVisits = () => {
     {
       title: 'Waiting Time',
       dataIndex: 'treatmentTime',
-      key: 'waitingTime',
+      key: 'treatmentTime',
       render: (_, record) => {
         const combinedDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
         const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
         const hours = Math.floor(elapsedMinutes / 60);
         const minutes = elapsedMinutes % 60;
-
+  
         return `${hours}h ${minutes}m`;
       },
     },
@@ -113,22 +151,22 @@ const DoctorVisits = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleNavigate(record?.patientNo, record?.treatmentNo)}
+          onClick={() => handleNavigate(record, record.treatmentNo)}
         >
           <CheckOutlined /> Check In
         </Button>
       ),
     },
   ];
-
-  const handleNavigate = ( treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`);
-
+  
+  const handleNavigate = (record, treatmentNo) => {
+    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.patientNo, obserVationNumber: record.observationNo } });
+    console.log('obserVationNumber:', record.observationNo);
   };
 
   return (
     <div style={{ padding: '10px 10px' }}>
-      <ConsultationRoomSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath}  />
+      <ConsultationRoomSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} />
       <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
         <div className="admit-patient-filter-container">
           <Search

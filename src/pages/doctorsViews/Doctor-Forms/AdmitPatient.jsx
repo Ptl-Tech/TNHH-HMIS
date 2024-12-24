@@ -1,137 +1,204 @@
-import { Button, Card, Col, Form, Input, Row, Select, Space, Table, Typography, Modal } from "antd";
-import { handOverNurse, hospitalBranchesTotalWards, selectBed } from "../../../constants/nurse-constants";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Space,
+  Table,
+  Typography,
+  Modal,
+} from "antd";
+import {
+  FileTextOutlined,
+  HistoryOutlined,
+  CloseCircleOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
+import { IoBedOutline } from "react-icons/io5";
 import TextArea from "antd/es/input/TextArea";
 import { useState } from "react";
-import { SearchOutlined } from '@ant-design/icons'; // Import icon
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  requestPatientAdmission,
+  saveAdmissionDetails,
+} from "../../../actions/Doc-actions/postAdmissionRequest";
 
 const AdmitPatientForm = () => {
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const queryParams = new URLSearchParams(location.search);
+  const treatmentNo = queryParams.get("TreatmentNo"); // Get 'TreatmentNo' from query params
   const [historyVisible, setHistoryVisible] = useState(false);
+  const { loading } = useSelector((state) => state.saveAdmissionDetails);
+  const { loading: loadingAdmissionRequest, success: admissionRequestSuccess } =
+    useSelector((state) => state.requestAdmission);
+
+  // Set current date for the date of admission
+  const currentDate = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
 
   // Sample patient admission history data
   const admissionHistoryData = [
-    { key: '1', admissionDate: '01/01/2024', admissionArea: 'Ward A', admissionNurse: 'Nurse A', reason: 'General Checkup' },
-    { key: '2', admissionDate: '05/02/2024', admissionArea: 'Ward B', admissionNurse: 'Nurse B', reason: 'Surgery' },
-    // Add more records here as needed
+    {
+      key: "1",
+      admissionDate: "01/01/2024",
+      admissionArea: "Ward A",
+      admissionNurse: "Nurse A",
+      reason: "General Checkup",
+    },
+    {
+      key: "2",
+      admissionDate: "05/02/2024",
+      admissionArea: "Ward B",
+      admissionNurse: "Nurse B",
+      reason: "Surgery",
+    },
   ];
 
   // Table columns for the admission history
   const admissionHistoryColumns = [
-    { title: 'Admission Date', dataIndex: 'admissionDate', key: 'admissionDate' },
-    { title: 'Admission Area', dataIndex: 'admissionArea', key: 'admissionArea' },
-    { title: 'Admission Nurse', dataIndex: 'admissionNurse', key: 'admissionNurse' },
-    { title: 'Reason for Admission', dataIndex: 'reason', key: 'reason' },
+    {
+      title: "Admission Date",
+      dataIndex: "admissionDate",
+      key: "admissionDate",
+    },
+    {
+      title: "Admission Area",
+      dataIndex: "admissionArea",
+      key: "admissionArea",
+    },
+    {
+      title: "Admission Nurse",
+      dataIndex: "admissionNurse",
+      key: "admissionNurse",
+    },
+    { title: "Reason for Admission", dataIndex: "reason", key: "reason" },
   ];
 
   // Function to show the modal
-  const handleHistoryClick = () => {
-    setHistoryVisible(true);
-  };
+  const handleHistoryClick = () => setHistoryVisible(true);
 
   // Function to close the modal
-  const handleCancel = () => {
-    setHistoryVisible(false);
+  const handleCancel = () => setHistoryVisible(false);
+
+  const handleAdmissionRequest = () => {
+    dispatch(requestPatientAdmission(treatmentNo));
+    console.log("Admission request sent for treatmentNo:", treatmentNo);
   };
 
+  // Function to handle form submission and dispatch action
+  const handlePatientAdmission = (values) => {
+    const admissionObject = {
+      myAction: "create",  // Action type
+      treatmentNo: values.treatmentNo,  // Treatment number from form
+      dateOfAdmission: values.dateOfAdmission,  // Use the date as-is from the form
+      admissionReason: values.admissionReason,  // Admission reason from form
+    };
+  
+    // Ensure the dateOfAdmission is in the correct format (YYYY-MM-DD) before sending to the backend
+    if (admissionObject.dateOfAdmission) {
+      const formattedDate = new Date(admissionObject.dateOfAdmission).toISOString().split("T")[0]; // Format as YYYY-MM-DD
+      admissionObject.dateOfAdmission = formattedDate;
+    }
+  
+    dispatch(saveAdmissionDetails(admissionObject));  // Dispatch the action with the Admission object
+  };
+  
   return (
     <div>
-      {/* Button Section with View Patient History and Cancel Admission */}
-      <div style={{ marginBottom: '20px' }}>
-        <Typography.Title level={4} style={{ color: "#0F5689", display: 'inline-block', marginRight: '10px' }}>
-          <SearchOutlined style={{ marginRight: '8px' }} />
-          View Patient History
+      {/* Button Section */}
+      <div style={{ marginBottom: "20px" }}>
+        <Typography.Title
+          level={4}
+          style={{ color: "#0F5689", display: "flex", alignItems: "center" }}
+        >
+          <FileTextOutlined style={{ marginRight: "8px" }} />
+          Patient Admission
         </Typography.Title>
-        
-        <Button 
-          type="default" 
-          onClick={handleHistoryClick} 
-          style={{ marginRight: '10px' }}
-        >
-          Show History
-        </Button>
-        
-        <Button 
-          type="danger" 
-          style={{ marginLeft: '10px' }}
-        >
-          Cancel Admission
-        </Button>
+
+        <div style={{ float: "right", display: "flex", alignItems: "center" }}>
+          <Button
+            type="primary"
+            style={{ marginRight: "10px" }}
+            icon={<IoBedOutline />}
+            loading={loadingAdmissionRequest}
+            onClick={handleAdmissionRequest}
+            disabled={loadingAdmissionRequest} // Prevent clicking until saved
+            className={
+              loading || admissionRequestSuccess ? "ant-btn-disabled" : ""
+            } // Ensure it appears visually disabled
+          >
+            Request Admission
+          </Button>
+
+          <Button
+            type="default"
+            onClick={handleHistoryClick}
+            style={{ marginRight: "10px" }}
+            icon={<HistoryOutlined />}
+          >
+            Show History
+          </Button>
+          <Button
+            type="default"
+            variant="Dashed"
+            style={{ marginLeft: "10px" }}
+            icon={<CloseCircleOutlined />}
+            danger
+          >
+            Cancel Admission
+          </Button>
+        </div>
       </div>
 
-      <Card style={{ margin: '20px 10px 10px 10px' }}>
-        <Form layout="vertical" className="admit-patient-card-container">
-          {/* Patient Information Form */}
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Admission Number" name="admissionNumber">
-                <Input type="text" disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Patient Number" name="patientNumber">
-                <Input type="text" disabled />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Patient Name" name="patientName">
-                <Input type="text" disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Admission Date" name="admissionDate">
-                <Input type="text" disabled />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Admission Area" name="admissionArea">
-                <Input type="text" disabled />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Admission Nurse" name="admissionNurse">
-                <Input type="text" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Select Ward" name="selectWard">
-                <Select style={{ width: '100%' }} optionFilterProp="label" options={hospitalBranchesTotalWards} placeholder="Select ward" showSearch />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Handover Nurse" name="handoverNurse">
-                <Select style={{ width: '100%' }} optionFilterProp="label" options={handOverNurse} placeholder="Select nurse" showSearch />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Admission Reason" name="admissionReason">
-                <TextArea />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Select Bed" name="selectBed">
-                <Select style={{ width: '100%' }} optionFilterProp="label" options={selectBed} placeholder="Select bed" showSearch />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Space>
-            <Form.Item>
-              <Button type="primary" htmlType="submit">Save Admission</Button>
+      {/* Patient Admission Form */}
+      <Form
+        layout="vertical"
+        className="admit-patient-card-container my-4"
+        initialValues={{
+          treatmentNo: treatmentNo,
+          dateOfAdmission: currentDate,
+          admissionReason: "",
+        }}
+        onFinish={handlePatientAdmission}
+      >
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="treatmentNo"
+              label="Treatment Number"
+              rules={[{ required: true }]}
+            >
+              <Input
+                style={{ width: "100%", color: "green", fontWeight: "bold" }}
+                disabled
+              />
             </Form.Item>
-          </Space>
-        </Form>
-      </Card>
+          </Col>
+          <Col span={12}>
+            <Form.Item label="Date of Admission" name="dateOfAdmission">
+              <Input type="text" value={currentDate} disabled />{" "}
+              {/* Default to current date */}
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item label="Admission Reason" name="admissionReason">
+              <TextArea />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Space>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              <SaveOutlined /> Save Admission Details
+            </Button>
+          </Form.Item>
+        </Space>
+      </Form>
 
       {/* Modal for Patient Admission History */}
       <Modal
@@ -143,7 +210,7 @@ const AdmitPatientForm = () => {
             Close
           </Button>
         }
-        width={800} // You can adjust the modal width
+        width={800}
       >
         <Table
           dataSource={admissionHistoryData}

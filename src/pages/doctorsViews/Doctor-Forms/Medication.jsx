@@ -3,6 +3,7 @@ import React from "react";
 import AllergyAndMedication from "../../nurse-view/forms/triage-forms/AllergyAndMedication";
 import Injections from "../../nurse-view/forms/triage-forms/Injections";
 import { Typography } from "antd";
+import PrescriptionForm from "./PrescriptionForm";
 
 const Medication = () => {
   return (
@@ -30,9 +31,9 @@ const Medication = () => {
             marginBottom: "12px",
           }}
         >
-          Injections
+         Prescription Details
         </Typography.Title>
-        <Injections />
+        <PrescriptionForm />
       </div> 
     </div>
   )

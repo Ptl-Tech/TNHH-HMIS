@@ -1,7 +1,7 @@
 import { Button, Card, Divider, List, Typography } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 
-const InpatientCardInfo = () => {
+const InpatientCardInfo = ({ patientDetails }) => {
     const allergyItems = [
         {
           title: 'Food Allergies',
@@ -18,10 +18,10 @@ const InpatientCardInfo = () => {
         <Card className="card" style={{ width: '100%' }}>
             <div className="inpatient-details-container-1">
                 <Typography.Text className="patient-name">
-                    Patrick Mwakasila Mwakasila
+                    {patientDetails?.SearchName||'N/A' }
                 </Typography.Text>
                 <Typography.Text className="patient-id">
-                    Patient ID : 123456789
+                    Patient ID : {patientDetails?.PatientNo||'N/A' }
                 </Typography.Text>
             </div>
 
@@ -44,7 +44,7 @@ const InpatientCardInfo = () => {
                     Age and Gender
                     </Typography.Text>
                     <Typography.Text className="age-and-gender">
-                        25 years, Male
+                       {patientDetails?.AgeinYears} years, {patientDetails?.Gender}
                     </Typography.Text>
                 </div>
             </div>

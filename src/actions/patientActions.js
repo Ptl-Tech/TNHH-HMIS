@@ -36,7 +36,6 @@ import { message } from "antd";
 import useAuth from "../hooks/useAuth";
 
 const API = "http://217.21.122.62:8085/";
-console.log("Base URL: ", API);
 
 
 export const createPatient = (patient) => async (dispatch, getState) => {

@@ -1,11 +1,11 @@
 import { Col, List, Row, Space, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
 
-const PatientInfo = () => {
+const PatientInfo = ({patientDetails}) => {
   const data = [
     {
         title: 'Patient Name',
-        description: 'Kevin Mwakasila Mwakasila',
+        description: patientDetails?.SearchName || 'N/A',
     },
     {
         title: 'Patient ID',

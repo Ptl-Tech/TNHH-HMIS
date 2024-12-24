@@ -39,16 +39,19 @@ import ObservationRoom from "./Doctor-Forms/ObservationRoom";
 const ConsultationRoomEvalutionCard = () => {
   const location = useLocation();
   const dispatch = useDispatch();
-
+  const { state } = useLocation(); // Access the state passed via navigate
+  const {patientNo, obserVationNumber  } = state || {}; // Destructure patient data if available
   // Parse the query parameters using URLSearchParams
   const queryParams = new URLSearchParams(location.search);
-  const patientNo = queryParams.get("Patient_id");
   const observationNo = queryParams.get("TreatmentNo");
   const userDetails = useAuth();
   const staffNo = userDetails?.userData?.firstName;
 
   useEffect(() => {
     dispatch(getPatientDetails(patientNo));
+    console.log(patientNo);
+    console.log('obserVationNumber:', obserVationNumber);
+
   }, [dispatch, patientNo]);
 
   const { loadingPatientDetails, patientDetails } = useSelector(
@@ -94,7 +97,7 @@ const ConsultationRoomEvalutionCard = () => {
     { key: "4", label: "Radiology", content: <Imaging /> },
     { key: "5", label: "Diagnosis", content: <Diagnosis /> },
     { key: "6", label: "Medication", content: <Medication /> },  
-    { key: "7", label: "Theatre", content: <Theatre /> },
+    { key: "7", label: "Injections", content: <Injections /> },
     { key: "8", label: "Admit Patient", content: <AdmitPatientForm /> },
     { key: "9", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },
     { key: "10", label: "Referrals", content: <Referrals /> },
@@ -109,7 +112,7 @@ const ConsultationRoomEvalutionCard = () => {
         </Typography.Text>
       </Space>
       <Row gutter={8} className="inpatient-card-container">
-        <Col xs={24} md={24} lg={16} xl={16}>
+        <Col xs={24} md={20} lg={16} xl={16}>
           <Card style={{ padding: "10px 16px" }}>
             <Row gutter={8}>
               <Tabs
@@ -131,7 +134,7 @@ const ConsultationRoomEvalutionCard = () => {
             </Row>
           </Card>
         </Col>
-        <Col xs={24} md={24} lg={8} xl={8}>
+        <Col xs={24} md={4} lg={8} xl={8}>
           {loadingPatientDetails ? (
             <SkeletonLoading />
           ) : (

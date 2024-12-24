@@ -59,6 +59,8 @@ import Admissions from "./pages/nurse-view/Admissions";
 import AdmissionRequests from "./pages/nurse-view/AdmissionRequests";
 import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 import DischargeList from "./pages/nurse-view/DischargeList";
+import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
+import RadiologyOutPatient from "./pages/doctorsViews/tables/Radiology/RadiologyOutPatient";
 function App() {
   return (
     <Routes>
@@ -170,12 +172,19 @@ function App() {
           <Route path="/Doctor/PendingTreatmentList" element={<TreamentListPending />} />
 
           <Route path="/Doctor/Consultation/Patient" element={<ConsultationRoomEvalutionCard />} />
+          <Route path="/Doctor/Consultation/Inpatient" element={<Inpatient />} />
+          <Route path="/Doctor/Inpatient/Patient-card" element={<InpatientCard />} />
+          <Route path="/Doctor/Admissions" element={<Admissions />} />
+          <Route path="/Doctor/Discharge-list" element={<DischargeList />} />
+          <Route path="/Doctor/Discharge-requests" element={<DischargeRequests />} />
+          <Route path="/Doctor/Past-doctor-visit" element={<PastDoctorVisit />} />
+          <Route path="/Doctor/Past-doctor-visit/Patient" element={<TreatmentCard />} />
+          <Route path="/Doctor/Past-doctor-visit/Patient" element={<TreatmentCard />} />
+          <Route path="/Doctor/Lab-Patients" element={<LabOutPatient />} />
+          <Route path="/Doctor/Radiology-Patients" element={<RadiologyOutPatient />} />
 
-          {/* <Route path="treatmentCard/:TreatmentNo" element={<PatientCard />}>
-            <Route path="add-allergies" element={<AddAllergies />} />
-            <Route path="add-vitals" element={<Vitals />} />
-          </Route> */}
 
+          
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
