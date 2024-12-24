@@ -3,7 +3,6 @@ import axios from "axios";
 import { TRIAGE_VISIT_LIST_REQUEST, TRIAGE_VISIT_LIST_SUCCESS, TRIAGE_VISIT_LIST_FAIL } from "../constants/TriageConstants";
 import useAuth from "../hooks/useAuth";
 
-const API = "http://217.21.122.62:8085/";
 
 
 export const TriageWaitingList = () => async (dispatch, getState) => {

@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
-console.log("Base URL: ", API);
 import { OUTPATIENT_LIST_FAIL, OUTPATIENT_LIST_REQUEST, OUTPATIENT_LIST_SUCCESS } from "../../constants/doc-constants/outPatient";
 
 export const getOutPatientTreatmentList = () => async (dispatch, getState) => { 
@@ -37,4 +36,39 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
       dispatch({ type: OUTPATIENT_LIST_FAIL, payload: error.message });
     }
   };
+
+
+  //export const getPatientDetails
+  export const getPatientDetails = () => async (dispatch, getState) => { 
+    try {
+      dispatch({ type: OUTPATIENT_LIST_REQUEST });
   
+      const {
+        otpVerify: { userInfo },
+      } = getState();
+  
+      // Fetch branchCode from localStorage
+      const branchCode = localStorage.getItem("branchCode");
+  
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: userInfo.userData.no, // Add staffNo as a custom header
+          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          branchCode: branchCode, // Include branchCode in headers
+        },
+      };
+  
+      const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
+  
+      // Filter the patients by branchCode matching GlobalDimension1Code
+      // const filteredData = data.filter((patient) => patient.InPatient===false);
+      // //patient.GlobalDimension1Code === branchCode  && 
+
+      console.log("filteredData: ", filteredData);
+  
+      dispatch({ type: OUTPATIENT_LIST_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({ type: OUTPATIENT_LIST_FAIL, payload: error.message });
+    }
+  };

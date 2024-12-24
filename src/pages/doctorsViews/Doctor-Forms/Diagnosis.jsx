@@ -1,143 +1,322 @@
-import React, { useState } from "react";
-import { Table, Button, Form, Input, DatePicker, Select, Typography, message } from "antd";
-import axios from "axios";
+import {
+  Form,
+  Input,
+  DatePicker,
+  Row,
+  Col,
+  Button,
+  Typography,
+  Select,
+  Checkbox,
+  message,
+  Modal,
+} from "antd";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FileTextOutlined,
+  SaveOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { useLocation } from "react-router-dom";
+import { getdiagnosisSetup } from "../../../actions/Doc-actions/qyDiagnosisSetup";
+import { postDiagnosisRequest } from "../../../actions/Doc-actions/postDiagnosis";
+import ModalComponent from "../../../components/MessageModal";
 
-const { TextArea } = Input;
 const { Option } = Select;
 
 const Diagnosis = () => {
-  const [data, setData] = useState([]); // Stores the list of lab results
-  const [form] = Form.useForm();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const treatmentNo = queryParams.get("TreatmentNo");
 
-  // Function to handle form submission for adding a new record
-  const handleAddRecord = (values) => {
-    axios
-      .post("/api/labResults", values)
-      .then(() => {
-        message.success("Record added successfully");
-        setData([...data, values]); // Update the table with the new data
-        form.resetFields(); // Reset the form fields
-      })
-      .catch((error) => {
-        message.error("Error adding record");
-        console.error(error);
-      });
+  const dispatch = useDispatch();
+  const { data } = useSelector((state) => state.getDiagnosisSetup);
+  const { loading, error, success } = useSelector((state) => state.postdiagnosis);
+
+  const [diagnosisList, setDiagnosisList] = useState([]);
+  const [diagnosisInput, setDiagnosisInput] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({
+    type: "info",
+    title: "",
+    content: "",
+  });
+
+  useEffect(() => {
+    dispatch(getdiagnosisSetup());
+  }, [dispatch]);
+
+  const handleAddDiagnosis = () => {
+    if (diagnosisInput.trim()) {
+      setDiagnosisList([
+        ...diagnosisList,
+        { diagnosisCode: diagnosisInput, confirmed: false, remarks: "" },
+      ]);
+      setDiagnosisInput(""); // Reset Select field
+    }
   };
 
-  // Function to handle record deletion
-  const handleDelete = (record) => {
-    axios
-      .delete(`/api/labResults/${record.treatmentNo}`)
-      .then(() => {
-        message.success("Record deleted successfully");
-        setData(data.filter((item) => item.treatmentNo !== record.treatmentNo)); // Remove deleted record from table
-      })
-      .catch((error) => {
-        message.error("Error deleting record");
-        console.error(error);
-      });
+  const handleUpdateDiagnosis = (index, field, value) => {
+    const updatedList = [...diagnosisList];
+    updatedList[index][field] = value;
+    setDiagnosisList(updatedList);
   };
 
-  // Column configuration for the table
-  const columns = [
-    {
-      title: "Treatment No",
-      dataIndex: "treatmentNo",
-      key: "treatmentNo",
-    },
-    {
-      title: "Line No",
-      dataIndex: "lineNo",
-      key: "lineNo",
-    },
-    {
-      title: "Test Package Code",
-      dataIndex: "testPackageCode",
-      key: "testPackageCode",
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      render: (dueDate) => `${dueDate.year}-${dueDate.month}-${dueDate.day}`,
-    },
-    {
-      title: "Results",
-      dataIndex: "results",
-      key: "results",
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Button type="danger" onClick={() => handleDelete(record)}>
-          Delete
-        </Button>
-      ),
-    },
-  ];
+  const handleRemoveDiagnosis = (index) => {
+    setDiagnosisList(diagnosisList.filter((_, i) => i !== index));
+  };
 
+  const handleSubmit = async (values) => {
+    const { dueDate } = values;
+  
+    const formattedDueDate = {
+      year: dueDate.year(),
+      month: dueDate.month() + 1,
+      day: dueDate.date(),
+    };
+  
+    const Diagnosis = {
+      myAction: "create",
+      treatmentNo: treatmentNo || values.treatmentNo,
+      diagnosisNo: values.diagnosisCode,
+      confirmed: false,
+      dueDate: formattedDueDate,
+      diagnosisList,
+    };
+  
+    try {
+      let success = true;
+  
+      // Dispatch each diagnosis
+      for (let diagnosis of diagnosisList) {
+        const diagnosisData = {
+          myAction: "create",
+          treatmentNo: treatmentNo || values.treatmentNo,
+          diagnosisNo: diagnosis.diagnosisCode,
+          diagnosisCode: diagnosis.diagnosisCode,
+          confirmed: diagnosis.confirmed,
+          remarks: diagnosis.remarks,
+        };
+  
+        const response = await dispatch(postDiagnosisRequest(diagnosisData));
+  
+        // Check response for success status
+        if (response.status !== "success") {
+          success = false;
+          break;
+        }
+      }
+  
+      // Update modal content based on the result
+      if (success) {
+        Modal.success({
+          content: "Diagnosis saved successfully.",
+        });
+      } else {
+        setModalContent({
+          type: "error",
+          title: "Save Failed",
+          content: "Failed to save diagnosis. Please try again.",
+        });
+      }
+  
+      // Display the modal after processing
+      if (success) {
+        setDiagnosisList([]); // Clear the list on success
+      }
+    } catch (error) {
+      setModalContent({
+        type: "error",
+        title: "Error",
+        content: "An error occurred while saving the diagnosis. Please try again.",
+      });
+      setIsModalVisible(true);
+    }
+  };
+  
   return (
     <div>
-      <Typography.Title level={4}>Diagnosis</Typography.Title>
-      <div className="d-flex justify-content-end align-items-center gap-3 my-3">
-        <Button type="default" onClick={() => message.info("Viewing results")}>
-          View Results
-        </Button>
-        <Button
-          type="default"
-          onClick={() => message.info("Requesting results from lab")}
-        >
-          Previous Diagnosis
-        </Button>
-      </div>
-      {/* Table to display lab results */}
-      <Table columns={columns} dataSource={data} rowKey="treatmentNo" />
-
-      {/* Form for adding new records */}
-      <Form
-        form={form}
-        onFinish={handleAddRecord}
-        layout="vertical"
-        className="mt-4"
+      <Typography.Title
+        level={5}
+        style={{
+          color: "#0F5689",
+          fontSize: "16px",
+          marginBottom: "12px",
+          display: "flex",
+          alignItems: "center",
+        }}
       >
-      
+        <FileTextOutlined style={{ marginRight: "8px" }} />
+        Diagnosis
+      </Typography.Title>
 
-        <Form.Item
-          name="diagnosis"
-          label="Search Diagnosis or ICD-10-CM code"
-          rules={[
-            { required: true, message: "Please select a diagnosis!" },
-          ]}
-        >
-          <Select placeholder="Select diagnosis">
-            <Option value="diagnosis1">Diagnosis 1</Option>
-            <Option value="diagnosis2">Diagnosis 2</Option>
-            <Option value="diagnosis3">Diagnosis 3</Option>
-          </Select>
-        </Form.Item>
+      <Form
+        layout="vertical"
+        initialValues={{
+          treatmentNo: treatmentNo || "",
+          diagnosisCode: "",
+          dueDate: moment(),
+        }}
+        autoComplete="off"
+        onFinish={handleSubmit}
+      >
+        <Row gutter={24} style={{ paddingBottom: "16px" }}>
+          <Col span={12}>
+            <Form.Item
+              name="treatmentNo"
+              label="Treatment Number"
+              rules={[{ required: true, message: "Please enter the treatment number." }]}
+            >
+              <Input
+                placeholder="Treatment Number"
+                style={{ width: "100%", color: "green", fontWeight: "bold" }}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="dueDate"
+              label="Due Date"
+              rules={[{ required: true, message: "Please select a due date!" }]}
+            >
+              <DatePicker
+                placeholder="Select Due Date"
+                style={{ width: "100%" }}
+                format="YYYY-MM-DD"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[
-            { required: true, message: "Please input description!" },
-          ]}
-        >
-          <TextArea rows={3} />
-        </Form.Item>
+        <Row gutter={24} style={{ paddingBottom: "16px" }}>
+          <Col span={18}>
+            <Form.Item name="diagnosisCode" label="Diagnosis Code">
+              <Select
+                placeholder="Select Diagnosis"
+                onChange={setDiagnosisInput}
+                value={diagnosisInput}
+                name="diagnosisCode"
+              >
+                {data?.map((item) => (
+                  <Option key={item.Code} value={item.Code}>
+                    {item.Description}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAddDiagnosis}
+                style={{ width: "100%", marginTop: "26px" }}
+              >
+                Add
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Save
+        {diagnosisList.length > 0 && (
+          <div
+            style={{
+              marginTop: "16px",
+              padding: "8px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                fontWeight: "bold",
+                padding: "8px 0",
+                borderBottom: "1px solid #ddd",
+              }}
+            >
+              <div style={{ flex: "1" }}>#</div>
+              <div style={{ flex: "3" }}>Diagnosis Code</div>
+              <div style={{ flex: "2" }}>Confirmed</div>
+              <div style={{ flex: "4" }}>Remarks</div>
+              <div style={{ flex: "1" }}>Action</div>
+            </div>
+            {diagnosisList.map((diagnosis, index) => (
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  padding: "8px 0",
+                  borderBottom: "1px solid #f0f0f0",
+                  alignItems: "center",
+                }}
+              >
+                <div style={{ flex: "1" }}>{index + 1}</div>
+                <div style={{ flex: "3" }}>
+                  <Input
+                    value={diagnosis.diagnosisCode}
+                    onChange={(e) =>
+                      handleUpdateDiagnosis(index, "diagnosisCode", e.target.value)
+                    }
+                  />
+                </div>
+                <div style={{ flex: "2", marginLeft: "20px" }}>
+                  <Checkbox
+                    checked={diagnosis.confirmed}
+                    onChange={(e) =>
+                      handleUpdateDiagnosis(index, "confirmed", e.target.checked)
+                    }
+                  >
+                    Confirm
+                  </Checkbox>
+                </div>
+                <div style={{ flex: "4" }}>
+                  <Input
+                    value={diagnosis.remarks}
+                    onChange={(e) =>
+                      handleUpdateDiagnosis(index, "remarks", e.target.value)
+                    }
+                  />
+                </div>
+                <div style={{ flex: "1" }}>
+                  <Button
+                    type="text"
+                    danger
+                    onClick={() => handleRemoveDiagnosis(index)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ marginTop: "16px", marginBottom: "56px" }}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ width: "150px", float: "right" }}
+            icon={<SaveOutlined />}
+            loading={loading}
+          >
+            Save Diagnosis
           </Button>
-        </Form.Item>
+        </div>
       </Form>
+
+      {/* Show the success/error message modal */}
+      {isModalVisible && (
+        <ModalComponent
+          type={modalContent.type}
+          title={modalContent.title}
+          content={modalContent.content}
+          onOk={() => setIsModalVisible(false)}
+        />
+      )}
     </div>
   );
 };

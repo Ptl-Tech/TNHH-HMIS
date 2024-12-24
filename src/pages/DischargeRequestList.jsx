@@ -183,9 +183,9 @@ const DischargeRequestList = () => {
 
   const filteredPatients = patients.filter(
     (patient) =>
-      patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.idNumber.includes(searchQuery)
+      patient.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.idNumber?.includes(searchQuery)
   );
 
   const totalPatients = filteredPatients.length;

@@ -5,7 +5,6 @@ import { message } from "antd";
 
 
 const API = "http://217.21.122.62:8085/"
-console.log("Base URL: ", API)
 
 export const login = (staffNo, password) => async (dispatch) => {
   try {
@@ -18,6 +17,7 @@ export const login = (staffNo, password) => async (dispatch) => {
     );
 
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+    console.log("User Login Data: ", data); 
     localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({

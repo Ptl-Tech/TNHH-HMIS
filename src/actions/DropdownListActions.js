@@ -28,12 +28,14 @@ import {
   EMPLYEES_LIST_FAIL,
   MARKETING_LIST_REQUEST,
   MARKETING_LIST_SUCCESS,
-  MARKETING_LIST_FAIL
+  MARKETING_LIST_FAIL,
+  EMPLOYEE_DETAILS_REQUEST,
+  EMPLOYEE_DETAILS_SUCCESS,
+  EMPLOYEE_DETAILS__FAIL
 
 } from "../constants/DropDownConstants";
 
 const API = "http://217.21.122.62:8085/";
-console.log("Base URL: ", API);
 
 export const listCountries = () => async (dispatch, getState) => {
   try {
@@ -328,11 +330,44 @@ export const getEmployeesList = () => async (dispatch, getState) => {
 
     dispatch({ type: EMPLOYEES_LIST_SUCCESS, payload: data });
 
-    console.log("Filtered employees data: ", data);
   } catch (error) {
     dispatch({ type: EMPLYEES_LIST_FAIL, payload: error.message });
   }
 };
+
+export const getEmployeeByNumber = (staffNumber) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: EMPLOYEE_DETAILS_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    // Correct URL construction, ensuring the staff number is correctly quoted in the query
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyEmployees&isList=false&query=$filter=No eq '${staffNumber}'`,
+      config
+    );
+
+    // Dispatch success action with the fetched employee data
+    dispatch({ type: EMPLOYEE_DETAILS_SUCCESS, payload: data });
+
+  } catch (error) {
+    dispatch({ type: EMPLOYEE_DETAILS__FAIL, payload: error.message });
+  }
+};
+
 
 export const branchesList = (patient) => async (dispatch, getState) => {
   try {

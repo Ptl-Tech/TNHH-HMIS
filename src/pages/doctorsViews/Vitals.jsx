@@ -7,15 +7,18 @@ import Loading from '../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 import { updateTriageListVitalsSlice } from '../../actions/triage-actions/updateTriageListVitalsSlice';
 import { postTriageListVitalsSlice } from '../../actions/triage-actions/postTriageListVitalsSlice';
+import { useLocation } from 'react-router-dom';
 
-const FormVitals = ({ observationNumber, patientNumber}) => {
+const FormVitals = ({ patientNumber}) => {
 
   const [form] = Form.useForm();
+  const { state } = useLocation(); // Access the state passed via navigate
+  const {patientNo, obserVationNumber  } = state || {}; // Destructure patient data if available
+  const observationNumber=obserVationNumber;
 
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
-
   const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
   
   useEffect(() => {

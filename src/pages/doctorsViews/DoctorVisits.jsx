@@ -9,10 +9,14 @@ import { postCheckInPatientSlice } from '../../actions/Doc-actions/postCheckInPa
 import Loading from '../../partials/nurse-partials/Loading';
 import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
 import Search from 'antd/es/transfer/search';
+import { render } from 'react-dom';
+import { listPatients } from '../../actions/patientActions';
 
 const DoctorVisits = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch()
+  
+
   const location = useLocation();
   const currentPath = location.pathname; // Get the current URL path
   const [searchParams, setSearchParams] = useState({
@@ -20,22 +24,58 @@ const DoctorVisits = () => {
     patientNo: "",
     treatmentNo: "",
   });
-
-;
+  const { patients: patientList } = useSelector((state) => state.patientList);
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
     (state) => state.docTreatmentList
   ) || {};
+  
+  const combinedList = treatmentList?.map((treatment) => {
+    // Log the current treatment and patientList for debugging
 
-  const openDoctorVisitList = treatmentList?.filter((item) => item.Status === 'New');
+    console.log("Treatment:", treatment);
+    
+    // Find the matching patient from patientList
+    const testTreatment = { PatientNo: 'PT_00012' };  // Example treatment
+   const matchingPatient = patientList.find(
+  (patient) => (patient.PatientNo).trim().toLowerCase() === String(treatment.PatientNo).trim().toLowerCase()
+);
 
-  const waitingListTableDataSource = openDoctorVisitList?.map((item, index) => ({
+    console.log("Test Matching Patient:", matchingPatient);
+    
+    console.log("Patient List:", patientList);
+    console.log("Treatment PatientNo:", treatment.PatientNo);
+    
+    // Log the matching patient for debugging
+    console.log("Matching Patient:", matchingPatient);
+  
+    // Return a new object combining the treatment and patient data
+    return {
+      ...treatment,
+      PatientNo: treatment.PatientNo,
+      SearchName: matchingPatient?.SearchName || 'Unknown',
+      Address: matchingPatient?.NextOfkinFullName || 'Unknown',
+    };
+  });
+  
+
+  
+console.log(combinedList);
+
+
+  const openDoctorVisitList = combinedList?.filter((item) => item.Status === 'New');
+  const waitingListTableDataSource = combinedList
+  ?.filter((item) => item.Status === 'New')
+  ?.map((item, index) => ({
     key: index + 1,
     treatmentNo: item?.TreatmentNo,
     patientNo: item?.PatientNo,
     treatmentDate: item?.TreatmentDate,
     treatmentTime: item?.TreatmentTime,
-  })).sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
+    searchName: item.SearchName, // Directly use SearchName from combinedList
+  }))
+  .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
+console.log(waitingListTableDataSource);
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
   const handleSearchChange = (e, field) => {
@@ -72,7 +112,9 @@ const DoctorVisits = () => {
       dispatch(getOutPatientTreatmentList());
     }
   }, [dispatch]);
-
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
   const waitingListColumns = [
     {
       title: '#',
@@ -81,29 +123,34 @@ const DoctorVisits = () => {
     },
     {
       title: 'Treatment No',
-      dataIndex: 'treatmentNo',
-      key: 'treatmentNo',
+      dataIndex: 'TreatmentNo',
+      key: 'TreatmentNo',
     },
     {
       title: 'Patient No',
-      dataIndex: 'patientNo',
-      key: 'patientNo',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
+    },
+    {
+      title: 'Patient Name',
+      dataIndex: 'searchName',
+      key: 'searchName',
     },
     {
       title: 'Treatment Date',
-      dataIndex: 'treatmentDate',
-      key: 'treatmentDate',
+      dataIndex: 'TreatmentDate',
+      key: 'TreatmentDate',
     },
     {
       title: 'Waiting Time',
-      dataIndex: 'treatmentTime',
-      key: 'waitingTime',
+      dataIndex: 'TreatmentTime',
+      key: 'TreatmentTime',
       render: (_, record) => {
         const combinedDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
         const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
         const hours = Math.floor(elapsedMinutes / 60);
         const minutes = elapsedMinutes % 60;
-
+  
         return `${hours}h ${minutes}m`;
       },
     },
@@ -113,18 +160,24 @@ const DoctorVisits = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleNavigate(record?.patientNo, record?.treatmentNo)}
+          onClick={() => handleNavigate(record, record.TreatmentNo)}
         >
           <CheckOutlined /> Check In
         </Button>
       ),
     },
   ];
-
-  const handleNavigate = ( treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`);
-
+  
+  console.log('Treatment List:', treatmentList);
+  console.log('Patient List:', patientList);
+  console.log('Combined List:', combinedList);
+  console.log('Waiting List Data Source:', waitingListTableDataSource);
+  
+  const handleNavigate = (record, treatmentNo) => {
+    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.PatientNo, obserVationNumber:record.ObservationNo  } });
+    console.log('obserVationNumber:', record.obserVationNumber);
   };
+  
 
   return (
     <div style={{ padding: '10px 10px' }}>
@@ -151,7 +204,7 @@ const DoctorVisits = () => {
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={filteredPatients}
+          dataSource={treatmentList}
           bordered
           size="middle"
           pagination={{

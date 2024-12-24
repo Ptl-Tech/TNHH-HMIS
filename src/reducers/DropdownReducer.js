@@ -1,4 +1,30 @@
 import {
+  QY_SYMPTOMS_LIST_REQUEST,
+  QY_SYMPTOMS_LIST_SUCCESS,
+  QY_SYMPTOMS_LIST_FAIL,
+  QY_SYMPTOMS_LIST_RESET,
+  QY_SIGNS_LIST_REQUEST,
+  QY_SIGNS_LIST_SUCCESS,
+  QY_SIGNS_LIST_FAIL,
+  QY_SIGNS_LIST_RESET,
+  QY_HMS_LIST_REQUEST,
+  QY_HMS_LIST_SUCCESS,
+  QY_HMS_LIST_FAIL,
+  QY_HMS_LIST_RESET,
+  QY_LAB_TEST_LIST_REQUEST,
+  QY_LAB_TEST_LIST_SUCCESS,
+  QY_LAB_TEST_LIST_FAIL,
+  QY_LAB_TEST_LIST_RESET,
+  QY_RADIOLOGY_TEST_LIST_REQUEST,
+  QY_RADIOLOGY_TEST_LIST_SUCCESS,
+  QY_RADIOLOGY_TEST_LIST_FAIL,
+  QY_RADIOLOGY_TEST_LIST_RESET,
+  QY_DIAGNOSIS_LIST_REQUEST,
+  QY_DIAGNOSIS_LIST_SUCCESS,
+  QY_DIAGNOSIS_LIST_FAIL,
+  QY_DIAGNOSIS_LIST_RESET,
+} from "../constants/doc-constants/QySymptomConstants";
+import {
   COUNTRIES_LIST_FAIL,
   COUNTRIES_LIST_REQUEST,
   COUNTRIES_LIST_RESET,
@@ -35,6 +61,10 @@ import {
   MARKETING_LIST_SUCCESS,
   MARKETING_LIST_FAIL,
   MARKETING_LIST_RESET,
+  EMPLOYEE_DETAILS_REQUEST,
+  EMPLOYEE_DETAILS_SUCCESS,
+  EMPLOYEE_DETAILS__FAIL,
+  EMPLOYEE_DETAILS_RESET,
 } from "../constants/DropDownConstants";
 
 export const countriesListReducer = (state = { countries: [] }, action) => {
@@ -97,7 +127,6 @@ export const getrelationshipOptionsReducer = (state = { data: [] }, action) => {
   }
 };
 
-
 export const getInsuranceReducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case INSURANCE_LIST_REQUEST:
@@ -157,7 +186,20 @@ export const getemployeesListReducer = (state = { data: [] }, action) => {
       return state;
   }
 };
-
+export const getemployeeDetailsReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case EMPLOYEE_DETAILS_REQUEST:
+      return { loading: true, data: [] };
+    case EMPLOYEE_DETAILS_SUCCESS:
+      return { loading: false, data: action.payload };
+    case EMPLOYEE_DETAILS__FAIL:
+      return { loading: false, error: action.payload };
+    case EMPLOYEE_DETAILS_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
 
 export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
   switch (action.type) {
@@ -173,3 +215,97 @@ export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
       return state;
   }
 };
+
+export const QySymptomsSetupReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_SYMPTOMS_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_SYMPTOMS_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_SYMPTOMS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_SYMPTOMS_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+export const QySignsSetupReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_SIGNS_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_SIGNS_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_SIGNS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_SIGNS_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+export const QYHMSReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_HMS_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_HMS_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_HMS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_HMS_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
+
+export const QyLabTestsSetupReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_LAB_TEST_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_LAB_TEST_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_LAB_TEST_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_LAB_TEST_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+}
+
+
+export const QyRadiologyTestsSetupReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_RADIOLOGY_TEST_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_RADIOLOGY_TEST_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_RADIOLOGY_TEST_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_RADIOLOGY_TEST_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+}
+
+
+export const QyDiagnosisTestsSetupReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case QY_DIAGNOSIS_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case QY_DIAGNOSIS_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case QY_DIAGNOSIS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case QY_DIAGNOSIS_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+}
+
