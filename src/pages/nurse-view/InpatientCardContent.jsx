@@ -4,13 +4,13 @@ import CarePlan from './CarePlan'
 import Requests from './Requests'
 import Discharges from './Discharges'
 
-const InpatientCardContent = () => {
+const InpatientCardContent = ({patientDetails}) => {
   return (
     <>
         <Card className="card">
             <Tabs defaultActiveKey="1">
                 <Tabs.TabPane tab="Patient File" key="1">
-                    <PatientFile />
+                    <PatientFile patientDetails={patientDetails} />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Care Plan" key="2">
                     <CarePlan />

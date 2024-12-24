@@ -97,10 +97,10 @@ const ConsultationRoomEvalutionCard = () => {
     { key: "4", label: "Radiology", content: <Imaging /> },
     { key: "5", label: "Diagnosis", content: <Diagnosis /> },
     { key: "6", label: "Medication", content: <Medication /> },  
-    // { key: "7", label: "Theatre", content: <Theatre /> },
-    { key: "7", label: "Admit Patient", content: <AdmitPatientForm /> },
-    { key: "8", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },
-    { key: "9", label: "Referrals", content: <Referrals /> },
+    { key: "7", label: "Injections", content: <Injections /> },
+    { key: "8", label: "Admit Patient", content: <AdmitPatientForm /> },
+    { key: "9", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },
+    { key: "10", label: "Referrals", content: <Referrals /> },
   ];
 
   return (

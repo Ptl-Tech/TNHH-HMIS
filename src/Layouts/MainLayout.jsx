@@ -226,17 +226,17 @@ const MainLayout = () => {
             icon: <TeamOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "inpatient-list",
+            key: "/Doctor/Consultation/Inpatient",
             label: "In-Patient List",
             icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "patient-admission-list",
+            key: "/Doctor/Admissions",
             label: "Patient Admission List",
             icon: <FileAddOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "past-doctor-visit-list",
+            key: "/Doctor/Past-doctor-visit",
             label: "Past Doctor Visits",
             icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
@@ -265,12 +265,12 @@ const MainLayout = () => {
         label: "Discharge List",
         children: [
           {
-            key: "discharge-requests",
+            key: "/Doctor/Discharge-requests",
             label: "Discharge Requests",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "discharges-list",
+            key: "/Doctor/Discharge-list",
             label: "Discharges List",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
@@ -309,7 +309,7 @@ const MainLayout = () => {
         label: "Radiology",
         children: [
           {
-            key: "radiology-outpatient",
+            key: "/Doctor/Radiology-Patients",
             label: "Radiology List OutPatient",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
@@ -336,7 +336,7 @@ const MainLayout = () => {
         label: "Lab",
         children: [
           {
-            key: "lab-outpatient",
+            key: "/Doctor/Lab-Patients",
             label: "Lab List OutPatient",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },

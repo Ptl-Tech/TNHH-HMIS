@@ -65,7 +65,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "In patients",
-      value: filterOutPatients?.length,
+      value: filterInPatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
       color: '#000' ,// You can set the color here

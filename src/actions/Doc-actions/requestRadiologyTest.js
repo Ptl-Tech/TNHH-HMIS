@@ -3,13 +3,23 @@ import { message } from "antd"; // Import Ant Design message for error handling
 
 const API = "http://217.21.122.62:8085/";
 
-export const REQUEST_Radiology_TEST = "REQUEST_Radiology_TEST";
-export const REQUEST_Radiology_TEST_SUCCESS = "REQUEST_Radiology_TEST_SUCCESS";
-export const REQUEST_Radiology_TEST_FAIL = "REQUEST_Radiology_TEST_FAIL";
+
+
+export const REQUEST_RADIOLOGY_TEST = "REQUEST_RADIOLOGY_TEST";
+export const REQUEST_RADIOLOGY_TEST_SUCCESS = "REQUEST_RADIOLOGY_TEST_SUCCESS";
+export const REQUEST_RADIOLOGY_TEST_FAIL = "REQUEST_RADIOLOGY_TEST_FAIL";
+export const REQUEST_RADIOLOGY_TEST_RESET = "REQUEST_RADIOLOGY_TEST_RESET";
+
+
+export const VIEW_PATIENT_RADIOLOGY_TEST = "VIEW_PATIENT_RADIOLOGY_TEST";
+export const VIEW_PATIENT_RADIOLOGY_TEST_SUCCESS = "VIEW_PATIENT_RADIOLOGY_TEST_SUCCESS";
+export const VIEW_PATIENT_RADIOLOGY_TEST_FAIL = "VIEW_PATIENT_RADIOLOGY_TEST_FAIL";
+export const VIEW_PATIENT_RADIOLOGY_TEST_RESET = "VIEW_PATIENT_RADIOLOGY_TEST_RESET";
+
 
 export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) => {
   try {
-    dispatch({ type: REQUEST_Radiology_TEST });
+    dispatch({ type: REQUEST_RADIOLOGY_TEST });
 
     const {
       otpVerify: { userInfo },
@@ -40,13 +50,13 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
       data: response.data, // Assuming response contains required patient data
     };
 
-    dispatch({ type: REQUEST_Radiology_TEST_SUCCESS, payload: responseData });
+    dispatch({ type: REQUEST_RADIOLOGY_TEST_SUCCESS, payload: responseData });
 
     // Return patient data for further use if necessary
     return responseData.data;
   } catch (error) {
     dispatch({
-      type: REQUEST_Radiology_TEST_FAIL,
+      type: REQUEST_RADIOLOGY_TEST_FAIL,
       payload: error.response?.data?.message || error.message,
     });
     // Show error message using Ant Design's message component
@@ -54,3 +64,35 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
     throw error; // Rethrow error for further handling by the calling function
   }
 };
+
+
+export const getPatientRadiologyTest = (treatmentId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: VIEW_PATIENT_RADIOLOGY_TEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyTreatmentRadiologyLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}`,
+      config
+    );
+
+    dispatch({ type: VIEW_PATIENT_RADIOLOGY_TEST_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({ type: VIEW_PATIENT_RADIOLOGY_TEST_FAIL, payload: error.message });
+  }
+
+}

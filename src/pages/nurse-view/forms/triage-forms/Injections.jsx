@@ -136,10 +136,16 @@ const Injections = ({ observationNumber, staffNo }) => {
                 key={'location'}
                 style={{ width: '100%' }}
                 optionFilterProp="label"
-                options={injectionsNumber} 
                 placeholder="Select Injection No"
                 
             >
+                {
+                    injectionsNumber && injectionsNumber.map((item, index) => (
+                        <Select.Option key={index} value={item.Code} label={item.Code}>
+                            {item.Description}
+                        </Select.Option>
+                    ))
+                }
             </Select>
             </Form.Item>
             </Col>

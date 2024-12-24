@@ -9,11 +9,11 @@ import TreatmentHistory from "./nurse-patient-file/TreatmentHistory"
 import Charges from "./nurse-patient-file/Charges"
 import Consumables from "./nurse-patient-file/Consumables"
 
-const PatientFile = () => {
+const PatientFile = ({patientDetails}) => {
     const handleOnClick = (item) => {
         switch (item) {
             case 'Patient Info':
-                setSelectedItem(<PatientInfo />)
+                setSelectedItem(<PatientInfo patientDetails={patientDetails} />)
                 break
             case 'Medical Info':
                 setSelectedItem(<MedicalInfo />)

@@ -1,81 +1,61 @@
-import { Button, Card, message, Table } from 'antd';
+import { Button, Card, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckOutlined, SearchOutlined } from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
-import { postCheckInPatientSlice } from '../../actions/Doc-actions/postCheckInPatientSlice';
+import { listPatients } from '../../actions/patientActions';
 import Loading from '../../partials/nurse-partials/Loading';
 import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
 import Search from 'antd/es/transfer/search';
-import { render } from 'react-dom';
-import { listPatients } from '../../actions/patientActions';
 
 const DoctorVisits = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  
-
+  const dispatch = useDispatch();
   const location = useLocation();
-  const currentPath = location.pathname; // Get the current URL path
+  const currentPath = location.pathname;
+  
   const [searchParams, setSearchParams] = useState({
     name: "",
     patientNo: "",
     treatmentNo: "",
   });
-  const { patients: patientList } = useSelector((state) => state.patientList);
+  
   const { loading: treatmentListLoading, patients: treatmentList } = useSelector(
     (state) => state.docTreatmentList
   ) || {};
-  
-  const combinedList = treatmentList?.map((treatment) => {
-    // Log the current treatment and patientList for debugging
 
-    console.log("Treatment:", treatment);
-    
-    // Find the matching patient from patientList
-    const testTreatment = { PatientNo: 'PT_00012' };  // Example treatment
-   const matchingPatient = patientList.find(
-  (patient) => (patient.PatientNo).trim().toLowerCase() === String(treatment.PatientNo).trim().toLowerCase()
-);
+  const { patients } = useSelector((state) => state.patientList);
 
-    console.log("Test Matching Patient:", matchingPatient);
-    
-    console.log("Patient List:", patientList);
-    console.log("Treatment PatientNo:", treatment.PatientNo);
-    
-    // Log the matching patient for debugging
-    console.log("Matching Patient:", matchingPatient);
-  
-    // Return a new object combining the treatment and patient data
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
+
+  const openDoctorVisitList = treatmentList?.filter((item) => item.Status === 'New');
+
+  // Pre-populate treatment list with patient details
+  const openDoctorVisitListWithPatientDetails = openDoctorVisitList?.map((item) => {
+    const patient = patients.find((patient) => patient.PatientNo === item.PatientNo);
     return {
-      ...treatment,
-      PatientNo: treatment.PatientNo,
-      SearchName: matchingPatient?.SearchName || 'Unknown',
-      Address: matchingPatient?.NextOfkinFullName || 'Unknown',
+      ...item,
+      SearchName: patient?.SearchName,
+      IDNumber: patient?.IDNumber,
     };
   });
-  
 
-  
-console.log(combinedList);
+  const waitingListTableDataSource = openDoctorVisitListWithPatientDetails
+    ?.map((item, index) => ({
+      key: index + 1,
+      treatmentNo: item?.TreatmentNo,
+      patientNo: item?.PatientNo,
+      treatmentDate: item?.TreatmentDate,
+      treatmentTime: item?.TreatmentTime,
+      searchName: item?.SearchName,
+      idNumber: item?.IDNumber,
+    }))
+    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-
-  const openDoctorVisitList = combinedList?.filter((item) => item.Status === 'New');
-  const waitingListTableDataSource = combinedList
-  ?.filter((item) => item.Status === 'New')
-  ?.map((item, index) => ({
-    key: index + 1,
-    treatmentNo: item?.TreatmentNo,
-    patientNo: item?.PatientNo,
-    treatmentDate: item?.TreatmentDate,
-    treatmentTime: item?.TreatmentTime,
-    searchName: item.SearchName, // Directly use SearchName from combinedList
-  }))
-  .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
-
-console.log(waitingListTableDataSource);
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
   const handleSearchChange = (e, field) => {
@@ -112,9 +92,7 @@ console.log(waitingListTableDataSource);
       dispatch(getOutPatientTreatmentList());
     }
   }, [dispatch]);
-  useEffect(() => {
-    dispatch(listPatients());
-  }, [dispatch]);
+
   const waitingListColumns = [
     {
       title: '#',
@@ -123,28 +101,41 @@ console.log(waitingListTableDataSource);
     },
     {
       title: 'Treatment No',
-      dataIndex: 'TreatmentNo',
-      key: 'TreatmentNo',
+      dataIndex: 'treatmentNo',
+      key: 'treatmentNo',
     },
     {
       title: 'Patient No',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
+      dataIndex: 'patientNo',
+      key: 'patientNo',
     },
-    {
-      title: 'Patient Name',
-      dataIndex: 'searchName',
-      key: 'searchName',
-    },
+    // {
+    //   title: 'Search Name',
+    //   dataIndex: 'searchName',
+    //   key: 'searchName',
+    //   render: (_, record) => {
+    //     const patient = patients?.find((patient) => patient.PatientNo === record.patientNo);
+    //     return patient ? patient.SearchName : "Name not found"; // Check for undefined patient
+    //   },
+    // },
+    // {
+    //   title: 'ID Number',
+    //   dataIndex: 'idNumber',
+    //   key: 'idNumber',
+    //   render: (_, record) => {
+    //     const patient = patients?.find((patient) => patient.PatientNo === record.patientNo);
+    //     return patient ? patient.IDNumber : "ID not found"; // Check for undefined patient
+    //   },
+    // },
     {
       title: 'Treatment Date',
-      dataIndex: 'TreatmentDate',
-      key: 'TreatmentDate',
+      dataIndex: 'treatmentDate',
+      key: 'treatmentDate',
     },
     {
       title: 'Waiting Time',
-      dataIndex: 'TreatmentTime',
-      key: 'TreatmentTime',
+      dataIndex: 'treatmentTime',
+      key: 'treatmentTime',
       render: (_, record) => {
         const combinedDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
         const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
@@ -160,7 +151,7 @@ console.log(waitingListTableDataSource);
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleNavigate(record, record.TreatmentNo)}
+          onClick={() => handleNavigate(record, record.treatmentNo)}
         >
           <CheckOutlined /> Check In
         </Button>
@@ -168,20 +159,14 @@ console.log(waitingListTableDataSource);
     },
   ];
   
-  console.log('Treatment List:', treatmentList);
-  console.log('Patient List:', patientList);
-  console.log('Combined List:', combinedList);
-  console.log('Waiting List Data Source:', waitingListTableDataSource);
-  
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.PatientNo, obserVationNumber:record.ObservationNo  } });
-    console.log('obserVationNumber:', record.obserVationNumber);
+    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.patientNo, obserVationNumber: record.observationNo } });
+    console.log('obserVationNumber:', record.observationNo);
   };
-  
 
   return (
     <div style={{ padding: '10px 10px' }}>
-      <ConsultationRoomSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath}  />
+      <ConsultationRoomSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} />
       <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
         <div className="admit-patient-filter-container">
           <Search
@@ -204,7 +189,7 @@ console.log(waitingListTableDataSource);
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={treatmentList}
+          dataSource={filteredPatients}
           bordered
           size="middle"
           pagination={{

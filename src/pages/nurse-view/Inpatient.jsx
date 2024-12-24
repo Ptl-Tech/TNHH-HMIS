@@ -1,149 +1,158 @@
-import { Card, Input, Space, Table, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Card, Input, Space, Table, Typography } from "antd";
+import { ProfileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
-
+import useAuth from "../../hooks/useAuth";
 
 const Impatient = () => {
+  const dispatch = useDispatch();
+  const userDetails = useAuth();  // Use the custom hook to get user info
+  const { patients: dataSource } = useSelector((state) => state.patientList);
 
-    const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-const dataSource = [
-    {
-        key: '1',
-        admNo: 'ADM0001',
-        patientNo: 'PAT0001',
-        names: 'John Brown',
-        admDate: '2023-01-01',
-        ward: 'Ward 1',
-        bed: 'B101',
-        doctor: 'Dr. Smith',
-    },
-    {
-        key: '2',
-        admNo: 'ADM0002',
-        patientNo: 'PAT0002',
-        names: 'Jim Green',
-        admDate: '2023-01-01',
-        ward: 'Ward 2',
-        bed: 'B102',
-        doctor: 'Dr. Johnson',
-    },
-    {
-        key: '3',
-        admNo: 'ADM0003',
-        patientNo: 'PAT0003',
-        names: 'Joe Black',
-        admDate: '2023-01-01',
-        ward: 'Ward 1',
-        bed: 'B103',
-        doctor: 'Dr. Williams',
-    },
-];
-const columns = [
-    {
-        title: 'Adm No',
-        dataIndex: 'admNo',
-        key: 'admNo',
-    },
-    {
-        title: 'Patient No',
-        dataIndex: 'patientNo',
-        key: 'patientNo',
-    },
-    {
-        title: 'Names',
-        dataIndex: 'names',
-        key: 'names',
-        render: (_, record) => <a onClick={()=>handleNavigate(record?.patientNo, record?.admNo)} style={{ color: '#0f5689' }}>{record.names}</a>,
-    },
-    {
-        title: 'Adm Date',
-        dataIndex: 'admDate',
-        key: 'admDate',
-    },
-    {
-        title: 'Ward',
-        dataIndex: 'ward',
-        key: 'ward',
-    },
-    {
-        title: 'Bed',
-        dataIndex: 'bed',
-        key: 'bed',
-    },
-    {
-        title: 'Doctor',
-        dataIndex: 'doctor',
-        key: 'doctor',
-    },
-];
-
-const navigate = useNavigate();
-
-const handleNavigate = (patientNo, admNo) => {
-  navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${patientNo}&AdmNo=${admNo}`);
-}
+  const handleNavigate = (record) => {
+   if(userDetails.userData.departmentName === 'Nurse'){
+    navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmNo}`, {
+      state: { patientDetails: record },
+    });
+   }else{
+    navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmNo}`, {
+      state: { patientDetails: record },
+    });
+   }
+  };
 
   useEffect(() => {
     dispatch(getPatientListSlice());
-  }, [dispatch]); 
-
+  }, [dispatch]);
 
   const { allPatientLList } = useSelector((state) => state.getPatientList) || {};
 
-  const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};
-  console.log('filtered patients', filterInPatients);
+  const filterInPatients =
+    allPatientLList?.filter((item) => item.Inpatient === true) || [];
 
-  const { PatientNo } = filterInPatients;
+  const columns = [
+    {
+      title: "Adm No",
+      dataIndex: "AdmNo",
+      key: "AdmNo",
+    },
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+    },
+    {
+      title: "Names",
+      dataIndex: "SearchName",
+      key: "SearchName",
+      render: (_, record) => (
+        <a
+          onClick={() => handleNavigate(record)}
+          style={{ color: "#0f5689" }}
+        >
+          {record.SearchName}
+        </a>
+      ),
+    },
+    {
+      title: "Adm Date",
+      dataIndex: "AdmissionsDate",
+      key: "AdmissionsDate",
+    },
+    {
+      title: "Ward",
+      dataIndex: "ward",
+      key: "ward",
+      render: (ward) => ward || "Not assigned",
+    },
+    {
+      title: "Bed",
+      dataIndex: "bed",
+      key: "bed",
+    },
+    {
+      title: "Doctor",
+      dataIndex: "doctor",
+      key: "doctor",
+    },
+  ];
 
   return (
-    <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Current Inpatients
-            </Typography.Text>
-            <Space style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: '3px', top: '2px'}}>
-               <span style={{ color: 'black', fontSize: '14px', fontWeight: 'bold'}}>Total Patients</span>
-               <span style={{ backgroundColor: '#0f5689', borderRadius: '50%', width: '25px', height: '25px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'white'}}>
-                { filterInPatients.length || 0 }
-                </span>
-            </Space>
-          </Space>
+    <div style={{ margin: "20px 10px 10px 10px" }}>
+      <Space
+        style={{
+          color: "#0f5689",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          paddingBottom: "10px",
+          position: "relative",
+        }}
+      >
+        <ProfileOutlined />
+        <Typography.Text
+          style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}
+        >
+          Current Inpatients
+        </Typography.Text>
+        <Space
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            right: "3px",
+            top: "2px",
+          }}
+        >
+          <span
+            style={{ color: "black", fontSize: "14px", fontWeight: "bold" }}
+          >
+            Total Patients
+          </span>
+          <span
+            style={{
+              backgroundColor: "#0f5689",
+              borderRadius: "50%",
+              width: "25px",
+              height: "25px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+            }}
+          >
+            {filterInPatients.length || 0}
+          </span>
+        </Space>
+      </Space>
 
-          <Card style={{ padding: '10px 10px 10px 10px'}}>
-            
-              <div className='admit-patient-filter-container'>
-                  <Input placeholder="search by name" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by patient no" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by id number" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-              </div>
-          </Card>
+      <Card style={{ padding: "10px 10px 10px 10px" }}>
+        <div className="admit-patient-filter-container">
+          <Input placeholder="search by name" allowClear showCount />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="search by patient no" allowClear showCount />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="search by id number" allowClear showCount />
+        </div>
+      </Card>
 
-          <Table 
-              columns={columns} 
-              dataSource={dataSource} 
-              className="admit-patient-table"
-          />
+      <Table
+        columns={columns}
+        dataSource={filterInPatients}
+        className="admit-patient-table"
+        rowKey={(record) => record.PatientNo}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default Impatient
+export default Impatient;

@@ -7,20 +7,24 @@ import {
     Button,
     Typography,
     Select,
+    Modal,
+    Table,
   } from "antd";
   import moment from "moment"; // Import moment to handle date formatting
-  import React, { useEffect } from "react";
+  import React, { useEffect, useState } from "react";
   import { useDispatch, useSelector } from "react-redux";
   import {
     SendOutlined,
     FileSearchOutlined,
     CalendarOutlined,
     FileTextOutlined,
+    SaveOutlined,
+    EyeOutlined,
   } from "@ant-design/icons";
   import { useLocation } from "react-router-dom";
   import { getRadiologySetup } from "../../../actions/Doc-actions/qyRadiologyTestSetups";
   import { postRadiologyRequest } from "../../../actions/Doc-actions/postRadiolgyRequest";
-  import { requestRadiologyTest } from "../../../actions/Doc-actions/requestRadiologyTest";
+  import { getPatientRadiologyTest, requestRadiologyTest } from "../../../actions/Doc-actions/requestRadiologyTest";
   
   const { Option } = Select;
   
@@ -34,15 +38,28 @@ import {
     const { data } = useSelector((state) => state.getRadiologySetup);
     const { loading } = useSelector((state) => state.postRadiologyRequest);
     const { loading: loadingRadiologyRequest } = useSelector(state => state.requestRadiologyTest);
-  
+    const { data: radiologyData } = useSelector((state) => state.patientRadiologyTest);
+const [isModalVisible, setIsModalVisible] = useState(false);
+
     useEffect(() => {
       dispatch(getRadiologySetup());
     }, [dispatch]);
+
+    useEffect(() => {
+      if (treatmentNo) {
+        dispatch(getPatientRadiologyTest(treatmentNo));
+      }
+    }, [dispatch, treatmentNo]);
+
+    const handleModalVisible = () => {
+      setIsModalVisible(true);
+    };
   
     const handleRadiologyRequest = () => {
       dispatch(requestRadiologyTest(treatmentNo));
     };
-  
+
+   
     // Handle form submission
     const handleSave = (values) => {
       const { testPackageCode, dueDate } = values;
@@ -64,6 +81,32 @@ import {
       dispatch(postRadiologyRequest(radiologyRequest));
       console.log("Radiology request submitted:", radiologyRequest);
     };
+
+
+    const columns = [
+      {
+        title: "Date",
+        dataIndex: "DateTaken",
+        key: "DateTaken",
+      },
+      {
+        title: "Test Package",
+        dataIndex: "RadiologyTestPackageName",
+        key: "RadiologyTestPackageName",
+      },
+      {
+        title: "Results",
+        dataIndex: "Results",
+        key: "Results",
+      },
+     
+      {
+        title: "Status",
+        dataIndex: "Status",
+        key: "Status",
+      },
+    ];
+  
   
     return (
       <div>
@@ -81,7 +124,25 @@ import {
             <FileTextOutlined style={{ marginRight: "8px" }} />
             Radiology Request
           </Typography.Title>
-  
+          <div className="d-flex justify-content-end my-2">
+          <Button
+            type="dashed"
+            style={{ marginRight: "10px" }}
+            icon={<EyeOutlined />}
+            onClick={handleModalVisible}
+          >
+            View Results
+          </Button>
+          <Button
+            type="dashed"
+            style={{ marginRight: "10px" }}
+            icon={<SaveOutlined />}
+            onClick={handleSave}
+            loading={loading}
+          >
+            View History
+          </Button>
+        </div>
           <Form
             layout="vertical"
             initialValues={{
@@ -180,7 +241,29 @@ import {
               </Button>
             </div>
           </Form>
+
         </div>
+        {
+          isModalVisible && (
+            <Modal
+              title="Radiology Results"
+              open={isModalVisible}
+              onCancel={() => setIsModalVisible(false)}
+              footer={
+                <Button
+                  key="back"
+                  onClick={() => setIsModalVisible(false)}
+                >
+                  Close
+                </Button>
+              }
+              width={800}
+              style={{ width: "100%", top: 20 }}
+            >
+              <Table dataSource={radiologyData} columns={columns} />
+            </Modal>
+          )
+        }
       </div>
     );
   };

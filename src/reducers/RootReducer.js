@@ -69,8 +69,8 @@ import {
 } from "./doc-reducers/OutPatientReducers";
 import { getPatientListReducer } from "./nurse-reducers/getPatientListReducer";
 import { getConsultationRoomListReducer } from "./nurse-reducers/getConsultationRoomReducer";
-import { postLabReducer, requestLabTestReducer, viewPatientLabTestReducer } from "./doc-reducers/labRequestReducer";
-import { postRadiologyReducer, requestRadiologyReducer } from "./doc-reducers/radiologyRequestReducer";
+import { getLabListReducer, postLabReducer, requestLabTestReducer, viewPatientLabTestReducer } from "./doc-reducers/labRequestReducer";
+import { postRadiologyReducer, requestRadiologyReducer, viewPatientRadiologyReducer } from "./doc-reducers/radiologyRequestReducer";
 import { postDiagnosisReducer } from "./doc-reducers/diagnosisRequestReducer";
 import { saveAdmissionDetails } from "../actions/Doc-actions/postAdmissionRequest";
 import { requestAdmissionReducer, saveAdmissionDetailsReducer } from "./doc-reducers/admissionRequestReducers";
@@ -153,4 +153,6 @@ export const rootReducer = combineReducers({
   saveSigns:saveSignsReducer,
   saveSyptoms:saveSyptomsReducer,
   patientLabTest:viewPatientLabTestReducer,
+  patientRadiologyTest:viewPatientRadiologyReducer,
+  labList:getLabListReducer,
 });
