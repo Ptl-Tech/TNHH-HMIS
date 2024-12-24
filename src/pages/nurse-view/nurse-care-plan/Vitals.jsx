@@ -1,221 +1,46 @@
-import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
-import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
-import { useEffect } from 'react';
-import Loading from '../../../../partials/nurse-partials/Loading';
-import { SaveOutlined } from '@ant-design/icons';
-import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/updateTriageListVitalsSlice';
+import { Button, Col, Form, Input, Modal, Row, Space, Typography } from "antd";
+import { useState } from "react";
+import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons";
+import VitalsTable from "../tables/triage-tables/VitalsTable";
 
-const FormVitals = ({ observationNumber, patientNumber}) => {
-
-  const [form] = Form.useForm();
-
-  const dispatch = useDispatch();
-  const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
-  const { loading } = useSelector((state) => state.postTriageListVitals);
-
-  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
-  
-  useEffect(() => {
-    if (!vitalsLines.length) {
-      dispatch(getVitalsLinesSlice(observationNumber));
-    }
-  }, [dispatch, observationNumber, vitalsLines.length]);
-
-  useEffect(() => {
-    if (vitalsLines) {
-      form.setFieldsValue({
-        vitals: {
-          pulseRate: PulseRate || '',
-          pain: Pain || '',
-          height: Height || '',
-          weight: Weight || '',
-          temperature: Temperature || '',
-          bloodPreasure: BloodPressure || '',
-          sP02: SP02,
-          respirationRate: RespirationRate || '',
-          bmi: BMI ? BMI.toFixed(2) : "0.0",
-        },
-      });
-    }
-    }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
-  
-
-    const onFinish = async (values) => {
-      try {
-        const {
-          pulseRate,
-          pain,
-          height,
-          weight,
-          temperature,
-          bloodPreasure,
-          sP02,
-          respirationRate,
-        } = values.vitals;
-    
-        // Transform values
-        const transformedValues = {
-          pulseRate,
-          pain: parseInt(cleanValue(pain)),
-          height: parseFloat(cleanValue(height)),
-          weight: parseFloat(cleanValue(weight)),
-          temperature: parseFloat(cleanValue(temperature)),
-          bloodPreasure,
-          sP02,
-          respirationRate,
-          BMI: calculateBMI(height, weight),
-        };
-    
-        // Common payload properties
-        const baseVitals = {
-          ...transformedValues,
-          patientNo: patientNumber,
-          observationNo: observationNumber,
-        };
-    
-        // Create or update logic
-        if (vitalsLines && Object.keys(vitalsLines).length > 0) {
-          // Update vitals
-          const updateVitals = {
-            ...baseVitals,
-            lineNo: LineNo,
-            type: 1,
-            myAction: "edit",
-          };
-
-          console.log("Update Vitals:", updateVitals);
-    
-          await dispatch(updateTriageListVitalsSlice(updateVitals));
-          message.success("Successfully updated vitals");
-        } else {
-          // Create vitals
-          const createVitals = {
-            ...baseVitals,
-            type: 0,
-            myAction: "create",
-          };
-    
-          const response = await dispatch(postTriageListVitalsSlice(createVitals));
-          if (response?.status === "success") {
-            message.success("Vitals successfully created");
-          } else {
-            message.error("Error saving vitals data");
-          }
-        }
-    
-        // Reload vitals list after successful operation
-        dispatch(getVitalsLinesSlice(observationNumber));
-      } catch (error) {
-        // Generic error handling
-        message.error("An error occurred while saving vitals data.");
-        console.error("Error saving vitals:", error);
-      }
-    };
-    
-  
-  
-  const cleanValue = (value) => {
-    if (typeof value === "string") {
-      return value.replace(/[^\d.-]/g, "");
-    }
-    return value;
+const Vitals = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
   };
 
-  const calculateBMI = (height, weight) => {
-    if (!height || !weight) {
-      return null; 
-    }
-    const heightInMeters = height / 100; 
-    const bmi = weight / (heightInMeters * heightInMeters);
-    return bmi.toFixed(2); 
-  };
-
-  const handleValuesChange = (_, allValues) => {
-    const { height, weight } = allValues.vitals || {};
-    if (height && weight) {
-      const bmi = calculateBMI(height, weight);
-      form.setFieldsValue({
-        vitals: { ...allValues.vitals, bmi }, // Update BMI field
-      });
-    }
-  };
-
-  const columns = [
-    {
-      title: 'Pulse Rate',
-      dataIndex: 'pulseRate',
-      key: 'pulseRate',
-    },
-    {
-      title: 'Pain',
-      dataIndex: 'pain',
-      key: 'pain',
-    },
-    {
-      title: 'Height',
-      dataIndex: 'height',
-      key: 'height',
-    },
-    {
-      title: 'Weight',
-      dataIndex: 'weight',
-      key: 'weight',
-    },
-    {
-      title: 'Temperature',
-      dataIndex: 'temperature',
-      key: 'temperature',
-    },
-
-  ]
-
-  const dataSource = [
-    {
-      key: ObservationNo,
-      pulseRate: PulseRate,
-      pain: Pain,
-      height: Height,
-      weight: Weight,
-      temperature: Temperature,
-      bloodPreasure: BloodPressure,
-      sP02: SP02,
-      respirationRate: RespirationRate,
-      bmi: BMI,
-    }
-  ]
-
+const [ form ] = Form.useForm();
   return (
-   <div>
-    {
-      loadingVitalsLines ? (
-        <Loading />
-      ):(
-        
-      <div>
-        <Form layout="vertical" 
+    <div>
+      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
+          <ProfileOutlined />
+          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
+              Add Vitals
+          </Typography.Text>
+        </Space>
 
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Allergies and Medications</Button>
+          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview Pain Assessment Tool</Button>
+        </div>
+
+
+        <VitalsTable showModal={showModal} />
+
+
+        <Modal title="Add Vitals" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+          <Form
+          layout="vertical"
           form={form}
-          onFinish={onFinish}
-          initialValues={{
-            vitals: {
-              pulseRate: '',
-              bloodPreasure: '',
-              temperature: '',
-              sP02: '',
-              height: '',
-              weight: '',
-              respirationRate: '',
-              pain: 0,
-              bmi: "0.0"
-            },
-            
-          }}
           autoComplete="off"
-          onValuesChange={handleValuesChange}
           >
+
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Pulse Rate (bpm)"
@@ -493,54 +318,11 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               </Col>
             </Row>
 
-            <Col span={12}>
-                <Form.Item >
-                    <Button type="primary" loading={loading} htmlType="submit">
-                      <SaveOutlined />
-                      {
-                        vitalsLines && Object.keys(vitalsLines).length > 0 ? 'Update vitals' : 'Save vitals'
-                      }
-                    </Button>
-                </Form.Item>
-            </Col>
-        </Form>
-        
+          </Form>
+        </Modal>
 
-        {
-          vitalsLines && Object.keys(vitalsLines).length > 0 && 
-          (
-            <div style={{ marginTop: '10px' }}>
-            <Divider />
-            <Table columns={columns} 
-            dataSource={dataSource} 
-            pagination={false}
-            expandable={{
-              expandedRowRender: (record) => (
-                <p style={{ margin: 0 }}>
-
-                  Blood Preasure : {record.bloodPreasure}, 
-                  SP02 : {record.sP02}, 
-                  Respiration Rate : {record.respirationRate}, 
-                  BMI : {record.bmi.toFixed(2)}
-                </p>
-              ),
-              rowExpandable: (record) => record.name !== 'Not Expandable',
-            }}
-            />
-            </div>
-          )
-        }
-        </div>
-      )
-    }
-   </div>
+    </div>
   )
 }
 
-export default FormVitals
-
-//prop type validation
-FormVitals.propTypes = {
-  observationNumber: PropTypes.string.isRequired,
-  patientNumber: PropTypes.string.isRequired,
-}
+export default Vitals

@@ -98,7 +98,7 @@ const AdmitPatients = () => {
         getCheckboxProps: (record) => ({
           disabled: record.name === 'Disabled User', // Disable specific rows if needed
         }),
-      };
+    };
       
       
 
