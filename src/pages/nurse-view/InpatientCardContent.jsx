@@ -3,6 +3,8 @@ import PatientFile from './PatientFile'
 import CarePlan from './CarePlan'
 import Requests from './Requests'
 import Discharges from './Discharges'
+import PropTypes from 'prop-types'
+import NurseForms from './NurseForms'
 
 const InpatientCardContent = ({patientDetails}) => {
   return (
@@ -21,6 +23,9 @@ const InpatientCardContent = ({patientDetails}) => {
                 <Tabs.TabPane tab="Discharge" key="4">
                     <Discharges/>
                 </Tabs.TabPane>
+                <Tabs.TabPane tab="Nurse Forms" key="5">
+                    <NurseForms/>
+                </Tabs.TabPane>
             </Tabs>
         </Card>
     </>
@@ -28,3 +33,7 @@ const InpatientCardContent = ({patientDetails}) => {
 }
 
 export default InpatientCardContent
+// props validation
+InpatientCardContent.propTypes = {
+    patientDetails: PropTypes.object.isRequired,
+}

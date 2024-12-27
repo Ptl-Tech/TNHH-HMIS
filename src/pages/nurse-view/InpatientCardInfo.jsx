@@ -1,5 +1,6 @@
 import { Button, Card, Divider, List, Typography } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
+import PropTypes from 'prop-types'
 
 const InpatientCardInfo = ({ patientDetails }) => {
     const allergyItems = [
@@ -80,3 +81,8 @@ const InpatientCardInfo = ({ patientDetails }) => {
 }
 
 export default InpatientCardInfo
+
+// props validation
+InpatientCardInfo.propTypes = {
+    patientDetails: PropTypes.object.isRequired,
+  };

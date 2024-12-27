@@ -8,6 +8,7 @@ import NursingNotes from "./nurse-patient-file/NursingNotes"
 import TreatmentHistory from "./nurse-patient-file/TreatmentHistory"
 import Charges from "./nurse-patient-file/Charges"
 import Consumables from "./nurse-patient-file/Consumables"
+import PropTypes from "prop-types"
 
 const PatientFile = ({patientDetails}) => {
     const handleOnClick = (item) => {
@@ -76,3 +77,8 @@ const PatientFile = ({patientDetails}) => {
 }
 
 export default PatientFile
+
+// props validation
+PatientFile.propTypes = {
+    patientDetails: PropTypes.object.isRequired,
+}

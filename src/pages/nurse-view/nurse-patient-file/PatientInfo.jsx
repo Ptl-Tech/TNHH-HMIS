@@ -1,5 +1,6 @@
 import { Col, List, Row, Space, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
+import PropTypes from "prop-types"
 
 const PatientInfo = ({patientDetails}) => {
   const data = [
@@ -114,3 +115,9 @@ const PatientInfo = ({patientDetails}) => {
 }
 
 export default PatientInfo
+
+//props validation
+
+PatientInfo.propTypes = {
+    patientDetails: PropTypes.object.isRequired,
+}
