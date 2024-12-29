@@ -459,7 +459,7 @@ const MainLayout = () => {
             onOpenChange={onOpenChange}
             onClick={handleMenuClick}
             style={{
-              backgroundColor: "transparent",
+              backgroundColor: "#0f5689 !important",
               height: "100vh",
               paddingBottom: "90px",
               color: "#fff",
