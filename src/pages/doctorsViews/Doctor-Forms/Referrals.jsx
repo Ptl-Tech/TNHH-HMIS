@@ -211,7 +211,7 @@ const Referrals = () => {
 
           <Row gutter={16}>
             <Col span={24}>
-              <Button type="primary" htmlType="submit" loading={saveLoading}>
+            <Button type="primary" htmlType="submit" loading={saveLoading} disabled={saveLoading}>
                 Submit Referral
               </Button>
             </Col>

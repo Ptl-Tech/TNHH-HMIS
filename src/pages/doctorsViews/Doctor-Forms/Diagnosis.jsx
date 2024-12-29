@@ -110,6 +110,7 @@ const Diagnosis = () => {
       }
   
       // Update modal content based on the result
+     setTimeout(() => {
       if (success) {
         Modal.success({
           content: "Diagnosis saved successfully.",
@@ -126,6 +127,9 @@ const Diagnosis = () => {
       if (success) {
         setDiagnosisList([]); // Clear the list on success
       }
+      setIsModalVisible(true);
+    }, 1000);
+    
     } catch (error) {
       setModalContent({
         type: "error",

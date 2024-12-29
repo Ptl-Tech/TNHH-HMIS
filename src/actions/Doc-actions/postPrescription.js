@@ -43,10 +43,12 @@ export const postPrescriptionDetails = (prescription) => async (dispatch, getSta
       data: response.data,
     };
 
-    // Dispatch success action
-    dispatch({ type: POST_PRESCRIPTION_SUCCESS, payload: responseData });
-
+   
     // Show success modal if status is "success"
+   setTimeout(() => {
+     // Dispatch success action
+     dispatch({ type: POST_PRESCRIPTION_SUCCESS, payload: responseData });
+
     if (responseData.status === "success") {
       Modal.success({
         title: "Success",
@@ -56,17 +58,17 @@ export const postPrescriptionDetails = (prescription) => async (dispatch, getSta
         },
       });
     }
+   }, 2000);
 
     return responseData.data; // Return response data if needed
   } catch (error) {
-    // Handle error if prescription request fails
-    dispatch({
-      type: POST_PRESCRIPTION_FAIL,
-      payload: error.response?.data?.message || error.message || "Something went wrong",
-    });
-
-    // Display error message
-    message.error(error.message, 5);
+    setTimeout(() => {
+      dispatch({
+        type: POST_PRESCRIPTION_FAIL,
+        payload: error.response?.data?.message || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
 
     throw error; // Rethrow error for handling in the component
   }
@@ -109,16 +111,19 @@ export const sendtoPharmacy = (treatmentId) => async (dispatch, getState) => {
   
       setTimeout(() => {
         dispatch({ type: POST_PRESCRIPTION_TO_PHARMACY_SUCCESS, payload: responseData });
+        message.success("Prescription posted to pharmacy Successfully", 2);
       }, 2000);
   
       // Return patient ID for further use
       return responseData.data; // `msg` contains the patient ID
     } catch (error) {
-      dispatch({
-        type: POST_PRESCRIPTION_TO_PHARMACY_FAIL,
-        payload: error.response?.data?.message || error.message,
-      });
-      message.error(error.message, 5);
+      setTimeout(() => {
+        dispatch({
+          type: POST_PRESCRIPTION_TO_PHARMACY_FAIL,
+          payload: error.response?.data?.message || error.errors,
+        });
+        message.error(error.response?.data?.errors || error.errors);
+      }, 1200);
       throw error; // Rethrow error for `handleSubmit` to handle
     }
   };

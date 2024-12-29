@@ -71,6 +71,8 @@ const DoctorNotes = () => {
       treatmentNo,
       signNo: sign.signCode, 
       system: values.system, 
+      lineNo: 0,
+
     }));
 
     const symptoms = symptomsData.map((symptom) => ({
@@ -81,6 +83,8 @@ const DoctorNotes = () => {
       duration: symptom.duration,
       description: symptom.description,
       characteristics: symptom.xtics,
+      lineNo: 0,
+
     }));
 
     dispatch(postSignsRequest(signs));

@@ -38,7 +38,6 @@ export const saveAdmissionDetails = (Admission) => async (dispatch, getState) =>
       },
     };
 
-    console.log("Admission Request:", Admission); // Corrected from Diagnosis
 
     // Make API POST request
     const response = await axios.post(`${API}Doctor/PatientAdmission`, Admission, config);
@@ -52,8 +51,10 @@ export const saveAdmissionDetails = (Admission) => async (dispatch, getState) =>
     // Simulate a delay for UI feedback
     setTimeout(() => {
       dispatch({ type: SAVE_ADMISSION_DETAILS_SUCCESS, payload: responseData });
-      console.log("Dispatched Payload:", responseData);
-    }, 2000);
+      message.success("Admission details saved successfully");
+
+    }, 1200);
+    
 
     // Return patient ID for further use
     return responseData.data; // Assuming `msg` contains the patient ID
@@ -62,11 +63,14 @@ export const saveAdmissionDetails = (Admission) => async (dispatch, getState) =>
     // Dispatch failure action with error message
     dispatch({
       type: SAVE_ADMISSION_DETAILS_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: error.response?.data?.message || error.message || error.errors,
     });
 
     // Show error message
-    message.error(error.message, 5);
+    message.error(
+      error.response?.data?.message || error.message || error.errors,
+      5
+    );
 
     // Rethrow error for further handling
     throw error;
@@ -122,17 +126,20 @@ export const requestPatientAdmission = (treatmentId) => async (dispatch, getStat
     }, 2000);
 
     // Return the patient ID for further use
-    return responseData.data; // Assuming `data` contains the necessary info
+    return responseData.data; 
 
   } catch (error) {
-    // Dispatch failure action in case of error
-    dispatch({
-      type: REQUEST_PATIENT_ADMISSION_FAIL,
-      payload: error.response?.data?.message || error.message, // Use response message if available
-    });
+  
+    setTimeout(() => {
+      dispatch({
+        type: REQUEST_PATIENT_ADMISSION_FAIL,
+        payload: error.response?.data?.message|| error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
 
-    // Show error message
-    message.error(error.message, 5);
+   
+  
 
     // Rethrow error for any additional handling
     throw error;

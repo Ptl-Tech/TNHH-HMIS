@@ -49,18 +49,22 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
       status: response.data.status,
       data: response.data, // Assuming response contains required patient data
     };
-
-    dispatch({ type: REQUEST_RADIOLOGY_TEST_SUCCESS, payload: responseData });
+setTimeout(() => {
+      dispatch({ type: REQUEST_RADIOLOGY_TEST_SUCCESS, payload: responseData });
+      message.success("Radiology Test posted Successfully", 2);
+    }, 2000);
 
     // Return patient data for further use if necessary
     return responseData.data;
   } catch (error) {
-    dispatch({
-      type: REQUEST_RADIOLOGY_TEST_FAIL,
-      payload: error.response?.data?.message || error.message,
-    });
-    // Show error message using Ant Design's message component
-    message.error(error.message, 5);
+    setTimeout(() => {
+      dispatch({
+        type: REQUEST_RADIOLOGY_TEST_FAIL,
+        payload: error.response?.data?.message | error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
+   
     throw error; // Rethrow error for further handling by the calling function
   }
 };

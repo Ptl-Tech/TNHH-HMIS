@@ -35,6 +35,7 @@ import {
   QyRadiologyTestsSetupReducer,
   QyDiagnosisTestsSetupReducer,
   getemployeeDetailsReducer,
+  QyLocationsListReducer,
 } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import {
@@ -78,6 +79,7 @@ import { requestReferralReducer, saveReferralDetailsReducer } from "./doc-reduce
 import { savePrescriptionDetailsReducer, sendtoPharmacyReducer } from "./doc-reducers/prescriptionRequestReducer";
 import { sendtoPharmacy } from "../actions/Doc-actions/postPrescription";
 import { saveSignsReducer, saveSyptomsReducer } from "./doc-reducers/signs&SyptomsRequestReducer";
+import { postDocInjectionsReducer } from "./doc-reducers/postInjectionReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -155,4 +157,6 @@ export const rootReducer = combineReducers({
   patientLabTest:viewPatientLabTestReducer,
   patientRadiologyTest:viewPatientRadiologyReducer,
   labList:getLabListReducer,
+  getLocationsSetup:QyLocationsListReducer,
+  postDoctorInjections:postDocInjectionsReducer
 });

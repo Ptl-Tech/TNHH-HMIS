@@ -12,7 +12,6 @@ import {
 } from "antd";
 import { UserOutlined, DiffOutlined } from "@ant-design/icons";
 import AllergyAndMedication from "../nurse-view/forms/triage-forms/AllergyAndMedication";
-import Injections from "../nurse-view/forms/triage-forms/Injections";
 import Dressing from "../nurse-view/forms/triage-forms/Dressing";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
@@ -35,6 +34,7 @@ import AdmitPatientForm from "./Doctor-Forms/AdmitPatient";
 import TCA_Appointment from "./Doctor-Forms/TCA_Appointment";
 import Referrals from "./Doctor-Forms/Referrals";
 import ObservationRoom from "./Doctor-Forms/ObservationRoom";
+import Injections from "./Doctor-Forms/Injections";
 
 const ConsultationRoomEvalutionCard = () => {
   const location = useLocation();
@@ -96,7 +96,7 @@ const ConsultationRoomEvalutionCard = () => {
     { key: "3", label: "Lab Results", content: <LabResults /> },
     { key: "4", label: "Radiology", content: <Imaging /> },
     { key: "5", label: "Diagnosis", content: <Diagnosis /> },
-    { key: "6", label: "Medication", content: <Medication /> },  
+    { key: "6", label: "Medication", content: <Medication  /> },  
     { key: "7", label: "Injections", content: <Injections /> },
     { key: "8", label: "Admit Patient", content: <AdmitPatientForm /> },
     { key: "9", label: "Dispatch to Pyschology", content: <TCA_Appointment /> },

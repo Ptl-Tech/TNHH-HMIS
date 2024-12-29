@@ -79,7 +79,6 @@ const [isModalVisible, setIsModalVisible] = useState(false);
       };
   
       dispatch(postRadiologyRequest(radiologyRequest));
-      console.log("Radiology request submitted:", radiologyRequest);
     };
 
 
@@ -106,6 +105,15 @@ const [isModalVisible, setIsModalVisible] = useState(false);
         key: "Status",
       },
     ];
+  
+    const DataSource = Array.isArray(radiologyData)
+    ? radiologyData.filter(item => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
+    : Object.keys(radiologyData?.data || {})
+        .filter((TreatmentNo) => radiologyData[TreatmentNo].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
+        .map((TreatmentNo) => ({
+          ...radiologyData[TreatmentNo],
+          TreatmentNo,
+        }));
   
   
     return (
@@ -260,7 +268,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
               width={800}
               style={{ width: "100%", top: 20 }}
             >
-              <Table dataSource={radiologyData} columns={columns} />
+              <Table dataSource={DataSource} columns={columns} />
             </Modal>
           )
         }

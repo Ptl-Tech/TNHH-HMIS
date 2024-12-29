@@ -35,13 +35,12 @@ const LabResults = () => {
 
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.getlabRequestSetup);
-  const { loading } = useSelector((state) => state.postLabRequest);
+  const { loading: loadingLabRequestPost } = useSelector((state) => state.postLabRequest);
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
   const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
   const [labRequest, setLabRequest] = useState({
     myAction: "create",
     treatmentNo,
@@ -58,10 +57,9 @@ const LabResults = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (treatmentNo) {
-      dispatch(getPatientLabTest(treatmentNo));
-    }
-  }, [dispatch, treatmentNo]);
+    dispatch(getPatientLabTest());
+
+  }, [dispatch]);
 
   const handleDateChange = (date, dateString) => {
     setLabRequest((prev) => ({
@@ -81,12 +79,10 @@ const LabResults = () => {
   };
   const handleLabRequest = () => {
     dispatch(requestLabTest(treatmentNo));
-    message.success("Posted Lab Request Successfully");
  };
 
   const handleSave = () => {
     const action = labRequest.myAction === "create" ? "Create" : "Edit";
-    console.log(`${action} lab request data:`, labRequest);
     dispatch(postLabRequest(labRequest));
   };
 
@@ -113,7 +109,16 @@ const LabResults = () => {
       key: "Status",
     },
   ];
- 
+  const DataSource = Array.isArray(patientLabTest)
+  ? patientLabTest.filter(item => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
+  : Object.keys(patientLabTest)
+      .filter((TreatmentNo) => patientLabTest[TreatmentNo].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
+      .map((TreatmentNo) => ({
+        ...patientLabTest[TreatmentNo],
+        TreatmentNo,
+      }));
+
+
 
   return (
     <div>
@@ -144,7 +149,7 @@ const LabResults = () => {
           style={{ marginRight: "10px" }}
           icon={<SaveOutlined />}
           onClick={handleSave}
-          loading={loading}
+          loading={loadingLabRequestPost}
         >
           View History
         </Button>
@@ -237,6 +242,7 @@ const LabResults = () => {
           icon={<FileTextOutlined />}
           onClick={handleLabRequest}
           loading={loadingLabRequest}
+          disabled={loadingLabRequestPost}
         >
           Request Test
         </Button>
@@ -251,7 +257,7 @@ const LabResults = () => {
           }}
           icon={<SaveOutlined />}
           onClick={handleSave}
-          loading={loading}
+          loading={loadingLabRequestPost}
         >
           {labRequest.myAction === "create"
             ? "Add Lab Request"
@@ -259,20 +265,19 @@ const LabResults = () => {
         </Button>
       </div>
 
-    {
-      isModalVisible && (
-        <Modal
-          title="Lab Results"
-          visible={isModalVisible}
-          onCancel={() => setIsModalVisible(false)}
-          footer={null}
-          width={1000}
-        >
-                      <Table dataSource={patientLabTest} columns={columns} />
-        
-        </Modal>
-      )
-    }
+      <Modal
+        title="Lab Results"
+        visible={isModalVisible}
+        onOk={() => setIsModalVisible(false)}
+        onCancel={() => setIsModalVisible(false)}
+        width={800}
+      >
+        <Table
+          columns={columns}
+          dataSource={DataSource}
+          pagination={false}
+        />
+      </Modal>
     </div>
   );
 };

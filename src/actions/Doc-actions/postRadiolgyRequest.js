@@ -1,4 +1,5 @@
 
+import { message } from "antd";
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
@@ -40,17 +41,19 @@ export const postRadiologyRequest  = (radiologyRequest) => async (dispatch, getS
   
       setTimeout(() => {
         dispatch({ type: POST_RADIOLOGY_SUCCESS, payload: responseData });
-        console.log("Dispatched Payload:", responseData);
+        message.success("Radiology Requested Successfully", 2);
       }, 2000);
   
       // Return patient ID for further use
       return responseData.data; // `msg` contains the patient ID
     } catch (error) {
-      dispatch({
-        type: POST_RADIOLOGY_FAIL,
-        payload: error.response?.data?.message || error.message,
-      });
-      message.error(error.message, 5);
+     setTimeout(() => {
+        dispatch({
+          type: POST_RADIOLOGY_FAIL,
+          payload: error.response?.data?.message || error.errors,
+        });
+        message.error(error.response?.data?.errors || error.errors);
+      }, 1200);
       throw error; // Rethrow error for `handleSubmit` to handle
     }
   };

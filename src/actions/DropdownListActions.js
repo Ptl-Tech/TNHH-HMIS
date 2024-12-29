@@ -31,7 +31,11 @@ import {
   MARKETING_LIST_FAIL,
   EMPLOYEE_DETAILS_REQUEST,
   EMPLOYEE_DETAILS_SUCCESS,
-  EMPLOYEE_DETAILS__FAIL
+  EMPLOYEE_DETAILS__FAIL,
+  LOCATION_LIST_REQUEST,
+  LOCATION_LIST_SUCCESS,
+  LOCATION_LIST_FAIL,
+
 
 } from "../constants/DropDownConstants";
 
@@ -415,3 +419,43 @@ export const branchesList = (patient) => async (dispatch, getState) => {
     throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
+
+
+export const getLoactions = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: LOCATION_LIST_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyLocations&isList=true`,
+      config
+    );
+
+    // // Filter data to only include doctors
+    // const doctors = data.filter(
+    //   (item) => item.Shortcut_Dimension_2_Code === "DOCTOR"
+    // );
+
+    dispatch({ type: LOCATION_LIST_SUCCESS, payload: data });
+
+  } catch (error) {
+    dispatch({ type: LOCATION_LIST_FAIL, payload: error.message });
+  }
+};
+
+
+

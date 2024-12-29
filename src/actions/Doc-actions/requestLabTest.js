@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
@@ -43,20 +44,23 @@ export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
 
     setTimeout(() => {
       dispatch({ type: REQUEST_LAB_TEST_SUCCESS, payload: responseData });
+      message.success("Radiology Test posted Successfully", 2);
     }, 2000);
 
     return responseData.data; 
   } catch (error) {
-    dispatch({
-      type: REQUEST_LAB_TEST_FAIL,
-      payload: error.response?.data?.message || error.message,
-    });
-    message.error(error.message, 5);
+    setTimeout(() => {
+      dispatch({
+        type: REQUEST_LAB_TEST_FAIL,
+        payload: error.response?.data?.message || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
     throw error;
   }
 };
 
-export const getPatientLabTest = (treatmentId) => async (dispatch, getState) => {
+export const getPatientLabTest = () => async (dispatch, getState) => {
   try {
     dispatch({ type: VIEW_PATIENT_LAB_TEST });
 
@@ -76,7 +80,7 @@ export const getPatientLabTest = (treatmentId) => async (dispatch, getState) => 
     };
 
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}'`,
+      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=true`,
       config
     );
 
