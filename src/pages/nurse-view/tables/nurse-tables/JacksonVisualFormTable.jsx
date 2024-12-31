@@ -1,51 +1,69 @@
 import { Button, Space, Table } from 'antd'
 import PropTypes from 'prop-types'
 import { EditOutlined } from '@ant-design/icons'
+import { useState } from 'react'
+import Loading from '../../../../partials/nurse-partials/Loading'
 
-const JacksonVisualFormTable = ({ showModal }) => {
+const JacksonVisualFormTable = ({ showModal, loadingGetJacksonVisual, getJacksonVisual }) => {
     const columns = [
         {
           title: 'Date',
-          dataIndex: 'date',
-          key: 'date',
+          dataIndex: 'Date',
+          key: 'Date',
         },
         {
           title: 'Score',
-          dataIndex: 'score',
-          key: 'score',
+          dataIndex: 'Score',
+          key: 'Score',
         },
         {
           title: 'IV Line',
-          dataIndex: 'iv_line',
-          key: 'iv_line',
-        },
-        {
-            title: 'Nurse',
-            dataIndex: 'nurse',
-            key: 'nurse',
+          dataIndex: 'IVLine',
+          key: 'IVLine',
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={() => showModal()}><EditOutlined /> Edit</Button>
+                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
                 </Space>
             ),
         }
     ]
-    const data = [
-        {
-            key: '1',
-            date: '2023-01-01',
-            score: '10',
-            iv_line: 'Removal',
-            nurse: 'Nurse 1',
-        }
-    ]
+     const [pagination, setPagination] = useState({
+            current: 1,
+            pageSize: 10,
+            total: getJacksonVisual?.length,
+        });
+              
+        const handleTableChange = (newPagination) => {
+            setPagination(newPagination); // Update pagination settings
+        };
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+         {
+          loadingGetJacksonVisual ? (
+            <Loading /> 
+          ):(
+            <Table columns={columns} dataSource={getJacksonVisual} 
+          bordered size='middle' 
+          pagination={{
+            ...pagination,
+            total: getJacksonVisual?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+            onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+            style: {
+                marginTop: '30px',
+            }
+        }}
+         />
+          )
+         }
     </div>
   )
 }
@@ -55,4 +73,6 @@ export default JacksonVisualFormTable
 //props validation
 JacksonVisualFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
+    loadingGetJacksonVisual: PropTypes.bool.isRequired,
+    getJacksonVisual: PropTypes.array.isRequired
 }

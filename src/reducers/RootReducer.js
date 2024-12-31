@@ -54,7 +54,6 @@ import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesM
 import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
 import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
 import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
-import { getInjectionsReducer } from "./triage-reducers/getInjectionsReducer";
 import { getStoreRequisitionHeadersReducer } from "./triage-reducers/getStoreRequisitionHeadersReducer";
 import { getItemsReducer } from "./triage-reducers/getItemsReducer";
 import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
@@ -78,6 +77,17 @@ import { requestReferralReducer, saveReferralDetailsReducer } from "./doc-reduce
 import { savePrescriptionDetailsReducer, sendtoPharmacyReducer } from "./doc-reducers/prescriptionRequestReducer";
 import { sendtoPharmacy } from "../actions/Doc-actions/postPrescription";
 import { saveSignsReducer, saveSyptomsReducer } from "./doc-reducers/signs&SyptomsRequestReducer";
+import { getSpecificInjectionReducer } from "./triage-reducers/getSpecificInjectionReducer";
+import { getVisitorsListReducer } from "./nurse-reducers/getVisitorsListReducer";
+import { postSuicidalFormReducer } from "./nurse-reducers/postSuicidalFormReducer";
+import { getSuicidalFormReducer } from "./nurse-reducers/getSuicidalFormReducer";
+import { postMentalExaminationFormReducer } from "./nurse-reducers/postMentalExaminationFormReducer";
+import { getMentalExaminationFormReducer } from "./nurse-reducers/getMentalExaminationFormReducer";
+import { getQyIpLookupValuesReducer } from "./nurse-reducers/getQyIPLookupValuesReducer";
+import { postDietaryIntakeFormLineReducer } from "./nurse-reducers/postDietaryIntakeFormLineReducer";
+import { getQyDietaryFormLineReducer } from "./nurse-reducers/getQyIPDietaryFormLinesReducer";
+import { postJacksonVisualFormReducer } from "./nurse-reducers/postJacksonVisualFormReducer";
+import { getJacksonVisualFormReducer } from "./nurse-reducers/getJacksonVisualFormReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -114,13 +124,13 @@ export const rootReducer = combineReducers({
   admitVisitor: admitVisitorReducer,
   getPatientDetails: getPatientDetailsReducer,
   getTriageListDetails: getTriageListDetailsReducer,
+  getSpecificInjection: getSpecificInjectionReducer,
   postTriageListVitals: postTriageListVitalsReducer,
   getVitalsLines: getVitalsLinesReducer,
   postAllergiesMedication: postAllergiesMedicationReducer,
   getAllergiesAndMedications: getAllergiesAndMedicationReducer,
   postInjections: postInjectionsReducer,
   getInjectionNumber: getInjectionNumberReducer,
-  getInjections: getInjectionsReducer,
   getStoreRequisitionHeaders: getStoreRequisitionHeadersReducer,
   getItems: getItemsReducer,
   getItemUnits: getItemUnitsOfMeasureReducer,
@@ -155,4 +165,15 @@ export const rootReducer = combineReducers({
   patientLabTest:viewPatientLabTestReducer,
   patientRadiologyTest:viewPatientRadiologyReducer,
   labList:getLabListReducer,
+  getIPVisitors:getVisitorsListReducer,
+  postSuicidalForm:postSuicidalFormReducer,
+  getIpSuicidalForm:getSuicidalFormReducer,
+  postMentalStatusExaminationForm:postMentalExaminationFormReducer,
+  getMentalStatusExaminationForm:getMentalExaminationFormReducer,
+  getQyIpLookupValues:getQyIpLookupValuesReducer,
+  postDietaryIntakeFormLine:postDietaryIntakeFormLineReducer,
+  getQyDietaryFormLine:getQyDietaryFormLineReducer,
+  postJacksonVisualForm:postJacksonVisualFormReducer,
+  getJacksonVisualForm:getJacksonVisualFormReducer
+
 });

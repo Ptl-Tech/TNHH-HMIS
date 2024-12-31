@@ -21,6 +21,8 @@ export const postInjectionsSlice = (injections) => async (dispatch, getState) =>
         );
 
         dispatch({ type: POST_INJECTIONS_SUCCESS, payload: response.data });
+
+        console.log('post response', response.data)
        
         return response.data;
 

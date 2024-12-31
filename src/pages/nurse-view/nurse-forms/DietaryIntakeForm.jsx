@@ -1,22 +1,101 @@
-import { Button, Col, Divider, Form, Input, Modal, Row, Select, Space, Typography } from 'antd'
+import { Button, Divider, Form, Input, message, Modal, Select, Space, Typography } from 'antd'
 import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from '@ant-design/icons'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import DietaryIntakeTable from '../tables/nurse-tables/DietaryIntakeTable';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getQyIpLookupValuesSlice } from '../../../actions/nurse-actions/getQyIPLookupValuesSlice';
+import { POST_DIETARY_INTAKE_FORM_LINE_FAILURE, POST_DIETARY_INTAKE_FORM_LINE_SUCCESS, postDietaryIntakeFormLineSlice } from '../../../actions/nurse-actions/postDietaryIntakeFormLineSlice';
+import { getQyDietaryFormLinesSlice } from '../../../actions/nurse-actions/getQyIPDietaryFormLinesSlice';
 
 const DietaryIntakeForm = () => {
+
+    const { patientDetails } = useLocation().state;
+    const [ form ] = Form.useForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const showModal = () => {
-      setIsModalOpen(true);
-    };
+    const dispatch = useDispatch();
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    const {ipLookupValues} = useSelector((state) => state.getQyIpLookupValues);
+    const { loadingGetIpDietaryForm, ipGetDietaryForm} = useSelector((state) => state.getQyDietaryFormLine);
+    
+    const showModal = (record) => {
+        form.resetFields();
+        if (record) {
+            setIsEditMode(true);
+            form.setFieldsValue({
+                category: record?.Category || '',
+                comments: record?.Comment || '',
+            });
+        } else {
+            setIsEditMode(false);
+        }
+        setIsModalOpen(true);
+      };
     const handleOk = () => {
-      setIsModalOpen(false);
+        form.submit();
     };
     const handleCancel = () => {
       setIsModalOpen(false);
     };
+
+
+    const handleOnFinish = async (values) => {
+        try {
+          const { category, comments } = values;
+      
+          // Construct the visitor data
+          const visitorData = {
+            myAction: isEditMode ? "edit" : "create",
+            admissionNo: patientDetails?.CurrentAdmNo,
+            category,
+            comments,
+          };
+      
+          // Dispatch function to handle API call and feedback
+          const dispatchVisitorData = async (data) => {
+            await dispatch(postDietaryIntakeFormLineSlice(data))
+              .then((result) => {
+                if (result.type === POST_DIETARY_INTAKE_FORM_LINE_SUCCESS) {
+                  const actionWord = isEditMode ? 'updated' : 'added';
+                  message.success(`Dietary Intake Form Line ${actionWord} successfully!`);
+                  dispatch(getQyDietaryFormLinesSlice(patientDetails?.CurrentAdmNo));
+                } else if (result.type === POST_DIETARY_INTAKE_FORM_LINE_FAILURE) {
+                  message.error(result.payload.message || "Internal server error, please try again later.");
+                }
+              })
+              .then(() => {
+                setIsModalOpen(false);
+                form.resetFields();
+              })
+              .catch((err) => {
+                message.error(err.message || "Internal server error, please try again later.");
+              });
+          };
+      
+          // Call the function
+          await dispatchVisitorData(visitorData);
+      
+        } catch (error) {
+          message.error(error.message || "An unexpected error occurred.");
+        }
+      };
   
-    const [ form ] = Form.useForm();
+
+    useEffect(() => {
+        if(!ipLookupValues?.length){
+          dispatch(getQyIpLookupValuesSlice());
+        }
+      }, [dispatch, ipLookupValues]);
+
+      useEffect(() => {
+            if(!ipGetDietaryForm?.length){
+              dispatch(getQyDietaryFormLinesSlice(patientDetails?.CurrentAdmNo));
+            }
+          }, [dispatch, patientDetails?.CurrentAdmNo, ipGetDietaryForm?.length]);
+      
+    
   return (
     <div>
         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
@@ -25,87 +104,6 @@ const DietaryIntakeForm = () => {
               Dietary Intake Form
           </Typography.Text>
         </Space>
-
-
-        <div>
-            <Form
-                style={{ paddingTop: '10px'}} 
-                form={form}
-                layout="vertical"
-            >
-
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item
-                        label="Admission No"
-                        name="admissionNo"
-                        hasFeedback
-                    >
-                        <Input placeholder="Admission No" disabled/>
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item
-                        label="Height"
-                        name="height"
-                        hasFeedback
-                    >
-                        <Input placeholder="Height" type='number'/>
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item
-                        label="Weight"
-                        name="weight"
-                        hasFeedback
-                    >
-                        <Input placeholder="Weight" type='number'/>
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item
-                        label="RM"
-                        name="rm"
-                        hasFeedback
-                    >
-                        <Input placeholder="RM" type='number'/>
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item
-                        label="Meal Preference"
-                        name="mealPreference"
-                        hasFeedback
-                    >
-                        <Input placeholder="Meal Preference" type='text'/>
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item
-                        label="Beverage Preference"
-                        name="beveragePreference"
-                        hasFeedback
-                    >
-                        <Input placeholder="Beverage Preference" type='text'/>
-                    </Form.Item>
-                </Col>
-            </Row>
-
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Button type="primary" style={{ width: '100%' }}><PlusOutlined /> Save
-                    </Button>
-                </Col>
-            </Row>
-
-            </Form>
-        </div>
 
         <Divider />
 
@@ -117,19 +115,27 @@ const DietaryIntakeForm = () => {
           </Button>
         </div>
 
-        <DietaryIntakeTable showModal={showModal} />
+        <DietaryIntakeTable showModal={showModal} ipGetDietaryForm={ipGetDietaryForm} loadingGetIpDietaryForm={loadingGetIpDietaryForm}/>
 
         <Modal title="Dietary Intake Form" 
           open={isModalOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          okText="Save Form"
+          okText= {isEditMode ? "Update Form" : "Save Form"}
         >
             <Form
             
-            layout="vertical" 
+                layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
+                onFinish={handleOnFinish}
+                initialValues={
+                    {
+                        admissionNo: patientDetails?.CurrentAdmNo,
+                        category: '',
+                        comments: '',
+                    }
+                }
             >
           
             <Form.Item 
@@ -147,6 +153,12 @@ const DietaryIntakeForm = () => {
             label="Category"    
             name="category"
             hasFeedback
+            rules={[
+                {
+                    required: true,
+                    message: 'Please select a category!',
+                }
+            ]}
             >
                 <Select>
                     <Select.Option value="morning">Good</Select.Option>
@@ -159,6 +171,12 @@ const DietaryIntakeForm = () => {
                 label="Comments" 
                 name="comments"
                 hasFeedback
+                rules={[
+                    {
+                        required: true,
+                        message: 'Please enter comments!',
+                    }
+                ]}
                 >
                 <TextArea placeholder="Comments"
                     type="text"
