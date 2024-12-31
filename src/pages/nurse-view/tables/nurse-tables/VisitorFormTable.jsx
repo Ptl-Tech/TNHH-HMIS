@@ -1,60 +1,81 @@
 import { Button, Space, Table } from 'antd'
 import PropTypes from 'prop-types'
 import { EditOutlined } from '@ant-design/icons'
+import Loading from '../../../../partials/nurse-partials/Loading'
+import { useState } from 'react'
 
-const VisitorFormTable = ({ showModal }) => {
+const VisitorFormTable = ({ showModal, loadingIpVisitors, ipVisitors }) => {
+
     const columns = [
         {
             title: 'Admission Number',
-            dataIndex: 'admissionNumber',
-            key: 'admissionNumber',
+            dataIndex: 'AdmissionNo',
+            key: 'AdmissionNo',
         },
         {
             title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'VisitorName',
+            key: 'VisitorName',
         },
         {
             title: 'Contact Number',
-            dataIndex: 'contactNumber',
-            key: 'contactNumber',
+            dataIndex: 'PhoneNumber',
+            key: 'PhoneNumber',
         },
         {
             title: 'Id Number',
-            dataIndex: 'idNumber',
-            key: 'idNumber',
+            dataIndex: 'IdNumber',
+            key: 'IdNumber',
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={() => showModal()}><EditOutlined /> Edit</Button>
+                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
                 </Space>
             ),
         }
     ]
 
-    const data = [
-        {
-            key: '1',
-            admissionNumber: '1234567890',
-            name: 'John Brown',
-            contactNumber: '0712345678',
-            idNumber: '1234567890',
-        },
-        {
-            key: '2',
-            admissionNumber: '1234567890',
-            name: 'Jim Green',
-            contactNumber: '0712345678',
-            idNumber: '1234567890',
-        }
-    ]
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        total: ipVisitors?.length,
+    });
+          
+    const handleTableChange = (newPagination) => {
+        setPagination(newPagination); // Update pagination settings
+    };
+
   return (
-    <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
-    </div>
+    <>
+    {
+        loadingIpVisitors ? (
+            <Loading />
+        ) : (
+            <div style={{ paddingTop: '30px' }}>
+            <Table columns={columns} dataSource={ipVisitors} 
+             bordered size='middle' 
+              pagination={{
+                ...pagination,
+                total: ipVisitors?.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                position: ['bottom', 'right'],
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                style: {
+                    marginTop: '30px',
+                }
+            }}
+            />
+           </div>
+        )
+    } 
+    </>
+
   )
 }
 
@@ -63,4 +84,6 @@ export default VisitorFormTable
 //props validation
 VisitorFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
+    loadingIpVisitors: PropTypes.bool.isRequired,
+    ipVisitors: PropTypes.array.isRequired
 }

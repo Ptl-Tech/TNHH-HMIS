@@ -1,36 +1,33 @@
 import { Col, List, Row, Space, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
+import { useLocation } from "react-router-dom";
 
 const NextOfKin = () => {
+
+  const { patientDetails } = useLocation().state;
+
   const data = [
    
-    {
-        title: 'Mobile Phone',
-        description: '+254712345678',
-    },
+   
     {
         title: 'Next of Kin Full Name',
-        description: 'John Doe',
+        description: patientDetails?.NextOfkinFullName || 'N/A',
     },
     {
         title: 'Next of Kin Relationship',
-        description: 'Father',
+        description: patientDetails?.NextofkinRelationship || 'N/A',
     },
     {
-        title: 'Next of Kin Address',
-        description: '123 Main St',
+        title: 'Next of ID Number',
+        description: patientDetails?.NextOfKinIDCardNo || 'N/A',
     },
     {
-        title: 'Next of Kin Email',
-        description: 'Zo9yM@example.com',
+        title: 'Next of Kin Address 1',
+        description: patientDetails?.NextOfkinAddress1 || 'N/A',
     },
     {
-        title: 'Next of Kin Phone',
-        description: '+254712345678',
-    },
-    {
-        title: 'Next of Kin Address',
-        description: '123 Main St',
+        title: 'Next of Kin Address 2',
+        description: patientDetails?.NextOfkinAddress2 || 'N/A',
     }
 ]
   return (

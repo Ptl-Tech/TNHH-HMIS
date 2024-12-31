@@ -2,6 +2,7 @@ import { Button, Card, Divider, List, Typography } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import PropTypes from 'prop-types'
 
+
 const InpatientCardInfo = ({ patientDetails }) => {
     const allergyItems = [
         {
@@ -22,7 +23,7 @@ const InpatientCardInfo = ({ patientDetails }) => {
                     {patientDetails?.SearchName||'N/A' }
                 </Typography.Text>
                 <Typography.Text className="patient-id">
-                    Patient ID : {patientDetails?.PatientNo||'N/A' }
+                    Patient Number : {patientDetails?.PatientNo||'N/A' }
                 </Typography.Text>
             </div>
 
@@ -31,10 +32,10 @@ const InpatientCardInfo = ({ patientDetails }) => {
             <div className="inpatient-details-container-2">
                 <div className="patient-hospital-number-container">
                     <Typography.Text className="hospital-number-header">
-                    Hospital No
+                    Admission No
                     </Typography.Text>
                     <Typography.Text className="hospital-number">
-                        123456789 
+                        {patientDetails?.CurrentAdmNo||'N/A' }
                     </Typography.Text>
                 </div>
                 

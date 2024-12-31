@@ -20,6 +20,8 @@ export const postAllergiesMedicationSlice = (allergiesMedication) => async (disp
             config
         );
 
+        console.log('config', config);
+
         dispatch({ type: POST_ALLERGIES_MEDICATION_SUCCESS, payload: response.data });
        
         return response.data;
