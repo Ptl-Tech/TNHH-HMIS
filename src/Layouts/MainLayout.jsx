@@ -242,23 +242,23 @@ const MainLayout = () => {
           },
         ],
       },
-      {
-        key: "/doctors/appointments",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-        label: "Appointments",
-        children: [
-          {
-            key: "/reception/appointments/list",
-            label: "Appointments",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "upcoming-appointments",
-            label: "Upcoming Appointments",
-            icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
-          },
-        ],
-      },
+      // {
+      //   key: "/doctors/appointments",
+      //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //   label: "Appointments",
+      //   children: [
+      //     {
+      //       key: "/reception/appointments/list",
+      //       label: "Appointments",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "upcoming-appointments",
+      //       label: "Upcoming Appointments",
+      //       icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
+      //     },
+      //   ],
+      // },
       {
         key: "/doctor/discharge",
         icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
@@ -276,33 +276,33 @@ const MainLayout = () => {
           },
         ],
       },
-      {
-        key: "/doctor/pharmacy",
-        icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
-        label: "Pharmacy",
-        children: [
-          {
-            key: "pharmacy-outpatient",
-            label: "Pharmacy List OutPatient",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "pharmacy-inpatient",
-            label: "Pharmacy List InPatient",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "pharmacy-history",
-            label: "Pharmacy History",
-            icon: <HistoryOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "pharmacy-returns",
-            label: "Pharmacy List Returns",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-        ],
-      },
+      // {
+      //   key: "/doctor/pharmacy",
+      //   icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+      //   label: "Pharmacy",
+      //   children: [
+      //     {
+      //       key: "pharmacy-outpatient",
+      //       label: "Pharmacy List OutPatient",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "pharmacy-inpatient",
+      //       label: "Pharmacy List InPatient",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "pharmacy-history",
+      //       label: "Pharmacy History",
+      //       icon: <HistoryOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "pharmacy-returns",
+      //       label: "Pharmacy List Returns",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //   ],
+      // },
       {
         key: "/doctor/radiology",
         icon: <RadarChartOutlined style={{ color: "#fff" }} />,
@@ -313,21 +313,21 @@ const MainLayout = () => {
             label: "Radiology List OutPatient",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
-          {
-            key: "radiology-inpatient",
-            label: "Radiology List InPatient",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "radiology-walkin",
-            label: "Walk-in Radiology",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "radiology-history",
-            label: "Radiology History",
-            icon: <HistoryOutlined style={{ color: "#fff" }} />,
-          },
+          // {
+          //   key: "radiology-inpatient",
+          //   label: "Radiology List InPatient",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "radiology-walkin",
+          //   label: "Walk-in Radiology",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "radiology-history",
+          //   label: "Radiology History",
+          //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          // },
         ],
       },
       {
@@ -340,16 +340,16 @@ const MainLayout = () => {
             label: "Lab List OutPatient",
             icon: <CalendarOutlined style={{ color: "#fff" }} />,
           },
-          {
-            key: "lab-inpatient",
-            label: "Lab List InPatient",
-            icon: <CalendarOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "lab-history",
-            label: "Lab History",
-            icon: <HistoryOutlined style={{ color: "#fff" }} />,
-          },
+          // {
+          //   key: "lab-inpatient",
+          //   label: "Lab List InPatient",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "lab-history",
+          //   label: "Lab History",
+          //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          // },
         ],
       },
     ];
