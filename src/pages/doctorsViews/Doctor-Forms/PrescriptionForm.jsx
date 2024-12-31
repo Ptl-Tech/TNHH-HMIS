@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { getItemUnitsOfMeasureSlice } from "../../../actions/triage-actions/getItemUnitsOfMeasureSlice";
 import { postPrescriptionDetails, sendtoPharmacy } from "../../../actions/Doc-actions/postPrescription";
 import { useLocation } from "react-router-dom";
+import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
 
 const PrescriptionForm = () => {
   const location = useLocation();
@@ -19,7 +20,12 @@ const PrescriptionForm = () => {
   const { loading: pharmacyPosting } = useSelector((state) => state.sendtoPharmacy);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { items } = useSelector((state) => state.getItems);
 
+    useEffect(() => {
+      dispatch(getItemsSlice());
+    }, [dispatch]);
+  
   useEffect(() => {
     dispatch(getItemUnitsOfMeasureSlice());
   }, [dispatch]);
@@ -61,6 +67,7 @@ const PrescriptionForm = () => {
     dispatch(sendtoPharmacy(treatmentNo));
   };
 
+
   return (
     <div>
       <Form
@@ -97,13 +104,31 @@ const PrescriptionForm = () => {
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Prescription Quantity"
-              name={["Prescriptions", "PrescriptionQuantity"]}
+              label="Search Drug Name"
+              name={["Prescriptions", "DrugNo"]}
               hasFeedback
+              rules={
+                [
+                  {
+                    required: true,
+                    message: "Please select a drug",
+                  },
+                ]
+              }
             >
-              <Input type="number" name="PrescriptionQuantity" />
+             {
+              items &&
+              <Select name="DrugNo" placeholder="Select Drug">
+                {items.map((item) => (
+                  <Select.Option key={item.No} value={item.No}>
+                    {item.Description}
+                  </Select.Option>
+                ))}
+              </Select>
+             }
             </Form.Item>
           </Col>
+          
         </Row>
         <Row gutter={16}>
           <Col span={12}>
@@ -111,17 +136,33 @@ const PrescriptionForm = () => {
               label="Drug Group"
               name={["Prescriptions", "DrugGroup"]}
               hasFeedback
+              rules={
+                [
+                  {
+                    required: true,
+                    message: "Please select a drug group",
+                  },
+                ]
+              }
             >
               <Input name="DrugGroup" />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
-              label="Drug No"
-              name={["Prescriptions", "DrugNo"]}
+              label="Prescription Quantity"
+              name={["Prescriptions", "PrescriptionQuantity"]}
               hasFeedback
+              rules={
+                [
+                  {
+                    required: true,
+                    message: "Please enter prescription quantity",
+                  },
+                ]
+              }
             >
-              <Input name="DrugNo" />
+              <Input type="number" name="PrescriptionQuantity" />
             </Form.Item>
           </Col>
         </Row>
@@ -131,6 +172,14 @@ const PrescriptionForm = () => {
               label="Unit of Measure"
               name={["Prescriptions", "UnitOfMeasure"]}
               hasFeedback
+              rules={
+                [
+                  {
+                    required: true,
+                    message: "Please select a unit of measure",
+                  },
+                ]
+              }
             >
               <Select name="UnitOfMeasure" placeholder="Select Unit">
                 {itemUnitsOfMeasure.map((item) => (
@@ -146,13 +195,21 @@ const PrescriptionForm = () => {
               label="Dosage"
               name={["Prescriptions", "Dosage"]}
               hasFeedback
+              rules={
+                [
+                  {
+                    required: true,
+                    message: "Please enter dosage",
+                  },
+                ]
+              }
             >
               <Input name="Dosage" />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item
               label="Prescription Remarks"
               name={["Prescriptions", "PrescriptionRemarks"]}

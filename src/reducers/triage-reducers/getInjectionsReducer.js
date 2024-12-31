@@ -2,6 +2,7 @@ import {
     GET_INJECTIONS_REQUEST,
     GET_INJECTIONS_SUCCESS,
     GET_INJECTIONS_FAILURE,
+  
 } from "../../actions/triage-actions/getInjectionsSlice";
 
 const initialState = {

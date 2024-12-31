@@ -129,7 +129,7 @@ const Diagnosis = () => {
       }
       setIsModalVisible(true);
     }, 1000);
-    
+
     } catch (error) {
       setModalContent({
         type: "error",
@@ -141,7 +141,7 @@ const Diagnosis = () => {
   };
   
   return (
-    <div>
+    <div className="mt-4">
       <Typography.Title
         level={5}
         style={{
@@ -156,6 +156,28 @@ const Diagnosis = () => {
         Diagnosis
       </Typography.Title>
 
+<Row gutter={24}>
+  <Col span={12}>
+  <Button
+      type="primary"
+      icon={<PlusOutlined />}
+      style={{ marginBottom: "16px", width: "100%" }}
+      onClick={handleAddDiagnosis}
+    >
+    Add Diagnosis
+    </Button>
+      </Col>
+      <Col span={12}>
+      <Button
+      type="default"
+      icon={<FileTextOutlined />}
+      style={{ marginBottom: "16px", width: "100%" }}
+      onClick={handleAddDiagnosis}
+    >
+      Add Doctor Notes
+    </Button>
+      </Col>
+</Row>
       <Form
         layout="vertical"
         initialValues={{
@@ -195,8 +217,8 @@ const Diagnosis = () => {
         </Row>
 
         <Row gutter={24} style={{ paddingBottom: "16px" }}>
-          <Col span={18}>
-            <Form.Item name="diagnosisCode" label="Diagnosis Code">
+          <Col span={12}>
+            <Form.Item name="diagnosisCode" label="DCM_5 Diagnosis">
               <Select
                 placeholder="Select Diagnosis"
                 onChange={setDiagnosisInput}

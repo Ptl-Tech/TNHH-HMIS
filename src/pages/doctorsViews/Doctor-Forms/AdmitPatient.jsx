@@ -77,7 +77,9 @@ const AdmitPatientForm = () => {
   ];
 
   // Function to show the modal
-  const handleHistoryClick = () => setHistoryVisible(true);
+  const handleHistoryClick=()=>{
+    setHistoryVisible(true);
+  }
 
   // Function to close the modal
   const handleCancel = () => setHistoryVisible(false);

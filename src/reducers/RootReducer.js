@@ -80,6 +80,10 @@ import { savePrescriptionDetailsReducer, sendtoPharmacyReducer } from "./doc-red
 import { sendtoPharmacy } from "../actions/Doc-actions/postPrescription";
 import { saveSignsReducer, saveSyptomsReducer } from "./doc-reducers/signs&SyptomsRequestReducer";
 import { postDocInjectionsReducer } from "./doc-reducers/postInjectionReducer";
+import { getPatientSignsLinesReducer } from "./doc-reducers/getPatientsignsLinesReducer";
+import { getPatientsyptomslinesReducer } from "./doc-reducers/getPatientsyptomslinesReducer";
+import { getInjectionsLinesReducer } from "./triage-reducers/getInjectionsLinesReducer";
+import { QyHospNumberReducer } from "./doc-reducers/getHospNumberReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -158,5 +162,9 @@ export const rootReducer = combineReducers({
   patientRadiologyTest:viewPatientRadiologyReducer,
   labList:getLabListReducer,
   getLocationsSetup:QyLocationsListReducer,
-  postDoctorInjections:postDocInjectionsReducer
+  postDoctorInjections:postDocInjectionsReducer,
+  getPatientsSigns:getPatientSignsLinesReducer, 
+  getPatientSyptoms:getPatientsyptomslinesReducer,
+  getInjectionLines:getInjectionsLinesReducer,
+  getHosNumber: QyHospNumberReducer,
 });
