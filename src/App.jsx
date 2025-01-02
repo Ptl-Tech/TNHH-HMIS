@@ -61,6 +61,10 @@ import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 import DischargeList from "./pages/nurse-view/DischargeList";
 import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
 import RadiologyOutPatient from "./pages/doctorsViews/tables/Radiology/RadiologyOutPatient";
+import LaboratoryEvaluationCard from "./pages/doctorsViews/tables/lab/LaboratoryEvaluationCard";
+import DoctorAdmissions from "./pages/doctorsViews/DocAdmission-views/DoctorAdmissions";
+import VerifiedAdmission from "./pages/doctorsViews/DocAdmission-views/VerifiedAdmission";
+import AdmittedPatients from "./pages/doctorsViews/DocAdmission-views/AdmittedPatients";
 function App() {
   return (
     <Routes>
@@ -174,7 +178,7 @@ function App() {
           <Route path="/Doctor/Consultation/Patient" element={<ConsultationRoomEvalutionCard />} />
           <Route path="/Doctor/Consultation/Inpatient" element={<Inpatient />} />
           <Route path="/Doctor/Inpatient/Patient-card" element={<InpatientCard />} />
-          <Route path="/Doctor/Admissions" element={<Admissions />} />
+          <Route path="/Doctor/Admissions" element={<DoctorAdmissions />} />
           <Route path="/Doctor/Discharge-list" element={<DischargeList />} />
           <Route path="/Doctor/Discharge-requests" element={<DischargeRequests />} />
           <Route path="/Doctor/Past-doctor-visit" element={<PastDoctorVisit />} />
@@ -182,9 +186,13 @@ function App() {
           <Route path="/Doctor/Past-doctor-visit/Patient" element={<TreatmentCard />} />
           <Route path="/Doctor/Lab-Patients" element={<LabOutPatient />} />
           <Route path="/Doctor/Radiology-Patients" element={<RadiologyOutPatient />} />
+{/* Laboratory Routes */}
+          <Route path="/Doctor/Lab/Patient" element={<LaboratoryEvaluationCard />} />
+
+          <Route path="/Doctor/Approved-Admissions" element={<VerifiedAdmission />} />
+          <Route path="/Doctor/Admitted-Patients" element={<AdmittedPatients />} />
 
 
-          
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>

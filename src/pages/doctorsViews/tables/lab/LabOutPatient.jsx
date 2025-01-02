@@ -8,52 +8,69 @@ import { getTriageWaitingList } from "../../../../actions/triage-actions/getTria
 import { listDoctors } from "../../../../actions/DropdownListActions";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { getConsultationRoomListSlice } from "../../../../actions/nurse-actions/getConsultationRoomSlice";
+import { getLabList } from "../../../../actions/Doc-actions/getLabList";
+import { render } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
 const LabOutPatient = () => {
-    
+    const navigate=useNavigate();
     const columns = [
         {
             title: 'Lab No',
-            dataIndex: 'LabNo',
-            key: 'LabNo',
+            dataIndex: 'LaboratoryNo',
+            key: 'LaboratoryNo',
         },
         {
             title: 'Patient No',
-            dataIndex: 'patientNo',
-            key: 'patientNo',
+            dataIndex: 'PatientNo',
+            key: 'PatientNo',
         },
         {
             title: 'Patient Names',
-            dataIndex: 'names',
-            key: 'names',
+            dataIndex: 'Patient_Names',
+            key: 'Patient_Names',
             render: (_, record) => {
-                return <Button type="link" onClick={() => showModal(record)} style={{ color: '#0f5689' }}>
-                    {record.names}
+                return <Button type="link" onClick={() => handleNavigate(record, record.LaboratoryNo)} style={{ color: '#0f5689' }}>
+                    {record.Patient_Names}
                 </Button>
             }
         },
-
         {
-            title: 'Lab Test Type',
-            dataIndex: 'LaboratoryTestPackageCode',
-            key: 'LaboratoryTestPackageCode',
-        },
-        {
-            title: 'Lab Test Date',
-            dataIndex: 'LaboratoryTestPackageName',
-            key: 'LaboratoryTestPackageName',
-        },
-        {
-            title: 'status',
+            title: 'Status',
             dataIndex: 'Status',
             key: 'Status',
+            render: (_, record) => {
+                let statusColor;
+                switch (record.Status) {
+                    case 'New':
+                        statusColor = 'orange';
+                        break;
+                    case 'Completed':
+                        statusColor = 'green';
+                        break;
+                    case 'Forwarded':
+                        statusColor = 'blue';
+                        break;
+                    case 'Cancelled':
+                        statusColor = 'red';
+                        break;
+                    default:
+                        statusColor = 'gray'; // Default color for unknown statuses
+                }
+                
+                return (
+                    <Typography.Text style={{ color: statusColor, fontWeight: 'bold' }}>
+                        {record.Status}
+                    </Typography.Text>
+                );
+            }
         },
         {
             title: 'Action',
             dataIndex: 'action',
             key: 'action',
             render: (_, record) => {
-                return <Button type="primary" onClick={() => showModal(record)}>checkIn Lab</Button>
+                return <Button type="primary" onClick={() => handleNavigate(record, record.LaboratoryNo)}>checkIn Lab</Button>
             }
         }
     ];
@@ -78,94 +95,29 @@ const LabOutPatient = () => {
 
     const dispatch = useDispatch();
 
-    const { loadinglabTreatmentHeaders, data:labTreatmentHeaders } = useSelector(state => state.labList);
-    const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
-    const filteredConsultationRooms = consultationRoomList.filter(room => room.Status === 'New');
-    const formattedTriageWaitingList = triageWaitingList.map(patient => {
-        return {
-            PatientNo: patient.PatientNo,
-            SearchName: patient.SearchName,
-        }
-    });
-
-    const { data } = useSelector(state => state.getDoctorsList);
-    const formattedDoctorDetails = data.map(doctor => {
-        return {
-            DoctorID: doctor.DoctorID,
-            DoctorsName: doctor.DoctorsName,
-        }
-    });
-
-    // console.log('triageWaitingList', triageWaitingList);
-
-    const combinedList = filteredConsultationRooms.map(room => {
-        // Find the matching patient in the formattedTriageWaitingList
-        const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
-    
-        // Combine room data with the matching patient's data
-        return {
-            ...room, // Include all fields from the room object
-            PatientNo: room.PatientNo,
-            SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
-        };
-    });
-
-    const combinedListWithDoctors = combinedList.map(item => {
-        // Find the doctor matching the DoctorID in the current item
-        const matchingDoctor = formattedDoctorDetails.find(doctor => doctor.DoctorID === item.DoctorID);
-    
-        // Combine the doctor's data with the current item
-        return {
-            ...item, // Include all fields from the combinedList item
-            DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null, // Add DoctorsName if doctor exists
-        };
-    });
-
-    const dataSource = combinedListWithDoctors.map((item, index) => ({
-        key: index + 1,
-        treatmentNo: item.TreatmentNo,
-        patientNo: item.PatientNo,
-        names: item.SearchName,
-        treatmentDate: item.TreatmentDate,
-        treatmentType: item.TreatmentType,
-        doctor: item.DoctorsName,
-    })).sort((a, b) => {
-        // Sort by treatment date in descending order
-        return new Date(b.treatmentDate) - new Date(a.treatmentDate);
-    })
-
-    // console.log('combinedList is:', combinedList);
-
+    const { loadinglabTreatmentHeaders, data: labTreatmentHeaders } = useSelector(state => state.labList);
+   
     useEffect(() => {
-        if(!data.length) {
-            dispatch(listDoctors());
+        if(!labTreatmentHeaders.length) {
+            dispatch(getLabList());
         }
-    }, [dispatch, data.length]);
-
-    useEffect(() => {
-        
-        if(!triageWaitingList.length) {
-            dispatch(getTriageWaitingList());
-        }
-    }, [dispatch, triageWaitingList.length]);
-
-    useEffect(() => {
-        if(!consultationRoomList.length) {
-            dispatch(getConsultationRoomListSlice());
-        }
-    }, [dispatch, consultationRoomList.length]);
+    }, [dispatch, labTreatmentHeaders.length]);
 
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
-        total: dataSource.length,
+        total: labTreatmentHeaders.length,
     });
 
     const handleTableChange = (newPagination) => {
         setPagination(newPagination); // Update pagination settings
     };
 
-    const paginatedData = dataSource.slice(
+    const handleNavigate=(record,LaboratoryNo )=>{
+        navigate(`/Doctor/Lab/Patient?LaboratoryNo=${LaboratoryNo}`, { state: { patientNo: record.PatientNo, labObservationNo: record.LaboratoryNo, patientLabRecord: record } });
+    }
+
+    const paginatedData = labTreatmentHeaders.slice(
         (pagination.current - 1) * pagination.pageSize,
         pagination.current * pagination.pageSize
     );
@@ -203,12 +155,12 @@ const LabOutPatient = () => {
           </Card>
 
           {
-            loadingConsultationRoomList ? (
+            loadinglabTreatmentHeaders ? (
                 <Loading />
             ):(
                 <Table 
                 columns={columns} 
-                dataSource={dataSource} 
+                dataSource={labTreatmentHeaders} 
                 className="admit-patient-table"
                 bordered size='middle' 
                 pagination={{

@@ -232,7 +232,7 @@ const MainLayout = () => {
           },
           {
             key: "/Doctor/Admissions",
-            label: "Patient Admission List",
+            label: "Admissions",
             icon: <FileAddOutlined style={{ color: "#fff" }} />,
           },
           {

@@ -218,7 +218,7 @@ const Diagnosis = () => {
 
         <Row gutter={24} style={{ paddingBottom: "16px" }}>
           <Col span={12}>
-            <Form.Item name="diagnosisCode" label="DCM_5 Diagnosis">
+            <Form.Item name="diagnosisCode" label=" Primary Diagnosis" rules={[{ required: true }]}>
               <Select
                 placeholder="Select Diagnosis"
                 onChange={setDiagnosisInput}

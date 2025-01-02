@@ -14,7 +14,11 @@
   min-width: 230px !important;
   width: 230px !important;
 }
-
+/* Override submenu background to make it transparent */
+:where(.css-dev-only-do-not-override-lobnjp).ant-menu-light, :where(.css-dev-only-do-not-override-lobnjp).ant-menu-light>.ant-menu {
+  color: #ffffff;
+  background: #0f5689 !important;
+}
 
 :where(.css-lobnjp).ant-menu-light, 
 :where(.css-lobnjp).ant-menu-light > .ant-menu {

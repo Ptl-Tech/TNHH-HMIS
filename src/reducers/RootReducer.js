@@ -84,6 +84,14 @@ import { getPatientSignsLinesReducer } from "./doc-reducers/getPatientsignsLines
 import { getPatientsyptomslinesReducer } from "./doc-reducers/getPatientsyptomslinesReducer";
 import { getInjectionsLinesReducer } from "./triage-reducers/getInjectionsLinesReducer";
 import { QyHospNumberReducer } from "./doc-reducers/getHospNumberReducer";
+import { QySpecimenSampleSetupReducer } from "./doc-reducers/getSampleSetupReducer";
+import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
+import { postAdmissionVerificationReducer } from "./doc-reducers/Admission/postAdmissionVerificationReducer";
+import { postAdmissionCancellationReducer } from "./doc-reducers/Admission/cancelPatientAdmissionReducer";
+import { getVerifiedAdmissionsReducer } from "./doc-reducers/Admission/getVerifiedAdmissionsReducer";
+import { getAdmittedPatientsReducer } from "./doc-reducers/Admission/getAdmittedPatients";
+import { getDischargeListReducer } from "./doc-reducers/Admission/getDischargeListReducer";
+import { getPendingAdmissionListReducer } from "./doc-reducers/Admission/getPendingAdmissionListReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -167,4 +175,13 @@ export const rootReducer = combineReducers({
   getPatientSyptoms:getPatientsyptomslinesReducer,
   getInjectionLines:getInjectionsLinesReducer,
   getHosNumber: QyHospNumberReducer,
+  getSampleSetup:QySpecimenSampleSetupReducer,
+  postAdmitPatient:postPatientAdmissionReducer,
+  postAdmissionVerification:postAdmissionVerificationReducer,
+  cancelPatientAdmission:postAdmissionCancellationReducer,
+  getVerifiedAdmissionList:getVerifiedAdmissionsReducer,
+  getAdmissionList:getAdmittedPatientsReducer,
+  getDischargeList:getDischargeListReducer,
+  getPendingAdmissions:getPendingAdmissionListReducer,
+
 });

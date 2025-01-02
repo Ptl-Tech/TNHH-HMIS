@@ -1,79 +1,64 @@
 import { Card, Input, Space, Table, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getDischargeList } from "../../actions/Doc-actions/Admission/getdischargeList";
 
 
 const DischargeList = () => {
+    const dispatch=useDispatch();
+    const { loading, data } = useSelector(
+        (state) => state.getDischargeList
+      );
 
-  
-  const dataSource = [
-    {
-        key: '1',
-        admNo: 'ADM0001',
-        patientNo: 'PAT0001',
-        names: 'John Brown',
-        admDate: '2023-01-01',
-        ward: 'Ward 1',
-        bed: 'B101',
-        doctor: 'Dr. Smith',
-    },
-    {
-        key: '2',
-        admNo: 'ADM0002',
-        patientNo: 'PAT0002',
-        names: 'Jim Green',
-        admDate: '2023-01-01',
-        ward: 'Ward 2',
-        bed: 'B102',
-        doctor: 'Dr. Johnson',
-    },
-    {
-        key: '3',
-        admNo: 'ADM0003',
-        patientNo: 'PAT0003',
-        names: 'Joe Black',
-        admDate: '2023-01-01',
-        ward: 'Ward 1',
-        bed: 'B103',
-        doctor: 'Dr. Williams',
-    },
-];
+
+      useEffect(() => {
+        dispatch(getDischargeList());
+        }, [dispatch]);
+    
+
 const columns = [
     {
         title: 'Adm No',
-        dataIndex: 'admNo',
-        key: 'admNo',
+        dataIndex: 'AdmissionNo',
+        key: 'AdmissionNo',
     },
     {
         title: 'Patient No',
-        dataIndex: 'patientNo',
-        key: 'patientNo',
+        dataIndex: 'PatientNo',
+        key: 'PatientNo',
     },
     {
         title: 'Names',
-        dataIndex: 'names',
-        key: 'names',
-        render: (_, record) => <a onClick={()=>handleNavigate(record?.patientNo, record?.admNo)} style={{ color: '#0f5689' }}>{record.names}</a>,
+        dataIndex: 'Search_Names',
+        key: 'Search_Names',
+        render: (_, record) => <a onClick={()=>handleNavigate(record?.patientNo, record?.admNo)} style={{ color: '#0f5689' }}>{record.Search_Names}</a>,
     },
     {
         title: 'Adm Date',
-        dataIndex: 'admDate',
-        key: 'admDate',
+        dataIndex: 'DateofAdmission',
+        key: 'DateofAdmission',
     },
     {
         title: 'Ward',
-        dataIndex: 'ward',
-        key: 'ward',
+        dataIndex: 'WardNo',
+        key: 'WardNo',
     },
     {
         title: 'Bed',
-        dataIndex: 'bed',
-        key: 'bed',
+        dataIndex: 'BedNo',
+        key: 'BedNo',
     },
     {
-        title: 'Doctor',
-        dataIndex: 'doctor',
-        key: 'doctor',
+        title: 'Action',
+        dataIndex: 'Action',
+        key: 'Action',
+        render: () => (
+            <Space size="middle">
+                <a style={{ color: '#0f5689' }}>Discharge</a>
+            </Space>
+        ),
     },
 ];
 
@@ -116,7 +101,8 @@ const handleNavigate = (patientNo, admNo) => {
 
           <Table 
               columns={columns} 
-              dataSource={dataSource} 
+              dataSource={data} 
+              loading={loading} 
               className="admit-patient-table"
           />
     </div>

@@ -265,8 +265,8 @@ const PrescriptionForm = () => {
             >
               <Select name="UnitOfMeasure" placeholder="Select Unit">
                 {itemUnitsOfMeasure.map((item) => (
-                  <Select.Option key={item.ItemNo} value={item.ItemNo}>
-                    {item.Code}
+                  <Select.Option key={item.Code} value={item.Code}>
+                    {item.Description}
                   </Select.Option>
                 ))}
               </Select>
