@@ -78,7 +78,7 @@ const LabOutPatient = () => {
 
     const dispatch = useDispatch();
 
-    const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
+    const { loadinglabTreatmentHeaders, data:labTreatmentHeaders } = useSelector(state => state.labList);
     const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
     const filteredConsultationRooms = consultationRoomList.filter(room => room.Status === 'New');
     const formattedTriageWaitingList = triageWaitingList.map(patient => {

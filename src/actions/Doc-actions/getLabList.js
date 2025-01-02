@@ -33,7 +33,7 @@ export const getLabList = () => async (dispatch, getState) => {
 
     // Ensure `treatmentId` is passed correctly in the API request
     const {data} = await axios.post(
-      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines`,      
+      `${API}data/odatafilter?webservice=PgLaboratoryTestHeaders`,      
       config
     );
 
