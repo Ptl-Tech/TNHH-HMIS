@@ -1,40 +1,71 @@
 import { Button, Form, Input, Modal, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
+import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const AddAllergies = () => {
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-        const showModal = () => {
-          setIsModalOpen(true);
-        };
-        const handleOk = () => {
-          setIsModalOpen(false);
-        };
+        const [selectedRowKey, setSelectedRowKey] = useState(null);
+        const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+        const [selectedRow, setSelectedRow] = useState([]);
+        const [ form ] = Form.useForm();
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const dispatch = useDispatch();
+        const { patientDetails } = useLocation().state;
+
         const handleCancel = () => {
           setIsModalOpen(false);
         };
 
-    const [ form ] = Form.useForm();
+        const handleViewAllergies = () => {
+          setIsModalOpen(true);
+        }
+
+        const rowSelection = {
+          selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
+          onChange: (selectedRowKeys, selectedRows) => {
+            if (selectedRowKeys.length > 1) {
+              setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
+              setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
+            } else {
+              setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
+              setSelectedRow(selectedRows); // Update the selected row
+            }
+            setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
+          },
+          getCheckboxProps: (record) => ({
+            disabled: record.name === 'Disabled User', // Disable specific rows if needed
+          }),
+      };
+
+    
   return (
     <div>
 
         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
           <ProfileOutlined />
           <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Add Allergies and Medications
+              Allergies and Medications
           </Typography.Text>
         </Space>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Allergies and Medications</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview Allergies and Medications</Button>
+          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
+          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> Preview Allergies and Medications</Button>
         </div>
 
-        <AddAllergiesTable showModal={showModal} />
+        <AddAllergiesTable rowSelection={rowSelection} />
 
-        <Modal title="Add Allergies and Medications" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title="Add Allergies and Medications" 
+        open={isModalOpen}
+        footer={[
+          <Button key="cancel" color="danger" onClick={handleCancel}>
+            Cancel
+          </Button>,
+        ]}
+        >
         <Form
             layout="vertical" 
             style={{ paddingTop: '10px'}} 

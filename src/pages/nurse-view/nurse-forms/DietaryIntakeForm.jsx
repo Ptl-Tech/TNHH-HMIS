@@ -19,6 +19,8 @@ const DietaryIntakeForm = () => {
 
     const {ipLookupValues} = useSelector((state) => state.getQyIpLookupValues);
     const { loadingGetIpDietaryForm, ipGetDietaryForm} = useSelector((state) => state.getQyDietaryFormLine);
+
+    const filterIpLookupValues = ipLookupValues?.filter((item) => item.Type === "Dietary Intake Form");
     
     const showModal = (record) => {
         form.resetFields();
@@ -160,11 +162,15 @@ const DietaryIntakeForm = () => {
                 }
             ]}
             >
-                <Select>
-                    <Select.Option value="morning">Good</Select.Option>
-                    <Select.Option value="afternoon">Average</Select.Option>
-                    <Select.Option value="evening">Poor</Select.Option>
-                </Select>
+              <Select 
+              placeholder="Select a category"
+              showSearch
+              options={filterIpLookupValues?.map((item) => ({
+                value: item.Category,
+                label: item.Category,
+              }))}
+
+              />
             </Form.Item>
 
             <Form.Item 

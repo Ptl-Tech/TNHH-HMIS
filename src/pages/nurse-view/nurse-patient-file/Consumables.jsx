@@ -1,23 +1,104 @@
-import { Button, DatePicker, Form, Input, Modal, Select, Space, Typography } from "antd"
-import { ProfileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
-import { useState } from "react";
+import { Button, Form, Input, message, Modal, Select, Space, Typography } from "antd"
+import { ProfileOutlined, PlusOutlined, PrinterOutlined } from "@ant-design/icons"
+import { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
-import ConsumablesTables from "../tables/nurse-tables/ConsumablesTables";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { POST_PATIENT_CONSUMABLES_FAILURE, POST_PATIENT_CONSUMABLES_SUCCESS, postPatientConsumablesSlice } from "../../../actions/nurse-actions/postPatientConsumablesSlice";
+import { getPatientConsumablesSlice } from "../../../actions/nurse-actions/getPatientConsumablesSlice";
+import useAuth from "../../../hooks/useAuth";
+import { getQyLocationsSlice } from "../../../actions/nurse-actions/getQyLocationsSlice";
+import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumablesTable";
+import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 
 const Consumables = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { patientDetails } = useLocation().state;
+    const [ form ] = Form.useForm();
+    const [isEditMode, setIsEditMode] = useState(false);
+    const dispatch = useDispatch();
+    const userDetails = useAuth();
+    const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
+
+    const {loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables} = useSelector(state => state.getPgOpenPatientConsumables);
+
+
+    const { qyLocations } = useSelector((state) => state.getQyLocations);
+
+    const { loadingPostConsumables } = useSelector((state) => state.postPatientConsumables);
+
+    const consumables = getPgOpenPatientConsumables?.filter(item => item.Admission_No === patientDetails?.AdmNo);
+
+ 
     const showModal = () => {
       setIsModalOpen(true);
     };
     const handleOk = () => {
-      setIsModalOpen(false);
+      form.submit();
     };
     const handleCancel = () => {
       setIsModalOpen(false);
     };
   
-    const [ form ] = Form.useForm();
+    const handleOnFinish = async (values) => {
+      try {
+        const { location, quantity, remarks } = values;
+    
+        // Construct the visitor data
+        const consumableData = {
+          myAction: isEditMode ? "edit" : "create",
+          admissionNo: patientDetails?.CurrentAdmNo,
+          recId: "",
+          location,
+          quantity,
+          remarks,
+          documentNo: patientDetails?.CurrentAdmNo,
+          branchCode: branchCode,
+          staffNo: userDetails.userData.no
+        };
+    
+        // Dispatch function to handle API call and feedback
+        const dispatchPatientConsumablesData = async (data) => {
+          await dispatch(postPatientConsumablesSlice('/GeneralProcesses/PatientConsumables', data))
+            .then((result) => {
+              if (result.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
+                const actionWord = isEditMode ? 'updated' : 'added';
+                message.success(`Visitor ${result.payload.visitorName} ${actionWord} successfully!`);
+                dispatch(getPatientConsumablesSlice(patientDetails?.CurrentAdmNo));
+              } else if (result.type === POST_PATIENT_CONSUMABLES_FAILURE) {
+                message.error(result.payload.message || "Internal server error, please try again later.");
+              }
+            })
+            .then(() => {
+              setIsModalOpen(false);
+              form.resetFields();
+            })
+            .catch((err) => {
+              message.error(err.message || "Internal server error, please try again later.");
+            });
+        };
+    
+        // Call the function
+        await dispatchPatientConsumablesData(consumableData);
+    
+      } catch (error) {
+        message.error(error.message || "An unexpected error occurred.");
+      }
+    };
+
+    useEffect(() => {
+        if(!getPgOpenPatientConsumables?.length){
+            dispatch(getPgOpenPatientConsumablesSlice());
+        }
+    }, [dispatch, getPgOpenPatientConsumables?.length]);
+
+    useEffect(() => {
+      if(!qyLocations?.length){
+        dispatch(getQyLocationsSlice());
+      }
+    }, [dispatch, qyLocations?.length]);
+
   return (
     <div>
       <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
@@ -29,73 +110,47 @@ const Consumables = () => {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Consumables</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview Consumables</Button>
+          <Button color="default" variant="outlined" style={{ width: '100%' }}><PrinterOutlined /> Print Consumables</Button>
         </div>
 
 
-        <ConsumablesTables showModal={showModal}/>
+        <InpatientConsumablesTable loadingGetPgOpenPatientConsumables={loadingGetPgOpenPatientConsumables} consumables={consumables}/>
 
 
-        <Modal title="Consumables" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title="Consumables" 
+        open={isModalOpen} onOk={handleOk} 
+        onCancel={handleCancel}
+        okText={isEditMode ? 'Update Consumables' : 'Post Consumables'}
+        okButtonProps={{ loading: loadingPostConsumables }}
+        >
             <Form
             
-            layout="vertical" 
+                layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
+                onFinish={handleOnFinish}
+                initialValues={{
+                  location: '',
+                  quantity: '',
+                  remarks: '',
+                }}
             >
-
-            <Form.Item
-            label="Date Administered"
-            name="dateAdministered"
-            >
-              <DatePicker style={{ width: '100%'}} placeholder="Select Date Administered" />
-
-            </Form.Item>
 
             <Form.Item 
-                label="Item Name" 
-                name="itemName"
-                rules={[{ required: true, message: 'Please select an item!' }]}
+                label="Location" 
+                name="location"
+                rules={[{ required: true, message: 'Please select location!' }]}
               >
               <Select
                 style={{ width: '100%' }}
                 placeholder="Select Item"
                 allowClear
                 showSearch
-              >
-                <Select.Option value="option1">Item 1</Select.Option>
-                <Select.Option value="option2">Item 2</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item 
-                label="Transaction Code" 
-                name="transactionCode"
-                rules={[{ required: true, message: 'Please select an item!' }]}
-              >
-              <Select
-                style={{ width: '100%' }}
-                placeholder="Select Transaction Code"
-                allowClear
-                showSearch
-              >
-                <Select.Option value="option1">Code 1</Select.Option>
-                <Select.Option value="option2">Code 2</Select.Option>
-              </Select>
-            </Form.Item>
-            <Form.Item 
-                label="Store" 
-                name="store"
-                rules={[{ required: true, message: 'Please select store!' }]}
-              >
-              <Select
-                style={{ width: '100%' }}
-                placeholder="Select Store"
-                allowClear
-                showSearch
-              >
-                <Select.Option value="option1">Main Store</Select.Option>
-                <Select.Option value="option2">Braeside Store</Select.Option>
-              </Select>
+                options={qyLocations?.map((item) => ({
+                  value: item.Code,
+                  label: item.Name,
+                }))}
+              />
             </Form.Item>
             <Form.Item 
                 label="Quantity" 
@@ -107,8 +162,8 @@ const Consumables = () => {
             </Form.Item>
 
             <Form.Item 
-            label="Consumables Remarks" 
-            name="consumablesRemarks"
+            label="Remarks" 
+            name="remarks"
             rules={[
               {
                   validator: (_, value) => {

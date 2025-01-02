@@ -8,61 +8,38 @@ const columns = [
             key: 'drugName',
         },
         {
-          title: 'Dosage',
-          dataIndex: 'dosage',
-          key: 'dosage',
+          title: 'Quantity',
+          dataIndex: 'quantity',
+          key: 'quantity',
         },
         {
-          title: 'Frequency',
-          dataIndex: 'frequency',
-          key: 'frequency',
+          title: 'Quantity Issued',
+          dataIndex: 'quantityIssued',
+          key: 'quantityIssued',
         },
         {
-            title: 'Route',
-            dataIndex: 'route',
-            key: 'route',
+            title: 'Remaining Quantity',
+            dataIndex: 'remainingQuantity',
+            key: 'remainingQuantity',
+           
         },
         {
-          title: 'Duration',
-          dataIndex: 'duration',
-          key: 'duration',
+          title: 'Remarks',
+          dataIndex: 'remarks',
+          key: 'remarks',
         },
-        {
-            title: 'Prescribed By',
-            dataIndex: 'prescribedBy',
-            key: 'prescribedBy',
-        },
-        {
-          title: 'Status',
-          key: 'status',
-          render: (_, record) => (
-            <Space>
-                <Badge status="processing" text={record.status} />
-            </Space>
-          ),
-        },
+        
+        
       ];
       
       const data = [
         {
           key: '1',
-          drugName: 'Paracetamol',
-          dosage: '500mg',
-          frequency: 'Twice a day',
-          route: 'Oral',
-          duration: '3 days',
-          prescribedBy: 'Dr. John Doe',
-          status: 'Pending',
-        },
-        {
-          key: '2',
-          drugName: 'Ibuprofen',
-          dosage: '200mg',
-          frequency: 'Once a day',
-          route: 'Oral',
-          duration: '5 days',
-          prescribedBy: 'Dr. Jane Doe',
-          status: 'Processed',
+          drugName: 'Drug 1',
+          quantity: '10',
+          quantityIssued: '5',
+          remainingQuantity: '5',
+          remarks: 'Remarks 1',
         }
     ];
   return (

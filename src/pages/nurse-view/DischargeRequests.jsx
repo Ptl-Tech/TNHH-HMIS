@@ -1,93 +1,155 @@
-import { Button, Card, DatePicker, Form, Input, Modal, Space, Table, Typography } from "antd";
+import { Button, Card, Input, Space, Table, Typography, Modal, message } from "antd";
 import { ProfileOutlined } from "@ant-design/icons";
-import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { getPgInpatientDischargeRequestsSlice } from "../../actions/nurse-actions/getPgInpatientDischargeRequestsSlice";
+import { listDoctors } from "../../actions/DropdownListActions";
+import Loading from "../../partials/nurse-partials/Loading";
+import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../actions/nurse-actions/postInitiateDischargeSlice";
 
 const DischargeRequests = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState(null);
-
-    const [ form ] = Form.useForm();
-    const showModal = (record) => {
-        setSelectedRecord(record);
-        setIsModalOpen(true);
-    };
-
-    const handleOk = async () => {
-        const formData = await form.validateFields();
-        console.log(selectedRecord);
-    //   setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-      form.resetFields();
-      setIsModalOpen(false);
-    };
-
+    
     const columns = [
         {
-            title: 'Discharge No',
-            dataIndex: 'dischargeNo',
-            key: 'dischargeNo',
-        },
-        {
-            title: 'Patient No',
-            dataIndex: 'patientNo',
-            key: 'patientNo',
+            title: 'Admission No',
+            dataIndex: 'AdmissionNo',
+            key: 'AdmissionNo',
+            fixed: 'left',
+            width: 100
         },
         {
             title: 'Patient Names',
-            dataIndex: 'names',
-            key: 'names',
+            dataIndex: 'Search_Name',
+            key: 'Search_Name',
             render: (_, record) => {
-                return <Button type="link" onClick={() => showModal(record)} style={{ color: '#0f5689' }}>
-                    {record.names}
-                </Button>
+                return <Typography.Text style={{ color: '#0f5689' }}>
+                    {record.Search_Name}
+                </Typography.Text>
             }
         },
         {
-            title: 'Discharge Date',
-            dataIndex: 'dischargeDate',
-            key: 'dischargeDate',
+            title: 'Admission Date',
+            dataIndex: 'AdmissionDate',
+            key: 'AdmissionDate',
         },
         {
-            title: 'Treatment Type',
-            dataIndex: 'treatmentType',
-            key: 'treatmentType',
+            title: 'Ward',
+            dataIndex: 'Ward',
+            key: 'Ward',
+           
+        },
+        {
+            title: 'Bed',
+            dataIndex: 'Bed',
+            key: 'Bed',
            
         },
         {
             title: 'Doctor',
-            dataIndex: 'doctor',
-            key: 'doctor',
+            dataIndex: 'DoctorName',
+            key: 'DoctorName',
+        },
+        {
+            title: 'Admission Reason',
+            dataIndex: 'AdmissionReason',
+            key: 'AdmissionReason',
         },
         {
             title: 'Action',
             dataIndex: 'action',
             key: 'action',
+            fixed: 'right',
+            width: 150,
             render: (_, record) => {
-                return <Button type="primary" onClick={() => showModal(record)}>Discharge</Button>
+                return <Button type="primary" onClick={() => handleInitiateDischarge(record)}>Initiate Discharge</Button>
             }
         }
     ];
 
-    const dataSource =[
-        {
-            dischargeNo: '12345',
-            patientNo: '12345',
-            names: 'John Doe',
-            dischargeDate: '2023-07-15',
-            treatmentType: 'General',
-            doctor: 'Dr. Smith',
-        },
-        {
-            dischargeNo: '12345',
-            patientNo: '12345',
-            names: 'John Doe',
-            dischargeDate: '2023-07-15',
-            treatmentType: 'General',
-            doctor: 'Dr. Smith',
-        },
-    ]
+    const {loadingGetInpatientDischargeRequests, getInpatientDischargeRequest} = useSelector(state => state.getPgInpatientDischargeRequests);
+    const dispatch = useDispatch();
+    const { loading, data } = useSelector(state => state.getDoctorsList);
+    const { confirm } = Modal;
+
+    const formattedDoctorDetails = data.map(doctor => {
+        return {
+            DoctorID: doctor.DoctorID,
+            DoctorsName: doctor.DoctorsName,
+        }
+    });
+
+    const formattedPatientDischargeRequests = getInpatientDischargeRequest.map(discharge => {
+        const matchDoctorName = formattedDoctorDetails.find(doctor => doctor.DoctorID === discharge.Doctor);
+        return {
+            ...discharge,
+            DoctorName: matchDoctorName?.DoctorsName
+        }
+        
+    });
+
+    const [pagination, setPagination] = useState({
+            current: 1,
+            pageSize: 10,
+            total: formattedPatientDischargeRequests?.length,
+        });
+              
+    const handleTableChange = (newPagination) => {
+        setPagination(newPagination); // Update pagination settings
+    };
+
+    const handleInitiateDischarge = (record) => {
+        confirm({
+            title: 'Confirm Initiate Discharge',
+            content: `Are you sure you want to initiate discharge for ${record?.Search_Name} ?`,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk(){
+                return new Promise((resolve, reject) => {
+                    handleInitiateDischargeAction(record)
+                    .then(resolve) // Resolve the modal when successful
+                    .catch(reject); // Reject on failure
+                });
+            },
+        })
+    }
+
+    const handleInitiateDischargeAction = async (record) => {
+        try {
+            const result = await dispatch(
+              postInitiateDischargeSlice('/Inpatient/InitiateDischarge', {
+                admissionNo: record?.AdmissionNo,
+              })
+            );
+        
+            if (result.type === POST_INITIATE_DISCHARGE_SUCCESS) {
+              message.success(
+                result.payload.message || `${record?.Search_Name} discharge initiated successfully!`
+              );
+              dispatch(getPgInpatientDischargeRequestsSlice());
+              return Promise.resolve(); // Resolve the Promise to close the modal
+            } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
+              message.error(
+                result.payload.message || 'An error occurred while initiating patient discharge, please try again.'
+              );
+              return Promise.reject(); // Reject the Promise to keep the modal open
+            }
+          } catch (error) {
+            message.error(error.message || 'Unexpected error occurred');
+            return Promise.reject(); // Reject on unexpected errors
+          }
+    }
+
+    useEffect(() => {
+        if(!getInpatientDischargeRequest?.length)
+            dispatch(getPgInpatientDischargeRequestsSlice());
+    }, [dispatch, getInpatientDischargeRequest?.length]);
+
+    useEffect(() => {
+        if(!data.length) {
+            dispatch(listDoctors());
+        }
+    }, [dispatch, data.length]);
 
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
@@ -121,74 +183,36 @@ const DischargeRequests = () => {
               </div>
           </Card>      
            
-        <Table 
-        columns={columns} 
-        dataSource={dataSource} 
-        className="admit-patient-table"
-        bordered size='middle' 
-        />
-            
-          {/* modal contents */}
+        {
+            loadingGetInpatientDischargeRequests || loading ? 
 
-        <Modal title="Patient Discharge Requests" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} okText="Submit">
-                <Form layout="vertical" 
-                style={{ paddingTop: '10px'}} 
-                form={form}
-                initialValues={
-                    {
-                        dateOfDischargeRequest: null,
-                        dischargeReason: '',
-                        dischargeRemarks: '',
-                    }
-                }
-                >
-                    <Form.Item 
-                        label="Date of Discharge Request" 
-                        name="dateOfDischargeRequest"
-                        rules={[{ required: true, message: 'Please enter the date of discharge request!' }]}
-                    >
-                        <DatePicker style={{ width: '100%'}}
-                        />
-                    </Form.Item>
-                    <Form.Item 
-                        label="Reason of Discharge Request" 
-                        name="dischargeReason"
-                        rules={[
-                            { required: true, message: 'Please enter the discharge reason!' },
-                            {
-                                validator: (_, value) => {
-                                  if (value && value.length > 100) {
-                                    return Promise.reject(new Error('Discharge reason cannot exceed 150 characters!'));
-                                  }
-                                  return Promise.resolve();
-                                },
-                            }
-                        ]}
-                    >
-                        
-                        <Input placeholder="Discharge Reason" 
-                        />
-                    </Form.Item>
-                    <Form.Item 
-                        label="Discharge Remarks" 
-                        name="dischargeRemarks"
-                        rules={[
-                            {
-                                validator: (_, value) => {
-                                  if (value && value.length > 200) {
-                                    return Promise.reject(new Error('Discharge remarks cannot exceed 150 characters!'));
-                                  }
-                                  return Promise.resolve();
-                                },
-                            }
-                        ]}
-                    >
-                        <TextArea placeholder="Discharge Remarks" name="dischargeRemarks"
-                            rows={3}
-                        />
-                    </Form.Item>
-                </Form>
-        </Modal>
+            <Loading /> 
+
+            :
+
+            <Table 
+            rowKey="SystemId"
+            scroll={{ x: 'max-content' }}
+            columns={columns} 
+            dataSource={formattedPatientDischargeRequests} 
+            className="admit-patient-table"
+            bordered size='middle' 
+            pagination={{
+            ...pagination,
+            total: formattedPatientDischargeRequests?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+            onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+            style: {
+                marginTop: '30px',
+            }
+            }}
+        />
+        }
+            
     </div>
   )
 }

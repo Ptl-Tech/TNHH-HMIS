@@ -1,7 +1,9 @@
 import { Button, Table } from "antd"
 import PropTypes from "prop-types"
+import Loading from "../../../../partials/nurse-partials/Loading"
+import { useState } from "react"
 
-const ConsumablesTables = ({ showModal }) => {
+const ConsumablesTables = ({ showModal, loadingGetPatientConsumables, getPatientConsumables }) => {
     const columns = [
     
         {
@@ -41,24 +43,41 @@ const ConsumablesTables = ({ showModal }) => {
           render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
         }
       ]
-    
-      const data = [
-        {
-          key: '1',
-          dateAdministered: '12/12/2021',
-          itemName: 'Paracetamol',
-          transactionCode: 'Code 1',
-          store: 'Main Store',
-          quantity: '1',
-          remarks: 'Delivered by Nurse Jane',
-          date: '12/12/2021',
-          action: 'View',
-          
-        },
-      ]
+
+      const [pagination, setPagination] = useState({
+              current: 1,
+              pageSize: 10,
+              total: getPatientConsumables?.length,
+          });
+                
+          const handleTableChange = (newPagination) => {
+              setPagination(newPagination); // Update pagination settings
+          };
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+         {
+          loadingGetPatientConsumables ? (
+                <Loading />
+            ) : (
+                <Table columns={columns} 
+                dataSource={getPatientConsumables} 
+                bordered size='middle' 
+              pagination={{
+                ...pagination,
+                total: getPatientConsumables?.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                position: ['bottom', 'right'],
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                style: {
+                    marginTop: '30px',
+                }
+            }}
+                />
+            )
+         }
     </div>
   )
 }
@@ -67,5 +86,7 @@ export default ConsumablesTables
 
 //props validation
 ConsumablesTables.PropTypes = {
-    showModal: PropTypes.func
+    showModal: PropTypes.func.isRequired,
+    loadingGetPatientConsumables: PropTypes.bool.isRequired,
+    getPatientConsumables: PropTypes.array.isRequired,
 }

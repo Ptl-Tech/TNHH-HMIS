@@ -4,32 +4,27 @@ import PropTypes from "prop-types";
 const DiagnosisTable = ({ showModal }) => {
     const columns = [
         {
-            title: 'Diagnosis Type',
-            dataIndex: 'diagnosisType',
-            key: 'diagnosisType',
+            title: 'Injection Date',
+            dataIndex: 'date',
+            key: 'date',
           },
         {
-          title: 'Diagnosis',
-          dataIndex: 'diagnosis',
-          key: 'diagnosis',
+          title: 'Injection',
+          dataIndex: 'injection',
+          key: 'injection',
         },
+        
         {
-          title: 'Date',
-          dataIndex: 'date',
-          key: 'date',
-        },
-        {
-          title: 'Diagnosed By',
-          dataIndex: 'diagnosedBy',
-          key: 'diagnosedBy',
+          title: 'Remarks',
+          dataIndex: 'remarks',
+          key: 'remarks',
         },
         {
           title: 'Action',
           key: 'action',
           render: (_, record) => (
             <Space>
-                <Button type="primary" variant="outlined" onClick={() => showModal()}>Edit</Button>
-                <Button  color="danger" variant="outlined">Delete</Button>
+                <Button type="primary" variant="outlined" onClick={() => showModal()}>View</Button>
             </Space>
           ),
         },
@@ -38,10 +33,9 @@ const DiagnosisTable = ({ showModal }) => {
       const data = [
         {
           key: '1',
-          diagnosisType: 'Primary',
-          diagnosis: 'Headache',
+          injection: 'Headache',
           date: '2023-04-20',
-          diagnosedBy: 'Dr. John Doe',
+          remarks: 'Dr. John Doe',
         },
       ];
   return (

@@ -1,9 +1,9 @@
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, Space, Typography } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Select, Space, Typography } from "antd";
 import { useState } from "react";
 import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons";
 import DoctorPrescriptionsTable from "../tables/nurse-tables/DoctorPrescriptionsTable";
 
-const DoctorPrescriptions = () => {
+const Prescriptions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
           const showModal = () => {
             setIsModalOpen(true);
@@ -22,7 +22,7 @@ const DoctorPrescriptions = () => {
       <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
           <ProfileOutlined />
           <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Doctor Prescriptions
+              Prescriptions
           </Typography.Text>
         </Space>
 
@@ -34,7 +34,12 @@ const DoctorPrescriptions = () => {
         <DoctorPrescriptionsTable showModal={showModal} />
 
 
-        <Modal title="Doctor Prescriptions" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title="Prescriptions" 
+         open={isModalOpen}
+         onOk={handleOk}
+         onCancel={handleCancel}
+         okText= "Save Prescription"
+         >
         <Form
             layout="vertical" 
             style={{ paddingTop: '10px'}} 
@@ -49,61 +54,13 @@ const DoctorPrescriptions = () => {
                     rules={[{ required: true, message: 'Please select a drug name!' }]}
                     hasFeedback
                     >
-                    <Select placeholder="Select a category">
+                    <Select placeholder="Drug Name">
                         <Select.Option value="General">Drug 1</Select.Option>
                         <Select.Option value="Allergy">Drug 2</Select.Option> 
                     </Select>
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item label="Dosage"
-                    name="dosage"
-                    rules={[{ required: true, message: 'Please enter a dosage!' }]}
-                    hasFeedback
-                    >
-                        <Input placeholder="Enter dosage" 
-                        />
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Route" 
-                name="route"
-                rules={[{ required: true, message: 'Please select a route!' }]}
-                hasFeedback
-                >
-                  <Select placeholder="Select a route">
-                      <Select.Option value="General">Oral</Select.Option>
-                      <Select.Option value="Allergy">Intravenous</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Frequency" 
-                name="frequency"
-                rules={[{ required: true, message: 'Please select a frequency!' }]}
-                hasFeedback
-                >
-                  <Select placeholder="Select a frequency">
-                    <Select.Option value="General">Once a day</Select.Option>
-                    <Select.Option value="Allergy">Twice a day</Select.Option>
-                  </Select>
-              </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-              <Col span={12}>
-              <Form.Item label="Duration"
-              name="duration"
-              rules={[{ required: true, message: 'Please select a duration!' }]}
-              hasFeedback
-              >
-                <Input placeholder="Enter duration" type="number" />
-              </Form.Item>
-              </Col>
-              <Col span={12}>
                 <Form.Item label="Quantity"
                 name="quantity"
                 rules={[{ required: true, message: 'Please enter a quantity!' }]}
@@ -115,28 +72,28 @@ const DoctorPrescriptions = () => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-              <Form.Item label="Start Date" 
+              <Form.Item label="Actual Quantity issued" 
               rules={[{ required: true, message: 'Please select a start date!' }]}
               name="startDate"
               hasFeedback
               >
-                <DatePicker type='text' placeholder="Enter date" style={{ width: '100%' }}/>
+                <Input type='text' placeholder="Actual Quantity issued" />
                   
               </Form.Item>
               </Col>
               <Col span={12}>
-              <Form.Item label="End Date"
+              <Form.Item label="Remaining Quantity"
               rules={[{ required: true, message: 'Please select an end date!' }]}
               name="endDate"
               hasFeedback
               >
-                <DatePicker type='text' placeholder="Enter date" style={{ width: '100%' }}/>
+                <Input type='text' placeholder="Remaining Quantity" />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={24}>
-              <Form.Item label="Instructions" name="instructions"
+              <Form.Item label="Remarks" name="instructions"
               rules={[{ required: true, message: 'Please enter instructions!' }]}
               hasFeedback
               >
@@ -153,4 +110,4 @@ const DoctorPrescriptions = () => {
   )
 }
 
-export default DoctorPrescriptions
+export default Prescriptions

@@ -88,6 +88,25 @@ import { postDietaryIntakeFormLineReducer } from "./nurse-reducers/postDietaryIn
 import { getQyDietaryFormLineReducer } from "./nurse-reducers/getQyIPDietaryFormLinesReducer";
 import { postJacksonVisualFormReducer } from "./nurse-reducers/postJacksonVisualFormReducer";
 import { getJacksonVisualFormReducer } from "./nurse-reducers/getJacksonVisualFormReducer";
+import { postNurseAdmissionNotesReducer } from "./nurse-reducers/postNurseAdmissionNotesReducer";
+import { getNurseAdmissionNotesReducer } from "./nurse-reducers/getNurseAdmissionNotesReducer";
+import { getPgTreatmentDoctorNotesReducer } from "./nurse-reducers/getPgTreatmentDoctorsNotesReducer";
+import { getPatientConsumablesReducer } from "./nurse-reducers/getPatientConsumablesReducer";
+import { getQyLocationsReducer } from "./nurse-reducers/getQyLocationsReducer";
+import { postPatientConsumablesReducer } from "./nurse-reducers/postPatientConsumablesReducer";
+import { postPatientAdmissionReducer } from "./nurse-reducers/postPatientAdmissionReducer";
+import { postRequestPatientAdmissionReducer } from "./nurse-reducers/postRequestPatientAdmissionReducer";
+import { getPgAdmissionsVerifiedReducer } from "./nurse-reducers/getPgAdmissionsVerifiedReducer";
+import { getPgInpatientDischargeRequestsReducer } from "./nurse-reducers/getPgInpatientDischargeRequestsReducer";
+import { getPgInpatientDischargeListReducer } from "./nurse-reducers/getPgInpatientDischargeListReducer";
+import { getPgOpenPatientConsumablesReducer } from "./nurse-reducers/getPgOpenPatientConsumablesReducer";
+import { postInitiateDischargeReducer } from "./nurse-reducers/postInitiateDischargeReducer";
+import { postPostDischargeReducer } from "./nurse-reducers/postPostDischargeReducer";
+import { postCancelDischargeReducer } from "./nurse-reducers/postCancelDischargeReducer";
+import { postReleaseBedReducer } from "./nurse-reducers/postReleaseBedReducer";
+import { getPgAdmissionPendingVerificationReducer } from "./nurse-reducers/getPgAdmissionsPendingVerificationReducer";
+import { postVerifyAdmissionReducer } from "./nurse-reducers/postVerifyAdmissionReducer";
+import { postCancelAdmissionReducer } from "./nurse-reducers/postCancelAdmissionReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -174,6 +193,25 @@ export const rootReducer = combineReducers({
   postDietaryIntakeFormLine:postDietaryIntakeFormLineReducer,
   getQyDietaryFormLine:getQyDietaryFormLineReducer,
   postJacksonVisualForm:postJacksonVisualFormReducer,
-  getJacksonVisualForm:getJacksonVisualFormReducer
+  getJacksonVisualForm:getJacksonVisualFormReducer,
+  postNurseAdmissionNotes:postNurseAdmissionNotesReducer,
+  getNurseAdmissionNotes:getNurseAdmissionNotesReducer,
+  getPgTreatmentDoctorNotes:getPgTreatmentDoctorNotesReducer,
+  postPatientConsumables:postPatientConsumablesReducer,
+  getPatientConsumables:getPatientConsumablesReducer,
+  getQyLocations:getQyLocationsReducer,
+  postPatientAdmission:postPatientAdmissionReducer,
+  postRequestPatientAdmission:postRequestPatientAdmissionReducer,
+  getPgAdmissionVerified:getPgAdmissionsVerifiedReducer,
+  getPgInpatientDischargeRequests:getPgInpatientDischargeRequestsReducer,
+  getPgInpatientDischargeList:getPgInpatientDischargeListReducer,
+  getPgOpenPatientConsumables:getPgOpenPatientConsumablesReducer,
+  postInitiateDischarge:postInitiateDischargeReducer,
+  postPostDischarge:postPostDischargeReducer,
+  postCancelDischarge:postCancelDischargeReducer,
+  postReleaseBed:postReleaseBedReducer,
+  getPgAdmissionsPendingVerification:getPgAdmissionPendingVerificationReducer,
+  postVerifyAdmission:postVerifyAdmissionReducer,
+  postCancelAdmission:postCancelAdmissionReducer
 
 });

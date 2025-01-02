@@ -1,7 +1,8 @@
 import { Button, Space, Table } from "antd"
 import PropTypes from "prop-types"
+import { useState } from "react"
 
-const VitalsTable = ({ showModal }) => {
+const VitalsTable = ({ rowSelection }) => {
   const columns = [
     {
       title: 'Pulse Rate',
@@ -28,16 +29,6 @@ const VitalsTable = ({ showModal }) => {
       dataIndex: 'temperature',
       key: 'temperature',
     },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-          <Space size="middle">
-              <Button type="primary" onClick={() => showModal()}>Edit</Button>
-              <Button color="danger" variant="outlined">Delete</Button>
-          </Space>
-      ),
-    }
 
   ]
 
@@ -51,10 +42,12 @@ const VitalsTable = ({ showModal }) => {
       temperature: '36.5°C'
     }
   ]
-   
+ 
   return (
     <div style={{ paddingTop: '30px' }}>
-        <Table columns={columns} dataSource={data} />
+        <Table columns={columns} dataSource={data} 
+        rowSelection={rowSelection}
+        />
     </div>
   )
 }
@@ -62,5 +55,5 @@ const VitalsTable = ({ showModal }) => {
 export default VitalsTable
 //props types validations
 VitalsTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
+    rowSelection: PropTypes.object.isRequired
 }

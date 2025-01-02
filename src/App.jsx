@@ -61,6 +61,8 @@ import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 import DischargeList from "./pages/nurse-view/DischargeList";
 import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
 import RadiologyOutPatient from "./pages/doctorsViews/tables/Radiology/RadiologyOutPatient";
+import ViewDoctorNotes from "./pages/nurse-view/nurse-patient-file/ViewDoctorNotes";
+import PostedConsumables from "./pages/nurse-view/PostedConsumables";
 function App() {
   return (
     <Routes>
@@ -104,6 +106,8 @@ function App() {
 
           <Route path="Discharge-requests" element={<DischargeRequests />} />
 
+          <Route path="Inpatient/Doctor-Notes" element={<ViewDoctorNotes />} />
+
           <Route
             path="Ward-management/Transfer-bed"
             element={<TransferBed />}
@@ -116,6 +120,8 @@ function App() {
           <Route path="BedManagement" element={<BedManager />} />
 
           <Route path="Discharge-list" element={<DischargeList />} />
+          <Route path="Discharge-list/Posted-Consumables" element={<PostedConsumables />} />
+
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>

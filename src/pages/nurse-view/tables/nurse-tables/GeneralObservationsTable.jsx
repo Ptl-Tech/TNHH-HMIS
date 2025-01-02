@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 const GeneralObservationsTable = ({ showModal }) => {
     const columns = [
         {
-          title: 'Date',
-          dataIndex: 'date',
-          key: 'date',
+          title: 'Process',
+          dataIndex: 'process',
+          key: 'process',
         },
         {
           title: 'Time',
@@ -14,22 +14,16 @@ const GeneralObservationsTable = ({ showModal }) => {
           key: 'time',
         },
         {
-          title: 'Observation',
-          dataIndex: 'observation',
-          key: 'observation',
-        },
-        {
-          title: 'Value',
-          dataIndex: 'value',
-          key: 'value',
+          title: 'Remarks',
+          dataIndex: 'remarks',
+          key: 'remarks',
         },
         {
           title: 'Action',
           key: 'action',
           render: (_, record) => (
             <Space size="middle">
-              <Button type="primary" onClick={() => showModal()}>Edit</Button>
-              <Button color="danger" variant="outlined">Delete</Button>
+              <Button type="primary" onClick={() => showModal()}>View</Button>
             </Space>
           ),
         },
@@ -38,17 +32,16 @@ const GeneralObservationsTable = ({ showModal }) => {
       const data = [
         {
           key: '1',
+          process: 'Patient is feeling better',
           date: '2023-07-25',
           time: '10:00 AM',
-          observation: 'Patient is feeling better',
-          value: 'Normal',
+          remarks: 'Normal',
         },
         {
           key: '2',
-          date: '2023-07-26',
+          process: 'Patient is feeling better',
           time: '11:00 AM',
-          observation: 'Patient is feeling better',
-          value: 'Normal',
+          remarks: 'Normal',
         },
       ];
   return (

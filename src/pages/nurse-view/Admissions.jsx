@@ -1,4 +1,4 @@
-import { Button, Card, DatePicker, Form, Input, Space, Table, Typography } from "antd"
+import { Button, Card, DatePicker, Form, Input, message, Space, Table, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
 import Modal from "antd/es/modal/Modal";
 import { useEffect, useState } from "react";
@@ -8,6 +8,9 @@ import { getConsultationRoomListSlice } from "../../actions/nurse-actions/getCon
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
+import useAuth from "../../hooks/useAuth";
+import { POST_PATIENT_ADMISSION_FAILURE, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmissionSlice } from "../../actions/nurse-actions/postPatientAdmissionSlice";
+import { POST_REQUEST_PATIENT_ADMISSION_FAILURE, POST_REQUEST_PATIENT_ADMISSION_SUCCESS, postRequestPatientAdmissionSlice } from "../../actions/nurse-actions/postRequestPatientAdmissionSlice";
 const Admissions = () => {
 
     
@@ -33,11 +36,6 @@ const Admissions = () => {
             }
         },
         {
-            title: 'Treatment Date',
-            dataIndex: 'treatmentDate',
-            key: 'treatmentDate',
-        },
-        {
             title: 'Treatment Type',
             dataIndex: 'treatmentType',
             key: 'treatmentType',
@@ -53,22 +51,58 @@ const Admissions = () => {
             dataIndex: 'action',
             key: 'action',
             render: (_, record) => {
-                return <Button type="primary" onClick={() => showModal(record)}>Admission</Button>
+                return <Button type="primary" onClick={() => showModal(record)}>Place Admission Request</Button>
             }
         }
     ];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const { loadingAdmission } = useSelector(state => state.postPatientAdmission);
+
 
     const [ form ] = Form.useForm();
+    const userDetails = useAuth();
     const showModal = (record) => {
         setSelectedRecord(record);
         setIsModalOpen(true);
     };
     const handleOk = async () => {
         const formData = await form.validateFields();
-        console.log(selectedRecord);
+        const { admissionRemarks, dateOfAdmission } = formData;
+        const admissionDetails = {
+            admissionReason: admissionRemarks,
+            dateOfAdmission: dateOfAdmission.format('YYYY-MM-DD'),
+            treatmentNo: selectedRecord?.treatmentNo,
+            myAction: "create",
+            staffNo: userDetails.userData.no
+        }
+        if(formData && selectedRecord) {
+            // dispatch action to save admission details
+            await dispatch(postPatientAdmissionSlice('/Doctor/PatientAdmission', admissionDetails)).then((res) => {
+                if(res.type === POST_PATIENT_ADMISSION_SUCCESS) {
+
+                    dispatch(postRequestPatientAdmissionSlice('/Doctor/RequestPatientAdmission',{treatmentNo: selectedRecord?.treatmentNo, staffNo: userDetails.userData.no})).then((res) => {
+                        if(res.type === POST_REQUEST_PATIENT_ADMISSION_SUCCESS) {
+                            message.success(res.payload.message || 'Admission request placed successfully');
+                        }else if(res.type === POST_REQUEST_PATIENT_ADMISSION_FAILURE) {
+                            message.error(res.payload.message || 'Error placing admission request');
+                        }
+                    }).catch((err) => {
+                        message.error(err.message || "Internal server error, please try again later.");
+                    });
+                    message.success('Admission request placed successfully');
+                    
+                }else if(res.type === POST_PATIENT_ADMISSION_FAILURE) {
+                    message.error('Error placing admission request');
+                }
+            }).then(() => {
+                setIsModalOpen(false);
+                form.resetFields();
+            }).catch((err) => {
+                message.error(err.message || "Internal server error, please try again later.");
+            });
+        }
     //   setIsModalOpen(false);
     };
     const handleCancel = () => {
@@ -126,7 +160,6 @@ const Admissions = () => {
         treatmentNo: item.TreatmentNo,
         patientNo: item.PatientNo,
         names: item.SearchName,
-        treatmentDate: item.TreatmentDate,
         treatmentType: item.TreatmentType,
         doctor: item.DoctorsName,
     })).sort((a, b) => {
@@ -175,7 +208,7 @@ const Admissions = () => {
         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
             <ProfileOutlined />
             <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Admissions
+                Place Admission Request
             </Typography.Text>
           </Space>
 
@@ -230,14 +263,18 @@ const Admissions = () => {
         
           {/* modal contents */}
 
-        <Modal title="Patient Admissions" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} okText="Submit">
+            <Modal 
+                title="Patient Admissions" 
+                open={isModalOpen} onOk={handleOk} 
+                onCancel={handleCancel} 
+                okText="Place Admission Request">
                 <Form layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
+                okButtonProps={{ loading: loadingAdmission }}
                 initialValues={
                     {
                         dateOfAdmission: null,
-                        admissionReason: '',
                         admissionRemarks: '',
                     }
                 }
@@ -246,32 +283,15 @@ const Admissions = () => {
                         label="Date of Admission" 
                         name="dateOfAdmission"
                         rules={[{ required: true, message: 'Please enter the date of admission!' }]}
+                        hasFeedback
                     >
                         <DatePicker style={{ width: '100%'}}
                         />
                     </Form.Item>
                     <Form.Item 
-                        label="Admission Reason" 
-                        name="admissionReason"
-                        rules={[
-                            { required: true, message: 'Please enter the admission reason!' },
-                            {
-                                validator: (_, value) => {
-                                  if (value && value.length > 100) {
-                                    return Promise.reject(new Error('Admission reason cannot exceed 150 characters!'));
-                                  }
-                                  return Promise.resolve();
-                                },
-                            }
-                        ]}
-                    >
-                        
-                        <Input placeholder="Admission Reason" 
-                        />
-                    </Form.Item>
-                    <Form.Item 
                         label="Admission Remarks" 
                         name="admissionRemarks"
+                        hasFeedback
                         rules={[
                             {
                                 validator: (_, value) => {

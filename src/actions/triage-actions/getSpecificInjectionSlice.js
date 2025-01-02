@@ -1,5 +1,5 @@
 
-import configHelpers  from '../../actions/configHelpers'
+import configHelpers  from '../configHelpers'
 import axios from "axios";
 
 export const GET_SPECIFIC_INJECTION_REQUEST = 'GET_SPECIFIC_INJECTION_REQUEST';

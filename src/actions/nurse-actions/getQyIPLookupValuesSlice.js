@@ -13,7 +13,7 @@ export const getQyIpLookupValuesSlice = () =>
     try {
         dispatch({ type: GET_QY_IP_LOOKUP_VALUES_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPLookupValues&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPFormLookupValues&isList=true`, config);
     
 
         dispatch({ type: GET_QY_IP_LOOKUP_VALUES_SUCCESS, payload: data });

@@ -2,12 +2,12 @@ import { Button, Divider } from 'antd'
 import { useState } from 'react'
 import AddAllergies from './nurse-care-plan/AddAllergies'
 import Vitals from './nurse-care-plan/Vitals'
-import GeneralObservations from './nurse-care-plan/GeneralObservations'
-import Diagnosis from './nurse-care-plan/Diagnosis'
-import DoctorPrescriptions from './nurse-care-plan/DoctorPrescriptions'
 import TreatmentsSheet from './nurse-care-plan/TreatmentsSheet'
 import ECTScan from './nurse-care-plan/ECTScan'
 import TCAAppointments from './nurse-care-plan/TCAAppointments'
+import DailyProcess from './nurse-care-plan/DailyProcess'
+import Injections from './nurse-care-plan/Injections'
+import Prescriptions from './nurse-care-plan/Prescriptions'
 
 const CarePlan = () => {
   const [selectedItem, setSelectedItem] = useState('Add Allergies')
@@ -19,14 +19,14 @@ const CarePlan = () => {
         case 'Vitals':
             setSelectedItem(<Vitals/>)
             break
-        case 'General Observations':
-            setSelectedItem(<GeneralObservations />)
+        case 'Daily Process / Procedures':
+            setSelectedItem(<DailyProcess />)
             break
-        case 'Diagnosis':
-            setSelectedItem(<Diagnosis />)
+        case 'Injections':
+            setSelectedItem(<Injections />)
             break
-        case 'Doctors Prescription':
-            setSelectedItem(<DoctorPrescriptions />)
+        case 'Prescriptions':
+            setSelectedItem(<Prescriptions />)
             break
         case 'Treatments Sheet':
             setSelectedItem(<TreatmentsSheet />)
@@ -46,11 +46,11 @@ const CarePlan = () => {
         <div style={{ display: 'flex', flex: 1, gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
             {
                 [
-                    'Add Allergies',
+                    'Allergies',
                     'Vitals',
-                    'General Observations',
-                    'Diagnosis',
-                    'Doctors Prescription',
+                    'Daily Process / Procedures',
+                    'Injections',
+                    'Prescriptions',
                     'Treatments Sheet',
                     'ECT',
                     'TCA / Appointments',
