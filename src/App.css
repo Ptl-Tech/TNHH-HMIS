@@ -10,7 +10,9 @@
   border-radius: 0 0 8px 8px;
 }
 
-
+.ant-menu-light, :where(.css-lobnjp).ant-menu-light>.ant-menu {
+  background-color: #0f5689 !important;
+}
 
 
 
