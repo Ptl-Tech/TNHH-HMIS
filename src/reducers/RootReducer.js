@@ -90,8 +90,16 @@ import { postAdmissionVerificationReducer } from "./doc-reducers/Admission/postA
 import { postAdmissionCancellationReducer } from "./doc-reducers/Admission/cancelPatientAdmissionReducer";
 import { getVerifiedAdmissionsReducer } from "./doc-reducers/Admission/getVerifiedAdmissionsReducer";
 import { getAdmittedPatientsReducer } from "./doc-reducers/Admission/getAdmittedPatients";
-import { getDischargeListReducer } from "./doc-reducers/Admission/getDischargeListReducer";
+import { getDischargeListReducer, getDischargeRequestListReducer } from "./doc-reducers/Admission/getDischargeListReducer";
 import { getPendingAdmissionListReducer } from "./doc-reducers/Admission/getPendingAdmissionListReducer";
+import { postInitiateInpatientDischargeReducer, postInpatientDischargeReducer } from "./doc-reducers/Admission/postInpatientDischarge";
+import { getAdmissionLinesReducer } from "./doc-reducers/Admission/getAdmissionLinesReducer";
+import { getDiagnosisLinesReducer } from "./doc-reducers/getDiagnosisLinesReducer";
+import { getReferralLinesReducer } from "./doc-reducers/getReferralLinesReducer";
+import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmacyRequests";
+import { postArchivePrescriptionReducer, postDrugIssuanceReducer } from "./pharmacy-reducers/postPharmacyReducers";
+import { getPatientPharmacyReturnLinesReducer, getPharmacyReturnLinesListReducer } from "./pharmacy-reducers/getPharmacyReturnLinesReducer";
+import { getPharmacyHistoryList } from "../actions/pharmacy-actions/getPharmacyHistoryList";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -182,6 +190,17 @@ export const rootReducer = combineReducers({
   getVerifiedAdmissionList:getVerifiedAdmissionsReducer,
   getAdmissionList:getAdmittedPatientsReducer,
   getDischargeList:getDischargeListReducer,
+  getDischargeListRequests:getDischargeRequestListReducer,
   getPendingAdmissions:getPendingAdmissionListReducer,
-
+  postInitiateDischarge:postInitiateInpatientDischargeReducer,
+  postInpatient:postInpatientDischargeReducer,
+  getAdmissionLines:getAdmissionLinesReducer,
+  getDiagnosisLines:getDiagnosisLinesReducer,
+  getReferralLines:getReferralLinesReducer,
+  getNewPharmacyList:getNewPharmacyRequestsReducer,
+  postDrugIssuance:postDrugIssuanceReducer,
+  postArchivePrescription:postArchivePrescriptionReducer,
+  getPharmacyReturnLinesList:getPharmacyReturnLinesListReducer,
+  getPatientPharmacyReturnLine:getPatientPharmacyReturnLinesReducer,
+getPharmacyHitoryList:getPharmacyHistoryList,
 });

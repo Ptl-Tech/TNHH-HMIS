@@ -1,8 +1,19 @@
-import { Button, Col, Form, Input, Row, Select } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Table,
+  Empty,
+  Card,
+  List,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { SaveOutlined, SendOutlined } from "@ant-design/icons";
+import { SaveOutlined, SearchOutlined, SendOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { getItemUnitsOfMeasureSlice } from "../../../actions/triage-actions/getItemUnitsOfMeasureSlice";
 import {
@@ -11,6 +22,11 @@ import {
 } from "../../../actions/Doc-actions/postPrescription";
 import { useLocation } from "react-router-dom";
 import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
+import {
+  prescriptionDoseTypes,
+  routeTypes,
+} from "../../../constants/DropDownConstants";
+import { useForm } from "antd/es/form/Form";
 
 const PrescriptionForm = () => {
   const location = useLocation();
@@ -26,6 +42,8 @@ const PrescriptionForm = () => {
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const form = useForm();
   const { items } = useSelector((state) => state.getItems);
 
   useEffect(() => {
@@ -35,6 +53,32 @@ const PrescriptionForm = () => {
   useEffect(() => {
     dispatch(getItemUnitsOfMeasureSlice());
   }, [dispatch]);
+
+  const [prescriptionCardData, setPrescriptionCardData] = useState({
+    DrugNo: "N/A",
+    Dosage: "N/A",
+    UnitOfMeasure: "N/A",
+    prescriptionDose: "N/A",
+    route: "N/A",
+    noOfDays: "N/A",
+    PrescriptionQuantity: "N/A",
+    PrescriptionRemarks: "N/A",
+  });
+
+  const onValuesChange = (changedValues, allValues) => {
+    // Update prescription card state with current form values
+    const updatedData = {
+      DrugNo: allValues.Prescriptions?.DrugNo || "N/A",
+      Dosage: allValues.Prescriptions?.Dosage || "N/A",
+      UnitOfMeasure: allValues.Prescriptions?.UnitOfMeasure || "N/A",
+      prescriptionDose: allValues.Prescriptions?.prescriptionDose || "N/A",
+      route: allValues.Prescriptions?.route || "N/A",
+      noOfDays: allValues.Prescriptions?.noOfDays || "N/A",
+      PrescriptionQuantity: allValues.Prescriptions?.PrescriptionQuantity || "N/A",
+      PrescriptionRemarks: allValues.Prescriptions?.PrescriptionRemarks || "N/A",
+    };
+    setPrescriptionCardData(updatedData);
+  };
 
   const onFinish = (values) => {
     const {
@@ -52,20 +96,24 @@ const PrescriptionForm = () => {
     const prescription = {
       myAction: "create",
       treatmentNo: treatmentNo, // Send treatmentNo to the backend
-      drugGroup: DrugGroup,
+      drugGroup: DrugNo,
       drugNo: DrugNo,
       quantity: PrescriptionQuantity,
       unitOfMeasure: UnitOfMeasure,
       dosage: Dosage,
       prescriptionDose: prescriptionDose,
-      noOfDays: 0,
-      route: 0,
+      noOfDays: noOfDays,
+      route: route,
       remarks: PrescriptionRemarks,
     };
 
     setIsSubmitting(true); // Start the loading simulation
 
     dispatch(postPrescriptionDetails(prescription)); // Dispatch the action
+  };
+  
+  const handleSearch = (value) => {
+    setSearchValue(value);
   };
 
   useEffect(() => {
@@ -79,125 +127,33 @@ const PrescriptionForm = () => {
     dispatch(sendtoPharmacy(treatmentNo));
   };
 
-  const prescriptionDoseTypes = [
-    {
-      value: "1",
-      label: "STAT",
-    },
-    {
-      value: "2",
-      label: "PRN",
-    },
-    {
-      value: "3",
-      label: "PD",
-    },
-    {
-      value: "4",
-      label: "TDS",
-    },
-    {
-      value: "5",
-      label: "OD",
-    },
-    {
-      value: "6",
-      label: "QID",
-    },
-    {
-      value: "7",
-      label: "QD",
-    },
-    {
-      value: "8",
-      label: "NOCTE",
-    },
-    {
-      value: "9",
-      label: "HOURLY",
-    },
-  ];
-  const routeTypes = [
-    {
-      value: "0",
-      label: "Oral",
-    },
-    {
-      value: "1",
-      label: "Intravenous(IV)",
-    },
-    {
-      value: "2",
-      label: "Rectal",
-    },
-    {
-      value: "3",
-      label: "Vaginal",
-    },
-    {
-      value: "4",
-      label: "Nasal",
-    },
-    {
-      value: "5",
-      label: "Subcutaneous(SC)",
-    },
-    {
-      value: "6",
-      label: "Intrathical",
-    },
-    {
-      value: "7",
-      label: "Intradermal",
-    },
-    {
-      value: "8",
-      label: "Intramuscular(IM)",
-    },
-    {
-      value: "9",
-      label: "Topical",
-    },
-  ];
-
   return (
-    <div>
-      <Form
-        layout="vertical"
-        validateTrigger="onChange"
-        onFinish={onFinish}
-        initialValues={{
-          Prescriptions: {
-            PrescriptionNo: treatmentNo, // Set PrescriptionNo to treatmentNo
-            PrescriptionQuantity: "",
-            PrescriptionRemarks: "",
-            DrugGroup: "",
-            DrugNo: "",
-            UnitOfMeasure: "",
-            Dosage: "",
-            prescriptionDose: "",
-            route: "",
-            noOfDays: "",
-            treatmentNo: treatmentNo, // Keep treatmentNo in initial values
-          },
-        }}
-        autoComplete="off"
-      >
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              label="Prescription No"
-              name={["Prescriptions", "PrescriptionNo"]} // Ensure name matches the initial value
-            >
-              <Input
-                name="PrescriptionNo"
-                value={treatmentNo} // Value is set to treatmentNo from URL
-                style={{ width: "100%", color: "green", fontWeight: "bold" }}
-                readOnly // Make it read-only so it can't be edited
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
+    <Row gutter={24}>
+      {/* drug input card */}
+      <Col span={16}>
+        <Card title="Prescription Form" style={{ padding: "10px 16px" }}>
+          <Form
+            layout="vertical"
+            validateTrigger="onChange"
+            onFinish={onFinish}
+            onValuesChange={onValuesChange}
+            initialValues={{
+              Prescriptions: {
+                PrescriptionNo: treatmentNo, // Set PrescriptionNo to treatmentNo
+                PrescriptionQuantity: "",
+                PrescriptionRemarks: "",
+                DrugGroup: "",
+                DrugNo: "",
+                UnitOfMeasure: "",
+                Dosage: "",
+                prescriptionDose: "",
+                route: "",
+                noOfDays: "",
+                treatmentNo: treatmentNo, // Keep treatmentNo in initial values
+              },
+            }}
+            autoComplete="off"
+          >
             <Form.Item
               label="Search Drug Name"
               name={["Prescriptions", "DrugNo"]}
@@ -208,152 +164,175 @@ const PrescriptionForm = () => {
                   message: "Please select a drug",
                 },
               ]}
+              className="w-100 my-2"
             >
               {items && (
-                <Select name="DrugNo" placeholder="Select Drug">
-                  {items.map((item) => (
-                    <Select.Option key={item.No} value={item.No}>
+                <Select
+                  name="DrugNo"
+                  placeholder="Select Drug e.g Paracetamol"
+                  showSearch
+                  suffixIcon={<SearchOutlined />}
+                  onSearch={handleSearch}
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
+                  notFoundContent={
+                    searchValue && items.length === 0 ? (
+                      <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description="No drugs found"
+                      />
+                    ) : null
+                  }
+                >
+                  {searchValue &&
+                    items.map((item) => (
+                      <Select.Option key={item.No} value={item.No}>
+                        {item.Description}
+                      </Select.Option>
+                    ))}
+                </Select>
+              )}
+            </Form.Item>
+            <div className="d-block d-flex align-items-center justify-content-between gap-2">
+              <Form.Item
+                label="Route"
+                name={["Prescriptions", "route"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a route",
+                  },
+                ]}
+                className="w-100"
+              >
+                <Select
+                  name="route"
+                  placeholder="Select Route e.g oral"
+                  className="w-100"
+                >
+                  {routeTypes &&
+                    routeTypes.map((item) => (
+                      <Select.Option key={item.value} value={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Dosage"
+                name={["Prescriptions", "Dosage"]}
+                placeholder="Enter Dosage e.g 1 tablet"
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter dosage",
+                  },
+                ]}
+                className="w-100"
+              >
+                <Input
+                  name="Dosage"
+                  className="w-100"
+                  placeholder="Enter Dosage e.g 1 tablet"
+                />
+              </Form.Item>
+            </div>
+            <div className="d-block d-flex align-items-center justify-content-between gap-2">
+              <Form.Item
+                label="Unit of Measure"
+                name={["Prescriptions", "UnitOfMeasure"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a unit of measure",
+                  },
+                ]}
+                className="w-100"
+              >
+                <Select
+                  name="UnitOfMeasure"
+                  placeholder="Select Unit e.g ml"
+                  className="w-100"
+                >
+                  {itemUnitsOfMeasure.map((item) => (
+                    <Select.Option key={item.Code} value={item.Code}>
                       {item.Description}
                     </Select.Option>
                   ))}
                 </Select>
-              )}
-            </Form.Item>
-          </Col> <Col span={8}>
-            <Form.Item
-              label="Drug Group"
-              name={["Prescriptions", "DrugGroup"]}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a drug group",
-                },
-              ]}
-            >
-              <Input name="DrugGroup" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>         
-          <Col span={8}>
-            <Form.Item
-              label="Prescription Quantity"
-              name={["Prescriptions", "PrescriptionQuantity"]}
-              hasFeedback
-              placeholder="Enter Prescription Quantity e.g 1"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter prescription quantity",
-                },
-              ]}
-            >
-              <Input type="number" name="PrescriptionQuantity" />
-            </Form.Item>
-          </Col> <Col span={8}>
-            <Form.Item
-              label="Unit of Measure"
-              name={["Prescriptions", "UnitOfMeasure"]}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a unit of measure",
-                },
-              ]}
-            >
-              <Select name="UnitOfMeasure" placeholder="Select Unit">
-                {itemUnitsOfMeasure.map((item) => (
-                  <Select.Option key={item.Code} value={item.Code}>
-                    {item.Description}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item
-              label="Dosage"
-              name={["Prescriptions", "Dosage"]}
-              placeholder="Enter Dosage e.g 1 tablet"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter dosage",
-                },
-              ]}
-            >
-              <Input name="Dosage" />
-            </Form.Item>
-          </Col>
-        </Row>
-        
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item
-              label="Frequency per Day"
-              name={["Prescriptions", "prescriptionDose"]}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a prescription dose",
-                },
-              ]}
-            >
-              <Select
-                name="prescriptionDose"
-                placeholder="Select Prescription Dose"
+              </Form.Item>
+              <Form.Item
+                label="Frequency per Day"
+                name={["Prescriptions", "prescriptionDose"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a prescription dose",
+                  },
+                ]}
+                className="w-100"
               >
-                {prescriptionDoseTypes.map((item) => (
-                  <Select.Option key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
+                <Select
+                  name="prescriptionDose"
+                  placeholder="Select Prescription Dose"
+                  className="w-100"
+                >
+                  {prescriptionDoseTypes &&
+                    prescriptionDoseTypes.map((item) => (
+                      <Select.Option key={item.value} value={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </div>
+            <div className="d-block d-flex align-items-center justify-content-between gap-2">
             <Form.Item
-              label="Route"
-              name={["Prescriptions", "route"]}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a route",
-                },
-              ]}
-            >
-              <Select name="route" placeholder="Select Route">
-                {routeTypes.map((item) => (
-                  <Select.Option key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col> <Col span={8}>
-            <Form.Item
-              label="No of Days"
-              name={["Prescriptions", "noOfDays"]}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter number of days",
-                },
-              ]}
-            >
-              <Input type="number" name="noOfDays" />
-            </Form.Item>
-          </Col>
-        </Row>
-       
-        <Row gutter={16}>
-          <Col span={12}>
+                label="Duration (No of Days)"
+                name={["Prescriptions", "noOfDays"]}
+                hasFeedback
+                placeholder="Enter No of Days e.g 1"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter no of days",
+                  },
+                ]}
+                className="w-100"
+              >
+                <Input
+                  type="number"
+                  name="noOfDays"
+                  className="w-100"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Prescription Quantity"
+                name={["Prescriptions", "PrescriptionQuantity"]}
+                hasFeedback
+                placeholder="Enter Prescription Quantity e.g 1"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter prescription quantity",
+                  },
+                ]}
+                className="w-100"
+              >
+                <Input
+                  type="number"
+                  name="PrescriptionQuantity"
+                  className="w-100"
+                />
+              </Form.Item>
+            </div>
+
             <Form.Item
               label="Prescription Remarks"
               name={["Prescriptions", "PrescriptionRemarks"]}
@@ -364,38 +343,63 @@ const PrescriptionForm = () => {
                 name="PrescriptionRemarks"
               />
             </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={savingPrescription}
-                disabled={isSubmitting}
-              >
-                <SaveOutlined />
-                Save Prescription
-              </Button>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item>
-              <Button
-                type="primary"
-                onClick={handleSendToPharmacy}
-                loading={pharmacyPosting}
-                disabled={!prescriptionSaved}
-              >
-                <SendOutlined />
-                Send to Pharmacy
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    </div>
+
+            <div className="d-flex align-items-start gap-2 justify-content-evenly">
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={savingPrescription}
+                >
+                  <SaveOutlined />
+                  Save Prescription
+                </Button>
+              </Form.Item>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  onClick={handleSendToPharmacy}
+                  loading={pharmacyPosting}
+                  disabled={!prescriptionSaved}
+                >
+                  <SendOutlined />
+                  Send to Pharmacy
+                </Button>
+              </Form.Item>
+            </div>
+          </Form>
+        </Card>
+      </Col>
+      {/* <Col span={8}>
+        <Card
+          title="Patient Prescription Card"
+          bordered={false}
+          className="card"
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={[
+              { name: "Drug Name", description: prescriptionCardData.DrugNo },
+              { name: "Dosage", description: prescriptionCardData.Dosage },
+              { name: "Unit of Measure", description: prescriptionCardData.UnitOfMeasure },
+              { name: "Frequency per Day", description: prescriptionCardData.prescriptionDose },
+              { name: "Route", description: prescriptionCardData.route },
+              { name: "No of Days", description: prescriptionCardData.noOfDays },
+              { name: "Quantity", description: prescriptionCardData.PrescriptionQuantity },
+              { name: "Remarks", description: prescriptionCardData.PrescriptionRemarks },
+            ]}
+            renderItem={(item) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={item.name}
+                  description={item.description}
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
+      </Col> */}
+    </Row>
   );
 };
 

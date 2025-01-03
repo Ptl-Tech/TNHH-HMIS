@@ -11,6 +11,7 @@ import {
   Skeleton,
   List,
   Select,
+  Table,
 } from "antd";
 import {
   FileTextOutlined,
@@ -36,6 +37,7 @@ import { useLocation } from "react-router-dom";
 import moment from "moment";
 import useAuth from "../../../hooks/useAuth";
 import { getHospitalNumber } from "../../../actions/Doc-actions/getHospitalNumber";
+import { getReferralLines } from "../../../actions/Doc-actions/getReferralLines";
 
 const Referrals = () => {
   const location = useLocation();
@@ -49,6 +51,11 @@ const Referrals = () => {
   const { loading: requestLoading } = useSelector(
     (state) => state.requestRefferal
   );
+
+  const { loading: referralLinesLoading, data: referralLines } = useSelector(
+    (state) => state.getReferralLines
+  );
+  
   const { data } = useSelector((state) => state.getHosNumber);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStaffNo, setSelectedStaffNo] = useState(null);
@@ -62,6 +69,12 @@ const Referrals = () => {
   useEffect(() => {
     dispatch(getHospitalNumber());
   }, [dispatch]);
+
+  useEffect(() => {
+    if(treatmentNo){
+      dispatch(getReferralLines(treatmentNo));
+    }
+  }, [dispatch, treatmentNo]);
 
   useEffect(() => {
     if (selectedStaffNo) {
@@ -113,6 +126,73 @@ const Referrals = () => {
     window.print();
   };
 
+  const referralLinesCols = [
+    {
+      title: "Treatment No",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+    },
+    {
+      title: "Description",
+      dataIndex: "ReferralReason",
+      key: "ReferralReason",
+    },
+    {
+      title: "Clinical Notes",
+      dataIndex: "ClinicalHistoryTreatment",
+      key: "ClinicalHistoryTreatment",
+    },
+    {
+      title: "Date Referred",
+      dataIndex: "DateReferred",
+      key: "DateReferred",
+    },
+    {
+      title: "Hospital",
+      dataIndex: "HospitalName",
+      key: "HospitalName",
+    },
+    {
+      title: "Contact Person",
+      dataIndex: "ContactPerson",
+      key: "ContactPerson",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      // render different status colors  for approved new and cancelled
+      render: (text) => {
+        let color = "black";
+        if (text === "Approved") {
+          color = "green";
+        } else if (text === "New") {
+          color = "blue";
+        } else if (text === "Cancelled") {
+          color = "red";
+        }
+        return (
+          <Typography.Text style={{ color: color, fontWeight: "bold" }}>
+            {text}
+          </Typography.Text>
+        );
+      },
+    }
+  ];
+
+  const dataSource=[
+    {
+      key:referralLines?.TreatmentNo,
+      TreatmentNo: referralLines?.TreatmentNo,
+      ReferralReason: referralLines?.ReferralReason,
+      ClinicalHistoryTreatment: referralLines?.ClinicalHistoryTreatment,
+      DateReferred: referralLines?.DateReferred,
+      HospitalName: referralLines?.HospitalName,
+      ContactPerson: referralLines?.ContactPerson,
+      Status: referralLines?.Status
+    }
+  ]
+
   return (
     <div>
       {/* Button Section */}
@@ -121,7 +201,7 @@ const Referrals = () => {
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Referral Details
         </Typography.Title>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "right" , justifyContent: "flex-end"}}>
           <Button
             type="default"
             icon={<PrinterOutlined />}
@@ -137,7 +217,7 @@ const Referrals = () => {
             Send to Referral
           </Button>
           <Button type="default" onClick={handleModalVisible}>
-            Show Referral Details
+            Show Previous Referrals
           </Button>
         </div>
       </div>
@@ -145,7 +225,7 @@ const Referrals = () => {
       {/* Referral and Employee Info Cards */}
       <Row gutter={16}>
         {/* Referral Form Card */}
-        <Col span={10}>
+        <Col span={14}>
           <Form
             form={form}
             layout="vertical"
@@ -242,7 +322,7 @@ const Referrals = () => {
         </Col>
 
         {/* Employee Info Card */}
-        <Col span={14}>
+        <Col span={10}>
           {loadingProfile ? (
             <Skeleton active paragraph={{ rows: 4 }} />
           ) : (
@@ -344,12 +424,14 @@ const Referrals = () => {
             Close
           </Button>
         }
-        width={800}
+        width={900}
       >
-        <Typography.Paragraph>
-          Here you can view the details of the referral and any related
-          information.
-        </Typography.Paragraph>
+        <Table
+          columns={referralLinesCols}
+          dataSource={dataSource}
+          pagination={false}
+          loading={referralLinesLoading}
+        />
       </Modal>
     </div>
   );

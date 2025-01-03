@@ -18,6 +18,7 @@ const PatientRequests = () => {
         break;
       case 'Admission Requests':
         setSelectedItem(<AdmitPatientForm />);
+        break;
         case 'Patient Referals':
         setSelectedItem(<Referrals />);
         break;

@@ -42,9 +42,8 @@ const MainLayout = () => {
   const [selectedKey, setSelectedKey] = useState(location.pathname);
   const [menuItems, setMenuItems] = useState([]);
 
-
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     const department = userInfo?.userData?.departmentName;
 
     const receptionRoutes = [
@@ -118,7 +117,6 @@ const MainLayout = () => {
         label: "Dashboard",
       },
       {
-       
         icon: <FileTextOutlined style={{ color: "#fff" }} />,
         label: "Triage",
         children: [
@@ -130,7 +128,6 @@ const MainLayout = () => {
         ],
       },
       {
-        
         icon: <SolutionOutlined style={{ color: "#fff" }} />,
         label: "Admissions",
         children: [
@@ -142,19 +139,16 @@ const MainLayout = () => {
           {
             key: "Admission-requests",
             label: "Admission Requests",
-            icon: <InteractionOutlined style={{ color: "#fff" }} />, 
+            icon: <InteractionOutlined style={{ color: "#fff" }} />,
           },
           {
             key: "Admit-patient",
             label: "Admit Patient",
             icon: <ImportOutlined style={{ color: "#fff" }} />,
           },
-          
-          
         ],
       },
       {
-        
         icon: <PicCenterOutlined style={{ color: "#fff" }} />,
         label: "Inpatients",
         children: [
@@ -163,10 +157,9 @@ const MainLayout = () => {
             label: "Inpatient-list",
             icon: <PicCenterOutlined style={{ color: "#fff" }} />,
           },
-        ]
+        ],
       },
       {
-        
         icon: <LayoutOutlined style={{ color: "#fff" }} />,
         label: "Ward Management",
         children: [
@@ -175,10 +168,9 @@ const MainLayout = () => {
             label: "Manage Wards",
             icon: <LayoutOutlined style={{ color: "#fff" }} />,
           },
-        ]
+        ],
       },
       {
-        
         icon: <RetweetOutlined style={{ color: "#fff" }} />,
         label: "Discharges",
         children: [
@@ -192,10 +184,9 @@ const MainLayout = () => {
             label: "Discharge Patient",
             icon: <HistoryOutlined style={{ color: "#fff" }} />,
           },
-        ]
+        ],
       },
       {
-        
         icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
         label: "Past Doctor Visits",
         children: [
@@ -203,9 +194,9 @@ const MainLayout = () => {
             key: "Past-doctor-visit",
             label: "Past Doctor Visit List",
             icon: <RadiusUprightOutlined style={{ color: "#fff" }} />,
-          } 
-        ]
-      }
+          },
+        ],
+      },
     ];
 
     // Define the menu items
@@ -226,7 +217,7 @@ const MainLayout = () => {
             icon: <TeamOutlined style={{ color: "#fff" }} />,
           },
           {
-            key: "/Doctor/Consultation/Inpatient",
+            key: "/Doctor/Inpatient",
             label: "In-Patient List",
             icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
           },
@@ -276,33 +267,6 @@ const MainLayout = () => {
           },
         ],
       },
-      // {
-      //   key: "/doctor/pharmacy",
-      //   icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
-      //   label: "Pharmacy",
-      //   children: [
-      //     {
-      //       key: "pharmacy-outpatient",
-      //       label: "Pharmacy List OutPatient",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "pharmacy-inpatient",
-      //       label: "Pharmacy List InPatient",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "pharmacy-history",
-      //       label: "Pharmacy History",
-      //       icon: <HistoryOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "pharmacy-returns",
-      //       label: "Pharmacy List Returns",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //   ],
-      // },
       {
         key: "/doctor/radiology",
         icon: <RadarChartOutlined style={{ color: "#fff" }} />,
@@ -328,8 +292,10 @@ const MainLayout = () => {
           //   label: "Radiology History",
           //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
           // },
+          
         ],
       },
+
       {
         key: "/doctor/lab",
         icon: <ExperimentOutlined style={{ color: "#fff" }} />,
@@ -352,6 +318,34 @@ const MainLayout = () => {
           // },
         ],
       },
+      {
+        key: "/doctor/pharmacy",
+        icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+        label: "Pharmacy",
+        children: [
+          {
+            key: "/Doctor/Pharmacy-OutPatient",
+            label: "Pharmacy List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/Doctor/Pharmacy-Inpatient",
+            label: "Pharmacy List InPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          
+          {
+            key: "/Doctor/Pharmacy-Returns",
+            label: "Pharmacy List Returns",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/Doctor/Pharmacy-History",
+            label: "Pharmacy History",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          }
+        ],
+      },
     ];
     // Security Routes
     const securityRoutes = [
@@ -366,14 +360,17 @@ const MainLayout = () => {
 
       {
         key: "RegistrationGroup",
-        label: <span style={{ color: "#ac8342", fontWeight: "medium" }}>Registration</span>,
+        label: (
+          <span style={{ color: "#ac8342", fontWeight: "medium" }}>
+            Registration
+          </span>
+        ),
         type: "group",
         children: [
           {
             key: "visitors-list",
             label: "Visitor List",
             icon: <UserOutlined style={{ color: "#fff" }} />,
-
           },
         ],
       },
@@ -389,7 +386,6 @@ const MainLayout = () => {
     } else if (department === "Security") {
       setMenuItems(securityRoutes);
     }
-
   }, []);
 
   // Handle open submenu logic
@@ -469,7 +465,6 @@ const MainLayout = () => {
         </Sider>
 
         <Layout className="site-layout">
-          
           {/* import the dynamic breadcrumb component here */}
 
           <DynamicBreadcrumb collapsed={collapsed} />

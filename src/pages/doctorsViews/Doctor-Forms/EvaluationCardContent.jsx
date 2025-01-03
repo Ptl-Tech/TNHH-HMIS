@@ -19,7 +19,7 @@ const EvaluationCardContent = ({
           <Tabs.TabPane tab="Patient File" key="1">
             <PatientFile patientDetails={patientDetails} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Diagnosis" key="2">
+          <Tabs.TabPane tab="Care Plan" key="2">
             <ObservationRoom
               treatmentNo={treatmentNo}
               observationNo={observationNo}

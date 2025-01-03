@@ -8,12 +8,16 @@ import {
   HeartOutlined,
   SolutionOutlined,
   MedicineBoxOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons"; // Import icons
-import DoctorNotes from "./DoctorNotes";
 import Diagnosis from "./Diagnosis";
 import FormVitals from "../Vitals";
 import PatientSigns from "./PatientSigns";
 import PatientSymptoms from "./PatientSyptoms";
+import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
+
+import { FaNotesMedical } from "react-icons/fa6";
+import SickOff from "../../nurse-view/discharges/SickOff";
 
 const { Title } = Typography;
 
@@ -32,7 +36,15 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
       case "Diagnosis":
         setSelectedItem(<Diagnosis />);
         break;
+        case "Doctor Notes":
+        setSelectedItem(<DoctorNotes />);
+        break;
+        case "Sick Off":
+        setSelectedItem(<SickOff />);
+        break;
+
       default:
+
         setSelectedItem(<FormVitals />);
     }
   };
@@ -44,7 +56,11 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
     { label: "Add Patient Signs", icon: <SolutionOutlined /> },
     { label: "Add Patient Syptoms", icon: <SolutionOutlined /> },
     { label: "Diagnosis", icon: <MedicineBoxOutlined /> },
-
+    { label: "Doctor Notes", icon: <FaNotesMedical /> },
+    {
+      label: "Sick Off",
+      icon: < CalendarOutlined/>,
+    }
   ];
 
   return (

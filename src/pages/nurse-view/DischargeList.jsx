@@ -1,112 +1,146 @@
-import { Card, Input, Space, Table, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Card, Input, Space, Table, Typography } from "antd";
+import { ProfileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getDischargeList } from "../../actions/Doc-actions/Admission/getdischargeList";
-
+import { getPatientDetails } from "../../actions/Doc-actions/OutPatientAction";
+import useAuth from "../../hooks/useAuth";
 
 const DischargeList = () => {
-    const dispatch=useDispatch();
-    const { loading, data } = useSelector(
-        (state) => state.getDischargeList
-      );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userDetails = useAuth();  // Use the custom hook to get user info
 
+  const { loading, data } = useSelector((state) => state.getDischargeList);
+  const { loading: loadingPatientDetails, patientDetails } = useSelector(
+    (state) => state.getPatientDetails
+  );
 
-      useEffect(() => {
-        dispatch(getDischargeList());
-        }, [dispatch]);
-    
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
-const columns = [
-    {
-        title: 'Adm No',
-        dataIndex: 'AdmissionNo',
-        key: 'AdmissionNo',
-    },
-    {
-        title: 'Patient No',
-        dataIndex: 'PatientNo',
-        key: 'PatientNo',
-    },
-    {
-        title: 'Names',
-        dataIndex: 'Search_Names',
-        key: 'Search_Names',
-        render: (_, record) => <a onClick={()=>handleNavigate(record?.patientNo, record?.admNo)} style={{ color: '#0f5689' }}>{record.Search_Names}</a>,
-    },
-    {
-        title: 'Adm Date',
-        dataIndex: 'DateofAdmission',
-        key: 'DateofAdmission',
-    },
-    {
-        title: 'Ward',
-        dataIndex: 'WardNo',
-        key: 'WardNo',
-    },
-    {
-        title: 'Bed',
-        dataIndex: 'BedNo',
-        key: 'BedNo',
-    },
-    {
-        title: 'Action',
-        dataIndex: 'Action',
-        key: 'Action',
-        render: () => (
-            <Space size="middle">
-                <a style={{ color: '#0f5689' }}>Discharge</a>
-            </Space>
-        ),
-    },
-];
+  // Fetch discharge list on component mount
+  useEffect(() => {
+    dispatch(getDischargeList());
+  }, [dispatch]);
 
-const navigate = useNavigate();
+  // Fetch patient details when `selectedRecord` changes
+  useEffect(() => {
+    if (selectedRecord?.PatientNo) {
+      dispatch(getPatientDetails(selectedRecord.PatientNo));
+    }
+  }, [dispatch, selectedRecord]);
 
-const handleNavigate = (patientNo, admNo) => {
-  navigate(`/Nurse/Discharge-list/Discharge-card?PatientNo=${patientNo}&AdmNo=${admNo}`);
-}
+  const handleNavigate = () => {
+    if(userDetails.userData.departmentName === 'Nurse'){
+        navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmissionNo}`, {
+          state: { patientDetails: record },
+        });
+       }else{
+        navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmissionNo}`, {
+          state: { patientDetails: record },
+        });
+       }
+  };
+
+  const columns = [
+    {
+      title: "Adm No",
+      dataIndex: "AdmissionNo",
+      key: "AdmissionNo",
+    },
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+    },
+    {
+      title: "Names",
+      dataIndex: "Search_Names",
+      key: "Search_Names",
+      render: (_, record) => (
+        <a
+          onClick={() => setSelectedRecord(record)}
+          style={{ color: "#0f5689" }}
+        >
+          {record.Search_Names}
+        </a>
+      ),
+    },
+    {
+      title: "Adm Date",
+      dataIndex: "DateofAdmission",
+      key: "DateofAdmission",
+    },
+    {
+      title: "Ward",
+      dataIndex: "WardNo",
+      key: "WardNo",
+    },
+    {
+      title: "Bed",
+      dataIndex: "BedNo",
+      key: "BedNo",
+    },
+    {
+      title: "Action",
+      dataIndex: "Action",
+      key: "Action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a
+            style={{ color: "#0f5689" }}
+            onClick={() => handleNavigate(record.PatientNo, record.AdmissionNo)}
+          >
+            Discharge
+          </a>
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Discharge List
-            </Typography.Text>
-          </Space>
+    <div style={{ margin: "20px 10px 10px 10px" }}>
+      <Space
+        style={{
+          color: "#0f5689",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          paddingBottom: "10px",
+        }}
+      >
+        <ProfileOutlined />
+        <Typography.Text
+          style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}
+        >
+          Discharge List
+        </Typography.Text>
+      </Space>
 
-          <Card style={{ padding: '10px 10px 10px 10px'}}>
-            
-              <div className='admit-patient-filter-container'>
-                  <Input placeholder="search by name" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by patient no" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by id number" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-              </div>
-          </Card>
+      <Card style={{ padding: "10px" }}>
+        <div className="admit-patient-filter-container">
+          <Input placeholder="Search by name" allowClear />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="Search by patient no" allowClear />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="Search by ID number" allowClear />
+        </div>
+      </Card>
 
-          <Table 
-              columns={columns} 
-              dataSource={data} 
-              loading={loading} 
-              className="admit-patient-table"
-          />
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        className="admit-patient-table"
+        rowKey="AdmissionNo"
+      />
     </div>
-  )
-}
+  );
+};
 
-export default DischargeList
+export default DischargeList;

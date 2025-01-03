@@ -65,6 +65,11 @@ import LaboratoryEvaluationCard from "./pages/doctorsViews/tables/lab/Laboratory
 import DoctorAdmissions from "./pages/doctorsViews/DocAdmission-views/DoctorAdmissions";
 import VerifiedAdmission from "./pages/doctorsViews/DocAdmission-views/VerifiedAdmission";
 import AdmittedPatients from "./pages/doctorsViews/DocAdmission-views/AdmittedPatients";
+import PhamarcyOutpatient from "./pages/pharmacy-views/PhamarcyOutpatient";
+import PharmacyCard from "./pages/pharmacy-views/PharmacyCard";
+import PharmacyInpatient from "./pages/pharmacy-views/PharmacyInpatient";
+import PharmacyListReturnLines from "./pages/pharmacy-views/PharmacyListReturnLines";
+import PharmacyHistoryList from "./pages/pharmacy-views/PharmacyHistoryList";
 function App() {
   return (
     <Routes>
@@ -99,7 +104,10 @@ function App() {
           <Route path="Admit-patient/Charges" element={<PatientCharges />} />
           <Route path="Ward-management" element={<WardManagement />} />
           <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
-          <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
+          <Route
+            path="Ward-management/Transfer-bed"
+            element={<TransferBed />}
+          />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
 
           <Route path="Admissions" element={<Admissions />} />
@@ -171,28 +179,67 @@ function App() {
 
       <Route element={<PrivateRoute allowedDepartments={["Doctor"]} />}>
         <Route path="/Doctor" element={<MainLayout />}>
-          <Route index element={<DoctorDashboard/>} />
+          <Route index element={<DoctorDashboard />} />
           <Route path="/Doctor/Consultation-List" element={<DoctorVisits />} />
-          <Route path="/Doctor/PendingTreatmentList" element={<TreamentListPending />} />
+          <Route
+            path="/Doctor/PendingTreatmentList"
+            element={<TreamentListPending />}
+          />
 
-          <Route path="/Doctor/Consultation/Patient" element={<ConsultationRoomEvalutionCard />} />
-          <Route path="/Doctor/Consultation/Inpatient" element={<Inpatient />} />
-          <Route path="/Doctor/Inpatient/Patient-card" element={<InpatientCard />} />
+          <Route
+            path="/Doctor/Consultation/Patient"
+            element={<ConsultationRoomEvalutionCard />}
+          />
+          <Route path="/Doctor/Inpatient" element={<Inpatient />} />
+          <Route
+            path="/Doctor/Inpatient/Patient-card"
+            element={<InpatientCard />}
+          />
           <Route path="/Doctor/Admissions" element={<DoctorAdmissions />} />
           <Route path="/Doctor/Discharge-list" element={<DischargeList />} />
-          <Route path="/Doctor/Discharge-requests" element={<DischargeRequests />} />
-          <Route path="/Doctor/Past-doctor-visit" element={<PastDoctorVisit />} />
-          <Route path="/Doctor/Past-doctor-visit/Patient" element={<TreatmentCard />} />
-          <Route path="/Doctor/Past-doctor-visit/Patient" element={<TreatmentCard />} />
+          <Route
+            path="/Doctor/Discharge-requests"
+            element={<DischargeRequests />}
+          />
+          <Route
+            path="/Doctor/Past-doctor-visit"
+            element={<PastDoctorVisit />}
+          />
+          <Route
+            path="/Doctor/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
+          <Route
+            path="/Doctor/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
           <Route path="/Doctor/Lab-Patients" element={<LabOutPatient />} />
-          <Route path="/Doctor/Radiology-Patients" element={<RadiologyOutPatient />} />
-{/* Laboratory Routes */}
-          <Route path="/Doctor/Lab/Patient" element={<LaboratoryEvaluationCard />} />
+          <Route
+            path="/Doctor/Radiology-Patients"
+            element={<RadiologyOutPatient />}
+          />
+          {/* Laboratory Routes */}
+          <Route
+            path="/Doctor/Lab/Patient"
+            element={<LaboratoryEvaluationCard />}
+          />
 
-          <Route path="/Doctor/Approved-Admissions" element={<VerifiedAdmission />} />
-          <Route path="/Doctor/Admitted-Patients" element={<AdmittedPatients />} />
-
-
+          <Route
+            path="/Doctor/Approved-Admissions"
+            element={<VerifiedAdmission />}
+          />
+          <Route
+            path="/Doctor/Admitted-Patients"
+            element={<AdmittedPatients />}
+          />
+          <Route
+            path="/Doctor/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route path="/Doctor/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
+          <Route path="/Doctor/Pharmacy-Card" element={<PharmacyCard />} />
+<Route path="/Doctor/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
+<Route path="/Doctor/Pharmacy-History" element={<PharmacyHistoryList />} />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
