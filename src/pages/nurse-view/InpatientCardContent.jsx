@@ -4,6 +4,7 @@ import CarePlan from './CarePlan'
 import Requests from './Requests'
 import Discharges from './Discharges'
 import NurseForms from './NurseForms'
+import PropTypes from 'prop-types'
 
 const InpatientCardContent = () => {
   return (
@@ -32,3 +33,8 @@ const InpatientCardContent = () => {
 }
 
 export default InpatientCardContent
+//props validation
+InpatientCardContent.propTypes = {
+    filterAllergies: PropTypes.array,
+    loadingAllergies: PropTypes.bool
+}

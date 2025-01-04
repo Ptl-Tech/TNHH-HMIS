@@ -8,13 +8,13 @@ export const GET_PATIENT_CONSUMABLES_FAILURE = 'GET_PATIENT_CONSUMABLES_FAILURE'
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
-export const getPatientConsumablesSlice = (admissionNo) => 
+export const getPatientConsumablesSlice = () => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_PATIENT_CONSUMABLES_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgPostedPatientConsumables&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgOpenPatientConsumables&isList=true`, config);
     
 
         dispatch({ type: GET_PATIENT_CONSUMABLES_SUCCESS, payload: data });

@@ -17,9 +17,20 @@ export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatc
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
       
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data })
+
+        return {  type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data };
            
 
     } catch (error) {
-        dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error.message });
+        dispatch({ 
+            type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, 
+            payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null,
+            } 
+        });
+
+        return { type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error };
     }
 }

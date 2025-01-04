@@ -23,14 +23,13 @@ const NursingNotes = () => {
 
   const { loadingNurseNotes } = useSelector((state) => state.postNurseAdmissionNotes);
 
-  console.log('nurse notes', getNurseNotes)
   const showModal = (record) => {
     form.resetFields();
     if (record) {
         setIsEditMode(true);
         form.setFieldsValue({
             admissionNo: record?.AdmissionNo || '',
-            nursingNotes: record?.NursingNotes || '',
+            nurseNotes: record?.Notes || '',
         });
     } else {
         setIsEditMode(false);
@@ -56,13 +55,13 @@ const handleOnFinish = async (values) => {
           branchCode: branchCode,
           patientNo: patientDetails?.PatientNo,
           admissionNo: patientDetails?.CurrentAdmNo,
-          notes: values.nurseNotes,
+          notes: values?.nurseNotes,
         };
 
     
         // Dispatch function to handle API call and feedback
         const dispatchNurseNotesData = async (data) => {
-          await dispatch(postNurseAdmissionNotesSlice('/InpatientForms/VisitorsListForm', data))
+          await dispatch(postNurseAdmissionNotesSlice('/Nurse/NurseAdmissionNotes', data))
             .then((result) => {
               if (result.type === POST_NURSE_ADMISSION_NOTES_SUCCESS) {
                 const actionWord = isEditMode ? 'updated' : 'added';
@@ -115,7 +114,12 @@ const handleOnFinish = async (values) => {
             onOk={handleOk}
             onCancel={handleCancel}
             okText={isEditMode ? 'Update Notes' : 'Add Notes'}
-            okButtonProps={{ disabled: loadingNurseNotes }}
+
+            okButtonProps={{
+              disabled: loadingNurseNotes,
+              loading: loadingNurseNotes,
+              style: isEditMode ? { display: 'none' } : undefined,
+            }}
           >
             <Form
             

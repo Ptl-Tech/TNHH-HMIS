@@ -1,5 +1,4 @@
 
-import { message } from 'antd';
 import configHelpers  from '../../actions/configHelpers'
 import axios from "axios";
 
@@ -17,8 +16,19 @@ export const getItemsSlice = () => async (dispatch, getState) => {
         const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyItems&isList=true`, config);
 
         dispatch({ type: GET_ITEMS_SUCCESS, payload: data });
+
+        return { type: GET_ITEMS_SUCCESS, payload: data };
      
     } catch (error) {
-        dispatch({ type: GET_ITEMS_FAILURE, payload: error.message });
+        dispatch({ 
+            type: GET_ITEMS_FAILURE, 
+            payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null
+            }
+        });
+
+        return { type: GET_ITEMS_FAILURE, payload: error };
     }
 }

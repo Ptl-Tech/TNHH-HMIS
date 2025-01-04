@@ -41,16 +41,14 @@ const InpatientConsumablesTable = ({ consumables, loadingGetPgOpenPatientConsuma
             key: 'RemainingQuantity',
         },
         {
-            title: 'Unit of Measure',
-            dataIndex: 'UnitOfMeasure',
-            key: 'UnitOfMeasure',
-        },
-        {
             title: 'Remarks',
             dataIndex: 'Remarks',
             key: 'Remarks',
             fixed: 'right',
-            width: 150,
+            width: 200,
+            render: (text) => 
+                text.length > 50 ? `${text.substring(0, 47)}...` : text,
+
         },
     ];
 

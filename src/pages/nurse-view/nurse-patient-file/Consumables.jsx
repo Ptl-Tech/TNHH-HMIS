@@ -10,6 +10,7 @@ import useAuth from "../../../hooks/useAuth";
 import { getQyLocationsSlice } from "../../../actions/nurse-actions/getQyLocationsSlice";
 import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumablesTable";
 import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
+import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
 
 const Consumables = () => {
 
@@ -23,8 +24,9 @@ const Consumables = () => {
 
     const {loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables} = useSelector(state => state.getPgOpenPatientConsumables);
 
+    const { loadingItems, items } = useSelector((state) => state.getItems);
 
-    const { qyLocations } = useSelector((state) => state.getQyLocations);
+    const { loadingQyLocations, qyLocations } = useSelector((state) => state.getQyLocations);
 
     const { loadingPostConsumables } = useSelector((state) => state.postPatientConsumables);
 
@@ -43,7 +45,7 @@ const Consumables = () => {
   
     const handleOnFinish = async (values) => {
       try {
-        const { location, quantity, remarks } = values;
+        const { location, quantity, item, remarks } = values;
     
         // Construct the visitor data
         const consumableData = {
@@ -53,6 +55,7 @@ const Consumables = () => {
           location,
           quantity,
           remarks,
+          item,
           documentNo: patientDetails?.CurrentAdmNo,
           branchCode: branchCode,
           staffNo: userDetails.userData.no
@@ -64,8 +67,8 @@ const Consumables = () => {
             .then((result) => {
               if (result.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
                 const actionWord = isEditMode ? 'updated' : 'added';
-                message.success(`Visitor ${result.payload.visitorName} ${actionWord} successfully!`);
-                dispatch(getPatientConsumablesSlice(patientDetails?.CurrentAdmNo));
+                message.success(`Consumables ${actionWord} successfully!`);
+                dispatch(getPgOpenPatientConsumablesSlice());
               } else if (result.type === POST_PATIENT_CONSUMABLES_FAILURE) {
                 message.error(result.payload.message || "Internal server error, please try again later.");
               }
@@ -98,6 +101,12 @@ const Consumables = () => {
         dispatch(getQyLocationsSlice());
       }
     }, [dispatch, qyLocations?.length]);
+
+    useEffect(() => {
+      if(!items?.length){
+        dispatch(getItemsSlice());
+      }
+    }, [dispatch, items?.length]);
 
   return (
     <div>
@@ -140,22 +149,47 @@ const Consumables = () => {
                 label="Location" 
                 name="location"
                 rules={[{ required: true, message: 'Please select location!' }]}
+                hasFeedback
               >
               <Select
                 style={{ width: '100%' }}
-                placeholder="Select Item"
+                placeholder="Select Location"
                 allowClear
                 showSearch
+                loading={loadingQyLocations}
                 options={qyLocations?.map((item) => ({
+                  key: item.AdmNo,
                   value: item.Code,
                   label: item.Name,
                 }))}
               />
             </Form.Item>
+            <Form.Item
+              label="Item"
+              name="item"
+              rules={[{ required: true, message: 'Please select item!' }]}
+              hasFeedback
+            >
+
+              <Select 
+                style={{ width: '100%' }}
+                placeholder="Select Item"
+                allowClear
+                showSearch
+                loading={loadingItems}
+                options={items?.map((item) => ({
+                  key: item.No,
+                  value: item.No,
+                  label: item.Description,
+                }))}
+              />
+
+            </Form.Item>
             <Form.Item 
                 label="Quantity" 
                 name="quantity"
                 rules={[{ required: true, message: 'Please enter quantity!' }]}
+                hasFeedback
               >
                   <Input type="number" placeholder="Enter Quantity"
              />
@@ -164,6 +198,7 @@ const Consumables = () => {
             <Form.Item 
             label="Remarks" 
             name="remarks"
+            hasFeedback
             rules={[
               {
                   validator: (_, value) => {

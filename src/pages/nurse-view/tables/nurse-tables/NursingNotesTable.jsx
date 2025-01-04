@@ -2,7 +2,7 @@ import { Button, Table } from "antd"
 import PropTypes from "prop-types"
 import Loading from "../../../../partials/nurse-partials/Loading"
 import { useState } from "react"
-import { EditOutlined } from '@ant-design/icons'
+import { FolderViewOutlined } from '@ant-design/icons'
 
 const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseNotes }) => {
 
@@ -12,6 +12,8 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
       title: 'Admission No',
       dataIndex: 'AdmissionNo', // Matches key in data
       key: 'AdmissionNo',
+      fixed: 'left',
+      width: 100
     },
     {
       title: 'Notes Date',
@@ -27,13 +29,17 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
       title: 'Notes',
       dataIndex: 'Notes', // Matches key in data
       key: 'Notes',
+      render: (text) => 
+        text.length > 50 ? `${text.substring(0, 47)}...` : text,
     },
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
+      fixed: 'right',
+      width: 100,
       render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(record)}>
-        <EditOutlined /> Edit
+        <FolderViewOutlined /> View
       </Button>
     }
   ]
@@ -56,6 +62,8 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
          {
           loadingGetNurseAdmissionNotes ? <Loading /> :
           <Table columns={columns} dataSource={formattedDataSource} 
+          rowKey='SystemId'
+          scroll={{ x: 'max-content' }}
           bordered size='middle' 
           pagination={{
             ...pagination,

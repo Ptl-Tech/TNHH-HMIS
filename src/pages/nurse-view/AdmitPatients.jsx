@@ -88,14 +88,14 @@ const AdmitPatients = () => {
         }),
     };
       
-    const formattedDoctorDetails = data.map(doctor => {
+    const formattedDoctorDetails = data?.map(doctor => {
         return {
             DoctorID: doctor.DoctorID,
             DoctorsName: doctor.DoctorsName,
         }
     });
 
-    const formattedPatientAdmissions = getPatientAdmissions.map(admission => {
+    const formattedPatientAdmissions = getPatientAdmissions?.map(admission => {
         const matchDoctorName = formattedDoctorDetails.find(doctor => doctor.DoctorID === admission.Doctor);
         return {
             ...admission,
