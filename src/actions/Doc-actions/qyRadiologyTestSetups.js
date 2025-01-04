@@ -4,14 +4,14 @@ import { message } from "antd"; // Import message for error handling
 const API = "http://217.21.122.62:8085/";
 
 
-export const RADIOLOGY_TEST_SETUP_REQUEST = "RADIOLOGY_TEST_SETUP_REQUEST";
-export const RADIOLOGY_TEST_SETUP_SUCCESS = "RADIOLOGY_TEST_SETUP_SUCCESS";
-export const RADIOLOGY_TEST_SETUP_FAIL = "RADIOLOGY_TEST_SETUP_FAIL";
+export const QY_RADIOLOGY_TEST_LIST_REQUEST = "QY_RADIOLOGY_TEST_LIST_REQUEST";
+export const QY_RADIOLOGY_TEST_LIST_SUCCESS = "QY_RADIOLOGY_TEST_LIST_SUCCESS";
+export const QY_RADIOLOGY_TEST_LIST_FAIL = "QY_RADIOLOGY_TEST_LIST_FAIL";
 
 
 export const getRadiologySetup = () => async (dispatch, getState) => {
     try {
-        dispatch({ type: RADIOLOGY_TEST_SETUP_REQUEST });
+        dispatch({ type: QY_RADIOLOGY_TEST_LIST_REQUEST });
 
         const {
             otpVerify: { userInfo },
@@ -34,7 +34,7 @@ export const getRadiologySetup = () => async (dispatch, getState) => {
         );
 
         // Dispatch success action with received data
-        dispatch({ type: RADIOLOGY_TEST_SETUP_SUCCESS, payload: data });
+        dispatch({ type: QY_RADIOLOGY_TEST_LIST_SUCCESS, payload: data });
     } catch (error) {
         // Dispatch fail action and show error message
         dispatch({

@@ -47,17 +47,20 @@ export const postRefferalDetails = (refferalData) => async (dispatch, getState) 
     // Dispatch success action after a short delay
     setTimeout(() => {
       dispatch({ type: POST_REFERRAL_SUCCESS, payload: responseData });
-      console.log("Dispatched Payload:", responseData);
-    }, 2000);
+      message.success("Referral details sent successfully");
+    }, 1200);
 
     // Return relevant data (e.g., patient ID)
     return responseData.data;
   } catch (error) {
-    dispatch({
-      type: POST_REFERRAL_FAIL,
-      payload: error.response?.data?.message || error.message,
-    });
-    message.error(error.message, 5);
+    setTimeout(() => {
+      dispatch({
+        type: POST_REFERRAL_FAIL,
+        payload: error.response?.data?.message || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
+
     throw error; // Propagate error to handle in the component
   }
 };
@@ -98,16 +101,19 @@ export const requestRefferal = (treatmentId) => async (dispatch, getState) => {
     // Dispatch success action after a short delay
     setTimeout(() => {
       dispatch({ type: POST_REFERRAL_SUCCESS, payload: responseData });
-    }, 2000);
+      message.success("Referral request sent successfully");
+    }, 1200);
 
     // Return response data (e.g., patient ID)
     return responseData.data;
   } catch (error) {
-    dispatch({
-      type: POST_REFERRAL_FAIL,
-      payload: error.response?.data?.message || error.message,
-    });
-    message.error(error.message, 5);
+    setTimeout(() => {
+      dispatch({
+        type: POST_REFERRAL_FAIL,
+        payload: error.response?.data?.message || error.errors,
+      });
+      message.error(error.response?.data?.message || error.errors, 5);
+    }, 1200);
     throw error; // Propagate error to handle in the component
   }
 };

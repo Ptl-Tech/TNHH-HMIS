@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Button, Card, Space, Table, Typography, Modal, message } from "antd"
 import { ProfileOutlined, VerticalAlignTopOutlined, CloseOutlined, ExperimentOutlined, PrinterOutlined, FileExclamationOutlined, DeliveredProcedureOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux";
@@ -11,9 +12,23 @@ import { useNavigate } from "react-router-dom";
 import { POST_DISCHARGE_PATIENT_FAILURE, POST_DISCHARGE_PATIENT_SUCCESS, postPostDischargeSlice } from "../../actions/nurse-actions/postPostDischargeSlice";
 import { POST_RELEASE_BED_FAILURE, POST_RELEASE_BED_SUCCESS, postReleaseBedSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
 import { POST_CANCEL_DISCHARGE_FAILURE, POST_CANCEL_DISCHARGE_SUCCESS, postCancelDischargeSlice } from "../../actions/nurse-actions/postCancelDischargeSlice";
+=======
+import { Card, Input, Space, Table, Typography } from "antd";
+import { ProfileOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { getDischargeList } from "../../actions/Doc-actions/Admission/getdischargeList";
+import { getPatientDetails } from "../../actions/Doc-actions/OutPatientAction";
+import useAuth from "../../hooks/useAuth";
+>>>>>>> main
 
 const DischargeList = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userDetails = useAuth();  // Use the custom hook to get user info
 
+<<<<<<< HEAD
 const columns = [
     {
         title: 'Adm No',
@@ -286,15 +301,115 @@ useEffect(() => {
         }
     }, [dispatch, data.length]);
 
-  return (
-    <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Discharge List
-            </Typography.Text>
-          </Space>
+=======
+  const { loading, data } = useSelector((state) => state.getDischargeList);
+  const { loading: loadingPatientDetails, patientDetails } = useSelector(
+    (state) => state.getPatientDetails
+  );
 
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
+  // Fetch discharge list on component mount
+  useEffect(() => {
+    dispatch(getDischargeList());
+  }, [dispatch]);
+
+  // Fetch patient details when `selectedRecord` changes
+  useEffect(() => {
+    if (selectedRecord?.PatientNo) {
+      dispatch(getPatientDetails(selectedRecord.PatientNo));
+    }
+  }, [dispatch, selectedRecord]);
+
+  const handleNavigate = () => {
+    if(userDetails.userData.departmentName === 'Nurse'){
+        navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmissionNo}`, {
+          state: { patientDetails: record },
+        });
+       }else{
+        navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.AdmissionNo}`, {
+          state: { patientDetails: record },
+        });
+       }
+  };
+
+  const columns = [
+    {
+      title: "Adm No",
+      dataIndex: "AdmissionNo",
+      key: "AdmissionNo",
+    },
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+    },
+    {
+      title: "Names",
+      dataIndex: "Search_Names",
+      key: "Search_Names",
+      render: (_, record) => (
+        <a
+          onClick={() => setSelectedRecord(record)}
+          style={{ color: "#0f5689" }}
+        >
+          {record.Search_Names}
+        </a>
+      ),
+    },
+    {
+      title: "Adm Date",
+      dataIndex: "DateofAdmission",
+      key: "DateofAdmission",
+    },
+    {
+      title: "Ward",
+      dataIndex: "WardNo",
+      key: "WardNo",
+    },
+    {
+      title: "Bed",
+      dataIndex: "BedNo",
+      key: "BedNo",
+    },
+    {
+      title: "Action",
+      dataIndex: "Action",
+      key: "Action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a
+            style={{ color: "#0f5689" }}
+            onClick={() => handleNavigate(record.PatientNo, record.AdmissionNo)}
+          >
+            Discharge
+          </a>
+        </Space>
+      ),
+    },
+  ];
+
+>>>>>>> main
+  return (
+    <div style={{ margin: "20px 10px 10px 10px" }}>
+      <Space
+        style={{
+          color: "#0f5689",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          paddingBottom: "10px",
+        }}
+      >
+        <ProfileOutlined />
+        <Typography.Text
+          style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}
+        >
+          Discharge List
+        </Typography.Text>
+      </Space>
+
+<<<<<<< HEAD
         <Card className="admit-patient-card-container">
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Space className="admit-patient-button-container">
@@ -341,8 +456,31 @@ useEffect(() => {
                 />
             )
           }
-    </div>
-  )
-}
+=======
+      <Card style={{ padding: "10px" }}>
+        <div className="admit-patient-filter-container">
+          <Input placeholder="Search by name" allowClear />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="Search by patient no" allowClear />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Input placeholder="Search by ID number" allowClear />
+        </div>
+      </Card>
 
-export default DischargeList
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        className="admit-patient-table"
+        rowKey="AdmissionNo"
+      />
+>>>>>>> main
+    </div>
+  );
+};
+
+export default DischargeList;

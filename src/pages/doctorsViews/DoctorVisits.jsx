@@ -49,6 +49,7 @@ const DoctorVisits = () => {
       key: index + 1,
       treatmentNo: item?.TreatmentNo,
       patientNo: item?.PatientNo,
+      observationNo: item?.ObservationNo,
       treatmentDate: item?.TreatmentDate,
       treatmentTime: item?.TreatmentTime,
       searchName: item?.SearchName,
@@ -160,7 +161,7 @@ const DoctorVisits = () => {
   ];
   
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.patientNo, obserVationNumber: record.observationNo } });
+    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, { state: { patientNo: record.patientNo, observationNo: record.observationNo } });
     console.log('obserVationNumber:', record.observationNo);
   };
 

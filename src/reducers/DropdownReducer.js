@@ -65,6 +65,10 @@ import {
   EMPLOYEE_DETAILS_SUCCESS,
   EMPLOYEE_DETAILS__FAIL,
   EMPLOYEE_DETAILS_RESET,
+  LOCATION_LIST_REQUEST,
+  LOCATION_LIST_SUCCESS,
+  LOCATION_LIST_FAIL,
+  LOCATION_LIST_RESET,
 } from "../constants/DropDownConstants";
 
 export const countriesListReducer = (state = { countries: [] }, action) => {
@@ -211,6 +215,21 @@ export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
       return { loading: false, error: action.payload };
     case SUB_COUNTIES_LIST_RESET:
       return { subCounties: [] };
+    default:
+      return state;
+  }
+};
+
+export const QyLocationsListReducer = (state = { locations: [] }, action) => {
+  switch (action.type) {
+    case LOCATION_LIST_REQUEST:
+      return { loading: true, locations: [] };
+    case LOCATION_LIST_SUCCESS:
+      return { loading: false, locations:action.payload };
+    case LOCATION_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case LOCATION_LIST_RESET:
+      return { locations: [] };
     default:
       return state;
   }

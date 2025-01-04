@@ -19,41 +19,44 @@ export const getLabList = () => async (dispatch, getState) => {
     } = getState();
 
     // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = localStorage.getItem("branchCode") || "";
 
     // Set up the request configuration with headers
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, 
-        sessionToken: userInfo.userData.portalSessionToken,
-        branchCode: branchCode,
+        staffNo: userInfo?.userData?.no || "",
+        sessionToken: userInfo?.userData?.portalSessionToken || "",
+        branchCode,
       },
     };
 
-    // Ensure `treatmentId` is passed correctly in the API request
-    const {data} = await axios.post(
-      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines`,      
+    // API request
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=PgLaboratoryTestHeaders`,
+   
       config
     );
 
-    // Prepare the response data
-    
     // Dispatch success action with the fetched data
     dispatch({
       type: REQUEST_LAB_LIST_SUCCESS,
       payload: data,
     });
 
-    return responseData.data; // Optionally return the data
+    return data; // Optionally return the data
 
   } catch (error) {
-    // Handle errors
+    // Extract and handle errors properly
+    const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+    
     dispatch({
       type: REQUEST_LAB_LIST_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: errorMessage,
     });
-    message.error(error.message, 5); // Display the error message to the user
+
+    message.error(errorMessage, 5); // Display the error message to the user
+
     throw error; // Rethrow the error if needed
   }
 };

@@ -16,6 +16,7 @@
 
 
 
+
 .scrollable-menu {
   overflow-y: auto;
   max-height: calc(100vh - 64px); /* Adjust the max-height based on your layout */
@@ -66,7 +67,6 @@
   position: sticky !important;
   left:0 !important;
   top: 0 !important;
-  background-color: #002329 !important  ;
   transition: 0.2s ease;
 
 }
