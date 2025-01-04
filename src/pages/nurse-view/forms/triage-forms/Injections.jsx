@@ -26,10 +26,11 @@ const Injections = ({ observationNumber, staffNo }) => {
     // console.log('injection number', injectionsNumber)
 
     useEffect(() => {
-   
-        dispatch(getSpecificInjectionSlice(observationNumber))
+        if(!injections?.length){
+        dispatch(getSpecificInjectionSlice())
+        }
       
-    }, [dispatch, observationNumber])
+    }, [dispatch, injections?.length])
 
 
     const onFinish = (values) => {
@@ -55,7 +56,7 @@ const Injections = ({ observationNumber, staffNo }) => {
       
 
         dispatch(postInjectionsSlice(createInjection)).then(()=>{
-          console.log('injection data', createInjection)
+
           message.success('Injections has been saved');
         }).catch((error)=>{
             message.error(error.message);

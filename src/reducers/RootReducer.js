@@ -112,6 +112,8 @@ import { getInpatientAllergiesReducer } from "./nurse-reducers/getInPatientAller
 import { getInpatientVitalsReducer } from "./nurse-reducers/getInpatientVitalsReducer";
 import { postDailyProcedureOrProcessReducer } from "./nurse-reducers/postDailyProcedureOrProcessReducer";
 import { getQyInpatientProcessProceduresReducer } from "./nurse-reducers/getQyInpatientProcessProceduresReducer";
+import { postInpatientInjectionReducer } from "./nurse-reducers/postInpatientInjectionReducer";
+import { getInpatientInjectionReducer } from "./nurse-reducers/getInpatientInjectionReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -221,6 +223,8 @@ export const rootReducer = combineReducers({
   getInpatientAllergies:getInpatientAllergiesReducer,
   getInpatientVitals:getInpatientVitalsReducer,
   postDailyProcedureOrProcess:postDailyProcedureOrProcessReducer,
-  getQyInpatientProcessProcedure:getQyInpatientProcessProceduresReducer
+  getQyInpatientProcessProcedure:getQyInpatientProcessProceduresReducer,
+  postInpatientInjection:postInpatientInjectionReducer,
+  getInpatientInjection:getInpatientInjectionReducer
 
 });
