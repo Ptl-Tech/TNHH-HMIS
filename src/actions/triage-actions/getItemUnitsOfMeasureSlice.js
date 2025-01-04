@@ -14,7 +14,7 @@ export const getItemUnitsOfMeasureSlice = () => async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyItemUnitsOfMeasure&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyMeasuringUnitsSetup&isList=true`, config);
 
 
         dispatch({ type: GET_ITEMS_UNITS_OF_MEASURE_SUCCESS, payload: data })

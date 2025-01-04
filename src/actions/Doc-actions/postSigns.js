@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
@@ -24,7 +25,6 @@ export const postSignsRequest = (signs) => async (dispatch, getState) => {
       },
     };
 
-    console.log("Lab Request:", signs);
     const response = await axios.post(
       `${API}Doctor/PatientSigns`,
       signs,
@@ -39,17 +39,19 @@ export const postSignsRequest = (signs) => async (dispatch, getState) => {
 
     setTimeout(() => {
       dispatch({ type: POST_SIGNS_SUCCESS, payload: responseData });
-      console.log("Dispatched Payload:", responseData);
+      message.success("Signs posted Successfully", 2);
     }, 2000);
 
     // Return response data for further use
     return responseData.data;
   } catch (error) {
+   setTimeout(() => {
     dispatch({
       type: POST_SIGNS_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: error.response?.data?.message || error.errors,
     });
-    message.error(error.message, 5);
+    message.error(error.response?.data?.errors || error.errors);
+   }, 2000);
     throw error; // Rethrow error for further handling
   }
 };

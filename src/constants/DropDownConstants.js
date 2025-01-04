@@ -14,6 +14,87 @@ export const paymentmodeOptions = [
   { value: "2", label: "Cash" },
 ]
 
+export const prescriptionDoseTypes = [
+  {
+    value: "1",
+    label: "STAT",
+  },
+  {
+    value: "2",
+    label: "PRN",
+  },
+  {
+    value: "3",
+    label: "PD",
+  },
+  {
+    value: "4",
+    label: "TDS",
+  },
+  {
+    value: "5",
+    label: "OD",
+  },
+  {
+    value: "6",
+    label: "QID",
+  },
+  {
+    value: "7",
+    label: "QD",
+  },
+  {
+    value: "8",
+    label: "NOCTE",
+  },
+  {
+    value: "9",
+    label: "HOURLY",
+  },
+];
+export const routeTypes = [
+  {
+    value: "0",
+    label: "Oral",
+  },
+  {
+    value: "1",
+    label: "Intravenous(IV)",
+  },
+  {
+    value: "2",
+    label: "Rectal",
+  },
+  {
+    value: "3",
+    label: "Vaginal",
+  },
+  {
+    value: "4",
+    label: "Nasal",
+  },
+  {
+    value: "5",
+    label: "Subcutaneous(SC)",
+  },
+  {
+    value: "6",
+    label: "Intrathical",
+  },
+  {
+    value: "7",
+    label: "Intradermal",
+  },
+  {
+    value: "8",
+    label: "Intramuscular(IM)",
+  },
+  {
+    value: "9",
+    label: "Topical",
+  },
+];
+
 export const COUNTRIES_LIST_REQUEST = "COUNTRIES_LIST_REQUEST";
 export const COUNTRIES_LIST_SUCCESS = "COUNTRIES_LIST_SUCCESS";
 export const COUNTRIES_LIST_FAIL = "COUNTRIES_LIST_FAIL";

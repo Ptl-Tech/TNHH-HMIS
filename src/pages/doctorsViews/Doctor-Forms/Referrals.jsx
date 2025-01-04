@@ -8,33 +8,43 @@ import {
   Button,
   Typography,
   Modal,
-  Select,
   Skeleton,
+  List,
+  Select,
+  Table,
 } from "antd";
 import {
   FileTextOutlined,
   PrinterOutlined,
   MailOutlined,
-} from "@ant-design/icons";
+  UserOutlined,
+  PhoneOutlined,
+  IdcardOutlined,
+  EnvironmentOutlined,
+  AppstoreAddOutlined,
+  SaveOutlined,
+} from "@ant-design/icons"; // Add relevant icons here
 import { useDispatch, useSelector } from "react-redux";
 import {
   getEmployeesList,
   getEmployeeByNumber,
 } from "../../../actions/DropdownListActions";
-import { postRefferalDetails, requestRefferal } from "../../../actions/Doc-actions/postRefferalDetails";
+import {
+  postRefferalDetails,
+  requestRefferal,
+} from "../../../actions/Doc-actions/postRefferalDetails";
 import { useLocation } from "react-router-dom";
 import moment from "moment";
+import useAuth from "../../../hooks/useAuth";
+import { getHospitalNumber } from "../../../actions/Doc-actions/getHospitalNumber";
+import { getReferralLines } from "../../../actions/Doc-actions/getReferralLines";
 
 const Referrals = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
-
+  const employeeData = useAuth();
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.getEmployees);
-  const { data: employeeData, loading: employeeLoading } = useSelector(
-    (state) => state.getEmployeeDetails
-  );
   const { loading: saveLoading } = useSelector(
     (state) => state.saveRefferalDetails
   );
@@ -42,15 +52,29 @@ const Referrals = () => {
     (state) => state.requestRefferal
   );
 
+  const { loading: referralLinesLoading, data: referralLines } = useSelector(
+    (state) => state.getReferralLines
+  );
+  
+  const { data } = useSelector((state) => state.getHosNumber);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStaffNo, setSelectedStaffNo] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(false);
-
-  const [form] = Form.useForm(); // Use Ant Design form hook
+  const [form] = Form.useForm();
 
   useEffect(() => {
     dispatch(getEmployeesList());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getHospitalNumber());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if(treatmentNo){
+      dispatch(getReferralLines(treatmentNo));
+    }
+  }, [dispatch, treatmentNo]);
 
   useEffect(() => {
     if (selectedStaffNo) {
@@ -71,7 +95,6 @@ const Referrals = () => {
     dispatch(requestRefferal(treatmentNo));
   };
 
-  // Form submission handler
   const handleSubmitReferral = async (values) => {
     const {
       treatmentNo,
@@ -81,30 +104,94 @@ const Referrals = () => {
       referralReason,
       referralRemarks,
     } = values;
-  
+
     const referralData = {
-      myAction: "create", // Replace with appropriate action
+      myAction: "create",
       treatmentNo: treatmentNo,
-      dateReferred: new Date(dateReferred).toISOString().split("T")[0], // Format date as YYYY-MM-DD
+      dateReferred: new Date(dateReferred).toISOString().split("T")[0],
       hospitalNo: hospitalNo,
       contactPerson: contactPerson,
       referralReason: referralReason,
       referralRemarks: referralRemarks,
     };
-  
+
     try {
-      // Dispatch the action to send referral details
       await dispatch(postRefferalDetails(referralData));
-      alert("Referral details submitted successfully!");
     } catch (error) {
       console.error("Failed to submit referral:", error);
     }
   };
-  
 
   const handlePrintTransfer = () => {
     window.print();
   };
+
+  const referralLinesCols = [
+    {
+      title: "Treatment No",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+    },
+    {
+      title: "Description",
+      dataIndex: "ReferralReason",
+      key: "ReferralReason",
+    },
+    {
+      title: "Clinical Notes",
+      dataIndex: "ClinicalHistoryTreatment",
+      key: "ClinicalHistoryTreatment",
+    },
+    {
+      title: "Date Referred",
+      dataIndex: "DateReferred",
+      key: "DateReferred",
+    },
+    {
+      title: "Hospital",
+      dataIndex: "HospitalName",
+      key: "HospitalName",
+    },
+    {
+      title: "Contact Person",
+      dataIndex: "ContactPerson",
+      key: "ContactPerson",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      // render different status colors  for approved new and cancelled
+      render: (text) => {
+        let color = "black";
+        if (text === "Approved") {
+          color = "green";
+        } else if (text === "New") {
+          color = "blue";
+        } else if (text === "Cancelled") {
+          color = "red";
+        }
+        return (
+          <Typography.Text style={{ color: color, fontWeight: "bold" }}>
+            {text}
+          </Typography.Text>
+        );
+      },
+    }
+  ];
+
+  const dataSource=[
+    {
+      key:referralLines?.TreatmentNo,
+      TreatmentNo: referralLines?.TreatmentNo,
+      ReferralReason: referralLines?.ReferralReason,
+      ClinicalHistoryTreatment: referralLines?.ClinicalHistoryTreatment,
+      DateReferred: referralLines?.DateReferred,
+      HospitalName: referralLines?.HospitalName,
+      ContactPerson: referralLines?.ContactPerson,
+      Status: referralLines?.Status
+    }
+  ]
 
   return (
     <div>
@@ -114,7 +201,7 @@ const Referrals = () => {
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Referral Details
         </Typography.Title>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "right" , justifyContent: "flex-end"}}>
           <Button
             type="default"
             icon={<PrinterOutlined />}
@@ -130,157 +217,202 @@ const Referrals = () => {
             Send to Referral
           </Button>
           <Button type="default" onClick={handleModalVisible}>
-            Show Referral Details
+            Show Previous Referrals
           </Button>
         </div>
       </div>
 
-      {/* Referral Form Card */}
-      <Card style={{ margin: "20px 10px" }}>
-        <Form form={form} layout="vertical" onFinish={handleSubmitReferral} initialValues={{
-          treatmentNo: treatmentNo,
-          dateReferred: moment().format("YYYY-MM-DD"), // Default to current date
-          hospitalNo: "",
-          contactPerson: "",
-          referralReason: "",
-          referralRemarks: "",
-
-        }}>
-          <Row gutter={16}>
-            <Col span={12}>
-               <Form.Item
-                              name="treatmentNo"
-                              label="Treatment Number"
-                              rules={[
-                                {
-                                  required: true,
-                                  message: "Please enter the treatment number.",
-                                },
-                              ]}
-                            >
-                              <Input
-                                placeholder="Treatment Number"
-                                style={{ width: "100%", color: "green", fontWeight: "bold" }}
-                              />
-                            </Form.Item>
-            </Col>
-            <Col span={12}>
-            <Form.Item label="Date Referred" name="dateReferred">
-        <Input name="dateReferred" placeholder="YYYY-MM-DD" value={moment().format("YYYY-MM-DD")} disabled />
-      </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Hospital Number" name="hospitalNo">
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Contact Person" name="contactPerson">
-                <Select
-                  placeholder="Select Contact Person"
-                  onChange={setSelectedStaffNo}
+      {/* Referral and Employee Info Cards */}
+      <Row gutter={16}>
+        {/* Referral Form Card */}
+        <Col span={14}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmitReferral}
+            initialValues={{
+              treatmentNo: treatmentNo,
+              dateReferred: moment().format("YYYY-MM-DD"), // Default to current date
+              hospitalNo: "",
+              contactPerson: "",
+              referralReason: "",
+              referralRemarks: "",
+            }}
+          >
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  name="treatmentNo"
+                  label="Treatment Number"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter the treatment number.",
+                    },
+                  ]}
                 >
-                  {data?.map((item) => (
-                    <Select.Option key={item.No} value={item.No}>
-                      {item.FirstName} {item.LastName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item label="Referral Reason" name="referralReason">
-                <Input.TextArea />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item label="Referral Remarks" name="referralRemarks">
-                <Input.TextArea />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={24}>
-            <Button type="primary" htmlType="submit" loading={saveLoading} disabled={saveLoading}>
-                Submit Referral
-              </Button>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-
-      {/* Profile Information for Contact Person */}
-      {employeeLoading ? (
-        <Skeleton active paragraph={{ rows: 4 }} />
-      ) : (
-        employeeData && (
-          <Card title="Contact Person Profile" style={{ margin: "20px 10px" }}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Typography.Text strong>Name:</Typography.Text>
-                <Typography.Text>
-                  {employeeData.FirstName} {employeeData.LastName}
-                </Typography.Text>
+                  <Input
+                    placeholder="Treatment Number"
+                    style={{
+                      width: "100%",
+                      color: "green",
+                      fontWeight: "bold",
+                    }}
+                  />
+                </Form.Item>
               </Col>
-              <Col span={12}>
-                <Typography.Text strong>Gender:</Typography.Text>
-                <Typography.Text>{employeeData.Gender}</Typography.Text>
+              <Col span={24}>
+                <Form.Item label="Date Referred" name="dateReferred">
+                  <Input
+                    name="dateReferred"
+                    placeholder="YYYY-MM-DD"
+                    value={moment().format("YYYY-MM-DD")}
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item label="Hospital" name="hospitalNo">
+                  <Select
+                    placeholder="Select Hospital"
+                    style={{ width: "100%" }}
+                    showSearch
+                  >
+                    {data?.map((item) => {
+                      <Option key={item[0].No} value={item.No}>
+                        {item[0].Name}
+                      </Option>;
+                    })}
+                  </Select>
+                </Form.Item>
               </Col>
             </Row>
 
             <Row gutter={16}>
-              <Col span={12}>
-                <Typography.Text strong>Staff No:</Typography.Text>
-                <Typography.Text>{employeeData.No}</Typography.Text>
-              </Col>
-              <Col span={12}>
-                <Typography.Text strong>Profession:</Typography.Text>
-                <Typography.Text>
-                  {employeeData.Shortcut_Dimension_2_Code || "N/A"}
-                </Typography.Text>
+              <Col span={24}>
+                <Form.Item label="Referral Reason" name="referralReason">
+                  <Input.TextArea />
+                </Form.Item>
               </Col>
             </Row>
 
             <Row gutter={16}>
-              <Col span={12}>
-                <Typography.Text strong>Contact:</Typography.Text>
-                <Typography.Text>
-                  {employeeData.WorkPhoneNumber}
-                </Typography.Text>
-              </Col>
-              <Col span={12}>
-                <Typography.Text strong>Branch:</Typography.Text>
-                <Typography.Text>
-                  {employeeData.Shortcut_Dimension_1_Code}
-                </Typography.Text>
+              <Col span={24}>
+                <Form.Item label="Referral Remarks" name="referralRemarks">
+                  <Input.TextArea />
+                </Form.Item>
               </Col>
             </Row>
 
             <Row gutter={16}>
-              <Col span={12}>
-                <Typography.Text strong>Email:</Typography.Text>
-                <Typography.Text>{employeeData.CompanyEMail}</Typography.Text>
-              </Col>
-              <Col span={12}>
-                <Typography.Text strong>Designation:</Typography.Text>
-                <Typography.Text>
-                  {employeeData.Shortcut_Dimension_4_Code}
-                </Typography.Text>
+              <Col span={24}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={saveLoading}
+                  disabled={saveLoading}
+                  style={{ width: "100%" }}
+                >
+                  <SaveOutlined />
+                  Save
+                </Button>
               </Col>
             </Row>
-          </Card>
-        )
-      )}
+          </Form>
+        </Col>
+
+        {/* Employee Info Card */}
+        <Col span={10}>
+          {loadingProfile ? (
+            <Skeleton active paragraph={{ rows: 4 }} />
+          ) : (
+            employeeData && (
+              <Card
+                title="Contact Person Profile"
+                style={{ margin: "20px 10px", backgroundColor: "#f4f8fb" }}
+              >
+                <List
+                  itemLayout="horizontal"
+                  style={{ width: "100%", padding: "10px" }}
+                  dataSource={[
+                    {
+                      title: "Name",
+                      content:
+                        `${employeeData.userData.firstName} ${employeeData.userData.lastName}` ||
+                        "N/A",
+                      icon: <UserOutlined style={{ fontSize: "20px" }} />,
+                    },
+                    {
+                      title: "Gender",
+                      content: employeeData.userData.Gender,
+                      icon: (
+                        <AppstoreAddOutlined style={{ fontSize: "20px" }} />
+                      ),
+                    },
+                    {
+                      title: "Title",
+                      content: employeeData.userData.title,
+                      icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
+                    },
+                    {
+                      title: "Staff No",
+                      content: employeeData.userData.no,
+                      icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
+                    },
+                    {
+                      title: "Profession",
+                      content:
+                        employeeData.userData.Shortcut_Dimension_2_Code ||
+                        "N/A",
+                      icon: (
+                        <AppstoreAddOutlined style={{ fontSize: "20px" }} />
+                      ),
+                    },
+                    {
+                      title: "Contact",
+                      content: employeeData.userData.workPhoneNumber,
+                      icon: <PhoneOutlined style={{ fontSize: "20px" }} />,
+                    },
+                    {
+                      title: "Branch",
+                      content: employeeData.userData.shortcut_Dimension_1_Code,
+                      icon: (
+                        <EnvironmentOutlined style={{ fontSize: "20px" }} />
+                      ),
+                    },
+                    {
+                      title: "Email",
+                      content: employeeData.userData.companyEMail,
+                      icon: <MailOutlined style={{ fontSize: "20px" }} />,
+                    },
+                    {
+                      title: "Designation",
+                      content: employeeData.userData.shortcut_Dimension_4_Code,
+                      icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
+                    },
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        style={{ width: "100%", flexWrap: "row" }}
+                        avatar={item.icon}
+                        title={
+                          <Typography.Text strong>
+                            {item.title}:
+                          </Typography.Text>
+                        }
+                        description={
+                          <Typography.Text>{item.content}</Typography.Text>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            )
+          )}
+        </Col>
+      </Row>
 
       {/* Modal for Referral Details */}
       <Modal
@@ -292,12 +424,14 @@ const Referrals = () => {
             Close
           </Button>
         }
-        width={800}
+        width={900}
       >
-        <Typography.Paragraph>
-          Here you can view the details of the referral and any related
-          information.
-        </Typography.Paragraph>
+        <Table
+          columns={referralLinesCols}
+          dataSource={dataSource}
+          pagination={false}
+          loading={referralLinesLoading}
+        />
       </Modal>
     </div>
   );

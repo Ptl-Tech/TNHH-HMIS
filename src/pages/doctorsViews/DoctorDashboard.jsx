@@ -33,7 +33,6 @@ const DoctorDashboard = () => {
   const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};
   const filterOutPatients = allPatientLList.filter((item)=>item.Inpatient===false) || {};
 
-  console.log('Inpatients', filterInPatients);
   // Sample data for the cards
   const cardData = [
     {
@@ -90,8 +89,6 @@ const chartData = last30Days.reverse().flatMap((date) => [
   { date, type: 'Inpatient', count: inPatientCountsByDate[date] || 0 },
 ]);
 
-// Example: Chart Data for Ant Design
-console.log(chartData);
 
 
 

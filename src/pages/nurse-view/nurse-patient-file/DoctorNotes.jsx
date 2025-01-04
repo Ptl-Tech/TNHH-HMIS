@@ -1,11 +1,13 @@
-import { Button, DatePicker, Form, Input, Modal, Space, Typography } from "antd"
+import { Button, DatePicker, Form, Input, Modal, Select, Space, Typography } from "antd"
 import { ProfileOutlined, FolderViewOutlined, PlusOutlined } from "@ant-design/icons"
 import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable"
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
+import useAuth from "../../../hooks/useAuth";
 
 const DoctorNotes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const docDetails=useAuth();
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -17,6 +19,21 @@ const DoctorNotes = () => {
   };
 
   const [ form ] = Form.useForm();
+
+const notesTypes=[
+  {value: '1', label: 'Doctor Notes'},
+  {value: '2', label: 'Medical Report'},
+  {value: '3', label: 'History'},
+  {value: '4', label: 'Treatment Plan'},
+  {value: '5', label: 'Chief Complaints'},
+  {value: '6', label: 'Past Medical History'},
+  {value: '7', label: 'Past Surgical History'},
+  {value: '8', label: 'Social History'},
+  {value: '9', label: 'Investigations'},
+  {value: '10', label: 'Assessment and plan'}
+
+]
+
 
   return (
     <div>
@@ -54,7 +71,19 @@ const DoctorNotes = () => {
                   name="doctor"
                     >   
                     <Input placeholder="Doctor name" 
+                     name="doctor"
+                     value={docDetails.userData.SearchName|| `${docDetails.userData.firstName} ${docDetails.userData.lastName}`}
                      disabled
+                    />
+                </Form.Item>
+                <Form.Item
+                    label="Notes Type"
+                    name="notesType"
+                    rules={[{ required: true, message: 'Please select Notes Type!' }]}
+                >
+                    <Select
+                        options={notesTypes}
+                        placeholder="Select Notes Type"
                     />
                 </Form.Item>
                 <Form.Item 

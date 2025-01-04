@@ -20,6 +20,11 @@
   background: #0f5689 !important;
 }
 
+:where(.css-lobnjp).ant-menu-light, 
+:where(.css-lobnjp).ant-menu-light > .ant-menu {
+    color: #ffffff;
+    background: #0f5689 !important;
+}
 
 .ant-layout-sider-collapsed {
   flex: 0 0 80px !important;
