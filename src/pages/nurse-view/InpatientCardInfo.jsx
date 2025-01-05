@@ -41,16 +41,6 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
                     </Typography.Text>
                 </div>
             </div>
-
-            <Divider />
-
-            <div className="print-button-container">
-
-                <Button type="primary" style={{ width: '100%' }}><PrinterOutlined /> Interim invoice</Button>
-                <Button color="default" variant="outlined" style={{ width: '100%' }}><PrinterOutlined /> Treatment form</Button>
-
-            </div>
-
         </Card>
 
         <Card className="card" title="Allergies and Medications" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none' }}>

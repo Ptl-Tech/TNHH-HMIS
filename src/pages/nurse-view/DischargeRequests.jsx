@@ -7,6 +7,7 @@ import { getPgInpatientDischargeRequestsSlice } from "../../actions/nurse-action
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
 import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../actions/nurse-actions/postInitiateDischargeSlice";
+import useSetTablePagination from "../../hooks/useSetTablePagination";
 
 const DischargeRequests = () => {
     
@@ -88,15 +89,7 @@ const DischargeRequests = () => {
         
     });
 
-    const [pagination, setPagination] = useState({
-            current: 1,
-            pageSize: 10,
-            total: formattedPatientDischargeRequests?.length,
-        });
-              
-    const handleTableChange = (newPagination) => {
-        setPagination(newPagination); // Update pagination settings
-    };
+    const { pagination, handleTableChange } = useSetTablePagination(formattedPatientDischargeRequests);
 
     const handleInitiateDischarge = (record) => {
         confirm({
@@ -142,9 +135,8 @@ const DischargeRequests = () => {
     }
 
     useEffect(() => {
-        if(!getInpatientDischargeRequest?.length)
-            dispatch(getPgInpatientDischargeRequestsSlice());
-    }, [dispatch, getInpatientDischargeRequest?.length]);
+        dispatch(getPgInpatientDischargeRequestsSlice());
+    }, [dispatch]);
 
     useEffect(() => {
         if(!data.length) {

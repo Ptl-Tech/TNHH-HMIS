@@ -1,53 +1,66 @@
-import { Button, Divider, message } from "antd";
+import { Button, Divider, message, Modal } from "antd";
 import { useState } from "react";
 import Summery from "./discharges/Summery";
 import DischargeMedication from "./discharges/DischargeMedication";
 import SickOff from "./discharges/SickOff";
-import { useDispatch, useSelector } from "react-redux";
-import { postInitiatePatientDischarge, postInpatientDischarge } from "../../actions/Doc-actions/Admission/postInitiateDischarge";
+import { useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../actions/nurse-actions/postInitiateDischargeSlice";
 
 const Discharges = () => {
   const [selectedItem, setSelectedItem] = useState("Summery");
   const dispatch=useDispatch();
+  const { patientDetails } = useLocation().state;
+  const { confirm } = Modal;
 
-  const {
-    loading: InitiateDischargeLoading,
-    success: InitiateDischargeSuccess,
-  } = useSelector((state) => state.postInitiateDischarge);
-  const {
-    loading: postInpatientDischargeLoading,
-    success: postInpatientDischargeSuccess,
-  } = useSelector((state) => state.postInpatient);
-  const admnNo = new URLSearchParams(window.location.search).get("treatmentNo");
+  const handleInitiateDischargeAction = async () => {
+    try {
+        const result = await dispatch(
+          postInitiateDischargeSlice('/Inpatient/InitiateDischarge', {
+            admissionNo: patientDetails?.CurrentAdmNo,
+          })
+        );
+    
+        if (result.type === POST_INITIATE_DISCHARGE_SUCCESS) {
+          message.success(
+            result.payload.message || `${patientDetails?.SearchName} discharge initiated successfully!`
+          );
+          return Promise.resolve(); // Resolve the Promise to close the modal
+        } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
+          message.error(
+            result.payload.message || 'An error occurred while initiating patient discharge, please try again.'
+          );
+          return Promise.reject(); // Reject the Promise to keep the modal open
+        }
+      } catch (error) {
+        message.error(error.message || 'Unexpected error occurred');
+        return Promise.reject(); // Reject on unexpected errors
+      }
+}
 
-  const handleInpatientDischarge = async () => {
-   const response= await dispatch(postInitiatePatientDischarge(admnNo));
-   console.log(response);
-    if (response.status === "success") {
-    //   message.success("You have initiated patient discharge successfully");
-    //   console.log("Patient discharge initiated successfully");
-    // //   navigate(
-    // //     `/Nurse/Discharge-list/Discharge-card?PatientNo=${patientNo}&AdmNo=${admNo}`
-    // //   );
-    const response = await dispatch(postInpatientDischarge(admnNo));
-    if (response.status === "success") {
-        setTimeout(() => {
-            message.success(
-                <>
-                  Successfully Initiated Discharge process for Admission No: <b>{admnNo}</b>
-                </>
-              );  
-        }, 1200);   
-    }
-    } else {
-      message.error("Patient discharge failed");
-    }
-  };
+
+
+  const handleInitiateDischarge = () => {
+    confirm({
+        title: 'Confirm Initiate Discharge',
+        content: `Are you sure you want to initiate discharge for ${patientDetails?.SearchName} ?`,
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk(){
+            return new Promise((resolve, reject) => {
+                handleInitiateDischargeAction(patientDetails?.AdmissionNo)
+                .then(resolve) // Resolve the modal when successful
+                .catch(reject); // Reject on failure
+            });
+        },
+    })
+}
 
   const handleOnClick = (item) => {
     switch (item) {
       case "Initiate Discharge":
-        handleInpatientDischarge();
+        handleInitiateDischarge();
         break;
       case "Summary":
         setSelectedItem(<Summery />);

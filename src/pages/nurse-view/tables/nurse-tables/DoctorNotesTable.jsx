@@ -1,39 +1,49 @@
 import { Table } from "antd"
 import PropTypes from "prop-types"
-import { useState } from "react"
 import Loading from "../../../../partials/nurse-partials/Loading"
+import useSetTablePagination from "../../../../hooks/useSetTablePagination"
 
 const DoctorNotesTable = ({ rowSelection, loadingGetDoctorNotes, getDoctorNotes }) => {
 
   const columns = [
-    
     {
-      title: 'Date',
-      dataIndex: 'TreatmentDate',
-      key: 'TreatmentDate',
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
+      fixed: 'left',
+      width: 100
     },
     {
-      title: 'Doctor',
-      dataIndex: 'Doctor',
-      key: 'Doctor',
+      title: 'Patient Name',
+      dataIndex: 'Patient_Name',
+      key: 'Patient_Name',
+    },
+    {
+      title: 'Treatment Date',
+      dataIndex: 'Treatment_Date',
+      key: 'Treatment_Date',
+    },
+    {
+      title: 'Clinic',
+      dataIndex: 'Clinic',
+      key: 'Clinic',
+    },
+    {
+      title: 'Notes Type',
+      dataIndex: 'Notes_Type',
+      key: 'Notes_Type',
     },
     {
       title: 'Notes',
-      dataIndex: 'Notes',
-      key: 'Notes',
+      dataIndex: 'NotesTxt',
+      key: 'NotesTxt',
+      fixed: 'right',
+      width: 300
     },
     
   ]
 
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: getDoctorNotes?.length,
-});
-      
-const handleTableChange = (newPagination) => {
-    setPagination(newPagination); // Update pagination settings
-};
+  const { pagination, handleTableChange } = useSetTablePagination(getDoctorNotes);
 
   return (
     <div style={{ paddingTop: '30px' }}>
@@ -41,7 +51,10 @@ const handleTableChange = (newPagination) => {
           loadingGetDoctorNotes ? (
                 <Loading />
             ) : (
-              <Table columns={columns} dataSource={getDoctorNotes} 
+              <Table columns={columns} 
+              dataSource={getDoctorNotes} 
+              rowKey={'SystemId'}
+              scroll={{ x: 'max-content' }}
               rowSelection={rowSelection}
               bordered size='middle' 
               pagination={{

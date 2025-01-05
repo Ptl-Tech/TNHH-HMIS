@@ -54,7 +54,7 @@ const Injections = () => {
             recId: "",
             admissionNo:  patientDetails?.CurrentAdmNo,
             injectionDate: dayjs(values?.date).format('YYYY-MM-DD'),
-            injectionTime: dayjs(values?.time).format('HH:mm'),
+            injectionTime: dayjs(values?.time).format('HH:mm:ss'),
             injection: values?.injection,
             remarks: values?.remarks,
           };
@@ -66,7 +66,7 @@ const Injections = () => {
               .then((result) => {
                 if (result.type === POST_INPATIENT_INJECTION_SUCCESS) {
                   const actionWord = isEditMode ? 'updated' : 'added';
-                  message.success(`Injection ${result.payload.visitorName} ${actionWord} successfully!`);
+                  message.success(`Injection ${actionWord} successfully!`);
                   dispatch(getInpatientInjectionSlice('/data/odatafilter?webservice=QyInpatientInjections&isList=true'));
                 } else if (result.type === POST_INPATIENT_INJECTION_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");

@@ -24,6 +24,26 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
       title: 'Notes Time',
       dataIndex: 'NotesTime', // Matches key in data
       key: 'NotesTime',
+      render: (time) => {
+        // Check if time exists
+        if (!time) return '-';
+    
+        // Convert `HH:mm:ss` to a Date object
+        const today = new Date(); // Get today's date
+        const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
+    
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Time';
+    
+        // Format time to "hh:mm AM/PM"
+        const formattedTime = date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+    
+        return formattedTime;
+      },
     },
     {
       title: 'Notes',

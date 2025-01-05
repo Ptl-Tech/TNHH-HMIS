@@ -1,6 +1,8 @@
 import { Button, Space, Table } from "antd"
+import { FolderViewOutlined } from "@ant-design/icons"
+import PropTypes from "prop-types";
 
-const DischargeSummeryTable = () => {
+const DischargeSummeryTable = ({ showModal }) => {
     const columns = [   
        
         {
@@ -29,9 +31,9 @@ const DischargeSummeryTable = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space>
-                    <Button color="danger" variant="outlined"
-                    onClick={() => handleCancel(record)}
-                    >Cancel</Button>
+                    <Button color="primary"
+                    onClick={() => showModal(record)}
+                    ><FolderViewOutlined /> View</Button>
                 </Space>
             ),
         }
@@ -47,10 +49,6 @@ const DischargeSummeryTable = () => {
         },
     ];
 
-    const handleCancel = (record) => {
-        console.log('Cancel clicked');
-    };
-
   return (
     <div style={{ paddingTop: '30px' }}>
     <Table 
@@ -65,3 +63,7 @@ const DischargeSummeryTable = () => {
 }
 
 export default DischargeSummeryTable
+// props validation
+DischargeSummeryTable.propTypes = {
+    showModal: PropTypes.func.isRequired,
+}

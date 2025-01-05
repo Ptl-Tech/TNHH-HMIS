@@ -1,5 +1,5 @@
 
-import { Button, DatePicker, Form, Input, Modal, Space, Typography } from "antd"
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Typography } from "antd"
 import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
 
 import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable"
@@ -9,12 +9,11 @@ import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import { getPgTreatmentDoctorNotesSlice } from "../../../actions/nurse-actions/getPgTreatmentDoctorsNotesSlice";
 import { useLocation } from "react-router-dom";
+import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 
 const DoctorNotes = () => {
 
-      const [selectedRowKey, setSelectedRowKey] = useState(null);
-      const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-      const [selectedRow, setSelectedRow] = useState([]);
+      const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
       const [ form ] = Form.useForm();
       const [isModalOpen, setIsModalOpen] = useState(false);
       const dispatch = useDispatch();
@@ -24,34 +23,29 @@ const DoctorNotes = () => {
         (state) => state.getPgTreatmentDoctorNotes
       );
 
+      const filterGetDoctorsNotes = getDoctorNotes?.filter((item) => item.PatientNo === patientDetails?.PatientNo);
+
       const handleCancel = () => {
         setIsModalOpen(false);
       };
 
   const handleViewDoctorNotes = () => {
-
+    if(selectedRow[0]){
+      form.resetFields();
+      form.setFieldsValue({
+        number: selectedRow[0]?.PatientNo,
+        type: selectedRow[0]?.Notes_Type,
+        date: selectedRow[0]?.Treatment_Date,
+        clinic: selectedRow[0]?.Clinic,
+        notes: selectedRow[0]?.NotesTxt
+      })
+      setIsModalOpen(true);
+    }
   }
-
-  const rowSelection = {
-    selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRowKeys.length > 1) {
-        setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-        setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-      } else {
-        setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-        setSelectedRow(selectedRows); // Update the selected row
-      }
-      setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User', // Disable specific rows if needed
-    }),
-  };
 
   useEffect(() => {
     if(!getDoctorNotes?.length){
-      dispatch(getPgTreatmentDoctorNotesSlice(patientDetails?.patientNo));
+      dispatch(getPgTreatmentDoctorNotesSlice());
     }
   }, [dispatch, getDoctorNotes?.length, patientDetails?.patientNo]);
  
@@ -71,7 +65,7 @@ const DoctorNotes = () => {
         <DoctorNotesTable 
           rowSelection={rowSelection} 
           loadingGetDoctorNotes={loadingGetDoctorNotes}
-          getDoctorNotes={getDoctorNotes}
+          getDoctorNotes={filterGetDoctorsNotes}
         />
 
         <Modal title="View Doctor Notes" 
@@ -83,57 +77,67 @@ const DoctorNotes = () => {
           ]}
         >
             <Form
-            
-                layout="vertical" 
-                style={{ paddingTop: '10px'}} 
-                form={form}
-                initialValues={{
-                  
-                }}
+            layout="vertical" 
+            style={{ paddingTop: '10px'}} 
+            form={form}
+            initialValues={
+              {
+                number: '',
+                type: '',
+                date: '',
+                clinic: '',
+                notes: ''
+              }
+            }
             >
-            <Form.Item
-              name={"notesDate"}
-              label="Notes Date"
-            >
-              <Input placeholder="Date" />
-              </Form.Item>
-              <Form.Item
-                label="Notes"
-                name="notes"
-              >
 
-               <DatePicker style={{ width: '100%'}}
-             />
-            </Form.Item>
-                <Form.Item
-                    label="Notes Type"
-                    name="notesType"
-                    rules={[{ required: true, message: 'Please select Notes Type!' }]}
+            <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item label="Patient No" 
+                    name="number"
+                    >
+                    <Input type="text"/>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                <Form.Item label="Notes Type"
+                name="type"
                 >
+                  <Input  type="text" />
                 </Form.Item>
-                <Form.Item 
-                label="Doctor Notes" 
-                name="doctorNotes"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please enter Doctor Notes!',
-                  },
-                  {
-                      validator: (_, value) => {
-                        if (value && value.length > 2000) {
-                          return Promise.reject(new Error('Doctor Notes cannot exceed 150 characters!'));
-                        }
-                        return Promise.resolve();
-                      },
-                  }
-                ]}
+              </Col>
+            </Row>
+          
+            <Row gutter={16}>
+                <Col span={12}>
+                    <Form.Item label="Notes Date" 
+                    name="date"
+                    >
+                    <Input type="text"/>
+                    </Form.Item>
+                </Col>
+                <Col span={12}>
+                <Form.Item label="Clinic"
+                name="clinic"
+                >
+                  <Input  type="text" />
+                </Form.Item>
+              </Col>
+            </Row>
+            
+
+            <Row gutter={16}>
+              <Col span={24}>
+              <Form.Item label="Notes" name="notes"
+             
               >
-              <TextArea placeholder="Enter Doctor Notes" name="Doctor Notes"
-                  rows={3}
-              />
-            </Form.Item>
-            </Form>
+                <Input.TextArea type='text'
+                />
+              </Form.Item>
+              </Col>
+            </Row>
+
+        </Form>
         </Modal>
         
     </div>

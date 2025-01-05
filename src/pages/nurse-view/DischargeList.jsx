@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { POST_DISCHARGE_PATIENT_FAILURE, POST_DISCHARGE_PATIENT_SUCCESS, postPostDischargeSlice } from "../../actions/nurse-actions/postPostDischargeSlice";
 import { POST_RELEASE_BED_FAILURE, POST_RELEASE_BED_SUCCESS, postReleaseBedSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
 import { POST_CANCEL_DISCHARGE_FAILURE, POST_CANCEL_DISCHARGE_SUCCESS, postCancelDischargeSlice } from "../../actions/nurse-actions/postCancelDischargeSlice";
+import useSetTablePagination from "../../hooks/useSetTablePagination";
+import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 
 
 const DischargeList = () => {
@@ -75,10 +77,9 @@ const columns = [
 ];
 
 const {loadingGetPatientDischargeList, getPatientDischargeList} = useSelector(state => state.getPgInpatientDischargeList);
-const [selectedRowKey, setSelectedRowKey] = useState(null);
-const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 const [selectedRow, setSelectedRow] = useState([]);
 const { confirm } = Modal;
+const { setIsButtonDisabled, setSelectedRowKey, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
 
 const dispatch = useDispatch();
 const navigate = useNavigate();
@@ -100,15 +101,7 @@ const formattedPatientDischargeList = getPatientDischargeList.map(discharge => {
     }
 });
 
-const [pagination, setPagination] = useState({
-            current: 1,
-            pageSize: 10,
-            total: formattedPatientDischargeList?.length,
-        });
-              
-const handleTableChange = (newPagination) => {
-    setPagination(newPagination); // Update pagination settings
-};
+const { pagination, handleTableChange } = useSetTablePagination(formattedPatientDischargeList);
 
 const handleDischargePatient = () => {
     confirm({
@@ -139,6 +132,7 @@ const handleDischargePatient = () => {
         message.success(
           result.payload.message || `${selectedRow[0]?.Search_Names} discharged successfully!`
         );
+        
         setSelectedRowKey(null);
         setSelectedRow([]);
         setIsButtonDisabled(true);
@@ -231,7 +225,7 @@ const handleCancelDischarge = () => {
 const handleCancelDischargeAction = async () => {
     try {
         const result = await dispatch(
-          postCancelDischargeSlice('/Inpatient/ReleaseBed', {
+          postCancelDischargeSlice('/Inpatient/CancelDischarge', {
             admissionNo: selectedRow[0]?.AdmissionNo,
           })
         );
@@ -257,30 +251,13 @@ const handleCancelDischargeAction = async () => {
       }  
 }
 
-  const rowSelection = {
-    selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRowKeys.length > 1) {
-        setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-        setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-      } else {
-        setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-        setSelectedRow(selectedRows); // Update the selected row
-      }
-      setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User', // Disable specific rows if needed
-    }),
-};
-
 
 useEffect(() => {
-    if(!getPatientDischargeList.length) {
-        // Fetch patient discharge list
-        dispatch(getPgInpatientDischargeListSlice());
-    }
-}, [dispatch, getPatientDischargeList.length]);
+ 
+    // Fetch patient discharge list
+    dispatch(getPgInpatientDischargeListSlice());
+    
+}, [dispatch]);
 
  useEffect(() => {
         if(!data.length) {

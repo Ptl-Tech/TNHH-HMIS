@@ -7,13 +7,13 @@ export const GET_PG_TREATMENT_DOCTOR_NOTES_FAILURE = 'GET_PG_TREATMENT_DOCTOR_NO
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
-export const getPgTreatmentDoctorNotesSlice = (patientNo) => 
+export const getPgTreatmentDoctorNotesSlice = () => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_PG_TREATMENT_DOCTOR_NOTES_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgTreatmentDoctorsNotes&isList=true&query=$filter=PatientNo eq '${patientNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgTreatmentDoctorsNotes&isList=true`, config);
     
 
         dispatch({ type: GET_PG_TREATMENT_DOCTOR_NOTES_SUCCESS, payload: data });
