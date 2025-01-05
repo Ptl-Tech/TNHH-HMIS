@@ -2,9 +2,11 @@
 import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Typography } from "antd"
 import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
 
+
 import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable"
 import { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
+
 
 import { useDispatch, useSelector } from "react-redux";
 import { getPgTreatmentDoctorNotesSlice } from "../../../actions/nurse-actions/getPgTreatmentDoctorsNotesSlice";
@@ -121,6 +123,36 @@ const DoctorNotes = () => {
                 name="clinic"
                 >
                   <Input  type="text" />
+                  </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="notesDate"
+                label="Notes Date"
+              >
+                <Input placeholder="Date" />
+                </Form.Item>
+                <Form.Item
+                  label="Notes"
+                  name="notes"
+                >
+
+                <DatePicker style={{ width: '100%'}}
+              />
+              
+              </Form.Item>
+            </Col>
+      
+              <Col span={12}>
+                <Form.Item
+                    label="Notes Type"
+                    name="type"
+                    rules={[{ required: true, message: 'Please select Notes Type!' }]}
+                >
+                  <Input />
                 </Form.Item>
               </Col>
             </Row>
@@ -131,17 +163,20 @@ const DoctorNotes = () => {
               <Form.Item label="Notes" name="notes"
              
               >
-                <Input.TextArea type='text'
+                <TextArea type='text'
                 />
               </Form.Item>
               </Col>
             </Row>
 
-        </Form>
+          </Form>    
+            
         </Modal>
         
     </div>
   )
+
 }
+
 
 export default DoctorNotes

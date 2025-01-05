@@ -1,4 +1,5 @@
 
+
 import { Button, Card, Space, Table, Typography, Modal, message } from "antd"
 import { ProfileOutlined, VerticalAlignTopOutlined, CloseOutlined, ExperimentOutlined, PrinterOutlined, FileExclamationOutlined, DeliveredProcedureOutlined } from "@ant-design/icons"
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +17,9 @@ import useSetTablePagination from "../../hooks/useSetTablePagination";
 import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 
 
+
 const DischargeList = () => {
+  
   
 const columns = [
     {
