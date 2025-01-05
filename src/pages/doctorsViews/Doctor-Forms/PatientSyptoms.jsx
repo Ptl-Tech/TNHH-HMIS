@@ -11,7 +11,7 @@ import {
   Col,
   Row,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, SaveOutlined, FileOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SaveOutlined, FileOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getSymptomsRequest } from "../../../actions/Doc-actions/qySymptomsSetup";
 import { getHMSsetup } from "../../../actions/Doc-actions/qyHMSSystems";
@@ -82,27 +82,46 @@ const PatientSymptoms = ({ treatmentNo }) => {
   };
 
   const columnsSymptoms = [
-    {title:"Tratement No", dataIndex:"TreatmentNo", key:"TreatmentNo"},
+    { title: "Treatment No", dataIndex: "TreatmentNo", key: "TreatmentNo" },
     { title: "System", dataIndex: "System", key: "System" },
-    { title: "Symptom", dataIndex: "SymptomDescription", key: "SymptomDescription" },
-    {title:"Date Taken", dataIndex:"DateTaken", key:"DateTaken"},
+    { title: "Symptom Code", dataIndex: "SymptomCode", key: "SymptomCode" },
     { title: "Description", dataIndex: "Description", key: "Description" },
+    { title: "Duration", dataIndex: "Duration", key: "Duration" },
     {
       title: "Characteristics",
-      dataIndex: "characteristics",
-      key: "characteristics",
+      dataIndex: "Characteristics",
+      key: "Characteristics",
     },
-    { title: "Duration", dataIndex: "Duration", key: "Duration" },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Popconfirm
-          title="Are you sure?"
-          onConfirm={() => deleteItem(record.SymptomCode)}
-        >
-          <Button type="link" icon={<DeleteOutlined />} danger />
-        </Popconfirm>
+        <>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => viewItem(record.key)}
+            style={{ marginRight: "8px" }}
+          >
+            View
+          </Button>
+          <Button
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() => editItem(record.key)}
+            style={{ marginRight: "8px" }}
+          >
+            Edit
+          </Button>
+          <Button
+            type="primary"
+            icon={<DeleteOutlined />}
+            onClick={() => deleteItem(record.key)}
+            danger
+          >
+            Delete
+          </Button>
+        </>
       ),
     },
   ];
@@ -132,7 +151,7 @@ const DataSource = Array.isArray(symptomsLines)
 <>
 {!showForm ? (
         <>
-        <Table columns={columnsSymptoms} dataSource={DataSource} />
+        <div className="d-flex justify-content-end my-2">
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -147,6 +166,16 @@ const DataSource = Array.isArray(symptomsLines)
         >
           Add Symptom
         </Button>
+        </div>
+        <Table columns={columnsSymptoms} dataSource={DataSource}  pagination={{
+                  position: ["bottom", "right"],
+                  showSizeChanger: true,
+                  pageSize: 10,
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} items`,
+                }}
+       />
+        
         </>
       ) : (
         <>

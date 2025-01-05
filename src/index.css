@@ -15,9 +15,12 @@
   width: 230px !important;
 }
 /* Override submenu background to make it transparent */
-:where(.css-dev-only-do-not-override-lobnjp).ant-menu-light, :where(.css-dev-only-do-not-override-lobnjp).ant-menu-light>.ant-menu {
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light, :where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light>.ant-menu {
   color: #ffffff;
   background: #0f5689 !important;
+}
+:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light, :where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light>.ant-menu {
+  color: #ffffff;
 }
 
 :where(.css-lobnjp).ant-menu-light, 
@@ -174,6 +177,19 @@
 .warning-row {
   background-color: #ffe58f; /* Light yellow */
 }
+
+.row-green {
+  background-color: #dfffd6; /* Light green */
+}
+
+.row-orange {
+  background-color: #ffedd6; /* Light orange */
+}
+
+.row-red {
+  background-color: #ffd6d6; /* Light red */
+}
+
 
 
 main {

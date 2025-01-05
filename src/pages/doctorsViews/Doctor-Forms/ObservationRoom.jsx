@@ -27,21 +27,7 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
       case "Vitals":
         setSelectedItem(<FormVitals treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-      case "Add Patient Signs":
-        setSelectedItem(<PatientSigns treatmentNo={treatmentNo} />);
-        break;
-        case "Add Patient Syptoms":
-        setSelectedItem(<PatientSymptoms treatmentNo={treatmentNo} />);
-        break;
-      case "Diagnosis":
-        setSelectedItem(<Diagnosis />);
-        break;
-        case "Doctor Notes":
-        setSelectedItem(<DoctorNotes />);
-        break;
-        case "Sick Off":
-        setSelectedItem(<SickOff />);
-        break;
+     
 
       default:
 
@@ -53,14 +39,7 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
 
   const buttonItems = [
     { label: "Vitals", icon: <HeartOutlined /> },
-    { label: "Add Patient Signs", icon: <SolutionOutlined /> },
-    { label: "Add Patient Syptoms", icon: <SolutionOutlined /> },
-    { label: "Diagnosis", icon: <MedicineBoxOutlined /> },
-    { label: "Doctor Notes", icon: <FaNotesMedical /> },
-    {
-      label: "Sick Off",
-      icon: < CalendarOutlined/>,
-    }
+   
   ];
 
   return (

@@ -1,11 +1,20 @@
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
-import { OUTPATIENT_LIST_FAIL, OUTPATIENT_LIST_REQUEST, OUTPATIENT_LIST_SUCCESS } from "../../constants/doc-constants/outPatient";
+
+export const TREATMENT_LIST_REQUEST = "TREATMENT_LIST_REQUEST";
+export const TREATMENT_LIST_SUCCESS = "TREATMENT_LIST_SUCCESS";
+export const TREATMENT_LIST_FAIL = "TREATMENT_LIST_FAIL";
+export const TREATMENT_LIST_RESET = "TREATMENT_LIST_RESET";
+
+export const GET_PATIENT_DETAILS_REQUEST = "GET_PATIENT_DETAILS_REQUEST";
+export const GET_PATIENT_DETAILS_SUCCESS = "GET_PATIENT_DETAILS_SUCCESS";
+export const GET_PATIENT_DETAILS_FAILURE = "GET_PATIENT_DETAILS_FAILURE";
+export const GET_PATIENT_DETAILS_RESET = "GET_PATIENT_DETAILS_RESET";
 
 export const getOutPatientTreatmentList = () => async (dispatch, getState) => { 
     try {
-      dispatch({ type: OUTPATIENT_LIST_REQUEST });
+      dispatch({ type: TREATMENT_LIST_REQUEST });
   
       const {
         otpVerify: { userInfo },
@@ -31,9 +40,9 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
 
       console.log("filteredData: ", filteredData);
   
-      dispatch({ type: OUTPATIENT_LIST_SUCCESS, payload: filteredData });
+      dispatch({ type: TREATMENT_LIST_SUCCESS, payload: filteredData });
     } catch (error) {
-      dispatch({ type: OUTPATIENT_LIST_FAIL, payload: error.message });
+      dispatch({ type: TREATMENT_LIST_FAIL, payload: error.message });
     }
   };
 
@@ -41,7 +50,7 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
   //export const getPatientDetails
   export const getPatientDetails = () => async (dispatch, getState) => { 
     try {
-      dispatch({ type: OUTPATIENT_LIST_REQUEST });
+      dispatch({ type: GET_PATIENT_DETAILS_REQUEST });
   
       const {
         otpVerify: { userInfo },
@@ -59,7 +68,7 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
         },
       };
   
-      const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
+      const { data } = await axios.get(`${API}data/odatafilter?webservice=PgPatientsList&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
   
       // Filter the patients by branchCode matching GlobalDimension1Code
       // const filteredData = data.filter((patient) => patient.InPatient===false);
@@ -67,8 +76,8 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
 
       console.log("filteredData: ", filteredData);
   
-      dispatch({ type: OUTPATIENT_LIST_SUCCESS, payload: data });
+      dispatch({ type: GET_PATIENT_DETAILS_SUCCESS, payload: data });
     } catch (error) {
-      dispatch({ type: OUTPATIENT_LIST_FAIL, payload: error.message });
+      dispatch({ type: GET_PATIENT_DETAILS_FAILURE, payload: error.message });
     }
   };

@@ -50,7 +50,7 @@ import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
 import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
 import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
 import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
-import { getVitalsLinesReducer } from "./triage-reducers/getVitalsLinesReducer";
+import { getPatientVitalsLinesReducer, getVitalsLinesReducer } from "./triage-reducers/getVitalsLinesReducer";
 import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesMedicationReducer";
 import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
 import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
@@ -100,6 +100,7 @@ import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmac
 import { postArchivePrescriptionReducer, postDrugIssuanceReducer } from "./pharmacy-reducers/postPharmacyReducers";
 import { getPatientPharmacyReturnLinesReducer, getPharmacyReturnLinesListReducer } from "./pharmacy-reducers/getPharmacyReturnLinesReducer";
 import { getPharmacyHistoryList } from "../actions/pharmacy-actions/getPharmacyHistoryList";
+import { getChargesSetupReducer } from "./ChargesReducers/getChargesSetupReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -138,6 +139,7 @@ export const rootReducer = combineReducers({
   getTriageListDetails: getTriageListDetailsReducer,
   postTriageListVitals: postTriageListVitalsReducer,
   getVitalsLines: getVitalsLinesReducer,
+  getPatientVital:getPatientVitalsLinesReducer,
   postAllergiesMedication: postAllergiesMedicationReducer,
   getAllergiesAndMedications: getAllergiesAndMedicationReducer,
   postInjections: postInjectionsReducer,
@@ -203,4 +205,6 @@ export const rootReducer = combineReducers({
   getPharmacyReturnLinesList:getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine:getPatientPharmacyReturnLinesReducer,
 getPharmacyHitoryList:getPharmacyHistoryList,
+getChargesList:getChargesSetupReducer,
+
 });
