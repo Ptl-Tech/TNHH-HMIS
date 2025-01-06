@@ -16,10 +16,14 @@ import {
 import { EyeOutlined, TeamOutlined, DownOutlined } from "@ant-design/icons";
 import { appmntList, postTriageVisit } from "../actions/patientActions";
 import dayjs from "dayjs";
+import { getAppmntDetails } from "../actions/getAppmntDetails";
+import { useNavigate } from "react-router-dom";
 
 const ActiveAppmnts = () => {
   const { loading, patients } = useSelector((state) => state.appmntList);
   const currentDate = dayjs().format("YYYY-MM-DD");
+  const {  data:visitData } = useSelector((state) => state.getPatientVisit);
+const navigate=useNavigate();
 
   const {
     loading: postTriageVisitLoading,
@@ -81,6 +85,8 @@ const ActiveAppmnts = () => {
       }
 
       const appointmentId = selectedRowKeys[0]; // Using AppointmentNo as Appointment ID
+      console.log(`Dispatching patient with ID: ${appointmentId}`);
+     
       await dispatchPatient(appointmentId);
     } else {
       console.log(`Dispatching patients to: ${key}`);
@@ -94,23 +100,39 @@ const ActiveAppmnts = () => {
       message.error("Appointment ID is required!");
       return;
     }
-
+  
     try {
-      console.log("Dispatching patient with appointment ID:", appointmentId);
+      // Fetch appointment details
+      const visitDetails = await dispatch(getAppmntDetails(appointmentId));
+  
+      // Validate patient data
+      if (!visitDetails?.PatientType || !visitDetails?.SpecialClinics) {
+        message.error("Please ensure Patient Type and Special Clinics are filled before dispatching.");
+        navigate(`/reception/Add-Appointment/${appointmentId}`, {
+          state: { existingPatient: visitDetails },
+        });
+        return;
+      }
+  
+      // Dispatch Triage Visit
       await dispatch(postTriageVisit(appointmentId));
       message.success("Patient has been dispatched successfully!");
-      // Navigate to a different page after successful dispatch, if needed
-      // navigate("/reception/visitors-list");
-//filter the selected patient from the table
-      const filteredPatients = paginatedData.filter((patient) => patient.AppointmentNo !== appointmentId);
-      setFilteredPatients(filteredPatients);
-
+  
+      // Navigate to the next page with patient data
+      navigate(`/triage/${appointmentId}`, {
+        state: { patientData: visitDetails },
+      });
+  
+      // Remove dispatched patient from the filtered list
+      setFilteredPatients((prev) =>
+        prev.filter((patient) => patient.AppointmentNo !== appointmentId)
+      );
     } catch (error) {
       console.error("Error dispatching patient:", error);
       message.error("Failed to dispatch patient!");
     }
   };
-
+  
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };

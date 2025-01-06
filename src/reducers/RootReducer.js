@@ -138,6 +138,7 @@ import { getQyInpatientProcessProceduresReducer } from "./nurse-reducers/getQyIn
 import { postInpatientInjectionReducer } from "./nurse-reducers/postInpatientInjectionReducer";
 import { getInpatientInjectionReducer } from "./nurse-reducers/getInpatientInjectionReducer";
 import { getQyTreatmentDiagnosisLinesReducer } from "./nurse-reducers/getQyTreatmentDiagnosisLinesReducer";
+import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -242,4 +243,5 @@ export const rootReducer = combineReducers({
   getPharmacyReturnLinesList:getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine:getPatientPharmacyReturnLinesReducer,
 getPharmacyHitoryList:getPharmacyHistoryList,
+getPatientVisit:getPatientVisitReducer,
 });

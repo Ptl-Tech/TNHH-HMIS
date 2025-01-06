@@ -4,7 +4,7 @@ import { Avatar, Button, Card, Typography, Row, Col } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { getPatientDetails } from "../../../../actions/Doc-actions/OutPatientAction";
 
-const PatientCardInfo = ({ patientNo, labObservationNo, patientLabRecord }) => {
+const PatientCard = ({ patientNo, labObservationNo, patientLabRecord }) => {
   const dispatch = useDispatch();
   const labNo = new URLSearchParams(location.search).get("LaboratoryNo");
 
@@ -200,4 +200,4 @@ const InfoRow = ({ label, value }) => (
   </div>
 );
 
-export default PatientCardInfo;
+export default PatientCard
