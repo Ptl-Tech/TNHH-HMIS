@@ -357,8 +357,8 @@ const Injections = ({ observationNumber }) => {
                       style={{ width: "100%" }}
                       optionFilterProp="label"
                       options={itemUnitsOfMeasure.map((itemUnit) => ({
-                        label: itemUnit.ItemNo,
-                        value: itemUnit.ItemNo,
+                        label: itemUnit.Code,
+                        value: itemUnit.Description,
                       }))}
                       placeholder="Select units of measure"
                       showSearch

@@ -13,7 +13,7 @@ import useAuth from "../../hooks/useAuth";
 
 const PatientFile = ({ patientDetails }) => {
   const userRole = useAuth();
-  const [selectedItem, setSelectedItem] = useState("Patient Info");
+  const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
   // Define menu items conditionally
   const menuItems = [

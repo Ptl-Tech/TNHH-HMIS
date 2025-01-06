@@ -279,8 +279,8 @@ const Referrals = () => {
                     showSearch
                   >
                     {data?.map((item) => {
-                      <Option key={item[0].No} value={item.No}>
-                        {item[0].Name}
+                      <Option key={item[0]?.No} value={item.No}>
+                        {item[0]?.Name}
                       </Option>;
                     })}
                   </Select>

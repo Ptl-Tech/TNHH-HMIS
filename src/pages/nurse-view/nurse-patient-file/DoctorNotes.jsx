@@ -1,182 +1,127 @@
-
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Space, Typography } from "antd"
-import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
-
-
-import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable"
-import { useEffect, useState } from "react";
+import { Button, DatePicker, Form, Input, Modal, Select, Space, Typography } from "antd";
+import { ProfileOutlined, FolderViewOutlined, PlusOutlined } from "@ant-design/icons";
+import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable";
+import { useState, useEffect } from "react";
 import TextArea from "antd/es/input/TextArea";
-
-
-import { useDispatch, useSelector } from "react-redux";
-import { getPgTreatmentDoctorNotesSlice } from "../../../actions/nurse-actions/getPgTreatmentDoctorsNotesSlice";
-import { useLocation } from "react-router-dom";
-import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
+import useAuth from "../../../hooks/useAuth";
+import moment from "moment";
 
 const DoctorNotes = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const docDetails = useAuth();
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
-      const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
-      const [ form ] = Form.useForm();
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const dispatch = useDispatch();
-      const { patientDetails } = useLocation().state;
+  const [form] = Form.useForm();
 
-      const { loadingGetDoctorNotes, getDoctorNotes } = useSelector(
-        (state) => state.getPgTreatmentDoctorNotes
-      );
-
-      const filterGetDoctorsNotes = getDoctorNotes?.filter((item) => item.PatientNo === patientDetails?.PatientNo);
-
-      const handleCancel = () => {
-        setIsModalOpen(false);
-      };
-
-  const handleViewDoctorNotes = () => {
-    if(selectedRow[0]){
-      form.resetFields();
-      form.setFieldsValue({
-        number: selectedRow[0]?.PatientNo,
-        type: selectedRow[0]?.Notes_Type,
-        date: selectedRow[0]?.Treatment_Date,
-        clinic: selectedRow[0]?.Clinic,
-        notes: selectedRow[0]?.NotesTxt
-      })
-      setIsModalOpen(true);
-    }
-  }
+  const notesTypes = [
+    { value: '1', label: 'Doctor Notes' },
+    { value: '2', label: 'Medical Report' },
+    { value: '3', label: 'History' },
+    { value: '4', label: 'Treatment Plan' },
+    { value: '5', label: 'Chief Complaints' },
+    { value: '6', label: 'Past Medical History' },
+    { value: '7', label: 'Past Surgical History' },
+    { value: '8', label: 'Social History' },
+    { value: '9', label: 'Investigations' },
+    { value: '10', label: 'Assessment and plan' }
+  ];
 
   useEffect(() => {
-    if(!getDoctorNotes?.length){
-      dispatch(getPgTreatmentDoctorNotesSlice());
+    if (isModalOpen) {
+      form.setFieldsValue({
+        doctor: docDetails.userData.SearchName || `${docDetails.userData.firstName} ${docDetails.userData.lastName}` || docDetails.userData.no,
+        doctorNotesDate: moment(),  // Default current date
+        notesType: notesTypes[0].value,  // You can set a default note type if needed
+      });
     }
-  }, [dispatch, getDoctorNotes?.length, patientDetails?.patientNo]);
- 
+  }, [isModalOpen, docDetails, form]);
+
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-                Doctor Notes
-            </Typography.Text>
-        </Space>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewDoctorNotes}><FolderViewOutlined /> View Doctor Notes</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewDoctorNotes}><FolderViewOutlined /> View Treatment Plan</Button>
-        </div>
+      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative' }}>
+        <ProfileOutlined />
+        <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px' }}>
+          Doctor Notes
+        </Typography.Text>
+      </Space>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px' }}>
+        <Button type="primary" style={{ width: '100%' }} onClick={() => showModal()}><PlusOutlined /> Add Doctor Notes</Button>
+        <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> View Treatment Plan</Button>
+      </div>
 
-        <DoctorNotesTable 
-          rowSelection={rowSelection} 
-          loadingGetDoctorNotes={loadingGetDoctorNotes}
-          getDoctorNotes={filterGetDoctorsNotes}
-        />
+        <DoctorNotesTable showModal={showModal}/>
 
-        <Modal title="View Doctor Notes" 
-          open={isModalOpen} 
-          footer={[
-            <Button key="cancel" color="danger" onClick={handleCancel}>
-              Cancel
-            </Button>,
-          ]}
-        >
+        <Modal title="Doctor Notes" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <Form
+            
             layout="vertical" 
-            style={{ paddingTop: '10px'}} 
-            form={form}
-            initialValues={
-              {
-                number: '',
-                type: '',
-                date: '',
-                clinic: '',
-                notes: ''
-              }
-            }
+                style={{ paddingTop: '10px'}} 
+                form={form}
             >
 
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item label="Patient No" 
-                    name="number"
-                    >
-                    <Input type="text"/>
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                <Form.Item label="Notes Type"
-                name="type"
-                >
-                  <Input  type="text" />
-                </Form.Item>
-              </Col>
-            </Row>
-          
-            <Row gutter={16}>
-                <Col span={12}>
-                    <Form.Item label="Notes Date" 
-                    name="date"
-                    >
-                    <Input type="text"/>
-                    </Form.Item>
-                </Col>
-                <Col span={12}>
-                <Form.Item label="Clinic"
-                name="clinic"
-                >
-                  <Input  type="text" />
-                  </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="notesDate"
-                label="Notes Date"
+            <Form.Item 
+                label="Date" 
+                name="doctorNotesDate"
+                rules={[{ required: true, message: 'Please enter the date!' }]}
               >
-                <Input placeholder="Date" />
+                  <DatePicker style={{ width: '100%'}}
+             />
+            </Form.Item>
+            <Form.Item 
+                  label="Doctor" 
+                  name="doctor"
+                    >   
+                    <Input placeholder="Doctor name" 
+                     name="doctor"
+                     value={docDetails.userData.SearchName|| `${docDetails.userData.firstName} ${docDetails.userData.lastName}`}
+                     disabled
+                    />
                 </Form.Item>
-                <Form.Item
-                  label="Notes"
-                  name="notes"
-                >
-
-                <DatePicker style={{ width: '100%'}}
-              />
-              
-              </Form.Item>
-            </Col>
-      
-              <Col span={12}>
                 <Form.Item
                     label="Notes Type"
-                    name="type"
+                    name="notesType"
                     rules={[{ required: true, message: 'Please select Notes Type!' }]}
                 >
-                  <Input />
+                    <Select
+                        options={notesTypes}
+                        placeholder="Select Notes Type"
+                    />
                 </Form.Item>
-              </Col>
-            </Row>
-            
-
-            <Row gutter={16}>
-              <Col span={24}>
-              <Form.Item label="Notes" name="notes"
-             
+                <Form.Item 
+                label="Doctor Notes" 
+                name="doctorNotes"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter Doctor Notes!',
+                  },
+                  {
+                      validator: (_, value) => {
+                        if (value && value.length > 2000) {
+                          return Promise.reject(new Error('Doctor Notes cannot exceed 150 characters!'));
+                        }
+                        return Promise.resolve();
+                      },
+                  }
+                ]}
               >
-                <TextArea type='text'
-                />
-              </Form.Item>
-              </Col>
-            </Row>
-
-          </Form>    
-            
+              <TextArea placeholder="Enter Doctor Notes" name="Doctor Notes"
+                  rows={3}
+              />
+            </Form.Item>
+            </Form>
         </Modal>
         
     </div>
-  )
+  );
+};
 
-}
-
-
-export default DoctorNotes
+export default DoctorNotes;

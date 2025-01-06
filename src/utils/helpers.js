@@ -15,7 +15,36 @@ export const getColorByWaitingTime = (observationDateTime) => {
       return 'red';
     }
   };
+  export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {
+    const currentTime = dayjs(); // Current date-time
+    const treatmentTimeParsed = dayjs(treatmentDateTime); // Parse the observation date-time
+    const waitingTimeMinutes = currentTime.diff(treatmentTimeParsed, 'minute'); // Calculate the difference in minutes
   
+    if (waitingTimeMinutes <= 60) {
+      return 'green';
+    } else if (waitingTimeMinutes <= 120) {
+      return 'orange';
+    } else {
+      return 'red';
+    }
+  };
+
+
+  export const rowClassName = (record) => {
+    const treatmentDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
+    const color = getColorByWaitingTreatmentTime(treatmentDateTime);
+
+    switch (color) {
+      case "green":
+        return "row-green";
+      case "orange":
+        return "row-orange";
+      case "red":
+        return "row-red";
+      default:
+        return "";
+    }
+  };
 
 export const formatElapsedTime = (minutes) => {
     if (minutes < 60) {

@@ -11,38 +11,40 @@ import {
   Row,
   Col,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, SaveOutlined, EditOutlined, FileOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  SaveOutlined,
+  EditOutlined,
+  FileOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getSignsSetup } from "../../../actions/Doc-actions/qySignsSetup";
-import { getHMSsetup } from "../../../actions/Doc-actions/qyHMSSystems";
 import { postSignsRequest } from "../../../actions/Doc-actions/postSigns";
 import { getPatientSignsLines } from "../../../actions/Doc-actions/getPatientSignsLines";
 import Loading from "../../../partials/nurse-partials/Loading";
 import { IoListOutline } from "react-icons/io5";
+import { render } from "react-dom";
 
 const PatientSigns = ({ treatmentNo }) => {
   const [editingRecord, setEditingRecord] = useState(null); // Store the record being edited
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
-  
-  const [form] = Form.useForm();
+  const [selectedSignSystem, setSelectedSignSystem] = useState(""); // Store the selected sign system
 
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const { loading: systemLoading, data: system = [] } = useSelector(
-    (state) => state.getHMSsetup
-  );
+
   const { loading: signsLoading, data: signs = [] } = useSelector(
     (state) => state.getSignsSetup
   );
   const { loading: postsignsLoading, success: postsignsSuccess } = useSelector(
     (state) => state.saveSigns
   );
-
   const { loading: patientSignsLinesLoading, data: patientSignsLines = [] } =
     useSelector((state) => state.getPatientsSigns);
 
   useEffect(() => {
     dispatch(getSignsSetup());
-    dispatch(getHMSsetup());
   }, [dispatch]);
 
   useEffect(() => {
@@ -58,11 +60,19 @@ const PatientSigns = ({ treatmentNo }) => {
       setEditingRecord(null);
     }
   }, [postsignsSuccess, form]);
-
   const handleFinish = (values) => {
+    // Find the selected sign's system value from the signs data
+    const selectedSign = signs.find((sign) => sign.SignCode === values.signNo);
+
+    // Ensure the sign and system are found before proceeding
+    if (!selectedSign) {
+      message.error("Selected sign not found.");
+      return;
+    }
+
     const data = {
       ...values,
-      treatmentNo: treatmentNo,
+      system: selectedSign.System, // Add the system value from the selected sign
       myAction: editingRecord ? "edit" : "create", // Handle create or update
       treatmentNo: editingRecord ? editingRecord.TreatmentNo : treatmentNo,
     };
@@ -84,6 +94,14 @@ const PatientSigns = ({ treatmentNo }) => {
   };
 
   const columnsSigns = [
+    {
+      title: "Treatment No",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+      render: (text) => (
+        <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
+      ),
+    },
     { title: "System", dataIndex: "System", key: "System" },
     { title: "Sign", dataIndex: "SignCode", key: "SignCode" },
     {
@@ -95,19 +113,33 @@ const PatientSigns = ({ treatmentNo }) => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <>
+        <div className="d-block d-md-flex justify-content-center align-items-center gap-3">
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            title="Edit"
+            onClick={() => handleEdit(record)} // Trigger edit when clicked
+          >
+            Edit
+          </Button>
+          <Button
+            type="primary"
+            icon={<FileOutlined />}
+            title="View"
+            onClick={() => console.log(`View: ${record.key}`)}
+            ghost
+          >
+            View
+          </Button>
           <Popconfirm
             title="Are you sure?"
             onConfirm={() => console.log(`Delete: ${record.key}`)}
           >
-            <Button type="link" icon={<DeleteOutlined />} danger />
+            <Button type="primary" icon={<DeleteOutlined />} danger>
+              Delete
+            </Button>
           </Popconfirm>
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)} // Trigger edit when clicked
-          />
-        </>
+        </div>
       ),
     },
   ];
@@ -128,6 +160,16 @@ const PatientSigns = ({ treatmentNo }) => {
       signNo: record.SignCode,
       description: record.SignDescription,
     });
+    // Set the system value when editing
+    setSelectedSignSystem(record.System);
+  };
+
+  const handleSignChange = (value) => {
+    // Find the sign in signs setup and set the system value
+    const selectedSign = signs.find((sign) => sign.SignCode === value);
+    if (selectedSign) {
+      setSelectedSignSystem(selectedSign.System);
+    }
   };
 
   return (
@@ -144,15 +186,27 @@ const PatientSigns = ({ treatmentNo }) => {
         <>
           {!showForm ? (
             <>
-              <Table dataSource={DataSource} columns={columnsSigns} />
+              <div className="d-flex justify-content-end my-2">
               <Button
-                onClick={handleToggleForm}
-                style={{ marginRight: "10px" }}
-                type="primary"
-                icon={<PlusOutlined />}
-              >
-                Add Sign
-              </Button>
+                    onClick={handleToggleForm}
+                    style={{ marginRight: "10px", justifyContent: "end" }}
+                    type="primary"
+                    icon={<PlusOutlined />}
+                  >
+                    Add Sign
+                  </Button>
+              </div>
+              <Table
+                dataSource={DataSource}
+                columns={columnsSigns}
+                pagination={{
+                  position: ["bottom", "right"],
+                  showSizeChanger: true,
+                  pageSize: 10,
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} items`,
+                }}
+              />
             </>
           ) : (
             <>
@@ -161,81 +215,74 @@ const PatientSigns = ({ treatmentNo }) => {
                 form={form}
                 onFinish={handleFinish}
                 initialValues={{
-                  system: "",
+                  system: selectedSignSystem, // Use the selected system value
                   signNo: "",
                   description: "",
                 }}
               >
-              <Row gutter={16}>
+                <Row gutter={16}>
                   <Col span={12}>
-                  <Form.Item
-                  label="System"
-                  name="system"
-                  rules={[{ required: true, message: "Please select a system" }]}
-                >
-                  <Select
-                    placeholder="Select System"
-                    loading={systemLoading}
-                    allowClear
-                  >
-                    {system.map((sys) => (
-                      <Select.Option key={sys.SignCode} value={sys.SignCode}>
-                        {sys.SignsName}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+                    <Form.Item
+                      label="Sign"
+                      name="signNo"
+                      rules={[
+                        { required: true, message: "Please select a sign" },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select Sign"
+                        loading={signsLoading}
+                        allowClear
+                        onChange={handleSignChange} // Trigger system value update on sign change
+                      >
+                        {signs.map((sign) => (
+                          <Select.Option
+                            key={sign.SignCode}
+                            value={sign.SignCode}
+                          >
+                            {sign.SignsName}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
                   </Col>
-                
+                </Row>
+                <Row gutter={16}>
                   <Col span={12}>
-                  <Form.Item
-                  label="Sign"
-                  name="signNo"
-                  rules={[{ required: true, message: "Please select a sign" }]}
-                >
-                  <Select
-                    placeholder="Select Sign"
-                    loading={signsLoading}
-                    allowClear
-                  >
-                    {signs.map((sign) => (
-                      <Select.Option key={sign.SignCode} value={sign.SignCode}>
-                        {sign.SignsName}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+                    <Form.Item
+                      label="Description"
+                      name="description"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a description",
+                        },
+                      ]}
+                    >
+                      <Input.TextArea />
+                    </Form.Item>
                   </Col>
-              <Col span={12}>
-              <Form.Item
-                  label="Description"
-                  name="description"
-                  rules={[{ required: true, message: "Please enter a description" }]}
-                >
-                  <Input.TextArea />
-                </Form.Item>
-              </Col>
                 </Row>
 
-               <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit">
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item>
+                      <Button type="primary" htmlType="submit">
                         <SaveOutlined />
-Save
-                    </Button>
-                  </Form.Item>
-                </Col>
-                
-                <Col span={12}>
-                  <Form.Item>
-                    <Button onClick={handleToggleForm} type="primary">
+                        Save
+                      </Button>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={12}>
+                    <Form.Item>
+                      <Button onClick={handleToggleForm} type="primary">
                         <IoListOutline />
                         View Patient Signs
-                    </Button>
-                  </Form.Item>
-                </Col>
-               </Row>
+                      </Button>
+                    </Form.Item>
+                  </Col>
+                </Row>
               </Form>
             </>
           )}

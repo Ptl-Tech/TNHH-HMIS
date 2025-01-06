@@ -89,26 +89,48 @@ const Imaging = () => {
   };
 
   const columns = [
-    { title: "Date", dataIndex: "DateTaken", key: "DateTaken" },
     {
       title: "Test Package",
+      dataIndex: "RadiologyTypeCode",
+      key: "RadiologyTypeCode",
+render: (text) => 
+        {
+          return (
+            <Button type="link">
+              {text}
+            </Button>
+          );
+        },    },
+    {
+      title: "Radiology Test Name",
       dataIndex: "RadiologyTypeName",
-      key: "RadiologyTypeName",
+      key: "RequiredInvestigation",
     },
+    { title: "Date", dataIndex: "DateDue", key: "DateDue" },
+    
     { title: "Status", dataIndex: "Status", key: "Status", align: "center" , render: (text) => <span style={{ color: text === "Completed" ? "green" : "red" }}>{text}</span>},
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleRadiologyRequest(record)}>
+          Request
+        </Button>
+      ),
+    }
   ];
 
-  const DataSource =
-    radiologyData && typeof radiologyData === "object"
-      ? [
-        {
-          key: "1",
-          DateTaken: radiologyData.DateTaken,
-          RadiologyTypeName: radiologyData.RadiologyTypeName,
-          Status: radiologyData.Status,
-        }
-      ]
-      : [];
+  const DataSource =[
+    {
+      key: 1,
+    
+      RadiologyTypeCode: radiologyData.RadiologyTypeCode,
+      RadiologyTypeName: radiologyData.RadiologyTypeName,
+      DateDue: radiologyData.DateDue,
+      Status: radiologyData.Status
+    }
+  ]
+   
 
   return (
     <div>
@@ -169,8 +191,22 @@ const Imaging = () => {
               />
             </Form.Item>
           </Col>
-
           <Col span={12}>
+            <Form.Item
+              name="dueDate"
+              label="Due Date"
+              rules={[
+                { required: true, message: "Please select a due date!" },
+              ]}
+            >
+              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+            </Form.Item>
+          </Col>
+         
+        </Row>
+
+        <Row gutter={24}>
+           <Col span={12}>
             <Form.Item
               name="testPackageCode"
               label="Radiology Code"
@@ -190,18 +226,22 @@ const Imaging = () => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
 
-        <Row gutter={24}>
           <Col span={12}>
             <Form.Item
-              name="dueDate"
-              label="Due Date"
+              name="HospitalPartners"
+              label="Hospital Partners"
               rules={[
-                { required: true, message: "Please select a due date!" },
+                {
+                  required: true,
+                  message: "Please select Hospital Partner.",
+                },
               ]}
             >
-              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+              <Select placeholder="Select Hospital Partners">
+                <Select.Option value="Option 1">Option 1</Select.Option>
+                <Select.Option value="Option 2">Option 2</Select.Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>

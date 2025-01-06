@@ -7,13 +7,14 @@ import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction
 const PatientInfo = ({ patientNo, treatmentNo }) => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getPatientDetails(patientNo));
-  }, [dispatch, patientNo]);
 
   const { loadingPatientDetails, patientDetails } = useSelector(
     (state) => state.getPatientDetails
   );
+
+  useEffect(() => {
+    dispatch(getPatientDetails(patientNo));
+  }, [dispatch, patientNo]);
 
   const capitalizeWords = (name) =>
     name
@@ -22,12 +23,12 @@ const PatientInfo = ({ patientNo, treatmentNo }) => {
       .join(" ");
   
   const patientName =
-    patientDetails?.SearchName
-      ? capitalizeWords(patientDetails.SearchName)
+    patientDetails?.Names
+      ? capitalizeWords(patientDetails.Names)
       : capitalizeWords(
           [
             patientDetails?.Surname,
-            patientDetails?.FirstName,
+            patientDetails?.LastName,
             patientDetails?.MiddleName,
           ]
             .filter(Boolean)
@@ -66,7 +67,8 @@ const PatientInfo = ({ patientNo, treatmentNo }) => {
           <div>
             <Typography.Title
               level={5}
-              style={{ margin: 0, fontSize: "16px", color: "black" }}
+              style={{ margin: 0, fontSize: "16px",  color: "#0F5689",
+              }}
             >
               {patientName}
             </Typography.Title>
@@ -96,7 +98,7 @@ const PatientInfo = ({ patientNo, treatmentNo }) => {
         >
           <InfoRow label="Patient Number" value={patientDetails?.PatientNo} />
           <InfoRow label="Treatment Number" value={treatmentNo} />
-          <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} />
+          {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
           <InfoRow label="Gender" value={patientDetails?.Gender} />
         </div>
       </Card>
@@ -183,12 +185,12 @@ const PatientInfo = ({ patientNo, treatmentNo }) => {
                 </Typography.Title>
                 <Typography.Text
                   style={{
-                    fontSize: "12px",
-                    color: "gray",
+                    fontSize: "16px",
+                    color: "#0f5689",
                     fontWeight: "bold",
                   }}
                 >
-                  {` KSH. ${patientDetails?.TotalBilled} `}
+                  {` KSH. ${patientDetails?.Balance} `}
                 </Typography.Text>
               </div>
               <div style={{ display: "flex", gap: "8px", flexDirection: "row" , justifyContent: "space-between", marginTop:"40px"}}>

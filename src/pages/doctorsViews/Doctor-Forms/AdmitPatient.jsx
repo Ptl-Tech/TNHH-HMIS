@@ -14,6 +14,7 @@ import {
   HistoryOutlined,
   CloseCircleOutlined,
   SaveOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { IoBedOutline } from "react-icons/io5";
 import TextArea from "antd/es/input/TextArea";
@@ -147,28 +148,15 @@ const AdmitPatientForm = () => {
           Patient Admission
         </Typography.Title>
 
-        <div style={{ float: "right", display: "flex", alignItems: "center" }}>
+        <div className="d-flex justify-content-end my-2">
+         
           <Button
             type="primary"
-            style={{ marginRight: "10px" }}
-            icon={<IoBedOutline />}
-            loading={loadingAdmissionRequest}
-            onClick={handleAdmissionRequest}
-            disabled={loadingAdmissionRequest} // Prevent clicking until saved
-            className={
-              loading || admissionRequestSuccess ? "ant-btn-disabled" : ""
-            } // Ensure it appears visually disabled
-          >
-            Request Admission
-          </Button>
-
-          <Button
-            type="default"
             onClick={handleHistoryClick}
             style={{ marginRight: "10px" }}
-            icon={<HistoryOutlined />}
+            icon={<PlusOutlined />}
           >
-            Show History
+           New Admission Request
           </Button>
           {/* <Button
             type="default"
@@ -183,9 +171,46 @@ const AdmitPatientForm = () => {
       </div>
 
       {/* Patient Admission Form */}
-      <Form
+       <Table
+          dataSource={dataSource}
+          columns={admissionHistoryColumns}
+          pagination={false}
+        />
+
+      {/* Modal for Patient Admission History */}
+      <Modal
+        title="Patient Admission History"
+        visible={historyVisible}
+        onCancel={handleCancel}
+        footer={
+        
+            <Space>
+            <Button type="primary" htmlType="submit" loading={loading}>
+                  <SaveOutlined /> Save Admission Details
+                </Button>
+              <Button
+                type="primary"
+                style={{ marginRight: "10px" }}
+                icon={<IoBedOutline />}
+                loading={loadingAdmissionRequest}
+                onClick={handleAdmissionRequest}
+                disabled={loadingAdmissionRequest} // Prevent clicking until saved
+                className={
+                  loading || admissionRequestSuccess ? "ant-btn-disabled" : ""
+                } // Ensure it appears visually disabled
+              >
+                Request Admission
+              </Button>
+              <Button type="primary" onClick={handleCancel}>
+            Close
+          </Button>
+            </Space>
+        }
+        width={800}
+      >
+        <Form
         layout="vertical"
-        className="admit-patient-card-container my-4"
+        className="admit-patient-card-container "
         initialValues={{
           treatmentNo: treatmentNo,
           dateOfAdmission: currentDate,
@@ -221,32 +246,9 @@ const AdmitPatientForm = () => {
           </Col>
         </Row>
 
-        <Space>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              <SaveOutlined /> Save Admission Details
-            </Button>
-          </Form.Item>
-        </Space>
+      
       </Form>
-
-      {/* Modal for Patient Admission History */}
-      <Modal
-        title="Patient Admission History"
-        visible={historyVisible}
-        onCancel={handleCancel}
-        footer={
-          <Button type="primary" onClick={handleCancel}>
-            Close
-          </Button>
-        }
-        width={800}
-      >
-        <Table
-          dataSource={dataSource}
-          columns={admissionHistoryColumns}
-          pagination={false}
-        />
+       
       </Modal>
     </div>
   );

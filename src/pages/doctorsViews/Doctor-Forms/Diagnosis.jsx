@@ -42,7 +42,6 @@ const Diagnosis = () => {
   const { loading: diagnosisLinesLoading, data: diagnosisLines } = useSelector(
     (state) => state.getDiagnosisLines
   );
-  
 
   const [diagnosisList, setDiagnosisList] = useState([]);
   const [diagnosisInput, setDiagnosisInput] = useState("");
@@ -60,7 +59,7 @@ const Diagnosis = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if(treatmentNo){
+    if (treatmentNo) {
       dispatch(getDiagnosisLines(treatmentNo));
     }
   }, [dispatch, treatmentNo]);
@@ -94,20 +93,12 @@ const Diagnosis = () => {
   };
 
   const handleSubmit = async (values) => {
-    const { dueDate } = values;
-
-    const formattedDueDate = {
-      year: dueDate.year(),
-      month: dueDate.month() + 1,
-      day: dueDate.date(),
-    };
-
     const Diagnosis = {
       myAction: "create",
       treatmentNo: treatmentNo || values.treatmentNo,
       diagnosisNo: values.diagnosisCode,
       confirmed: false,
-      dueDate: formattedDueDate,
+      dueDate: moment().format("YYYY-MM-DD"),
       diagnosisList,
     };
 
@@ -176,6 +167,11 @@ const Diagnosis = () => {
       ),
     },
     {
+      title:"Diagnosis Code",
+      dataIndex: "DiagnosisCode",
+      key: "DiagnosisCode",
+    },
+    {
       title: "Diagnosis",
       dataIndex: "DiagnosisName",
       key: "DiagnosisName",
@@ -186,17 +182,13 @@ const Diagnosis = () => {
       key: "Confirmed",
       render: (text) => {
         return (
-         <span style={{ color: text ? "green" : "red", fontWeight: "bold" }}>
+          <span style={{ color: text ? "green" : "red", fontWeight: "bold" }}>
             {text ? "Yes" : "No"}
-         </span>
+          </span>
         );
       },
     },
-    {
-      title: "Diagnosis Date",
-      dataIndex: "Ddate",
-      key: "Ddate",
-    },
+    
     {
       title: "Remarks",
       dataIndex: "Remarks",
@@ -217,18 +209,16 @@ const Diagnosis = () => {
       ),
     },
   ];
-  
-  const dataSource=[
-    {
-      key: diagnosisLines?.TreatmentNo,
-      TreatmentNo: diagnosisLines?.TreatmentNo,
-      DiagnosisName: diagnosisLines?.DiagnosisName,
-      Confirmed: diagnosisLines?.Confirmed,
-      Ddate: diagnosisLines?.Ddate,
-      Remarks: diagnosisLines?.Remarks,
-    }
-  ]
-  
+
+  const dataSource=Array.isArray(diagnosisLines)
+  ? diagnosisLines.filter((item) => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
+  : Object.keys(diagnosisLines)
+      .filter((key) => diagnosisLines[key].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
+      .map((key) => ({
+        ...diagnosisLines[key],
+        TreatmentNo: key,
+      }));
+
 
   return (
     <div className="mt-4">
@@ -245,20 +235,19 @@ const Diagnosis = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Diagnosis
       </Typography.Title>
-
       <Row gutter={24}>
-        <Col span={24}>
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            style={{ marginBottom: "16px", float: "right" }}
-            onClick={handleHistoryClick}
-          >
-            View Previous Diagnosis
-          </Button>
-        </Col>
-        <Col span={12}>
-          {/* <Button
+          <Col span={24}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              style={{ marginBottom: "16px", float: "right" }}
+              onClick={handleHistoryClick}
+            >
+             Add New Diagnosis
+            </Button>
+          </Col>
+          <Col span={12}>
+            {/* <Button
             type="default"
             icon={<FileTextOutlined />}
             style={{ marginBottom: "16px", width: "100%" }}
@@ -266,180 +255,21 @@ const Diagnosis = () => {
           >
             Add Doctor Notes
           </Button> */}
-        </Col>
-      </Row>
-      <Form
-        layout="vertical"
-        initialValues={{
-          treatmentNo: treatmentNo || "",
-          diagnosisCode: "",
-          dueDate: moment(),
-        }}
-        autoComplete="off"
-        onFinish={handleSubmit}
-      >
-        {/* <Row gutter={24} style={{ paddingBottom: "16px" }}>
-          <Col span={12}>
-            <Form.Item
-              name="treatmentNo"
-              label="Treatment Number"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter the treatment number.",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Treatment Number"
-                style={{ width: "100%", color: "green", fontWeight: "bold" }}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="dueDate"
-              label="Due Date"
-              rules={[{ required: true, message: "Please select a due date!" }]}
-            >
-              <DatePicker
-                placeholder="Select Due Date"
-                style={{ width: "100%" }}
-                format="YYYY-MM-DD"
-              />
-            </Form.Item>
-          </Col>
-        </Row> */}
-
-        <Row gutter={24} style={{ paddingBottom: "16px" }}>
-          <Col span={12}>
-            <Form.Item
-              name="diagnosisCode"
-              label=" Primary Diagnosis"
-              rules={[{ required: true }]}
-            >
-              <Select
-                placeholder="Select Diagnosis"
-                onChange={setDiagnosisInput}
-                value={diagnosisInput}
-                name="diagnosisCode"
-              >
-                {data?.map((item) => (
-                  <Option key={item.Code} value={item.Code}>
-                    {item.Description}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddDiagnosis}
-                style={{ width: "100%", marginTop: "26px" }}
-              >
-                Add
-              </Button>
-            </Form.Item>
           </Col>
         </Row>
-
-        {diagnosisList.length > 0 && (
-          <div
-            style={{
-              marginTop: "16px",
-              padding: "8px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                fontWeight: "bold",
-                padding: "8px 0",
-                borderBottom: "1px solid #ddd",
-              }}
-            >
-              <div style={{ flex: "1" }}>#</div>
-              <div style={{ flex: "3" }}>Diagnosis Code</div>
-              <div style={{ flex: "2" }}>Confirmed</div>
-              <div style={{ flex: "4" }}>Remarks</div>
-              <div style={{ flex: "1" }}>Action</div>
-            </div>
-            {diagnosisList.map((diagnosis, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  padding: "8px 0",
-                  borderBottom: "1px solid #f0f0f0",
-                  alignItems: "center",
-                }}
-              >
-                <div style={{ flex: "1" }}>{index + 1}</div>
-                <div style={{ flex: "3" }}>
-                  <Input
-                    value={diagnosis.diagnosisCode}
-                    onChange={(e) =>
-                      handleUpdateDiagnosis(
-                        index,
-                        "diagnosisCode",
-                        e.target.value
-                      )
-                    }
-                  />
-                </div>
-                <div style={{ flex: "2", marginLeft: "20px" }}>
-                  <Checkbox
-                    checked={diagnosis.confirmed}
-                    onChange={(e) =>
-                      handleUpdateDiagnosis(
-                        index,
-                        "confirmed",
-                        e.target.checked
-                      )
-                    }
-                  >
-                    Confirm
-                  </Checkbox>
-                </div>
-                <div style={{ flex: "4" }}>
-                  <Input
-                    value={diagnosis.remarks}
-                    onChange={(e) =>
-                      handleUpdateDiagnosis(index, "remarks", e.target.value)
-                    }
-                  />
-                </div>
-                <div style={{ flex: "1" }}>
-                  <Button
-                    type="text"
-                    danger
-                    onClick={() => handleRemoveDiagnosis(index)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div style={{ marginTop: "16px", marginBottom: "56px" }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ width: "150px", float: "right" }}
-            icon={<SaveOutlined />}
-            loading={loading}
-          >
-            Save Diagnosis
-          </Button>
-        </div>
-      </Form>
+      <Table
+        dataSource={dataSource}
+        columns={diagnosisLinesColumns}
+        size="small"
+        pagination={{
+          position: ["bottom", "right"],
+          showSizeChanger: true,
+          pageSize: 10,
+          style: { marginTop: "16px" },
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
+        }}
+      />
 
       {/* Show the success/error message modal */}
       {isModalVisible && (
@@ -453,18 +283,175 @@ const Diagnosis = () => {
 
       {/* Show the diagnosis history modal */}
       <Modal
-        title="Diagnosis History"
+        title="Diagnosis Form"
         visible={historyVisible}
         onCancel={() => setHistoryVisible(false)}
         footer={null}
         width={1000}
       >
-        <Table
-          dataSource={dataSource}
-          columns={diagnosisLinesColumns}
-          size="small"
-          pagination={false}
-        />
+      
+        <Form
+          layout="vertical"
+          initialValues={{
+            treatmentNo: treatmentNo || "",
+            diagnosisCode: "",
+            dueDate: moment(),
+          }}
+          autoComplete="off"
+          onFinish={handleSubmit}
+        >
+        
+          <Row gutter={24} style={{ paddingBottom: "16px" }}>
+            <Col span={12}>
+              <Form.Item
+                name="diagnosisCode"
+                label=" Primary Diagnosis"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  placeholder="Select Diagnosis"
+                  onChange={setDiagnosisInput}
+                  value={diagnosisInput}
+                  name="diagnosisCode"
+                  size='large'
+                >
+                  {data?.map((item) => (
+                    <Option key={item.Code} value={item.Code}>
+                      {item.Description}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="underlyingIssues"
+                label=" Underlying Issues"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  placeholder="Select Diagnosis"
+                  onChange={setDiagnosisInput}
+                  value={diagnosisInput}
+                  name="underlyingIssues"
+                  mode="multiple"
+                  size="large"
+                  style={{ width: "100%" }}
+                >
+                  <Select.Option value="0">Diabetes</Select.Option>
+                  <Select.Option value="1">Hypertension</Select.Option>
+                  <Select.Option value="2">Cancer</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAddDiagnosis}
+                  style={{ width: "100%", marginTop: "26px" }}
+                >
+                  Add
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {diagnosisList.length > 0 && (
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  fontWeight: "bold",
+                  padding: "8px 0",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
+                <div style={{ flex: "1" }}>#</div>
+                <div style={{ flex: "3" }}>Diagnosis Code</div>
+                <div style={{ flex: "2" }}>Confirmed</div>
+                <div style={{ flex: "4" }}>Remarks</div>
+                <div style={{ flex: "1" }}>Action</div>
+              </div>
+              {diagnosisList.map((diagnosis, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    padding: "8px 0",
+                    borderBottom: "1px solid #f0f0f0",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ flex: "1" }}>{index + 1}</div>
+                  <div style={{ flex: "3" }}>
+                    <Input
+                      value={diagnosis.diagnosisCode}
+                      onChange={(e) =>
+                        handleUpdateDiagnosis(
+                          index,
+                          "diagnosisCode",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div style={{ flex: "2", marginLeft: "20px" }}>
+                    <Checkbox
+                      checked={diagnosis.confirmed}
+                      onChange={(e) =>
+                        handleUpdateDiagnosis(
+                          index,
+                          "confirmed",
+                          e.target.checked
+                        )
+                      }
+                    >
+                      Confirm
+                    </Checkbox>
+                  </div>
+                  <div style={{ flex: "4" }}>
+                    <Input
+                      value={diagnosis.remarks}
+                      onChange={(e) =>
+                        handleUpdateDiagnosis(index, "remarks", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div style={{ flex: "1" }}>
+                    <Button
+                      type="text"
+                      danger
+                      onClick={() => handleRemoveDiagnosis(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ marginTop: "16px", marginBottom: "56px" }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ width: "150px", float: "right" }}
+              icon={<SaveOutlined />}
+              loading={loading}
+            >
+              Save Diagnosis
+            </Button>
+          </div>
+        </Form>
       </Modal>
     </div>
   );
