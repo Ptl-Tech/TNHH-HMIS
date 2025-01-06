@@ -1,161 +1,193 @@
-import { Button, Card, Col, DatePicker, Form, Input, Row, Select, Space, TimePicker, Table, Typography } from "antd"
-import { hospitalBranchesTotalWards, selectBed } from "../../../../constants/nurse-constants"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Button, Card, Col, Form, message, Modal, Row, Select, Space, Typography } from "antd"
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getPgBedsSlice } from "../../../../actions/nurse-actions/getPgBedsSlice";
+import { getPgWardsListSlice } from "../../../../actions/nurse-actions/getPgWardsListSlice";
+import { POST_ADMISSION_FORM_DETAILS_SUCCESS, postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
+import { POST_CANCEL_ADMISSION_FAILURE } from "../../../../actions/nurse-actions/postCancelAdmissionSlice";
+import { POST_PATIENT_ADMISSION_FAIL, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
 
 const AdmitPatientForm = () => {
-  const dataSource = [
-      {
-          key: '1',
-          admNo: 'ADM0001',
-          patientNo: 'PAT0001',
-          admDate: '2023-01-01',
-          ward: 'Ward 1',
-          bed: 'B101',
-          doctor: 'Dr. Smith',
-          status: 'Admitted',
-      },
-      {
-          key: '2',
-          admNo: 'ADM0002',
-          patientNo: 'PAT0002',
-          admDate: '2023-01-01',
-          ward: 'Ward 2',
-          bed: 'B102',
-          doctor: 'Dr. Johnson',
-          status: 'Pending',
-      },
-      {
-          key: '3',
-          admNo: 'ADM0003',
-          patientNo: 'PAT0003',
-          admDate: '2023-01-01',
-          ward: 'Ward 1',
-          bed: 'B103',
-          doctor: 'Dr. Williams',
-          status: 'Pending',
-      },
+
+  const { patientDetails } = useLocation().state;
+  const dispatch = useDispatch();
+  const {loadingBeds, getBeds} = useSelector(state => state.getPgBeds);
+  const { loadingWards, getWards } = useSelector(state => state.getPgWardsList);
+
+  const patientInfo = [
+    { title: 'Patient Name', value: patientDetails?.Names },
+    { title: 'Patient Number', value: patientDetails?.PatientNo },
+    { title: 'Visit Number', value: patientDetails?.LinkNo },
+    { title: "Doctor's Name", value: patientDetails?.DoctorName }
   ];
-  const columns = [
-      {
-          title: 'Adm No',
-          dataIndex: 'admNo',
-          key: 'admNo',
+
+  const [form] = Form.useForm();
+  const { confirm } = Modal;
+
+  const filterBeds = Array.isArray(getBeds) ? getBeds.filter(bed => bed.Occupied === false) : [];
+  
+  const onFinish = async (values) => {
+    const { bed, ward, type } = values;
+    const formData = {
+      myAction: 'edit',
+      recId: "",
+      admissionNo: patientDetails?.AdmissionNo,
+      admissionType:  type,
+      ward,
+      bed,
+    }
+
+    try{
+      const result = await dispatch(postAdmissionFormDetailsSlice((formData)));
+
+      if(result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS){
+        message.success(result.payload.message || 'Admission Form Details Submitted Successfully');
+        form.resetFields();
+      }else if(result.type === POST_CANCEL_ADMISSION_FAILURE){
+        message.error(result.payload.message || 'Admission Form Details Failed to Submit');
+      }
+    }catch(error){
+        message.error(error.message || 'An error occurred');
+    }
+  }
+
+  const handleAdmitPatient = async () => {
+    confirm({
+      title: 'Confirm Patient Admission',
+      content: `Are you sure you want to admit ${patientDetails?.Names} ?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk(){
+          return new Promise((resolve, reject) => {
+              handleAdmitPatientAction()
+              .then(resolve) // Resolve the modal when successful
+              .catch(reject); // Reject on failure
+          });
       },
-      {
-          title: 'Patient No',
-          dataIndex: 'patientNo',
-          key: 'patientNo',
-      },
-    
-      {
-          title: 'Adm Date',
-          dataIndex: 'admDate',
-          key: 'admDate',
-      },
-      {
-          title: 'Ward',
-          dataIndex: 'ward',
-          key: 'ward',
-      },
-      {
-          title: 'Bed',
-          dataIndex: 'bed',
-          key: 'bed',
-      },
-      {
-          title: 'Doctor',
-          dataIndex: 'doctor',
-          key: 'doctor',
-      },
-      {
-          title: 'Status',
-          dataIndex: 'status',
-          key: 'status',
-      },
-  ];
+  })
+  }
+
+  const handleAdmitPatientAction = async () => {
+    try{
+      const result = await dispatch(postPatientAdmission({admissionNo: patientDetails?.AdmissionNo}));
+      if(result.type === POST_PATIENT_ADMISSION_SUCCESS){
+        message.success(result.payload.message || 'Patient Admitted Successfully');
+        form.resetFields();
+      }else if(result.type === POST_PATIENT_ADMISSION_FAIL){
+        message.error(result.payload.message || 'Patient Admission Failed');
+      }
+    }catch(error){
+      message.error(error.message || 'Unexpected error occurred');
+    }
+  }
+
+  useEffect(()=>{
+      if(!getBeds?.length){
+        dispatch(getPgBedsSlice())
+      }
+  }, [dispatch, getBeds?.length]);
+
+  useEffect(()=>{
+      if(!getWards?.length){
+        dispatch(getPgWardsListSlice())
+      }
+  }, [dispatch, getWards])
+
   return (
     <>
+     
+    <Row gutter={16}>
+    {patientInfo.map((info, index) => (
+    <Col key={index} xs={24} sm={24} md={12} lg={6} xl={6}>
+    <Card className="admit-patient-card-container">
+      <Typography.Title level={5}>
+        {info.title}
+      </Typography.Title>
+      <Typography.Text>
+        {info.value}
+      </Typography.Text>
+    </Card>
+    </Col>
+    ))}
+    </Row>
+
     <Card style={{ margin: '20px 10px 10px 10px' }}>
-        <Form layout="vertical" className="admit-patient-card-container">
+        <Form layout="vertical" 
+        className="admit-patient-card-container"
+        form={form}
+        onFinish={onFinish}
+        >
+        
         <Row gutter={16}>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-                <Form.Item 
-                  label="Admission Number"
-                  name='admissionNumber' 
-                  
-                >
-                  <Input type='text' 
-                    disabled
-                  />
-                </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+        <Col xs={24} sm={24} md={24} lg={8} xl={8}>
                 <Form.Item 
                   label="Select Ward"
-                  name='selectWard' 
+                  name='ward'
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Ward field is required!',
+                    }
+                  ]} 
                  
                 >
                 <Select 
                   optionFilterProp="label"
-                  options={hospitalBranchesTotalWards} 
+                  loading={loadingWards}
+                  options={getWards?.map((ward) => ({
+                    value: ward.Ward_Code,
+                    label: ward.Ward_Name,
+                  }))
+                  }
                   placeholder="Select ward"
                   showSearch
                 
-                >
-                </Select>
+                />
+               
                 </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-            <Form.Item label="Admission Date" name="admissionDate" >
-                <DatePicker placeholder="Admission Date" style={{ width: '100%' }} />
-            </Form.Item>
-            </Col>  
-        </Row>
-        <Row gutter={16}>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Admission Time" name='admissionTime'>
-                  <TimePicker placeholder="Admission Time" style={{ width: '100%' }} />
+              <Form.Item 
+              label="Select Bed" 
+              name='bed'
+              rules={[
+                {
+                  required: true,
+                  message: 'Bed field is required!',
+                }
+              ]}
+               >
+                <Select
+                  placeholder="Select Bed"
+                  showSearch
+                  loading={loadingBeds}
+                  options={filterBeds?.map((bed) => ({
+                    value: bed.BedNo,
+                    label: bed.BedName,
+                  }))
+                }
+                />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Select Bed" name='Select Bed' >
-                <Select 
-                      options={selectBed} 
-                      placeholder="Select bed"
-                      showSearch
-                    >
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Doctor" name='Doctor'>
-                  <Input  />
-              </Form.Item>
-            </Col>
-        </Row>
-        <Row gutter={16}>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Admission Area" name='admissionArea'>
-                  <Input  />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Patient Name" name='patientName' >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Admission Type" name='AdmissionType'>
+              <Form.Item 
+              label="Admission Type" 
+              name='type'
+              rules={[
+                {
+                  required: true,
+                  message: 'Admission type field is required!',
+                }
+              ]}
+              >
                   <Select 
                     options={
                       [
                         {
-                          value: 'Inpatient',
-                          label: 'Inpatient',
-                        },
-                        {
-                          value: 'Outpatient',
-                          label: 'Outpatient',
+                          value: 'inpatient',
+                          label: 'inpatient',
                         },
                       ]
                     }
@@ -163,59 +195,16 @@ const AdmitPatientForm = () => {
               </Form.Item>
             </Col>
         </Row>
-        <Row gutter={16}>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Admission Reason" name='admissionReason'>
-                  <Input />
-              </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Patient Number" name='patientNumber'>
-                  <Input />
-              </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Diagnosis Code" name='diagnosisCode'>
-                  <Input />
-              </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Branch" name='branch'>
-                  <Input />
-              </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item label="Expected Date of Discharge" name='expectedDateOfDischarge'>
-                  <DatePicker placeholder="Expected Date of Discharge" style={{ width: '100%' }} />
-              </Form.Item>
-          </Col>
-        </Row>
         <Space>
             <Form.Item >
                 <Button type="primary" htmlType="submit">Save Admission</Button>
             </Form.Item>
             <Form.Item >
-                <Button color="danger" variant="outlined">Cancel Admission</Button>
+                <Button type="primary" onClick={handleAdmitPatient} htmlType="submit">Admit Patient</Button>
             </Form.Item>
         </Space>
         </Form>
         </Card>
-
-        <div style={{ margin: '20px 10px 10px 10px' }}>
-          <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '15px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-              Past Admissions
-          </Typography.Text>
-          </Space>
-          <Table 
-          columns={columns} 
-          dataSource={dataSource} 
-          className="admit-patient-table"
-          />
-        </div>
     </>
     
   )

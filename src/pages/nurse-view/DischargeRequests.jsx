@@ -2,7 +2,7 @@
 import { Button, Card, Input, Space, Table, Typography, Modal, message } from "antd";
 import { ProfileOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getPgInpatientDischargeRequestsSlice } from "../../actions/nurse-actions/getPgInpatientDischargeRequestsSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";

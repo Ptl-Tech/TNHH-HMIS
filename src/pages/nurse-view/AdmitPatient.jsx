@@ -1,13 +1,8 @@
-import { Button, Card, Col, Row, Space, Typography } from "antd"
-import { ProfileOutlined, CopyOutlined } from "@ant-design/icons"
-import { useNavigate } from "react-router-dom";
+import { Col, Row, Space, Typography } from "antd"
+import { ProfileOutlined } from "@ant-design/icons"
 import AdmitPatientForm from "./forms/nurse-forms/AdmitPatient";
 
-const AdmitPatient = () => {
-    const navigate = useNavigate();
-    const handleAdmissionList = () => {
-        navigate('/Nurse/Admit-patient');
-    }
+const AdmitPatient = () => {  
   return (   
     <div>
     <Row style={{ margin: '20px 10px 10px 10px' }}>
@@ -18,12 +13,7 @@ const AdmitPatient = () => {
                         Patient Admission
                     </Typography.Text>
                 </Space>
-                    
-                <Card className="admit-patient-card-container">
-                    <Space className="admit-patient-button-container">
-                        <Button type="primary" onClick={handleAdmissionList}><CopyOutlined /> Admission List</Button>
-                    </Space>
-                </Card>
+
             </Col>
         </Row>
         <AdmitPatientForm /> 

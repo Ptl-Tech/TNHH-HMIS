@@ -1,10 +1,11 @@
 import { Button, Col, Form, Input, Modal, Row, Space, Typography } from "antd";
 import { useState } from "react";
-import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons";
+import { ProfileOutlined, FolderViewOutlined, FolderAddOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
 import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
+import VitalsFormData from "../forms/triage-forms/VitalsFormData";
 
 const Vitals = () => {
 
@@ -12,6 +13,7 @@ const Vitals = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { patientDetails } = useLocation().state;
+        const [isVitalFormVisible, setIsVitalFormVisible] = useState(false);
 
         const { combinedList, loadingInpatientVitals, loadingTriageList } = useFetchVitalsHook();
 
@@ -39,6 +41,10 @@ const Vitals = () => {
           }
         }
 
+        const handleVitalsButtonVisibility = () => {
+          setIsVitalFormVisible(!isVitalFormVisible);
+        }
+
   return (
     <div>
       <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
@@ -49,12 +55,29 @@ const Vitals = () => {
         </Space>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined /> View Vitals</Button>
+        <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
+           Add Vitals
+          </Button>
+          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined />
+           View Vitals
+          </Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined /> Preview Pain Assessment Tool</Button>
         </div>
 
+        {
+          isVitalFormVisible && (
+            
+              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo }setIsVitalFormVisible={setIsVitalFormVisible}/>
+           
+          )
+        }
 
-        <VitalsTable  rowSelection={rowSelection} filterVitals={filterVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
+
+        {
+          !isVitalFormVisible && (
+            <VitalsTable  rowSelection={rowSelection} filterVitals={filterVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
+          )
+        }
 
 
         <Modal title="Vitals" open={isModalOpen}
@@ -64,6 +87,7 @@ const Vitals = () => {
           </Button>,
         ]}
         >
+
           <Form
           layout="vertical"
           form={form}

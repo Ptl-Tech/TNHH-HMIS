@@ -95,7 +95,7 @@ import { getPgTreatmentDoctorNotesReducer } from "./nurse-reducers/getPgTreatmen
 // import { getPatientConsumablesReducer } from "./nurse-reducers/getPatientConsumablesReducer";
 import { getQyLocationsReducer } from "./nurse-reducers/getQyLocationsReducer";
 import { postPatientConsumablesReducer } from "./nurse-reducers/postPatientConsumablesReducer";
-import { postPatientAdmissionReducer } from "./nurse-reducers/postPatientAdmissionReducer";
+import { postPatientDoctorAdmissionReducer } from "./nurse-reducers/postPatientDoctorAdmissionReducer";
 import { postRequestPatientAdmissionReducer } from "./nurse-reducers/postRequestPatientAdmissionReducer";
 import { getPgAdmissionsVerifiedReducer } from "./nurse-reducers/getPgAdmissionsVerifiedReducer";
 import { getPgInpatientDischargeRequestsReducer } from "./nurse-reducers/getPgInpatientDischargeRequestsReducer";
@@ -115,6 +115,10 @@ import { getQyInpatientProcessProceduresReducer } from "./nurse-reducers/getQyIn
 import { postInpatientInjectionReducer } from "./nurse-reducers/postInpatientInjectionReducer";
 import { getInpatientInjectionReducer } from "./nurse-reducers/getInpatientInjectionReducer";
 import { getQyTreatmentDiagnosisLinesReducer } from "./nurse-reducers/getQyTreatmentDiagnosisLinesReducer";
+import { getPgBedsReducer } from "./nurse-reducers/getPgBedsReducer";
+import { getPgWardsListReducer } from "./nurse-reducers/getPgWardsListReducer";
+import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionFormDetailsReducer";
+import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -208,7 +212,7 @@ export const rootReducer = combineReducers({
   postPatientConsumables:postPatientConsumablesReducer,
   // getPatientConsumables:getPatientConsumablesReducer,
   getQyLocations:getQyLocationsReducer,
-  postPatientAdmission:postPatientAdmissionReducer,
+  postPatientDoctorAdmission:postPatientDoctorAdmissionReducer,
   postRequestPatientAdmission:postRequestPatientAdmissionReducer,
   getPgAdmissionVerified:getPgAdmissionsVerifiedReducer,
   getPgInpatientDischargeRequests:getPgInpatientDischargeRequestsReducer,
@@ -227,6 +231,11 @@ export const rootReducer = combineReducers({
   getQyInpatientProcessProcedure:getQyInpatientProcessProceduresReducer,
   postInpatientInjection:postInpatientInjectionReducer,
   getInpatientInjection:getInpatientInjectionReducer,
-  getQyTreatmentDiagnosisLines:getQyTreatmentDiagnosisLinesReducer
+  getQyTreatmentDiagnosisLines:getQyTreatmentDiagnosisLinesReducer,
+  getPgBeds:getPgBedsReducer,
+  getPgWardsList:getPgWardsListReducer,
+  postAdmissionFormDetails:postAdmissionFormDetailsReducer,
+  postPatientAdmission:postPatientAdmissionReducer
+ 
 
 });

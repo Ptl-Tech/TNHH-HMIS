@@ -1,9 +1,7 @@
 
-import { Button, Card, DatePicker, Form, Input, message, Space, Table, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
-
-import Modal from "antd/es/modal/Modal";
-import { useEffect, useState } from "react";
+import { Button, Card, DatePicker, Form, message, Space, Table, Typography, Modal } from "antd"
+import { ProfileOutlined, FileExclamationOutlined, PrinterOutlined, CheckSquareOutlined, FolderAddOutlined } from "@ant-design/icons"
+import { useEffect, useMemo, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import { getConsultationRoomListSlice } from "../../actions/nurse-actions/getConsultationRoomSlice";
@@ -12,8 +10,12 @@ import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
 
 import useAuth from "../../hooks/useAuth";
-import { POST_PATIENT_ADMISSION_FAILURE, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmissionSlice } from "../../actions/nurse-actions/postPatientAdmissionSlice";
+import { POST_PATIENT_DOCTOR_ADMISSION_FAILURE, POST_PATIENT_DOCTOR_ADMISSION_SUCCESS, postPatientDoctorAdmissionSlice } from "../../actions/nurse-actions/postPatientDoctorAdmissionSlice";
 import { POST_REQUEST_PATIENT_ADMISSION_FAILURE, POST_REQUEST_PATIENT_ADMISSION_SUCCESS, postRequestPatientAdmissionSlice } from "../../actions/nurse-actions/postRequestPatientAdmissionSlice";
+import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
+import SearchFilters from "./SearchFilters";
+import { exportToExcel, printToPDF } from "../../utils/helpers";
+import useSetTablePagination from "../../hooks/useSetTablePagination";
 
 const Admissions = () => {
  
@@ -50,139 +52,198 @@ const Admissions = () => {
             key: 'doctor',
         },
         {
-            title: 'Action',
-            dataIndex: 'action',
-            key: 'action',
-            render: (_, record) => {
-                return <Button type="primary" onClick={() => showModal(record)}>Place Admission Request</Button>
-            }
+            title: 'Clinic',
+            dataIndex: 'clinic',
+            key: 'clinic',
+        },
+        {
+            title: 'Date',
+            dataIndex: 'treatmentDate',
+            key: 'treatmentDate',
         }
     ];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState(null);
-    const { loadingAdmission } = useSelector(state => state.postPatientAdmission);
+    const { selectedRow, selectedRowKey, rowSelection, setSelectedRowKey, setSelectedRow, setIsButtonDisabled } = useSetTableCheckBoxHook();
 
+    const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
+    const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+    const { loadingAdmission } = useSelector(state => state.postPatientDoctorAdmission);
+    const { data } = useSelector(state => state.getDoctorsList);
 
     const [ form ] = Form.useForm();
+    const { confirm } = Modal;
     const userDetails = useAuth();
-    const showModal = (record) => {
-        setSelectedRecord(record);
+    const dispatch = useDispatch();
+
+    const showModal = () => {
+        if(selectedRow?.length === 0) {
+            message.error("Please select a patient to add admission details");
+            return;
+        }
         setIsModalOpen(true);
     };
-    const handleOk = async () => {
-
-    const formData = await form.validateFields();
     
-    const { admissionRemarks, dateOfAdmission } = formData;
-    const admissionDetails = {
-        admissionReason: admissionRemarks,
-        dateOfAdmission: dateOfAdmission.format('YYYY-MM-DD'),
-        treatmentNo: selectedRecord?.treatmentNo,
-        myAction: "create",
-        staffNo: userDetails.userData.no
+    const handleOk = () => {
+        form.submit();
     }
 
-    if(formData && selectedRecord) {
-        // dispatch action to save admission details
-        await dispatch(postPatientAdmissionSlice('/Doctor/PatientAdmission', admissionDetails)).then((res) => {
-            if(res.type === POST_PATIENT_ADMISSION_SUCCESS) {
+    const handleOnFinish = async (values) => {
+        
+        try{
 
-                dispatch(postRequestPatientAdmissionSlice('/Doctor/RequestPatientAdmission',{treatmentNo: selectedRecord?.treatmentNo, staffNo: userDetails.userData.no})).then((res) => {
-                    if(res.type === POST_REQUEST_PATIENT_ADMISSION_SUCCESS) {
-                        message.success(res.payload.message || 'Admission request placed successfully');
-                    }else if(res.type === POST_REQUEST_PATIENT_ADMISSION_FAILURE) {
-                        message.error(res.payload.message || 'Error placing admission request');
-                    }
-                }).catch((err) => {
-                    message.error(err.message || "Internal server error, please try again later.");
-                });
-                message.success('Admission request placed successfully');
-                
-            }else if(res.type === POST_PATIENT_ADMISSION_FAILURE) {
-                message.error('Error placing admission request');
+            const admissionDetails = {
+                admissionReason: values?.admissionRemarks,
+                dateOfAdmission: values?.dateOfAdmission.format('YYYY-MM-DD'),
+                treatmentNo: selectedRow[0]?.treatmentNo,
+                myAction: "create",
+                staffNo: userDetails.userData.no
             }
-        }).then(() => {
-            setIsModalOpen(false);
-            form.resetFields();
-        }).catch((err) => {
-            message.error(err.message || "Internal server error, please try again later.");
+            
+            const result = await dispatch(postPatientDoctorAdmissionSlice('/Doctor/PatientAdmission', admissionDetails))
+
+            if(result.type === POST_PATIENT_DOCTOR_ADMISSION_SUCCESS) {
+                message.success(result.payload.message || "Admission details added successfully");
+                setIsModalOpen(false);
+            }else if(result.type === POST_PATIENT_DOCTOR_ADMISSION_FAILURE) {
+                message.error(result.payload.message || "Failed to add admission details");
+            }
+
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    const handleAddAdmissionDetails = () => {
+        showModal();
+    }
+
+    const handleAdmissionRequest = () => {
+        confirm({
+          title: 'Confirm Patient Admission Request?',
+          content: `Are you sure you want to send admission request for ${selectedRow[0]?.names}?`,
+          okText: 'Yes',
+          okType: 'danger',
+          cancelText: 'No',
+          onOk() {
+            return new Promise((resolve, reject) => {
+              handleAdmissionRequestAction()
+                .then(resolve) // Resolve the modal when successful
+                .catch(reject); // Reject on failure
+            });
+          },
         });
-    }
-    }
+      };
 
-
+      const handleAdmissionRequestAction = async () => {
+         try {
+              const result = await dispatch(
+                postRequestPatientAdmissionSlice('/Doctor/RequestPatientAdmission', 
+                    {treatmentNo: selectedRow[0]?.treatmentNo, staffNo: userDetails.userData.no}
+                )
+              );
+          
+              if (result.type === POST_REQUEST_PATIENT_ADMISSION_SUCCESS) {
+                message.success(
+                  result.payload.message || `Admission request for ${selectedRow[0]?.names} has been placed successfully.`
+                );
+                
+                setSelectedRowKey(null);
+                setSelectedRow([]);
+                setIsButtonDisabled(true);
+                dispatch(getConsultationRoomListSlice());
+                return Promise.resolve(); // Resolve the Promise to close the modal
+              } else if (result.type === POST_REQUEST_PATIENT_ADMISSION_FAILURE) {
+                message.error(
+                  result.payload.message || 'Error placing admission request.'
+                );
+                return Promise.reject(); // Reject the Promise to keep the modal open
+              }
+            } catch (error) {
+              message.error(error.message || 'Unexpected error occurred');
+              return Promise.reject(); // Reject on unexpected errors
+            }
+      }
 
     const handleCancel = () => {
     form.resetFields();
     setIsModalOpen(false);
     };
 
-    const dispatch = useDispatch();
+    
+    const filteredConsultationRooms = useMemo(
+        () => consultationRoomList.filter(room => room?.Status === 'New'),
+        [consultationRoomList]
+    );
+    
+    const formattedTriageWaitingList = useMemo(() => {
+        return triageWaitingList?.map(patient => ({
+            PatientNo: patient?.PatientNo,
+            SearchName: patient?.SearchName,
+        }));
+    }, [triageWaitingList]);
+    
+    const formattedDoctorDetails = useMemo(() => {
+        return data?.map(doctor => ({
+            DoctorID: doctor?.DoctorID,
+            DoctorsName: doctor?.DoctorsName,
+        }));
+    }, [data]);
 
-    const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
-    const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
-    const filteredConsultationRooms = consultationRoomList.filter(room => room.Status === 'New');
-    const formattedTriageWaitingList = triageWaitingList.map(patient => {
-    return {
-    PatientNo: patient.PatientNo,
-    SearchName: patient.SearchName,
-    };
-    });
+    const combinedList = useMemo(() => {
+        return filteredConsultationRooms?.map(room => {
+            const matchingPatient = formattedTriageWaitingList?.find(patient => patient?.PatientNo === room?.PatientNo);
+            return {
+                ...room,
+                PatientNo: room?.PatientNo,
+                SearchName: matchingPatient ? matchingPatient?.SearchName : null,
+            };
+        });
+    }, [filteredConsultationRooms, formattedTriageWaitingList]);
+    
+    const combinedListWithDoctors = useMemo(() => {
+        return combinedList?.map(item => {
+            const matchingDoctor = formattedDoctorDetails?.find(doctor => doctor?.DoctorID === item?.DoctorID);
+            return {
+                ...item,
+                DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
+            };
+        });
+    }, [combinedList, formattedDoctorDetails]);
 
-    const { data } = useSelector(state => state.getDoctorsList);
-    const formattedDoctorDetails = data.map(doctor => {
-    return {
-    DoctorID: doctor.DoctorID,
-    DoctorsName: doctor.DoctorsName,
+    const { pagination, handleTableChange } = useSetTablePagination(combinedListWithDoctors);
 
-    };
-    });
-
-    const combinedList = filteredConsultationRooms.map(room => {
-    const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
-    return {
-    ...room,
-    PatientNo: room.PatientNo,
-    SearchName: matchingPatient ? matchingPatient.SearchName : null,
-    };
-    });
-
-    const combinedListWithDoctors = combinedList.map(item => {
-    const matchingDoctor = formattedDoctorDetails.find(doctor => doctor.DoctorID === item.DoctorID);
-    return {
-    ...item,
-    DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
-    };
-    });
-
-    const dataSource = combinedListWithDoctors.map((item, index) => ({
+    const dataSource = combinedListWithDoctors?.map((item, index) => ({
     key: index + 1,
-    treatmentNo: item.TreatmentNo,
-    patientNo: item.PatientNo,
-    names: item.SearchName,
-    treatmentDate: item.TreatmentDate,
-    treatmentType: item.TreatmentType,
-    doctor: item.DoctorsName,
-    })).sort((a, b) => new Date(b.treatmentDate) - new Date(a.treatmentDate));
+    treatmentNo: item?.TreatmentNo,
+    patientNo: item?.PatientNo,
+    names: item?.SearchName,
+    treatmentDate: item?.TreatmentDate,
+    treatmentType: item?.TreatmentType,
+    clinic: item?.Clinic,
+    doctor: item?.DoctorsName,
+    })).sort((a, b) => new Date(b?.treatmentDate) - new Date(a?.treatmentDate));
+
+    
 
     useEffect(() => {
-    if (!data.length) {
+    if (!data?.length) {
     dispatch(listDoctors());
     }
-    }, [dispatch, data.length]);
+    }, [dispatch, data?.length]);
 
     useEffect(() => {
-    if (!triageWaitingList.length) {
+    if (!triageWaitingList?.length) {
     dispatch(getTriageWaitingList());
     }
-    }, [dispatch, triageWaitingList.length]);
+    }, [dispatch, triageWaitingList?.length]);
 
     useEffect(() => {
-    if (!consultationRoomList.length) {
+    if (!consultationRoomList?.length) {
     dispatch(getConsultationRoomListSlice());
     }
-    }, [dispatch, consultationRoomList.length]);
+    }, [dispatch, consultationRoomList?.length]);
+    
 
 
 return (
@@ -190,32 +251,35 @@ return (
   <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
       <ProfileOutlined />
       <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-          Place Admission Request
+          Admissions
       </Typography.Text>
     </Space>
 
+    <SearchFilters />
 
-    <Card style={{ padding: '10px 10px 10px 10px' }}>
-    <div className='admit-patient-filter-container'>
-        <Input placeholder="search by name" 
-        allowClear
-        showCount
-        showSearch
-        />
-        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>or</span>
-        <Input placeholder="search by patient no" 
-        allowClear
-        showCount
-        showSearch
-        />
-        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>or</span>
-        <Input placeholder="search by id number" 
-        allowClear
-        showCount
-        showSearch
-        />
-    </div>
-    </Card>
+    <Card className="admit-patient-card-container">
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+            <Space className="admit-patient-button-container">
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleAddAdmissionDetails}><FolderAddOutlined />
+
+                    Add Admission Details
+
+                </Button>
+
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleAdmissionRequest}><CheckSquareOutlined />
+
+                    Place Admission Request
+
+                </Button>
+
+            </Space>
+            <Space className="admit-patient-button-container">
+                <Button type="primary" onClick={()=>exportToExcel(combinedListWithDoctors, 'Admission request request', 'admission-request-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
+                <Button type="primary" onClick={()=>printToPDF(combinedListWithDoctors, 'Admission request request')}><PrinterOutlined /> Print PDF</Button>
+            </Space>
+        </div>
+        </Card>
 
     {
     loadingConsultationRoomList ? (
@@ -223,20 +287,44 @@ return (
     ) : (
         <Table 
         columns={columns} 
+        rowSelection={rowSelection}
+        scroll={{ x: 'max-content' }}
         dataSource={dataSource} 
         className="admit-patient-table"
         bordered size='middle' 
+        pagination={{
+            ...pagination,
+            total: combinedListWithDoctors?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+            onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+            style: {
+                marginTop: '30px',
+            }
+            }}
         />
     )
     }
     <Modal 
         title="Patient Admissions" 
-        open={isModalOpen} onOk={handleOk} 
+        open={isModalOpen} 
+        onOk={handleOk} 
         onCancel={handleCancel} 
-        okText="Place Admission Request">
-        <Form layout="vertical" 
+        okText="Save Admission Details"
+        okButtonProps={{
+            loading: loadingAdmission,
+            disabled: loadingAdmission,
+        }}
+        >
+
+        <Form 
+        layout="vertical" 
         style={{ paddingTop: '10px'}} 
         form={form}
+        onFinish={handleOnFinish}
         okButtonProps={{ loading: loadingAdmission }}
         initialValues={
             {

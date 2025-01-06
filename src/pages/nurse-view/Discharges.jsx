@@ -88,7 +88,7 @@ const Discharges = () => {
       >
         {[
           "Initiate Discharge",
-          "Summery",
+          "Summary",
           "Discharge Medication",
           "Sick Off",
         ].map((item, index) => (
@@ -105,7 +105,7 @@ const Discharges = () => {
 
       <Divider />
       <div className="patient-file-content">
-        {selectedItem === "Summery" ? <Summery /> : selectedItem}
+        {selectedItem === "Summary" ? <Summery /> : selectedItem}
       </div>
     </>
   );

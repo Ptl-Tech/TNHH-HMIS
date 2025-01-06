@@ -9,16 +9,17 @@ import { getPgAdmissionsVerifiedSlice } from "../../actions/nurse-actions/getPgA
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
 import { POST_CANCEL_ADMISSION_FAILURE, POST_CANCEL_ADMISSION_SUCCESS, postCancelAdmissionSlice } from "../../actions/nurse-actions/postCancelAdmissionSlice";
+import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
+import useSetTablePagination from "../../hooks/useSetTablePagination";
 
 
 const AdmitPatients = () => {
 
-    const [selectedRowKey, setSelectedRowKey] = useState(null);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [selectedRow, setSelectedRow] = useState([]);
+
     const navigate = useNavigate();
     const { loadingGetPatientAdmissions, getPatientAdmissions } = useSelector((state) => state.getPgAdmissionVerified);
     const { loading, data } = useSelector(state => state.getDoctorsList);
+    const { selectedRow, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
 
     const dispatch = useDispatch();
     const { confirm } = Modal;
@@ -71,23 +72,6 @@ const AdmitPatients = () => {
         }
     ];
 
-    const rowSelection = {
-        selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-        onChange: (selectedRowKeys, selectedRows) => {
-          if (selectedRowKeys.length > 1) {
-            setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-            setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-          } else {
-            setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-            setSelectedRow(selectedRows); // Update the selected row
-          }
-          setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-        },
-        getCheckboxProps: (record) => ({
-          disabled: record.name === 'Disabled User', // Disable specific rows if needed
-        }),
-    };
-      
     const formattedDoctorDetails = data?.map(doctor => {
         return {
             DoctorID: doctor.DoctorID,
@@ -104,19 +88,13 @@ const AdmitPatients = () => {
         
     });
 
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-        total: formattedPatientAdmissions?.length,
-    });
-          
-    const handleTableChange = (newPagination) => {
-        setPagination(newPagination); // Update pagination settings
-    };
+    const { pagination, handleTableChange } = useSetTablePagination(formattedPatientAdmissions);
 
       const handleAdmitPatient = () => {
 
-        selectedRow[0]?.PatientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`);
+        selectedRow[0]?.PatientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`, {
+          state: { patientDetails: selectedRow[0] }
+        });
       }
 
       const handlePatientCharges = () => {

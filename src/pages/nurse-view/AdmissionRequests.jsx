@@ -8,6 +8,7 @@ import Loading from "../../partials/nurse-partials/Loading";
 import SearchFilters from "./SearchFilters";
 import { exportToExcel, printToPDF } from "../../utils/helpers";
 import { POST_VERIFY_ADMISSION_FAILURE, POST_VERIFY_ADMISSION_SUCCESS, postVerifyAdmissionSlice } from "../../actions/nurse-actions/postVerifyAdmissionSlice";
+import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 
 const AdmissionRequests = () => {
 
@@ -54,33 +55,16 @@ const columns = [
     },
 ];
 
-const [selectedRowKey, setSelectedRowKey] = useState(null);
-const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-const [selectedRow, setSelectedRow] = useState([]);
+
 const { confirm } = Modal;
 
 const {loadingPendingAdmissionVerification, pendingAdmissionVerification} = useSelector(state => state.getPgAdmissionsPendingVerification);
 
 const { loading, data } = useSelector(state => state.getDoctorsList);
+const { selectedRow, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
 
 const dispatch = useDispatch();
 
-const rowSelection = {
-    selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRowKeys.length > 1) {
-        setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-        setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-      } else {
-        setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-        setSelectedRow(selectedRows); // Update the selected row
-      }
-      setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User', // Disable specific rows if needed
-    }),
-};
 
 const formattedDoctorDetails = data.map(doctor => {
     return {
@@ -181,7 +165,7 @@ useEffect(() => {
         <Card className="admit-patient-card-container">
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Space className="admit-patient-button-container">
-                <Button type="primary" disabled={!selectedRowKey} onClick={handleVerifyAdmission}><CheckSquareOutlined /> A
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleVerifyAdmission}><CheckSquareOutlined />
                     Verify Patient Admission
                 </Button>
             </Space>

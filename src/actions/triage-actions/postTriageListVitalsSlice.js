@@ -15,18 +15,22 @@ export const postTriageListVitalsSlice = (vitals) => async (dispatch, getState) 
         dispatch({ type: POST_TRIAGE_LIST_VITALS_REQUEST });
 
         const config = apiHeaderConfig(getState);
-        const response = await axios.post(`${API_URL}/Triage/Vitals`, 
+        const {data} = await axios.post(`${API_URL}/Triage/Vitals`, 
             vitals,
             config
         );
 
-        dispatch({ type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: response.data });
-        // console.log('logging the response data', response.data);
-        return response.data;
+        dispatch({ type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: data });
+        
+        return { type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: data };
 
     }catch (error) {
         
-        dispatch({ type: POST_TRIAGE_LIST_VITALS_FAIL, payload: error });
+        dispatch({ type: POST_TRIAGE_LIST_VITALS_FAIL, 
+            payload: error.message,
+            status: error.response?.status || 'Network Error',
+            data: error.response?.data || null,
+        });
     
     }
 }
