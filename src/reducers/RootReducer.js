@@ -36,6 +36,7 @@ import {
   QyRadiologyTestsSetupReducer,
   QyDiagnosisTestsSetupReducer,
   getemployeeDetailsReducer,
+  QyLocationsListReducer,
 } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import {
@@ -84,7 +85,7 @@ import { getPatientsyptomslinesReducer } from "./doc-reducers/getPatientsyptomsl
 import { getInjectionsLinesReducer } from "./triage-reducers/getInjectionsLinesReducer";
 import { QyHospNumberReducer } from "./doc-reducers/getHospNumberReducer";
 import { QySpecimenSampleSetupReducer } from "./doc-reducers/getSampleSetupReducer";
-import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
+import { RequestPostPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 import { postAdmissionVerificationReducer } from "./doc-reducers/Admission/postAdmissionVerificationReducer";
 import { postAdmissionCancellationReducer } from "./doc-reducers/Admission/cancelPatientAdmissionReducer";
 import { getVerifiedAdmissionsReducer } from "./doc-reducers/Admission/getVerifiedAdmissionsReducer";
@@ -222,7 +223,7 @@ export const rootReducer = combineReducers({
   getInjectionLines:getInjectionsLinesReducer,
   getHosNumber: QyHospNumberReducer,
   getSampleSetup:QySpecimenSampleSetupReducer,
-  postAdmitPatient:postPatientAdmissionReducer,
+  postAdmitPatient:RequestPostPatientAdmissionReducer,
   postAdmissionVerification:postAdmissionVerificationReducer,
   cancelPatientAdmission:postAdmissionCancellationReducer,
   getVerifiedAdmissionList:getVerifiedAdmissionsReducer,

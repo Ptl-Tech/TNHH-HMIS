@@ -5,7 +5,7 @@ import {
   POST_PATIENT_ADMISSION_RESET,
 } from "../../../actions/Doc-actions/Admission/postAdmitPatient";
 
-export const postPatientAdmissionReducer = (
+export const RequestPostPatientAdmissionReducer = (
   state = { loading: false },
   action
 ) => {

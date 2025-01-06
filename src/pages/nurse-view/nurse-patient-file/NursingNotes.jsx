@@ -8,8 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { POST_NURSE_ADMISSION_NOTES_FAILURE, POST_NURSE_ADMISSION_NOTES_SUCCESS, postNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
 import useAuth from "../../../hooks/useAuth";
-import { useState } from "react";
-import useAuth from "../../../hooks/useAuth";
 
 const NursingNotes = () => {
   const role = useAuth().userData.departmentName; // Get user role from useAuth hook
