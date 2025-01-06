@@ -141,7 +141,7 @@ import { getQyTreatmentDiagnosisLinesReducer } from "./nurse-reducers/getQyTreat
 import { getPgBedsReducer } from "./nurse-reducers/getPgBedsReducer";
 import { getPgWardsListReducer } from "./nurse-reducers/getPgWardsListReducer";
 import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionFormDetailsReducer";
-import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
+// import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
 
 export const rootReducer = combineReducers({
@@ -260,7 +260,7 @@ export const rootReducer = combineReducers({
   getPgBeds:getPgBedsReducer,
   getPgWardsList:getPgWardsListReducer,
   postAdmissionFormDetails:postAdmissionFormDetailsReducer,
-  postPatientAdmission:postPatientAdmissionReducer
+  // postPatientAdmission:postPatientAdmissionReducer
  
 
 });
