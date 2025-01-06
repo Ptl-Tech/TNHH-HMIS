@@ -1,61 +1,105 @@
 import { Button, Table } from "antd"
 import PropTypes from "prop-types"
+import Loading from "../../../../partials/nurse-partials/Loading"
+import { useState } from "react"
+import { FolderViewOutlined } from '@ant-design/icons'
 
-const NursingNotesTable = ({ showModal }) => {
+const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseNotes }) => {
 
   const columns = [
     
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      title: 'Admission No',
+      dataIndex: 'AdmissionNo', // Matches key in data
+      key: 'AdmissionNo',
+      fixed: 'left',
+      width: 100
     },
     {
-        title: 'Time',
-        dataIndex: 'time',
-        key: 'time',
+      title: 'Notes Date',
+      dataIndex: 'NotesDate', // Matches key in data
+      key: 'NotesDate',
     },
     {
-      title: 'Nurse',
-      dataIndex: 'nurse',
-      key: 'nurse',
+      title: 'Notes Time',
+      dataIndex: 'NotesTime', // Matches key in data
+      key: 'NotesTime',
+      render: (time) => {
+        // Check if time exists
+        if (!time) return '-';
+    
+        // Convert `HH:mm:ss` to a Date object
+        const today = new Date(); // Get today's date
+        const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
+    
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Invalid Time';
+    
+        // Format time to "hh:mm AM/PM"
+        const formattedTime = date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+    
+        return formattedTime;
+      },
     },
     {
       title: 'Notes',
-      dataIndex: 'notes',
-      key: 'notes',
+      dataIndex: 'Notes', // Matches key in data
+      key: 'Notes',
+      render: (text) => 
+        text.length > 50 ? `${text.substring(0, 47)}...` : text,
     },
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
-      render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
+      fixed: 'right',
+      width: 100,
+      render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(record)}>
+        <FolderViewOutlined /> View
+      </Button>
     }
   ]
 
-  const data = [
-    {
-      key: '1',
-      date: '12/12/2021',
-      time: '12:00',
-      nurse: 'Kellyman',
-      notes: 'Patient is responding well to treatment',
-      action: 'View',
-      
-    },
-    {
-      key: '2',
-      date: '12/12/2021',
-      time: '12:00',
-      nurse: 'Cole Palmer',
-      notes: 'Patient is responding well to treatment',
-      action: 'View'
-    }
-  ]
+  const [pagination, setPagination] = useState({
+          current: 1,
+          pageSize: 10,
+          total: getNurseNotes?.length,
+      });
+            
+      const handleTableChange = (newPagination) => {
+          setPagination(newPagination); // Update pagination settings
+      };
+
+      const formattedDataSource = Array.isArray(getNurseNotes) ? getNurseNotes : [getNurseNotes];
+
 
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+         {
+          loadingGetNurseAdmissionNotes ? <Loading /> :
+          <Table columns={columns} dataSource={formattedDataSource} 
+          rowKey='SystemId'
+          scroll={{ x: 'max-content' }}
+          bordered size='middle' 
+          pagination={{
+            ...pagination,
+            total: getNurseNotes?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+            onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+            style: {
+                marginTop: '30px',
+            }
+        }}
+          />
+         }
     </div>
    
   )
@@ -67,4 +111,6 @@ export default NursingNotesTable
 
 NursingNotesTable.propTypes = {
   showModal: PropTypes.func.isRequired,
+  loadingGetNurseAdmissionNotes: PropTypes.bool.isRequired,
+  getNurseNotes: PropTypes.array.isRequired,
 }

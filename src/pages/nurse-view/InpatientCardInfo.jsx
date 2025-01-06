@@ -1,18 +1,10 @@
-import { Button, Card, Divider, List, Typography } from 'antd'
+import { Button, Card, Divider, Spin, Typography } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import PropTypes from 'prop-types'
+import { LoadingOutlined } from '@ant-design/icons'
 
-const InpatientCardInfo = ({ patientDetails }) => {
-    const allergyItems = [
-        {
-          title: 'Food Allergies',
-          description: 'Penicillin, Sulphur, Penicillin, Penicillin',
-        },
-        {
-          title: 'Medications Allergies',
-          description: 'Paracetamol, Aspirin, Penicillin, Penicillin',
-        },
-      ]
+
+const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList, loadingAllergies }) => {
       
   return (
     <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
@@ -22,7 +14,7 @@ const InpatientCardInfo = ({ patientDetails }) => {
                     {patientDetails?.SearchName||'N/A' }
                 </Typography.Text>
                 <Typography.Text className="patient-id">
-                    Patient ID : {patientDetails?.PatientNo||'N/A' }
+                    Patient Number : {patientDetails?.PatientNo||'N/A' }
                 </Typography.Text>
             </div>
 
@@ -31,10 +23,10 @@ const InpatientCardInfo = ({ patientDetails }) => {
             <div className="inpatient-details-container-2">
                 <div className="patient-hospital-number-container">
                     <Typography.Text className="hospital-number-header">
-                    Hospital No
+                    Admission No
                     </Typography.Text>
                     <Typography.Text className="hospital-number">
-                        123456789 
+                        {patientDetails?.CurrentAdmNo||'N/A' }
                     </Typography.Text>
                 </div>
                 
@@ -49,32 +41,53 @@ const InpatientCardInfo = ({ patientDetails }) => {
                     </Typography.Text>
                 </div>
             </div>
-
-            <Divider />
-
-            <div className="print-button-container">
-
-                <Button type="primary" style={{ width: '100%' }}><PrinterOutlined /> Interim invoice</Button>
-                <Button color="default" variant="outlined" style={{ width: '100%' }}><PrinterOutlined /> Treatment form</Button>
-
-            </div>
-
         </Card>
 
-        <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none' }}>
-        
-            <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
-            itemLayout="horizontal"
-            dataSource={allergyItems}
-            renderItem={(item) => (
-            <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <Typography.Text className="allergies-item-list-title">{item.title}</Typography.Text>
-                <Typography.Text>{item.description}</Typography.Text>
-            </List.Item>
-            )}
-            >
-            </List>
+        <Card className="card" title="Allergies and Medications" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none' }}>
+            
+        <div className="inpatient-details-container-2">
+                <div className="patient-hospital-number-container" style={{ paddingTop: '10px'}}>
+                    <Typography.Text style={{ fontWeight: 'bold', color: 'red' }}>
+                        Food Allergies
+                    </Typography.Text>
+                    {
+                        loadingTriageList || loadingAllergies ? (
+                        <Spin indicator={<LoadingOutlined spin />} />
+                        ) : filterAllergies.length > 0 ? (
+                        filterAllergies.map(allergy => (
+                        <Typography.Text key={allergy?.FoodAllergy}>
+                        {allergy?.FoodAllergy}
+                        </Typography.Text>
+                        ))
+                        ) : (
+                        <Typography.Text>No Allergies</Typography.Text>
+                        )
+                    }
 
+                </div>
+                
+                <Divider type="vertical" style={{ height: '40px' }} />
+
+                <div className="patient-age-gender-container" style={{ paddingTop: '10px'}}>
+                    <Typography.Text style={{ fontWeight: 'bold', color: 'red' }}>
+                        Drug and Medication Allergies
+                    </Typography.Text>
+                    {
+                        loadingTriageList || loadingAllergies ? (
+                        <Spin indicator={<LoadingOutlined spin />} />
+                        ) : filterAllergies.length > 0 ? (
+                        filterAllergies.map(allergy => (
+                        <Typography.Text key={allergy?.DrugAllergy}>
+                        {allergy?.DrugAllergy}
+                        </Typography.Text>
+                        ))
+                        ) : (
+                        <Typography.Text>No Allergies</Typography.Text>
+                        )
+                    }
+                </div>
+            </div>
+            
         </Card>
     </div>
   )
@@ -85,4 +98,7 @@ export default InpatientCardInfo
 // props validation
 InpatientCardInfo.propTypes = {
     patientDetails: PropTypes.object.isRequired,
+    filterAllergies: PropTypes.array.isRequired,
+    loadingTriageList: PropTypes.bool.isRequired,
+    loadingAllergies: PropTypes.bool.isRequired,
   };

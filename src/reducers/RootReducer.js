@@ -1,3 +1,4 @@
+
 import { combineReducers } from "@reduxjs/toolkit";
 import {
   otpVerifyReducer,
@@ -35,7 +36,6 @@ import {
   QyRadiologyTestsSetupReducer,
   QyDiagnosisTestsSetupReducer,
   getemployeeDetailsReducer,
-  QyLocationsListReducer,
 } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import {
@@ -55,7 +55,6 @@ import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesM
 import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
 import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
 import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
-import { getInjectionsReducer } from "./triage-reducers/getInjectionsReducer";
 import { getStoreRequisitionHeadersReducer } from "./triage-reducers/getStoreRequisitionHeadersReducer";
 import { getItemsReducer } from "./triage-reducers/getItemsReducer";
 import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
@@ -101,6 +100,43 @@ import { postArchivePrescriptionReducer, postDrugIssuanceReducer } from "./pharm
 import { getPatientPharmacyReturnLinesReducer, getPharmacyReturnLinesListReducer } from "./pharmacy-reducers/getPharmacyReturnLinesReducer";
 import { getPharmacyHistoryList } from "../actions/pharmacy-actions/getPharmacyHistoryList";
 import { getChargesSetupReducer } from "./ChargesReducers/getChargesSetupReducer";
+import { getSpecificInjectionReducer } from "./triage-reducers/getSpecificInjectionReducer";
+import { getVisitorsListReducer } from "./nurse-reducers/getVisitorsListReducer";
+import { postSuicidalFormReducer } from "./nurse-reducers/postSuicidalFormReducer";
+import { getSuicidalFormReducer } from "./nurse-reducers/getSuicidalFormReducer";
+import { postMentalExaminationFormReducer } from "./nurse-reducers/postMentalExaminationFormReducer";
+import { getMentalExaminationFormReducer } from "./nurse-reducers/getMentalExaminationFormReducer";
+import { getQyIpLookupValuesReducer } from "./nurse-reducers/getQyIPLookupValuesReducer";
+import { postDietaryIntakeFormLineReducer } from "./nurse-reducers/postDietaryIntakeFormLineReducer";
+import { getQyDietaryFormLineReducer } from "./nurse-reducers/getQyIPDietaryFormLinesReducer";
+import { postJacksonVisualFormReducer } from "./nurse-reducers/postJacksonVisualFormReducer";
+import { getJacksonVisualFormReducer } from "./nurse-reducers/getJacksonVisualFormReducer";
+import { postNurseAdmissionNotesReducer } from "./nurse-reducers/postNurseAdmissionNotesReducer";
+import { getNurseAdmissionNotesReducer } from "./nurse-reducers/getNurseAdmissionNotesReducer";
+import { getPgTreatmentDoctorNotesReducer } from "./nurse-reducers/getPgTreatmentDoctorsNotesReducer";
+// import { getPatientConsumablesReducer } from "./nurse-reducers/getPatientConsumablesReducer";
+import { getQyLocationsReducer } from "./nurse-reducers/getQyLocationsReducer";
+import { postPatientConsumablesReducer } from "./nurse-reducers/postPatientConsumablesReducer";
+import { postPatientAdmissionReducer } from "./nurse-reducers/postPatientAdmissionReducer";
+import { postRequestPatientAdmissionReducer } from "./nurse-reducers/postRequestPatientAdmissionReducer";
+import { getPgAdmissionsVerifiedReducer } from "./nurse-reducers/getPgAdmissionsVerifiedReducer";
+import { getPgInpatientDischargeRequestsReducer } from "./nurse-reducers/getPgInpatientDischargeRequestsReducer";
+import { getPgInpatientDischargeListReducer } from "./nurse-reducers/getPgInpatientDischargeListReducer";
+import { getPgOpenPatientConsumablesReducer } from "./nurse-reducers/getPgOpenPatientConsumablesReducer";
+import { postInitiateDischargeReducer } from "./nurse-reducers/postInitiateDischargeReducer";
+import { postPostDischargeReducer } from "./nurse-reducers/postPostDischargeReducer";
+import { postCancelDischargeReducer } from "./nurse-reducers/postCancelDischargeReducer";
+import { postReleaseBedReducer } from "./nurse-reducers/postReleaseBedReducer";
+import { getPgAdmissionPendingVerificationReducer } from "./nurse-reducers/getPgAdmissionsPendingVerificationReducer";
+import { postVerifyAdmissionReducer } from "./nurse-reducers/postVerifyAdmissionReducer";
+import { postCancelAdmissionReducer } from "./nurse-reducers/postCancelAdmissionReducer";
+import { getInpatientAllergiesReducer } from "./nurse-reducers/getInPatientAllergiesReducer";
+import { getInpatientVitalsReducer } from "./nurse-reducers/getInpatientVitalsReducer";
+import { postDailyProcedureOrProcessReducer } from "./nurse-reducers/postDailyProcedureOrProcessReducer";
+import { getQyInpatientProcessProceduresReducer } from "./nurse-reducers/getQyInpatientProcessProceduresReducer";
+import { postInpatientInjectionReducer } from "./nurse-reducers/postInpatientInjectionReducer";
+import { getInpatientInjectionReducer } from "./nurse-reducers/getInpatientInjectionReducer";
+import { getQyTreatmentDiagnosisLinesReducer } from "./nurse-reducers/getQyTreatmentDiagnosisLinesReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -137,6 +173,7 @@ export const rootReducer = combineReducers({
   admitVisitor: admitVisitorReducer,
   getPatientDetails: getPatientDetailsReducer,
   getTriageListDetails: getTriageListDetailsReducer,
+  getSpecificInjection: getSpecificInjectionReducer,
   postTriageListVitals: postTriageListVitalsReducer,
   getVitalsLines: getVitalsLinesReducer,
   getPatientVital:getPatientVitalsLinesReducer,
@@ -144,7 +181,6 @@ export const rootReducer = combineReducers({
   getAllergiesAndMedications: getAllergiesAndMedicationReducer,
   postInjections: postInjectionsReducer,
   getInjectionNumber: getInjectionNumberReducer,
-  getInjections: getInjectionsReducer,
   getStoreRequisitionHeaders: getStoreRequisitionHeadersReducer,
   getItems: getItemsReducer,
   getItemUnits: getItemUnitsOfMeasureReducer,
@@ -205,6 +241,4 @@ export const rootReducer = combineReducers({
   getPharmacyReturnLinesList:getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine:getPatientPharmacyReturnLinesReducer,
 getPharmacyHitoryList:getPharmacyHistoryList,
-getChargesList:getChargesSetupReducer,
-
 });

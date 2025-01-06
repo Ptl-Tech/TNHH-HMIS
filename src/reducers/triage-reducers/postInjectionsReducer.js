@@ -8,30 +8,33 @@ import {
 
 
 const initialState = {
-    postInjectionsLoading: false,
-    postInjections: [],
+    saveInjectionsLoading: false,
+    saveInjections: [],
     error: null,
 };
 
 export const postInjectionsReducer = (state = initialState, action) => {
     switch (action.type) {
         case POST_INJECTIONS_REQUEST:
+            console.log('postInjectionsReducer request', action.payload)
             return {
                 ...state,
-                postInjectionsLoading: true,
+                saveInjectionsLoading: true,
                 error: null,
             };
         case POST_INJECTIONS_SUCCESS:
+            console.log('postInjectionsReducer success', action.payload)
             return {
                 ...state,
-                postInjectionsLoading: false,
-                postInjections: action.payload,
+                saveInjectionsLoading: false,
+                saveInjections: action.payload,
                 error: null,
             };
         case POST_INJECTIONS_FAIL:
+            console.log('postInjectionsReducer fail', action.payload)
             return {
                 ...state,
-                postInjectionsLoading: false,
+                saveInjectionsLoading: false,
                 error: action.payload,
             };
         default:

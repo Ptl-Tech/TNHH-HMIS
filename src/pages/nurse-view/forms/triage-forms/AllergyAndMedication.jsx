@@ -11,7 +11,6 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
     const dispatch = useDispatch();
     const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
 
-    console.log('allergy and medication', allergiesMedication);
 
     const { postAllergyMedicationLoading } = useSelector((state) => state.postAllergiesMedication);
 
@@ -40,11 +39,12 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
           };
 
           dispatch(postAllergiesMedicationSlice(createAllergyAndMedicationData)).then((data)=>{
+            console.log('data', createAllergyAndMedicationData);
             if(data?.status === "success"){
               message.success(data?.status);
-              // dispatch(getVitalsLinesSlice(patientNo));
-            }else{
-              message.error('Error saving allergies and medication');
+              dispatch(getAllergiesAndMedicationsSlice(observationNumber));
+            }else if(data?.status === "error"){
+              message.error(data?.status);
             }
           })
 

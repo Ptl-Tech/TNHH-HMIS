@@ -1,59 +1,76 @@
 import { Button, Space, Table } from 'antd'
 import PropTypes from 'prop-types';
+import useSetTablePagination from '../../../../hooks/useSetTablePagination';
+import Loading from '../../../../partials/nurse-partials/Loading';
+import { FolderViewOutlined } from '@ant-design/icons';
 
-const GeneralObservationsTable = ({ showModal }) => {
+const GeneralObservationsTable = ({ showModal, ipGetProcedure, loadingGetIpProcedure }) => {
     const columns = [
         {
-          title: 'Date',
-          dataIndex: 'date',
-          key: 'date',
+          title: 'Process Code',
+          dataIndex: 'ProcessCode',
+          key: 'ProcessCode',
+          fixed: 'left',
+          width: 100,
         },
         {
-          title: 'Time',
-          dataIndex: 'time',
-          key: 'time',
+          title: 'Process Description',
+          dataIndex: 'Process',
+          key: 'Process',
         },
         {
-          title: 'Observation',
-          dataIndex: 'observation',
-          key: 'observation',
+            title: 'Date',
+            dataIndex: 'ProcessDate',
+            key: 'ProcessDate',
+            render: (text) => <span>{text ? new Date(text).toLocaleDateString() : ''}</span>
         },
         {
-          title: 'Value',
-          dataIndex: 'value',
-          key: 'value',
+          title: 'Remarks',
+          dataIndex: 'Remarks',
+          key: 'Remarks',
         },
         {
           title: 'Action',
           key: 'action',
+          fixed: 'right',
+          width: 100,
           render: (_, record) => (
             <Space size="middle">
-              <Button type="primary" onClick={() => showModal()}>Edit</Button>
-              <Button color="danger" variant="outlined">Delete</Button>
+              <Button type="primary" onClick={() => showModal(record)}><FolderViewOutlined /> View</Button>
             </Space>
           ),
         },
       ];
       
-      const data = [
-        {
-          key: '1',
-          date: '2023-07-25',
-          time: '10:00 AM',
-          observation: 'Patient is feeling better',
-          value: 'Normal',
-        },
-        {
-          key: '2',
-          date: '2023-07-26',
-          time: '11:00 AM',
-          observation: 'Patient is feeling better',
-          value: 'Normal',
-        },
-      ];
+      const { pagination, handleTableChange } = useSetTablePagination(ipGetProcedure);
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+      {
+        loadingGetIpProcedure ? (
+          <Loading />
+        ) : (
+        <Table columns={columns} 
+         rowKey='SystemId'
+         dataSource={ipGetProcedure} 
+         scroll={{ x: 'max-content' }}
+         bordered size='middle' 
+          pagination={{
+          ...pagination,
+          total: ipGetProcedure?.length,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          position: ['bottom', 'right'],
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+          onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+          style: {
+          marginTop: '30px',
+              }
+          }}
+         />
+        )
+      }
+         
     </div>
   )
 }
@@ -64,4 +81,6 @@ export default GeneralObservationsTable
 
 GeneralObservationsTable.propTypes = {
     showModal: PropTypes.func.isRequired,
+    loadingGetIpProcedure: PropTypes.bool.isRequired,
+    ipGetProcedure: PropTypes.array.isRequired
   };

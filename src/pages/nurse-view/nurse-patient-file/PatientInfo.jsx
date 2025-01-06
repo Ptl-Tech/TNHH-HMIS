@@ -1,8 +1,12 @@
 import { Col, List, Row, Space, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
-import PropTypes from "prop-types"
+import { useLocation } from "react-router-dom";
 
-const PatientInfo = ({patientDetails}) => {
+const PatientInfo = () => {
+
+  const { patientDetails } = useLocation().state;
+
+
   const data = [
     {
         title: 'Patient Name',
@@ -10,71 +14,60 @@ const PatientInfo = ({patientDetails}) => {
     },
     {
         title: 'Patient ID',
-        description: '123456789',
+        description: patientDetails?.PatientNo || 'N/A',
     },
     {
         title: 'Admission Number',
-        description: 'ADM0001',
-    },
-    {
-        title: 'Treatment Number',
-        description: 'TREAT0001',
+        description: patientDetails?.CurrentAdmNo || 'N/A',
     },
     {
         title: 'Date of Admission',
-        description: '2023-01-01',
+        description: patientDetails?.AdmissionsDate || 'N/A',
     },
     {
         title: 'Identification Number',
-        description: '123456789',
+        description: patientDetails?.IDNumber || 'N/A',
     },
     {
         title: 'Gender',
-        description: 'Male',
+        description: patientDetails?.Gender || 'N/A',
     },
     {
         title: 'Marital Status',
-        description: 'Single',
+        description: patientDetails?.MaritalStatus || 'N/A',
     },
     {
         title: 'Nationality',
-        description: 'Kenyan',
+        description: patientDetails?.Nationality || 'N/A',
     },
     {
         title: 'Date of Birth',
-        description: '1990-01-01',
+        description: patientDetails?.DateOfBirth || 'N/A',
     },
     {
         title: 'Address 1',
-        description: '123 Main St',
+        description: patientDetails?.CorrespondenceAddress1 || 'N/A',
     },
     {
         title: 'Address 2',
-        description: '123 Main St',
+        description: patientDetails?.CorrespondenceAddress2 || 'N/A',
     },
     {
-        title: 'City',
-        description: 'Nairobi',
+        title: 'County Ward',
+        description: patientDetails?.CountyWard || 'N/A',
     },
     {
-        title: 'Country',
-        description: 'Kenya',
+        title: 'Sub County',
+        description: patientDetails?.SubCountyName || 'N/A',
     },
-    {
-        title: 'County',
-        description: 'Nairobi',
-    },
-    {
-        title: 'Postal Code',
-        description: 'Kenya',
-    },
+    
     {
         title: 'Home Telephone',
-        description: '',
+        description: patientDetails?.TelephoneNo2 || 'N/A',
     },
     {
         title: 'Mobile Phone',
-        description: '+254712345678',
+        description: patientDetails?.TelephoneNo1 || 'N/A',
     }
 ]
   return (
@@ -115,9 +108,3 @@ const PatientInfo = ({patientDetails}) => {
 }
 
 export default PatientInfo
-
-//props validation
-
-PatientInfo.propTypes = {
-    patientDetails: PropTypes.object.isRequired,
-}

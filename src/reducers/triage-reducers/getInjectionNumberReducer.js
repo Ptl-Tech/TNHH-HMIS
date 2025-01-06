@@ -17,7 +17,7 @@ export const getInjectionNumberReducer = (state = initialState, action) => {
         case GET_INJECTIONS_NUMBER_SUCCESS:
             return { ...state, loadingInjectionNumber: false, injectionsNumber: action.payload };
         case GET_INJECTIONS_NUMBER_FAILURE:
-            return { ...state, loadingInjectionNumber: false, injectionsNumber: action.payload };
+            return { ...state, loadingInjectionNumber: false, error: action.payload };
         default:
             return state;
     }

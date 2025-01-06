@@ -35,14 +35,14 @@ const Summery = () => {
           </Button>
         </div>
 
-        <DischargeSummeryTable />
+        <DischargeSummeryTable showModal={showModal}/>
 
 
         <Modal title="Charge Summery" 
           open={isModalOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          okText="Initiate Discharge"
+          okText="Save Discharge Summery"
         >
             <Form
             
@@ -88,26 +88,6 @@ const Summery = () => {
                     rows={2}
                 />
             </Form.Item>
-
-            <Form.Item 
-                label="Final Diagnosis" 
-                name="finalDiagnosis"
-                rules={[
-                {
-                    validator: (_, value) => {
-                        if (value && value.length > 150) {
-                        return Promise.reject(new Error('Final Diagnosis cannot exceed 150 characters!'));
-                        }
-                        return Promise.resolve();
-                    },
-                }
-                ]}
-                >
-                <TextArea placeholder="Enter final diagnosis"
-                    rows={2}
-                />
-            </Form.Item>
-
 
             <Form.Item 
                 label="Discharge instructions / Treatments" 

@@ -19,7 +19,7 @@ export const REQUEST_PATIENT_ADMISSION_FAIL = "REQUEST_PATIENT_ADMISSION_FAIL";
 export const saveAdmissionDetails = (Admission) => async (dispatch, getState) => {
   try {
     dispatch({ type: SAVE_ADMISSION_DETAILS_REQUEST });
-
+    console.log("Admission Details:", Admission); // Corrected from Diagnosis
     // Get user info from state
     const {
       otpVerify: { userInfo },

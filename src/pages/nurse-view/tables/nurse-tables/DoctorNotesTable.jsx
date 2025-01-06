@@ -1,54 +1,78 @@
-import { Button, Table } from "antd"
+import { Table } from "antd"
 import PropTypes from "prop-types"
+import Loading from "../../../../partials/nurse-partials/Loading"
+import useSetTablePagination from "../../../../hooks/useSetTablePagination"
 
-const DoctorNotesTable = ({ showModal }) => {
+const DoctorNotesTable = ({ rowSelection, loadingGetDoctorNotes, getDoctorNotes }) => {
 
   const columns = [
-    
     {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
+      fixed: 'left',
+      width: 100
     },
     {
-      title: 'Doctor',
-      dataIndex: 'doctor',
-      key: 'doctor',
+      title: 'Patient Name',
+      dataIndex: 'Patient_Name',
+      key: 'Patient_Name',
+    },
+    {
+      title: 'Treatment Date',
+      dataIndex: 'Treatment_Date',
+      key: 'Treatment_Date',
+    },
+    {
+      title: 'Clinic',
+      dataIndex: 'Clinic',
+      key: 'Clinic',
+    },
+    {
+      title: 'Notes Type',
+      dataIndex: 'Notes_Type',
+      key: 'Notes_Type',
     },
     {
       title: 'Notes',
-      dataIndex: 'notes',
-      key: 'notes',
+      dataIndex: 'NotesTxt',
+      key: 'NotesTxt',
+      fixed: 'right',
+      width: 300
     },
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-      render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
-    }
+    
   ]
 
-  const data = [
-    {
-      key: '1',
-      date: '12/12/2021',
-      doctor: 'Dr. John Doe',
-      notes: 'Patient is responding well to treatment',
-      action: 'View',
-      
-    },
-    {
-      key: '2',
-      date: '12/12/2021',
-      doctor: 'Dr. John Doe',
-      notes: 'Patient is responding well to treatment',
-      action: 'View'
-    }
-  ]
+  const { pagination, handleTableChange } = useSetTablePagination(getDoctorNotes);
 
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+         {
+          loadingGetDoctorNotes ? (
+                <Loading />
+            ) : (
+              <Table columns={columns} 
+              dataSource={getDoctorNotes} 
+              rowKey={'SystemId'}
+              scroll={{ x: 'max-content' }}
+              rowSelection={rowSelection}
+              bordered size='middle' 
+              pagination={{
+                ...pagination,
+                total: getDoctorNotes?.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                position: ['bottom', 'right'],
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+                onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+                style: {
+                    marginTop: '30px',
+                }
+            }}
+             />
+            )
+         }
     </div>
    
   )
@@ -56,8 +80,9 @@ const DoctorNotesTable = ({ showModal }) => {
 
 export default DoctorNotesTable
 
-//Prop validations
-
+// props validation
 DoctorNotesTable.propTypes = {
-  showModal: PropTypes.func.isRequired,
-}
+  rowSelection: PropTypes.object.isRequired,
+  loadingGetDoctorNotes: PropTypes.bool.isRequired,
+  getDoctorNotes: PropTypes.array.isRequired,
+};

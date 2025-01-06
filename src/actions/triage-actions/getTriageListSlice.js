@@ -12,9 +12,22 @@ export const getTriageList = () => async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_TRIAGE_LIST_REQUEST });
-        const response = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true`, config);
-        dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: response.data });
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true`, config);
+
+        dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: data });
+
+        return { type: GET_TRIAGE_LIST_SUCCESS, payload: data };
+
     } catch (error) {
-        dispatch({ type: GET_TRIAGE_LIST_FAILURE, payload: error.message });
+        dispatch({
+             type: GET_TRIAGE_LIST_FAILURE, 
+             payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null,
+            }
+    });
+        return { type: GET_TRIAGE_LIST_FAILURE, payload: error };
     }
+    
 }

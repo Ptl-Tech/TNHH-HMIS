@@ -19,9 +19,6 @@ const Dressing = ({ observationNumber, staffNo }) => {
     const { dressing } = useSelector((state) => state.getDressing);
     const { dressingsLoading } = useSelector((state) => state.postDressings);
 
-
-    console.log('dressing', dressing);
-
     const onFinish = (values) => {
         const { processNumber, itemNumber, unitsOfMeasure, quantity, injectionRemarks } = values.dressing;
 

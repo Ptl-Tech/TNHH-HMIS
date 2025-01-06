@@ -23,7 +23,6 @@ const PatientFile = ({ patientDetails }) => {
     ...(userRole.userData.departmentName === "Nurse" ? ["Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
-    "Charges",
     "Consumables",
   ];
 
@@ -46,9 +45,6 @@ const PatientFile = ({ patientDetails }) => {
         break;
       case "Treatments History":
         setSelectedItem(<TreatmentHistory />);
-        break;
-      case "Charges":
-        setSelectedItem(<Charges />);
         break;
       case "Consumables":
         setSelectedItem(<Consumables />);
@@ -73,7 +69,9 @@ const PatientFile = ({ patientDetails }) => {
       </div>
       <Divider />
       <div className="patient-file-content">
-        {selectedItem}
+      {
+                selectedItem === 'Patient Info' ? <PatientInfo /> : selectedItem
+            }
       </div>
     </>
   );

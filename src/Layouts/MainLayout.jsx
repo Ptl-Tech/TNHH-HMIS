@@ -23,7 +23,7 @@ import {
   RetweetOutlined,
   LayoutOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, Button, Breadcrumb, theme } from "antd";
+import { Layout, Menu, Button, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
 import logo from "../assets/images/logo.png";
 import smallLogo from "../assets/images/smallLogo.png";

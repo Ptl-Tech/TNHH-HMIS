@@ -1,33 +1,100 @@
-import { Button, DatePicker, Form, Input, Modal, Space, TimePicker, Typography } from "antd";
+import { Button, Form, Input, message, Modal, Space, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { ProfileOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { POST_NURSE_ADMISSION_NOTES_FAILURE, POST_NURSE_ADMISSION_NOTES_SUCCESS, postNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
+import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
+import useAuth from "../../../hooks/useAuth";
 import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 
 const NursingNotes = () => {
   const role = useAuth().userData.departmentName; // Get user role from useAuth hook
+  const { patientDetails } = useLocation().state;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [viewNotes, setViewNotes] = useState(false); // State to control viewing notes
-  const [form] = Form.useForm();
+  const [ form ] = Form.useForm();
+  const dispatch = useDispatch();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
+  const userDetails = useAuth();
 
-  // Modal open and close handlers
-  const showModal = () => {
-    setIsModalOpen(true);
-    if (role === "Doctor") {
-      setViewNotes(true); // Set viewNotes to true when doctor clicks to view notes
+  const { loadingGetNurseAdmissionNotes, getNurseNotes } = useSelector((state) => state.getNurseAdmissionNotes);
+
+  const { loadingNurseNotes } = useSelector((state) => state.postNurseAdmissionNotes);
+
+  const showModal = (record) => {
+    form.resetFields();
+    if (record) {
+        setIsEditMode(true);
+        form.setFieldsValue({
+            admissionNo: record?.AdmissionNo || '',
+            nurseNotes: record?.Notes || '',
+        });
     } else {
-      setViewNotes(false); // Default to adding notes for non-doctors
+        setIsEditMode(false);
     }
+    setIsModalOpen(true);
   };
+    const handleOk = () => {
+      form.submit();
+    };
+    const handleCancel = () => {
+      setIsModalOpen(false);
+    };
+  
+    
+const handleOnFinish = async (values) => {
+      try {
+        
+        // Construct the visitor data
+        const notesData = {
+          myAction: isEditMode ? "edit" : "create",
+          recId: '',
+          staffNo: userDetails.userData.no,
+          branchCode: branchCode,
+          patientNo: patientDetails?.PatientNo,
+          admissionNo: patientDetails?.CurrentAdmNo,
+          notes: values?.nurseNotes,
+        };
 
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
+    
+        // Dispatch function to handle API call and feedback
+        const dispatchNurseNotesData = async (data) => {
+          await dispatch(postNurseAdmissionNotesSlice('/Nurse/NurseAdmissionNotes', data))
+            .then((result) => {
+              if (result.type === POST_NURSE_ADMISSION_NOTES_SUCCESS) {
+                const actionWord = isEditMode ? 'updated' : 'added';
+                message.success(`Visitor ${result.payload.visitorName} ${actionWord} successfully!`);
+                dispatch(getNurseAdmissionNotesSlice(patientDetails?.CurrentAdmNo));
+              } else if (result.type === POST_NURSE_ADMISSION_NOTES_FAILURE) {
+                message.error(result.payload.message || "Internal server error, please try again later.");
+              }
+            })
+            .then(() => {
+              setIsModalOpen(false);
+              form.resetFields();
+            })
+            .catch((err) => {
+              message.error(err.message || "Internal server error, please try again later.");
+            });
+        };
+    
+        // Call the function
+        await dispatchNurseNotesData(notesData);
+    
+      } catch (error) {
+        message.error(error.message || "An unexpected error occurred.");
+      }
+    };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+    useEffect(() => {
+        if(!getNurseNotes?.length){
+          dispatch(getNurseAdmissionNotesSlice(patientDetails?.CurrentAdmNo));
+        }
+      }, [dispatch, patientDetails?.CurrentAdmNo, getNurseNotes?.length]);
 
   return (
     <div>
@@ -61,8 +128,68 @@ const NursingNotes = () => {
         )}
       </div>
 
+        <NursingNotesTable showModal={showModal} loadingGetNurseAdmissionNotes={loadingGetNurseAdmissionNotes} getNurseNotes={getNurseNotes} />
       <NursingNotesTable showModal={showModal} />
 
+        <Modal title="Nursing Notes" 
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            okText={isEditMode ? 'Update Notes' : 'Add Notes'}
+
+            okButtonProps={{
+              disabled: loadingNurseNotes,
+              loading: loadingNurseNotes,
+              style: isEditMode ? { display: 'none' } : undefined,
+            }}
+          >
+            <Form
+            
+                layout="vertical" 
+                style={{ paddingTop: '10px'}} 
+                form={form}
+                onFinish={handleOnFinish}
+                initialValues={{
+                  admissionNo: patientDetails?.CurrentAdmNo,
+                  nurseNotes: ''
+                  
+                }}
+            >
+
+            <Form.Item 
+                label="admissionNo Number" 
+                name="admissionNo"
+                rules={[{ required: true, message: 'Please enter the patient admission number!' }]}
+              >
+                  <Input 
+                  disabled
+             />
+            </Form.Item>  
+            <Form.Item 
+            label="Nurse Notes" 
+            name="nurseNotes"
+            rules={[
+              {
+                required: true,
+                message: 'Please enter the notes!',
+              },
+              {
+                  validator: (_, value) => {
+                    if (value && value.length > 2000) {
+                      return Promise.reject(new Error('Nurse notes cannot exceed 150 characters!'));
+                    }
+                    return Promise.resolve();
+                  },
+              }
+            ]}
+          >
+          <TextArea placeholder="Enter Nurse Notes" name="Nurse Notes"
+              rows={3}
+          />
+        </Form.Item>
+        </Form>
+        </Modal>
+        
       <Modal 
         title={viewNotes ? "View Nursing Notes" : "Nursing Notes"} 
         open={isModalOpen} 

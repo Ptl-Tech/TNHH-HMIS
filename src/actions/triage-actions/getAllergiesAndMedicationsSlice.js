@@ -18,10 +18,19 @@ export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatc
       
         dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data })
 
-        console.log('logging the response data', data);
+        return {  type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data };
            
 
     } catch (error) {
-        dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error.message });
+        dispatch({ 
+            type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, 
+            payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null,
+            } 
+        });
+
+        return { type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error };
     }
 }

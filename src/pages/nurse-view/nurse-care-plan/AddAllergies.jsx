@@ -1,79 +1,96 @@
 import { Button, Form, Input, Modal, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
+import { useLocation } from "react-router-dom";
+import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
+import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
 
 const AddAllergies = () => {
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-        const showModal = () => {
-          setIsModalOpen(true);
-        };
-        const handleOk = () => {
-          setIsModalOpen(false);
-        };
+        const [ form ] = Form.useForm();
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const { patientDetails } = useLocation().state;
+
+        const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
+        const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
+        const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.PatientNo);
+
         const handleCancel = () => {
           setIsModalOpen(false);
         };
 
-    const [ form ] = Form.useForm();
+        const handleViewAllergies = () => {
+          if (selectedRow[0]) {
+            //set form fields
+            form.resetFields();
+            form.setFieldsValue({
+              complaints: selectedRow[0]?.Complaints,
+              foodAllergy: selectedRow[0]?.FoodAllergy,
+              drugAllergy: selectedRow[0]?.DrugAllergy,  
+            });
+            setIsModalOpen(true);
+          }
+        }
+
+    
   return (
     <div>
 
         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
           <ProfileOutlined />
           <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Add Allergies and Medications
+              Allergies and Medications
           </Typography.Text>
         </Space>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Allergies and Medications</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview Allergies and Medications</Button>
+          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
+          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> Preview Allergies and Medications</Button>
         </div>
 
-        <AddAllergiesTable showModal={showModal} />
+        <AddAllergiesTable rowSelection={rowSelection} filterAllergies={filterAllergies} loadingAllergies={loadingAllergies} loadingTriageList={loadingTriageList} />
 
-        <Modal title="Add Allergies and Medications" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title="Add Allergies and Medications" 
+        open={isModalOpen}
+        footer={[
+          <Button key="cancel" color="danger" onClick={handleCancel}>
+            Cancel
+          </Button>,
+        ]}
+        >
         <Form
             layout="vertical" 
             style={{ paddingTop: '10px'}} 
             form={form}
             autoComplete="off"
+            initialValues={{
+                complains: '',
+                foodAllergy: '',
+                drugAllergy: '',
+            }}
             >
-
-            <Form.Item label="Assessed by" 
-                name={['allergy', 'assessedBy']}
-                rules={[{ required: true, message: 'Please input your name!' }]}
-                >
-                <Input type='text' 
-                name='assessedBy'
-                disabled
-                
-                />
-            </Form.Item>
             <Form.Item label="Complains" 
-                name={['allergy', 'complains']}
+                name='complains'
                 hasFeedback
                 >
                 <Input type='text' 
-                    name='complains'
                     
                 />
             </Form.Item>  
-            <Form.Item label="Food Allergy" name={['allergy', 'foodAllergy']}
-                        hasFeedback
+            <Form.Item label="Food Allergy"
+              name='foodAllergy'
+              hasFeedback
             >
             <Input type='text' 
-            
-            name='foodAllergy'
             />
         </Form.Item>
-        <Form.Item label="Drug Allergy" name={['allergy', 'drugAllergy']}
-                        hasFeedback
+        <Form.Item label="Drug Allergy" 
+                name='drugAllergy'
+                hasFeedback
             >
             <Input type='text' 
-            name='drugAllergy'
+        
             />
         </Form.Item>
         </Form>

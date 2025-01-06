@@ -1,29 +1,37 @@
 import { Button, Col, DatePicker, Form, Input, message, Row, Select, TimePicker, Divider, Table } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-const format = 'HH:mm';
+const format = 'HH:mm:ss';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getInjectionNumberSlice } from '../../../../actions/triage-actions/getInjectionNumberSlice';
 import { postInjectionsSlice } from '../../../../actions/triage-actions/postInjectionsSlice';
-import { getInjectionsSlice } from '../../../../actions/triage-actions/getInjectionsSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
+import { getSpecificInjectionSlice } from '../../../../actions/triage-actions/getSpecificInjectionSlice';
 
 const Injections = ({ observationNumber, staffNo }) => {
     const dispatch = useDispatch()
     const { injectionsNumber } = useSelector((state) => state.getInjectionNumber);
-    const {getInjectionsLoading, getInjections} = useSelector((state) => state.getInjections);
+    const { loadingInjection, injections} = useSelector((state) => state.getSpecificInjection);
     const { postInjectionsLoading } = useSelector((state) => state.postInjections);
 
     useEffect(() => {
-        dispatch(getInjectionNumberSlice())
-    }, [dispatch])
+        if(!injectionsNumber?.length){
+          dispatch(getInjectionNumberSlice())
+        }
+    }, [dispatch, injectionsNumber])
+
+    // console.log('injection number', injectionsNumber)
 
     useEffect(() => {
-        dispatch(getInjectionsSlice(observationNumber))
-    }, [dispatch, observationNumber])
+        if(!injections?.length){
+        dispatch(getSpecificInjectionSlice())
+        }
+      
+    }, [dispatch, injections?.length])
+
 
     const onFinish = (values) => {
         const { injectionNo, injectionDate, injectionQuantity, injectionTime, injectionRemarks } = values.injections;
@@ -48,7 +56,7 @@ const Injections = ({ observationNumber, staffNo }) => {
       
 
         dispatch(postInjectionsSlice(createInjection)).then(()=>{
-                
+
           message.success('Injections has been saved');
         }).catch((error)=>{
             message.error(error.message);
@@ -75,25 +83,24 @@ const Injections = ({ observationNumber, staffNo }) => {
         },
       ];
       
-      
-      const [ InjectionNo, InjectionDate, InjectionTime, InjectionQuantity, InjectionRemarks, ObservationNo] = getInjections
+    
+      const { InjectionNo, InjectionDate, InjectionTime, Quantity, InjectionRemarks, ObservationNo } = injections;
       const dataSource = [
         {
           key: ObservationNo,
           InjectionNo,
           InjectionDate,
           InjectionTime,
-          InjectionQuantity,
+          Quantity,
           InjectionRemarks,
           ObservationNo
         }
     ]
 
-
   return (
     <div>
         {
-            getInjectionsLoading ? (
+            loadingInjection ? (
                 <Loading />
             ):(
 
@@ -137,15 +144,14 @@ const Injections = ({ observationNumber, staffNo }) => {
                 style={{ width: '100%' }}
                 optionFilterProp="label"
                 placeholder="Select Injection No"
-                
-            >
-                {
-                    injectionsNumber && injectionsNumber.map((item, index) => (
-                        <Select.Option key={index} value={item.Code} label={item.Code}>
-                            {item.Description}
-                        </Select.Option>
-                    ))
-                }
+           >
+            {
+                injectionsNumber.map((injection, index) => (
+                    <Select.Option key={index} value={injection.injectionNo}>
+                        {injection.Description}
+                    </Select.Option>
+                ))
+              }
             </Select>
             </Form.Item>
             </Col>
@@ -197,7 +203,7 @@ const Injections = ({ observationNumber, staffNo }) => {
         </Form>
 
         {
-          getInjections && Object.keys(getInjections).length > 0 && (
+          injections && Object.keys(injections).length > 0 && (
           <div style={{ marginTop: '10px' }}>
             <Divider />
             <Table columns={columns} 

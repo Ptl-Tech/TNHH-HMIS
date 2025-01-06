@@ -3,7 +3,7 @@ import Search from 'antd/es/transfer/search'
 
 const SearchFilters = () => {
   return (
-    <Card style={{ padding: '10px 16px', marginTop: '10px', backgroundColor: '#fcfafa' }}>
+    <Card style={{ padding: '10px 16px', marginBottom: '20px', backgroundColor: '#fcfafa' }}>
           <div className='admit-patient-filter-container'>
                   <Search placeholder="search by names" 
                       allowClear

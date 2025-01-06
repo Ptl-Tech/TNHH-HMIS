@@ -57,53 +57,69 @@ const DoctorNotes = () => {
         <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> View Treatment Plan</Button>
       </div>
 
-      <DoctorNotesTable showModal={showModal} />
+        <DoctorNotesTable showModal={showModal}/>
 
-      <Modal title="Doctor Notes" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <Form
-          layout="vertical"
-          style={{ paddingTop: '10px' }}
-          form={form}
-        >
-          <Form.Item
-            label="Date"
-            name="doctorNotesDate"
-            rules={[{ required: true, message: 'Please enter the date!' }]}
-          >
-            <DatePicker style={{ width: '100%' , color: '#0f5689', fontWeight: 'bold' }} readOnly />
-          </Form.Item>
-          <Form.Item
-            label="Doctor"
-            name="doctor"
-          >
-            <Input placeholder="Doctor name" style={{ width: '100%' , color: '#0f5689', fontWeight: 'bold' }} disabled />
-          </Form.Item>
-          <Form.Item
-            label="Notes Type"
-            name="notesType"
-            rules={[{ required: true, message: 'Please select Notes Type!' }]}
-          >
-            <Select options={notesTypes} placeholder="Select Notes Type" />
-          </Form.Item>
-          <Form.Item
-            label="Doctor Notes"
-            name="doctorNotes"
-            rules={[
-              { required: true, message: 'Please enter Doctor Notes!' },
-              {
-                validator: (_, value) => {
-                  if (value && value.length > 2000) {
-                    return Promise.reject(new Error('Doctor Notes cannot exceed 150 characters!'));
+        <Modal title="Doctor Notes" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <Form
+            
+            layout="vertical" 
+                style={{ paddingTop: '10px'}} 
+                form={form}
+            >
+
+            <Form.Item 
+                label="Date" 
+                name="doctorNotesDate"
+                rules={[{ required: true, message: 'Please enter the date!' }]}
+              >
+                  <DatePicker style={{ width: '100%'}}
+             />
+            </Form.Item>
+            <Form.Item 
+                  label="Doctor" 
+                  name="doctor"
+                    >   
+                    <Input placeholder="Doctor name" 
+                     name="doctor"
+                     value={docDetails.userData.SearchName|| `${docDetails.userData.firstName} ${docDetails.userData.lastName}`}
+                     disabled
+                    />
+                </Form.Item>
+                <Form.Item
+                    label="Notes Type"
+                    name="notesType"
+                    rules={[{ required: true, message: 'Please select Notes Type!' }]}
+                >
+                    <Select
+                        options={notesTypes}
+                        placeholder="Select Notes Type"
+                    />
+                </Form.Item>
+                <Form.Item 
+                label="Doctor Notes" 
+                name="doctorNotes"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter Doctor Notes!',
+                  },
+                  {
+                      validator: (_, value) => {
+                        if (value && value.length > 2000) {
+                          return Promise.reject(new Error('Doctor Notes cannot exceed 150 characters!'));
+                        }
+                        return Promise.resolve();
+                      },
                   }
-                  return Promise.resolve();
-                },
-              }
-            ]}
-          >
-            <TextArea placeholder="Enter Doctor Notes" rows={3} />
-          </Form.Item>
-        </Form>
-      </Modal>
+                ]}
+              >
+              <TextArea placeholder="Enter Doctor Notes" name="Doctor Notes"
+                  rows={3}
+              />
+            </Form.Item>
+            </Form>
+        </Modal>
+        
     </div>
   );
 };
