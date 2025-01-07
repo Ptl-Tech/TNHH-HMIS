@@ -10,13 +10,6 @@
   border-radius: 0 0 8px 8px;
 }
 
-
-
-
-
-
-
-
 .scrollable-menu {
   overflow-y: auto;
   max-height: calc(100vh - 64px); /* Adjust the max-height based on your layout */
