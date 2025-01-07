@@ -30,7 +30,7 @@ const CreateVisitForm = () => {
   const location = useLocation();
 
   const { state } = location; // Access the state passed via navigate
-  const { patientData, existingPatient } = state || {}; // Destructure patient data if available
+  const { patientData, existingPatient,visitData } = state || {}; // Destructure patient data if available
   const { loading, patients:visitPatients } = useSelector((state) => state.appmntList);
 
   const {
@@ -95,22 +95,7 @@ const CreateVisitForm = () => {
     dispatch(appmntList());
   }, [dispatch]);
 
-  useEffect(() => {
-    // Reset form data when the component is unmounted or location changes
-    setNewVisit({
-      clinic: "",
-      doctor: "",
-      settlementType: "",
-      insuranceName: "",
-      membershipNo: "",
-      patientType: "",
-      appointmentType: "",
-      insuranceNo: "",
-      gender: "",
-      dob: "",
-    });
-  }, [location]);
-  
+
   useEffect(() => {
     const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
     if (branchCode && doctorsPayload) {
@@ -150,17 +135,15 @@ const CreateVisitForm = () => {
   const savepatientVisit = async () => {
     try {
       // // Step 1: Handle patient creation/edit if new data is provided
-      // if (!existingPatient || newVisit.membershipNo || newVisit.insuranceNo || newVisit.patientType) {
-      //   await editPatient(); // Update or create patient details
-      // }
-
+    
 
       // Step 2: Create Triage Visit
       const visitData = {
         patientNo:
           patientData?.patientNo ||
           existingPatient?.PatientNo ||
-          patientData?.PatientNo,
+          patientData?.PatientNo ||
+          visitData?.PatientNo,
         clinic: newVisit.clinic,
         doctor: newVisit.doctor,
         appointmentType: newVisit.appointmentType,
@@ -242,7 +225,7 @@ const CreateVisitForm = () => {
           <div className=" d-flex align-items-center justify-content-end gap-3">
             <Button
               type="primary"
-              size="large"
+              size="medium"
               className="pr-3 mr-3"
               onClick={savepatientVisit}
             >
@@ -250,11 +233,11 @@ const CreateVisitForm = () => {
             </Button>
             <Button
               type="primary"
-              size="large"
+              size="medium"
               className="pr-3 mr-3"
               onClick={() => dispatchPatient(appointmentId)}
             >
-              Dispatch Patient
+              Dispatch to Triage
             </Button>
           </div>
         </div>
@@ -273,7 +256,8 @@ const CreateVisitForm = () => {
                       value={
                         patientData?.patientNo ||
                         existingPatient?.PatientNo ||
-                        patientData?.PatientNo
+                        patientData?.PatientNo ||
+                        visitData?.PatientNo
                       }
                       disabled
                       className="text-success fw-bold"
@@ -281,15 +265,15 @@ const CreateVisitForm = () => {
                   </div>
                   <div className="col-12 col-md-6">
                     <label className="py-1">
-                      First Name:<span className="text-danger px-1">*</span>
+                      Patient Names:<span className="text-danger px-1">*</span>
                     </label>
                     <Input
-                      label="First Name"
+                      label="Patient Names"
                       value={
-                        patientData?.firstName ||
-                        (typeof existingPatient?.SearchName === "string"
-                          ? existingPatient.SearchName.split(" ")[0]
-                          : "")
+                        `${patientData?.firstName} ${patientData?.middleName} ${patientData?.lastName} ` || 
+                        existingPatient?.FirstName ||
+                       existingPatient?.SearchNames ||
+                       existingPatient?.SearchName
                       }
                       disabled
                       className="text-dark fw-medium"
@@ -297,14 +281,16 @@ const CreateVisitForm = () => {
                   </div>
                 </div>
 
-                <div className="row px-3 py-2 align-items-center justify-content-between">
+                {/* <div className="row px-3 py-2 align-items-center justify-content-between">
                   <div className="col-12 col-md-6">
                     <label className="py-1">
                       Last Name:<span className="text-danger px-1">*</span>
                     </label>
                     <Input
                       label="Last Name"
-                      value={patientData?.lastName || existingPatient?.LastName}
+                      value={patientData?.lastName || existingPatient?.LastName || (typeof existingPatient?.SearchNames === "string"
+                        ? existingPatient.SearchNames.split(" ")[1]
+                        : "")}
                       disabled
                       className="text-dark fw-medium"
                     />
@@ -321,13 +307,15 @@ const CreateVisitForm = () => {
                           ? "Cash"
                           : patientData?.paymentMode === "1"
                           ? "Insurance"
+                            : patientData?.paymentMode === "1"
+                          ? "Corporate"
                           : existingPatient?.PatientType || ""
                       }
                       disabled
                       className="text-dark fw-medium"
                     />
                   </div>
-                </div>
+                </div> */}
 
                 <div className="row px-3 py-2 align-items-center justify-content-between">
                   <div className="col-12 col-md-6">
@@ -444,25 +432,7 @@ const CreateVisitForm = () => {
                         ))}
                     </Select>
                   </div>
-                  {/* <div className="col-12 col-md-6">
-                      <label className="py-1">
-                        Appointment Type:
-                        <span className="text-danger px-1">*</span>
-                      </label>
-                      <Select
-                        placeholder="Select Appointment Type"
-                        className="w-100"
-                        value={newVisit.appointmentType}
-                        onChange={(value) =>
-                          handleInputChange("appointmentType", value)
-                        }
-                      >
-                        <Select.Option value="">--Select--</Select.Option>
-                        <Select.Option value="NORMAL">Normal</Select.Option>
-                        <Select.Option value="REVIEW">Review</Select.Option>
-                        <Select.Option value="REVISIT">Revisit</Select.Option>
-                      </Select>
-                    </div> */}
+                
                 </div>
               </Form>
             </Card>
@@ -497,12 +467,15 @@ const CreateVisitForm = () => {
                   </div>
                   {/* Add dynamic data fields for patientType, settlementType, clinic, doctor */}
                   <div className="col-12 mb-4">
-                    <p>
-                      <strong>Patient Type:</strong>{" "}
-                      {patientData?.patientType ||
-                        existingPatient?.PatientType ||
-                        "N/A"}
-                    </p>
+                  <p>
+  <strong>Patient Type:</strong>{" "}
+  {patientData?.paymentMode === "1"
+    ? "Insurance"
+    : patientData?.paymentMode === "2"
+    ? "Cash"
+    : existingPatient?.PatientType || "N/A"}
+</p>
+
                     <p>
                       <strong>Settlement Type:</strong>{" "}
                       {newVisit.settlementType === "1" ? "Insurance" : newVisit.settlementType === "2" ? "Cash" : "N/A"}
@@ -515,10 +488,10 @@ const CreateVisitForm = () => {
                       {selectedDoctor ? selectedDoctor.DoctorsName : "N/A"}
                     </p>
 
-                    <p>
+                    {/* <p>
                       <strong>Total Billed:</strong>{" "}
                       {newVisit.totalBilled || "0.00"}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </Form>

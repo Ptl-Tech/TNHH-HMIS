@@ -7,16 +7,15 @@ import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { POST_SUICIDAL_FORM_FAILURE, POST_SUICIDAL_FORM_SUCCESS, postSuicidalFormSlice } from '../../../actions/nurse-actions/postSuicidalFormSlice';
 import { getSuicidalFormSlice } from '../../../actions/nurse-actions/getSuicidalFormSlice';
+import { use } from 'react';
 
 const SuicidalForm = () => {
     const { patientDetails } = useLocation().state;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [ form ] = Form.useForm();
+const [loadingIpSuicidalForm, setLoadingIpSuicidalForm]=useState(false);
 
-    const { loadingIpSuicidalForm, ipSuicidalForm } = useSelector((state) => state.getIpSuicidalForm);
-
-    console.log('Suicidal form', ipSuicidalForm);
 
     const dispatch = useDispatch();
 

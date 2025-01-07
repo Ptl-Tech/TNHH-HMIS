@@ -35,14 +35,14 @@ const DispatchedAppmnts = () => {
     SearchNames: "",
     AppointmentNo: "",
   });
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);  // Keeping AppointmentNo as selected key
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Keeping AppointmentNo as selected key
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
   });
 
   const dispatch = useDispatch();
-const navigate=useNavigate();
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(appmntList());
   }, [dispatch]);
@@ -103,10 +103,11 @@ const navigate=useNavigate();
       message.success("Patient has been dispatched successfully!");
       // Navigate to a different page after successful dispatch, if needed
       // navigate("/reception/visitors-list");
-//filter the selected patient from the table
-      const filteredPatients = patients.filter((patient) => patient.AppointmentNo !== appointmentId);
+      //filter the selected patient from the table
+      const filteredPatients = patients.filter(
+        (patient) => patient.AppointmentNo !== appointmentId
+      );
       setFilteredPatients(filteredPatients);
-
     } catch (error) {
       console.error("Error dispatching patient:", error);
       message.error("Failed to dispatch patient!");
@@ -137,7 +138,7 @@ const navigate=useNavigate();
       key: "SearchNames",
     },
     {
-      title: "Appointment No",  // Using AppointmentNo as key
+      title: "Appointment No", // Using AppointmentNo as key
       dataIndex: "AppointmentNo",
       key: "AppointmentNo",
     },
@@ -167,7 +168,7 @@ const navigate=useNavigate();
         return dateTime.toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
-          hour12: true, 
+          hour12: true,
         });
       },
     },
@@ -181,11 +182,12 @@ const navigate=useNavigate();
       dataIndex: "PatientType",
       key: "PatientType",
     },
-    {
-      title: "Visit Type",
-      dataIndex: "VisitType",
-      key: "VisitType",
-    },
+    // update visit type
+    // {
+    //   title: "Visit Type",
+    //   dataIndex: "VisitType",
+    //   key: "VisitType",
+    // },
     {
       title: "Waiting At",
       dataIndex: "WaitingAt",
@@ -244,7 +246,13 @@ const navigate=useNavigate();
   onClick={() => {
     if (selectedRowKeys.length > 0) {
       const selectedPatientNo = selectedRowKeys[0]; // Assuming single selection
-      navigate(`/reception/Add-Appointment/${selectedPatientNo}`);
+      const selectedPatient = filteredPatients.find(
+        (patient) => patient.AppointmentNo === selectedPatientNo
+      ); // Find the selected patient by AppointmentNo
+
+      navigate(`/reception/Add-Appointment/${selectedPatientNo}`, {
+        state: { existingPatient: selectedPatient }, // Passing full patient details
+      });
     } else {
       navigate("/reception/Add-Appointment");
     }
@@ -253,12 +261,13 @@ const navigate=useNavigate();
   Create New Visit <IoAddOutline />
 </Button>
 
+
         <Table
           columns={columns}
           loading={loading}
           dataSource={paginatedData.map((patient) => ({
             ...patient,
-            key: patient.AppointmentNo,  // Set AppointmentNo as the unique key
+            key: patient.AppointmentNo, // Set AppointmentNo as the unique key
           }))}
           rowSelection={{
             selectedRowKeys,

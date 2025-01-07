@@ -163,7 +163,6 @@ export const listClinics = () => async (dispatch, getState) => {
 
     dispatch({ type: CLINICS_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: CLINICS_LIST_FAIL, payload: error.message });
   }
@@ -227,7 +226,6 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
 
     dispatch({ type: INSURANCE_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
   }

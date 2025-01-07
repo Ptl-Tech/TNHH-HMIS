@@ -104,24 +104,18 @@ const navigate=useNavigate();
     try {
       // Fetch appointment details
       const visitDetails = await dispatch(getAppmntDetails(appointmentId));
-  
-      // Validate patient data
+      
+      // Validate patient type and special clinics
       if (!visitDetails?.PatientType || !visitDetails?.SpecialClinics) {
         message.error("Please ensure Patient Type and Special Clinics are filled before dispatching.");
         navigate(`/reception/Add-Appointment/${appointmentId}`, {
           state: { existingPatient: visitDetails },
         });
-        return;
       }
   
       // Dispatch Triage Visit
       await dispatch(postTriageVisit(appointmentId));
       message.success("Patient has been dispatched successfully!");
-  
-      // Navigate to the next page with patient data
-      navigate(`/triage/${appointmentId}`, {
-        state: { patientData: visitDetails },
-      });
   
       // Remove dispatched patient from the filtered list
       setFilteredPatients((prev) =>

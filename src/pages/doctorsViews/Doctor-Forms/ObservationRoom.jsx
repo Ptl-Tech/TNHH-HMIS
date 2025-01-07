@@ -27,7 +27,9 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
       case "Vitals":
         setSelectedItem(<FormVitals treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-     
+     case'Allergies and Medications':
+     setSelectedItem(<AllergyAndMedication />);
+     break;
 
       default:
 
@@ -39,6 +41,7 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
 
   const buttonItems = [
     { label: "Vitals", icon: <HeartOutlined /> },
+    { label: "Allergies and Medications", icon: <MedicineBoxOutlined /> },
    
   ];
 

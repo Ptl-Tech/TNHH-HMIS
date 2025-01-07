@@ -83,14 +83,14 @@ const Login = () => {
                 //   handleLoginSuccess(); // Trigger OTP modal on login success
               }}
             >
-              {error && (
+              {/* {error && (
                 <Alert
                   message={error}
                   type="error"
                   showIcon
                   closeText="Close"
                 />
-              )}
+              )} */}
 
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
