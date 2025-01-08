@@ -5,7 +5,7 @@ import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
 import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
-import VitalsFormData from "../forms/triage-forms/VitalsFormData";
+import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
 
 const Vitals = () => {
 
@@ -196,3 +196,6 @@ const Vitals = () => {
 }
 
 export default Vitals
+
+        
+        

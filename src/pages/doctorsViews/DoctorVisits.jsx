@@ -138,7 +138,7 @@ const DoctorVisits = () => {
       dataIndex: "treatmentNo",
       key: "treatmentNo",
       render: (text) => (
-        <span onClick={() => handleNavigate(record, record.treatmentNo)} className="fw-bold" style={{ color:"green" }}>{text}</span>
+        <span onClick={() => handleNavigate(text, text.treatmentNo)} className="fw-bold" style={{ color:"green" }}>{text}</span>
       )
     },
     {
@@ -159,7 +159,7 @@ const DoctorVisits = () => {
       // render in capital letters
      render: (text) => {
       return(
-        <span onClick={() => handleNavigate(record, record.treatmentNo)} className="fw-bold" style={{ color:"#0f5689" }}>{text.toUpperCase()}</span>
+        <span onClick={() => handleNavigate(text, text.treatmentNo)} className="fw-bold" style={{ color:"#0f5689" }}>{text.toUpperCase()}</span>
       )
      }
     },

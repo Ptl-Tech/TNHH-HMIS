@@ -8,6 +8,7 @@ import TCAAppointments from './nurse-care-plan/TCAAppointments'
 import DailyProcess from './nurse-care-plan/DailyProcess'
 import Injections from './nurse-care-plan/Injections'
 import Diagnosis from './nurse-care-plan/Diagnosis'
+import Prescription from './nurse-care-plan/Prescription'
 
 const CarePlan = () => {
   const [selectedItem, setSelectedItem] = useState('Add Allergies')
@@ -27,6 +28,9 @@ const CarePlan = () => {
             break
         case 'Diagnosis':
             setSelectedItem(<Diagnosis />)
+            break
+        case 'Prescription':
+            setSelectedItem(<Prescription />)
             break
         case 'Treatments Sheet':
             setSelectedItem(<TreatmentsSheet />)
@@ -51,6 +55,7 @@ const CarePlan = () => {
                     'Daily Process / Procedures',
                     'Injections',
                     'Diagnosis',
+                    'Prescription',
                     'Treatments Sheet',
                     'ECT',
                     'TCA / Appointments',

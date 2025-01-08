@@ -16,6 +16,7 @@ import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 import SearchFilters from "./SearchFilters";
 import { exportToExcel, printToPDF } from "../../utils/helpers";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
+import { useNavigate } from "react-router-dom";
 
 const Admissions = () => {
  
@@ -35,7 +36,7 @@ const Admissions = () => {
             dataIndex: 'names',
             key: 'names',
             render: (_, record) => {
-                return <Button type="link" onClick={() => showModal(record)} style={{ color: '#0f5689' }}>
+                return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689' }}>
                     {record.names}
                 </Button>
             }
@@ -75,6 +76,16 @@ const Admissions = () => {
     const { confirm } = Modal;
     const userDetails = useAuth();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleNavigate = (record) => {
+        console.log('records', record);
+        if(userDetails.userData.departmentName === 'Nurse'){
+         navigate(`/Nurse/Consultation/Patient?TreatmentNo=${record?.treatmentNo}`, {
+           state: { patientDetails: record },
+         });
+        }
+       };
 
     const showModal = () => {
         if(selectedRow?.length === 0) {
@@ -113,6 +124,8 @@ const Admissions = () => {
             console.log(error);
         }
     }
+
+    
 
     const handleAddAdmissionDetails = () => {
         showModal();
@@ -251,12 +264,13 @@ return (
   <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
       <ProfileOutlined />
       <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-          Admissions
+          Consultation Room
       </Typography.Text>
     </Space>
 
-    <SearchFilters />
 
+    <SearchFilters />
+{/* 
     <Card className="admit-patient-card-container">
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
 
@@ -279,7 +293,7 @@ return (
                 <Button type="primary" onClick={()=>printToPDF(combinedListWithDoctors, 'Admission request request')}><PrinterOutlined /> Print PDF</Button>
             </Space>
         </div>
-        </Card>
+        </Card> */}
 
     {
     loadingConsultationRoomList ? (
@@ -287,7 +301,7 @@ return (
     ) : (
         <Table 
         columns={columns} 
-        rowSelection={rowSelection}
+        // rowSelection={rowSelection}
         scroll={{ x: 'max-content' }}
         dataSource={dataSource} 
         className="admit-patient-table"

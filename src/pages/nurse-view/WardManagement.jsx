@@ -1,7 +1,7 @@
-import { Card, Col, Row, Select, Typography, Button, Table, Space } from "antd"
+import { Card, Col, Row, Select, Typography, Button, Table, Space, List, Tag } from "antd"
 import { hospitalBranchesTotalWards } from "../../constants/nurse-constants"
 import { useNavigate } from "react-router-dom";
-import { BankOutlined, CopyOutlined, AppstoreOutlined } from "@ant-design/icons"
+import { BankOutlined, AppstoreOutlined } from "@ant-design/icons"
 import { useState } from "react";
 
 const WardManagement = () => {
@@ -19,48 +19,58 @@ const WardManagement = () => {
     const dataSource = [
         {
             key: '1',
-            roomName: 'Room 1',
-            totalNoOfBeds: 10,
-            bedsAvailable: 5,
-            bedsOccupied: 3,
+            bedName: 'Bed 1',
+            bedNumber: 10,
+            roomName: 5,
+            status: 'occupied',
         },
         {
             key: '2',
-            roomName: 'Room 2',
-            totalNoOfBeds: 10,
-            bedsAvailable: 5,
-            bedsOccupied: 3,
+            bedName: 'Bed 2',
+            bedNumber: 10,
+            roomName: 5,
+            status: 'free bed',
         },
         {
             key: '3',
-            roomName: 'Room 3',
-            totalNoOfBeds: 10,
-            bedsAvailable: 5,
-            bedsOccupied: 3,
+            bedName: 'Bed 3',
+            bedNumber: 10,
+            roomName: 5,
+            status: 'occupied',
         },
     
     ];
     const columns = [
         {
-            title: 'Room Name',
+            title: 'Bed Name',
+            dataIndex: 'bedName',
+            key: 'bedName',
+        },
+        {
+            title: 'Bed Number',
+            dataIndex: 'bedNumber',
+            key: 'bedNumber',
+        },
+        {
+            title: 'Room Number',
             dataIndex: 'roomName',
             key: 'roomName',
         },
         {
-            title: 'Total No. of Beds',
-            dataIndex: 'totalNoOfBeds',
-            key: 'totalNoOfBeds',
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text) => {
+                if (text === 'occupied') {
+                  return <Tag color="#f50">{text}</Tag>;
+                } else if (text === 'free bed') {
+                  return <Tag color="#108ee9">{text}</Tag>;
+                }
+                return text; 
+              }          
+            
         },
-        {
-            title: 'Beds Available',
-            dataIndex: 'bedsAvailable',
-            key: 'bedsAvailable',
-        },
-        {
-            title: 'Beds Occupied',
-            dataIndex: 'bedsOccupied',
-            key: 'bedsOccupied',
-        },
+        
     ];
 
 
@@ -91,61 +101,76 @@ const WardManagement = () => {
         selectedRow[0]?.key &&  navigate(`/Nurse/Ward-management/Transfer-Bed?WardNo=${selectedRow[0].key}`);
       }
 
-      const handleAdmissionList = () => {
-        navigate('/Nurse/Admit-patient');
+     const handleRoom = (item) => {
+       console.log("Room Clicked", item);
       }
-
 
   return (
     <div>
-        <Row style={{ margin: '20px 10px 10px 10px' }}>
-            <Col span={24}>
+        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
+            <BankOutlined />
+            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
+                Ward Management
+            </Typography.Text>
+        </Space>
 
-                <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
-                    <BankOutlined />
-                    <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                        Ward Management
-                    </Typography.Text>
+        <Card className="admit-patient-card-container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Space>
+                    <Button color="default" variant="outlined" disabled={!selectedRowKey} onClick={handleReleaseBed}> 
+                        <BankOutlined /> 
+                        Release Bed
+                    </Button>
+                    <Button type="primary" disabled={!selectedRowKey} onClick={handleBedTransfer}><AppstoreOutlined /> Bed Transfer</Button>
                 </Space>
+            
+                <Space>
+                    <Button type="primary" onClick={() => navigate('/Nurse/Ward-management/Bed-occupancy')}>
+                        Bed Occupancy
+                    </Button>
+                </Space>
+            </div>
+        </Card>
 
-                <Card className="admit-patient-card-container">
-                    <Space className="admit-patient-button-container">
-                        <Button type="primary" onClick={handleAdmissionList}><CopyOutlined /> Admission List</Button>
-                        <Button color="default" variant="outlined" disabled={!selectedRowKey} onClick={handleReleaseBed}> 
-                            <BankOutlined /> 
-                            Release Bed
-                        </Button>
-                        <Button type="primary" disabled={!selectedRowKey} onClick={handleBedTransfer}><AppstoreOutlined /> Bed Transfer</Button>
-                    </Space>
-                </Card>
+        <Card style={{ padding: '24px 10px 10px 10px', marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <label htmlFor='selectWard'style={{ marginRight: '20px', fontWeight: 'bold'}}>Search to Select Ward</label>
+                <Select 
+                    options={hospitalBranchesTotalWards} 
+                    showSearch
+                    onChange={handleWardClick} 
+                    placeholder="Search to Select ward"
+                    optionFilterProp="label"
+                    style={{ width: '300px' }}
+                    filterSort={(optionA, optionB) =>
+                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                    }
+                />
+            </div>
+        </Card>
 
-                <Card style={{ padding: '24px 10px 10px 10px', marginTop: '10px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                        <label htmlFor='selectWard'style={{ marginRight: '20px', fontWeight: 'bold'}}>Select Ward</label>
-                        <Select 
-                            options={hospitalBranchesTotalWards} 
-                            showSearch
-                            onChange={handleWardClick} 
-                            placeholder="Search to Select ward"
-                            optionFilterProp="label"
-                            style={{ width: '300px' }}
-                            filterSort={(optionA, optionB) =>
-                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                            }
-                        />
-                    </div>
-                </Card>
-
+        <Row gutter={16} style={{ marginTop: '20px', overflowX: 'hidden' }}>
+            <Col  span={8}>
+                
+                <List
+                    style={{ cursor: 'pointer',  }}
+                    dataSource={['Item 1', 'Item 2', 'Item 3']}
+                    renderItem={(item) => 
+                    <List.Item onClick={()=> handleRoom(item)}>
+                        {item}
+                    </List.Item>}
+                    bordered
+                />
+                
+            </Col>
+            <Col  span={16} style={{ overflowX: 'hidden' }}>
                 <Table 
                     columns={columns} 
                     dataSource={dataSource} 
-                    className="admit-patient-table"
                     rowSelection={rowSelection}
-                />
-
+                />  
             </Col>
-        </Row>
-
+        </Row>         
     </div>
   )
 }

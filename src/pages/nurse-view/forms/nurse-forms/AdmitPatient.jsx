@@ -1,12 +1,13 @@
 import { Button, Card, Col, Form, message, Modal, Row, Select, Space, Typography } from "antd"
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPgBedsSlice } from "../../../../actions/nurse-actions/getPgBedsSlice";
 import { getPgWardsListSlice } from "../../../../actions/nurse-actions/getPgWardsListSlice";
 import { POST_ADMISSION_FORM_DETAILS_SUCCESS, postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
 import { POST_CANCEL_ADMISSION_FAILURE } from "../../../../actions/nurse-actions/postCancelAdmissionSlice";
 import { POST_PATIENT_ADMISSION_FAIL, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
+import { getPgWardRoomsSetupSlice } from "../../../../actions/nurse-actions/getPgWardRoomsSetupSlice";
 
 const AdmitPatientForm = () => {
 
@@ -14,6 +15,9 @@ const AdmitPatientForm = () => {
   const dispatch = useDispatch();
   const {loadingBeds, getBeds} = useSelector(state => state.getPgBeds);
   const { loadingWards, getWards } = useSelector(state => state.getPgWardsList);
+  const { loadingWardRooms, wardRooms } = useSelector(state => state.getPgWardRoomsSetup);
+  const [ selectedWard, setSelectedWard] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
 
   const patientInfo = [
     { title: 'Patient Name', value: patientDetails?.Names },
@@ -25,7 +29,8 @@ const AdmitPatientForm = () => {
   const [form] = Form.useForm();
   const { confirm } = Modal;
 
-  const filterBeds = Array.isArray(getBeds) ? getBeds.filter(bed => bed.Occupied === false) : [];
+  const filteredRooms = wardRooms.filter(room => room.Ward_No === selectedWard);
+  const filteredBeds = getBeds.filter(bed => bed.Room_No === selectedRoom);
   
   const onFinish = async (values) => {
     const { bed, ward, type } = values;
@@ -95,6 +100,12 @@ const AdmitPatientForm = () => {
       }
   }, [dispatch, getWards])
 
+  useEffect(()=>{
+      if(!wardRooms?.length){
+        dispatch(getPgWardRoomsSetupSlice())
+      }
+  }, [dispatch, wardRooms])
+
   return (
     <>
      
@@ -113,7 +124,7 @@ const AdmitPatientForm = () => {
     ))}
     </Row>
 
-    <Card style={{ margin: '20px 10px 10px 10px' }}>
+    <Card style={{ marginTop: '30px' }}>
         <Form layout="vertical" 
         className="admit-patient-card-container"
         form={form}
@@ -136,6 +147,10 @@ const AdmitPatientForm = () => {
                 <Select 
                   optionFilterProp="label"
                   loading={loadingWards}
+                  onChange={(value) => {
+                    setSelectedWard(value); // Update selected ward
+                    setSelectedRoom(null); // Reset room selection
+                  }}
                   options={getWards?.map((ward) => ({
                     value: ward.Ward_Code,
                     label: ward.Ward_Name,
@@ -147,6 +162,29 @@ const AdmitPatientForm = () => {
                 />
                
                 </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
+              <Form.Item 
+              label="Room Number" 
+              name='type'
+              rules={[
+                {
+                  required: true,
+                  message: 'Room Number is required!',
+                }
+              ]}
+              >
+                  <Select 
+                    showSearch
+                    onChange={(value) => setSelectedRoom(value)} // Update selected room
+                    disabled={!selectedWard} // Disable if no ward is selected
+                    options={filteredRooms?.map((room) => ({
+                      value: room.Room_Name,
+                      label: room.Room_Name,
+                    }))
+                  }
+                  />
+              </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={24} lg={8} xl={8}>
               <Form.Item 
@@ -162,8 +200,9 @@ const AdmitPatientForm = () => {
                 <Select
                   placeholder="Select Bed"
                   showSearch
-                  loading={loadingBeds}
-                  options={filterBeds?.map((bed) => ({
+                  onChange={(value) => console.log('Selected Bed:', value)} // Handle bed selection
+                  disabled={!selectedRoom} // Disable if no room is selected
+                  options={filteredBeds?.map((bed) => ({
                     value: bed.BedNo,
                     label: bed.BedName,
                   }))
@@ -171,31 +210,9 @@ const AdmitPatientForm = () => {
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item 
-              label="Admission Type" 
-              name='type'
-              rules={[
-                {
-                  required: true,
-                  message: 'Admission type field is required!',
-                }
-              ]}
-              >
-                  <Select 
-                    options={
-                      [
-                        {
-                          value: 'inpatient',
-                          label: 'inpatient',
-                        },
-                      ]
-                    }
-                  />
-              </Form.Item>
-            </Col>
+            
         </Row>
-        <Space>
+        <Space style={{ marginTop: '20px' }}>
             <Form.Item >
                 <Button type="primary" htmlType="submit">Save Admission</Button>
             </Form.Item>

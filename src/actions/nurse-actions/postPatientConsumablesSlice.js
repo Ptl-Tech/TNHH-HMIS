@@ -10,6 +10,7 @@ const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.6
 export const postPatientConsumablesSlice = (endpoint = '/GeneralProcesses/PatientConsumables', consumablesData) => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
+
     try {
         dispatch({ type: POST_PATIENT_CONSUMABLES_REQUEST });
 

@@ -1,10 +1,9 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types';
 import useSetTablePagination from '../../../../hooks/useSetTablePagination';
 import Loading from '../../../../partials/nurse-partials/Loading';
-import { FolderViewOutlined } from '@ant-design/icons';
 
-const GeneralObservationsTable = ({ showModal, ipGetProcedure, loadingGetIpProcedure }) => {
+const GeneralObservationsTable = ({ ipGetProcedure, loadingGetIpProcedure }) => {
     const columns = [
         {
           title: 'Process Code',
@@ -28,17 +27,6 @@ const GeneralObservationsTable = ({ showModal, ipGetProcedure, loadingGetIpProce
           title: 'Remarks',
           dataIndex: 'Remarks',
           key: 'Remarks',
-        },
-        {
-          title: 'Action',
-          key: 'action',
-          fixed: 'right',
-          width: 100,
-          render: (_, record) => (
-            <Space size="middle">
-              <Button type="primary" onClick={() => showModal(record)}><FolderViewOutlined /> View</Button>
-            </Space>
-          ),
         },
       ];
       

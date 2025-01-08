@@ -143,6 +143,8 @@ import { getPgWardsListReducer } from "./nurse-reducers/getPgWardsListReducer";
 import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionFormDetailsReducer";
 // import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
+import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
+import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -261,6 +263,7 @@ export const rootReducer = combineReducers({
   getPgWardsList:getPgWardsListReducer,
   postAdmissionFormDetails:postAdmissionFormDetailsReducer,
   // postPatientAdmission:postPatientAdmissionReducer
- 
+  getQyUrgencyColorCodingSetup:getQyUrgencyColorCodingSetupReducer,
+  getPgWardRoomsSetup:getPgWardRoomsSetupReducer
 
 });

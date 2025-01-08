@@ -49,8 +49,8 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
       title: 'Notes',
       dataIndex: 'Notes', // Matches key in data
       key: 'Notes',
-      render: (text) => 
-        text.length > 50 ? `${text.substring(0, 47)}...` : text,
+      // render: (text) => 
+      //   text.length > 50 ? `${text.substring(0, 47)}...` : text,
     },
     {
       title: 'Action',

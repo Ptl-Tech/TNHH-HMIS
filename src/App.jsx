@@ -74,6 +74,9 @@ import PharmacyCard from "./pages/pharmacy-views/PharmacyCard";
 import PharmacyInpatient from "./pages/pharmacy-views/PharmacyInpatient";
 import PharmacyListReturnLines from "./pages/pharmacy-views/PharmacyListReturnLines";
 import PharmacyHistoryList from "./pages/pharmacy-views/PharmacyHistoryList";
+import ReadNurseNotes from "./pages/nurse-view/ReadNurseNotes";
+import ConsultationCard from "./pages/nurse-view/ConsultationCard";
+import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 
 function App() {
   return (
@@ -115,7 +118,9 @@ function App() {
           />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
 
-          <Route path="Admissions" element={<Admissions />} />
+          <Route path="Consultation" element={<Admissions />} />
+          <Route path="Consultation/Patient" element={<ConsultationCard />} />
+          
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
 
@@ -127,7 +132,9 @@ function App() {
             path="Ward-management/Transfer-bed"
             element={<TransferBed />}
           />
+          <Route path="Ward-management/Bed-occupancy" element={<BedOccupancy />} />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
+          <Route path="Inpatient/Read-nurse-notes" element={<ReadNurseNotes />} />
 
           <Route path="Observation-Room/:id" element={<NurseObservation />} />
           <Route path="Outpatient-list" element={<NurseOutpatientList />} />

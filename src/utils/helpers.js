@@ -63,6 +63,26 @@ export const formatElapsedTime = (minutes) => {
     XLSX.writeFile(workBook, fileName);
   }
 
+  export const convertTime = (time) => {
+    if (!time) return '-';
+
+    // Convert `HH:mm:ss` to a Date object
+    const today = new Date(); // Get today's date
+    const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Time';
+
+    // Format time to "hh:mm AM/PM"
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return formattedTime;
+}
+
    // Print PDF
    export const printToPDF = (dataSource, tableTitle) => {
     const doc = new jsPDF();

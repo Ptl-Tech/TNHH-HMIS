@@ -1,134 +1,177 @@
-import { Card, Input, Space, Table, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
-import { useNavigate } from "react-router-dom";
 
+import { Space, Table, Typography } from "antd"
+import { ProfileOutlined } from "@ant-design/icons"
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getConsultationRoomListSlice } from "../../actions/nurse-actions/getConsultationRoomSlice";
+import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { listDoctors } from "../../actions/DropdownListActions";
+import Loading from "../../partials/nurse-partials/Loading";
+import useSetTablePagination from "../../hooks/useSetTablePagination";
+import SearchFilters from "./SearchFilters";
 
 const PastDoctorVisit = () => {
-  
-  const dataSource = [
-    {
-        key: '1',
-        admNo: 'ADM0001',
-        patientNo: 'PAT0001',
-        names: 'John Brown',
-        admDate: '2023-01-01',
-        patientType: 'cash',
-        appointmentNo: 'A00032',
-        scheme: 'Jubilee',
-        membershipNo: 'ABC123',
-    },
-    {
-        key: '2',
-        admNo: 'ADM0002',
-        patientNo: 'PAT0002',
-        names: 'Jim Green',
-        admDate: '2023-01-01',
-        patientType: 'cash',
-        appointmentNo: 'A00032',
-        scheme: 'Bupa',
-        membershipNo: 'ABC123',
-    },
-    {
-        key: '3',
-        admNo: 'ADM0003',
-        patientNo: 'PAT0003',
-        names: 'Joe Black',
-        admDate: '2023-01-01',
-        patientType: 'cash',
-        appointmentNo: 'A00032',
-        scheme: 'NHIF',
-        membershipNo: 'ABC123',
-    },
-];
-const columns = [
-    {
-        title: 'Adm No',
-        dataIndex: 'admNo',
-        key: 'admNo',
-    },
-    {
-        title: 'Patient No',
-        dataIndex: 'patientNo',
-        key: 'patientNo',
-    },
-    {
-        title: 'Names',
-        dataIndex: 'names',
-        key: 'names',
-        render: (_, record) => <a onClick={()=>handleNavigate(record?.patientNo, record?.admNo)} style={{ color: '#0f5689' }}>{record.names}</a>,
-    },
-    {
-        title: 'Date',
-        dataIndex: 'admDate',
-        key: 'admDate',
-    },
-    {
-        title: 'Patient Type',
-        dataIndex: 'patientType',
-        key: 'patientType',
-    },
-    {
-        title: 'Appointment No',
-        dataIndex: 'appointmentNo',
-        key: 'appointmentNo',
-    },
-    {
-      title: 'Scheme',
-      dataIndex: 'scheme',
-      key: 'scheme',
-  },
-  {
-    title: 'Membership No',
-    dataIndex: 'membershipNo',
-    key: 'membershipNo',
-},
-];
+ 
+    const columns = [
+        {
+            title: 'Treatment No',
+            dataIndex: 'treatmentNo',
+            key: 'treatmentNo',
+        },
+        {
+            title: 'Patient No',
+            dataIndex: 'patientNo',
+            key: 'patientNo',
+        },
+        {
+            title: 'Patient Names',
+            dataIndex: 'names',
+            key: 'names',
+        },
+        {
+            title: 'Treatment Type',
+            dataIndex: 'treatmentType',
+            key: 'treatmentType',
+           
+        },
+        {
+            title: 'Doctor',
+            dataIndex: 'doctor',
+            key: 'doctor',
+        },
+        {
+            title: 'Clinic',
+            dataIndex: 'clinic',
+            key: 'clinic',
+        },
+        {
+            title: 'Date',
+            dataIndex: 'treatmentDate',
+            key: 'treatmentDate',
+        }
+    ];
 
-const navigate = useNavigate();
+    const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
+    const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+    const { data } = useSelector(state => state.getDoctorsList);
 
-const handleNavigate = (patientNo, admNo) => {
-  navigate(`/Nurse/Past-doctor-visit/Patient?PatientNo=${patientNo}&AdmNo=${admNo}`);
-}
-  
-  return (
-    <div style={{ margin: '20px 10px 10px 10px' }}>
-    <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
-        <ProfileOutlined />
-        <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-            Past Doctor Visit
-        </Typography.Text>
-      </Space>
+    const dispatch = useDispatch();
+    
+    const filteredConsultationRooms = useMemo(
+        () => consultationRoomList.filter(room => room?.Status === 'New'),
+        [consultationRoomList]
+    );
+    
+    const formattedTriageWaitingList = useMemo(() => {
+        return triageWaitingList?.map(patient => ({
+            PatientNo: patient?.PatientNo,
+            SearchName: patient?.SearchName,
+        }));
+    }, [triageWaitingList]);
+    
+    const formattedDoctorDetails = useMemo(() => {
+        return data?.map(doctor => ({
+            DoctorID: doctor?.DoctorID,
+            DoctorsName: doctor?.DoctorsName,
+        }));
+    }, [data]);
 
-      <Card style={{ padding: '10px 10px 10px 10px'}}>
-        
-          <div className='admit-patient-filter-container'>
-              <Input placeholder="search by name" 
-                  allowClear
-                  showCount
-                  showSearch
-              />
-              <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-              <Input placeholder="search by patient no" 
-                  allowClear
-                  showCount
-                  showSearch
-              />
-              <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-              <Input placeholder="search by id number" 
-                  allowClear
-                  showCount
-                  showSearch
-              />
-          </div>
-      </Card>
+    const combinedList = useMemo(() => {
+        return filteredConsultationRooms?.map(room => {
+            const matchingPatient = formattedTriageWaitingList?.find(patient => patient?.PatientNo === room?.PatientNo);
+            return {
+                ...room,
+                PatientNo: room?.PatientNo,
+                SearchName: matchingPatient ? matchingPatient?.SearchName : null,
+            };
+        });
+    }, [filteredConsultationRooms, formattedTriageWaitingList]);
+    
+    const combinedListWithDoctors = useMemo(() => {
+        return combinedList?.map(item => {
+            const matchingDoctor = formattedDoctorDetails?.find(doctor => doctor?.DoctorID === item?.DoctorID);
+            return {
+                ...item,
+                DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
+            };
+        });
+    }, [combinedList, formattedDoctorDetails]);
 
-      <Table 
-          columns={columns} 
-          dataSource={dataSource} 
-          className="admit-patient-table"
-      />
+    const { pagination, handleTableChange } = useSetTablePagination(combinedListWithDoctors);
+
+    const dataSource = combinedListWithDoctors?.map((item, index) => ({
+    key: index + 1,
+    treatmentNo: item?.TreatmentNo,
+    patientNo: item?.PatientNo,
+    names: item?.SearchName,
+    treatmentDate: item?.TreatmentDate,
+    treatmentType: item?.TreatmentType,
+    clinic: item?.Clinic,
+    doctor: item?.DoctorsName,
+    })).sort((a, b) => new Date(b?.treatmentDate) - new Date(a?.treatmentDate));
+
+    
+
+    useEffect(() => {
+    if (!data?.length) {
+    dispatch(listDoctors());
+    }
+    }, [dispatch, data?.length]);
+
+    useEffect(() => {
+    if (!triageWaitingList?.length) {
+    dispatch(getTriageWaitingList());
+    }
+    }, [dispatch, triageWaitingList?.length]);
+
+    useEffect(() => {
+    if (!consultationRoomList?.length) {
+    dispatch(getConsultationRoomListSlice());
+    }
+    }, [dispatch, consultationRoomList?.length]);
+    
+
+
+return (
+<div style={{ margin: '20px 10px 10px 10px' }}>
+  <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
+      <ProfileOutlined />
+      <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
+          Past Doctors Visits
+      </Typography.Text>
+    </Space>
+
+    <SearchFilters />
+
+    {
+    loadingConsultationRoomList ? (
+        <Loading />
+    ) : (
+        <Table 
+        columns={columns} 
+        // rowSelection={rowSelection}
+        scroll={{ x: 'max-content' }}
+        dataSource={dataSource} 
+        className="admit-patient-table"
+        bordered size='middle' 
+        pagination={{
+            ...pagination,
+            total: combinedListWithDoctors?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+            onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+            style: {
+                marginTop: '30px',
+            }
+            }}
+        />
+    )
+    }
 </div>
-  )
+);
 }
 
-export default PastDoctorVisit
+export default PastDoctorVisit;

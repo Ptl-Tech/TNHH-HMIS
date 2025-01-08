@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   AppstoreOutlined,
@@ -11,7 +11,6 @@ import {
   UserSwitchOutlined,
   FileAddOutlined,
   HistoryOutlined,
-  ClockCircleOutlined,
   PicCenterOutlined,
   RadiusUprightOutlined,
   ImportOutlined,
@@ -19,9 +18,9 @@ import {
   ExperimentOutlined,
   RadarChartOutlined,
   SolutionOutlined,
-  InteractionOutlined,
   RetweetOutlined,
   LayoutOutlined,
+  
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
 import { FaUserGroup } from "react-icons/fa6";
@@ -128,19 +127,21 @@ const MainLayout = () => {
         ],
       },
       {
+
+        icon: <CalendarOutlined style={{ color: "#fff" }} />,
+        label: "Consultation Room",
+        children: [
+          {
+            key: "Consultation",
+            label: "Consultation",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      {
         icon: <SolutionOutlined style={{ color: "#fff" }} />,
         label: "Admissions",
         children: [
-          {
-            key: "Admissions",
-            label: "Admissions",
-            icon: <SolutionOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "Admission-requests",
-            label: "Admission Requests",
-            icon: <InteractionOutlined style={{ color: "#fff" }} />,
-          },
           {
             key: "Admit-patient",
             label: "Admit Patient",
@@ -174,11 +175,6 @@ const MainLayout = () => {
         icon: <RetweetOutlined style={{ color: "#fff" }} />,
         label: "Discharges",
         children: [
-          {
-            key: "Discharge-requests",
-            label: "Discharge Requests",
-            icon: <RetweetOutlined style={{ color: "#fff" }} />,
-          },
           {
             key: "Discharge-list",
             label: "Discharge Patient",

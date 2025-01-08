@@ -1,9 +1,9 @@
 import configHelpers from '../configHelpers';
 import axios from "axios";
 
-export const GET_PG_WARDS_LIST_REQUEST = 'GET_PG_BEDS_REQUEST';
-export const GET_PG_WARDS_LIST_SUCCESS = 'GET_PG_BEDS_SUCCESS';
-export const GET_PG_WARDS_LIST_FAILURE = 'GET_PG_BEDS_FAILURE';
+export const GET_PG_WARDS_LIST_REQUEST = 'GET_PG_WARDS_LIST_REQUEST';
+export const GET_PG_WARDS_LIST_SUCCESS = 'GET_PG_WARDS_LIST_SUCCESS';
+export const GET_PG_WARDS_LIST_FAILURE = 'GET_PG_WARDS_LIST_FAILURE';
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 export const getPgWardsListSlice = () => 

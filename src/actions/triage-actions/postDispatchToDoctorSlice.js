@@ -15,18 +15,25 @@ export const postDispatchToDoctorSlice = (dispatchToDoctor) => async (dispatch, 
         dispatch({ type: POST_DISPATCH_TO_DOCTOR_REQUEST });
 
         const config = apiHeaderConfig(getState);
-        const response = await axios.post(`${API_URL}/Triage/DispatchToDoctor`, 
+        const {data} = await axios.post(`${API_URL}/Triage/DispatchToDoctor`, 
             dispatchToDoctor,
             config
         );
 
-        dispatch({ type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: response.data });
+        dispatch({ type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: data });
  
-        return response.data;
+        return { type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: data };
 
     }catch (error) {
         
-        dispatch({ type: POST_DISPATCH_TO_DOCTOR_FAIL, payload: error });
+        dispatch({ 
+            type: POST_DISPATCH_TO_DOCTOR_FAIL, 
+            payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null,
+            }
+        });
     
     }
 }

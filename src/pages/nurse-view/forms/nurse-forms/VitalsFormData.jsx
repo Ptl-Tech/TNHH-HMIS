@@ -391,7 +391,7 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
               </Col>
             </Row>
             <Row gutter={16}>
-              <Col span={24}>
+              <Col span={12}>
               <Form.Item label="BMI" name={['vitals', 'bmi']}
               >
                 <Input type='text' 

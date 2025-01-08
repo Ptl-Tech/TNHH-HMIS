@@ -1,21 +1,19 @@
-import { Card, Tabs, Row, Col, Avatar, Typography, Divider, Button, message, Space } from 'antd'
+import { Card, Tabs, Row, Col, Avatar, Typography, Button, Space } from 'antd'
 import { UserOutlined, DiffOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
 import Injections from './forms/triage-forms/Injections';
 import Dressing from './forms/triage-forms/Dressing';
 import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
 import useAuth from '../../hooks/useAuth';
-import { postDispatchToDoctorSlice } from '../../actions/triage-actions/postDispatchToDoctorSlice';
 import SkeletonLoading from '../../partials/nurse-partials/Skeleton';
-import LoadingParagraphs from '../../partials/nurse-partials/LoadingParagraphs';
-import { getVitalsLinesSlice } from '../../actions/triage-actions/getVitalsLinesSlice';
+import TriageDispatchToDoctorFormData from './nurse-forms/TriageDispatchToDoctorFormData';
+import Loading from '../../partials/nurse-partials/Loading';
 
 const EvaluatePatientInTriage = () => {
-
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -26,6 +24,8 @@ const EvaluatePatientInTriage = () => {
   const observationNo = queryParams.get('Ob_number');
   const userDetails = useAuth();
   const staffNo = userDetails?.userData?.firstName
+
+  const [isDispatchFormVisible, setIsDispatchFormVisible] = useState(false);  
 
   useEffect(()=>{
       dispatch(getPatientDetails(patientNo))
@@ -38,21 +38,14 @@ const EvaluatePatientInTriage = () => {
       .filter(Boolean) // Remove null, undefined, or empty strings
       .join(' '); // Join with a space
 
-  const handleDispatchToDoctor = (observationNumber) => {
-    dispatch(getVitalsLinesSlice(observationNumber)).then((data)=>{
-      if(Object.keys(data).length > 0){
-          dispatch(postDispatchToDoctorSlice({observationNo: observationNumber, staffNo})).then((data)=>{
-            if(Object.keys(data).length > 0){
-              message.success('Patient dispatched to doctor successfully');
-            }else{
-              message.error('An error occurred, please try again');
-            }
-          })
-      }else{
-        message.error('Please add vitals before dispatching to doctor');
-      }
-    });
-  };
+  const handleVitalsButtonVisibility = () => {
+    setIsDispatchFormVisible(!isDispatchFormVisible);
+  }
+
+  const infoRows = [
+    { label: 'Patient Number', value: patientDetails?.PatientNo },
+    { label: 'Observation No', value: observationNo },
+  ];
 
 
   return (
@@ -63,9 +56,81 @@ const EvaluatePatientInTriage = () => {
                 Triage Observation Form
             </Typography.Text>
           </Space>
-           <Row gutter={8} className='inpatient-card-container'>
-  
-              <Col xs={24} md={24} lg={16} xl={16}>
+          <Row>
+            {
+              loadingPatientDetails ? (
+                <SkeletonLoading />
+              ):(
+                <Col xs={24} md={24} lg={12} xl={12}>
+              <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '12px' }}>
+                  <Avatar icon={<UserOutlined />} size={48}/>
+                  <div style={{ marginTop: '10px'}}>
+                        <Typography.Title level={5} style={{color: 'black', fontSize: '13px'}}>{patientName}</Typography.Title>
+                        <Typography.Text style={{ fontSize: '13px', color:'gray' }}>DOB: {patientDetails?.DateOfBirth}</Typography.Text>
+                  </div>
+                  </div> 
+                  <div>
+                      <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
+                        Age and Gender: {patientDetails?.Gender}, {patientDetails?.AgeinYears || 0 } Years
+                      </Typography.Title>
+
+                  </div>
+                                   
+                  </Card>  
+              </Col>
+              )
+            }
+          {
+            loadingPatientDetails ? (
+                <Loading />
+            ):(
+              <Col xs={24} md={24} lg={12} xl={12}>
+              <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+                <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
+                Additional Information
+                </Typography.Title>
+                    {infoRows.map((row, index) => (
+                    <div 
+                    key={index} 
+                    style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}
+                    >
+                    <Typography.Title 
+                    level={5} 
+                    style={{ fontSize: '14px', color: 'black' }}
+                    >
+                    {row.label}
+                    </Typography.Title>
+                    <Typography.Text 
+                    style={{ fontSize: '12px', color: 'gray', fontWeight: 'bold' }}
+                    >
+                    {row.value}
+                    </Typography.Text>
+                    </div>
+                    ))}
+                </Card> 
+              </Col>
+            )
+          }
+          </Row>
+          <Card style={{ padding: '10px 16px', marginTop: '10px', marginBottom: '10px' }}>
+              
+             
+                <Button type="primary" onClick={handleVitalsButtonVisibility} style={{ width: '50%', marginBottom: '10px'}}>
+                          Dispatch patient to the Doctor
+                </Button>
+
+              {
+                isDispatchFormVisible && (
+                  <TriageDispatchToDoctorFormData staffNo={staffNo} observationNo={observationNo} setIsDispatchFormVisible={setIsDispatchFormVisible}/>
+                )
+              }
+
+          </Card>
+            {
+            !isDispatchFormVisible && (
+              <Row gutter={8} className='inpatient-card-container'>
+              <Col xs={24} md={24} lg={24} xl={24}>
                   <Card style={{ padding: '10px 16px' }}>
                         <Tabs>
                           <Tabs.TabPane tab="Vitals" key="1">
@@ -82,68 +147,10 @@ const EvaluatePatientInTriage = () => {
                           </Tabs.TabPane>
                         </Tabs>
                   </Card>
-              </Col>
-              <Col xs={24} md={24} lg={8} xl={8}>
-
-
-              {
-                loadingPatientDetails ? (
-                  <SkeletonLoading />
-                ) :(
-                      <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '12px' }}>
-                        <Avatar icon={<UserOutlined />} size={48}/>
-                        <div style={{ marginTop: '10px'}}>
-                              <Typography.Title level={5} style={{color: 'black', fontSize: '13px'}}>{patientName}</Typography.Title>
-                              <Typography.Text style={{ fontSize: '13px', color:'gray' }}>DOB: {patientDetails?.DateOfBirth}</Typography.Text>
-                        </div>
-                      </div>
-                      <Divider />
-                      <Button type="primary" onClick={()=>handleDispatchToDoctor(observationNo)} style={{width: '100%', marginBottom: '10px'}}>
-                          Dispatch patient to the Doctor
-                      </Button>
-                  </Card>
-                ) 
-              }
-              
-                 {
-                  loadingPatientDetails ? (
-                    <LoadingParagraphs />
-                  ) : (
-                    <Card style={{ padding: '10px 16px', marginRight: '10px', marginTop: '10px' }}>
-                    <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
-                      Additional Information
-                    </Typography.Title>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                        <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>PatientNumber</Typography.Title>
-    
-                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.PatientNo}</Typography.Text>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', }}>
-                        
-                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black',}}>Observation No</Typography.Title>
-                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{observationNo}</Typography.Text>
-                    
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                    
-                      
-                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>Age</Typography.Title>
-                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{`${patientDetails?.AgeinYears} Years`}
-                          </Typography.Text>
-                        
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between'}}>
-                          <Typography.Title level={5} style={{ fontSize: '14px', color:'black' }}>Gender</Typography.Title>
-                          <Typography.Text style={{ fontSize: '12px', color:'gray', fontWeight: 'bold'}}>{patientDetails?.Gender}</Typography.Text>
-                      
-                    </div>
-                  </Card>
-                  )
-                 }
-                    
-              </Col>
-           </Row>
+              </Col>     
+              </Row>
+            )
+           }
     </div>
   )
 }
