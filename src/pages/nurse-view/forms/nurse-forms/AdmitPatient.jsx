@@ -1,5 +1,5 @@
 import { Button, Card, Col, Form, message, Modal, Row, Select, Space, Typography } from "antd"
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPgBedsSlice } from "../../../../actions/nurse-actions/getPgBedsSlice";
@@ -11,7 +11,9 @@ import { getPgWardRoomsSetupSlice } from "../../../../actions/nurse-actions/getP
 
 const AdmitPatientForm = () => {
 
-  const { patientDetails } = useLocation().state;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails || {};
   const dispatch = useDispatch();
   const {loadingBeds, getBeds} = useSelector(state => state.getPgBeds);
   const { loadingWards, getWards } = useSelector(state => state.getPgWardsList);
@@ -105,6 +107,12 @@ const AdmitPatientForm = () => {
         dispatch(getPgWardRoomsSetupSlice())
       }
   }, [dispatch, wardRooms])
+
+  useEffect(()=>{
+    if(!location.state){
+      navigate('/Nurse/Dashboard');
+    }
+  }, [location.state, navigate])
 
   return (
     <>

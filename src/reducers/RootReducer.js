@@ -264,7 +264,7 @@ export const rootReducer = combineReducers({
   postAdmissionFormDetails:postAdmissionFormDetailsReducer,
   // postPatientAdmission:postPatientAdmissionReducer
   getQyUrgencyColorCodingSetup:getQyUrgencyColorCodingSetupReducer,
-  getPgWardRoomsSetup:getPgWardRoomsSetupReducer
+  getPgWardRoomsSetup:getPgWardRoomsSetupReducer,
 
   getLocationsSetup:QyLocationsListReducer,
   postDoctorInjections:postDocInjectionsReducer,
@@ -281,7 +281,7 @@ export const rootReducer = combineReducers({
   getDischargeList:getDischargeListReducer,
   getDischargeListRequests:getDischargeRequestListReducer,
   getPendingAdmissions:getPendingAdmissionListReducer,
-  postInitiateDischarge:postInitiateInpatientDischargeReducer,
+  // postInitiateDischarge:postInitiateInpatientDischargeReducer,
   postInpatient:postInpatientDischargeReducer,
   getAdmissionLines:getAdmissionLinesReducer,
   getDiagnosisLines:getDiagnosisLinesReducer,
