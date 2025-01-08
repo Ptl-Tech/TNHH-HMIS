@@ -13,7 +13,6 @@ const Signout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userDetails = useAuth();  // Use the custom hook to get user info
-  console.log("User details:", userDetails);
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase(); // Fetch branch code from localStorage
 
   const handleMenuClick = (e) => {
@@ -40,7 +39,6 @@ const Signout = () => {
   const getSalutation = () => {
     // Ensure userDetails is available before accessing properties
     if (userDetails && userDetails.userData.firstName) {
-      console.log("User details:", userDetails.userData);
       return `Hi ${userDetails.userData.firstName}`;
     }
     return 'Hi there'; // Default greeting if userDetails is not available

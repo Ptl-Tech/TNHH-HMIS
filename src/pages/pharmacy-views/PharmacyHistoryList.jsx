@@ -40,7 +40,7 @@ import { getPharmacyHistoryList } from "../../actions/pharmacy-actions/getPharma
     const [showForm, setShowForm] = useState(true); // Toggle between table and form
   
     const {loading:pharmacyHistoryLoading, data: PharmacyHistory } = useSelector(
-      (state) => state.getPharmacyReturnLinesList
+      (state) => state.getPharmacyHistoryList
     );
    
   

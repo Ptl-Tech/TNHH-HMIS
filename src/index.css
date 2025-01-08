@@ -23,8 +23,8 @@
   color: #ffffff;
 }
 
-:where(.css-lobnjp).ant-menu-light, 
-:where(.css-lobnjp).ant-menu-light > .ant-menu {
+:where(.css-1gx1iy6).ant-menu-light, 
+:where(.css-1gx1iy6).ant-menu-light > .ant-menu {
     color: #ffffff;
     background: #0f5689 !important;
 }

@@ -33,6 +33,8 @@ export const getAppmntDetails = (appointmentId) => async (dispatch, getState) =>
       );
     dispatch({ type: VIEW_PATIENT_APPMNT_DATA_SUCCESS, payload: response.data });
 
+    return response.data;
+
   } catch (error) {
     setTimeout(() => {
       dispatch({

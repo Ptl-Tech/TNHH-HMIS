@@ -9,7 +9,6 @@ const PrivateRoute = ({ allowedDepartments }) => {
   }));
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const department = userInfo?.userData?.departmentName;
-  console.log(department);
 
   const location = useLocation();
 

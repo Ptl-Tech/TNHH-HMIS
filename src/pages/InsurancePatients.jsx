@@ -10,9 +10,12 @@ import {
   Typography,
   Pagination,
   Tooltip,
+  Modal,
+  Form,
+  InputNumber,
 } from "antd";
 import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
-import { listPatients } from "../actions/patientActions";
+import { appmntList, listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 
 const InsurancePatients = () => {
@@ -21,6 +24,7 @@ const InsurancePatients = () => {
     error: patientsError,
     patients,
   } = useSelector((state) => state.patientList);
+  const { loading, patients: visitData } = useSelector((state) => state.appmntList);
 
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchParams, setSearchParams] = useState({
@@ -32,6 +36,8 @@ const InsurancePatients = () => {
     current: 1,
     pageSize: 20,
   });
+  const [billingModalVisible, setBillingModalVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,65 +47,100 @@ const InsurancePatients = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    // Filter only "Cash" patients and those with isActivated: true
-    const InsurancePatients = patients.filter(
+    dispatch(appmntList());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Filter only "Corporate" patients and those with isActivated: true from visitData
+    const InsurancePatients = visitData.filter(
       (patient) => patient.PatientType === "Corporate" && patient.Activated === true
     );
     setFilteredPatients(InsurancePatients);
-  }, [patients]);
-  
+  }, [visitData]); // Dependency on visitData
+
   const handleSearchChange = (e, key) => {
     const value = e.target.value;
     setSearchParams((prev) => ({ ...prev, [key]: value }));
-  
-    const filtered = patients.filter((patient) => {
+
+    const filtered = visitData.filter((patient) => {
       const matchesName = patient.Names.toLowerCase().includes(searchParams.SearchNames.toLowerCase());
       const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(searchParams.AppointmentNo.toLowerCase());
-  
-      // Ensure the patient is both 'Cash' and 'isActivated: true'
+
       return (
         matchesName &&
         matchesAppointmentNo &&
-        patient.PatientType === "Cash" &&
-        patient.isActivated === true
+        patient.PatientType === "Corporate" 
       );
     });
-  
+
     setFilteredPatients(filtered);
   };
-  
+
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };
 
-  useEffect(() => {
-    const startIndex = (pagination.current - 1) * pagination.pageSize;
-    const endIndex = startIndex + pagination.pageSize;
-    setFilteredPatients((prevPatients) => prevPatients.slice(startIndex, endIndex));
-  }, [pagination]);
+  const showModal = (patient) => {
+    setSelectedPatient(patient);
+    setBillingModalVisible(true);
+  };
+
+  const handleBillingSubmit = () => {
+    setBillingModalVisible(false);
+  };
 
   const columns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
       key: "PatientNo",
-      sorter: (a, b) => a.PatientNo - b.PatientNo,
     },
     {
       title: "Patient Name",
-      dataIndex: "SearchName",
-      key: "SearchName",
-      sorter: (a, b) => a.Names.localeCompare(b.SearchName),
+      dataIndex: "Names", // Corrected key to match patient object
+      key: "Names",
     },
-    { title: "Gender", dataIndex: "Gender", key: "Gender" },
-    { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    {
+      title: "Appointment No",
+      dataIndex: "AppointmentNo",
+      key: "AppointmentNo",
+    },
     {
       title: "Appointment Date",
-      dataIndex: "ActiveAppointmentdate",
-      key: "ActiveAppointmentdate",
-      render: (text) => new Date(text).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.ActiveAppointmentdate) - new Date(b.ActiveAppointmentdate),
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      },
+    },
+    {
+      title: "Appointment Time",
+      dataIndex: "AppointmentTime",
+      key: "AppointmentTime",
+      render: (text, record) => {
+        const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
+        const dateTime = new Date(dateTimeString);
+        return dateTime.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
+    },
+    {
+      title: "Gender",
+      dataIndex: "Gender",
+      key: "Gender",
+    },
+    {
+      title: "Patient Type",
+      dataIndex: "PatientType",
+      key: "PatientType",
     },
     {
       title: "Actions",
@@ -111,11 +152,10 @@ const InsurancePatients = () => {
               View Details
             </Button>
           </Tooltip>
-          {/* Action Button to redirect to billing page */}
           <Tooltip title="Bill and Clear">
             <Button
               type="primary"
-              onClick={() => navigate(`/billing/${record.AppointmentNo}`)} // Updated to use navigate
+              onClick={() => showModal(record)}
             >
               Bill & Clear
             </Button>
@@ -167,8 +207,8 @@ const InsurancePatients = () => {
       <div className="mt-4">
         <Table
           columns={columns}
-          loading={patientsLoading}
-          dataSource={paginatedData.map((patient) => ({
+          loading={loading}
+          dataSource={visitData.map((patient) => ({
             ...patient,
             key: patient.AppointmentNo,
           }))}
@@ -176,9 +216,6 @@ const InsurancePatients = () => {
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys),
           }}
-          rowClassName={(record) =>
-            record.Status === "New" ? "row-warning" : ""
-          }
           pagination={false}
           bordered
           size="small"
@@ -194,6 +231,38 @@ const InsurancePatients = () => {
           style={{ float: "right", margin: "16px" }}
         />
       </div>
+
+      <Modal
+        title="Billing Details"
+        visible={billingModalVisible}
+        onCancel={() => setBillingModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setBillingModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleBillingSubmit}>
+            Print Invoice
+          </Button>,
+        ]}
+      >
+        {selectedPatient && (
+          <Form layout="vertical">
+            <Form.Item label="Patient Name">
+              <Input value={selectedPatient.Names} disabled  style={{fontWeight: 'bold', color: '#0f5689'}}/>
+            </Form.Item>
+            <Form.Item label="Appointment No">
+              <Input value={selectedPatient.AppointmentNo} disabled />
+            </Form.Item>
+            <Form.Item label="Amount">
+              <InputNumber
+                min={0}
+                defaultValue={selectedPatient.BillAmount || 0}
+                style={{ width: "100%" }}
+              />
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
 
       <style jsx>{`
         .row-warning {

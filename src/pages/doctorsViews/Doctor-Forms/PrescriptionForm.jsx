@@ -102,7 +102,7 @@ const PrescriptionForm = () => {
       unitOfMeasure: UnitOfMeasure,
       dosage: Dosage,
       prescriptionDose: prescriptionDose,
-      noOfDays: noOfDays,
+      // noOfDays: noOfDays,
       route: route,
       remarks: PrescriptionRemarks,
     };

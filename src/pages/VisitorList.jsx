@@ -9,6 +9,8 @@ import {
   Tag,
   Typography,
   message,
+  Modal,
+  Form,
 } from "antd";
 import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +31,8 @@ const VisitorList = () => {
   });
   const [filteredVisitors, setFilteredVisitors] = useState([]);
   const [filterLoading, setFilterLoading] = useState(false);
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
@@ -41,42 +45,26 @@ const VisitorList = () => {
 
   const loading = visitorsLoading || patientsLoading || filterLoading;
 
-  // Fetch initial data
   useEffect(() => {
     dispatch(getVisitorsList());
     dispatch(listPatients());
   }, [dispatch]);
 
-  // Apply filters
   useEffect(() => {
     const applyFilters = () => {
       setFilterLoading(true);
 
-      // Filter visitors based on the criteria
       const filtered = visitors.filter((visitor) => {
         const isToday = visitor.InitiatedDate === currentDate;
         const allowedStatuses = visitor.Status === "Entered";
-
-        if(!isToday ){
-          return false 
-        }
-
-        if(!allowedStatuses){
-          return false 
-        }
+        if (!isToday || !allowedStatuses) return false;
 
         const isPatient = patients.some(
           (patient) => patient.IDNumber === visitor.IDNumber
         );
 
-        if(isToday && !isPatient && allowedStatuses){
-          return true
-        }
-
-        // Filter logic: visitor initiated today, has entered status, and matches search params
         return (
-          isToday &&
-          allowedStatuses &&
+          !isPatient &&
           (!searchParams.VisitorName ||
             visitor.VisitorName?.toLowerCase().includes(
               searchParams.VisitorName.toLowerCase()
@@ -84,10 +72,7 @@ const VisitorList = () => {
           (!searchParams.IdNumber ||
             visitor.IDNumber?.includes(searchParams.IdNumber)) &&
           (!searchParams.VisitorPhone ||
-            visitor.PhoneNumber?.includes(searchParams.VisitorPhone)) &&
-            visitor.Status !== "Converted to Patient"&&
-
-          (isPatient || visitor.Status !== "Converted to Patient") 
+            visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
         );
       });
 
@@ -95,35 +80,39 @@ const VisitorList = () => {
       setFilterLoading(false);
     };
 
-    // Run filters when visitors or patients data change
     if (visitors.length && patients.length) {
       applyFilters();
     }
   }, [visitors, patients, searchParams, currentDate]);
 
-  // Trigger search change and update search parameters
   const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    const updatedSearchParams = {
-      ...searchParams,
-      [field]: value,
-    };
-    setSearchParams(updatedSearchParams);
+    setSearchParams({ ...searchParams, [field]: e.target.value });
   };
 
-  // Determine button text based on visitor status
   const getButtonText = (visitor) => {
-    const patient = patients.find(
+    
+    const patient = visitors.find(
       (patient) => patient.IDNumber === visitor.IDNumber
     );
     return patient ? "Create New Visit" : "Convert to Patient";
   };
+  const openModal = (visitor) => {
+    setSelectedVisitor({
+      ...visitor,
+      FirstName: visitor.FirstName || "",
+      MiddleName: visitor.MiddleName || "",
+      LastName: visitor.LastName || "",
+    });
+    setIsModalVisible(true);
+  };
 
-  // Handle conversion of visitor to patient
-  const handleConvertToPatient = async (visitor) => {
+  
+
+  const handleConvertToPatient = async () => {
+    if (!selectedVisitor) return;
+
     try {
-      const patientNo = await dispatch(convertPatient(visitor.No));
-
+      const patientNo = await dispatch(convertPatient(selectedVisitor.No));
       if (patientNo) {
         const existingPatient = patients.find(
           (patient) => patient.PatientNo === patientNo
@@ -134,12 +123,12 @@ const VisitorList = () => {
             state: { existingPatient },
           });
         } else {
-          message.warning(
-            "Patient not found. Please register the patient first.",
+          message.success(
+            "Register Patient First.",
             5
           );
           navigate("/reception/Patient-Registration", {
-            state: { visitorData: visitor, patientNumber: patientNo },
+            state: { visitorData: selectedVisitor, patientNumber: patientNo },
           });
         }
       } else {
@@ -148,68 +137,41 @@ const VisitorList = () => {
     } catch (error) {
       message.error("An error occurred while processing the request.", 5);
     }
+    setIsModalVisible(false);
   };
 
   const columns = [
-    {
-      title: "Index",
-      dataIndex: "index",
-      key: "index",
-      render: (_, __, index) => index + 1,
-    },
-    { title: "Visitor No", dataIndex: "No", key: "No" },
-    { title: "Visitor Name", dataIndex: "VisitorName", key: "VisitorName" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
-    {
-      title: "Phone Number",
-      dataIndex: "PhoneNumber",
-      key: "PhoneNumber",
-    },
+    { title: "Index", dataIndex: "index", render: (_, __, index) => index + 1 },
+    { title: "Visitor No", dataIndex: "No" },
+    { title: "Visitor Name", dataIndex: "VisitorName" },
+    { title: "ID Number", dataIndex: "IDNumber" },
+    { title: "Phone Number", dataIndex: "PhoneNumber" },
     {
       title: "Date of Visit",
       dataIndex: "InitiatedDate",
-      key: "InitiatedDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
       title: "Status",
       dataIndex: "Status",
-      key: "Status",
-      render: (status) => {
-        const statusColors = {
-          Arrived: "orange",
-          Entered: "red",
-          Received: "blue",
-          Cleared: "green",
-        };
-        return <Tag color={statusColors[status] || "default"}>{status}</Tag>;
-      },
+      render: (status) => (
+        <Tag color={status === "Entered" ? "red" : "default"}>{status}</Tag>
+      ),
     },
     {
       title: "Action",
-      key: "action",
-      render: (_, visitor) => {
-        const buttonText = getButtonText(visitor);
-        const isCreatedVisit = buttonText === "Create New Visit";
-        const ghost = isCreatedVisit;
-
-        return (
-          <Button
-            ghost={ghost}
-            onClick={() => handleConvertToPatient(visitor)}
-            type="primary"
-          >
-            {buttonText}
-          </Button>
-        );
-      },
+      render: (_, visitor) => (
+        <Button type="primary" onClick={() => openModal(visitor)}>
+          {getButtonText(visitor)}
+        </Button>
+      ),
     },
   ];
 
   return (
     <div className="card mt-4">
-      <div className="d-flex justify-content-between align-items-center m-4 text-dark ">
-        <h5 style={{ color: "#ac8342", textAlign: "center" }}>
+      <div className="d-flex justify-content-between align-items-center m-4">
+        <h5>
           <TeamOutlined style={{ marginRight: 8 }} />
           Current Visitors List
         </h5>
@@ -221,14 +183,11 @@ const VisitorList = () => {
           Refresh
         </Button>
       </div>
-      <Card className="card-header mb-4 p-4">
-        <Typography.Text style={{ color: "#003F6D", fontWeight: "bold" }}>
-          Find Visitor Details by:
-        </Typography.Text>
-        <Row gutter={16} className="mt-2">
+      <Card className="mb-4">
+        <Row gutter={16}>
           <Col span={6}>
             <Input
-              placeholder="Id Number"
+              placeholder="ID Number"
               value={searchParams.IdNumber}
               onChange={(e) => handleSearchChange(e, "IdNumber")}
               allowClear
@@ -255,14 +214,78 @@ const VisitorList = () => {
       {loading ? (
         <Loading />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredVisitors}
-          bordered
-          size="small"
-          style={{ marginTop: "16px" }}
-        />
+        <Table columns={columns} dataSource={filteredVisitors} bordered />
       )}
+      <Modal
+        title="Visitor Details"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        style={{ top: 20 }}
+        width={750}
+        footer={[
+          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="convert" type="primary" onClick={handleConvertToPatient}>
+            Convert to Patient
+          </Button>,
+        ]}
+      >
+        {selectedVisitor && (
+          <Form layout="vertical">
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item label="Visitor Number">
+                  <Input
+                    value={selectedVisitor.No}
+                    readOnly
+                    style={{ fontWeight: "bold" }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="First Name">
+                  <Input value={selectedVisitor.FirstName} readOnly />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Middle Name">
+                  <Input value={selectedVisitor.MiddleName} readOnly />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Last Name">
+                  <Input value={selectedVisitor.LastName} readOnly />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Category">
+                  <Input value={selectedVisitor.VisitorCategory} readOnly />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Reason for Visit">
+                  <Input
+                    value={
+                      selectedVisitor.ReasonForVisit === "1"
+                        ? "Medication"
+                        : "Official Visit"
+                    }
+                    readOnly
+                  />
+                </Form.Item>
+              </Col>
+              {selectedVisitor.PersonToSee && (
+                <Col span={8}>
+                  <Form.Item label="Person to Visit">
+                    <Input value={selectedVisitor.PersonToSee} readOnly />
+                  </Form.Item>
+                </Col>
+              )}
+            </Row>
+          </Form>
+        )}
+      </Modal>
     </div>
   );
 };

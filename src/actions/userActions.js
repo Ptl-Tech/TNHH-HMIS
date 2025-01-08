@@ -9,21 +9,44 @@ const API = "http://217.21.122.62:8085/"
 export const login = (staffNo, password) => async (dispatch) => {
   try {
     dispatch({ type: USER_LOGIN_REQUEST });
-    const config = { headers: { "Content-Type": "application/json", } };
+
+    const config = {
+      headers: { "Content-Type": "application/json" },
+    };
+
+    // API call
     const { data } = await axios.post(
       `${API}Authentication/Login`,
       { staffNo, password },
       config
     );
 
+    // Dispatch success action
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
-    console.log("User Login Data: ", data); 
+
+    const responseData = {
+      status: data.status,
+      message: data.msg, // Assuming response.data contains the required information
+    };
+
+
+    // Store user data in localStorage
     localStorage.setItem("userInfo", JSON.stringify(data));
+    message.success(data.msg, 5);
   } catch (error) {
+    // Extract error message
+    const errorMessage =
+      error.response?.data?.message || error.response?.data?.errors || "An unknown error occurred";
+
+    // Dispatch failure action
     dispatch({
       type: USER_LOGIN_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: errorMessage,
     });
+
+    // Display error message using Ant Design's message component
+    message.error(errorMessage);
+    
   }
 };
 

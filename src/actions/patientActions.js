@@ -192,7 +192,6 @@ export const postTriageVisit = (appointmentId) => async (dispatch, getState) => 
       },
     };
 
-    console.log("patient: ", appointmentId);
 
     const response = await axios.post(
       `${API}Reception/DispatchToTriage`,
@@ -306,7 +305,6 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
       },
     };
 
-    console.log("patient: ", visitorNo);
 
   const {data} = await axios.post(
       `${API}Reception/ConvertVisitorToPatient `,
@@ -316,10 +314,6 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
 
   //  // Extract response details
     const responseData =data.patientNo;
-
-    setTimeout(() => {
-      console.log("Dispatched Payload:", responseData);
-    }, 2000);
 
     dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: responseData });
     //message with success message and observationNo
