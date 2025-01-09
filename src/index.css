@@ -145,7 +145,7 @@
 .modal-title-content {
   background-color: #f5f5dc; /* Light greyish cream */
   padding: 20px;
-  //text-align: center; /* Center the title and logo */
+  
 }
 
 .modal-logo-container {
@@ -190,6 +190,9 @@
   background-color: #ffd6d6; /* Light red */
 }
 
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert .ant-alert-close-icon .anticon-close {
+  color: #0f5689 !important;
+}
 
 
 main {

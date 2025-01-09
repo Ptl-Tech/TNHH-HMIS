@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import SkeletonLoading from '../../partials/nurse-partials/Skeleton';
 import TriageDispatchToDoctorFormData from './nurse-forms/TriageDispatchToDoctorFormData';
 import Loading from '../../partials/nurse-partials/Loading';
+import { calculateAge } from '../../utils/helpers';
 
 const EvaluatePatientInTriage = () => {
 
@@ -32,6 +33,7 @@ const EvaluatePatientInTriage = () => {
   }, [dispatch, patientNo])
 
   const { loadingPatientDetails, patientDetails } = useSelector((state) => state.getPatientDetails);
+  console.log('patient details', patientDetails)
 
   const patientName = patientDetails?.SearchName 
   || [patientDetails?.Surname, patientDetails?.FirstName, patientDetails?.MiddleName]
@@ -62,7 +64,7 @@ const EvaluatePatientInTriage = () => {
                 <SkeletonLoading />
               ):(
                 <Col xs={24} md={24} lg={12} xl={12}>
-              <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+              <Card style={{ padding: '10px 16px', marginRight: '10px', borderTop: '3px solid #0f5689' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'start', gap: '12px' }}>
                   <Avatar icon={<UserOutlined />} size={48}/>
                   <div style={{ marginTop: '10px'}}>
@@ -72,7 +74,7 @@ const EvaluatePatientInTriage = () => {
                   </div> 
                   <div>
                       <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
-                        Age and Gender: {patientDetails?.Gender}, {patientDetails?.AgeinYears || 0 } Years
+                        Age and Gender: {patientDetails?.Gender}, {calculateAge(patientDetails?.DateOfBirth)}
                       </Typography.Title>
 
                   </div>
@@ -86,7 +88,7 @@ const EvaluatePatientInTriage = () => {
                 <Loading />
             ):(
               <Col xs={24} md={24} lg={12} xl={12}>
-              <Card style={{ padding: '10px 16px', marginRight: '10px' }}>
+              <Card style={{ padding: '10px 16px', marginRight: '10px', borderTop: '3px solid #0f5689' }}>
                 <Typography.Title level={5} style={{color: '#0f5689', fontSize: '14px', margin: '10px 0 10px 0'}}>
                 Additional Information
                 </Typography.Title>

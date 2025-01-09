@@ -1,5 +1,4 @@
-import { Button, Card, Divider, Spin, Typography } from 'antd'
-import { PrinterOutlined } from '@ant-design/icons'
+import { Card, Divider, Spin, Typography } from 'antd'
 import PropTypes from 'prop-types'
 import { LoadingOutlined } from '@ant-design/icons'
 
@@ -8,7 +7,7 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
       
   return (
     <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
-        <Card className="card" style={{ width: '100%' }}>
+        <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689' }}>
             <div className="inpatient-details-container-1">
                 <Typography.Text className="patient-name">
                     {patientDetails?.SearchName||'N/A' }
@@ -43,7 +42,7 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
             </div>
         </Card>
 
-        <Card className="card" title="Allergies and Medications" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none' }}>
+        <Card className="card" title="Allergies and Medications" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', borderTop: '3px solid #0f5689' }}>
             
         <div className="inpatient-details-container-2">
                 <div className="patient-hospital-number-container" style={{ paddingTop: '10px'}}>

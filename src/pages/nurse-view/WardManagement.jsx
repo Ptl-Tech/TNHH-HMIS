@@ -1,118 +1,106 @@
-import { Card, Col, Row, Select, Typography, Button, Table, Space, List, Tag } from "antd"
-import { hospitalBranchesTotalWards } from "../../constants/nurse-constants"
+import { Card, Col, Row, Select, Typography, Button, Space, List } from "antd"
 import { useNavigate } from "react-router-dom";
 import { BankOutlined, AppstoreOutlined } from "@ant-design/icons"
-import { useState } from "react";
+import useSetTableCheckBoxHook  from "../../hooks/useSetTableCheckBoxHook";
+import WardManagementTable from "./tables/nurse-tables/WardManagementTable";
+import { useGetWardManagementHook } from "../../hooks/useGetWardManagementHook";
+import { useEffect, useState } from "react";
+import Loading from "../../partials/nurse-partials/Loading";
+import DisplayAlert from "../../partials/nurse-partials/DisplayAlert";
+import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+import FilterWardManagement from "../../partials/nurse-partials/FilterWardManagement";
 
 const WardManagement = () => {
 
+    
     const navigate = useNavigate();
+    const { selectedRow, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
+    const {getBeds, loadingWards, getWards, wardRooms } = useGetWardManagementHook();
 
-    function handleWardClick(){
-        
+    const [ selectedWard, setSelectedWard] = useState(null);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [filteredRooms, setFilteredRooms] = useState([]);
+    const [loadingRooms, setLoadingRooms] = useState(false);
+    const [filteredBeds, setFilteredBeds] = useState([]);
+    const [loadingBeds, setLoadingBeds] = useState(false);
+    const [alertType, setAlertType] = useState('info');
+    const [alertMessage, setAlertMessage] = useState('');
+
+    const freeBeds = getBeds.filter((bed) => bed.Occupied === false);
+    const occupiedBeds = getBeds.filter((bed) => bed.Occupied === true);
+
+    useEffect(() => {
+        if (selectedWard) {
+          setLoadingRooms(true); 
+          setFilteredBeds([]);
+          const timeout = setTimeout(() => {
+            setFilteredRooms(
+              wardRooms.filter((room) => room.Ward_No === selectedWard)
+            );
+            setLoadingRooms(false); 
+          }, 200); 
+          return () => clearTimeout(timeout); // Cleanup timeout on ward change
+        } else {
+          setFilteredRooms([]); // Clear rooms if no ward selected
+        }
+      }, [selectedWard, wardRooms]);
+
+      useEffect(() => {
+        if (selectedRoom) {
+            setLoadingBeds(true); 
+          const timeout = setTimeout(() => {
+            setFilteredBeds(
+                getBeds.filter((bed) => bed.Room_No === selectedRoom)
+            );
+            setLoadingBeds(false); 
+          }, 200); 
+          return () => clearTimeout(timeout); // Cleanup timeout on ward change
+        } else {
+          setFilteredBeds([]); // Clear rooms if no ward selected
+        }
+      }, [selectedRoom, getBeds]);
+
+    function handleWardChange(value){
+        setSelectedWard(value)
     }
-
-    const [selectedRowKey, setSelectedRowKey] = useState(null);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [selectedRow, setSelectedRow] = useState([]);
-    
-    const dataSource = [
-        {
-            key: '1',
-            bedName: 'Bed 1',
-            bedNumber: 10,
-            roomName: 5,
-            status: 'occupied',
-        },
-        {
-            key: '2',
-            bedName: 'Bed 2',
-            bedNumber: 10,
-            roomName: 5,
-            status: 'free bed',
-        },
-        {
-            key: '3',
-            bedName: 'Bed 3',
-            bedNumber: 10,
-            roomName: 5,
-            status: 'occupied',
-        },
-    
-    ];
-    const columns = [
-        {
-            title: 'Bed Name',
-            dataIndex: 'bedName',
-            key: 'bedName',
-        },
-        {
-            title: 'Bed Number',
-            dataIndex: 'bedNumber',
-            key: 'bedNumber',
-        },
-        {
-            title: 'Room Number',
-            dataIndex: 'roomName',
-            key: 'roomName',
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            render: (text) => {
-                if (text === 'occupied') {
-                  return <Tag color="#f50">{text}</Tag>;
-                } else if (text === 'free bed') {
-                  return <Tag color="#108ee9">{text}</Tag>;
-                }
-                return text; 
-              }          
-            
-        },
-        
-    ];
-
-
-    const rowSelection = {
-        selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-        onChange: (selectedRowKeys, selectedRows) => {
-          if (selectedRowKeys.length > 1) {
-            setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-            setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-          } else {
-            setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-            setSelectedRow(selectedRows); // Update the selected row
-          }
-          setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-        },
-        getCheckboxProps: (record) => ({
-          disabled: record.name === 'Disabled User', // Disable specific rows if needed
-        }),
-      };
-      
-      
-
       const handleReleaseBed = () => {
-        selectedRow[0]?.key &&  navigate(`/Nurse/Ward-management/Release-Bed?WardNo=${selectedRow[0].key}`);
+        if (selectedRow[0]?.Occupied == false){
+            setAlertMessage('This bed is already free');
+            setAlertType('info');
+            return;
+        }else{
+            selectedRow[0] &&  navigate(`/Nurse/Ward-management/Release-Bed?WardNo=${selectedRow[0].key}`);
+            setAlertMessage('');
+        }
       }
 
       const handleBedTransfer = () => {
-        selectedRow[0]?.key &&  navigate(`/Nurse/Ward-management/Transfer-Bed?WardNo=${selectedRow[0].key}`);
+        if(selectedRow[0]?.Occupied == false){
+            setAlertMessage('This bed is already free');
+            setAlertType('info');
+            return;
+        }else{
+            selectedRow[0] &&  navigate(`/Nurse/Ward-management/Transfer-Bed?WardNo=${selectedRow[0].key}`);
+            setAlertMessage('');
+        }
       }
 
-     const handleRoom = (item) => {
-       console.log("Room Clicked", item);
+     const handleRoom = (room) => {
+       setSelectedRoom(room)
       }
+
+      
 
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px'}}>
-            <BankOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Ward Management
-            </Typography.Text>
-        </Space>
+        {
+        alertMessage && (
+            <DisplayAlert alertMessage={alertMessage} alertType={alertType} setAlertMessage={setAlertMessage}/>
+        )
+        
+        }
+
+        <NurseInnerHeader title="Ward Management" />
 
         <Card className="admit-patient-card-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -132,43 +120,65 @@ const WardManagement = () => {
             </div>
         </Card>
 
-        <Card style={{ padding: '24px 10px 10px 10px', marginTop: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <label htmlFor='selectWard'style={{ marginRight: '20px', fontWeight: 'bold'}}>Search to Select Ward</label>
-                <Select 
-                    options={hospitalBranchesTotalWards} 
-                    showSearch
-                    onChange={handleWardClick} 
-                    placeholder="Search to Select ward"
-                    optionFilterProp="label"
-                    style={{ width: '300px' }}
-                    filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                    }
-                />
-            </div>
-        </Card>
+        <div style={{ marginTop: '10px', paddingBottom: '10px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+            {
+                getBeds && (
+                    <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
+                        Total Beds { getBeds ? `: ${getBeds?.length}` : ''}
+                    </Typography.Text>
+                )
+            }
+            {
+                getBeds && (
+                    <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
+                        Free Beds { freeBeds ? `: ${freeBeds?.length}` : ''}
+                    </Typography.Text>
+                )
+            }
+            {
+                getBeds && (
+                    <Typography.Text style={{ fontWeight: 'bold', color: '#f50', fontSize: '14px'}}>
+                        Bed Occupied { occupiedBeds ? `: ${occupiedBeds?.length}` : ''}
+                    </Typography.Text>
+                )
+            }
+            {
+                selectedRoom && (
+                    <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
+                        Room Selected { selectedRoom ? `: ${selectedRoom}` : ''}
+                    </Typography.Text>
+                )
+            }
+
+        </div>
+        
+        <FilterWardManagement getWards={getWards} handleWardChange={handleWardChange} loadingWards={loadingWards}/>
 
         <Row gutter={16} style={{ marginTop: '20px', overflowX: 'hidden' }}>
             <Col  span={8}>
-                
-                <List
-                    style={{ cursor: 'pointer',  }}
-                    dataSource={['Item 1', 'Item 2', 'Item 3']}
-                    renderItem={(item) => 
-                    <List.Item onClick={()=> handleRoom(item)}>
-                        {item}
-                    </List.Item>}
+            
+            {
+                loadingRooms ? (
+                    <Loading />
+                ): (
+                    <List
+                    style={{ cursor: 'pointer' }}
+                    dataSource={filteredRooms.map((room) => ({
+                    value: room.Room_No, // The unique identifier for the room
+                    label: room.Room_Name, // The display name for the room
+                    }))}
+                    renderItem={(item) => (
+                    <List.Item onClick={() => handleRoom(item.value)} style={{ color:  '#0f5689' }}>
+                    {item.label}
+                    </List.Item>
+                    )}
                     bordered
-                />
-                
+                    />
+                )
+            }    
             </Col>
             <Col  span={16} style={{ overflowX: 'hidden' }}>
-                <Table 
-                    columns={columns} 
-                    dataSource={dataSource} 
-                    rowSelection={rowSelection}
-                />  
+                <WardManagementTable rowSelection={rowSelection} filteredBeds={filteredBeds} loadingBeds={loadingBeds} />
             </Col>
         </Row>         
     </div>

@@ -83,6 +83,30 @@ export const formatElapsedTime = (minutes) => {
     return formattedTime;
 }
 
+
+export const calculateAge =(dob) => {
+  const today = new Date();
+  const birthDate = new Date(dob);
+
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDate() - birthDate.getDate();
+
+  // Adjust months and years if needed
+  if (days < 0) {
+    months -= 1;
+    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); 
+    days += lastMonth.getDate();
+  }
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return `${years} years ${months} months ${days} days`;
+}
+
    // Print PDF
    export const printToPDF = (dataSource, tableTitle) => {
     const doc = new jsPDF();

@@ -64,7 +64,7 @@ export const postPatientAdmission = (admissionNo) => async (dispatch, getState) 
     setTimeout(() => {
       dispatch({
         type: POST_PATIENT_ADMISSION_FAIL,
-        payload: error.response?.data?.message|| error.errors,
+        payload: error.response?.data || error.errors,
       });
       message.error(error.response?.data?.errors || error.errors);
     }, 1200);
