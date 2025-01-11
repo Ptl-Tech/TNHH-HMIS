@@ -28,6 +28,11 @@
   background: #f1f1f1;
 }
 
+.ant-menu-light.ant-menu-light {
+  color: #ffffff;
+  background: #0f5689 !important;
+}
+
 
 /* Override submenu background to make it transparent */
 :where(.css-dev-only-do-not-override-191squa).ant-menu-light, :where(.css-dev-only-do-not-override-191squa).ant-menu-light>.ant-menu {
