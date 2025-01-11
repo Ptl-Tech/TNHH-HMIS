@@ -10,10 +10,16 @@ import {
   Typography,
   Pagination,
   Tooltip,
+  Modal,
+  Form,
+  InputNumber,
 } from "antd";
 import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import { listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
+import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoice";
+import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
+import useAuth from "../hooks/useAuth";
 
 const CashPatients = () => {
   const {
@@ -22,12 +28,24 @@ const CashPatients = () => {
     patients,
   } = useSelector((state) => state.patientList);
 
+  const {
+    loading: patientDetailsLoading,
+    error: patientDetailsError,
+    patientDetails,
+  } = useSelector((state) => state.getPatientDetails);
+  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+    useSelector((state) => state.postInterimInvoice);
+
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [billingModalVisible, setBillingModalVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
+  const staffNo = useAuth().userData.No;
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
@@ -40,23 +58,47 @@ const CashPatients = () => {
     dispatch(listPatients());
   }, [dispatch]);
 
+  // get details of the selected patient
   useEffect(() => {
-    // Filter only "Cash" patients and those with isActivated: true
+    if (selectedPatient) {
+      console.log("Selected Patient:", selectedPatient);
+      dispatch(getPatientDetails(selectedPatient.PatientNo));
+    }
+  }, [selectedPatient]);
+
+  useEffect(() => {
+    console.log("Patient Details Updated:", patientDetails);
+  }, [patientDetails]);
+
+  // Update patientBalanceDetails when patientDetails changes
+  useEffect(() => {
+    if (
+      patientDetails &&
+      selectedPatient?.PatientNo === patientDetails.PatientNo
+    ) {
+      setPatientBalanceDetails(patientDetails);
+    }
+  }, [patientDetails, selectedPatient]);
+
+  useEffect(() => {
     const cashPatients = patients.filter(
       (patient) => patient.PatientType === "Cash" && patient.Activated === true
     );
     setFilteredPatients(cashPatients);
   }, [patients]);
-  
+
   const handleSearchChange = (e, key) => {
     const value = e.target.value;
     setSearchParams((prev) => ({ ...prev, [key]: value }));
-  
+
     const filtered = patients.filter((patient) => {
-      const matchesName = patient.Names.toLowerCase().includes(searchParams.SearchNames.toLowerCase());
-      const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(searchParams.AppointmentNo.toLowerCase());
-  
-      // Ensure the patient is both 'Cash' and 'isActivated: true'
+      const matchesName = patient.Names.toLowerCase().includes(
+        searchParams.SearchNames.toLowerCase()
+      );
+      const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(
+        searchParams.AppointmentNo.toLowerCase()
+      );
+
       return (
         matchesName &&
         matchesAppointmentNo &&
@@ -64,18 +106,41 @@ const CashPatients = () => {
         patient.isActivated === true
       );
     });
-  
+
     setFilteredPatients(filtered);
   };
-  
+
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
+  };
+
+  const showModal = (patient) => {
+    setSelectedPatient(patient); // Set the selected patient
+    setBillingModalVisible(true);
+  };
+
+  const handleBillingSubmit = () => {
+    setBillingModalVisible(false);
+
+    if (patientBalanceDetails) {
+      const invoiceData = {
+        PatientNo: patientBalanceDetails.PatientNo,
+        visitNo: patientBalanceDetails.ActiveVisitNo,
+        staffNo,
+      };
+
+      dispatch(postInterimInvoice(invoiceData));
+    } else {
+      console.error("Patient balance details not available.");
+    }
   };
 
   useEffect(() => {
     const startIndex = (pagination.current - 1) * pagination.pageSize;
     const endIndex = startIndex + pagination.pageSize;
-    setFilteredPatients((prevPatients) => prevPatients.slice(startIndex, endIndex));
+    setFilteredPatients((prevPatients) =>
+      prevPatients.slice(startIndex, endIndex)
+    );
   }, [pagination]);
 
   const columns = [
@@ -99,7 +164,8 @@ const CashPatients = () => {
       dataIndex: "ActiveAppointmentdate",
       key: "ActiveAppointmentdate",
       render: (text) => new Date(text).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.ActiveAppointmentdate) - new Date(b.ActiveAppointmentdate),
+      sorter: (a, b) =>
+        new Date(a.ActiveAppointmentdate) - new Date(b.ActiveAppointmentdate),
     },
     {
       title: "Actions",
@@ -111,12 +177,8 @@ const CashPatients = () => {
               View Details
             </Button>
           </Tooltip>
-          {/* Action Button to redirect to billing page */}
           <Tooltip title="Bill and Clear">
-            <Button
-              type="primary"
-              onClick={() => navigate(`/billing/${record.AppointmentNo}`)} // Updated to use navigate
-            >
+            <Button type="primary" onClick={() => showModal(record)}>
               Bill & Clear
             </Button>
           </Tooltip>
@@ -194,6 +256,48 @@ const CashPatients = () => {
           style={{ float: "right", margin: "16px" }}
         />
       </div>
+
+      {/* Modal for Billing Details */}
+      <Modal
+        title="Billing Details"
+        visible={billingModalVisible}
+        onCancel={() => setBillingModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setBillingModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleBillingSubmit}>
+            Print Invoice
+          </Button>,
+        ]}
+      >
+      {patientBalanceDetails ? (
+  <Form layout="vertical">
+    <Form.Item label="Patient Name">
+      <Input
+        value={patientBalanceDetails?.Names || "N/A"}
+        disabled
+        style={{ fontWeight: "bold", color: "#0f5689" }}
+      />
+    </Form.Item>
+    <Form.Item label="Appointment No">
+      <Input value={patientBalanceDetails?.ActiveVisitNo || "N/A"} disabled />
+    </Form.Item>
+    <Form.Item label="Amount">
+      <InputNumber
+        min={0}
+        value={patientBalanceDetails?.Balance || 0}
+        style={{ width: "100%" }}
+      />
+    </Form.Item>
+  </Form>
+) : (
+  <div style={{ textAlign: "center" }}>
+    <Typography.Text>Loading patient details...</Typography.Text>
+  </div>
+)}
+
+      </Modal>
 
       <style jsx>{`
         .row-warning {

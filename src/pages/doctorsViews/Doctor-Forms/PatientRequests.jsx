@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { HeartOutlined, SolutionOutlined, MedicineBoxOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { HeartOutlined, SolutionOutlined, MedicineBoxOutlined, UsergroupAddOutlined, ScanOutlined } from '@ant-design/icons';
 import LabResults from './LabResults';
 import Imaging from './Imaging';
 import { Button, Space } from 'antd';
 import { IoBedOutline } from 'react-icons/io5';
 import AdmitPatientForm from './AdmitPatient';
 import Referrals from './Referrals';
+import ECTScan from '../../nurse-view/nurse-care-plan/ECTScan';
 
 const PatientRequests = () => {
   const handleOnClick = (item) => {
@@ -16,7 +17,9 @@ const PatientRequests = () => {
       case 'Radiology Requests':
         setSelectedItem(<Imaging />);
         break;
-    
+    case 'ECT':
+        setSelectedItem(<ECTScan />);
+        break;
       default:
         setSelectedItem(<LabResults />);
     }
@@ -35,6 +38,10 @@ const PatientRequests = () => {
     {
       label: 'Radiology Requests',
       icon: <MedicineBoxOutlined />,
+    },
+    {
+      label: 'ECT',
+      icon: <ScanOutlined />,
     },
    
   ];

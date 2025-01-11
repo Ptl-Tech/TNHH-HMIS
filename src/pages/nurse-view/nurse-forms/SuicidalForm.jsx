@@ -15,6 +15,14 @@ const SuicidalForm = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [ form ] = Form.useForm();
 const [loadingIpSuicidalForm, setLoadingIpSuicidalForm]=useState(false);
+const [ipSuicidalForm, setIpSuicidalForm] = useState([]);
+const [suicidalFormData, setSuicidalFormData] = useState({
+  date: '',
+  time: '',
+  handingOver: '',
+  takingOver: '',
+  remarks: ''
+});
 
 
     const dispatch = useDispatch();

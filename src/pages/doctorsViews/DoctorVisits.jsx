@@ -1,4 +1,4 @@
-import { Button, Card, Table } from "antd";
+import { Badge, Button, Card, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,6 +12,7 @@ import Search from "antd/es/transfer/search";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import {
   getColorByWaitingTreatmentTime,
+  getUrgencyColorcode,
   rowClassName,
 } from "../../utils/helpers";
 import { render } from "react-dom";
@@ -26,6 +27,7 @@ const DoctorVisits = () => {
     name: "",
     patientNo: "",
     treatmentNo: "",
+    urgency: "",
   });
 
   const { triageWaitingList: patients } = useSelector(
@@ -87,6 +89,7 @@ const DoctorVisits = () => {
       idNumber: item?.IDNumber,
       age: item?.Age,
       patientType: item?.PatientType,
+      urgency: item?.UrgencyStatus,
     }))
     .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
@@ -113,11 +116,13 @@ const DoctorVisits = () => {
         const treatmentNo = patient.treatmentNo?.toLowerCase() || "";
         const patientNo = patient.patientNo?.toLowerCase() || "";
         const searchName = patient.searchName?.toLowerCase() || "";
+        const urgency= patient.UrgencyStatus|| "";
 
         return (
           treatmentNo.includes(searchParams.treatmentNo.toLowerCase()) &&
           searchName.includes(searchParams.searchName.toLowerCase()) &&
-          patientNo.includes(searchParams.patientNo.toLowerCase())
+          patientNo.includes(searchParams.patientNo.toLowerCase()) &&
+          urgency.includes(searchParams.urgency)
         );
       });
 
@@ -157,9 +162,9 @@ const DoctorVisits = () => {
       onFilter: (value, record) => record.searchName.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
       // render in capital letters
-     render: (text) => {
+     render: (text, record) => {
       return(
-        <span onClick={() => handleNavigate(text, text.treatmentNo)} className="fw-bold" style={{ color:"#0f5689" }}>{text.toUpperCase()}</span>
+        <span onClick={() => handleNavigate(record, record.treatmentNo)} className="fw-bold" style={{ color:"#0f5689", cursor:"pointer" }}>{text.toUpperCase()}</span>
       )
      }
     },
@@ -206,6 +211,22 @@ const DoctorVisits = () => {
           <span >{record.age} years</span>
         )
       }
+    },
+
+    {
+      title: "Urgency",
+      dataIndex: "urgency",
+      key: "urgency",
+      render: (_, record) => {
+        const { color, text } = getUrgencyColorcode(record.urgency);
+        return (
+          <Badge
+            color={color}
+            text={text} // Display urgency text
+            style={{ color: color }}
+          />
+        );
+      },
     },
     
     {
@@ -270,6 +291,16 @@ const DoctorVisits = () => {
             value={searchParams.patientNo}
             onChange={(e) => handleSearchChange(e, "patientNo")}
           />
+          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
+            or
+          </span>
+          <Search
+  placeholder="Search by Urgency Status"
+  allowClear
+  value={searchParams.urgency}
+  onChange={(e) => handleSearchChange(e, "urgency")}
+/>
+
         </div>
       </Card>
       {treatmentListLoading ? (

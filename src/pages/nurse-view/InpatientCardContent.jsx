@@ -5,8 +5,10 @@ import Requests from './Requests'
 import Discharges from './Discharges'
 import NurseForms from './NurseForms'
 import PropTypes from 'prop-types'
+import useAuth from '../../hooks/useAuth'
 
 const InpatientCardContent = () => {
+    const role =useAuth().userData.departmentName
   return (
     <>
         <Card className="card">
@@ -23,9 +25,16 @@ const InpatientCardContent = () => {
                 <Tabs.TabPane tab="Discharge" key="4">
                     <Discharges/>
                 </Tabs.TabPane>
-                <Tabs.TabPane tab="Nurse Forms" key="5">
+                <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : "Doctor Forms"} key="5">
                     <NurseForms/>
                 </Tabs.TabPane>
+
+                {
+                    role === "Doctor" &&
+                    <Tabs.TabPane tab=" OutPatient Notes" key="6">
+                        <Discharges/>
+                    </Tabs.TabPane>
+                }
             </Tabs>
         </Card>
     </>

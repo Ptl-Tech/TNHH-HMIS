@@ -26,6 +26,7 @@ import { getdiagnosisSetup } from "../../../actions/Doc-actions/qyDiagnosisSetup
 import { postDiagnosisRequest } from "../../../actions/Doc-actions/postDiagnosis";
 import ModalComponent from "../../../components/MessageModal";
 import { getDiagnosisLines } from "../../../actions/Doc-actions/getDiagnosisLines";
+import { getSecondaryDiagnosisSetup } from "../../../actions/Doc-actions/qySecondaryDiagnosisSetup";
 
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const Diagnosis = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.getDiagnosisSetup);
+  const { data: secondaryDiagnosis } = useSelector((state) => state.getSecondaryDiagnosisSetup);  
   const { loading, error, success } = useSelector(
     (state) => state.postdiagnosis
   );
@@ -56,6 +58,7 @@ const Diagnosis = () => {
 
   useEffect(() => {
     dispatch(getdiagnosisSetup());
+    dispatch(getSecondaryDiagnosisSetup());
   }, [dispatch]);
 
   useEffect(() => {
@@ -326,7 +329,7 @@ const Diagnosis = () => {
             <Col span={12}>
               <Form.Item
                 name="underlyingIssues"
-                label=" Underlying Issues"
+                label="Comorbid Issues"
                 rules={[{ required: true }]}
               >
                 <Select
@@ -338,9 +341,11 @@ const Diagnosis = () => {
                   size="large"
                   style={{ width: "100%" }}
                 >
-                  <Select.Option value="0">Diabetes</Select.Option>
-                  <Select.Option value="1">Hypertension</Select.Option>
-                  <Select.Option value="2">Cancer</Select.Option>
+                 {secondaryDiagnosis?.map((item) => (
+                    <Option key={item.DiagnosisCode} value={item.DiagnosisCode}>
+                      {item.Description}
+                    </Option>
+                 ))}
                 </Select>
               </Form.Item>
             </Col>

@@ -112,7 +112,9 @@ const OutpatientList = () => {
                 icon={<PlusOutlined />}
                 onClick={() =>
                   navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
-                    state: { existingPatient: record },
+                    state: { existingPatient: record, previousPath: location.pathname  },
+                   
+                    
                   })
                 }
               >

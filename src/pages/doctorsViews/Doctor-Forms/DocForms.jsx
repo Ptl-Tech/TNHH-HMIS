@@ -6,6 +6,7 @@ import {
   SolutionOutlined,
 } from "@ant-design/icons"; // Import iconsimport { Button } from "antd";
 import { Button } from "antd";
+import DoctorReviewRequest from "./DoctorReviewRequests";
 const DocForms = () => {
   const handleOnClick = (item) => {
     switch (item) {
@@ -14,6 +15,9 @@ const DocForms = () => {
         break;
       case "Mental State Examination Form":
         setSelectedItem(<MentalStateExaminationForm />);
+        break;
+        case "Doctor Review Requests":
+        setSelectedItem(<DoctorReviewRequest />);
         break;
       default:
         setSelectedItem(<SuicidalForm />);
@@ -28,6 +32,10 @@ const DocForms = () => {
     },
     {
       label: "Mental State Examination Form",
+    icon: <SolutionOutlined />
+    },
+    {
+      label: "Doctor Review Requests",
     icon: <SolutionOutlined />
     },
   ]

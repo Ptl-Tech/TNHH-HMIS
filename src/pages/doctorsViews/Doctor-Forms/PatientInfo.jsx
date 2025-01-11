@@ -3,14 +3,19 @@ import { Card, Typography, Avatar,Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
 import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
+import useAuth from "../../../hooks/useAuth";
+import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 
 const PatientInfo = ({ patientNo, treatmentNo }) => {
   const dispatch = useDispatch();
-
+const staffNo=useAuth().userData.No;
 
   const { loadingPatientDetails, patientDetails } = useSelector(
     (state) => state.getPatientDetails
   );
+    const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+      useSelector((state) => state.postInterimInvoice);
+  
 
   useEffect(() => {
     dispatch(getPatientDetails(patientNo));
@@ -35,7 +40,15 @@ const PatientInfo = ({ patientNo, treatmentNo }) => {
             .join(" ")
         );
   
+const handlePrintInvoice = () => {
+  const invoiceData={
+    PatientNo:patientNo,
+    visitNo:treatmentNo ,
+    staffNo
+  }
 
+  dispatch(postInterimInvoice(invoiceData));
+};
   return (
     <div
       style={{
