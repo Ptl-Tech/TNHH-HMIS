@@ -202,9 +202,9 @@ const PatientRegistration = () => {
 
       if (name === "isPrincipleMember" && value) {
         // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName ||visitorData?.VisitorName} ${
-          prev.middleName || ""
-        } ${prev.lastName}`
+        updatedPatient.insurancePrinicipalMemberName = `${
+          prev.firstName || visitorData?.VisitorName
+        } ${prev.middleName || ""} ${prev.lastName}`
           .trim()
           .toUpperCase();
       } else if (name === "isPrincipleMember" && !value) {
@@ -239,6 +239,28 @@ const PatientRegistration = () => {
       dispatch(marketingStrategies());
     }
   };
+
+  useEffect(() => {
+    if (patientDet) {
+      setNewPatient({
+        idNumber: patientDet?.IDNumber || "",
+        firstName: patientDet?.FirstName || "",
+        middleName: patientDet?.MiddleName || "",
+        lastName: patientDet?.LastName || "",
+        gender: patientDet?.Gender==="Male" ? "1" : "2" || "",
+        dob: patientDet?.DateOfBirth || null,
+        phoneNumber: patientDet?.TelephoneNo1 || "",
+        email: patientDet?.Email || "",
+        nationality: patientDet?.Nationality || "",
+        county: patientDet?.CountyWardName || "",
+        subCounty: patientDet?.SubCountyName || "",
+        residence: patientDet?.Residence || "",
+        nextOfKinFullName: patientDet?.NextOfkinFullName || "",
+        nextOfKinRelationShip: patientDet?.NextofkinRelationship || "",
+      });
+    }
+  }, [patientDet]);
+  
   const handleSavePatient = async (e) => {
     e.preventDefault();
 
@@ -247,11 +269,23 @@ const PatientRegistration = () => {
 
     // Prepare patient data
     const patientData = {
-      firstName: newPatient.firstName || visitorData.VisitorName?.split(" ")[0] || visitorData?.firstName,
-      lastName: newPatient.lastName || visitorData.VisitorName?.split(" ")[2] || visitorData?.lastName,
-      middleName: newPatient.middleName || visitorData.VisitorName?.split(" ")[1] || visitorData?.middleName,
+      firstName:
+        newPatient.firstName ||
+        visitorData.VisitorName?.split(" ")[0] ||
+        visitorData?.firstName,
+      lastName:
+        newPatient.lastName ||
+        visitorData.VisitorName?.split(" ")[2] ||
+        visitorData?.lastName,
+      middleName:
+        newPatient.middleName ||
+        visitorData.VisitorName?.split(" ")[1] ||
+        visitorData?.middleName,
       idNumber: newPatient.idNumber || visitorData?.IDNumber,
-      phoneNumber:newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1,
+      phoneNumber:
+        newPatient.phoneNumber ||
+        visitorData?.PhoneNumber ||
+        patientDet?.TelephoneNo1,
       email: newPatient.email || patientDet?.Email,
       gender: newPatient.gender || patientDet.Gender,
       dob: newPatient.dob || patientDet.DateOfBirth,
@@ -259,22 +293,27 @@ const PatientRegistration = () => {
       county: newPatient.county || patientDet.County,
       subCounty: newPatient.subCounty || patientDet.SubCountyName,
       residence: newPatient.residence,
-      nextOfKinFullName: newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
-      nextOfKinRelationship: newPatient.nextOfKinRelationShip || patientDet?.NextofkinRelationship,
+      nextOfKinFullName:
+        newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
+      nextOfKinRelationship:
+        newPatient.nextOfKinRelationShip || patientDet?.NextofkinRelationship,
       schemeName: newPatient.schemeName || patientDet?.SchemeName,
-      nextOfKinPhoneNo: newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo,
+      nextOfKinPhoneNo:
+        newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo,
       paymentMode: newPatient.paymentMode || patientDet?.PatientType,
-      insuranceNo: newPatient.insuranceNo ||patientDet?.InsuranceNo,
-      insurancePrinicipalMemberName: newPatient.insurancePrinicipalMemberName || patientDet?.SearchName,
+      insuranceNo: newPatient.insuranceNo || patientDet?.InsuranceNo,
+      insurancePrinicipalMemberName:
+        newPatient.insurancePrinicipalMemberName || patientDet?.SearchName,
       isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal,
       membershipNo: newPatient.membershipNo || patientDet?.MembershipNo,
       insuranceName: newPatient.insuranceName || patientDet?.InsuranceName,
-      howYouKnewABoutUs: newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs,
+      howYouKnewABoutUs:
+        newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs,
       myAction: isEditAction ? "edit" : "create",
       patientNo: patientNumber, // Include patientNo only if editing
     };
 
-   // Validate the entire form
+    // Validate the entire form
     const errors = validateForm(newPatient);
     setErrors(errors);
 
@@ -307,38 +346,14 @@ const PatientRegistration = () => {
   };
 
   // Define the validateForm function
-  const validateForm = (patient,  visitorData,  patientDet) => {
+  const validateForm = (patient, visitorData, patientDet) => {
     const errors = {};
-  
-    // // First Name Validation
-    // if (!patient.firstName || patient.firstName.trim() === "" ) {
-    //   errors.firstName = "First name is required.";
-    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[0]) {
-    //   // If visitor data exists and first name is missing
-    //   errors.firstName = "Visitor first name is required.";
-    // }
-  
-    // // Last Name Validation
-    // if (!patient.lastName || patient.lastName.trim() === "") {
-    //   errors.lastName = "Last name is required.";
-    // } else if (visitorData?.VisitorName && !visitorData.VisitorName.split(" ")[1]) {
-    //   // If visitor data exists and last name is missing
-    //   errors.lastName = "Visitor last name is required.";
-    // }
-  
-    // Phone Number Validation
-    // const phoneNumber = patient.phoneNumber || newPatient.phoneNumber ||  visitorData?.PhoneNumber ||  patientDet?.TelephoneNo1
-    // if (!phoneNumber || phoneNumber.trim() === "") {
-    //   errors.phoneNumber = "Phone number is required.";
-    // } else if (!/^\d{10,12}$/.test(phoneNumber)) {
-    //   errors.phoneNumber = "Phone number must be 10 to 12 digits long.";
-    // }
-  
+
     // Nationality Validation
     if (!patient.nationality || patient.nationality.trim() === "") {
       errors.nationality = "Nationality is required.";
     }
-  
+
     // Email Validation
     const email = patient.email || visitorData?.Email || newPatient.email;
     if (!email || email.trim() === "") {
@@ -346,39 +361,38 @@ const PatientRegistration = () => {
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       errors.email = "Email must be a valid email address.";
     }
-  
+
     // ID Number Validation
     if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber) {
       const isRegistered = patientListPayload?.some(
-        (existingPatient) => existingPatient.IDNumber === patient.idNumber || visitorData?.IDNumber === patient.idNumber
+        (existingPatient) =>
+          existingPatient.IDNumber === patient.idNumber ||
+          visitorData?.IDNumber === patient.idNumber
       );
       if (isRegistered) {
         errors.idNumber = "This ID/Passport/Birth No is already registered.";
       }
     }
-  
+
     return errors;
   };
-  
-
- 
 
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
-      <h4 style={{ textAlign: "center", color: "#E89641" }}>
-        Patient Registration {patientNumber || patientDet?.PatientNo}
-      </h4>
-      {/* if patientdet exists show edit button */}
-      {patientDet && (
-    <Button 
-      type="primary" 
-      style={{ margin: "20px" }} 
-      //onClick={() => handleEditPatient(patientDet)}
-    >
-      Edit
-    </Button>
-  )}
+        <h4 style={{ textAlign: "center", color: "#E89641" }}>
+          Patient Registration {patientNumber || patientDet?.PatientNo}
+        </h4>
+        {/* if patientdet exists show edit button */}
+        {patientDet && (
+          <Button
+            type="primary"
+            style={{ margin: "20px" }}
+            onClick={() => handleEditPatient(patientDet)}
+          >
+            Edit
+          </Button>
+        )}
       </div>
       <div className="row">
         <div className="col-12 col-md-8">
@@ -425,9 +439,8 @@ const PatientRegistration = () => {
                     value={
                       newPatient.firstName ||
                       visitorData?.VisitorName?.split(" ")[0] ||
-                      patientDet?.SearchName?.split(" ")[0]||
+                      patientDet?.SearchName?.split(" ")[0] ||
                       patientDet?.FirstName?.split(" ")[0]
-
                     }
                     onChange={handleInputChange}
                     className="text-center fw-bold"
@@ -551,8 +564,7 @@ const PatientRegistration = () => {
                   {errors.phoneNumber && (
                     <span style={{ color: "red", fontSize: "0.875rem" }}>
                       {errors.phoneNumber}
-                      
-                                          </span>
+                    </span>
                   )}
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -565,7 +577,7 @@ const PatientRegistration = () => {
                     type="email"
                     name="email"
                     style={{ width: "100%" }}
-                    value={newPatient.email || patientDet?.Email }
+                    value={newPatient.email || patientDet?.Email}
                     onChange={handleInputChange}
                     className="text-center fw-bold"
                   />
@@ -676,7 +688,6 @@ const PatientRegistration = () => {
                     value={newPatient.residence}
                     onChange={handleInputChange}
                     className="text-center fw-bold"
-
                   />
                 </div>
               </div>
@@ -694,7 +705,6 @@ const PatientRegistration = () => {
                     }
                     onChange={handleInputChange}
                     className="text-center fw-bold"
-
                   />
                 </div>
                 <div className="col-12 col-md-4 ">
@@ -749,7 +759,6 @@ const PatientRegistration = () => {
                       patientDet?.NextOfkinAddress1
                     }
                     className="text-center fw-bold"
-
                     onChange={handleInputChange}
                     type="number"
                   />
@@ -817,10 +826,11 @@ const PatientRegistration = () => {
                       visitorData?.VisitorName?.split(" ")[1]
                         ?.charAt(0)
                         .toUpperCase() ||
-                      ""||visitorData?.VisitorName?.split(" ")[2]
-                      ?.charAt(0)
-                      .toUpperCase() ||
-                    ""
+                      "" ||
+                      visitorData?.VisitorName?.split(" ")[2]
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ""
                     }`}
                   </Avatar>
                 </div>
@@ -837,115 +847,121 @@ const PatientRegistration = () => {
                     }
                   >
                     <Select.Option value="">--Select--</Select.Option>
-                    <Select.Option value={2}>Cash</Select.Option>
-                    <Select.Option value={1}>Insurance</Select.Option>
-                  </Select>{" "}
+                    <Select.Option value="2">Cash</Select.Option>
+                    <Select.Option value="1">Insurance</Select.Option>
+                    <Select.Option value="3">Corporate</Select.Option>
+                  </Select>
                 </div>
-                <div className="row g-2">
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Insurance Name:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Select
-                      placeholder="Select Insurance "
-                      className="w-100 "
-                      value={newPatient.insuranceNo || patientDet?.InsuranceNo}
-                      onChange={(value) =>
-                        handleSelectChange("insuranceNo", value)
-                      }
-                      // variant="borderless"
-                      name="insuranceNo"
-                      onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                      disabled={newPatient.paymentMode === "2"}
-                    >
-                      <Select.Option value="">
-                        --Select Insurance--
-                      </Select.Option>
-                      {insurancePayload && insurancePayload.length > 0 ? (
-                        insurancePayload.map((insurance) => (
-                          <Select.Option
-                            key={insurance.No}
-                            value={insurance.No}
-                          >
-                            {insurance.Name}
-                          </Select.Option>
-                        ))
-                      ) : (
-                        <Select.Option value="" disabled>
-                          No data available
+
+                {/* Insurance Input Fields */}
+                {newPatient.paymentMode !== "2"  && (
+                  <div className="row g-2">
+                    <div className="col-12 col-md-6">
+                      <label className="py-1">
+                        Insurance Name:
+                        <span className="text-danger px-1">*</span>
+                      </label>
+                      <Select
+                        placeholder="Select Insurance"
+                        className="w-100"
+                        value={
+                          newPatient.insuranceNo || patientDet?.InsuranceNo
+                        }
+                        onChange={(value) =>
+                          handleSelectChange("insuranceNo", value)
+                        }
+                        name="insuranceNo"
+                        onFocus={handleDisplayDropDown}
+                      >
+                        <Select.Option value="">
+                          --Select Insurance--
                         </Select.Option>
-                      )}
-                    </Select>
+                        {insurancePayload && insurancePayload.length > 0 ? (
+                          insurancePayload.map((insurance) => (
+                            <Select.Option
+                              key={insurance.No}
+                              value={insurance.No}
+                            >
+                              {insurance.Name}
+                            </Select.Option>
+                          ))
+                        ) : (
+                          <Select.Option value="" disabled>
+                            No data available
+                          </Select.Option>
+                        )}
+                      </Select>
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="py-1">
+                        Membership No:
+                        <span className="text-danger px-1">*</span>
+                      </label>
+                      <Input
+                        placeholder="Enter Membership Number"
+                        name="membershipNo"
+                        value={
+                          newPatient.membershipNo || patientDet?.MembershipNo
+                        }
+                        onChange={handleInputChange}
+                      />
+                    </div>
                   </div>
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Membership No:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      placeholder="Enter Membership Number"
-                      name="membershipNo"
-                      value={
-                        newPatient.membershipNo || patientDet?.MembershipNo
-                      }
-                      onChange={handleInputChange}
-                      disabled={
-                        newPatient.paymentMode === "2" ||
-                        patientDet?.MembershipNo
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="row g-2 mb-3">
-                  <div className="col-12">
-                    <label className="py-1">
-                      Scheme Name:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      placeholder="Enter Insurance Number"
-                      name="schemeName"
-                      value={newPatient.schemeName || patientDet?.SchemeName}
-                      onChange={handleInputChange}
-                      disabled={newPatient.paymentMode === "2"}
-                    />
-                  </div>
-                  <div className="col-12 ">
-                    <label className="py-1">
-                      Principal Name:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      placeholder="Enter Principal Name"
-                      name="insurancePrinicipalMemberName"
-                      value={
-                        newPatient.insurancePrinicipalMemberName ||
-                        patientDet?.InsurancePrinicipalMemberName ||  
-                        ""
-                      }
-                      onChange={handleInputChange}
-                      disabled={
-                        newPatient.paymentMode === "2" &&
-                        newPatient.isPrincipleMember
-                      }
-                      //style={{ cursor: "not-allowed" }}
-                    />
-                  </div>
-                </div>
-                <div className="col-12 mb-4">
-                  <label className="py-1">
-                    Principle Member ?{" "}
-                    <span className="text-danger px-1">*</span>
-                  </label>
-                  <Switch
-                    checked={
-                      newPatient.isPrincipleMember || patientDet?.Principal
-                    }
-                    onChange={(checked) =>
-                      handleSwitchChange("isPrincipleMember", checked)
-                    }
-                    size="large"
-                    style={{ margin: "0 10px" }}
-                    disabled={newPatient.paymentMode === "2"}
-                  />
-                </div>
+                )}
+
+                {/* Additional Fields for Insurance */}
+                {newPatient.paymentMode !== "2" && (
+                  <>
+                    <div className="row g-2 mb-3">
+                      <div className="col-12">
+                        <label className="py-1">
+                          Scheme Name:
+                          <span className="text-danger px-1">*</span>
+                        </label>
+                        <Input
+                          placeholder="Enter Insurance Number"
+                          name="schemeName"
+                          value={
+                            newPatient.schemeName || patientDet?.SchemeName
+                          }
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="col-12">
+                        <label className="py-1">
+                          Principal Name:
+                          <span className="text-danger px-1">*</span>
+                        </label>
+                        <Input
+                          placeholder="Enter Principal Name"
+                          name="insurancePrincipalMemberName"
+                          value={
+                            newPatient.insurancePrincipalMemberName ||
+                            patientDet?.InsurancePrincipalMemberName ||
+                            ""
+                          }
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-12 mb-4">
+                      <label className="py-1">
+                        Principle Member ?
+                        <span className="text-danger px-1">*</span>
+                      </label>
+                      <Switch
+                        checked={
+                          newPatient.isPrincipleMember || patientDet?.Principal
+                        }
+                        onChange={(checked) =>
+                          handleSwitchChange("isPrincipleMember", checked)
+                        }
+                        size="large"
+                        style={{ margin: "0 10px" }}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </Form>
           </Card>

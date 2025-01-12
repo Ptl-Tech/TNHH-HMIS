@@ -5,50 +5,48 @@ import RadiologyRequest from "./requests/RadiologyRequest"
 import LaboratoryRequest from "./requests/LaboratoryRequest"
 
 const Requests = () => {
-    const [selectedItem, setSelectedItem] = useState('Laboratory Requests')
-    const handleOnClick = (item) => {
-        switch (item) {
-            case 'Laboratory Requests':
-                setSelectedItem(<LaboratoryRequest />)
-                break
-            case 'Physiotherapy Requests':
-                setSelectedItem(<PhysiotherapyRequest />)
-                break
-            case 'Radiology Requests':
-                setSelectedItem(<RadiologyRequest />)
-                break
-            default:
-                break
-        }
+  const [selectedItem, setSelectedItem] = useState(<LaboratoryRequest />); // Default component
+
+  const handleOnClick = (item) => {
+    switch (item) {
+      case 'Laboratory Requests':
+        setSelectedItem(<LaboratoryRequest />);
+        break;
+      case 'Psychology Requests':
+        setSelectedItem(<PhysiotherapyRequest />);
+        break;
+      case 'Radiology Requests':
+        setSelectedItem(<RadiologyRequest />);
+        break;
+      default:
+        setSelectedItem(<LaboratoryRequest />); // Default fallback
     }
+  }
+
   return (
     <>
-        <div style={{ display: 'flex', flex: 1, gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
-            {
-                [
-                    'Laboratory Requests',
-                    'Physiotherapy Requests',
-                    'Radiology Requests',
-                ].map((item, index) => (
-                    <Button key={index} type="primary" style={{ backgroundColor: '#0f5689' }} 
-                    onClick={() => handleOnClick(item)}
-                    >
-                        {item}
-                    </Button>
-                ))
-            }
+      <div style={{ display: 'flex', flex: 1, gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+        {
+          [
+            'Laboratory Requests',
+            'Psychology Requests',
+            'Radiology Requests',
+          ].map((item, index) => (
+            <Button key={index} type="primary" style={{ backgroundColor: '#0f5689' }} 
+              onClick={() => handleOnClick(item)}
+            >
+              {item}
+            </Button>
+          ))
+        }
+      </div>
 
-        </div>
-
-        <Divider />
-        <div className="patient-file-content">
-            {
-                selectedItem === 'Laboratory Requests' ? <LaboratoryRequest /> : selectedItem
-            }
-        </div>
-
+      <Divider />
+      <div className="patient-file-content">
+        {selectedItem}
+      </div>
     </>
-  )
+  );
 }
 
-export default Requests
+export default Requests;

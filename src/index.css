@@ -8,14 +8,34 @@
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
 .ant-layout-sider {
   flex: 0 0 230px !important;
   max-width: 230px !important;
   min-width: 230px !important;
   width: 230px !important;
 }
+.admit-patient-table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admit-patient-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+
+.admit-patient-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.ant-menu-light.ant-menu-light {
+  color: #ffffff;
+  background: #0f5689 !important;
+}
+
+
 /* Override submenu background to make it transparent */
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light, :where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light>.ant-menu {
+:where(.css-dev-only-do-not-override-191squa).ant-menu-light, :where(.css-dev-only-do-not-override-191squa).ant-menu-light>.ant-menu {
   color: #ffffff;
   background: #0f5689 !important;
 }
@@ -23,8 +43,7 @@
   color: #ffffff;
 }
 
-:where(.css-1gx1iy6).ant-menu-light, 
-:where(.css-1gx1iy6).ant-menu-light > .ant-menu {
+:where(.css-191squa).ant-menu-light, :where(.css-191squa).ant-menu-light>.ant-menu  {
     color: #ffffff;
     background: #0f5689 !important;
 }

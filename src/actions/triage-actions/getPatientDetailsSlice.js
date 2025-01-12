@@ -1,12 +1,12 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 import { message } from "antd";
+const API_URL =  'http://217.21.122.62:8085';
 
 export const GET_PATIENT_DETAILS_REQUEST = 'GET_PATIENT_DETAILS_REQUEST';
 export const GET_PATIENT_DETAILS_SUCCESS = 'GET_PATIENT_DETAILS_SUCCESS';
 export const GET_PATIENT_DETAILS_FAILURE = 'GET_PATIENT_DETAILS_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
 export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
     try {

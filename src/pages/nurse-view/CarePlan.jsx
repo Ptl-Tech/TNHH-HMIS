@@ -8,17 +8,20 @@ import TCAAppointments from './nurse-care-plan/TCAAppointments'
 import DailyProcess from './nurse-care-plan/DailyProcess'
 import Injections from './nurse-care-plan/Injections'
 import Diagnosis from './nurse-care-plan/Diagnosis'
+import useAuth from '../../hooks/useAuth'
 import Prescription from './nurse-care-plan/Prescription'
 
 const CarePlan = () => {
-  const [selectedItem, setSelectedItem] = useState('Add Allergies')
+  const [selectedItem, setSelectedItem] = useState(<AddAllergies />);
+  const role = useAuth().userData.departmentName
+
   const handleOnClick = (item) => {
     switch (item) {
         case 'Add Allergies':
             setSelectedItem(<AddAllergies />)
             break
         case 'Vitals':
-            setSelectedItem(<Vitals/>)
+            setSelectedItem(<Vitals />)
             break
         case 'Daily Process / Procedures':
             setSelectedItem(<DailyProcess />)
@@ -41,10 +44,14 @@ const CarePlan = () => {
         case 'TCA / Appointments':
             setSelectedItem(<TCAAppointments />)
             break
+        case 'Daily Ward Rounds Notes':
+            setSelectedItem(<DailyProcess />)
+            break
         default:
             setSelectedItem(<AddAllergies />)
     }
   }
+
   return (
     <>
         <div style={{ display: 'flex', flex: 1, gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
@@ -52,7 +59,7 @@ const CarePlan = () => {
                 [
                     'Allergies',
                     'Vitals',
-                    'Daily Process / Procedures',
+                    role === 'Doctor' ? 'Daily Ward Rounds Notes' : 'Daily Process / Procedures',
                     'Injections',
                     'Diagnosis',
                     'Prescription',
@@ -67,16 +74,12 @@ const CarePlan = () => {
                     </Button>
                 ))
             }
-
         </div>
 
         <Divider />
         <div className="patient-file-content">
-            {
-                selectedItem === 'Add Allergies' ? <AddAllergies /> : selectedItem
-            }
+            {selectedItem}
         </div>
-
     </>
   )
 }

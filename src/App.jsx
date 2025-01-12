@@ -77,6 +77,7 @@ import PharmacyHistoryList from "./pages/pharmacy-views/PharmacyHistoryList";
 import ReadNurseNotes from "./pages/nurse-view/ReadNurseNotes";
 import ConsultationCard from "./pages/nurse-view/ConsultationCard";
 import BedOccupancy from "./pages/nurse-view/BedOccupancy";
+import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 
 function App() {
   return (
@@ -198,8 +199,8 @@ function App() {
           <Route index element={<DoctorDashboard />} />
           <Route path="/Doctor/Consultation-List" element={<DoctorVisits />} />
           <Route
-            path="/Doctor/PendingTreatmentList"
-            element={<TreamentListPending />}
+            path="/Doctor/ClosedConsultationList"
+            element={<CloseList />}
           />
 
           <Route

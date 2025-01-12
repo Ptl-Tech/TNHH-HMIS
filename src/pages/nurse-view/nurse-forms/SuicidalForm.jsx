@@ -19,6 +19,13 @@ const SuicidalForm = () => {
     const { ipSuicidalForm, loadingIpSuicidalForm } = useSelector(state => state.getIpSuicidalForm);
     const { loadingSuicidalForm } = useSelector(state => state.postSuicidalForm);
     const [isFormVisible, setIsFormVisible] = useState(false);
+const [suicidalFormData, setSuicidalFormData] = useState({
+  date: '',
+  time: '',
+  handingOver: '',
+  takingOver: '',
+  remarks: ''
+});
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     const staffNo = userInfo?.userData?.no

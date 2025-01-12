@@ -1,287 +1,269 @@
 import React, { useState, useEffect } from "react";
 import {
+  Button,
+  Table,
   Form,
   Input,
-  Button,
-  Select,
-  Table,
-  Modal,
   Popconfirm,
+  message,
   Typography,
-  Col,
-  Row,
+  Steps, Collapse, Radio, Checkbox, DatePicker, Tooltip, Card
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SaveOutlined, FileOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  SaveOutlined,
+  EditOutlined,
+  FileOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getSymptomsRequest } from "../../../actions/Doc-actions/qySymptomsSetup";
-import { getHMSsetup } from "../../../actions/Doc-actions/qyHMSSystems";
-import { postSymptomsRequest } from "../../../actions/Doc-actions/postSyptoms";
-import { IoListOutline } from "react-icons/io5";
-import { getPatientSyptomLines } from "../../../actions/Doc-actions/getPatientSyptomLines";
+import { getSignsSetup } from "../../../actions/Doc-actions/qySignsSetup";
+import { postSignsRequest } from "../../../actions/Doc-actions/postSigns";
+import { getPatientSignsLines } from "../../../actions/Doc-actions/getPatientSignsLines";
 import Loading from "../../../partials/nurse-partials/Loading";
+import { IoListOutline } from "react-icons/io5";
+import { render } from "react-dom";
+const { Step } = Steps;
+const { Panel } = Collapse;
+const { TextArea } = Input;
 
 const PatientSymptoms = ({ treatmentNo }) => {
-      const [showForm, setShowForm] = useState(false); // Toggle between table and form
-    
+  
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState({});
   const [form] = Form.useForm();
-  const [isSymptomsModalVisible, setIsSymptomsModalVisible] = useState(false);
-
   const dispatch = useDispatch();
-  const { loading: systemLoading, data: system = [] } = useSelector(
-    (state) => state.getHMSsetup
-  );
-  const { loading: symptomLoading, data: symptoms = [] } = useSelector(
-    (state) => state.getSymptoms
-  );
-  const { loading: symptomLinesLoading, data: symptomsLines = [] } = useSelector(
-    (state) => state.getPatientSyptoms
-  );
-  const {
-    loading: postsymptomLoading,
-    success: postsymptomSuccess,
-    error: postsymptomError,
-  } = useSelector((state) => state.saveSyptoms);
 
-  useEffect(() => {
-    dispatch(getSymptomsRequest());
-    dispatch(getHMSsetup());
-  }, [dispatch]);
+  
 
-  useEffect(() => {
-    if (postsymptomSuccess) {
-      form.resetFields();
-      setIsSymptomsModalVisible(false);
-    }
-  }, [postsymptomSuccess, form]);
+  // const handleFinish = (values) => {
+  //   // Find the selected sign's system value from the signs data
+  //   const selectedSign = signs.find((sign) => sign.SignCode === values.signNo);
 
-  useEffect(() => {
-    dispatch(getPatientSyptomLines());
-  }, [dispatch]);
+  //   // Ensure the sign and system are found before proceeding
+  //   if (!selectedSign) {
+  //     message.error("Selected sign not found.");
+  //     return;
+  //   }
 
+  //   const data = {
+  //     ...values,
+  //     system: selectedSign.System, // Add the system value from the selected sign
+  //     myAction: editingRecord ? "edit" : "create", // Handle create or update
+  //     treatmentNo: editingRecord ? editingRecord.TreatmentNo : treatmentNo,
+  //   };
 
-  const handleAddSymptom = async () => {
-    try {
-      const values = await form.validateFields();
-      const data = {
-        ...values,
-        treatmentNo: treatmentNo,
-        myAction: "create",
-      };
-      dispatch(postSymptomsRequest(data));
-    } catch (error) {
-      // Form validation errors are handled automatically by Ant Design.
-    }
+  //   // Dispatch postSignsRequest for both create and update
+  //   dispatch(postSignsRequest(data)).then((data) => {
+  //     if (postsignsSuccess) {
+  //       dispatch(getPatientSignsLines()); // Reload data after successful request
+  //       form.resetFields(); // Reset the form fields
+  //       setEditingRecord(null);
+  //     } else {
+  //       message.error("An error occurred, please try again");
+  //     }
+  //   });
+  // };
+
+  const handleNext = () => {
+    setCurrentStep((prev) => prev + 1);
   };
 
-  const deleteItem = (key) => {
-    // Implement the delete logic if needed
-    console.log("Delete item with key:", key);
-  };
-  const handleToggleForm = () => {
-    setShowForm(!showForm);
+  const handlePrev = () => {
+    setCurrentStep((prev) => prev - 1);
   };
 
-  const columnsSymptoms = [
-    { title: "Treatment No", dataIndex: "TreatmentNo", key: "TreatmentNo" },
-    { title: "System", dataIndex: "System", key: "System" },
-    { title: "Symptom Code", dataIndex: "SymptomCode", key: "SymptomCode" },
-    { title: "Description", dataIndex: "Description", key: "Description" },
-    { title: "Duration", dataIndex: "Duration", key: "Duration" },
-    {
-      title: "Characteristics",
-      dataIndex: "Characteristics",
-      key: "Characteristics",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <>
-          <Button
-            type="primary"
-            icon={<EyeOutlined />}
-            onClick={() => viewItem(record.key)}
-            style={{ marginRight: "8px" }}
-          >
-            View
-          </Button>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            onClick={() => editItem(record.key)}
-            style={{ marginRight: "8px" }}
-          >
-            Edit
-          </Button>
-          <Button
-            type="primary"
-            icon={<DeleteOutlined />}
-            onClick={() => deleteItem(record.key)}
-            danger
-          >
-            Delete
-          </Button>
-        </>
-      ),
-    },
-  ];
+  const handleFinish = (values) => {
+    setFormData(values);
+    onSubmit(values);
+  };
 
-const DataSource = Array.isArray(symptomsLines)
-? symptomsLines.filter((item) => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
-: Object.keys(symptomsLines)
-    .filter((key) => symptomsLines[key].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
-    .map((key) => ({
-      ...symptomsLines[key],
-      TreatmentNo: key,
-    }));
+
+
   return (
     <div className="mt-4">
       <Typography.Text
-      className="my-4"
-        style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+        style={{
+          fontWeight: "bold",
+          color: "#0f5689",
+          fontSize: "14px",
+          marginBottom: "10px",
+        }}
       >
         <FileOutlined />
-        Patient Symptoms
+        MSE Form
       </Typography.Text>
-     
-{
-    symptomLinesLoading ? (
-     <Loading/>
-    ) : (
-<>
-{!showForm ? (
-        <>
-        <div className="d-flex justify-content-end my-2">
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleToggleForm}
+      <>
+      <Steps current={currentStep} size="small" style={{ marginBottom: 24, marginTop: 24 }}>
+        <Step title="Appearance & Speech" />
+        <Step title="Mood & Thinking" />
+        <Step title="Sensorium & Perception" />
+        <Step title="Judgement & Insight" />
+      </Steps>
 
-          style={{
-            backgroundColor: "#0f5689",
-            borderColor: "#0f5689",
-            width: "100%",
-            maxWidth: "200px",
-          }}
-        >
-          Add Symptom
-        </Button>
+      <Form
+        name="mentalStateExamForm"
+        onFinish={handleFinish}
+        initialValues={formData}
+        layout="vertical"
+      >
+        {/* Step 1: Appearance & Speech */}
+        {currentStep === 0 && (
+          <>
+            <Collapse>
+              <Panel header="Appearance" key="1">
+                <Form.Item
+                  name="appearance"
+                  label="Appearance (Personal Identification)"
+                  rules={[{ required: true, message: 'Please describe appearance!' }]}
+                >
+                  <TextArea placeholder="e.g., cooperative, attentive, hostile..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="behavior"
+                  label="Behavior and Psychomotor Activity"
+                  rules={[{ required: true, message: 'Please describe behavior!' }]}
+                >
+                  <TextArea placeholder="e.g., gait, mannerisms, tics..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+              <Panel header="Speech" key="2">
+                <Form.Item
+                  name="speech"
+                  label="Speech"
+                  rules={[{ required: true, message: 'Please describe speech!' }]}
+                >
+                  <TextArea placeholder="e.g., rapid, slow, pressured..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+            </Collapse>
+          </>
+        )}
+
+        {/* Step 2: Mood & Thinking */}
+        {currentStep === 1 && (
+          <>
+            <Collapse>
+              <Panel header="Mood & Affect" key="1">
+                <Form.Item
+                  name="mood"
+                  label="Mood"
+                  rules={[{ required: true, message: 'Please describe the patient\'s mood!' }]}
+                >
+                  <TextArea placeholder="e.g., depressed, anxious, euphoric..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="affect"
+                  label="Affect"
+                  rules={[{ required: true, message: 'Please describe the patient\'s affect!' }]}
+                >
+                  <TextArea placeholder="e.g., broad, restricted, blunted..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+              <Panel header="Thinking & Perception" key="2">
+                <Form.Item
+                  name="thinkingForm"
+                  label="Form of Thinking"
+                  rules={[{ required: true, message: 'Please describe thinking form!' }]}
+                >
+                  <TextArea placeholder="e.g., overabundance of ideas, flight of ideas..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="thinkingContent"
+                  label="Content of Thinking"
+                >
+                  <TextArea placeholder="e.g., preoccupations, obsessions, compulsions..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="perceptualDisturbances"
+                  label="Perceptual Disturbances"
+                >
+                  <TextArea placeholder="e.g., hallucinations, illusions..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+            </Collapse>
+          </>
+        )}
+
+        {/* Step 3: Sensorium & Perception */}
+        {currentStep === 2 && (
+          <>
+            <Collapse>
+              <Panel header="Sensorium" key="1">
+                <Form.Item
+                  name="alertness"
+                  label="Alertness"
+                  rules={[{ required: true, message: 'Please describe alertness!' }]}
+                >
+                  <TextArea placeholder="e.g., attention span, GCS..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="orientation"
+                  label="Orientation"
+                  rules={[{ required: true, message: 'Please describe orientation!' }]}
+                >
+                  <TextArea placeholder="e.g., time, place, person..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+              <Panel header="Memory" key="2">
+                <Form.Item
+                  name="memory"
+                  label="Memory"
+                  rules={[{ required: true, message: 'Please describe memory!' }]}
+                >
+                  <TextArea placeholder="e.g., recent, remote, episodic..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+            </Collapse>
+          </>
+        )}
+
+        {/* Step 4: Judgement & Insight */}
+        {currentStep === 3 && (
+          <>
+            <Collapse>
+              <Panel header="Judgement & Insight" key="1">
+                <Form.Item
+                  name="judgement"
+                  label="Judgement"
+                  rules={[{ required: true, message: 'Please describe judgement!' }]}
+                >
+                  <TextArea placeholder="e.g., social, test judgement..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+                <Form.Item
+                  name="insight"
+                  label="Insight"
+                  rules={[{ required: true, message: 'Please describe insight!' }]}
+                >
+                  <TextArea placeholder="e.g., denial, intellectual insight..." autoSize={{ minRows: 3 }} />
+                </Form.Item>
+              </Panel>
+            </Collapse>
+          </>
+        )}
+
+        <div className="steps-action" style={{ marginTop: 20 }}>
+          {currentStep > 0 && (
+            <Button style={{ marginRight: 8 }} onClick={handlePrev}>
+              Previous
+            </Button>
+          )}
+          {currentStep < 3 && (
+            <Button type="primary" onClick={handleNext}>
+              Next
+            </Button>
+          )}
+          {currentStep === 3 && (
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          )}
         </div>
-        <Table columns={columnsSymptoms} dataSource={DataSource}  pagination={{
-                  position: ["bottom", "right"],
-                  showSizeChanger: true,
-                  pageSize: 10,
-                  showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} of ${total} items`,
-                }}
-       />
-        
-        </>
-      ) : (
-        <>
-         <Form layout="vertical" form={form} className="mt-4">
-        <Row gutter={16}>
-            <Col span={12}>
-            <Form.Item
-            label="System"
-            name="system"
-            rules={[{ required: true, message: "Please select a system" }]}
-          >
-            <Select placeholder="Select System" loading={systemLoading}>
-              {system.map((sys) => (
-                <Select.Option key={sys.Code} value={sys.Code}>
-                  {sys.Description}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          </Col>
-          <Col span={12}>
-          <Form.Item
-            label="Symptom"
-            name="symptomCode"
-            rules={[{ required: true, message: "Please select a symptom" }]}
-          >
-            <Select placeholder="Select Symptom" loading={symptomLoading}>
-              {symptoms.map((symptom) => (
-                <Select.Option
-                  key={symptom.SymptomCode}
-                  value={symptom.SymptomCode}
-                >
-                  {symptom.SymptomName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          </Col>
-          <Col span={12}>
-          <Form.Item
-            label="Duration"
-            name="duration"
-            rules={[{ required: true, message: "Please enter a duration" }]}
-          >
-            <Input />
-          </Form.Item>
-          </Col>
-         
-          <Col span={12}>
-          <Form.Item
-            label="Characteristics"
-            name="characteristics"
-            rules={[
-              { required: true, message: "Please enter characteristics" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          </Col>
-          <Col span={12}>
-          <Form.Item
-            label="Description"
-            name="description"
-            rules={[{ required: true, message: "Please enter a description" }]}
-          >
-            <Input.TextArea />
-          </Form.Item>
-          </Col>
-            </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item style={{width:"100%"}}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  onClick={handleAddSymptom}
-                  style={{ backgroundColor: "#0f5689", borderColor: "#0f5689", width:"100%" }}
-                >
-                    <PlusOutlined />
-                  Add Symptom
-                </Button>
-              </Form.Item>
-              </Col>
-              
-              <Col span={12}>
-              <Form.Item style={{width:"100%"}}>
-                <Button
-                  type="primary"
-                  onClick={handleToggleForm}
-                  style={{ backgroundColor: "#0f5689", borderColor: "#0f5689", width:"100%" }}
-                >
-                  <IoListOutline />
-                  View Symptoms
-                </Button>
-              </Form.Item>
-              </Col>
-          </Row>
-        </Form>
-        </>
-      )}
-</>    )
-}
-     
+      </Form>
+            </>
     </div>
   );
 };
 
 export default PatientSymptoms;
+

@@ -19,14 +19,14 @@ const EvaluationCardContent = ({
       <Card className="card" style={{ padding: "10px 16px" }}>
         <Tabs defaultActiveKey="1">
        
-          <Tabs.TabPane tab="Triage Room Details" key="2">
+          <Tabs.TabPane tab="Triage Room " key="2">
             <ObservationRoom
               treatmentNo={treatmentNo}
               observationNo={observationNo}
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Consultation Room Details" key="3">
+          <Tabs.TabPane tab="Consultation Room " key="3">
             <ConsultationroomDetails
               treatmentNo={treatmentNo}
               observationNo={observationNo}
@@ -43,10 +43,10 @@ const EvaluationCardContent = ({
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Doctor Forms" key="6">
+          {/* <Tabs.TabPane tab="Doctor Forms" key="6">
             <DocForms />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Patient Admission & Referral" key="7">
+          </Tabs.TabPane> */}
+          <Tabs.TabPane tab="Admission & Referral" key="7">
             <AdmissionTab />
           </Tabs.TabPane>
           <Tabs.TabPane tab="Patient File" key="8">

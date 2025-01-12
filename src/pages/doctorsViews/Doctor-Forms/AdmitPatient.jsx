@@ -179,13 +179,13 @@ const AdmitPatientForm = () => {
 
       {/* Modal for Patient Admission History */}
       <Modal
-        title="Patient Admission History"
+        title="Patient Admission "
         visible={historyVisible}
         onCancel={handleCancel}
         footer={
         
             <Space>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={loading}  onClick={handlePatientAdmission}>
                   <SaveOutlined /> Save Admission Details
                 </Button>
               <Button
@@ -208,15 +208,18 @@ const AdmitPatientForm = () => {
         }
         width={800}
       >
-        <Form
+       <Form
         layout="vertical"
-        className="admit-patient-card-container "
+        className="admit-patient-card-container"
         initialValues={{
           treatmentNo: treatmentNo,
           dateOfAdmission: currentDate,
           admissionReason: "",
         }}
-        onFinish={handlePatientAdmission}
+        onFinish={(values) => {
+          console.log("Form Submitted with values:", values);
+          handlePatientAdmission(values);
+        }}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -226,14 +229,19 @@ const AdmitPatientForm = () => {
               rules={[{ required: true }]}
             >
               <Input
-                style={{ width: "100%", color: "green", fontWeight: "bold" }}
+                style={{ width: "100%", color: "#0F5689", fontWeight: "bold" }}
                 disabled
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item label="Date of Admission" name="dateOfAdmission">
-              <Input type="text" value={currentDate} disabled />{" "}
+              <Input
+                type="text"
+                value={currentDate}
+                style={{ fontWeight: "bold", color: "#0F5689" }}
+                disabled
+              />{" "}
               {/* Default to current date */}
             </Form.Item>
           </Col>
@@ -245,8 +253,6 @@ const AdmitPatientForm = () => {
             </Form.Item>
           </Col>
         </Row>
-
-      
       </Form>
        
       </Modal>

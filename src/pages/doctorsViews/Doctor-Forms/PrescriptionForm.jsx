@@ -312,7 +312,7 @@ const PrescriptionForm = () => {
                 />
               </Form.Item>
 
-              <Form.Item
+              {/* <Form.Item
                 label="Prescription Quantity"
                 name={["Prescriptions", "PrescriptionQuantity"]}
                 hasFeedback
@@ -330,7 +330,7 @@ const PrescriptionForm = () => {
                   name="PrescriptionQuantity"
                   className="w-100"
                 />
-              </Form.Item>
+              </Form.Item> */}
             </div>
 
             <Form.Item

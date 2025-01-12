@@ -1,19 +1,27 @@
 import React from "react";
 import { Card, Typography } from "antd";
-import { HourglassOutlined, ClockCircleOutlined, StopOutlined } from "@ant-design/icons";
+import { HourglassOutlined, StopOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const ConsultationRoomSummeryCard = ({ currentPath}) => {
+const ConsultationRoomSummeryCard = ({ currentPath }) => {
   const { patients: treatmentList = [] } =
     useSelector((state) => state.docTreatmentList) || {};
 
-    
-  const openConsultationList = treatmentList.filter((item) => item.Status === "New");
-  const pendingConsultationList = treatmentList.filter((item) => item.Status === "Pending");
-  const closedConsultationList = treatmentList.filter((item) => item.Status === "Closed");
+  const currentDate = new Date();
+  
+  // Filter based on TreatmentDate
+  const openConsultationList =treatmentList?.filter(
+    (item) => item.Status === "New" 
+  );
+  const pendingConsultationList = treatmentList.filter(
+    (item) => new Date(item.TreatmentDate) <= currentDate && item.TreatmentDate !== null
+  );
+  const closedConsultationList = treatmentList?.filter(
+    (item) => item.Status === "Dispatched" 
+  );
 
   const cardData = [
     {
@@ -23,13 +31,6 @@ const ConsultationRoomSummeryCard = ({ currentPath}) => {
       link: "/Doctor/Consultation-List",
       count: openConsultationList.length,
     },
-    // {
-    //   backgroundColor: "gray",
-    //   icon: <ClockCircleOutlined />,
-    //   title: "In Consultation Room",
-    // //  link: "/Doctor/PendingConsultationList",
-    //   count: pendingConsultationList.length,
-    // },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,

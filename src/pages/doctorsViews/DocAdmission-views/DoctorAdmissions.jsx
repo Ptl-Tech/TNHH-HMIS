@@ -8,7 +8,11 @@ import {
   Table,
   Typography,
 } from "antd";
-import { ProfileOutlined } from "@ant-design/icons";
+import {
+  ProfileOutlined,
+  FileExclamationOutlined,
+  PrinterOutlined,
+} from "@ant-design/icons";
 import Modal from "antd/es/modal/Modal";
 import { useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
@@ -24,9 +28,13 @@ import { verifyPatientAdmission } from "../../../actions/Doc-actions/Admission/p
 import { cancelPatientAdmission } from "../../../actions/Doc-actions/Admission/cancelPatientAdmission";
 import { getPendingAdmissionsList } from "../../../actions/Doc-actions/Admission/getPendingAdmissions";
 import moment from "moment";
+import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
+import { exportToExcel, printToPDF } from "../../../utils/helpers";
 
 const DoctorAdmissions = () => {
   const { loading } = useSelector((state) => state.saveAdmissionDetails);
+  const [selectedRow, setSelectedRow] = useState([]);
+
   const { loading: postPatientAdmissionLoading } = useSelector(
     (state) => state.postAdmitPatient
   );
@@ -43,21 +51,9 @@ const DoctorAdmissions = () => {
     (state) => state.cancelPatientAdmission
   );
 
- 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
-
   const [form] = Form.useForm();
-
-  const showModal = (record) => {
-    setSelectedRecord(record);
-    form.setFieldsValue({
-        dateOfAdmission: moment(), // Set current date
-        admissionReason: record?.Remarks || "", // Use Remarks from the record
-        admissionRemarks: record?.Admission_Remarks || "",
-      });
-    setIsModalOpen(true);
-  };
 
   const handleOk = async () => {
     const formData = await form.validateFields();
@@ -72,10 +68,10 @@ const DoctorAdmissions = () => {
 
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-   dispatch(getPendingAdmissionsList());
+    dispatch(getPendingAdmissionsList());
   }, [dispatch]);
+
   const columns = [
     {
       title: "Admission No",
@@ -109,7 +105,7 @@ const DoctorAdmissions = () => {
       key: "Date",
     },
     {
-      title: "Doctor",
+      title: "Request Person",
       dataIndex: "LinkType",
       key: "LinkType",
     },
@@ -118,28 +114,6 @@ const DoctorAdmissions = () => {
       dataIndex: "Remarks",
       key: "Remarks",
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <div className="d-flex justify-content-between align-items-start gap-2">
-            <Button type="primary" onClick={() => showModal(record)}>
-              Admit Patient
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={() => handleCancelAdmission(record)}
-              danger
-            >
-              Cancel Admission
-            </Button>
-          </div>
-        );
-      },
-    },
   ];
 
   const [pagination, setPagination] = useState({
@@ -147,6 +121,13 @@ const DoctorAdmissions = () => {
     pageSize: 10,
     total: data.length,
   });
+  const rowSelection = {
+    type: "checkbox", // or 'checkbox' depending on your use case
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRecord(selectedRows[0]); // Assuming single row selection
+      setSelectedRowKey(selectedRowKeys[0]);
+    },
+  };
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
@@ -156,12 +137,35 @@ const DoctorAdmissions = () => {
     dispatch(postPatientAdmission(selectedRecord?.No));
   };
 
-  const handleAdmissionVerification = () => {
-    dispatch(verifyPatientAdmission(selectedRecord?.No));
+  const handleAdmissionVerification = (record) => {
+    if (record) {
+      setSelectedRecord(record);
+      console.log(selectedRecord?.No);
+      Modal.confirm({
+        title: "Are you sure you want to verify admission?",
+        content: `Do you want to verify the admission for ${selectedRecord?.Patient_Name}?`,
+        okText: "Yes",
+        cancelText: "No",
+        onOk: () => {
+          dispatch(verifyPatientAdmission(record?.No));
+        },
+      });
+    }
   };
+
   const handleCancelAdmission = (record) => {
     setSelectedRecord(record); // Set the selected patient for cancellation
-    dispatch(cancelPatientAdmission(record.No));
+
+    // Show confirmation modal before dispatching cancel action
+    Modal.confirm({
+      title: "Are you sure you want to cancel admission?",
+      content: `Do you want to cancel the admission for ${record.Patient_Name}?`,
+      okText: "Yes",
+      cancelText: "No",
+      onOk: () => {
+        dispatch(cancelPatientAdmission(record.No));
+      },
+    });
   };
 
   const paginatedData = data.slice(
@@ -186,10 +190,9 @@ const DoctorAdmissions = () => {
     }
 
     dispatch(saveAdmissionDetails(admissionObject));
-
     form.resetFields();
   };
-  
+
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       <Space
@@ -237,36 +240,83 @@ const DoctorAdmissions = () => {
       {getPendingAdmissionsLoading ? (
         <Loading />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={data}
-          className="admit-patient-table"
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            position: ["bottom", "right"],
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (page, pageSize) =>
-              handleTableChange({
-                current: page,
-                pageSize,
-                total: pagination.total,
-              }),
-            onShowSizeChange: (current, size) =>
-              handleTableChange({
-                current,
-                pageSize: size,
-                total: pagination.total,
-              }),
-            style: {
-              marginTop: "30px",
-            },
-          }}
-        />
+        <div className="admit-patient-table-container mt-2">
+          <div className="d-flex justify-content-between gap-2 align-items-center">
+            <Space className="admit-patient-button-container">
+              <Button
+                key="verify"
+                type="primary"
+                loading={postAdmissionVerificationLoading}
+                onClick={handleAdmissionVerification}
+              >
+                Verify Admission
+              </Button>
+              <Button
+                type="default"
+                onClick={() => handleCancelAdmission(selectedRecord)} // Pass the selected record here
+                danger
+              >
+                Cancel Admission
+              </Button>
+            </Space>
+            <Space className="admit-patient-button-container">
+              <Button
+                type="primary"
+                onClick={() =>
+                  exportToExcel(
+                    data,
+                    "Admission request success list",
+                    "admission-request-success-list.xlsx"
+                  )
+                }
+              >
+                <FileExclamationOutlined /> Export Excel
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  printToPDF(data, "Admission request success list")
+                }
+              >
+                <PrinterOutlined /> Print PDF
+              </Button>
+            </Space>
+          </div>
+          <Table
+            scroll={{ x: "max-content", scrollbar: false }}
+            columns={columns}
+            dataSource={data}
+            rowKey="SystemId"
+            className="admit-patient-table"
+            bordered
+            rowSelection={rowSelection} // Ensure rowSelection is an object with necessary props
+            size="middle"
+            pagination={{
+              ...pagination,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              position: ["bottom", "right"],
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+              onChange: (page, pageSize) =>
+                handleTableChange({
+                  current: page,
+                  pageSize,
+                  total: pagination.total,
+                }),
+              onShowSizeChange: (current, size) =>
+                handleTableChange({
+                  current,
+                  pageSize: size,
+                  total: pagination.total,
+                }),
+              style: {
+                marginTop: "30px",
+                zIndex: 0,
+              },
+            }}
+          />
+        </div>
       )}
 
       <Modal
@@ -283,19 +333,6 @@ const DoctorAdmissions = () => {
               onClick={handleAdmitPatient}
             >
               Admit Patient
-            </Button>
-
-            <Button
-              key="verify"
-              type="primary"
-              loading={postAdmissionVerificationLoading}
-              onClick={handleAdmissionVerification}
-            >
-              Verify Admission
-            </Button>
-
-            <Button key="back" onClick={handleCancel}>
-              Cancel
             </Button>
           </>,
         ]}
@@ -316,37 +353,42 @@ const DoctorAdmissions = () => {
             rules={[
               {
                 required: true,
-                message: "Please enter the date of admission!",
+                message: "Please enter date of admission",
               },
             ]}
           >
-            <DatePicker style={{ width: "100%" }} />
+            <DatePicker
+              format="YYYY-MM-DD"
+              showTime
+              className="full-width-input"
+            />
           </Form.Item>
 
           <Form.Item
             label="Admission Reason"
             name="admissionReason"
-            value={selectedRecord?.Admission_Reason}        
             rules={[
-              { required: true, message: "Please enter the admission reason!" },
               {
-                validator: (_, value) => {
-                  if (value && value.length > 100) {
-                    return Promise.reject(
-                      new Error(
-                        "Admission reason cannot exceed 150 characters!"
-                      )
-                    );
-                  }
-                  return Promise.resolve();
-                },
+                required: true,
+                message: "Please provide the reason for admission",
               },
             ]}
           >
-            <Input.TextArea placeholder="Admission Reason" />
+            <TextArea rows={4} placeholder="Enter admission reason" />
           </Form.Item>
 
-         
+          <Form.Item
+            label="Admission Remarks"
+            name="admissionRemarks"
+            rules={[
+              {
+                required: true,
+                message: "Please provide admission remarks",
+              },
+            ]}
+          >
+            <TextArea rows={4} placeholder="Enter admission remarks" />
+          </Form.Item>
         </Form>
       </Modal>
     </div>
