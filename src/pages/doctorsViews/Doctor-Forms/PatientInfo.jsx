@@ -219,7 +219,7 @@ const handlePrintInvoice = () => {
                 onClick={() => handleTransferPatient(observationNo)}
                 style={{ width: "100%" }}
               >
-                Transfer/Assign Patient
+               Request Patient Review
               </Button>
               <Button
                 type="primary"

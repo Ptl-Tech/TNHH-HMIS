@@ -286,7 +286,7 @@ const Diagnosis = () => {
 
       {/* Show the diagnosis history modal */}
       <Modal
-        title="Diagnosis Form"
+        title="DIAGNOSTIC FORMULATION "
         visible={historyVisible}
         onCancel={() => setHistoryVisible(false)}
         footer={null}

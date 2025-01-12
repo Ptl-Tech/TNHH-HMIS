@@ -8,11 +8,10 @@ import {
   Row,
   Table,
   Typography,
-  Pagination,
   Tooltip,
   Modal,
-  Form,
-  InputNumber,
+  
+  Tabs,
 } from "antd";
 import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import { appmntList, listPatients } from "../actions/patientActions";
@@ -20,15 +19,16 @@ import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
 import useAuth from "../hooks/useAuth";
 import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoice";
+import TabPane from "antd/es/tabs/TabPane";
+import { getBillingList } from "../actions/Charges-Actions/getBillingList";
 
 const InsurancePatients = () => {
-  const {
-    loading: patientsLoading,
-    error: patientsError,
-    patients,
-  } = useSelector((state) => state.patientList);
+  
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
+  );
+  const { loading: billingLoading, patients: billingData } = useSelector(
+    (state) => state.getBillingList
   );
   const {
     loading: patientDetailsLoading,
@@ -39,6 +39,10 @@ const InsurancePatients = () => {
     useSelector((state) => state.postInterimInvoice);
 
   const [filteredPatients, setFilteredPatients] = useState([]);
+  const [filteredOutpatients, setFilteredOutpatients] = useState([]);
+  const [filteredInpatients, setFilteredInpatients] = useState([]);
+  const [formattedBillingTable, setFormattedBillingTable] = useState([]);
+
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
@@ -54,25 +58,32 @@ const InsurancePatients = () => {
   const staffNo = useAuth().userData.No;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    dispatch(listPatients());
-  }, [dispatch]);
-
+  
   useEffect(() => {
     dispatch(appmntList());
+    dispatch(getBillingList());
   }, [dispatch]);
-  // get details of the selected patient
+
+
+  const formattedBillingList= visitData.map((patient) =>{
+    const matchingPatient=billingData.find((p) => p.PatientNo === patient.PatientNo);
+    return {
+      ...patient,
+      PatientNo: patient.PatientNo,
+      Balance: matchingPatient?.Balance,      
+      OpenInsuranceBalance:matchingPatient?.Open_Insurance_Amount,
+      Inpatient:matchingPatient?.Inpatient
+    };
+
+  });
+  console.log("Formatted Billing List:", formattedBillingList);
+
+ 
   useEffect(() => {
     if (selectedPatient) {
-      console.log("Selected Patient:", selectedPatient);
       dispatch(getPatientDetails(selectedPatient.PatientNo));
     }
   }, [selectedPatient]);
-
-  useEffect(() => {
-    console.log("Patient Details Updated:", patientDetails);
-  }, [patientDetails]);
 
   // Update patientBalanceDetails when patientDetails changes
   useEffect(() => {
@@ -84,36 +95,50 @@ const InsurancePatients = () => {
     }
   }, [patientDetails, selectedPatient]);
 
+ 
   useEffect(() => {
-    // Filter only "Corporate" patients and those with isActivated: true from visitData
-    const InsurancePatients = visitData.filter(
-      (patient) => patient.PatientType === "Corporate"
-    );
-    setFilteredPatients(InsurancePatients);
-  }, [visitData]); // Dependency on visitData
+    if (formattedBillingList) {
+      // Sort the list based on the AppointmentDate (latest first)
+      const sortedList = [...formattedBillingList].sort((a, b) => {
+        const dateA = new Date(a.AppointmentDate);
+        const dateB = new Date(b.AppointmentDate);
+        return dateB - dateA; // For descending order
+      });
+  
+      setFilteredOutpatients(
+        sortedList.filter(
+          (patient) =>
+            patient.PatientType === "Corporate" && !patient.Inpatient
+        )
+      );
+      setFilteredInpatients(
+        sortedList.filter(
+          (patient) =>
+            patient.PatientType === "Corporate" && patient.Inpatient
+        )
+      );
+    }
+  }, [formattedBillingList]);
+  
 
+  
   const handleSearchChange = (e, key) => {
-    const value = e.target.value;
+    const value = e.target.value.toLowerCase();
     setSearchParams((prev) => ({ ...prev, [key]: value }));
 
-    const filtered = visitData.filter((patient) => {
-      const matchesName = patient.Names.toLowerCase().includes(
+    const filtered = formattedBillingTable.filter((patient) => {
+      const matchesName = patient.Names?.toLowerCase().includes(
         searchParams.SearchNames.toLowerCase()
       );
-      const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(
+      const matchesAppointmentNo = patient.AppointmentNo?.toLowerCase().includes(
         searchParams.AppointmentNo.toLowerCase()
       );
 
-      return (
-        matchesName &&
-        matchesAppointmentNo &&
-        patient.PatientType === "Corporate"
-      );
+      return matchesName && matchesAppointmentNo;
     });
 
-    setFilteredPatients(filtered);
+    setFormattedBillingTable(filtered);
   };
-
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };
@@ -138,7 +163,85 @@ const InsurancePatients = () => {
       console.error("Patient balance details not available.");
     }
   };
-  const columns = [
+  const outpatientColumns = [
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+    },
+    {
+      title: "Patient Name",
+      dataIndex: "Names", // Corrected key to match patient object
+      key: "Names",
+    },
+    {
+      title: "Appointment No",
+      dataIndex: "AppointmentNo",
+      key: "AppointmentNo",
+    },
+    {
+      title: "Appointment Date",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      },
+    },
+    {
+      title: "Appointment Time",
+      dataIndex: "AppointmentTime",
+      key: "AppointmentTime",
+      render: (text, record) => {
+        const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
+        const dateTime = new Date(dateTimeString);
+        return dateTime.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
+    },
+    {
+      title: "Gender",
+      dataIndex: "Gender",
+      key: "Gender",
+    },
+    {
+      title: "Patient Type",
+      dataIndex: "PatientType",
+      key: "PatientType",
+    },
+    {
+      title: "Balance",
+      dataIndex: "Balance",
+      key: "Balance",
+      render: (text) => `KSh ${text.toFixed(2)}`,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div style={{ display: "flex", gap: "8px" }}>
+          {/* <Tooltip title="View Details">
+            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
+              View Details
+            </Button>
+          </Tooltip> */}
+          <Tooltip title="Bill and Clear">
+            <Button type="primary" onClick={() => showModal(record)}>
+              Bill
+            </Button>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+  const inpatientColumns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
@@ -203,7 +306,7 @@ const InsurancePatients = () => {
           </Tooltip>
           <Tooltip title="Bill and Clear">
             <Button type="primary" onClick={() => showModal(record)}>
-              Bill & Clear
+              Bill
             </Button>
           </Tooltip>
         </div>
@@ -251,31 +354,42 @@ const InsurancePatients = () => {
       </Card>
 
       <div className="mt-4">
-        <Table
-          columns={columns}
-          loading={loading}
-          dataSource={paginatedData.map((patient) => ({
-            ...patient,
-            key: patient.AppointmentNo,
-          }))}
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys),
-          }}
-          pagination={false}
-          bordered
-          size="small"
-        />
-        <Pagination
-          total={filteredPatients.length}
-          showTotal={(total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`
-          }
-          defaultPageSize={20}
-          current={pagination.current}
-          onChange={handlePaginationChange}
-          style={{ float: "right", margin: "16px" }}
-        />
+      <Tabs defaultActiveKey="1" size="large" type="card">
+        <TabPane tab="Outpatients list" key="1">
+          <Table
+            columns={outpatientColumns}
+            dataSource={filteredOutpatients.map((patient) => ({
+              ...patient,
+              key: patient.AppointmentNo,
+            }))}
+            pagination={{
+              total: filteredOutpatients.length,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              onChange: handlePaginationChange,
+            }}
+            bordered
+            size="small"
+          />
+        </TabPane>
+        <TabPane tab="Inpatients list" key="2">
+          <Table
+            columns={inpatientColumns}
+            dataSource={filteredInpatients.map((patient) => ({
+              ...patient,
+              key: patient.AppointmentNo,
+            }))}
+            pagination={{
+              total: filteredInpatients.length,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              onChange: handlePaginationChange,
+            }}
+            bordered
+            size="small"
+          />
+        </TabPane>
+      </Tabs>
       </div>
 
       <Modal

@@ -10,6 +10,7 @@ import Charges from "./nurse-patient-file/Charges";
 import Consumables from "./nurse-patient-file/Consumables";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
+import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 
 const PatientFile = ({ patientDetails }) => {
   const userRole = useAuth();
@@ -20,10 +21,13 @@ const PatientFile = ({ patientDetails }) => {
     "Patient Info",
     "Medical Info",
     "Next of Kin",
-    ...(userRole.userData.departmentName === "Nurse" ? ["Doctor Notes"] : []),
+    ...(userRole.userData.departmentName === "Doctor" ? ["Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
     "Consumables",
+    ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+
+    ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
 
   const handleOnClick = (item) => {
@@ -48,6 +52,12 @@ const PatientFile = ({ patientDetails }) => {
         break;
       case "Consumables":
         setSelectedItem(<Consumables />);
+        break;
+      case "Charges":
+        setSelectedItem(<Charges/>);
+        break;
+        case "TCA":
+        setSelectedItem(<TCAAppointments/>);
         break;
       default:
         setSelectedItem(<PatientInfo />);

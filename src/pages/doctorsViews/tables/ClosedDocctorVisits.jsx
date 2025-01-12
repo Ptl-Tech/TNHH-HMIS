@@ -4,23 +4,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import { listPatients } from "../../actions/patientActions";
-import Loading from "../../partials/nurse-partials/Loading";
-import ConsultationRoomSummeryCard from "./ConsultationRoomSummeryCard";
+import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
+import { listPatients } from "../../../actions/patientActions";
+import Loading from "../../../partials/nurse-partials/Loading";
+import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
 import Search from "antd/es/transfer/search";
-import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import {
   getColorByWaitingTreatmentTime,
   getUrgencyColorcode,
   rowClassName,
-} from "../../utils/helpers";
+} from "../../../utils/helpers";
 import { render } from "react-dom";
-const DoctorVisits = () => {
+const CloseList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
+  const currentDate = new Date();
 
   const [searchParams, setSearchParams] = useState({
     name: "",
@@ -41,15 +42,14 @@ const DoctorVisits = () => {
   useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
-
   const openDoctorVisitList = treatmentList?.filter(
     (item) => item.Status === "New" 
   );
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Closed"
+    (item) => item.Status === "Dispatched" 
   );
 
-  const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
+  const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
     SearchName: patient.SearchName,
     IDNumber: patient.IDNumber,
@@ -57,8 +57,8 @@ const DoctorVisits = () => {
     PatientType: patient.PatientType,
   }));
 
-  const combinedList = openDoctorVisitList.map((room) => {
-    const matchingPatient = openDoctorVisitListWithPatientDetails.find(
+  const combinedList = closedConsultationList.map((room) => {
+    const matchingPatient = closedConsultationListWithPatientDetails.find(
       (patient) => patient.PatientNo === room.PatientNo
     );
 
@@ -327,4 +327,4 @@ const DoctorVisits = () => {
 };
 
 
-export default DoctorVisits;
+export default CloseList;

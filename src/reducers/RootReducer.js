@@ -183,6 +183,7 @@ import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceR
 import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
+import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -334,4 +335,5 @@ export const rootReducer = combineReducers({
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
   postDoctorNotes:postDoctorNotesReducer,
+  getBillingList:getBillingListReducer,
 });
