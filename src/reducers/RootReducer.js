@@ -145,6 +145,7 @@ import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionF
 import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
 import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
+import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -262,10 +263,10 @@ export const rootReducer = combineReducers({
   getPgBeds:getPgBedsReducer,
   getPgWardsList:getPgWardsListReducer,
   postAdmissionFormDetails:postAdmissionFormDetailsReducer,
+  postVisitorList:postVisitorListReducer,
   // postPatientAdmission:postPatientAdmissionReducer
   getQyUrgencyColorCodingSetup:getQyUrgencyColorCodingSetupReducer,
   getPgWardRoomsSetup:getPgWardRoomsSetupReducer,
-
   getLocationsSetup:QyLocationsListReducer,
   postDoctorInjections:postDocInjectionsReducer,
   getPatientsSigns:getPatientSignsLinesReducer, 
@@ -291,6 +292,6 @@ export const rootReducer = combineReducers({
   postArchivePrescription:postArchivePrescriptionReducer,
   getPharmacyReturnLinesList:getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine:getPatientPharmacyReturnLinesReducer,
-getPharmacyHistoryList:getPharmacyHistoryList,
-getPatientVisit:getPatientVisitReducer,
+  getPharmacyHistoryList:getPharmacyHistoryList,
+  getPatientVisit:getPatientVisitReducer,
 });

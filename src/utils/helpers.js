@@ -107,6 +107,18 @@ export const calculateAge =(dob) => {
   return `${years} years ${months} months ${days} days`;
 }
 
+export const calculateDailyBedOccupancy = (totalBeds, occupiedBeds) =>{
+  if (totalBeds <= 0) {
+      return;
+  }
+  if (occupiedBeds < 0 || occupiedBeds > totalBeds) {
+      return;
+  }
+  
+  const occupancyRate = (occupiedBeds / totalBeds) * 100;
+  return `${occupancyRate.toFixed(0)}%`;
+}
+
    // Print PDF
    export const printToPDF = (dataSource, tableTitle) => {
     const doc = new jsPDF();

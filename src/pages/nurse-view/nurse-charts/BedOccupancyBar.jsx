@@ -1,10 +1,14 @@
 import { Column } from "@ant-design/charts"
+import PropTypes from "prop-types"
 
 
-const BedOccupancyBar = () => {
+const BedOccupancyBar = ({ getBeds }) => {
+  const getTotalFreeBeds = getBeds.filter((bed) => bed.Occupied === false);
+  const getTotalOccupiedBeds = getBeds.filter((bed) => bed.Occupied === true);
+
     const data = [
-        { type: 'occupied', value: 60, name: 'Occupied Beds' },
-        { type: 'free bed', value: 40, name: 'Free Beds' },
+        { type: 'occupied', value: getTotalOccupiedBeds?.length, name: 'Occupied Beds' },
+        { type: 'free bed', value: getTotalFreeBeds?.length, name: 'Free Beds' },
     ]
 
     const config = {
@@ -41,3 +45,7 @@ const BedOccupancyBar = () => {
 }
 
 export default BedOccupancyBar
+// props validation
+BedOccupancyBar.propTypes = {
+    getBeds: PropTypes.array.isRequired,
+}

@@ -42,7 +42,15 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
             </div>
         </Card>
 
-        <Card className="card" title="Allergies and Medications" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', borderTop: '3px solid #0f5689' }}>
+        <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', borderTop: '3px solid #0f5689' }}>
+
+        <div className="inpatient-details-container-1">
+                <Typography.Text className="patient-name" style={{ fontWeight: 'bold' }}>
+                    Allergies and Medications
+                </Typography.Text>
+            </div>
+
+            <Divider/>
             
         <div className="inpatient-details-container-2">
                 <div className="patient-hospital-number-container" style={{ paddingTop: '10px'}}>

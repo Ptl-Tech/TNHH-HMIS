@@ -32,10 +32,10 @@ const ReadNurseNotes = () => {
     
       <NurseInnerHeader title="Read Nurse Notes" />
 
-        <Row gutter={16}>
+        <Row gutter={16} style={{ marginTop: '20px' }}>
         {patientInfo.map((info, index) => (
-        <Col key={index} xs={24} sm={24} md={12} lg={8} xl={8}>
-        <Card style={{ padding: '10px 16px' }}>
+        <Col key={index} xs={24} sm={24} md={12} lg={8} xl={8} >
+        <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
         <Typography.Title level={5}>
         {info.title}
         </Typography.Title>
@@ -51,7 +51,7 @@ const ReadNurseNotes = () => {
             loadingGetNurseAdmissionNotes ? (
                 <Loading />
             ): (
-                <div style={{ border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden', fontWeight: 'bold', marginTop: '10px' }}>
+                <div style={{ border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden', fontWeight: 'bold', marginTop: '20px' }}>
             <Row style={{ backgroundColor: '#0f5689', padding: '10px 0' }} justify="center">
                 <Col span={4} style={{ borderRight: '1px solid #ddd', textAlign: 'center'}}>
                     Date

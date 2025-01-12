@@ -1,10 +1,9 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types'
-import { EditOutlined } from '@ant-design/icons'
 import { useState } from 'react'
 import Loading from '../../../../partials/nurse-partials/Loading'
 
-const JacksonVisualFormTable = ({ showModal, loadingGetJacksonVisual, getJacksonVisual }) => {
+const JacksonVisualFormTable = ({ loadingGetJacksonVisual, getJacksonVisual, rowSelection }) => {
     const columns = [
         {
           title: 'Date',
@@ -17,19 +16,16 @@ const JacksonVisualFormTable = ({ showModal, loadingGetJacksonVisual, getJackson
           key: 'Score',
         },
         {
+          title: 'Nurse',
+          dataIndex: 'Nurse',
+          key: 'Nurse',
+        },
+        {
           title: 'IV Line',
           dataIndex: 'IVLine',
           key: 'IVLine',
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
-                </Space>
-            ),
-        }
+        
     ]
      const [pagination, setPagination] = useState({
             current: 1,
@@ -46,9 +42,13 @@ const JacksonVisualFormTable = ({ showModal, loadingGetJacksonVisual, getJackson
           loadingGetJacksonVisual ? (
             <Loading /> 
           ):(
-            <Table columns={columns} dataSource={getJacksonVisual} 
-          bordered size='middle' 
-          pagination={{
+            <Table 
+            rowKey={(record, index) => record.Date + index}
+            rowSelection={rowSelection}
+            columns={columns} 
+            dataSource={getJacksonVisual} 
+            bordered size='middle' 
+            pagination={{
             ...pagination,
             total: getJacksonVisual?.length,
             showSizeChanger: true,
@@ -74,5 +74,6 @@ export default JacksonVisualFormTable
 JacksonVisualFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingGetJacksonVisual: PropTypes.bool.isRequired,
-    getJacksonVisual: PropTypes.array.isRequired
+    getJacksonVisual: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
 }

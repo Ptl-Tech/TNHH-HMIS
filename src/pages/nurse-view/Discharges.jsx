@@ -6,9 +6,11 @@ import SickOff from "./discharges/SickOff";
 import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../actions/nurse-actions/postInitiateDischargeSlice";
+import useAuth from "../../hooks/useAuth";
 
 const Discharges = () => {
-  const [selectedItem, setSelectedItem] = useState("Summery");
+  const role = useAuth().userData.departmentName;
+  const [selectedItem, setSelectedItem] = useState("Summary");
   const dispatch=useDispatch();
   const { patientDetails } = useLocation().state;
   const { confirm } = Modal;
@@ -87,20 +89,23 @@ const Discharges = () => {
         }}
       >
         {[
-          "Initiate Discharge",
-          "Summary",
-          "Discharge Medication",
-          "Sick Off",
-        ].map((item, index) => (
-          <Button
-            key={index}
-            type="primary"
-            style={{ backgroundColor: "#0f5689" }}
-            onClick={() => handleOnClick(item)}
-          >
-            {item}
-          </Button>
+        "Initiate Discharge",
+        "Summary",
+        "Discharge Medication",
+        "Sick Off",
+        ]
+        .filter((item) => !(role === "Nurse" && item === "Initiate Discharge")) // Exclude "Initiate Discharge" for Nurse
+        .map((item, index) => (
+        <Button
+        key={index}
+        type="primary"
+        style={{ backgroundColor: "#0f5689" }}
+        onClick={() => handleOnClick(item)}
+        >
+        {item}
+        </Button>
         ))}
+
       </div>
 
       <Divider />

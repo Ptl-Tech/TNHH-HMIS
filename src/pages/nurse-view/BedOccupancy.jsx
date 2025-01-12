@@ -5,13 +5,31 @@ import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader"
 import FilterWardManagement from "../../partials/nurse-partials/FilterWardManagement"
 import PropTypes from "prop-types"
 import { useGetWardManagementHook } from "../../hooks/useGetWardManagementHook"
+import { useEffect, useState } from "react"
+import { calculateDailyBedOccupancy } from "../../utils/helpers"
 
 const BedOccupancy = () => {
-    const { loadingWards, getWards } = useGetWardManagementHook();
+    const { loadingWards, getWards, getBeds } = useGetWardManagementHook();
+    const [ selectedWard, setSelectedWard] = useState(null);
+    const [getWardsBeds, setGetWardBeds] = useState([]);
     
-    const handleWardChange = () => {
-
+    const handleWardChange = (value) => {
+        setSelectedWard(value);
     }
+
+    const getFreeBeds = getWardsBeds.filter((bed) => bed?.Occupied === false);
+    const getOccupiedBeds = getWardsBeds.filter((bed) => bed?.Occupied === true);
+
+    const getTotalOccupiedBeds = getBeds.filter((bed) => bed.Occupied === true);
+
+    useEffect(() => {
+        if (selectedWard) {
+            const filteredBeds = getBeds.filter((bed) => bed.WardNo === selectedWard);
+            setGetWardBeds(filteredBeds);
+        } else {
+            setGetWardBeds([]);
+        }
+    }, [selectedWard, getBeds]);
     
   return (
     <>
@@ -21,13 +39,13 @@ const BedOccupancy = () => {
 
         <Row gutter={16} style={{ marginTop: '20px' }}>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card title="Ward Occupancy">
-                    <BedOccupancyPie />
+                <Card title={`Daily Ward Bed Occupancy ${selectedWard ? calculateDailyBedOccupancy(getWardsBeds?.length, getOccupiedBeds?.length) : ''}`}>
+                    <BedOccupancyPie getFreeBeds={getFreeBeds} getOccupiedBeds={getOccupiedBeds} />
                 </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card title="Bed Occupancy">
-                    <BedOccupancyBar />
+                <Card title={`Daily Total Bed Occupancy ${selectedWard ? calculateDailyBedOccupancy(getBeds?.length, getTotalOccupiedBeds?.length) : ''}`}>
+                    <BedOccupancyBar getBeds={getBeds}/>
                 </Card>
             </Col>
         </Row>

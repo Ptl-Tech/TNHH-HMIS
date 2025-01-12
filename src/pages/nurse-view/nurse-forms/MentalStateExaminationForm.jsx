@@ -1,123 +1,118 @@
-import { Button, DatePicker, Form, message, Modal, Select, Space, Typography } from 'antd'
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { Button, Form, Modal, Select } from 'antd'
+import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import MentalStatusExaminationTable from '../tables/nurse-tables/MentalStatusExaminationTable';
 import { useDispatch, useSelector } from 'react-redux';
-import { POST_MENTAL_EXAMINATION_FORM_FAILURE, POST_MENTAL_EXAMINATION_FORM_SUCCESS, postMentalExaminationFormSlice } from '../../../actions/nurse-actions/postMentalExaminationFormSlice';
 import { getMentalExaminationFormSlice } from '../../../actions/nurse-actions/getMentalExaminationFormSlice';
 import { useLocation } from 'react-router-dom';
+import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
+import MseStatusFormData from './MseStatusFormData';
+import useSetTableCheckBoxHook from '../../../hooks/useSetTableCheckBoxHook';
+import useAuth from '../../../hooks/useAuth';
 
 const MentalStateExaminationForm = () => {
+  const role = useAuth().userData.departmentName;
     const { patientDetails } = useLocation().state;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ form ] = Form.useForm();
-    const [isEditMode, setIsEditMode] = useState(false);
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
 
     const { loadingIpGetMentalStatusForm, ipGetMentalStatusForm} = useSelector((state) => state.getMentalStatusExaminationForm);
+    const { loadingMentalStatus } = useSelector((state) => state.postMentalStatusExaminationForm);
+
+    const filterMSEFormData = ipGetMentalStatusForm.filter((item) => item?.AdmissionNo === patientDetails?.CurrentAdmNo);
 
     const dispatch = useDispatch();
 
-    const showModal = (record) => {
-      form.resetFields();
-      if (record) {
-          setIsEditMode(true);
-          form.setFieldsValue({
-              status: record?.Status || '',
-              comments: record?.Comments || '',
-          });
-      } else {
-          setIsEditMode(false);
-      }
-      setIsModalOpen(true);
-    };
-    const handleOk = () => {
-      form.submit();
-    };
+    const handleViewMSEForm = () => {
+      if(selectedRow[0]) {
+        form.resetFields();
+        form.setFieldsValue({
+          status: selectedRow[0]?.Status,
+          comments: selectedRow[0]?.Comments
+        })
+        setIsModalOpen(true);
+      };
+    }
     const handleCancel = () => {
       setIsModalOpen(false);
+      form.resetFields();
     };
-
-    const handleOnFinish = async (values) => {
-      
-      try{
-          
-        const { date, status, comments } = values;
-        
-        const mentalStateExaminationFormData = {
-          myAction: isEditMode ? "edit" : "create",
-          admissionNo: patientDetails?.CurrentAdmNo,
-          date: date.format('YYYY-MM-DD'),
-          status,
-          comments,
-        }
-
-      // Dispatch function to handle API call and feedback
-      const dispatchMentalStateExaminationData = async (data) => {
-        await dispatch(postMentalExaminationFormSlice('/InpatientForms/MentalStatusCheckForm', data))
-          .then((result) => {
-            if (result.type === POST_MENTAL_EXAMINATION_FORM_SUCCESS) {
-              const actionWord = isEditMode ? 'updated' : 'added';
-              message.success(`Mental state examination form has been ${actionWord} successfully!`);
-              dispatch(getMentalExaminationFormSlice(patientDetails?.CurrentAdmNo));
-            } else if (result.type === POST_MENTAL_EXAMINATION_FORM_FAILURE) {
-              message.error(result.payload.message || "Internal server error, please try again later.");
-            }
-          })
-          .then(() => {
-            setIsModalOpen(false);
-            form.resetFields();
-          })
-          .catch((err) => {
-            message.error(err.message || "Internal server error, please try again later.");
-          });
-      };
-      
-      // Call the function
-      await dispatchMentalStateExaminationData(mentalStateExaminationFormData);
-
-      }catch(err){
-        message.error(err.message || "Internal server error, please try again later.");
-      }
+    const handleButtonVisibility = () => {
+      setIsFormVisible(!isFormVisible);
     }
 
     useEffect(() => {
-      if(!ipGetMentalStatusForm?.length) {
-        dispatch(getMentalExaminationFormSlice(patientDetails?.CurrentAdmNo));
-      }
-    }, [ipGetMentalStatusForm?.length, dispatch, patientDetails?.CurrentAdmNo]);
+        dispatch(getMentalExaminationFormSlice());
+    }, [dispatch]);
     
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Mental State Examination Form
-          </Typography.Text>
-        </Space>
+      
+        <NurseInnerHeader title='Mental Status Level Checklist'/>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Form
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Form
-          </Button>
+          {
+            role === "Nurse" && (
+              <>
+                <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New MSE Level Checklist
+                </Button>
+                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
+                View MSE Level Checklist
+                </Button>
+                <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
+                Preview Form
+                </Button>
+              </>
+            )
+          }
+
+          {
+            role === "Doctor" && (
+              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
+                View MSE Level Checklist
+                </Button>
+            )
+          }
+        
         </div>
 
-        <MentalStatusExaminationTable showModal={showModal} loadingIpGetMentalStatusForm={loadingIpGetMentalStatusForm} ipGetMentalStatusForm={ipGetMentalStatusForm}/>
+        {
+          isFormVisible && (
+            <MseStatusFormData 
+            patientDetails={patientDetails} 
+            form={form}
+            setIsFormVisible={setIsFormVisible}
+            loadingMentalStatus={loadingMentalStatus}
+            />
+          )
+        }
 
+        {
+          !isFormVisible && (
+            <MentalStatusExaminationTable 
+            rowSelection={rowSelection}
+            loadingIpGetMentalStatusForm={loadingIpGetMentalStatusForm} 
+            filterMSEFormData={filterMSEFormData}
+          />
+          )
+        }
+        
         <Modal title="Suicidal Precaution Form" 
           open={isModalOpen} 
-          onOk={handleOk} 
-          onCancel={handleCancel}
-          okText={isEditMode ? "Update Form" : "Save Form"}
+          footer={[
+            <Button key="cancel" color="danger" onClick={handleCancel}>
+              Cancel
+            </Button>,
+          ]}
         >
             <Form
             
                 layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
-                onFinish={handleOnFinish}
                 initialValues={
                   {
                     date: '',
@@ -126,24 +121,6 @@ const MentalStateExaminationForm = () => {
                   }
                 }
             >
-          
-            <Form.Item 
-                label="Date" 
-                name="date"
-                hasFeedback
-                rules={[
-                    {
-                      required: true,
-                      message: 'Please input date!',
-                    },
-                  ]}
-                >
-                <DatePicker placeholder="Date"
-                    type='text'
-                    style={{ width: '100%' }}
-                />
-            </Form.Item>
-
             <Form.Item
             label="Status"    
             name="status"
