@@ -6,21 +6,13 @@ import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 
-const PatientInfo = ({ patientNo , treatmentNo }) => {
+const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
 
-  const { loadingPatientDetails, patientDetails } = useSelector(
-    (state) => state.getPatientDetails
-  );
+
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
-
-    useEffect(() => {
-      if (patientNo) {
-        dispatch(getPatientDetails(patientNo));
-      }
-    }, [dispatch, patientNo]);
 
     const capitalizeWords = (name) =>
       name

@@ -47,7 +47,7 @@ const ConsultationRoomEvalutionCard = () => {
           {loadingPatientDetails ? (
             <Skeleton />
           ) : (
-           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} />
+           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} observationNo={observationNo} patientDetails={patientDetails} />
           )}
 
          
