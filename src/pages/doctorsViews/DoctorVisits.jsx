@@ -246,7 +246,7 @@ const DoctorVisits = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, {
+    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
       state: {
         patientNo: record.patientNo,
         observationNo: record.observationNo,
