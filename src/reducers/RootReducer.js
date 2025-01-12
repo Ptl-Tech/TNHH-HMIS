@@ -336,4 +336,5 @@ export const rootReducer = combineReducers({
   postInterimInvoice: postInterimInvoiceReducer,
   postDoctorNotes:postDoctorNotesReducer,
   getBillingList:getBillingListReducer,
+  postVisitorList:postVisitorListReducer
 });
