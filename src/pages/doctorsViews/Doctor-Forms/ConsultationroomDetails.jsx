@@ -24,7 +24,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
       case "Patient History Notes":
         setSelectedItem(<PatientSigns treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-      case "Mental Sytemic Examination Form":
+      case  "Mental Systemic Examination Form":
         setSelectedItem(<PatientSymptoms treatmentNo={treatmentNo} />);
         break;
       case "Diagnosis Formulation":
