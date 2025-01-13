@@ -6,8 +6,10 @@ import EvaluationCardContent from "./Doctor-Forms/EvaluationCardContent";
 import { useLocation } from "react-router-dom";
 import { Space, Typography, Row, Col, Skeleton } from "antd";
 import { DiffOutlined } from "@ant-design/icons";
+import useAuth from "../../hooks/useAuth";
 
 const ConsultationRoomEvalutionCard = () => {
+  const role = useAuth().userData.departmentName;
   const location = useLocation();
   const dispatch = useDispatch();
   const { observationNo } = location.state;
@@ -47,7 +49,7 @@ const ConsultationRoomEvalutionCard = () => {
           {loadingPatientDetails ? (
             <Skeleton />
           ) : (
-           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} observationNo={observationNo} patientDetails={patientDetails} />
+           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} observationNo={observationNo} patientDetails={patientDetails} role={role}/>
           )}
 
          
@@ -59,7 +61,7 @@ const ConsultationRoomEvalutionCard = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          <EvaluationCardContent treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} {...patientDetails} />
+          <EvaluationCardContent treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} {...patientDetails} role={role}/>
         </Col>
        
       </Row>

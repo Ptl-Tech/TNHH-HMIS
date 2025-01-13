@@ -280,7 +280,7 @@ const AdmitPatientForm = () => {
             <Form.Item >
                 <Button type="primary" 
                 onClick={handleAdmitPatient} 
-                disabled={!loadingAdmissionDetails}
+                // disabled={!loadingAdmissionDetails}
                 >
                   Admit Patient
                 </Button>

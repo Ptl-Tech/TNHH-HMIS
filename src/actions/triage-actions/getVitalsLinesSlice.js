@@ -22,10 +22,19 @@ export const getVitalsLinesSlice = (observationNo) => async (dispatch, getState)
 
         dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data })
 
-        return data;
+        return { type: GET_VITAL_LINES_SUCCESS, payload: data };
 
     } catch (error) {
-        dispatch({ type: GET_VITAL_LINES_FAILURE, payload: error.message });
+         dispatch({
+            type: GET_VITAL_LINES_SUCCESS,
+            payload: {
+                message: error.message,
+                status: error.response?.status || 'Network Error',
+                data: error.response?.data || null,
+            },
+        });
+        
+        return { type: GET_VITAL_LINES_SUCCESS, payload: error };
     }
 }
 

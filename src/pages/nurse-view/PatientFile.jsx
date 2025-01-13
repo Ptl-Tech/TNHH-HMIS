@@ -20,6 +20,7 @@ const PatientFile = ({ patientDetails }) => {
     "Patient Info",
     "Medical Info",
     "Next of Kin",
+    "Doctor Notes",
     ...(userRole.userData.departmentName === "Doctor" ? ["Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",

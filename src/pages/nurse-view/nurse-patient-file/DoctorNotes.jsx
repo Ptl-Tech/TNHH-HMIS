@@ -1,56 +1,80 @@
 import {
   Button,
+  Col,
   DatePicker,
   Form,
   Input,
-  Modal,
+  Row,
   Select,
   Space,
   Typography,
 } from "antd";
 import {
   ProfileOutlined,
-  FolderViewOutlined,
+  EyeOutlined,
   PlusOutlined,
+  SaveOutlined
 } from "@ant-design/icons";
-import DoctorNotesTable from "../tables/nurse-tables/DoctorNotesTable";
-import { useState, useEffect } from "react";
-import TextArea from "antd/es/input/TextArea";
+import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
-import moment from "moment";
 import { useSelector, useDispatch } from "react-redux";
 import { postDoctorNotes } from "../../../actions/Doc-actions/postDoctorNotes";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { EditorState, convertToRaw } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
+import { stateToHTML } from 'draft-js-export-html';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 const DoctorNotes = ({ treatmentNo, patientNo }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { loading } = useSelector((state) => state.postDoctorNotes);
   const docDetails = useAuth();
   const dispatch = useDispatch(); // Get the dispatch function
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails || {};
+  const role = useAuth().userData.departmentName;
+  console.log('patient details', patientDetails.PatientNo);
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+  const handleEditorChange = (state) => {
+    setEditorState(state);
+    form.setFieldValue('content', JSON.stringify(convertToRaw(state.getCurrentContent())));
   };
 
-  const handleSubmitDoctorNotes = () => {
+  const handleOnFinish = () => {
+    const contentState = editorState.getCurrentContent();
+    const htmlContent = stateToHTML(contentState);
     const doctorNotes = {
       myAction: "create",
       recId: "",
       treatmentNo: treatmentNo,
-      patientNo: patientNo,
+      patientNo: patientDetails?.patientNo, //could'nt get the patientNo from the props
       notesType: form.getFieldValue("notesType"),    
-      notes: form.getFieldValue("doctorNotes"), // Corrected the field name for notes
+      notes: htmlContent, // Corrected the field name for notes
     };
 
+    console.log('doctor content', doctorNotes)
+
     dispatch(postDoctorNotes(doctorNotes)); // Corrected to dispatch the action
-    setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+
+  const handleNavigateReadNotes = () => {
+    if(role === "Nurse") {
+      navigate(`/Nurse/Consultation/Read-Doctor-Dotes?PatientNo=${patientDetails?.patientNo || patientDetails?.PatientNo}`)
+    } else {
+      navigate(`/Doctor/Consultation/Read-Doctor-Dotes?PatientNo=${patientDetails?.patientNo || patientDetails?.PatientNo}`)
+    }
   };
 
-  const [form] = Form.useForm();
+  const handleButtonVisibility = () => {
+    setIsFormVisible(!isFormVisible);
+  }
+
 
   const notesTypes = [
     { value: "1", label: "Doctor Notes" },
@@ -65,19 +89,6 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
     { value: "10", label: "Assessment and plan" },
   ];
 
-  useEffect(() => {
-    if (isModalOpen) {
-      form.setFieldsValue({
-        doctor:
-          docDetails.userData.SearchName ||
-          `${docDetails.userData.firstName} ${docDetails.userData.lastName}` ||
-          docDetails.userData.no,
-        doctorNotesDate: moment(), // Default current date
-        notesType: notesTypes[0].value, // You can set a default note type if needed
-      });
-    }
-  }, [isModalOpen, docDetails, form]);
-
   return (
     <div>
       <Space
@@ -88,6 +99,7 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
           gap: "8px",
           paddingBottom: "30px",
           position: "relative",
+          paddingTop: "20px",
         }}
       >
         <ProfileOutlined />
@@ -106,81 +118,126 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
           paddingBottom: "20px",
         }}
       >
-        <Button
-          type="primary"
-          style={{ width: "100%" }}
-          onClick={() => showModal()}
-        >
-          <PlusOutlined /> Add Doctor Notes
-        </Button>
-        <Button color="default" variant="outlined" style={{ width: "100%" }}>
-          <FolderViewOutlined /> View Treatment Plan
-        </Button>
+        
+            {
+              role === "Doctor" && (
+              <Button type="primary" 
+              style={{ width: '100%' }} 
+              icon={<PlusOutlined />}
+              onClick={handleButtonVisibility}
+              >
+                Add Doctor Notes
+              </Button>
+              )
+            }
+              <Button type="primary" 
+              style={{ width: '100%' }}
+              icon={<EyeOutlined />} 
+              onClick={handleNavigateReadNotes}
+              >
+                Read Doctor Notes
+            </Button>
+
       </div>
 
-      <DoctorNotesTable showModal={showModal} />
-
-      <Modal
-        title="Doctor Notes"
-        open={isModalOpen}
-        onOk={handleSubmitDoctorNotes} // Corrected to call handleSubmitDoctorNotes
-        onCancel={handleCancel}
-        style={{ top: 20 }}
-      >
-        <Form layout="vertical" style={{ paddingTop: "10px" }} form={form}>
-          <Form.Item
-            label="Date"
-            name="doctorNotesDate"
-            rules={[{ required: true, message: "Please enter the date!" }]}
+      {
+        isFormVisible && (
+          <Form layout="vertical" 
+          style={{ paddingTop: "20px" }} 
+          form={form}
+          onFinish={handleOnFinish}
           >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item label="Doctor" name="doctor">
-            <Input
-              placeholder="Doctor name"
-              name="doctor"
-              value={
+            <Row gutter={[16, 16]}>
+              <Col span={8}> 
+                <Form.Item
+                label="Date"
+                name="doctorNotesDate"
+                rules={[{ required: true, message: "Please enter the date!" }]}
+                >
+                <DatePicker style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+              <Form.Item label="Doctor" name="doctor">
+                <Input
+                placeholder="Doctor name"
+                name="doctor"
+                value={
                 docDetails.userData.SearchName ||
                 `${docDetails.userData.firstName} ${docDetails.userData.lastName}`
-              }
-              disabled
-            />
-          </Form.Item>
-          <Form.Item
-            label="Notes Type"
-            name="notesType"
-            rules={[{ required: true, message: "Please select Notes Type!" }]}
-          >
-            <Select options={notesTypes} placeholder="Select Notes Type" />
-          </Form.Item>
-          <Form.Item
-            label="Doctor Notes"
-            name="doctorNotes"
-            rules={[
-              {
-                required: true,
-                message: "Please enter Doctor Notes!",
-              },
-              {
-                validator: (_, value) => {
+                }
+                disabled
+                />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+              <Form.Item
+                label="Notes Type"
+                name="notesType"
+                rules={[{ required: true, message: "Please select Notes Type!" }]}
+                >
+                <Select options={notesTypes} placeholder="Select Notes Type" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Form.Item
+                  label="Doctor Notes"
+                  name="doctorNotes"
+                  rules={[
+                  {
+                  required: true,
+                  message: "Please enter Doctor Notes!",
+                  },
+                  {
+                  validator: (_, value) => {
                   if (value && value.length > 2000) {
                     return Promise.reject(
                       new Error("Doctor Notes cannot exceed 2000 characters!")
                     );
                   }
                   return Promise.resolve();
-                },
-              },
-            ]}
-          >
-            <TextArea
-              placeholder="Enter Doctor Notes"
-              name="Doctor Notes"
-              rows={3}
-            />
+                  },
+                  },
+                  ]}
+                  >
+                  <Editor
+                      editorState={editorState}
+                      onEditorStateChange={handleEditorChange}
+                      toolbar={{
+                          options: ['inline', 'blockType', 'list', 'textAlign', 'history'],
+                      }}
+                      editorStyle={{
+                          border: '1px solid #f0f0f0',
+                          padding: '5px',
+                          minHeight: '200px',
+                      }}
+                  />
+                  </Form.Item>
+                </Col>
+            </Row>
+          <Form.Item>
+            <Space>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                icon={<SaveOutlined />}
+                loading={loading}
+                >Save Doctor Notes
+                </Button>
+                <Button color="danger" variant="outlined" onClick={()=>setIsFormVisible(false)}>
+                  Cancel
+                </Button>
+            </Space>
+          <Form.Item>
+          </Form.Item>
           </Form.Item>
         </Form>
-      </Modal>
+        )
+      
+      }
+      
     </div>
   );
 };

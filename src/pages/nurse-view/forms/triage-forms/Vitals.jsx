@@ -1,7 +1,7 @@
 import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
+import { POST_TRIAGE_LIST_VITALS_FAIL, POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import { useEffect } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
@@ -97,10 +97,10 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           };
     
           const response = await dispatch(postTriageListVitalsSlice(createVitals));
-          if (response?.status === "success") {
-            message.success("Vitals successfully created");
-          } else {
-            message.error("Error saving vitals data");
+          if (response?.payload?.message === POST_TRIAGE_LIST_VITALS_SUCCESS) {
+            message.success(response.payload.message || "Vitals successfully created");
+          } else if(response?.payload?.message === POST_TRIAGE_LIST_VITALS_FAIL) {
+            message.error(response.payload.message || "Error saving vitals data");
           }
         }
     
