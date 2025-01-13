@@ -1,89 +1,51 @@
-import { Button, Divider, Form, Input, message, Modal, Select, Space, Typography } from 'antd'
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { Button, Form, Modal, Select } from 'antd'
+import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import DietaryIntakeTable from '../tables/nurse-tables/DietaryIntakeTable';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQyIpLookupValuesSlice } from '../../../actions/nurse-actions/getQyIPLookupValuesSlice';
-import { POST_DIETARY_INTAKE_FORM_LINE_FAILURE, POST_DIETARY_INTAKE_FORM_LINE_SUCCESS, postDietaryIntakeFormLineSlice } from '../../../actions/nurse-actions/postDietaryIntakeFormLineSlice';
 import { getQyDietaryFormLinesSlice } from '../../../actions/nurse-actions/getQyIPDietaryFormLinesSlice';
+import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
+import DietaryIntakeFormData from './DietaryIntakeFormData';
+import useSetTableCheckBoxHook from '../../../hooks/useSetTableCheckBoxHook';
+import useAuth from '../../../hooks/useAuth';
 
 const DietaryIntakeForm = () => {
-
+    const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
+    const role = useAuth().userData.departmentName;
     const { patientDetails } = useLocation().state;
     const [ form ] = Form.useForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const dispatch = useDispatch();
-    const [isEditMode, setIsEditMode] = useState(false);
+    const [isFormVisible, setIsFormVisible] = useState(false);
 
-    const {ipLookupValues} = useSelector((state) => state.getQyIpLookupValues);
+    const { loadingIpLookupValues, ipLookupValues} = useSelector((state) => state.getQyIpLookupValues);
     const { loadingGetIpDietaryForm, ipGetDietaryForm} = useSelector((state) => state.getQyDietaryFormLine);
+    const { loadingDietaryIntake } = useSelector((state) => state.postDietaryIntakeFormLine);
 
-    const filterIpLookupValues = ipLookupValues?.filter((item) => item.Type === "Dietary Intake Form");
+    const filterIpLookupValues = ipLookupValues?.filter((item) => item?.Type === "Dietary Intake Form");
+    const filterDietaryIntakeForm = ipGetDietaryForm?.filter((item) => item?.AdmissionNo === patientDetails?.CurrentAdmNo);
     
-    const showModal = (record) => {
-        form.resetFields();
-        if (record) {
-            setIsEditMode(true);
-            form.setFieldsValue({
-                category: record?.Category || '',
-                comments: record?.Comment || '',
-            });
-        } else {
-            setIsEditMode(false);
-        }
-        setIsModalOpen(true);
-      };
-    const handleOk = () => {
-        form.submit();
-    };
+      const handleViewForm = () => {
+        if(selectedRow[0]) {
+          form.resetFields();
+          form.setFieldsValue({
+            category: selectedRow[0]?.Category || '',
+            comments: selectedRow[0]?.Comment || '',
+          })
+          setIsModalOpen(true);
+        };
+      }
     const handleCancel = () => {
       setIsModalOpen(false);
+      form.resetFields();
     };
 
-
-    const handleOnFinish = async (values) => {
-        try {
-          const { category, comments } = values;
-      
-          // Construct the visitor data
-          const visitorData = {
-            myAction: isEditMode ? "edit" : "create",
-            admissionNo: patientDetails?.CurrentAdmNo,
-            category,
-            comments,
-          };
-      
-          // Dispatch function to handle API call and feedback
-          const dispatchVisitorData = async (data) => {
-            await dispatch(postDietaryIntakeFormLineSlice(data))
-              .then((result) => {
-                if (result.type === POST_DIETARY_INTAKE_FORM_LINE_SUCCESS) {
-                  const actionWord = isEditMode ? 'updated' : 'added';
-                  message.success(`Dietary Intake Form Line ${actionWord} successfully!`);
-                  dispatch(getQyDietaryFormLinesSlice(patientDetails?.CurrentAdmNo));
-                } else if (result.type === POST_DIETARY_INTAKE_FORM_LINE_FAILURE) {
-                  message.error(result.payload.message || "Internal server error, please try again later.");
-                }
-              })
-              .then(() => {
-                setIsModalOpen(false);
-                form.resetFields();
-              })
-              .catch((err) => {
-                message.error(err.message || "Internal server error, please try again later.");
-              });
-          };
-      
-          // Call the function
-          await dispatchVisitorData(visitorData);
-      
-        } catch (error) {
-          message.error(error.message || "An unexpected error occurred.");
-        }
-      };
-  
+    const handleButtonVisibility = () => {
+      setIsFormVisible(!isFormVisible);
+    }
 
     useEffect(() => {
         if(!ipLookupValues?.length){
@@ -91,84 +53,90 @@ const DietaryIntakeForm = () => {
         }
       }, [dispatch, ipLookupValues]);
 
-      useEffect(() => {
-            if(!ipGetDietaryForm?.length){
-              dispatch(getQyDietaryFormLinesSlice(patientDetails?.CurrentAdmNo));
-            }
-          }, [dispatch, patientDetails?.CurrentAdmNo, ipGetDietaryForm?.length]);
+      useEffect(() => {   
+          dispatch(getQyDietaryFormLinesSlice()); 
+      }, [dispatch]);
       
     
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Dietary Intake Form
-          </Typography.Text>
-        </Space>
-
-        <Divider />
+        <NurseInnerHeader title="Dietary Intake Form" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Form
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Form
-          </Button>
+
+          {
+            role === "Nurse" && (
+                <>
+                  <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New Dietary Form
+                  </Button>
+                  <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                  View Form
+                  </Button>
+                  <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
+                  Preview Form
+                  </Button>
+                </>
+            )
+          }
+          {
+            role === "Doctor" && (
+              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+              View Form
+              </Button>
+            )
+          }
+          
         </div>
 
-        <DietaryIntakeTable showModal={showModal} ipGetDietaryForm={ipGetDietaryForm} loadingGetIpDietaryForm={loadingGetIpDietaryForm}/>
+        {
+          isFormVisible && (
+            <DietaryIntakeFormData 
+            filterIpLookupValues={filterIpLookupValues} 
+            form={form} 
+            patientDetails={patientDetails}
+            setIsFormVisible={setIsFormVisible}
+            loadingDietaryIntake={loadingDietaryIntake}
+            loadingIpLookupValues={loadingIpLookupValues}
+            />
+          )
+        }
+
+        {
+          !isFormVisible && (
+            <DietaryIntakeTable 
+            filterDietaryIntakeForm={filterDietaryIntakeForm} 
+            loadingGetIpDietaryForm={loadingGetIpDietaryForm}
+            rowSelection={rowSelection}
+            />
+          )
+        }
 
         <Modal title="Dietary Intake Form" 
           open={isModalOpen} 
-          onOk={handleOk} 
-          onCancel={handleCancel}
-          okText= {isEditMode ? "Update Form" : "Save Form"}
+          footer={[
+            <Button key="cancel" color="danger" onClick={handleCancel}>
+              Cancel
+            </Button>
+          ]}
         >
             <Form
             
                 layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
-                onFinish={handleOnFinish}
                 initialValues={
                     {
-                        admissionNo: patientDetails?.CurrentAdmNo,
                         category: '',
                         comments: '',
                     }
                 }
             >
-          
-            <Form.Item 
-                label="Admission No" 
-                name="admissionNo"
-                hasFeedback
-                >
-                <Input placeholder="Admission No"
-                    type='text'
-                    disabled
-                />
-            </Form.Item>
-
             <Form.Item
             label="Category"    
             name="category"
-            hasFeedback
-            rules={[
-                {
-                    required: true,
-                    message: 'Please select a category!',
-                }
-            ]}
             >
               <Select 
               placeholder="Select a category"
-              showSearch
-              options={filterIpLookupValues?.map((item) => ({
-                value: item.Category,
-                label: item.Category,
-              }))}
 
               />
             </Form.Item>
@@ -176,13 +144,6 @@ const DietaryIntakeForm = () => {
             <Form.Item 
                 label="Comments" 
                 name="comments"
-                hasFeedback
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please enter comments!',
-                    }
-                ]}
                 >
                 <TextArea placeholder="Comments"
                     type="text"

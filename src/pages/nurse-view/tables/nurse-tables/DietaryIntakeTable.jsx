@@ -1,10 +1,9 @@
-import { Button, Space, Table } from 'antd'
-import { EditOutlined } from '@ant-design/icons'
+import { Table } from 'antd'
 import PropTypes from 'prop-types'
 import Loading from '../../../../partials/nurse-partials/Loading'
 import { useState } from 'react'
 
-const DietaryIntakeTable = ({ showModal, ipGetDietaryForm, loadingGetIpDietaryForm }) => {
+const DietaryIntakeTable = ({ filterDietaryIntakeForm, loadingGetIpDietaryForm, rowSelection }) => {
     const columns = [
         {
           title: 'Admission Number',
@@ -21,21 +20,12 @@ const DietaryIntakeTable = ({ showModal, ipGetDietaryForm, loadingGetIpDietaryFo
           dataIndex: 'Comment',
           key: 'Comment',
         },
-        {
-          title: 'Action',
-          key: 'action',
-          render: (_, record) => (
-            <Space size="middle">
-              <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
-            </Space>
-          ),
-        }
         
     ]
      const [pagination, setPagination] = useState({
             current: 1,
             pageSize: 10,
-            total: ipGetDietaryForm?.length,
+            total: filterDietaryIntakeForm?.length,
         });
               
         const handleTableChange = (newPagination) => {
@@ -47,11 +37,14 @@ const DietaryIntakeTable = ({ showModal, ipGetDietaryForm, loadingGetIpDietaryFo
       loadingGetIpDietaryForm ? (
         <Loading />
       ) : (
-        <Table columns={columns} dataSource={ipGetDietaryForm}
+        <Table columns={columns}
+        rowKey={(record, index) => record.AdmissionNo + index}
+        rowSelection={rowSelection} 
+        dataSource={filterDietaryIntakeForm}
         bordered size='middle' 
         pagination={{
           ...pagination,
-          total: ipGetDietaryForm?.length,
+          total: filterDietaryIntakeForm?.length,
           showSizeChanger: true,
           showQuickJumper: true,
           position: ['bottom', 'right'],
@@ -74,5 +67,6 @@ export default DietaryIntakeTable
 DietaryIntakeTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingGetIpDietaryForm: PropTypes.bool.isRequired,
-    ipGetDietaryForm: PropTypes.array.isRequired
+    filterDietaryIntakeForm: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
 }

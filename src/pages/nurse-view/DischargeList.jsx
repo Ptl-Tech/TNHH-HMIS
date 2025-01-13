@@ -80,9 +80,8 @@ const columns = [
 ];
 
 const {loadingGetPatientDischargeList, getPatientDischargeList} = useSelector(state => state.getPgInpatientDischargeList);
-const [selectedRow, setSelectedRow] = useState([]);
 const { confirm } = Modal;
-const { setIsButtonDisabled, setSelectedRowKey, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
+const { setIsButtonDisabled, setSelectedRowKey, selectedRowKey, selectedRow, setSelectedRow,  rowSelection } = useSetTableCheckBoxHook();
 
 const dispatch = useDispatch();
 const navigate = useNavigate();

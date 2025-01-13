@@ -1,10 +1,9 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types'
-import { EditOutlined } from '@ant-design/icons'
 import Loading from '../../../../partials/nurse-partials/Loading'
 import { useState } from 'react'
 
-const SuicidalFormTable = ({ showModal, loadingIpSuicidalForm, ipSuicidalForm }) => {
+const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection}) => {
     const columns = [
         {
           title: 'Date',
@@ -26,15 +25,6 @@ const SuicidalFormTable = ({ showModal, loadingIpSuicidalForm, ipSuicidalForm })
             dataIndex: 'TakingOver',
             key: 'TakingOver',
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
-                </Space>
-            ),
-        }
     ]
 
      const [pagination, setPagination] = useState({
@@ -55,6 +45,8 @@ const SuicidalFormTable = ({ showModal, loadingIpSuicidalForm, ipSuicidalForm })
           <div style={{ paddingTop: '30px' }}>
               <Table columns={columns} dataSource={ipSuicidalForm} 
                bordered size='middle' 
+               rowKey={(record, index) => record.Time + index}
+               rowSelection={rowSelection}
                pagination={{
                  ...pagination,
                  total: ipSuicidalForm?.length,
@@ -82,5 +74,7 @@ export default SuicidalFormTable
 SuicidalFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingIpSuicidalForm: PropTypes.bool.isRequired,
-    ipSuicidalForm: PropTypes.array.isRequired
+    ipSuicidalForm: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
+
 }

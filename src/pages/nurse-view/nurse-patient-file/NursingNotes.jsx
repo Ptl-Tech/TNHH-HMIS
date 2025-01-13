@@ -30,7 +30,6 @@ const NursingNotes = () => {
   const filterNurseNotes = getNurseNotes?.filter((note) => note?.AdmissionNo === patientDetails?.CurrentAdmNo);
     
   const handleNavigateReadNotes = () => {
-    console.log('button clicked for reading nurse notes')
     navigate(`/Nurse/Inpatient/Read-nurse-notes`, {
         state: {
             loadingGetNurseAdmissionNotes,
@@ -112,7 +111,7 @@ const handleOnFinish = async () => {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px' }}>
         {/* Conditionally render buttons based on role */}
-        {role !== 'Doctor' && (
+        {role == 'Nurse' && (
           <>
               <Button type="primary" 
               style={{ width: '100%' }} 

@@ -65,7 +65,7 @@ const Admissions = () => {
     ];
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { selectedRow, selectedRowKey, rowSelection, setSelectedRowKey, setSelectedRow, setIsButtonDisabled } = useSetTableCheckBoxHook();
+    const { selectedRow, setSelectedRowKey, setSelectedRow, setIsButtonDisabled } = useSetTableCheckBoxHook();
 
     const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
     const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);

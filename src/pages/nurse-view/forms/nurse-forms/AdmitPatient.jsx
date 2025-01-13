@@ -72,7 +72,7 @@ const AdmitPatientForm = () => {
     const { bed, ward, room } = values;
     const formData = {
       myAction: 'edit',
-      recId: patientDetails?.No,
+      recId: patientDetails?.SystemId,
       admissionNo: patientDetails?.No,
       admissionType:  room,
       ward,

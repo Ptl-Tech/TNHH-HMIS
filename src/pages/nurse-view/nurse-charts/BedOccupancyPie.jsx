@@ -1,9 +1,10 @@
 import { Pie } from "@ant-design/charts";
+import PropTypes from "prop-types";
 
-const BedOccupancyPie = () => {
+const BedOccupancyPie = ({ getFreeBeds, getOccupiedBeds }) => {
     const data = [
-        { type: 'occupied', value: 60, name: 'Occupied Beds' },
-        { type: 'free bed', value: 40, name: 'Free Beds' },
+        { type: 'occupied', value: getOccupiedBeds?.length, name: 'Occupied Beds' },
+        { type: 'free bed', value: getFreeBeds?.length, name: 'Free Beds' },
     ]
     
     const config = {
@@ -32,3 +33,8 @@ const BedOccupancyPie = () => {
 }
 
 export default BedOccupancyPie
+// props validation
+BedOccupancyPie.propTypes = {
+    getFreeBeds: PropTypes.array.isRequired,
+    getOccupiedBeds: PropTypes.array.isRequired,
+}

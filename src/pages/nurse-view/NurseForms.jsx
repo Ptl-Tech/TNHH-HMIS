@@ -8,7 +8,7 @@ import JacksonVisualForm from "./nurse-forms/JacksonVisualForm"
 
 const NurseForms = () => {
     
-    const [selectedItem, setSelectedItem] = useState('Patient Info')
+    const [selectedItem, setSelectedItem] = useState('Visitor List')
 
     const handleOnClick = (item) => {
         switch (item) {
@@ -18,7 +18,7 @@ const NurseForms = () => {
             case 'Suicidal Form':
                 setSelectedItem(<SuicidalForm />)
                 break
-            case 'Mental State Examination Form':
+            case 'MSE Status Level Checklist':
                 setSelectedItem(<MentalStateExaminationForm />)
                 break
             case 'Dietary Intake Form':
@@ -38,7 +38,7 @@ const NurseForms = () => {
                 [
                     'Visitor List',
                     'Suicidal Form',
-                    'Mental State Examination Form',
+                    'MSE Status Level Checklist',
                     'Dietary Intake Form',
                     'Jackson Visual Form'
                 ].map((item, index) => (
@@ -54,7 +54,7 @@ const NurseForms = () => {
         <Divider />
         <div className="patient-file-content">
             {
-                selectedItem === 'Patient Info' ? <VisitorsList /> : selectedItem
+                selectedItem === 'Visitor List' ? <VisitorsList /> : selectedItem
             }
         </div>
     </>

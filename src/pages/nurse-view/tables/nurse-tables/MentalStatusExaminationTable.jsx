@@ -1,10 +1,9 @@
-import { Badge, Button, Space, Table } from "antd"
+import { Badge, Table } from "antd"
 import PropTypes from "prop-types"
 import Loading from "../../../../partials/nurse-partials/Loading"
 import { useState } from "react"
-import { EditOutlined } from '@ant-design/icons'
 
-const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm, ipGetMentalStatusForm }) => {
+const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusForm, filterMSEFormData }) => {
     const columns = [
         {
           title: 'Date',
@@ -31,21 +30,12 @@ const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm,
           dataIndex: 'Comments',
           key: 'Comments',
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined />Edit</Button>
-                </Space>
-            ),
-        }
     ]
 
     const [pagination, setPagination] = useState({
             current: 1,
             pageSize: 10,
-            total: ipGetMentalStatusForm?.length,
+            total: filterMSEFormData?.length,
         });
               
         const handleTableChange = (newPagination) => {
@@ -59,11 +49,14 @@ const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm,
           <Loading />
         ) : (
           <div style={{ paddingTop: '30px' }}>
-           <Table columns={columns} dataSource={ipGetMentalStatusForm} 
+           <Table columns={columns} 
+           rowKey={(record, index) => record.Date + index}
+           dataSource={filterMSEFormData} 
            bordered size='middle' 
+           rowSelection={rowSelection}
            pagination={{
              ...pagination,
-             total: ipGetMentalStatusForm?.length,
+             total: filterMSEFormData?.length,
              showSizeChanger: true,
              showQuickJumper: true,
              position: ['bottom', 'right'],
@@ -88,5 +81,6 @@ export default MentalStatusExaminationTable
 MentalStatusExaminationTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingIpGetMentalStatusForm: PropTypes.bool.isRequired,
-    ipGetMentalStatusForm: PropTypes.array.isRequired
+    filterMSEFormData: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
 }

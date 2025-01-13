@@ -7,13 +7,13 @@ export const GET_QY_IP_DIETARY_FORM_FAILURE = 'GET_QY_IP_DIETARY_FORM_FAILURE';
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
-export const getQyDietaryFormLinesSlice = (admissionNo) => 
+export const getQyDietaryFormLinesSlice = () => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_QY_IP_DIETARY_FORM_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPDietaryFormLines&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPDietaryFormLines&isList=true`, config);
     
 
         dispatch({ type: GET_QY_IP_DIETARY_FORM_SUCCESS, payload: data });

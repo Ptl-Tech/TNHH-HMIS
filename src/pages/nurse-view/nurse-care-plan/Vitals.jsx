@@ -1,11 +1,12 @@
-import { Button, Col, Form, Input, Modal, Row, Space, Typography } from "antd";
+import { Button, Col, Form, Input, Modal, Row } from "antd";
 import { useState } from "react";
-import { ProfileOutlined, FolderViewOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { FolderViewOutlined, FolderAddOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
 import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const Vitals = () => {
 
@@ -47,12 +48,7 @@ const Vitals = () => {
 
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Patient Vitals
-          </Typography.Text>
-        </Space>
+      <NurseInnerHeader title="Vitals"/>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
@@ -67,7 +63,7 @@ const Vitals = () => {
         {
           isVitalFormVisible && (
             
-              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo }setIsVitalFormVisible={setIsVitalFormVisible}/>
+              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible}/>
            
           )
         }
@@ -80,7 +76,7 @@ const Vitals = () => {
         }
 
 
-        <Modal title="Vitals" open={isModalOpen}
+        <Modal title="View Vitals" open={isModalOpen}
          footer={[
           <Button key="cancel" color="danger" onClick={handleCancel}>
             Cancel

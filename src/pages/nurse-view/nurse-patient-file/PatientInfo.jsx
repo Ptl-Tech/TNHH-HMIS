@@ -1,13 +1,13 @@
-import { Col, List, Row, Space, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Card, Col, Row, Typography } from "antd"
 import { useLocation } from "react-router-dom";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const PatientInfo = () => {
 
   const { patientDetails } = useLocation().state;
 
 
-  const data = [
+  const patientPrimaryInfo = [
     {
         title: 'Patient Name',
         description: patientDetails?.SearchName || 'N/A',
@@ -40,6 +40,9 @@ const PatientInfo = () => {
         title: 'Nationality',
         description: patientDetails?.Nationality || 'N/A',
     },
+]
+
+const patientSecondaryInfo = [
     {
         title: 'Date of Birth',
         description: patientDetails?.DateOfBirth || 'N/A',
@@ -72,37 +75,31 @@ const PatientInfo = () => {
 ]
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-                Patient Information
-            </Typography.Text>
-          </Space>
-        <List 
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={item => (
-                <Row 
-                    key={item.id} 
-                    gutter={8} 
-                    align="middle" 
-                    style={{
-                        marginBottom: '10px',
-                        borderBottom: '1px solid #e8e8e8', // Adds a subtle bottom border
-                        paddingBottom: '10px' // Adds space between the content and border
-                    }}
-                >
-                    <Col xs={24} sm={12}>
-                        <Typography.Text style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                            {item.title}
-                        </Typography.Text>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                        <Typography.Text>{item.description}</Typography.Text>
-                    </Col>
-                </Row>
-            )}
-        />
+        
+        <NurseInnerHeader title="Patient Information" />
+
+        <Row gutter={16} style={{ marginTop: '20px' }}>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
+                    {patientPrimaryInfo.map((info, index) => (
+                        <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                            <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>
+                            <Typography.Text>{info.description}</Typography.Text>
+                        </div>
+                    ))}
+                </Card>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
+                    {patientSecondaryInfo.map((info, index) => (
+                        <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                            <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>
+                            <Typography.Text>{info.description}</Typography.Text>
+                        </div>
+                    ))}
+                </Card>
+            </Col>
+        </Row>
     </div>
   )
 }

@@ -182,6 +182,7 @@ import { QySecondaryDiagnosisSetupReducer } from "./doc-reducers/getSecondaryDia
 import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
 import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
+import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
 import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
@@ -303,14 +304,13 @@ export const rootReducer = combineReducers({
   getPgWardsList: getPgWardsListReducer,
   postAdmissionFormDetails: postAdmissionFormDetailsReducer,
   // postPatientAdmission:postPatientAdmissionReducer
-  getQyUrgencyColorCodingSetup: getQyUrgencyColorCodingSetupReducer,
-  getPgWardRoomsSetup: getPgWardRoomsSetupReducer,
-
-  getLocationsSetup: QyLocationsListReducer,
-  postDoctorInjections: postDocInjectionsReducer,
-  getPatientsSigns: getPatientSignsLinesReducer,
-  getPatientSyptoms: getPatientsyptomslinesReducer,
-  getInjectionLines: getInjectionsLinesReducer,
+  getQyUrgencyColorCodingSetup:getQyUrgencyColorCodingSetupReducer,
+  getPgWardRoomsSetup:getPgWardRoomsSetupReducer,
+  getLocationsSetup:QyLocationsListReducer,
+  postDoctorInjections:postDocInjectionsReducer,
+  getPatientsSigns:getPatientSignsLinesReducer, 
+  getPatientSyptoms:getPatientsyptomslinesReducer,
+  getInjectionLines:getInjectionsLinesReducer,
   getHosNumber: QyHospNumberReducer,
   getSampleSetup: QySpecimenSampleSetupReducer,
   postAdmitPatient: RequestPostPatientAdmissionReducer,
@@ -337,5 +337,6 @@ export const rootReducer = combineReducers({
   postInterimInvoice: postInterimInvoiceReducer,
   postDoctorNotes:postDoctorNotesReducer,
   getBillingList:getBillingListReducer,
+  postVisitorList:postVisitorListReducer,
   postPatientHistory:postPatientHistoryNotesReducer,
 });

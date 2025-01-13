@@ -1,10 +1,9 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types'
-import { EditOutlined } from '@ant-design/icons'
 import Loading from '../../../../partials/nurse-partials/Loading'
 import { useState } from 'react'
 
-const VisitorFormTable = ({ showModal, loadingIpVisitors, ipVisitors }) => {
+const VisitorFormTable = ({ loadingIpVisitors, filterVisitorList, rowSelection }) => {
 
     const columns = [
         {
@@ -27,21 +26,12 @@ const VisitorFormTable = ({ showModal, loadingIpVisitors, ipVisitors }) => {
             dataIndex: 'IdNumber',
             key: 'IdNumber',
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
-                </Space>
-            ),
-        }
     ]
 
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
-        total: ipVisitors?.length,
+        total: filterVisitorList?.length,
     });
           
     const handleTableChange = (newPagination) => {
@@ -55,11 +45,15 @@ const VisitorFormTable = ({ showModal, loadingIpVisitors, ipVisitors }) => {
             <Loading />
         ) : (
             <div style={{ paddingTop: '30px' }}>
-            <Table columns={columns} dataSource={ipVisitors} 
-             bordered size='middle' 
+            <Table 
+              rowKey={(record, index) => record.PhoneNumber + index}
+              columns={columns} 
+              dataSource={filterVisitorList} 
+              bordered size='middle'
+              rowSelection={rowSelection} 
               pagination={{
                 ...pagination,
-                total: ipVisitors?.length,
+                total: filterVisitorList?.length,
                 showSizeChanger: true,
                 showQuickJumper: true,
                 position: ['bottom', 'right'],
@@ -70,6 +64,7 @@ const VisitorFormTable = ({ showModal, loadingIpVisitors, ipVisitors }) => {
                     marginTop: '30px',
                 }
             }}
+
             />
            </div>
         )
@@ -85,5 +80,6 @@ export default VisitorFormTable
 VisitorFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingIpVisitors: PropTypes.bool.isRequired,
-    ipVisitors: PropTypes.array.isRequired
+    filterVisitorList: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
 }
