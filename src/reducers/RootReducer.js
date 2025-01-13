@@ -185,6 +185,7 @@ import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetup
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
 import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -336,5 +337,6 @@ export const rootReducer = combineReducers({
   postInterimInvoice: postInterimInvoiceReducer,
   postDoctorNotes:postDoctorNotesReducer,
   getBillingList:getBillingListReducer,
-  postVisitorList:postVisitorListReducer
+  postVisitorList:postVisitorListReducer,
+  postPatientHistory:postPatientHistoryNotesReducer,
 });
