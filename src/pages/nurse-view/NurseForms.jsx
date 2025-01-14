@@ -5,6 +5,7 @@ import SuicidalForm from "./nurse-forms/SuicidalForm"
 import MentalStateExaminationForm from "./nurse-forms/MentalStateExaminationForm"
 import DietaryIntakeForm from "./nurse-forms/DietaryIntakeForm"
 import JacksonVisualForm from "./nurse-forms/JacksonVisualForm"
+import BriefMentalStateExaminationForm from "./nurse-forms/BriefMentalStateExaminationForm"
 
 const NurseForms = () => {
     
@@ -20,6 +21,9 @@ const NurseForms = () => {
                 break
             case 'MSE Status Level Checklist':
                 setSelectedItem(<MentalStateExaminationForm />)
+                break
+            case 'Brief MSE Form':
+                setSelectedItem(<BriefMentalStateExaminationForm />)
                 break
             case 'Dietary Intake Form':
                 setSelectedItem(<DietaryIntakeForm />)
@@ -39,6 +43,7 @@ const NurseForms = () => {
                     'Visitor List',
                     'Suicidal Form',
                     'MSE Status Level Checklist',
+                    'Brief MSE Form',
                     'Dietary Intake Form',
                     'Jackson Visual Form'
                 ].map((item, index) => (

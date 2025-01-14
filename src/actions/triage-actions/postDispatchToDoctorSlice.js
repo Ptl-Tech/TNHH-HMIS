@@ -20,6 +20,8 @@ export const postDispatchToDoctorSlice = (dispatchToDoctor) => async (dispatch, 
             config
         );
 
+        console.log('data from the API', data);
+
         dispatch({ type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: data });
  
         return { type: POST_DISPATCH_TO_DOCTOR_SUCCESS, payload: data };

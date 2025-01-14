@@ -12,7 +12,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
     const { loadingColorCode, colorCode } = useSelector((state) => state.getQyUrgencyColorCodingSetup);
     const { loadingDispatchToDoctor } = useSelector((state)=> state.dispatchToDoctor);
    
-    const handleOnFinish = (values) => {
+    const handleOnFinish = async (values) => {
         const dispatchData = {
             observationNo,
             staffNo,
@@ -20,17 +20,21 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             tcaStatusRemarks: values.urgencyStatus,
             observationRemark: values.remarks,
         }
-    
         
-        const result = dispatch(postDispatchToDoctorSlice(dispatchData))
-        if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
-            message.success(result?.payload?.status || 'Dispatch to doctor successful');
-            setIsDispatchFormVisible(false);
-            form.resetFields()
-        }else if(result.type === POST_DISPATCH_TO_DOCTOR_FAIL){
-            message.error(result?.payload?.status || 'Dispatch to doctor failed');
-            setIsDispatchFormVisible(false);
+        try{
+            const result = await dispatch(postDispatchToDoctorSlice(dispatchData))
+            if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
+                message.success(result?.payload?.status || 'Dispatch to doctor successful');
+                setIsDispatchFormVisible(false);
+                form.resetFields()
+            }else if(result.type === POST_DISPATCH_TO_DOCTOR_FAIL){
+                message.error(result?.payload?.status || 'Dispatch to doctor failed');
+                setIsDispatchFormVisible(false);
+            }
+        }catch(error){
+           message.error(error?.message || 'Dispatch to doctor failed');
         }
+        
         
     }
 
