@@ -207,11 +207,11 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
         >
           {
             role === 'Doctor' && (
-                <>
+                <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
                     <Button
                     type="primary"
                     onClick={() => handleMarkAsCompleted(observationNo)}
-                    // style={{ width: "100%", marginBottom: "10px" }}
+                    style={{ width: "100%", marginBottom: "10px" }}
                     >
                     Mark as Completed
                     </Button>
@@ -222,14 +222,14 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
                     >
                     Request Patient Review
                     </Button>
-                    <Button
+                    {/* <Button
                     type="primary"
                     // style={{ marginTop: "10px", width: "100%" }}
                     onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
                     >
                     Print Interim Invoice
-                    </Button>
-                </>
+                    </Button> */}
+                </div>
             )
           }
           

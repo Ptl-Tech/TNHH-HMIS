@@ -20,7 +20,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
         <>
           <Form.Item
             name="1"
-            label="Chief Complaints (Pt own words and duration)"
+            label="Chief Complaints (Put own words and duration)"
             rules={[
               {
                 required: true,
@@ -38,7 +38,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
             label="Allegations (from others who brought the patient)"
             rules={[
               {
-                required: true,
+                required: false,
                 message: "Please enter allegations!",
               },
             ]}
@@ -74,41 +74,41 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       ),
       notesType: "3",
     },
+    // {
+    //   key: "3",
+    //   title: "Risk & Medical History",
+    //   content: (
+    //     <>
+    //       <Form.Item
+    //         name="5"
+    //         label="Risk History"
+    //         rules={[
+    //           {
+    //             required: true,
+    //             message: "Please enter the risk history!",
+    //           },
+    //         ]}
+    //       >
+    //         <TextArea
+    //           placeholder="Enter risk history..."
+    //           autoSize={{ minRows: 3 }}
+    //         />
+    //       </Form.Item>
+    //       <Form.Item name="6" label="Past Psychiatric & Medical History">
+    //         <TextArea
+    //           placeholder="Enter psychiatric and medical history..."
+    //           autoSize={{ minRows: 3 }}
+    //         />
+    //       </Form.Item>
+    //       <Form.Item name="substanceUse" valuePropName="checked">
+    //         <Checkbox>History of substance use</Checkbox>
+    //       </Form.Item>
+    //     </>
+    //   ),
+    //   notesType: "4",
+    // },
     {
       key: "3",
-      title: "Risk & Medical History",
-      content: (
-        <>
-          <Form.Item
-            name="5"
-            label="Risk History"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the risk history!",
-              },
-            ]}
-          >
-            <TextArea
-              placeholder="Enter risk history..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-          <Form.Item name="6" label="Past Psychiatric & Medical History">
-            <TextArea
-              placeholder="Enter psychiatric and medical history..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-          <Form.Item name="substanceUse" valuePropName="checked">
-            <Checkbox>History of substance use</Checkbox>
-          </Form.Item>
-        </>
-      ),
-      notesType: "4",
-    },
-    {
-      key: "4",
       title: "Family & Personal History",
       content: (
         <>
@@ -129,7 +129,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       notesType: "6",
     },
     {
-      key: "5",
+      key: "4",
       title: "Forensic & Premorbid Personality",
       content: (
         <>
