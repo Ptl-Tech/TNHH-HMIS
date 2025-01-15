@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Steps, Form, Input, Checkbox, Typography, message } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 
@@ -8,6 +8,7 @@ const { TextArea } = Input;
 const { Step } = Steps;
 
 const PatientSigns = ({ treatmentNo, patientNo }) => {
+  const{loading:saveNotesLoading}=useSelector(state=>state.postPatientHistory)
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -251,12 +252,12 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
             </Button>
           )}
           {currentStep < steps.length - 1 && (
-            <Button type="primary" onClick={handleNext}>
+            <Button type="primary" loading={saveNotesLoading} onClick={handleNext}>
               Next
             </Button>
           )}
           {currentStep === steps.length - 1 && (
-            <Button type="primary" onClick={handleNext}>
+            <Button type="primary" loading={saveNotesLoading} onClick={handleNext}>
               Submit
             </Button>
           )}
