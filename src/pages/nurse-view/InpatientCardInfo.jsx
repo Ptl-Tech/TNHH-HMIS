@@ -4,13 +4,14 @@ import { LoadingOutlined } from '@ant-design/icons'
 
 
 const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList, loadingAllergies }) => {
+    console.log('patient details', patientDetails)
       
   return (
     <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
         <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689' }}>
             <div className="inpatient-details-container-1">
                 <Typography.Text className="patient-name">
-                    {patientDetails?.SearchName||'N/A' }
+                    {patientDetails?.SearchName|| patientDetails?.Names || 'N/A' }
                 </Typography.Text>
                 <Typography.Text className="patient-id">
                     Patient Number : {patientDetails?.PatientNo||'N/A' }

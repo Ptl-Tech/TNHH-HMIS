@@ -34,6 +34,8 @@ const Impatient = () => {
   const filterInPatients =
     allPatientLList?.filter((item) => item.Inpatient === true) || [];
 
+    console.log('inpatient', filterInPatients)
+
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       

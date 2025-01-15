@@ -1,13 +1,12 @@
-import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
+import { Button, Col, Form, Input, message, Row, Table } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { POST_TRIAGE_LIST_VITALS_FAIL, POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
+import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import { useEffect } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/updateTriageListVitalsSlice';
-import { render } from 'react-dom';
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
 
