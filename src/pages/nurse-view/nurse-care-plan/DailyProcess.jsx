@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
 import { useLocation } from "react-router-dom";
 import DailyProcessFormData from "../nurse-forms/DailyProcessFormData";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const DailyProcess = () => {
       const { patientDetails } = useLocation().state;
@@ -31,12 +32,8 @@ const DailyProcess = () => {
       
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Daily Process / Procedures
-          </Typography.Text>
-        </Space>
+        
+        <NurseInnerHeader title='Nursing Rounds' />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility}><PlusOutlined /> Add Daily Process</Button>

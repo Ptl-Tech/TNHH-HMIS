@@ -15,13 +15,6 @@ import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWait
 
 const TriageList = () => {
   
-  const [searchParams, setSearchParams] = useState({
-    name: "",
-    patientNo: "",
-    observationNo: "",
-  });
-
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -33,7 +26,6 @@ const TriageList = () => {
   
   const openTriageList = triageList.filter((item) => item.Status === 'New');
 
-
   const formattedTriageWaitingList = triageWaitingList.map(patient => {
     return {
         PatientNo: patient.PatientNo,
@@ -41,141 +33,71 @@ const TriageList = () => {
     }
   });
 
-  const combinedList = openTriageList.map(room => {
-    // Find the matching patient in the formattedTriageWaitingList
+    const combinedList = openTriageList.map(room => {
     const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
 
-    // Combine room data with the matching patient's data
     return {
-        ...room, // Include all fields from the room object
+        ...room, 
         PatientNo: room.PatientNo,
         SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
     };
   });
-  
-  const location = useLocation();
-   //get the current location path
+
+   const location = useLocation();
    const currentPath = location.pathname;
 
   function handleNavigate(patientId, observationNo) {
     dispatch(postCheckInPatientSlice({observationNo})).then((data)=>{
       if(data?.status === 'success'){
-        message.success(data?.status);
+        message.success('Patient checked in successfully in the triage room');
         navigate(`/Nurse/Triage/Patient?Patient_id=${patientId}&Ob_number=${observationNo}`);
       }else{
         message.error('An error occurred, please try again')
       }
     })
   }
-
-
-//extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = combinedList.map((item, index) => ({
-    key: index + 1,
-    // name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
-    observationTime: item?.ObservationTime,
-    name: item?.SearchName || ``,
-    // sex: item?.Gender,
-    number: item?.PatientNo || '',
-    observationNo: item?.ObservationNo || '',
-  })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
-
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);  
-
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
-    total: filteredPatients.length,
+    total: combinedList.length,
 });
 
 const handleTableChange = (newPagination) => {
     setPagination(newPagination); // Update pagination settings
 };
 
-const paginatedData = filteredPatients.slice(
-    (pagination.current - 1) * pagination.pageSize,
-    pagination.current * pagination.pageSize
-);
-
-  const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    handleFilterPatients({ ...searchParams, [field]: value });
-  };
-
-
-
-  const handleFilterPatients = () => {
-    // Check if any search input has a value
-    const isSearching = Object.values(searchParams).some((value) => value.trim() !== "");
-  
-    if (isSearching) {
-      // Filter only when there's input
-      const filtered = waitingListTableDataSource.filter((patient) => {
-        const name = patient.name?.toLowerCase() || ""; // Handle undefined values
-        const observationNo = patient.observationNo?.toLowerCase() || "";
-        const number = patient.number?.toString() || "";
-  
-        return (
-          name.includes(searchParams.name.toLowerCase()) &&
-          observationNo.includes(searchParams.observationNo.toLowerCase()) &&
-          number.includes(searchParams.patientNo.toLowerCase())
-        );
-      });
-  
-      setFilteredPatients(filtered);
-    } else {
-      // Show all records when no search criteria are provided
-      setFilteredPatients(waitingListTableDataSource);
-    }
-  };
-
   useEffect(() => {
-    if (!triageList?.length) {
         dispatch(getTriageList());
-    }
-}, [triageList, dispatch]);
+}, [dispatch]);
 
 
   useEffect(() => {
-          
-      if(!triageWaitingList?.length) {
-          dispatch(getTriageWaitingList());
-      }
-  }, [dispatch, triageWaitingList.length]);
+      dispatch(getTriageWaitingList());
+  }, [dispatch]);
 
   const waitingListColumns = [
     {
-      title: '#',
-      dataIndex: 'key',
-      rowScope: 'row',
-    },
-    {
       title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
+      dataIndex: 'ObservationNo',
+      key: 'ObservationNo',
     },
     {
       title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
     },
     {
       title: 'Patient Name',
-      dataIndex: 'name',
-      rowScope: 'row',
+      dataIndex: 'SearchName',
+      key: 'SearchName',
       filterSearch: true, // Enable search
       filters: [
-        ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
+        ...new Set(combinedList.map((item) => ({ text: item.SearchName, value: item.SearchName }))),
       ],
-      onFilter: (value, record) => record.name.includes(value),
+      onFilter: (value, record) => record.SearchName.includes(value),
       filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
       render: (name, record) => (
-        <div style={{ color: getColorByWaitingTime(record.observationTime) }}>
+        <div style={{ color: getColorByWaitingTime(record.ObservationTime) }}>
           {name}
         </div>
       )
@@ -183,57 +105,48 @@ const paginatedData = filteredPatients.slice(
     
     {
       title: 'Observation Date',
-      dataIndex: 'regDate',
-      rowScope: 'row',
+      dataIndex: 'ObservationDate',
+      key: 'ObservationDate',
     },
 
     {
       title: 'Waiting Time',
-      dataIndex: 'observationTime',
-      rowScope: 'row',
+      dataIndex: 'ObservationTime',
+      key: 'ObservationTime',
       render: (_, record) => {
-        const combinedDateTime = `${record.regDate}T${record.observationTime}`;
+        const combinedDateTime = `${record.ObservationDate}T${record.ObservationTime}`;
         const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute'); // Calculate elapsed time in minutes
 
-        return <div style={{ color: getColorByWaitingTime(record.observationTime) }}>{formatElapsedTime(elapsedMinutes)}</div>;
+        return <div style={{ color: getColorByWaitingTime(elapsedMinutes) }}>{formatElapsedTime(elapsedMinutes)}</div>;
     },
     },
     
     {
       title: 'Check In',
       dataIndex: 'checkIn',
-      rowScope: 'row',
+      key: 'checkIn',
       width: 200,
-      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record?.number, record?.observationNo)}><CheckOutlined />Check In</Button>
+      render: (_, record) => <Button type='primary' onClick={()=>handleNavigate(record?.PatientNo, record?.ObservationNo)}><CheckOutlined />Check In</Button>
     },
   ];
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} openTriageList={openTriageList}/>
+          <TriageSummeryCard waitingPatient={combinedList} currentPath={currentPath} openTriageList={openTriageList}/>
          
 
           <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
           <div className='admit-patient-filter-container'>
                   <Search placeholder="search by name" 
                       allowClear
-                      value={searchParams.name}
-                      onChange={(e) => handleSearchChange(e, "name")}
-                      onSearch={handleFilterPatients}
                   />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>or</span>
                   <Search placeholder="search by patient no" 
                       allowClear
-                      value={searchParams.patientNo}
-                      onChange={(e) => handleSearchChange(e, "patientNo")}
-                      onSearch={handleFilterPatients}
                   />
                   <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
                   <Search placeholder="search by observation no" 
                       allowClear
-                      value={searchParams.idNumber}
-                      onChange={(e) => handleSearchChange(e, "observationNo")}
-                      onSearch={handleFilterPatients}
                   />
               </div>
               </Card>
@@ -247,7 +160,7 @@ const paginatedData = filteredPatients.slice(
             :
             (
                 <Table columns={waitingListColumns} 
-                dataSource={filteredPatients} 
+                dataSource={combinedList} 
                 bordered size='middle' 
                 pagination={{
                   ...pagination,

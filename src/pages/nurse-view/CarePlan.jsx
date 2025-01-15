@@ -23,7 +23,7 @@ const CarePlan = () => {
         case 'Vitals':
             setSelectedItem(<Vitals />)
             break
-        case 'Daily Process / Procedures':
+        case 'Nursing Rounds':
             setSelectedItem(<DailyProcess />)
             break
         case 'Injections':
@@ -59,7 +59,7 @@ const CarePlan = () => {
                 [
                     'Allergies',
                     'Vitals',
-                    role === 'Doctor' ? 'Daily Ward Rounds Notes' : 'Daily Process / Procedures',
+                    role === 'Doctor' ? 'Daily Ward Rounds Notes' : 'Nursing Rounds',
                     'Injections',
                     'Diagnosis',
                     'Prescription',
