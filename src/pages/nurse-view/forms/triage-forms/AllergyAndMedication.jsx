@@ -18,12 +18,6 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
         dispatch(getAllergiesAndMedicationsSlice(observationNumber));
       }, [dispatch, observationNumber]);
 
-    const cleanValue = (value) => {
-        if (typeof value === "string") {
-          return value.replace(/[^\d.-]/g, "");
-        }
-        return value;
-      };
     const onFinish = (values) =>{
         const { complains, foodAllergy, drugAllergy } = values.allergy;
         const createAllergyAndMedicationData = {
@@ -39,16 +33,15 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
           };
 
           dispatch(postAllergiesMedicationSlice(createAllergyAndMedicationData)).then((data)=>{
-            console.log('data', createAllergyAndMedicationData);
             if(data?.status === "success"){
               message.success(data?.status);
               dispatch(getAllergiesAndMedicationsSlice(observationNumber));
             }else if(data?.status === "error"){
-              message.error(data?.status);
+              message.error(data?.status || "Failed to save allergy and medication");
             }
           })
 
-            dispatch(getAllergiesAndMedicationsSlice(observationNumber));
+         dispatch(getAllergiesAndMedicationsSlice(observationNumber));
 
     }
 

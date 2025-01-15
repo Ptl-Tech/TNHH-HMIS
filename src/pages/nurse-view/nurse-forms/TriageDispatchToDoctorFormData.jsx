@@ -26,7 +26,6 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
                 message.success(result?.payload?.status || 'Dispatch to doctor successful');
                 setIsDispatchFormVisible(false);
-                form.resetFields()
             }else if(result.type === POST_DISPATCH_TO_DOCTOR_FAIL){
                 message.error(result?.payload?.status || 'Dispatch to doctor failed');
                 setIsDispatchFormVisible(false);
