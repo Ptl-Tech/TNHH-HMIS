@@ -1,22 +1,24 @@
-import { Button, Card, message, Table } from 'antd'
+import { Button, message, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TriageSummeryCard from './TriageSummeryCard';
-import { SearchOutlined } from '@ant-design/icons';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
 import { CheckOutlined } from '@ant-design/icons';
 import { postCheckInPatientSlice } from '../../actions/triage-actions/postCheckInPatientSlice';
 import { formatElapsedTime, getColorByWaitingTime } from '../../utils/helpers';
 import dayjs from 'dayjs';
-import Search from 'antd/es/transfer/search';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
+import FilterTriageList from '../../partials/nurse-partials/FilterTriageList';
 
 const TriageList = () => {
   
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchObservationNumber, setSearchObservationNumber] = useState('')
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
   // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
@@ -80,22 +82,25 @@ const handleTableChange = (newPagination) => {
       title: 'Observation No',
       dataIndex: 'ObservationNo',
       key: 'ObservationNo',
+      filteredValue: searchObservationNumber ? [searchObservationNumber] : null,
+      onFilter: (value, record) =>
+      record.ObservationNo.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: 'Patient Number',
       dataIndex: 'PatientNo',
       key: 'PatientNo',
+      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+      onFilter: (value, record) =>
+      record.PatientNo.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: 'Patient Name',
       dataIndex: 'SearchName',
       key: 'SearchName',
-      filterSearch: true, // Enable search
-      filters: [
-        ...new Set(combinedList.map((item) => ({ text: item.SearchName, value: item.SearchName }))),
-      ],
-      onFilter: (value, record) => record.SearchName.includes(value),
-      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
+      filteredValue: searchName ? [searchName] : null,
+      onFilter: (value, record) =>
+        record.SearchName.toLowerCase().includes(value.toLowerCase()),
       render: (name, record) => (
         <div style={{ color: getColorByWaitingTime(record.ObservationTime) }}>
           {name}
@@ -135,21 +140,7 @@ const handleTableChange = (newPagination) => {
           <TriageSummeryCard waitingPatient={combinedList} currentPath={currentPath} openTriageList={openTriageList}/>
          
 
-          <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
-          <div className='admit-patient-filter-container'>
-                  <Search placeholder="search by name" 
-                      allowClear
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>or</span>
-                  <Search placeholder="search by patient no" 
-                      allowClear
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Search placeholder="search by observation no" 
-                      allowClear
-                  />
-              </div>
-              </Card>
+          <FilterTriageList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchObservationNumber={setSearchObservationNumber}/>
           
 
           {

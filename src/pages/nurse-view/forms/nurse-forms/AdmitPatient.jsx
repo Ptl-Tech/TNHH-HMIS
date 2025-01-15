@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { POST_ADMISSION_FORM_DETAILS_FAILURE, POST_ADMISSION_FORM_DETAILS_SUCCESS, postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
-import { POST_PATIENT_ADMISSION_FAIL, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
+import { postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
 import { useGetWardManagementHook } from "../../../../hooks/useGetWardManagementHook";
 
 const AdmitPatientForm = () => {
@@ -12,6 +12,8 @@ const AdmitPatientForm = () => {
   const location = useLocation();
   const patientDetails = location.state?.patientDetails || {};
   const dispatch = useDispatch();
+
+  console.log('patient details', patientDetails)
 
   const {getBeds, loadingWards, getWards, loadingAdmissionDetails, wardRooms } = useGetWardManagementHook();
 
@@ -40,6 +42,8 @@ const AdmitPatientForm = () => {
     const filteredBeds = selectedRoom
     ? getBeds.filter((bed) => bed.Room_No === selectedRoom)
     : [];
+
+    const freeBeds = filteredBeds ? filteredBeds.filter((bed)=> bed.Occupied == false) : []
 
     const handleWardChange = (value) => {
       setSelectedWard(value);
@@ -81,7 +85,6 @@ const AdmitPatientForm = () => {
 
     try{
       const result = await dispatch(postAdmissionFormDetailsSlice((formData)));
-      console.log('Admission Form Details:', result);
       if(result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS){
         setResetMessage(result.payload.message || 'Admission Form Details Submitted Successfully')
         setAlertType('success');
@@ -105,7 +108,7 @@ const AdmitPatientForm = () => {
       cancelText: 'No',
       onOk(){
           return new Promise((resolve, reject) => {
-              handleAdmitPatientAction()
+              handleAdmitPatientAction(patientDetails)
               .then(resolve) // Resolve the modal when successful
               .catch(reject); // Reject on failure
           });
@@ -113,17 +116,19 @@ const AdmitPatientForm = () => {
   })
   }
 
-  const handleAdmitPatientAction = async () => {
+  const handleAdmitPatientAction = async (patientDetails) => {
+    console.log('patient details when button clicked', patientDetails)
     try{
-      const result = await dispatch(postPatientAdmission({admissionNo: patientDetails?.No}));
-      if(result.type === POST_PATIENT_ADMISSION_SUCCESS){
-        setAlertType(result.payload.message || 'Patient Admitted Successfully')
-        setAlertType('success');
-        form.resetFields();
-      }else if(result.type === POST_PATIENT_ADMISSION_FAIL){
-        setResetMessage(result.payload.message || 'Patient Admission Failed')
-        setAlertType('error');
-      }
+     await dispatch(postPatientAdmission({admissionNo: patientDetails?.No})).then((data)=>{
+       if(data){
+        message.success('Patient admitted successfully')
+        navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${patientDetails?.PatientNo}&AdmNo=${patientDetails?.CurrentAdmNo}`, {
+          state: { patientDetails: patientDetails },
+        });
+       }else{
+        message.error('Patient admission failed')
+       }
+     })
     }catch(error){
       message.error(error.message || 'Unexpected error occurred');
       setResetMessage(error.message || 'Unexpected error occurred')
@@ -257,7 +262,7 @@ const AdmitPatientForm = () => {
                   value={selectedBed}
                   onChange={handleBedChange} // Handle bed selection
                   disabled={!selectedRoom} // Disable if no room is selected
-                  options={filteredBeds?.map((bed) => ({
+                  options={freeBeds?.map((bed) => ({
                     value: bed.BedNo,
                     label: bed.BedName,
                   }))
