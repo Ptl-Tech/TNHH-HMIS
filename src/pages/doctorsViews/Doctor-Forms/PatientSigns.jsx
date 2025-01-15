@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Steps, Form, Input, Checkbox, Typography, message } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
+import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import { useMemo } from "react";
+
 
 const { TextArea } = Input;
 const { Step } = Steps;
@@ -11,6 +14,34 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+
+  const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+
+  console.log('patient No:', patientNo)
+
+  useEffect(() => {
+    if (patientNo) {
+      dispatch(getPatientHistorySlice(patientNo));
+    }
+  }, [dispatch, patientNo]);
+
+  const initialValues = useMemo(() => ({
+    1: data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)?.Notes || "",
+    2: data.filter((note) => note.Notes_Type === "Allegations").at(-1)?.Notes || "",
+    4: data.filter((note) => note.Notes_Type === "History of Presenting Complaint").at(-1)?.Notes || "",
+    5: data.filter((note) => note.Notes_Type === "Family History").at(-1)?.Notes || "",
+    6: data.filter((note) => note.Notes_Type === "4").at(-1)?.Notes || "",
+    substanceUse: data.filter((note) => note.Notes_Type === "4").at(-1)?.Notes || "",
+    7: data.filter((note) => note.Notes_Type === "Family History").at(-1)?.Notes || "",
+    personalHistory: data.filter((note) => note.Notes_Type === "Personal History").at(-1)?.Notes || "",
+    8: data.filter((note) => note.Notes_Type === "Forensic History").at(-1)?.Notes || "",
+    9: data.filter((note) => note.Notes_Type === "Premorbid Personality").at(-1)?.Notes || "",
+  }), [data]);
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
+
 
   const steps = [
     {
@@ -154,9 +185,9 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     try {
       const values = await form.validateFields(); // Validate form fields
       const currentStepData = steps[currentStep];
-  
+
       const notesArray = [];
-  
+
       if (currentStepData.key === "1") {
         if (values["1"]) {
           notesArray.push({
@@ -168,7 +199,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
             patientNo: patientNo,
           });
         }
-  
+
         if (values["2"]) {
           notesArray.push({
             myAction: "create",
@@ -194,14 +225,14 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
           }
         });
       }
-  
+
       const nonEmptyNotes = notesArray.filter((note) => note.notes.trim() !== "");
-  
+
       if (nonEmptyNotes.length > 0) {
         const results = await Promise.all(
           nonEmptyNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
         );
-  
+
         const allSuccess = results.every((status) => status === "success");
         if (allSuccess) {
           message.success("Notes Saved Successfully!");
@@ -209,7 +240,77 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
           message.error("Failed to complete some notes. Please try again.");
         }
       }
-  
+
+      if (currentStep < steps.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        // form.resetFields();
+        setCurrentStep(0);
+      }
+    } catch (error) {
+      console.error("Validation failed:", error);
+    }
+  };
+  /* const handleFinal = async () => {
+    try {
+      const values = await form.validateFields(); // Validate form fields
+      const currentStepData = steps[currentStep];
+
+      const notesArray = [];
+
+      if (currentStepData.key === "1") {
+        if (values["1"]) {
+          notesArray.push({
+            myAction: "create",
+            recId: "",
+            notesType: "1",
+            notes: values["1"],
+            treatmentNo: treatmentNo,
+            patientNo: patientNo,
+          });
+        }
+
+        if (values["2"]) {
+          notesArray.push({
+            myAction: "create",
+            recId: "",
+            notesType: "2",
+            notes: values["2"],
+            treatmentNo: treatmentNo,
+            patientNo: patientNo,
+          });
+        }
+      } else {
+        const fieldNames = Object.keys(values);
+        fieldNames.forEach((fieldName) => {
+          if (values[fieldName]) {
+            notesArray.push({
+              myAction: "create",
+              recId: "",
+              notesType: currentStepData.notesType,
+              notes: values[fieldName],
+              treatmentNo: treatmentNo,
+              patientNo: patientNo,
+            });
+          }
+        });
+      }
+
+      const nonEmptyNotes = notesArray.filter((note) => note.notes.trim() !== "");
+
+      if (nonEmptyNotes.length > 0) {
+        const results = await Promise.all(
+          nonEmptyNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
+        );
+
+        const allSuccess = results.every((status) => status === "success");
+        if (allSuccess) {
+          message.success("Notes Saved Successfully!");
+        } else {
+          message.error("Failed to complete some notes. Please try again.");
+        }
+      }
+
       if (currentStep < steps.length - 1) {
         setCurrentStep((prev) => prev + 1);
       } else {
@@ -219,8 +320,8 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     } catch (error) {
       console.error("Validation failed:", error);
     }
-  };
-  
+  }; */
+
   const handlePrev = () => {
     setCurrentStep((prev) => prev - 1);
   };

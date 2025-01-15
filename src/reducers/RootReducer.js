@@ -186,6 +186,7 @@ import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer"
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
 import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
+import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -339,4 +340,5 @@ export const rootReducer = combineReducers({
   getBillingList:getBillingListReducer,
   postVisitorList:postVisitorListReducer,
   postPatientHistory:postPatientHistoryNotesReducer,
+  getPatientHistoryNotesReducer:getPatientHistoryNotes,
 });
