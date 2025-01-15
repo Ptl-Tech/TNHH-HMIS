@@ -1,7 +1,6 @@
 import { Button, Col, Form, message, Row, Select } from "antd"
 import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
-import { getVitalsLinesSlice } from "../../../actions/triage-actions/getVitalsLinesSlice";
 import PropTypes from "prop-types";
 import { POST_DISPATCH_TO_DOCTOR_FAIL, POST_DISPATCH_TO_DOCTOR_SUCCESS, postDispatchToDoctorSlice } from "../../../actions/triage-actions/postDispatchToDoctorSlice";
 import { useEffect } from "react";
@@ -13,7 +12,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
     const { loadingColorCode, colorCode } = useSelector((state) => state.getQyUrgencyColorCodingSetup);
     const { loadingDispatchToDoctor } = useSelector((state)=> state.dispatchToDoctor);
    
-    const handleOnFinish = (values) => {
+    const handleOnFinish = async (values) => {
         const dispatchData = {
             observationNo,
             staffNo,
@@ -21,22 +20,21 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             tcaStatusRemarks: values.urgencyStatus,
             observationRemark: values.remarks,
         }
-        dispatch(getVitalsLinesSlice({observationNo})).then((data)=>{
-            if(Object.keys(data).length > 0){
-                const result = dispatch(postDispatchToDoctorSlice(dispatchData))
-                if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
-                    message.success(result?.payload?.message || 'Dispatch to doctor successful');
-                    setIsDispatchFormVisible(false);
-                    form.resetFields()
-                }else if(POST_DISPATCH_TO_DOCTOR_FAIL){
-                    message.error(result?.payload?.message || 'Dispatch to doctor failed');
-                    setIsDispatchFormVisible(false);
-                }
-                
-            }else{
-              message.error('Please add vitals before dispatching to doctor');
+        
+        try{
+            const result = await dispatch(postDispatchToDoctorSlice(dispatchData))
+            if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
+                message.success(result?.payload?.status || 'Dispatch to doctor successful');
+                setIsDispatchFormVisible(false);
+            }else if(result.type === POST_DISPATCH_TO_DOCTOR_FAIL){
+                message.error(result?.payload?.status || 'Dispatch to doctor failed');
+                setIsDispatchFormVisible(false);
             }
-          });
+        }catch(error){
+           message.error(error?.message || 'Dispatch to doctor failed');
+        }
+        
+        
     }
 
     useEffect(() => {

@@ -24,7 +24,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
       case "Patient History Notes":
         setSelectedItem(<PatientSigns treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-      case  "Mental Systemic Examination Form":
+      case  "Mental Status Exam ":
         setSelectedItem(<PatientSymptoms treatmentNo={treatmentNo} />);
         break;
       case "Diagnosis Formulation":
@@ -50,7 +50,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
   // Button items array to map through
   const buttonItems = [
     { label: "Patient History Notes", icon: <SolutionOutlined /> },
-    { label: "Mental Systemic Examination Form", icon: <SolutionOutlined /> },
+    { label:"Mental Status Exam ", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     { label: "Doctor Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },

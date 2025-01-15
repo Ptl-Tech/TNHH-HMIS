@@ -1,5 +1,5 @@
-import { Button, Form, message, Space, Typography } from "antd";
-import { ProfileOutlined, PlusOutlined, EyeOutlined, SaveOutlined } from "@ant-design/icons";
+import { Button, Form, message } from "antd";
+import { PlusOutlined, EyeOutlined, SaveOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,7 @@ import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { stateToHTML } from 'draft-js-export-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 
 const NursingNotes = () => {
@@ -37,7 +38,7 @@ const NursingNotes = () => {
             patientDetails,
         },
     });
-};
+  };
   const handleVitalsButtonVisibility = () => {
     setIsVitalFormVisible(!isVitalFormVisible);
   }
@@ -100,15 +101,9 @@ const handleOnFinish = async () => {
 
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative' }}>
-        <ProfileOutlined />
-        <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px' }}>
-          Nursing Notes
-        </Typography.Text>
-      </Space>
-
+      
+      <NurseInnerHeader title="Nursing Notes" />
     
-
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px' }}>
         {/* Conditionally render buttons based on role */}
         {role == 'Nurse' && (
@@ -144,7 +139,7 @@ const handleOnFinish = async () => {
       </div>
       {
         isVitalFormVisible && ( 
-          <Form
+      <Form
 
         layout="vertical" 
         style={{ paddingTop: '10px'}} 

@@ -24,8 +24,14 @@ const Dashboard = () => {
   
 
   const {triageList} = useSelector((state) => state.getTriageList) || {};
-  const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
-  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
+  const openTriageList = Array.isArray(triageList)
+    ? triageList.filter((item) => item.Status === 'New')
+    : [];
+    
+    const pendingTriageList = Array.isArray(triageList)
+    ? triageList.filter((item) => item.Status === 'Pending')
+    : [];
+
   const { allPatientLList } = useSelector((state) => state.getPatientList) || {};
 
   const filterInPatients = allPatientLList.filter((item)=>item.Inpatient===true) || {};

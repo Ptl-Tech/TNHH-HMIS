@@ -45,10 +45,9 @@ export const postPatientHistoryNotes = (historyNotes) => async (dispatch, getSta
 
     // Dispatch the success action with response data
     dispatch({ type: POST_PATIENT_HISTORY_NOTES_SUCCESS, payload: responseData });
-    message.success("Patient History Notes saved successfully!", 2);
 
     // Return relevant response data if needed
-    return responseData.data;
+    return responseData.status;
   } catch (error) {
     // Log the error for debugging
     console.error("Error posting Patient History Notes:", error);

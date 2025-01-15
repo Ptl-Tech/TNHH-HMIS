@@ -25,7 +25,7 @@ const ReadNurseNotes = () => {
         // Sanitize and render HTML safely
         const sanitizedHtml = DOMPurify.sanitize(notes);
         return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-    };
+        };
     
   return (
     <>

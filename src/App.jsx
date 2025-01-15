@@ -78,6 +78,7 @@ import ReadNurseNotes from "./pages/nurse-view/ReadNurseNotes";
 import ConsultationCard from "./pages/nurse-view/ConsultationCard";
 import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
+import ReadDoctorNotes from "./pages/ReadDoctorNotes";
 
 function App() {
   return (
@@ -121,6 +122,7 @@ function App() {
 
           <Route path="Consultation" element={<Admissions />} />
           <Route path="Consultation/Patient" element={<ConsultationCard />} />
+          <Route path="Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} />
           
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
@@ -255,8 +257,9 @@ function App() {
           />
           <Route path="/Doctor/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
           <Route path="/Doctor/Pharmacy-Card" element={<PharmacyCard />} />
-<Route path="/Doctor/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
-<Route path="/Doctor/Pharmacy-History" element={<PharmacyHistoryList />} />
+          <Route path="/Doctor/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
+          <Route path="/Doctor/Pharmacy-History" element={<PharmacyHistoryList />} />
+          <Route path="/Doctor/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>

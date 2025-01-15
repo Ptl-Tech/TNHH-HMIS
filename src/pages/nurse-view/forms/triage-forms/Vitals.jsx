@@ -1,12 +1,13 @@
 import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
+import { POST_TRIAGE_LIST_VITALS_FAIL, POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import { useEffect } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/updateTriageListVitalsSlice';
+import { render } from 'react-dom';
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
 
@@ -16,20 +17,19 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
   
-  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
+  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate,  BMI, LineNo} = vitalsLines;
+
+  console.log('vital lines', vitalsLines);
   
   useEffect(() => {
-    if (!vitalsLines.length) {
       dispatch(getVitalsLinesSlice(observationNumber));
-    }
-  }, [dispatch, observationNumber, vitalsLines.length]);
+  }, [dispatch, observationNumber]);
 
   useEffect(() => {
     if (vitalsLines) {
       form.setFieldsValue({
         vitals: {
           pulseRate: PulseRate || '',
-          pain: Pain || '',
           height: Height || '',
           weight: Weight || '',
           temperature: Temperature || '',
@@ -39,6 +39,8 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           bmi: BMI ? BMI.toFixed(2) : "0.0",
         },
       });
+    }else{
+      form.resetFields();
     }
     }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
   
@@ -47,7 +49,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
       try {
         const {
           pulseRate,
-          pain,
           height,
           weight,
           temperature,
@@ -59,7 +60,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
         // Transform values
         const transformedValues = {
           pulseRate,
-          pain: parseInt(cleanValue(pain)),
           height: parseFloat(cleanValue(height)),
           weight: parseFloat(cleanValue(weight)),
           temperature: parseFloat(cleanValue(temperature)),
@@ -88,6 +88,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
     
           await dispatch(updateTriageListVitalsSlice(updateVitals));
           message.success("Successfully updated vitals");
+          dispatch(getVitalsLinesSlice(observationNumber));
         } else {
           // Create vitals
           const createVitals = {
@@ -96,20 +97,19 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             myAction: "create",
           };
     
-          const response = await dispatch(postTriageListVitalsSlice(createVitals));
-          if (response?.status === "success") {
-            message.success("Vitals successfully created");
-          } else {
-            message.error("Error saving vitals data");
-          }
+          await dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
+                if(data){
+                  message.success("Vitals successfully created");
+                  dispatch(getVitalsLinesSlice(observationNumber));
+                }else{
+                  message.error(data?.status || "Error saving vitals data");
+                }
+            })
         }
-    
-        // Reload vitals list after successful operation
-        dispatch(getVitalsLinesSlice(observationNumber));
+       
       } catch (error) {
         // Generic error handling
-        message.error("An error occurred while saving vitals data.");
-        console.error("Error saving vitals:", error);
+        message.error(error.message || "An error occurred while saving vitals data.");
       }
     };
     
@@ -143,46 +143,53 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
   const columns = [
     {
-      title: 'Pulse Rate',
-      dataIndex: 'pulseRate',
-      key: 'pulseRate',
+      title: 'Observation No',
+      dataIndex: 'ObservationNo',
+      key: 'ObservationNo',
     },
     {
-      title: 'Pain',
-      dataIndex: 'pain',
-      key: 'pain',
+      title: 'Pulse Rate',
+      dataIndex: 'PulseRate',
+      key: 'PulseRate',
     },
     {
       title: 'Height',
-      dataIndex: 'height',
-      key: 'height',
+      dataIndex: 'Height',
+      key: 'Height',
     },
     {
       title: 'Weight',
-      dataIndex: 'weight',
-      key: 'weight',
+      dataIndex: 'Weight',
+      key: 'Weight',
     },
     {
       title: 'Temperature',
-      dataIndex: 'temperature',
-      key: 'temperature',
+      dataIndex: 'Temperature',
+      key: 'Temperature',
+    },
+    {
+      title: 'Blood BloodPressure',
+      dataIndex: 'BloodPressure',
+      key: 'BloodPressure',
+    },
+    {
+      title: 'SP02',
+      dataIndex: 'SP02',
+      key: 'SP02',
+    },
+    {
+      title: 'Respiratory Rate',
+      dataIndex: 'RespirationRate',
+      key: 'RespirationRate',
+    },
+    {
+      title: 'BMI',
+      dataIndex: 'BMI',
+      key: 'BMI',
+      //render BMI in two decimal places
+      render: (text) => <span>{text ? text.toFixed(2) : "0.0"}</span>,
     },
 
-  ]
-
-  const dataSource = [
-    {
-      key: ObservationNo,
-      pulseRate: PulseRate,
-      pain: Pain,
-      height: Height,
-      weight: Weight,
-      temperature: Temperature,
-      bloodPreasure: BloodPressure,
-      sP02: SP02,
-      respirationRate: RespirationRate,
-      bmi: BMI,
-    }
   ]
 
   return (
@@ -206,7 +213,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               height: '',
               weight: '',
               respirationRate: '',
-              pain: 0,
               bmi: "0.0"
             },
             
@@ -451,33 +457,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Pain (Scale 0-10)" name={['vitals', 'pain']}
-                validationTrigger={['onBlur', 'onChange']}
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Please input pain level!' },
-                  {
-                    validator(_, value) {
-                      if (value >= 0 && value <= 10) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error('Pain level must be a scale of 0-10 !'));
-                    },
-                  },
-                ]}
-
-                >
-                
-                  <Input type='text' 
-                   
-                    placeholder='eg 1'
-              
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={24}>
               <Form.Item label="BMI" name={['vitals', 'bmi']}
               >
                 <Input type='text' 
@@ -489,18 +468,16 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
                 </Form.Item>
               </Col>
-            </Row>
-
-            <Col span={12}>
-                <Form.Item >
-                    <Button type="primary" loading={loading} htmlType="submit">
-                      <SaveOutlined />
-                      {
-                        vitalsLines && Object.keys(vitalsLines).length > 0 ? 'Update vitals' : 'Save vitals'
-                      }
-                    </Button>
-                </Form.Item>
-            </Col>
+            </Row> 
+            <Form.Item >
+                <Button type="primary" loading={loading} htmlType="submit">
+                  <SaveOutlined />
+                  {
+                    vitalsLines && Object.keys(vitalsLines).length > 0 ? 'Update vitals' : 'Save vitals'
+                  }
+                </Button>
+            </Form.Item>
+         
         </Form>
         
 
@@ -508,22 +485,9 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           vitalsLines && Object.keys(vitalsLines).length > 0 && 
           (
             <div style={{ marginTop: '10px' }}>
-            <Divider />
             <Table columns={columns} 
-            dataSource={dataSource} 
+            dataSource={Array.isArray(vitalsLines) ? vitalsLines : [vitalsLines]}
             pagination={false}
-            expandable={{
-              expandedRowRender: (record) => (
-                <p style={{ margin: 0 }}>
-
-                  Blood Preasure : {record.bloodPreasure}, 
-                  SP02 : {record.sP02}, 
-                  Respiration Rate : {record.respirationRate}, 
-                  BMI : {record.bmi.toFixed(2)}
-                </p>
-              ),
-              rowExpandable: (record) => record.name !== 'Not Expandable',
-            }}
             />
             </div>
           )

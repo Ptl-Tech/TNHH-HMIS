@@ -6,7 +6,8 @@ import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 
-const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo }) => {
+
+const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, role }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
 
@@ -204,27 +205,34 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo })
             marginTop: "40px",
           }}
         >
-          <Button
-            type="primary"
-            onClick={() => handleMarkAsCompleted(observationNo)}
-            // style={{ width: "100%", marginBottom: "10px" }}
-          >
-            Mark as Completed
-          </Button>
-          <Button
-            type="default"
-            onClick={() => handleTransferPatient(observationNo)}
-            style={{ width: "100%" }}
-          >
-            Request Patient Review
-          </Button>
-          <Button
-            type="primary"
-            // style={{ marginTop: "10px", width: "100%" }}
-            onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
-          >
-            Print Interim Invoice
-          </Button>
+          {
+            role === 'Doctor' && (
+                <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
+                    <Button
+                    type="primary"
+                    onClick={() => handleMarkAsCompleted(observationNo)}
+                    style={{ width: "100%", marginBottom: "10px" }}
+                    >
+                    Mark as Completed
+                    </Button>
+                    <Button
+                    type="default"
+                    onClick={() => handleTransferPatient(observationNo)}
+                    style={{ width: "100%" }}
+                    >
+                    Request Patient Review
+                    </Button>
+                    {/* <Button
+                    type="primary"
+                    // style={{ marginTop: "10px", width: "100%" }}
+                    onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
+                    >
+                    Print Interim Invoice
+                    </Button> */}
+                </div>
+            )
+          }
+          
         </div>
       </Card>
     </div>

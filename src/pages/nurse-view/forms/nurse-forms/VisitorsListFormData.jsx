@@ -53,7 +53,7 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
             loadingIpVisitors ? (
                 <Loading />
             ):(
-                <Form
+            <Form
             
             layout="vertical" 
             style={{ paddingTop: '10px'}} 

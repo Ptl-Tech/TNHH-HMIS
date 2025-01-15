@@ -79,11 +79,14 @@ const Admissions = () => {
     const navigate = useNavigate();
 
     const handleNavigate = (record) => {
-        console.log('records', record);
         if(userDetails.userData.departmentName === 'Nurse'){
          navigate(`/Nurse/Consultation/Patient?TreatmentNo=${record?.treatmentNo}`, {
            state: { patientDetails: record },
          });
+        }else{
+            navigate(`/Doctor/Consultation/Patient?TreatmentNo=${record?.treatmentNo}`, {
+                state: { patientDetails: record },
+            });
         }
        };
 

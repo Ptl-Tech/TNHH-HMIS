@@ -3,16 +3,14 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 
 export const getColorByWaitingTime = (observationDateTime) => {
-    const currentTime = dayjs(); // Current date-time
-    const observationTimeParsed = dayjs(observationDateTime); // Parse the observation date-time
-    const waitingTimeMinutes = currentTime.diff(observationTimeParsed, 'minute'); // Calculate the difference in minutes
+   
   
-    if (waitingTimeMinutes <= 60) {
+    if (observationDateTime <= 60) {
       return 'green';
-    } else if (waitingTimeMinutes <= 120) {
+    } else if (observationDateTime <= 120) {
       return 'orange';
     } else {
-      return 'red';
+      return '#0f5689';
     }
   };
   export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {

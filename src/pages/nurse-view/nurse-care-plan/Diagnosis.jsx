@@ -45,6 +45,7 @@ const Diagnosis = () => {
           };
   
           const handleViewPrescriptions = () => {
+            console.log(selectedRow[0]);
             if(selectedRow[0]){
               form.resetFields();
               form.setFieldsValue({
@@ -78,7 +79,7 @@ const Diagnosis = () => {
         </Space>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }}  onClick={handleViewPrescriptions}><FolderViewOutlined /> Add Admission Diagnosis</Button>
+          <Button type="primary" style={{ width: '100%' }}  onClick={handleViewPrescriptions}><FolderViewOutlined /> View Admission Diagnosis</Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewPrescriptions}><FolderViewOutlined /> Submit Final Diagnosis</Button>
         </div>
         

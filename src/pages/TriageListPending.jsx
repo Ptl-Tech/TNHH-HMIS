@@ -12,48 +12,58 @@ import { RightOutlined } from '@ant-design/icons';
 const TriageListPending = () => {
   const [filterWaitingListType, setFilterWaitingListType] = useState('');
   const [searchQueryWaitingList, setSearchQueryWaitingList] = useState('');
+  const [filteredWaitingList, setFilteredWaitingList] = useState([]);
+  
   const dispatch = useDispatch();
+  const { loadingTriageList, triageList } = useSelector((state) => state.getTriageList) || {};
 
-  const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
+  // Get pending triage list
+  const pendingTriageList = Array.isArray(triageList)
+    ? triageList.filter((item) => item.Status === 'Pending')
+    : [];
 
-  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
+  // Generate waitingListTableDataSource
+  const waitingListTableDataSource = pendingTriageList
+    .map((item, index) => ({
+      key: index + 1,
+      name: item?.Names || `Patient name here`,
+      regDate: item.ObservationDate,
+      number: item?.PatientNo,
+      idNumber: item?.IDNumber,
+      observationNo: item?.ObservationNo,
+    }))
+    .sort((a, b) => new Date(a.regDate) - new Date(b.regDate));
 
-//extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = pendingTriageList.map((item, index) => ({
-    key: index + 1,
-    name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
-    // age: item?.AgeinYears,
-    // sex: item?.Gender,
-    number: item?.PatientNo,
-    idNumber: item?.IDNumber,
-    observationNo: item?.ObservationNo,
-  })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
-
-
-
-  //filtering waitingListTableDataSource
-  const filterWaitingListTableDataSource = () =>{
-    if(filterWaitingListType !== '' && searchQueryWaitingList.trim !== ''){
+  // Update the filtered data whenever inputs change
+  useEffect(() => {
+    const filterData = () => {
+      if (filterWaitingListType !== '' && searchQueryWaitingList.trim() !== '') {
         return waitingListTableDataSource.filter((item) => {
-          if(filterWaitingListType === 'name'){
+          if (filterWaitingListType === 'name') {
             return item.name.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
           }
-          if(filterWaitingListType === 'idNumber'){
+          if (filterWaitingListType === 'idNumber') {
             return item.idNumber.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
           }
-          if(filterWaitingListType === 'patientNo'){
+          if (filterWaitingListType === 'patientNo') {
             return item.number.toLowerCase().includes(searchQueryWaitingList.toLowerCase());
           }
           return false;
-        })
-    }
-    return waitingListTableDataSource;
-  }
+        });
+      }
+      return waitingListTableDataSource;
+    };
+
+    setFilteredWaitingList(filterData());
+  }, [filterWaitingListType, searchQueryWaitingList, waitingListTableDataSource]);
+
   
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
+  }, [dispatch])
+
+  useEffect(() => {
     dispatch(getTriageList())
   }, [dispatch]);
 
@@ -67,7 +77,7 @@ const TriageListPending = () => {
       title: 'Patient Name',
       dataIndex: 'name',
       rowScope: 'row',
-      filterSearch: true, // Enable search
+      filterSearch: true,
       filters: [
         ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
       ],
@@ -89,16 +99,6 @@ const TriageListPending = () => {
       dataIndex: 'regDate',
       rowScope: 'row',
     },
-    // {
-    //   title: 'Age',
-    //   dataIndex: 'age',
-    //   rowScope: 'row',
-    // },
-    // {
-    //   title: 'Sex',
-    //   dataIndex: 'sex',
-    //   rowScope: 'row',
-    // },
     {
       title: 'Patient Number',
       dataIndex: 'number',
@@ -128,7 +128,7 @@ const TriageListPending = () => {
             :
             (
                 <Table columns={waitingListColumns} 
-                dataSource={filterWaitingListTableDataSource()} 
+                dataSource={filteredWaitingList} 
                 bordered size='middle' 
                 pagination={{
                   position: ['bottom','right'],

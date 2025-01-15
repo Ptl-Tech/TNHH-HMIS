@@ -49,7 +49,7 @@ const Impatient = () => {
           <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
             or
           </span>
-          <Input placeholder="search by id number" allowClear showCount />
+          <Input placeholder="search by admission number" allowClear showCount />
         </div>
       </Card>
 

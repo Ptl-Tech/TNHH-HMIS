@@ -486,7 +486,7 @@ const MainLayout = () => {
           color: "#67336d",
         }}
       >
-        HMIS @ {new Date().getFullYear()} Created by potestastechnologies
+        HMIS @ {new Date().getFullYear()} By Chiromo Hospital Group
       </Footer>
     </Layout>
   );

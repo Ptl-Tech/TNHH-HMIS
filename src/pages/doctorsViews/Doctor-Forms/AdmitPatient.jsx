@@ -118,23 +118,24 @@ const AdmitPatientForm = () => {
 
   // Function to handle form submission and dispatch action
   const handlePatientAdmission = (values) => {
-    const admissionObject = {
-      myAction: "create", // Action type
-      treatmentNo: values.treatmentNo, // Treatment number from form
-      dateOfAdmission: values.dateOfAdmission, // Use the date as-is from the form
-      admissionReason: values.admissionReason, // Admission reason from form
-    };
-
-    // Ensure the dateOfAdmission is in the correct format (YYYY-MM-DD) before sending to the backend
-    if (admissionObject.dateOfAdmission) {
-      const formattedDate = new Date(admissionObject.dateOfAdmission)
-        .toISOString()
-        .split("T")[0]; // Format as YYYY-MM-DD
-      admissionObject.dateOfAdmission = formattedDate;
-    }
-
-    dispatch(saveAdmissionDetails(admissionObject)); // Dispatch the action with the Admission object
+  const admissionObject = {
+    myAction: "create", // Action type
+    treatmentNo: values.treatmentNo, // Treatment number from form
+    dateOfAdmission: values.dateOfAdmission, // Use the date as-is from the form
+    admissionReason: values.admissionReason, // Admission reason from form
   };
+
+  // Ensure the dateOfAdmission is in the correct format (YYYY-MM-DD) before sending to the backend
+  if (admissionObject.dateOfAdmission) {
+    const formattedDate = new Date(admissionObject.dateOfAdmission)
+      .toISOString()
+      .split("T")[0]; // Format as YYYY-MM-DD
+    admissionObject.dateOfAdmission = formattedDate;
+  }
+
+  console.log("Dispatching admission details:", admissionObject); // Log for debugging
+  dispatch(saveAdmissionDetails(admissionObject)); // Dispatch the action with the Admission object
+};
 
   return (
     <div>
@@ -216,10 +217,7 @@ const AdmitPatientForm = () => {
           dateOfAdmission: currentDate,
           admissionReason: "",
         }}
-        onFinish={(values) => {
-          console.log("Form Submitted with values:", values);
-          handlePatientAdmission(values);
-        }}
+        
       >
         <Row gutter={16}>
           <Col span={12}>
