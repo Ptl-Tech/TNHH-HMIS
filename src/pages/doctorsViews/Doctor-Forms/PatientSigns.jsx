@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Steps, Form, Input, Checkbox, Typography } from "antd";
+import { Button, Steps, Form, Input, Checkbox, Typography, message } from "antd";
 import { useDispatch } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
@@ -150,81 +150,43 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       notesType: "8",
     },
   ];
-
   const handleNext = async () => {
     try {
       const values = await form.validateFields(); // Validate form fields
       const currentStepData = steps[currentStep];
-
-      // Initialize an array to hold the note objects
+  
       const notesArray = [];
-
-      // Handle step 1 separately (Chief Complaints & Allegations)
+  
       if (currentStepData.key === "1") {
-        // Chief Complaints (NotesType 1)
         if (values["1"]) {
           notesArray.push({
             myAction: "create",
             recId: "",
-            notesType: "1", // NotesType for Chief Complaints
+            notesType: "1",
             notes: values["1"],
             treatmentNo: treatmentNo,
             patientNo: patientNo,
           });
         }
-
-        // Allegations (NotesType 2)
+  
         if (values["2"]) {
           notesArray.push({
             myAction: "create",
             recId: "",
-            notesType: "2", // NotesType for Allegations
+            notesType: "2",
             notes: values["2"],
             treatmentNo: treatmentNo,
             patientNo: patientNo,
           });
         }
       } else {
-        // For other steps, process each note as its respective NotesType
         const fieldNames = Object.keys(values);
         fieldNames.forEach((fieldName) => {
           if (values[fieldName]) {
-            // Determine NotesType for the current step
-            let notesType = "";
-            switch (currentStepData.key) {
-              case "2":
-                notesType = "3"; // History of Presenting Illness
-                break;
-              case "3":
-                notesType = "4"; // Risk & Medical History
-                break;
-              case "4":
-                notesType = "5"; // Family & Personal History
-                break;
-              case "5":
-                notesType = "6"; // Forensic & Premorbid Personality
-                break;
-              case "6":
-                notesType = "7"; // Social History
-                break;
-              case "7":
-                notesType = "8"; // Family History
-                break;
-              case "8":
-                notesType = "9"; // Personal History
-                break;
-              case "9":
-                notesType = "10"; // Premorbid Personality
-                break;
-              default:
-                break;
-            }
-
-            // Add the note for the current field and NotesType
             notesArray.push({
               myAction: "create",
               recId: "",
-              notesType: notesType,
+              notesType: currentStepData.notesType,
               notes: values[fieldName],
               treatmentNo: treatmentNo,
               patientNo: patientNo,
@@ -232,22 +194,33 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
           }
         });
       }
-
-      // Remove empty notes
-      const nonEmptyNotes = notesArray.filter(
-        (note) => note.notes.trim() !== ""
-      );
-
-      // Dispatch each non-empty note separately
-      nonEmptyNotes.forEach((note) => dispatch(postPatientHistoryNotes(note)));
-
-      // Move to the next step
-      setCurrentStep((prev) => prev + 1);
+  
+      const nonEmptyNotes = notesArray.filter((note) => note.notes.trim() !== "");
+  
+      if (nonEmptyNotes.length > 0) {
+        const results = await Promise.all(
+          nonEmptyNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
+        );
+  
+        const allSuccess = results.every((status) => status === "success");
+        if (allSuccess) {
+          message.success("Notes Saved Successfully!");
+        } else {
+          message.error("Failed to complete some notes. Please try again.");
+        }
+      }
+  
+      if (currentStep < steps.length - 1) {
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        form.resetFields();
+        setCurrentStep(0);
+      }
     } catch (error) {
       console.error("Validation failed:", error);
     }
   };
-
+  
   const handlePrev = () => {
     setCurrentStep((prev) => prev - 1);
   };
