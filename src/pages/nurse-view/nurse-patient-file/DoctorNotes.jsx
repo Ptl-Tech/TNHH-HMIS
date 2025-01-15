@@ -26,11 +26,12 @@ import { Editor } from 'react-draft-wysiwyg';
 import { stateToHTML } from 'draft-js-export-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
+
 const DoctorNotes = ({ treatmentNo }) => {
   const { loading } = useSelector((state) => state.postDoctorNotes);
   const docDetails = useAuth();
   const dispatch = useDispatch(); // Get the dispatch function
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(true);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const location = useLocation();

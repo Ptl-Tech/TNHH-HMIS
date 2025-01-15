@@ -11,6 +11,7 @@ const { TextArea } = Input;
 const { Step } = Steps;
 
 const PatientSigns = ({ treatmentNo, patientNo }) => {
+  const{loading:saveNotesLoading}=useSelector(state=>state.postPatientHistory)
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -352,12 +353,12 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
             </Button>
           )}
           {currentStep < steps.length - 1 && (
-            <Button type="primary" onClick={handleNext}>
+            <Button type="primary" loading={saveNotesLoading} onClick={handleNext}>
               Next
             </Button>
           )}
           {currentStep === steps.length - 1 && (
-            <Button type="primary" onClick={handleNext}>
+            <Button type="primary" loading={saveNotesLoading} onClick={handleNext}>
               Submit
             </Button>
           )}
