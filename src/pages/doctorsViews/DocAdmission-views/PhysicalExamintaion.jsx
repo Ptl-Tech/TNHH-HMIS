@@ -21,7 +21,7 @@ import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatient
 
 const { TabPane } = Tabs;
 
-const FourPsForm = ({ treatmentNo, patientNo }) => {
+const PhysicalExamintaion = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -29,10 +29,10 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 const{loading}=useSelector((state)=>state.postPatientHistory)
   const notesType = [
-    { value: "12", label: "Predisposing Factors" },
-    { value: "13", label: "Precipitating Factors" },
-    { value: "14", label: "Perpetuating Factors" },
-    { value: "15", label: "Protective Factors" },
+    { value: "16", label: "Central Nervous system" },
+    { value: "17", label: "Cardiovascular system" },
+    { value: "18", label: "Respiratory system" },
+    { value: "19", label: "Per Abdomen" },
   ];
 
   const handleTabChange = (key) => {
@@ -89,7 +89,7 @@ const{loading}=useSelector((state)=>state.postPatientHistory)
           }}
         >
           <FiFileText style={{ marginRight: "8px" }} />
-          Aetiology Notes
+          Physical Examination
         </Typography.Title>
       </Space>
       <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
@@ -187,4 +187,4 @@ const{loading}=useSelector((state)=>state.postPatientHistory)
   );
 };
 
-export default FourPsForm;
+export default PhysicalExamintaion;

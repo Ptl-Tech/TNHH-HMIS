@@ -24,9 +24,9 @@ const PatientFile = ({ patientDetails }) => {
     "Nursing Notes",
     "Treatments History",
     "Consumables",
-    ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
 
-    ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
+    // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
 
   const handleOnClick = (item) => {

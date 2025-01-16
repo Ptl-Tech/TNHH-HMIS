@@ -26,11 +26,13 @@ import {
   saveAdmissionDetails,
 } from "../../../actions/Doc-actions/postAdmissionRequest";
 import { getAdmissionLines } from "../../../actions/Doc-actions/Admission/getAdmissionLines";
+import { useForm } from "antd/es/form/Form";
+import moment from "moment";
 
 const AdmitPatientForm = () => {
   const location = useLocation();
   const dispatch = useDispatch();
-
+  const [form] = useForm();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); // Get 'TreatmentNo' from query params
 
@@ -44,11 +46,6 @@ const AdmitPatientForm = () => {
   const { loading: loadingAdmissionLines, data: admissionLines } = useSelector(
     (state) => state.getAdmissionLines
   );
-  
-
-
-  // Set current date for the date of admission
-  const currentDate = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
 
   useEffect(() => {
     if (treatmentNo) {
@@ -117,21 +114,14 @@ const AdmitPatientForm = () => {
   };
 
   // Function to handle form submission and dispatch action
-  const handlePatientAdmission = (values) => {
+  const handlePatientAdmission = () => {
   const admissionObject = {
     myAction: "create", // Action type
-    treatmentNo: values.treatmentNo, // Treatment number from form
-    dateOfAdmission: values.dateOfAdmission, // Use the date as-is from the form
-    admissionReason: values.admissionReason, // Admission reason from form
+    treatmentNo: treatmentNo,
+    dateOfAdmission: moment().format("YYYY-MM-DD"),
+    admissionReason: admissionReason
   };
 
-  // Ensure the dateOfAdmission is in the correct format (YYYY-MM-DD) before sending to the backend
-  if (admissionObject.dateOfAdmission) {
-    const formattedDate = new Date(admissionObject.dateOfAdmission)
-      .toISOString()
-      .split("T")[0]; // Format as YYYY-MM-DD
-    admissionObject.dateOfAdmission = formattedDate;
-  }
 
   console.log("Dispatching admission details:", admissionObject); // Log for debugging
   dispatch(saveAdmissionDetails(admissionObject)); // Dispatch the action with the Admission object
@@ -214,10 +204,9 @@ const AdmitPatientForm = () => {
         className="admit-patient-card-container"
         initialValues={{
           treatmentNo: treatmentNo,
-          dateOfAdmission: currentDate,
           admissionReason: "",
         }}
-        
+        form={form}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -236,7 +225,7 @@ const AdmitPatientForm = () => {
             <Form.Item label="Date of Admission" name="dateOfAdmission">
               <Input
                 type="text"
-                value={currentDate}
+                value={moment().format("DD MMM YYYY")}
                 style={{ fontWeight: "bold", color: "#0F5689" }}
                 disabled
               />{" "}

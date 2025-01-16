@@ -133,6 +133,12 @@
   outline: none;
   box-shadow: none;
 }
+.steps-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 28px; /* Adjust spacing as needed */
+  margin-top: 16px;
+}
 
 .st{
   color: rgb(177, 211, 177);

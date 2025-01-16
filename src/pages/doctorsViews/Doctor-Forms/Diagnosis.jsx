@@ -44,6 +44,8 @@ const Diagnosis = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { data } = useSelector((state) => state.getDiagnosisSetup);
+  const { loading: diagnosisLinesLoadingData, data:diagnosisLinesData } = useSelector((state) => state.getTreatmentDiagnosisLines);
+
   const { data: secondaryDiagnosis } = useSelector(
     (state) => state.getSecondaryDiagnosisSetup
   );
@@ -64,6 +66,7 @@ const Diagnosis = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const[lastSavedDiagnosis, setLastSavedDiagnosis] = useState([]);
   const [modalContent, setModalContent] = useState({
     type: "info",
     title: "",
@@ -155,66 +158,93 @@ const Diagnosis = () => {
   };
   const handleSubmit = async (values) => {
     let success = true;
+  
+    // Filter for unsaved diagnoses
+    const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter((diagnosis) => !diagnosis.diagnosisNo);
+    const lastUnSavedSecondaryDiagnosis = secondaryDiagnosisList.filter((diagnosis) => !diagnosis.diagnosisNo);
+  
+    try {
+      if (activeKey === "2") {
+        // Primary Diagnosis Tab
+        for (let diagnosis of lastUnSavedPrimaryDiagnosis) {
+          const diagnosisData = {
+            myAction: "create",
+            treatmentNo: treatmentNo || values.treatmentNo,
+            diagnosisType: "1",
+            diagnosisNo: diagnosis.diagnosisCode,
+            confirmed: diagnosis.confirmed,
+            remarks: diagnosis.remarks,
+          };
+  
+          const response = await dispatch(postDiagnosisRequest(diagnosisData));
+  
+          if (response.status === "success") {
+            // Add saved diagnosis to the primary list
+            message.success("Diagnosis saved successfully!");
+            const updatedDiagnosis = { ...diagnosis, diagnosisNo: response.data.diagnosisNo }; // Assume `response.data.diagnosisNo` contains the saved ID
+            setPrimaryDiagnosisList((prevList) => [...prevList, updatedDiagnosis]);
+            form.resetFields();
 
-    // Check the active tab using activeKey
-    if (activeKey === "2") {
-      // Primary Diagnosis Tab
-      for (let diagnosis of primaryDiagnosisList) {
-        const diagnosisData = {
-          myAction: "create",
-          treatmentNo: treatmentNo || values.treatmentNo,
-          diagnosisNo: diagnosis.diagnosisCode,
-          diagnosisCode: diagnosis.diagnosisCode,
-          confirmed: diagnosis.confirmed,
-          remarks: diagnosis.remarks,
-        };
+          } else {
+            success = false;
+            message.error(`Error saving primary diagnosis: ${diagnosis.diagnosisCode}`);
+          }
+        }
+      } else if (activeKey === "3") {
+        // Secondary Diagnosis Tab
+        for (let diagnosis of lastUnSavedSecondaryDiagnosis) {
+          const diagnosisData = {
+            myAction: "create",
+            treatmentNo: treatmentNo || values.treatmentNo,
+            diagnosisType: "2",
+            diagnosisNo: diagnosis.diagnosisCode,
+            confirmed: diagnosis.confirmed,
+            remarks: diagnosis.remarks,
+          };
+  
+          const response = await dispatch(postDiagnosisRequest(diagnosisData));
+  
+          if (response.status === "success") {
+            // Add saved diagnosis to the secondary list
+            message.success("Diagnosis saved successfully!");
 
-        const response = await dispatch(postDiagnosisRequest(diagnosisData));
-
-        if (response.status !== "success") {
-          success = false;
-          break;
+            const updatedDiagnosis = { ...diagnosis, diagnosisNo: response.data.diagnosisNo }; // Assume `response.data.diagnosisNo` contains the saved ID
+            setSecondaryDiagnosisList((prevList) => [...prevList, updatedDiagnosis]);
+            form.resetFields();
+          } else {
+            success = false;
+            message.error(`Error saving secondary diagnosis: ${diagnosis.diagnosisCode}`);
+          }
         }
       }
-    } else if (activeKey === "3") {
-      // Secondary Diagnosis Tab
-      for (let diagnosis of secondaryDiagnosisList) {
-        const diagnosisData = {
-          myAction: "create",
-          treatmentNo: treatmentNo || values.treatmentNo,
-          diagnosisNo: diagnosis.diagnosisCode,
-          diagnosisCode: diagnosis.diagnosisCode,
-          confirmed: diagnosis.confirmed,
-          remarks: diagnosis.remarks,
-        };
-
-        const response = await dispatch(postDiagnosisRequest(diagnosisData));
-
-        if (response.status !== "success") {
-          success = false;
-          break;
-        }
+  
+      if (success) {
+        setModalContent({
+          type: "success",
+          title: "Success",
+          content: "All unsaved diagnoses have been successfully saved!",
+        });
+      } else {
+        setModalContent({
+          type: "error",
+          title: "Error",
+          content: "One or more diagnoses failed to save. Please try again.",
+        });
       }
-    }
-
-    // Handle the result of the submission (success or error)
-    if (success) {
-      setModalContent({
-        type: "success",
-        title: "Success",
-        content: "Diagnosis saved successfully!",
-      });
-    } else {
+    } catch (error) {
+      success = false;
+      console.error("Error in handleSubmit:", error);
+      message.error("An unexpected error occurred. Please try again.");
       setModalContent({
         type: "error",
         title: "Error",
-        content:
-          "An error occurred while saving the diagnosis. Please try again.",
+        content: "An unexpected error occurred. Please try again.",
       });
     }
-
+  
     setIsModalVisible(true); // Display success/error modal
   };
+  
 
   const diagnosisLinesColumns = [
     {
@@ -270,14 +300,16 @@ const Diagnosis = () => {
     },
   ];
 
-  const dataSource = Array.isArray(diagnosisLines)
-    ? diagnosisLines.filter((item) => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
-    : Object.keys(diagnosisLines)
-        .filter((key) => diagnosisLines[key].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
-        .map((key) => ({
-          ...diagnosisLines[key],
-          TreatmentNo: key,
-        }));
+  const dataSource =[
+   {
+    // key: diagnosisLines?.treatmentNo,
+    TreatmentNo: diagnosisLines?.treatmentNo,
+    DiagnosisCode: diagnosisLines?.diagnosisCode,
+    DiagnosisName: diagnosisLines?.diagnosisName,
+    Confirmed: diagnosisLines?.confirmed,
+    Remarks: diagnosisLines?.remarks
+   } 
+  ]
 
   return (
     <div className="mt-4">
@@ -440,6 +472,12 @@ const Diagnosis = () => {
                       value={diagnosisInput}
                       name="diagnosisCode"
                       size="large"
+                      showSearch
+                      filterOption={(input, option) =>
+                        option?.children
+                          ?.toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
                     >
                       {data?.map((item) => (
                         <Option key={item.Code} value={item.Code}>
@@ -456,7 +494,8 @@ const Diagnosis = () => {
                       type="primary"
                       icon={<PlusOutlined />}
                       onClick={() => handleAddDiagnosis(1)} // 1 for Primary
-                      style={{ width: "100%", marginTop: "26px" }}
+                      style={{ width: "100%", marginTop: "30px" }}
+                      size="large"
                     >
                       Add
                     </Button>
@@ -596,7 +635,7 @@ const Diagnosis = () => {
               autoComplete="off"
             >
               <Row gutter={24} style={{ paddingBottom: "16px" }}>
-                <Col span={20}>
+                <Col span={18}>
                   <Form.Item
                     name="secondaryDiagnosisCode"
                     label="Comorbid Issues"
@@ -608,6 +647,12 @@ const Diagnosis = () => {
                       value={diagnosisInput}
                       name="secondaryDiagnosisCode"
                       // mode="multiple"
+                      showSearch
+                      filterOption={(input, option) =>
+                        option?.children
+                          ?.toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
                       size="large"
                       style={{ width: "100%" }}
                     >
@@ -622,14 +667,17 @@ const Diagnosis = () => {
                     </Select>
                   </Form.Item>
                 </Col>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => handleAddDiagnosis(2)} // 2 for Secondary
-                  style={{ width: "100%", marginTop: "26px" }}
-                >
-                  Add
-                </Button>
+                <Col span={6}>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => handleAddDiagnosis(2)} // 2 for Secondary
+                    style={{ width: "100%", marginTop: "30px" }}
+                    size="large"
+                  >
+                    Add
+                  </Button>
+                </Col>
               </Row>
 
               {secondaryDiagnosisList.length > 0 && (
@@ -723,14 +771,16 @@ const Diagnosis = () => {
                 </div>
               )}
 
-              <div  style={{
+<div
+                style={{
                   marginTop: "16px",
                   marginBottom: "56px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-end",
                   gap: "15px",
-                }}>
+                }}
+              >
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -740,6 +790,13 @@ const Diagnosis = () => {
                   onClick={() => handleSubmit()}
                 >
                   Save Diagnosis
+                </Button>
+                <Button
+                  type="default"
+                  onClick={() => setHistoryVisible(false)}
+                  danger
+                >
+                  Close
                 </Button>
               </div>
             </Form>
