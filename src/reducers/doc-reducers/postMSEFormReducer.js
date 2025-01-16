@@ -1,9 +1,4 @@
-import {
-  POST_MSE_NOTES_FAIL,
-  POST_MSE_NOTES_REQUEST,
-  POST_MSE_NOTES_RESET,
-  POST_MSE_NOTES_SUCCESS,
-} from "../../actions/Doc-actions/postMSEForm";
+import { POST_MSE_NOTES_REQUEST } from "../../actions/Doc-actions/postMentalStateForm";
 
 export const postMSENotesReducer = (state = { loading: false }, action) => {
   switch (action.type) {

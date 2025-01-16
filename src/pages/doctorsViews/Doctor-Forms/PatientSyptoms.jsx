@@ -10,10 +10,10 @@ import {
 } from "antd";
 import { FileOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { postMSENotes } from "../../../actions/Doc-actions/postMSEForm";
 import moment from "moment";
 import { useLocation } from "react-router-dom";
-import { getPatientMSESlice } from "../../../actions/Doc-actions/getPatientMSENotes.JS";
+import { getPatientMSESlice } from "../../../actions/Doc-actions/getPatientMentalStateNotes";
+import { postMSENotes } from "../../../actions/Doc-actions/postMentalStateForm";
 
 const { Step } = Steps;
 const { Panel } = Collapse;

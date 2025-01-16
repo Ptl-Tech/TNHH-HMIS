@@ -3,7 +3,7 @@ import {
   REQUEST_PATIENT_MSE_LINES_SUCCESS,
   REQUEST_PATIENT_MSE_LINES_FAIL,
   REQUEST_PATIENT_MSE_LINES_RESET,
-} from "../../actions/Doc-actions/getPatientMSENotes.JS";
+} from "../../actions/Doc-actions/getPatientMentalStateNotes.js";
 
 export const getPatientMSENotesReducer = (state = { data: [] }, action) => {
   console.log("Reducer patient No:", action.payload);
