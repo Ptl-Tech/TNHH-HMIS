@@ -57,8 +57,10 @@ const Medication = () => {
         >
          Prescription Details
         </Typography.Title>
+        
         <PrescriptionForm />
-      </div> 
+      </div>
+
     </div>
   )
 }

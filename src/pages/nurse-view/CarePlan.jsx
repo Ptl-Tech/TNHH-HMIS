@@ -10,6 +10,8 @@ import Injections from './nurse-care-plan/Injections'
 import Diagnosis from './nurse-care-plan/Diagnosis'
 import useAuth from '../../hooks/useAuth'
 import Prescription from './nurse-care-plan/Prescription'
+import PrescriptionForm from '../doctorsViews/Doctor-Forms/PrescriptionForm'
+import Medication from '../doctorsViews/Doctor-Forms/Medication'
 
 
 const CarePlan = () => {
@@ -28,14 +30,11 @@ const CarePlan = () => {
                 case 'Nursing Rounds':
                     setSelectedItem(<DailyProcess />)
                     break
-                case 'Injections':
-                    setSelectedItem(<Injections />)
-                    break
                 case 'Diagnosis':
                     setSelectedItem(<Diagnosis />)
                     break
                 case 'Prescription':
-                    setSelectedItem(<Prescription />)
+                    setSelectedItem(<Medication />)
                     break
                 case 'Treatments Sheet':
                     setSelectedItem(<TreatmentsSheet />)
@@ -65,7 +64,6 @@ const CarePlan = () => {
                     'Allergies',
                     'Vitals',
                     role === 'Doctor' ? 'Daily Ward Rounds' : 'Nursing Rounds',
-                    'Injections',
                     'Diagnosis',
                     'Prescription',
                     ...(role === 'Nurse' ? ['Treatments Sheet', 'ECT', 'TCA / Appointments'] : []),

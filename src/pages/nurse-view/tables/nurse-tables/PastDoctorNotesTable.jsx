@@ -1,12 +1,12 @@
 import { Table } from "antd"
 import PropTypes from "prop-types"
 
-const TreatmentHistoryTable = ({ showModal }) => {
+const PastDoctorNotesTable = ({ showModal }) => {
 
     const columns = [
     
         {
-          title: 'Treatment Number',
+          title: 'Encounter Number',
           dataIndex: 'treatmentNo',
           key: 'treatmentNo',
         },
@@ -26,14 +26,14 @@ const TreatmentHistoryTable = ({ showModal }) => {
           key: 'branch',
         },
         {
-            title: 'Payment Method',
-            dataIndex: 'paymentMethod',
-            key: 'paymentMethod',
+            title: 'Added By',
+            dataIndex: 'AddedBy',
+            key: 'AddedBy',
         },
         {
-          title: 'Treatment Report',
-          dataIndex: 'treatmentReport',
-          key: 'treatmentReport',
+          title: 'Action',
+          dataIndex: 'action',
+          key: 'action',
           // render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
         }
       ]
@@ -56,9 +56,9 @@ const TreatmentHistoryTable = ({ showModal }) => {
   )
 }
 
-export default TreatmentHistoryTable
+export default PastDoctorNotesTable
 
 //props validation
-TreatmentHistoryTable.propTypes = {
+PastDoctorNotesTable.propTypes = {
     showModal: PropTypes.func
 }

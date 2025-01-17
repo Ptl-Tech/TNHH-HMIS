@@ -20,7 +20,7 @@ const PatientFile = ({ patientDetails }) => {
     "Patient Info",
     "Medical Info",
     "Next of Kin",
-    ...(userRole.userData.departmentName === "Doctor" ? ["Doctor Notes"] : []),
+    ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
     "Consumables",
@@ -40,7 +40,7 @@ const PatientFile = ({ patientDetails }) => {
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
-      case "Doctor Notes":
+      case "Past Doctor Notes":
         setSelectedItem(<DoctorNotes />);
         break;
       case "Nursing Notes":
