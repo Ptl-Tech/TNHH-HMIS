@@ -158,12 +158,12 @@ const ECTScan = () => {
             </div>
           </div>
           <Form.Item
-            label="Description"
+            label="ECT procedure notes"
             name="description"
-            rules={[{ required: true, message: "Please enter a description!" }]}
+            rules={[{ required: true, message: "Please enter ECT procedure notes!" }]}
             hasFeedback
           >
-            <TextArea placeholder="Enter description" />
+            <TextArea placeholder="Enter ECT procedure notes" />
           </Form.Item>
         </Form>
       </Modal>

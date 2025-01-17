@@ -28,17 +28,13 @@ const useFetchVitalsHook = () => {
   
     // Fetch triage list if not already loaded
     useEffect(() => {
-      if (!triageList?.length) {
         dispatch(getTriageList());
-      }
     }, [dispatch, triageList?.length]);
   
     // Fetch allergies list if not already loaded
     useEffect(() => {
-      if (!inpatientVitals?.length) {
         dispatch(getInpatientVitalsSlice());
-      }
-    }, [dispatch, inpatientVitals?.length]);
+    }, [dispatch]);
   
     // Return the combined list and loading states
     return {

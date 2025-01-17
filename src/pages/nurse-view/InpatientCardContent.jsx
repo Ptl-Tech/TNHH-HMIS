@@ -16,7 +16,7 @@ const InpatientCardContent = () => {
                 <Tabs.TabPane tab="Patient File" key="1">
                     <PatientFile />
                 </Tabs.TabPane>
-                <Tabs.TabPane tab="Care Plan" key="2">
+                <Tabs.TabPane tab={role === "Nurse" ? "Nursing Tool" : "Daily Review"} key="2">
                     <CarePlan />
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Requests" key="3">
