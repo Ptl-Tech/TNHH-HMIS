@@ -18,6 +18,7 @@ import SuicidalForm from "../../nurse-view/nurse-forms/SuicidalForm";
 import PhysicalExamintaion from "../DocAdmission-views/PhysicalExamintaion";
 import PsychologyNotes from "./PsychologyNotes";
 import PastMedicalHistory from "./PastMedicalHistory";
+import TreatmentHistoryTable from "../../nurse-view/tables/nurse-tables/TreatmentHistoryTable";
 
 const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
   const [selectedItem, setSelectedItem] = useState(
@@ -40,7 +41,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
         );
         break;
       case "Physical Examination":
-        setSelectedItem(<PhysicalExamintaion />);
+        setSelectedItem(<PhysicalExamintaion treatmentNo={treatmentNo} patientNo={patientNo}/>);
         break;
       case "Mental Status Exam":
         setSelectedItem(
@@ -57,7 +58,8 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
         break;
       case "Past Encounters Notes":
         setSelectedItem(
-          <DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />
+          // <DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />
+          <TreatmentHistoryTable />
         );
         break;
       case "Aetiology":
