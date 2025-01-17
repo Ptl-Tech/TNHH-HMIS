@@ -41,7 +41,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
         );
         break;
       case "Physical Examination":
-        setSelectedItem(<PhysicalExamintaion />);
+        setSelectedItem(<PhysicalExamintaion treatmentNo={treatmentNo} patientNo={patientNo}/>);
         break;
       case "Mental Status Exam":
         setSelectedItem(
