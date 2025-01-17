@@ -1,45 +1,66 @@
 import { Card, Input } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 import useAuth from "../../hooks/useAuth";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { listDoctors } from "../../actions/DropdownListActions";
 
 const Impatient = () => {
   const dispatch = useDispatch();
   const userDetails = useAuth();  // Use the custom hook to get user info
+  const { loading, data } = useSelector(state => state.getDoctorsList);
  
   const navigate = useNavigate();
 
   const handleNavigate = (record) => {
    if(userDetails.userData.departmentName === 'Nurse'){
-    navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.CurrentAdmNo}`, {
+    navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
    }else{
-    navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.CurrentAdmNo}`, {
+    navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
    }
   };
 
-  useEffect(() => {
-    dispatch(getPatientListSlice());
-  }, [dispatch]);
+  const {loadingAdmittedPatients, admittedPatients} = useSelector((state)=>state.getPgAdmissionsAdmitted) || {}
 
-  const { loadingPatientList, allPatientLList } = useSelector((state) => state.getPatientList) || {};
+  const formattedDoctorDetails = useMemo(() => {
+          return data?.map(doctor => ({
+              DoctorID: doctor?.DoctorID,
+              DoctorsName: doctor?.DoctorsName,
+          }));
+      }, [data]);
 
-  const filterInPatients =
-    allPatientLList?.filter((item) => item.Inpatient === true) || [];
+const combinedPatients = admittedPatients?.map(patient => {
+  const matchingDoctor = formattedDoctorDetails?.find(doctor => (
+    patient?.Doctor === doctor?.DoctorID
+  ));
+  return {
+    ...patient,
+    DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
+  };
+});
+console.log('combined patients', combinedPatients)
+     
+    useEffect(() => {
+      dispatch(getPgAdmissionsAdmittedSlice());
+    }, [dispatch]);
 
-    console.log('inpatient', filterInPatients)
+    useEffect(() => {
+        if (!data?.length) {
+        dispatch(listDoctors());
+        }
+    }, [dispatch, data?.length]);
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       
-      <NurseInnerHeader filterInPatients={filterInPatients} title="Current Inpatients" />
+      <NurseInnerHeader filterInPatients={combinedPatients} title="Current Inpatients" />
 
       <Card style={{ padding: "10px 10px 10px 10px" }}>
         <div className="admit-patient-filter-container">
@@ -55,7 +76,7 @@ const Impatient = () => {
         </div>
       </Card>
 
-      <InpatientTable loadingPatientList={loadingPatientList} handleNavigate={handleNavigate} filterInPatients={filterInPatients} />
+      <InpatientTable loadingAdmittedPatients={loadingAdmittedPatients} loading={loading} handleNavigate={handleNavigate} filterInPatients={combinedPatients} />
 
     </div>
   );

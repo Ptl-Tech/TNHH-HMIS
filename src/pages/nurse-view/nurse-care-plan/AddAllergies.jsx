@@ -57,7 +57,7 @@ const AddAllergies = () => {
 
         {
           isFormVisible && (
-            <AllergyAndMedication />
+            <AllergyAndMedication setIsFormVisible={setIsFormVisible} />
           )
         }
 
