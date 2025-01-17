@@ -21,6 +21,7 @@ import useAuth from "../hooks/useAuth";
 import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoice";
 import TabPane from "antd/es/tabs/TabPane";
 import { getBillingList } from "../actions/Charges-Actions/getBillingList";
+import { saveAs } from "file-saver";
 
 const InsurancePatients = () => {
   
@@ -55,6 +56,8 @@ const InsurancePatients = () => {
   const [billingModalVisible, setBillingModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
+    const [pdfBlob, setPdfBlob] = useState(null);
+  
   const staffNo = useAuth().userData.No;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -143,24 +146,57 @@ const InsurancePatients = () => {
     setPagination({ current: page, pageSize });
   };
 
-  const showModal = (patient) => {
-    setSelectedPatient(patient);
-    setBillingModalVisible(true);
+  
+
+  const handleBillingSubmit = (patient) => {
+    const invoiceData = {
+      PatientNo: patient.PatientNo,
+      visitNo: patient.AppointmentNo,
+      staffNo,
+    };
+
+    dispatch(postInterimInvoice(invoiceData)).then((response) => {
+      if (response?.base64) {
+        const byteCharacters = atob(response.base64);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+          const slice = byteCharacters.slice(offset, offset + 512);
+          const byteNumbers = Array.from(slice).map((char) => char.charCodeAt(0));
+          byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        const blob = new Blob(byteArrays, { type: "application/pdf" });
+        const blobUrl = URL.createObjectURL(blob);
+        setPdfBlob(blobUrl);
+        setSelectedPatient(patient);
+        setBillingModalVisible(true);
+      }
+    });
   };
+  const handleDownload = () => {
+    if (pdfBlob && selectedPatient) {
+      // Use the patient's name or fallback to a default name if unavailable
+      const patientName = selectedPatient?.Names || "Unknown_Patient";
+      const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, '_');  // Replace spaces with underscores for a valid filename
+  
+      // Trigger the download
+      saveAs(pdfBlob, fileName);
+    }
+  };
+  
 
-  const handleBillingSubmit = () => {
-    setBillingModalVisible(false);
-
-    if (patientBalanceDetails) {
-      const invoiceData = {
-        PatientNo: patientBalanceDetails.PatientNo,
-        visitNo: patientBalanceDetails.ActiveVisitNo,
-        staffNo,
-      };
-
-      dispatch(postInterimInvoice(invoiceData));
-    } else {
-      console.error("Patient balance details not available.");
+  const handlePrint = () => {
+    if (pdfBlob) {
+      const printWindow = window.open("", "_blank");  // Open a blank window
+      const htmlContent = `
+        <html>
+          <head><title>Invoice</title></head>
+          <body>
+            <embed src="${pdfBlob}" width="100%" height="100%" />
+          </body>
+        </html>`;
+      printWindow.document.write(htmlContent);  // Write the content
+      printWindow.document.close();  // Close the document to ensure it renders
+      printWindow.print();  // Trigger the print
     }
   };
   const outpatientColumns = [
@@ -227,17 +263,17 @@ const InsurancePatients = () => {
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          {/* <Tooltip title="View Details">
-            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
-              View Details
-            </Button>
-          </Tooltip> */}
-          <Tooltip title="Bill and Clear">
-            <Button type="primary" onClick={() => showModal(record)}>
-              Bill
-            </Button>
-          </Tooltip>
-        </div>
+                  {/* <Tooltip title="View Details">
+                    <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
+                      View Details
+                    </Button>
+                  </Tooltip> */}
+                  <Tooltip title="Bill and Clear">
+                    <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
+                    Print Invoice
+                    </Button>
+                  </Tooltip>
+                </div>
       ),
     },
   ];
@@ -295,21 +331,27 @@ const InsurancePatients = () => {
       key: "PatientType",
     },
     {
+      title: "Balance",
+      dataIndex: "Balance",
+      key: "Balance",
+      render: (text) => `KSh ${text.toFixed(2)}`,
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Tooltip title="View Details">
-            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
-              View Details
-            </Button>
-          </Tooltip>
-          <Tooltip title="Bill and Clear">
-            <Button type="primary" onClick={() => showModal(record)}>
-              Bill
-            </Button>
-          </Tooltip>
-        </div>
+       <div style={{ display: "flex", gap: "8px" }}>
+                 {/* <Tooltip title="View Details">
+                   <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
+                     View Details
+                   </Button>
+                 </Tooltip> */}
+                 <Tooltip title="Bill and Clear">
+                   <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
+                   Print Invoice
+                   </Button>
+                 </Tooltip>
+               </div>
       ),
     },
   ];
@@ -317,6 +359,13 @@ const InsurancePatients = () => {
   const startIdx = (pagination.current - 1) * pagination.pageSize;
   const endIdx = startIdx + pagination.pageSize;
   const paginatedData = filteredPatients.slice(startIdx, endIdx);
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+  };
 
   return (
     <div>
@@ -357,6 +406,7 @@ const InsurancePatients = () => {
       <Tabs defaultActiveKey="1" size="large" type="card">
         <TabPane tab="Outpatients list" key="1">
           <Table
+                     rowSelection={rowSelection}
             columns={outpatientColumns}
             dataSource={filteredOutpatients.map((patient) => ({
               ...patient,
@@ -374,6 +424,8 @@ const InsurancePatients = () => {
         </TabPane>
         <TabPane tab="Inpatients list" key="2">
           <Table
+                     rowSelection={rowSelection}
+
             columns={inpatientColumns}
             dataSource={filteredInpatients.map((patient) => ({
               ...patient,
@@ -392,93 +444,27 @@ const InsurancePatients = () => {
       </Tabs>
       </div>
 
-      <Modal
-        title="Billing Details"
+          {/* Modal for previewing and printing/downloading the PDF */}
+              <Modal
+        title={`Invoice for ${selectedPatient?.Names}`}
         visible={billingModalVisible}
         onCancel={() => setBillingModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setBillingModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleBillingSubmit}>
-            Print Invoice
-          </Button>,
+          <Button type="primary" key="download" onClick={handleDownload}>Download</Button>,
+          <Button type="default" key="print" onClick={handlePrint}>Print</Button>,
+          <Button type="primary" key="close" onClick={() => setBillingModalVisible(false)}>Close</Button>,
         ]}
-        width={600} // Adjust width for better UI
+        width={800}
+        style={{ top: 20 }}
       >
-        {patientBalanceDetails ? (
-          <>
-            <Card className="card-header" style={{ borderRadius: 8 }}>
-              {/* <Typography.Title level={4} style={{ color: "#003F6D" }}>
-                Patient Details
-              </Typography.Title> */}
-              <Row gutter={[16, 16]}>
-                <Col span={12} className="pt-3 px-3">
-                  <Typography.Text strong>Patient Name:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Names || "N/A"}
-                  </Typography.Text>
-                </Col>
-                <Col span={12} className="pt-3 px-3">
-                  <Typography.Text strong>Patient No:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.PatientNo || "N/A"}
-                  </Typography.Text>
-                </Col>
-                <Col span={12} className="px-3 pb-3">
-                  <Typography.Text strong>Inpatient:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Inpatient ? "Yes" : "No"}
-                  </Typography.Text>
-                </Col>
-              </Row>
-            </Card>
-            <Card
-              className="card-header mb-4 mt-4 "
-              style={{ borderRadius: 8 }}
-            >
-              <Typography.Title level={5} style={{ color: "#003F6D" }}>
-                Insurance Details
-              </Typography.Title>
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Typography.Text strong>Insurance Name:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Insurance_Name || "N/A"}
-                  </Typography.Text>
-                </Col>
-                <Col span={12}>
-                  <Typography.Text strong>Insurance No:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Insurance_No || "N/A"}
-                  </Typography.Text>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]}>
-                <Col span={12} className="py-3">
-                  <Typography.Text strong>
-                    Open Insurance Amount:
-                  </Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Open_Insurance_Amount || "0.00"}
-                  </Typography.Text>
-                </Col>
-                <Col span={12} className="py-3">
-                  <Typography.Text strong>Balance:</Typography.Text>
-                  <Typography.Text>
-                    {patientBalanceDetails?.Balance || "0.00"}
-                  </Typography.Text>
-                </Col>
-              </Row>
-            </Card>
-          </>
-        ) : (
-          <div style={{ textAlign: "center" }}>
-            <Typography.Text>Loading patient details...</Typography.Text>
-          </div>
-        )}
+        <iframe 
+          src={pdfBlob} 
+          width="100%" 
+          height="600px" 
+          style={{ border: "none" }} 
+          className="iframe-scrollbar"
+        ></iframe>
       </Modal>
-
       <style jsx>{`
         .row-warning {
           background-color: #faad14 !important;

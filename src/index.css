@@ -139,6 +139,22 @@
   gap: 28px; /* Adjust spacing as needed */
   margin-top: 16px;
 }
+.iframe-scrollbar {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent; /* For Firefox */
+}
+
+.iframe-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 .st{
   color: rgb(177, 211, 177);
