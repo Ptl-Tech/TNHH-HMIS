@@ -144,7 +144,7 @@ const LabResults = () => {
         style={{ color: "#0F5689", marginBottom: "12px" }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
-        Laboratory Request
+        Laboratory Request 
       </Typography.Title>
 
       <div className="d-flex justify-content-end my-2">
