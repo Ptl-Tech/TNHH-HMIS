@@ -78,7 +78,7 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
 
                 <div className="patient-age-gender-container" style={{ paddingTop: '10px'}}>
                     <Typography.Text style={{ fontWeight: 'bold', color: 'red' }}>
-                        Drug and Medication Allergies
+                        Drug Allergies
                     </Typography.Text>
                     {
                         loadingTriageList || loadingAllergies ? (

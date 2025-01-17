@@ -38,11 +38,11 @@ const Summery = () => {
         <DischargeSummeryTable showModal={showModal}/>
 
 
-        <Modal title="Charge Summery" 
+        <Modal title="Charge Summary" 
           open={isModalOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          okText="Save Discharge Summery"
+          okText="Save Discharge Summary"
         >
             <Form
             
