@@ -23,7 +23,7 @@ const TriageList = () => {
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
   // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
 
-  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+  const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
   
   
   const openTriageList = triageList.filter((item) => item.Status === 'New');
@@ -84,7 +84,8 @@ const handleTableChange = (newPagination) => {
       key: 'ObservationNo',
       filteredValue: searchObservationNumber ? [searchObservationNumber] : null,
       onFilter: (value, record) =>
-      record.ObservationNo.toLowerCase().includes(value.toLowerCase()),
+        record?.ObservationNo ?
+        record.ObservationNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
     {
       title: 'Patient Number',
@@ -92,7 +93,8 @@ const handleTableChange = (newPagination) => {
       key: 'PatientNo',
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
-      record.PatientNo.toLowerCase().includes(value.toLowerCase()),
+        record?.PatientNo ?
+        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
     {
       title: 'Patient Name',
@@ -100,9 +102,10 @@ const handleTableChange = (newPagination) => {
       key: 'SearchName',
       filteredValue: searchName ? [searchName] : null,
       onFilter: (value, record) =>
-        record.SearchName.toLowerCase().includes(value.toLowerCase()),
-      render: (name, record) => (
-        <div style={{ color: getColorByWaitingTime(record.ObservationTime) }}>
+        record?.SearchName ?
+        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
+      render: (name) => (
+        <div style={{ color: '#0f5689' }}>
           {name}
         </div>
       )
@@ -144,7 +147,7 @@ const handleTableChange = (newPagination) => {
           
 
           {
-            loadingTriageList ? 
+            loadingTriageList || loadingWaitingList? 
             (
               <Loading />
             )

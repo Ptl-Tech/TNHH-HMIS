@@ -3,23 +3,35 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
 
-const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients }) => {
+const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, searchName, searchPatientNumber, searchAdmissionNumber }) => {
 
     const columns = [
         {
           title: "Adm No",
           dataIndex: "CurrentAdmNo",
           key: "CurrentAdmNo",
+          filteredValue: searchAdmissionNumber ? [searchAdmissionNumber] : null,
+          onFilter: (value, record) =>
+            record?.CurrentAdmNo ?
+            record.CurrentAdmNo.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
           title: "Patient No",
           dataIndex: "PatientNo",
           key: "PatientNo",
+          filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+          onFilter: (value, record) =>
+          record?.PatientNo ?
+          record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
           title: "Names",
           dataIndex: "SearchName",
           key: "SearchName",
+          filteredValue: searchName ? [searchName] : null,
+          onFilter: (value, record) =>
+            record?.SearchName ?
+            record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
           render: (_, record) => (
             <a
               onClick={() => handleNavigate(record)}
@@ -103,4 +115,7 @@ InpatientTable.propTypes = {
     loadingPatientList: PropTypes.bool.isRequired,
     handleNavigate: PropTypes.func.isRequired,
     filterInPatients: PropTypes.array.isRequired,
+    searchName: PropTypes.bool.isRequired,
+    searchPatientNumber: PropTypes.bool.isRequired,
+    searchAdmissionNumber: PropTypes.bool.isRequired
 };

@@ -10,7 +10,7 @@ export const getColorByWaitingTime = (observationDateTime) => {
     } else if (observationDateTime <= 120) {
       return 'orange';
     } else {
-      return '#0f5689';
+      return 'red';
     }
   };
   export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {

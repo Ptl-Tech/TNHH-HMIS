@@ -1,7 +1,7 @@
 import { Card, Input } from "antd"
 import PropTypes from "prop-types"
 
-const FilterInpatientList = ({ setSearchName, setSearchPatientNumber, setSearchAdmissionNumber }) => {
+const FilterConsultationRoom = ({ setSearchName, setSearchPatientNumber, setSearchVisitNumber }) => {
   return (
     <>
     <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
@@ -16,22 +16,20 @@ const FilterInpatientList = ({ setSearchName, setSearchPatientNumber, setSearchA
             onChange={(value)=>setSearchPatientNumber(value.target.value)}
         />
         <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-        <Input.Search placeholder="search admission number" 
+        <Input.Search placeholder="search visit number" 
             allowClear
-            onChange={(value)=>setSearchAdmissionNumber(value.target.value)}
+            onChange={(value)=>setSearchVisitNumber(value.target.value)}
         />
     </div>
     </Card>
-</>
+    </>
   )
 }
 
-export default FilterInpatientList
-
-// props validation
-FilterInpatientList.prototype = {
+export default FilterConsultationRoom
+//props validation
+FilterConsultationRoom.prototype = {
     setSearchName: PropTypes.bool.isRequired,
     setSearchPatientNumber: PropTypes.bool.isRequired,
-    setSearchAdmissionNumber: PropTypes.bool.isRequired
-
+    setSearchVisitNumber: PropTypes.bool.isRequired
 }

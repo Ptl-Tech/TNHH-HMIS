@@ -1,8 +1,7 @@
 import { Card, Col, Row, Space, Typography, Button, Table, Modal, message } from "antd"
 import { PlusOutlined, CloseOutlined, PayCircleOutlined, PrinterOutlined, FileExclamationOutlined } from "@ant-design/icons"
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SearchFilters from "./SearchFilters";
 import { useDispatch, useSelector } from "react-redux";
 import { exportToExcel, printToPDF } from "../../utils/helpers";
 import { getPgAdmissionsVerifiedSlice } from "../../actions/nurse-actions/getPgAdmissionsVerifiedSlice";
@@ -12,6 +11,7 @@ import { POST_CANCEL_ADMISSION_FAILURE, POST_CANCEL_ADMISSION_SUCCESS, postCance
 import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
 
 const AdmitPatients = () => {
@@ -19,9 +19,11 @@ const AdmitPatients = () => {
 
     const navigate = useNavigate();
     const { loadingGetPatientAdmissions, getPatientAdmissions } = useSelector((state) => state.getPgAdmissionVerified);
-    console.log('verified patients', getPatientAdmissions);
     const { loading, data } = useSelector(state => state.getDoctorsList);
     const { selectedRow, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
+    const [searchName, setSearchName] = useState('');
+    const [searchPatientNumber, setSearchPatientNumber] = useState('');
+    const [searchAdmissionNumber, setSearchAdmissionNumber] = useState('')
 
     const dispatch = useDispatch();
     const { confirm } = Modal;
@@ -32,17 +34,30 @@ const AdmitPatients = () => {
             dataIndex: 'No',
             key: 'No',
             fixed: 'left',
-            width: 100
+            width: 100,
+            filteredValue: searchAdmissionNumber ? [searchAdmissionNumber] : null,
+            onFilter: (value, record) =>
+              record?.No ?
+              record.No.toLowerCase().includes(value.toLowerCase()) : false,
+
         },
         {
             title: 'Patient No',
             dataIndex: 'PatientNo',
             key: 'PatientNo',
+            filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+            onFilter: (value, record) =>
+              record?.PatientNo ?
+              record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
             title: 'Patient Names',
             dataIndex: 'Names',
             key: 'Names',
+            filteredValue: searchName ? [searchName] : null,
+            onFilter: (value, record) =>
+              record?.SearchName ?
+              record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
             render: (_, record) => {
                 return <Typography.Text style={{ color: '#0f5689' }}>
                     {record.Names}
@@ -166,7 +181,7 @@ const AdmitPatients = () => {
                 
                 <NurseInnerHeader title="Patient Admissions List" />
 
-                <SearchFilters />
+                <FilterInpatientList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchAdmissionNumber}/>
                     
                 <Card className="admit-patient-card-container">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
