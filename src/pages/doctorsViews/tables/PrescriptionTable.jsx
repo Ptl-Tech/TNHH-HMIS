@@ -57,18 +57,18 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions}) => {
             fixed: 'right',
             width: 100,
         },
-        {
-          title: 'Action',
-          dataIndex: 'Action',
-          key: 'Action',
-          fixed: 'right',
-          width: 100,
-          render: (_, record) => (
-            <div>
-              <Button color="danger" variant="outlined" onClick={() => handleEdit(record)}>Delete</Button>
-            </div>
-          )
-      },
+      //   {
+      //     title: 'Action',
+      //     dataIndex: 'Action',
+      //     key: 'Action',
+      //     fixed: 'right',
+      //     width: 100,
+      //     render: (_, record) => (
+      //       <div>
+      //         <Button color="danger" variant="outlined" onClick={() => handleEdit(record)}>Delete</Button>
+      //       </div>
+      //     )
+      // },
         ]
   return (
     <div style={{ paddingTop: '30px' }}>
