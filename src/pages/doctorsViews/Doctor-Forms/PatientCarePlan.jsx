@@ -7,13 +7,11 @@ import { Button, Space } from 'antd';
 const PatientCarePlan = () => {
   const [selectedComponent, setSelectedComponent] = useState(<Medication />);
   const [selectedLabel, setSelectedLabel] = useState('Patient Prescription');
+  
 
   const handleOnClick = (label) => {
     setSelectedLabel(label);
     switch (label) {
-      case 'Injection Requests':
-        setSelectedComponent(<Injections />);
-        break;
       case 'Patient Prescription':
       default:
         setSelectedComponent(<Medication />);

@@ -36,7 +36,7 @@ const DoctorDashboard = () => {
   // Sample data for the cards
   const cardData = [
     {
-      title: "OP Waiting List Patients",
+      title: "OP Waiting List",
       value: openTreatmentList?.length,
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
@@ -45,7 +45,7 @@ const DoctorDashboard = () => {
       link: '/Doctor/Consultation-List' // You can set the link here
     },
     {
-      title: "Consultation Room Patients",
+      title: "Consultation Room",
       value: pendingTreatmentList?.length,
       subtitle: "Increase in 30 days",
       icon: <SafetyOutlined />,

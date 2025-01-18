@@ -43,7 +43,7 @@ const DoctorVisits = () => {
   }, [dispatch]);
 
   const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New" 
+    (item) => item.Status === "New"
   );
   const closedConsultationList = treatmentList?.filter(
     (item) => item.Status === "Closed"
@@ -135,15 +135,18 @@ const DoctorVisits = () => {
       title: "Treatment No",
       dataIndex: "treatmentNo",
       key: "treatmentNo",
-      render: (text) => (
-        <span
-          onClick={() => handleNavigate(text, text.treatmentNo)}
-          className="fw-bold"
-          style={{ color: "green" }}
-        >
-          {text}
-        </span>
-      ),
+      render: (_, record) => {
+        const { color } = getUrgencyColorcode(record.urgency)
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            className="fw-bold"
+            style={{ color: color }}
+          >
+            {record.treatmentNo}
+          </span>
+        )
+      }
     },
     {
       title: "Patient Name",
