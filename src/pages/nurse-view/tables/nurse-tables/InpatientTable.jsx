@@ -5,23 +5,35 @@ import Loading from "../../../../partials/nurse-partials/Loading";
 import { Link } from "react-router-dom";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 
-const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, loading }) => {
+const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, loading, searchName, searchPatientNumber, searchAdmissionNumber }) => {
 
     const columns = [
         {
           title: "Adm No",
           dataIndex: "Admission_No",
           key: "Admission_No",
+          filteredValue: searchAdmissionNumber ? [searchAdmissionNumber] : null,
+          onFilter: (value, record) =>
+            record?.Admission_No ?
+            record.Admission_No.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
           title: "Patient No",
           dataIndex: "Patient_No",
           key: "Patient_No",
-        },
+          filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+          onFilter: (value, record) =>
+            record?.Patient_No ?
+            record.Patient_No.toLowerCase().includes(value.toLowerCase()) : false,
+            },
         {
           title: "Names",
           dataIndex: "PatientName",
           key: "PatientName",
+          filteredValue: searchName ? [searchName] : null,
+          onFilter: (value, record) =>
+            record?.PatientName ?
+            record.PatientName.toLowerCase().includes(value.toLowerCase()) : false,
           render: (_, record) => (
             <a
               onClick={() => handleNavigate(record)}
@@ -125,4 +137,7 @@ InpatientTable.propTypes = {
     handleNavigate: PropTypes.func.isRequired,
     filterInPatients: PropTypes.array.isRequired,
     loading: PropTypes.bool.isRequired,
+    searchName: PropTypes.string.isRequired,
+    searchPatientNumber: PropTypes.string.isRequired,
+    searchAdmissionNumber: PropTypes.string.isRequired
 };

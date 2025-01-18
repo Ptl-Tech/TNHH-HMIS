@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { getPgInpatientDischargeListSlice } from "../../actions/nurse-actions/getPgInpatientDischargeListSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
-import SearchFilters from "./SearchFilters";
 import { exportToExcel, printToPDF } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { POST_DISCHARGE_PATIENT_FAILURE, POST_DISCHARGE_PATIENT_SUCCESS, postPostDischargeSlice } from "../../actions/nurse-actions/postPostDischargeSlice";
@@ -15,78 +14,93 @@ import { POST_RELEASE_BED_FAILURE, POST_RELEASE_BED_SUCCESS, postReleaseBedSlice
 import { POST_CANCEL_DISCHARGE_FAILURE, POST_CANCEL_DISCHARGE_SUCCESS, postCancelDischargeSlice } from "../../actions/nurse-actions/postCancelDischargeSlice";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
+import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
 
 
 const DischargeList = () => {
   
+  const {loadingGetPatientDischargeList, getPatientDischargeList} = useSelector(state => state.getPgInpatientDischargeList);
+  const { confirm } = Modal;
+  const { setIsButtonDisabled, setSelectedRowKey, selectedRowKey, selectedRow, setSelectedRow,  rowSelection } = useSetTableCheckBoxHook();
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchAdmissionNumber, setSearchAdmissionNumber] = useState('')
   
-const columns = [
-    {
-        title: 'Adm No',
-        dataIndex: 'AdmissionNo',
-        key: 'AdmissionNo',
-        fixed: 'left',
-        width: 100
-    },
-    {
-        title: 'Patient No',
-        dataIndex: 'PatientNo',
-        key: 'PatientNo',
-    },
-    {
-        title: 'Names',
-        dataIndex: 'Search_Names',
-        key: 'Search_Names',
-        render: (_, record) => {
-            return <Typography.Text style={{ color: '#0f5689' }}>
-                {record.Search_Names}
-            </Typography.Text>
-        }
-    },
-    {
-        title: 'Adm Date',
-        dataIndex: 'DateofAdmission',
-        key: 'DateofAdmission',
-    },
-    {
-        title: 'Ward',
-        dataIndex: 'WardNo',
-        key: 'WardNo',
-    },
-    {
-        title: 'Bed',
-        dataIndex: 'BedNo',
-        key: 'BedNo',
-    },
-    {
-        title: 'Doctor',
-        dataIndex: 'DoctorName',
-        key: 'DoctorName',
-        render: (_, record) => {
-            return <Typography.Text style={{ color: '#0f5689' }}>
-                {record?.DoctorName || ''}
-            </Typography.Text>
-        }
-    },
-    {
-        title: 'Remarks',
-        dataIndex: 'Remarks',
-        key: 'Remarks',
-        fixed: 'right',
-        width: 150,
-    },
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const { loading, data } = useSelector(state => state.getDoctorsList);
 
-];
+  const columns = [
+      {
+          title: 'Adm No',
+          dataIndex: 'AdmissionNo',
+          key: 'AdmissionNo',
+          fixed: 'left',
+          width: 100,
+          filteredValue: searchAdmissionNumber ? [searchAdmissionNumber] : null,
+          onFilter: (value, record) =>
+            record?.AdmissionNo ?
+            record.AdmissionNo.toLowerCase().includes(value.toLowerCase()) : false,
+      },
+      {
+          title: 'Patient No',
+          dataIndex: 'PatientNo',
+          key: 'PatientNo',
+          filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+          onFilter: (value, record) =>
+            record?.PatientNo ?
+            record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
+      },
+      {
+          title: 'Names',
+          dataIndex: 'Search_Names',
+          key: 'Search_Names',
+          filteredValue: searchName ? [searchName] : null,
+          onFilter: (value, record) =>
+              record?.Search_Names ?
+              record.Search_Names.toLowerCase().includes(value.toLowerCase()) : false,
+          render: (_, record) => {
+              return <Typography.Text style={{ color: '#0f5689' }}>
+                  {record.Search_Names}
+              </Typography.Text>
+          }
+      },
+      {
+          title: 'Adm Date',
+          dataIndex: 'DateofAdmission',
+          key: 'DateofAdmission',
+      },
+      {
+          title: 'Ward',
+          dataIndex: 'WardNo',
+          key: 'WardNo',
+      },
+      {
+          title: 'Bed',
+          dataIndex: 'BedNo',
+          key: 'BedNo',
+      },
+      {
+          title: 'Doctor',
+          dataIndex: 'DoctorName',
+          key: 'DoctorName',
+          render: (_, record) => {
+              return <Typography.Text style={{ color: '#0f5689' }}>
+                  {record?.DoctorName || ''}
+              </Typography.Text>
+          }
+      },
+      {
+          title: 'Remarks',
+          dataIndex: 'Remarks',
+          key: 'Remarks',
+          fixed: 'right',
+          width: 150,
+      },
 
-const {loadingGetPatientDischargeList, getPatientDischargeList} = useSelector(state => state.getPgInpatientDischargeList);
-const { confirm } = Modal;
-const { setIsButtonDisabled, setSelectedRowKey, selectedRowKey, selectedRow, setSelectedRow,  rowSelection } = useSetTableCheckBoxHook();
-
-const dispatch = useDispatch();
-const navigate = useNavigate();
-
-const { loading, data } = useSelector(state => state.getDoctorsList);
+  ];
 
 const formattedDoctorDetails = data.map(doctor => {
     return {
@@ -301,7 +315,7 @@ useEffect(() => {
         </div>
         </Card>
 
-         <SearchFilters />
+         <FilterInpatientList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchAdmissionNumber}/> 
 
           {
             loadingGetPatientDischargeList || loading ? (

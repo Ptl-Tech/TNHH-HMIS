@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './TriageSummeryCard';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
-import { getColorByWaitingTime } from '../../utils/helpers';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 import { useLocation } from 'react-router-dom';
 import FilterTriageList from '../../partials/nurse-partials/FilterTriageList';
@@ -21,7 +20,7 @@ const TriageListClosed = () => {
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
   // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
 
-  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+  const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
   
   
   const openTriageList = triageList.filter((item) => item.Status === 'Closed');
@@ -70,7 +69,8 @@ const handleTableChange = (newPagination) => {
       key: 'ObservationNo',
       filteredValue: searchObservationNumber ? [searchObservationNumber] : null,
       onFilter: (value, record) =>
-      record.ObservationNo.toLowerCase().includes(value.toLowerCase()),
+        record?.ObservationNo ?
+        record.ObservationNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
     {
       title: 'Patient Number',
@@ -78,7 +78,8 @@ const handleTableChange = (newPagination) => {
       key: 'PatientNo',
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
-      record.PatientNo.toLowerCase().includes(value.toLowerCase()),
+        record?.PatientNo ?
+        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
     {
       title: 'Patient Name',
@@ -86,9 +87,10 @@ const handleTableChange = (newPagination) => {
       key: 'SearchName',
       filteredValue: searchName ? [searchName] : null,
       onFilter: (value, record) =>
-        record.SearchName.toLowerCase().includes(value.toLowerCase()),
-      render: (name, record) => (
-        <div style={{ color: getColorByWaitingTime(record.ObservationTime) }}>
+        record?.SearchName ?
+        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
+      render: (name) => (
+        <div style={{ color: '#0f5689' }}>
           {name}
         </div>
       )
@@ -116,7 +118,7 @@ const handleTableChange = (newPagination) => {
           
 
           {
-            loadingTriageList ? 
+            loadingTriageList || loadingWaitingList ? 
             (
               <Loading />
             )

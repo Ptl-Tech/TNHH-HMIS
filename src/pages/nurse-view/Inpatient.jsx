@@ -1,17 +1,21 @@
-import { Card, Input } from "antd";
+
 import { useNavigate } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../../hooks/useAuth";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
+import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
 const Impatient = () => {
   const dispatch = useDispatch();
   const userDetails = useAuth();  // Use the custom hook to get user info
   const { loading, data } = useSelector(state => state.getDoctorsList);
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchAdmissionNumber, setSearchAdmissionNumber] = useState('')
  
   const navigate = useNavigate();
 
@@ -62,21 +66,9 @@ console.log('combined patients', combinedPatients)
       
       <NurseInnerHeader filterInPatients={combinedPatients} title="Current Inpatients" />
 
-      <Card style={{ padding: "10px 10px 10px 10px" }}>
-        <div className="admit-patient-filter-container">
-          <Input placeholder="search by name" allowClear showCount />
-          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
-            or
-          </span>
-          <Input placeholder="search by patient no" allowClear showCount />
-          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
-            or
-          </span>
-          <Input placeholder="search by admission number" allowClear showCount />
-        </div>
-      </Card>
+      <FilterInpatientList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchAdmissionNumber}/> 
 
-      <InpatientTable loadingAdmittedPatients={loadingAdmittedPatients} loading={loading} handleNavigate={handleNavigate} filterInPatients={combinedPatients} />
+      <InpatientTable loadingAdmittedPatients={loadingAdmittedPatients} loading={loading} handleNavigate={handleNavigate} filterInPatients={combinedPatients} searchName={searchName} searchPatientNumber={searchPatientNumber} searchAdmissionNumber={searchAdmissionNumber}/>
 
     </div>
   );
