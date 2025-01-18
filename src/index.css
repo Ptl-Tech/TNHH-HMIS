@@ -37,6 +37,9 @@
   background: #0f5689 !important;
 }
 
+:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+  background: #0f5689 !important;
+}
 :where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper .ant-table-tbody > tr > th{
   background-color:  #fff !important;
   color: #000 !important;
