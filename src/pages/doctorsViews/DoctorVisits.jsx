@@ -228,7 +228,10 @@ const DoctorVisits = () => {
           <Badge
             color={color}
             text={text} // Display urgency text
-            style={{ color: color }}
+            className="fw-bold"
+            style={{ 
+              color: color,
+            }}
           />
         );
       },

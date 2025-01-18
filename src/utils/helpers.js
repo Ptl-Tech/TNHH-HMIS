@@ -37,7 +37,7 @@ export const getColorByWaitingTime = (observationDateTime) => {
       case "Emergency":
         return { color: "#EB6965", text: "Emergency" }; // Red for high urgency
       default:
-        return { color: "#35AB22", text: "Low" }; // Default is low urgency
+        return { color: "#35AB22", text: "Normal" }; // Default is low urgency
     }
   };
   
