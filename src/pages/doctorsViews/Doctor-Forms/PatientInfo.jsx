@@ -180,7 +180,7 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
             justifyContent: "space-between",
           }}
         >
-          <Typography.Title
+          {/* <Typography.Title
             level={5}
             style={{ fontSize: "14px", color: "black" }}
           >
@@ -194,7 +194,7 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
             }}
           >
             {` KSH. ${patientDetails?.Balance} `}
-          </Typography.Text>
+          </Typography.Text> */}
         </div>
         <div
           style={{

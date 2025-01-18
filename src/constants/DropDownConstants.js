@@ -21,23 +21,23 @@ export const prescriptionDoseTypes = [
   },
   {
     value: "2",
-    label: "PRN",
+    label: "As Needed",
   },
   {
     value: "3",
-    label: "PD",
+    label: "Twice a Day",
   },
   {
     value: "4",
-    label: "TDS",
+    label: "Three Times a Day",
   },
   {
     value: "5",
-    label: "OD",
+    label: "Once a Day",
   },
   {
     value: "6",
-    label: "QID",
+    label: "Four Times a Day",
   },
   {
     value: "7",
