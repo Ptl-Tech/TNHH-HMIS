@@ -122,7 +122,7 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {`${localStorage.getItem("branchCode") || "N/A"} Branch`}
+                  {`${localStorage.getItem("branchCode") || "No"} Branch`}
                 </Typography.Text>
               </div>
             </Space>
@@ -159,7 +159,7 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                             marginLeft: "10px",
                           }}
                         >
-                          {userDetails?.userData?.floorNo || "N/A"}
+                          {userDetails?.userData?.floorNo || "Floor 1"}
                         </Typography.Text>
                       </div>
                     </div>
@@ -187,7 +187,7 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                             marginLeft: "10px",
                           }}
                         >
-                          {userDetails?.userData?.doctorRoomNo || "N/A"}
+                          {userDetails?.userData?.doctorRoomNo || "Room 1"}
                         </Typography.Text>
                       </div>
                     </div>
