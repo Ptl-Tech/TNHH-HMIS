@@ -95,7 +95,7 @@ const PrescriptionForm = () => {
     setPrescriptionCardData(updatedData);
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const {
       // PrescriptionQuantity,
       PrescriptionRemarks,
@@ -124,10 +124,11 @@ const PrescriptionForm = () => {
       remarks: PrescriptionRemarks,
     };
 
-    console.log('prescription', prescription);
     setIsSubmitting(true); // Start the loading simulation
 
-    dispatch(postPrescriptionDetails(prescription)); // Dispatch the action
+    await dispatch(postPrescriptionDetails(prescription))
+    dispatch(getQyPrescriptionLineSlice())
+    
   };
   
   const handleSearch = (value) => {
