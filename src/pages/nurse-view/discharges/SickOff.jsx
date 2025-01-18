@@ -1,8 +1,9 @@
-import { Button, DatePicker, Form, Input, Modal, Space, Typography } from 'antd'
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, DatePicker, Form, Input, Modal } from 'antd'
+import { PlusOutlined, UserAddOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import SickOffTable from '../tables/nurse-tables/SickOffTable';
+import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
 
 const SickOff = () => {
 
@@ -48,12 +49,7 @@ const SickOff = () => {
     const [ form ] = Form.useForm();
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Sick Off
-          </Typography.Text>
-        </Space>
+        <NurseInnerHeader icon={<UserAddOutlined/>} title="Sick Off" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Sick Off

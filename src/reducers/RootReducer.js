@@ -191,6 +191,7 @@ import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
 import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
+import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -348,6 +349,7 @@ export const rootReducer = combineReducers({
   postMSEForm:postMSENotesReducer,
   getPatientMSE:getPatientMSENotesReducer,
   getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
-  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer
+  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
+  getQyPrescriptionLine:getQyPrescriptionLinesReducer
 
 });

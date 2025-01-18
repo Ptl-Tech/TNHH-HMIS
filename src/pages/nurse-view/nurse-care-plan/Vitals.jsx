@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Modal, Row } from "antd";
 import { useState } from "react";
-import { FolderViewOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { FolderViewOutlined, FolderAddOutlined, FileMarkdownOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
 import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
@@ -49,7 +49,7 @@ const Vitals = () => {
 
   return (
     <div>
-      <NurseInnerHeader title="Vitals"/>
+      <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Vitals"/>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />

@@ -1,7 +1,8 @@
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Select } from "antd"
+import { PlusOutlined, FileMarkdownOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import DischargeMedicationTable from "../tables/nurse-tables/DischargeMedicationTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const DischargeMedication = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,12 +19,8 @@ const DischargeMedication = () => {
     const [ form ] = Form.useForm();
   return (
     <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Discharge Medication
-          </Typography.Text>
-        </Space>
+        
+        <NurseInnerHeader icon={<FileMarkdownOutlined/>} title="Discharge Medication" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
             <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Discharge Medication

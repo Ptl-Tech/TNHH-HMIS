@@ -1,11 +1,12 @@
-import { Button, Space, Typography } from "antd"
-import { ProfileOutlined, PlusOutlined, PrinterOutlined } from "@ant-design/icons"
+import { Button } from "antd"
+import { PlusOutlined, PrinterOutlined, HeartOutlined } from "@ant-design/icons"
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumablesTable";
 import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 import ConsumablesFormData from "../forms/nurse-forms/ConsumablesFormData";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const Consumables = () => {
 
@@ -31,12 +32,8 @@ const Consumables = () => {
 
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Patient Consumable
-          </Typography.Text>
-        </Space>
+      
+      <NurseInnerHeader icon={<HeartOutlined />} title="Consumables" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility}><PlusOutlined /> Add Consumables</Button>

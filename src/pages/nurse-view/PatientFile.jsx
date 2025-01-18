@@ -23,8 +23,8 @@ const PatientFile = ({ patientDetails }) => {
     ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
-    "Consumables",
-    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+    // "Consumables",
+    ...(userRole.userData.departmentName === "Nurse" ? ["Consumables"] : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
