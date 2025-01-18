@@ -8,8 +8,8 @@ const PatientInfo = () => {
   const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
   const { patientDetails } = useLocation().state;
   const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
-
-  const patientPrimaryInfo = [
+ 
+    const patientPrimaryInfo = [
     {
         title: 'Patient Name',
         description: patientDetails?.PatientName || 'N/A',

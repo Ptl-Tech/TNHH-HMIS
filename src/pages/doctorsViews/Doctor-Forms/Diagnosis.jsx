@@ -97,6 +97,9 @@ const Diagnosis = () => {
   const handleHistoryClick = () => {
     setHistoryVisible(true);
   };
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Close the modal by updating state
+  };
 
   const handleSave = async () => {
     const plainTextContent = editorState.getCurrentContent().getPlainText();
@@ -221,6 +224,8 @@ const Diagnosis = () => {
       // Show modal with success or error message after all diagnoses are processed
       if (success && !loading) {
         message.success("All diagnoses saved successfully!"); // Show success message after all saves
+        dispatch(getDiagnosisLines(treatmentNo));
+        form.resetFields();
         setModalContent({
           type: "success",
           title: "Success",
@@ -274,11 +279,9 @@ const Diagnosis = () => {
           </Button>
         </Col>
       </Row>
-      {!isModalVisible && (
-        <DiagnosisTable
+      <DiagnosisTable
        treatmentNo={treatmentNo}
         />
-      )}
 
       {/* Show the diagnosis history modal */}
       <Modal
@@ -311,7 +314,8 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-            />
+              OnClose={handleModalClose}
+              />
           </TabPane>
 
           <TabPane tab="Add Secondary Diagnosis" key="2">
@@ -326,8 +330,8 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-              onclose={handleHistoryClick}
-            />
+              OnClose={handleModalClose} 
+              />
           </TabPane>
         </Tabs>
       </Modal>

@@ -18,10 +18,10 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
 
   // Fetch patient history notes
   useEffect(() => {
-    if (patientNo) {
-      dispatch(getPatientHistorySlice(patientNo));
+    if (treatmentNo) {
+      dispatch(getPatientHistorySlice(treatmentNo));
     }
-  }, [dispatch, patientNo]);
+  }, [dispatch, treatmentNo]);
 
   // Extract initial values for the form
   const initialValues = useMemo(() => ({

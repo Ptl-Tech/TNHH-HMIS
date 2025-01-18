@@ -17,6 +17,7 @@ const DiagnosisTable = ({ treatmentNo }) => {
       dispatch(getDiagnosisLines(treatmentNo));
     }
   }, [dispatch, treatmentNo]);
+
   const diagnosisLinesColumns = [
     {
       title: "Treatment No",
@@ -28,12 +29,12 @@ const DiagnosisTable = ({ treatmentNo }) => {
     },
     {
       title: "Diagnosis Code",
-      dataIndex: "DiagnosisCode",
+      dataIndex: "DiagnosisCode", // Updated
       key: "DiagnosisCode",
     },
     {
       title: "Diagnosis",
-      dataIndex: "DiagnosisName",
+      dataIndex: "DiagnosisName", // Updated
       key: "DiagnosisName",
     },
     {
@@ -48,7 +49,7 @@ const DiagnosisTable = ({ treatmentNo }) => {
     },
     {
       title: "Remarks",
-      dataIndex: "Remarks",
+      dataIndex: "Remarks", // Updated
       key: "Remarks",
     },
     {
@@ -69,10 +70,20 @@ const DiagnosisTable = ({ treatmentNo }) => {
     total: diagnosisLines?.length,
   });
 
-  const dataSource = diagnosisLines.map((item) => ({
-   
-    key: item.TreatmentNo,
-  }));
+  console.log("mydiagnosisLines", diagnosisLines);
+   // Convert diagnosisLines to an array if necessary
+  const dataSource = Array.isArray(diagnosisLines)
+    ? diagnosisLines
+    : Object.keys(diagnosisLines).map((item, index) => ({
+        key: index,
+        TreatmentNo: item.TreatmentNo,
+        DiagnosisCode: item.DiagnosisCode,
+        DiagnosisName: item.DiagnosisName || item.Description,
+        Confirmed: item.Confirmed,
+        Remarks: item.Remarks,
+      }));
+
+console.log("dataSource", dataSource)
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
@@ -82,25 +93,29 @@ const DiagnosisTable = ({ treatmentNo }) => {
     <div style={{ paddingTop: "30px" }}>
       {loadingDiagnosisLines ? (
         <Loading />
-      ) : diagnosisLines && diagnosisLines.length > 0 ? (
+      ) : dataSource && dataSource.length > 0 ? (
         <Table
-          columns={diagnosisLinesColumns}
-          dataSource={dataSource}
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            total: dataSource.length,
-            showSizeChanger: true,
-            showQuickJumper: true,
-          }}
-        />
+  columns={diagnosisLinesColumns}
+  dataSource={dataSource.map((item, index) => ({
+    ...item,
+    key: item.key || index, // Ensure unique keys
+  }))}
+  bordered
+  size="middle"
+  pagination={{
+    ...pagination,
+    total: dataSource.length,
+    showSizeChanger: true,
+    showQuickJumper: true,
+  }}
+  onChange={handleTableChange}
+/>
+
       ) : (
         <p>No diagnosis lines available.</p>
       )}
     </div>
   );
 };
-
 
 export default DiagnosisTable;

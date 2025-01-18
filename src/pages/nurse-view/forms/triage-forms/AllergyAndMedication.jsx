@@ -74,6 +74,8 @@ const AllergyAndMedication = ({ observationNumber, patientNumber, staffNo }) => 
     },
   ]
 
+  console.log("allergiesMedication", allergiesMedication);
+
   const dataSource = allergiesMedication
     .map((item) => ({
       key: item.observationNo, // Unique key for each row
