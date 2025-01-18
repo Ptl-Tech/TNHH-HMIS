@@ -18,7 +18,7 @@ const PatientFile = ({ patientDetails }) => {
   // Define menu items conditionally
   const menuItems = [
     "Patient Info",
-    "Medical Info",
+    // "Medical Info",
     "Next of Kin",
     ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
     "Nursing Notes",
@@ -34,9 +34,9 @@ const PatientFile = ({ patientDetails }) => {
       case "Patient Info":
         setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
         break;
-      case "Medical Info":
-        setSelectedItem(<MedicalInfo />);
-        break;
+      // case "Medical Info":
+      //   setSelectedItem(<MedicalInfo />);
+      //   break;
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
@@ -46,7 +46,7 @@ const PatientFile = ({ patientDetails }) => {
       case "Nursing Notes":
         setSelectedItem(<NursingNotes />);
         break;
-      case "Treatments History":
+      case "Past Encounters Notes":
         setSelectedItem(<TreatmentHistory />);
         break;
       case "Consumables":

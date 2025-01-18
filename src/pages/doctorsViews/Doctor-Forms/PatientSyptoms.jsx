@@ -187,11 +187,21 @@ const PatientSymptoms = ({ treatmentNo }) => {
             <Panel header="Mood & Affect" key="1">
               <Form.Item
                 name="mood"
-                label="Describe patient Form thoughts and Content"
+                label="Describe Patient Form of Thought."
                 rules={[{ required: true, message: "Please describe mood!" }]}
               >
                 <TextArea
-                  placeholder="e.g., depressed, anxious, euphoric..."
+                  placeholder="e.g., thoughts, dreams, memories..."
+                  autoSize={{ minRows: 6 }}
+                />
+              </Form.Item>
+              <Form.Item
+                name="mood"
+                label="Describe Patient Thought Content"
+                rules={[{ required: true, message: "Please decribe patient Thought Content!" }]}
+              >
+                <TextArea
+                  placeholder="e.g., thoughts, dreams, memories..."
                   autoSize={{ minRows: 6 }}
                 />
               </Form.Item>
