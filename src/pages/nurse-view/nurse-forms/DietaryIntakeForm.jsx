@@ -1,5 +1,5 @@
 import { Button, Form, Modal, Select } from 'antd'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import DietaryIntakeTable from '../tables/nurse-tables/DietaryIntakeTable';
@@ -60,7 +60,7 @@ const DietaryIntakeForm = () => {
     
   return (
     <div>
-        <NurseInnerHeader title="Dietary Intake Form" />
+        <NurseInnerHeader icon={<FileOutlined />} title="Dietary Intake Form" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
 

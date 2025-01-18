@@ -1,6 +1,6 @@
-import { Button, Space, Typography } from "antd";
+import { Button } from "antd";
 import { useEffect, useState } from "react";
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons";
+import { PlusOutlined, UserAddOutlined, FolderViewOutlined } from "@ant-design/icons";
 import GeneralObservationsTable from "../tables/nurse-tables/GeneralObservationsTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
@@ -36,7 +36,7 @@ const DailyProcess = () => {
   return (
     <div>
         
-        <NurseInnerHeader title={role === 'NURSE' ? 'Nursing Rounds' : 'Daily Ward Rounds'} />
+        <NurseInnerHeader icon={<UserAddOutlined />} title={role === 'NURSE' ? 'Nursing Rounds' : 'Daily Ward Rounds'} />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility}><PlusOutlined /> Add Daily Progress</Button>

@@ -1,11 +1,14 @@
-import { Button, Form, Modal, Select, Space, Typography } from "antd"
-import { ProfileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, Form, Modal, Select } from "antd"
+import { MedicineBoxOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import RadiologyRequestTable from "../tables/nurse-tables/RadiologyRequestTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import RadiologyRequestFormData from "../forms/nurse-forms/RadiologyRequestFormData";
 
 const RadiologyRequest = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFormVisible, setIsFormVisible] = useState(false);
     const showModal = () => {
       setIsModalOpen(true);
     };
@@ -15,28 +18,37 @@ const RadiologyRequest = () => {
     const handleCancel = () => {
       setIsModalOpen(false);
     };
+
+    const handleVitalsButtonVisibility = () => {
+      setIsFormVisible(!isFormVisible);
+    }
   
     const [ form ] = Form.useForm();
 
   return (
     <div>
         
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Radiology Requests
-          </Typography.Text>
-        </Space>
+        <NurseInnerHeader icon={<MedicineBoxOutlined />} title="Radiology Request" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Radiology Request
+            <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility}><PlusOutlined /> Add Radiology Request
           </Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
             Preview Radiology Request
           </Button>
         </div>
 
-        <RadiologyRequestTable />
+        {
+          isFormVisible && (
+            <RadiologyRequestFormData setIsFormVisible={setIsFormVisible} />
+          )
+        }
+
+        {
+          !isFormVisible && (
+            <RadiologyRequestTable />
+          )
+        }
 
         <Modal title="Radiology Request" 
           open={isModalOpen} 
@@ -106,7 +118,7 @@ const RadiologyRequest = () => {
               rows={2}
           />
         </Form.Item>
-        </Form>
+            </Form>
         </Modal>
 
     </div>

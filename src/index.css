@@ -479,3 +479,27 @@ main {
 }
 
 /* END OF NURSE MODULE STYLES */
+
+.ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: black !important;
+}
+
+.ant-tabs-tab-btn {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+  background-color: #0f5689 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab-active {
+  background-color: #dddada !important;
+}
+
+.active-button{
+  background-color: #cac6c6 !important;
+  color: black !important;
+  border: none !important;
+}

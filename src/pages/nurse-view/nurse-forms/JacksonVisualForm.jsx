@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal, Select } from 'antd'
 import { useEffect, useState } from 'react'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import JacksonVisualFormTable from '../tables/nurse-tables/JacksonVisualFormTable';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,6 @@ const JacksonVisualForm = () => {
     const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm);
 
     const filterJacksonFormData = getJacksonVisual.filter((item) => item.AdmissionNo === patientDetails?.CurrentAdmNo);   
-    console.log('filterJacksonFormData', filterJacksonFormData);
 
     const handleButtonVisibility = () => {
       setIsFormVisible(!isFormVisible);
@@ -54,7 +53,7 @@ const JacksonVisualForm = () => {
   return (
     <div>
         
-        <NurseInnerHeader title="Jackson Visual Form" />
+        <NurseInnerHeader icon={<FileOutlined />} title="Jackson Visual Form" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           {

@@ -228,6 +228,7 @@ function App() {
             path="/Doctor/Past-doctor-visit/Patient"
             element={<TreatmentCard />}
           />
+          <Route path="/Doctor/Inpatient/Read-nurse-notes" element={<ReadNurseNotes />} />
           <Route
             path="/Doctor/Past-doctor-visit/Patient"
             element={<TreatmentCard />}

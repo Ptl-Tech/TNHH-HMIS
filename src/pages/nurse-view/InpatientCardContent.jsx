@@ -12,7 +12,10 @@ const InpatientCardContent = () => {
   return (
     <>
         <Card className="card">
-            <Tabs defaultActiveKey="1">
+            <Tabs 
+            defaultActiveKey="1"
+            type="card"
+            >
                 <Tabs.TabPane tab="Patient File" key="1">
                     <PatientFile />
                 </Tabs.TabPane>
@@ -25,15 +28,15 @@ const InpatientCardContent = () => {
                 <Tabs.TabPane tab="Discharge" key="4">
                     <Discharges/>
                 </Tabs.TabPane>
-                {
+                {/* {
                     role === "Doctor" &&
                     <Tabs.TabPane tab=" OutPatient Notes" key="6">
                         <Discharges/>
                     </Tabs.TabPane>
-                }
-                <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : ""} key="5">
+                } */}
+                {/* <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : ""} key="5">
                     <NurseForms/>
-                </Tabs.TabPane>
+                </Tabs.TabPane> */}
             </Tabs>
         </Card>
     </>

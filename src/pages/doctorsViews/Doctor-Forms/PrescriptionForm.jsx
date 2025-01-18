@@ -9,6 +9,7 @@ import {
   Empty,
   Card,
   List,
+  Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
@@ -27,11 +28,21 @@ import {
   routeTypes,
 } from "../../../constants/DropDownConstants";
 import { useForm } from "antd/es/form/Form";
+import useAuth from "../../../hooks/useAuth";
+import PrescriptionTable from "../tables/PrescriptionTable";
+import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
 const PrescriptionForm = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); // Get treatmentNo from URL
+  const staffNo = useAuth().userData.no;
+  const { loadingPrescriptions, prescriptions} = useSelector((state) => state.getQyPrescriptionLine);
+
+  const filteredPrescriptions = prescriptions.filter(
+    (prescription) => prescription.TreatmentNo === treatmentNo
+  );
+  
 
   const dispatch = useDispatch();
   const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
@@ -52,6 +63,10 @@ const PrescriptionForm = () => {
 
   useEffect(() => {
     dispatch(getItemUnitsOfMeasureSlice());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getQyPrescriptionLineSlice());
   }, [dispatch]);
 
   const [prescriptionCardData, setPrescriptionCardData] = useState({
@@ -82,31 +97,34 @@ const PrescriptionForm = () => {
 
   const onFinish = (values) => {
     const {
-      PrescriptionQuantity,
+      // PrescriptionQuantity,
       PrescriptionRemarks,
-      DrugGroup,
+      // DrugGroup,
       DrugNo,
       UnitOfMeasure,
       Dosage,
       prescriptionDose,
       route,
       noOfDays,
-    } = values.Prescriptions;
+    } = values;
 
     const prescription = {
       myAction: "create",
       treatmentNo: treatmentNo, // Send treatmentNo to the backend
-      drugGroup: DrugNo,
+      // drugGroup: DrugGroup,
+      staffNo,
       drugNo: DrugNo,
-      quantity: PrescriptionQuantity,
+      drugGroup: 'no',
+      // quantity: PrescriptionQuantity,
       unitOfMeasure: UnitOfMeasure,
       dosage: Dosage,
       prescriptionDose: prescriptionDose,
-      // noOfDays: noOfDays,
+      noOfDays: noOfDays,
       route: route,
       remarks: PrescriptionRemarks,
     };
 
+    console.log('prescription', prescription);
     setIsSubmitting(true); // Start the loading simulation
 
     dispatch(postPrescriptionDetails(prescription)); // Dispatch the action
@@ -128,7 +146,9 @@ const PrescriptionForm = () => {
   };
 
   return (
-    <Row gutter={24}>
+    
+    <>
+      <Row gutter={24}>
       {/* drug input card */}
       <Col span={16}>
         <Card title="Prescription Form" style={{ padding: "10px 16px" }}>
@@ -156,7 +176,7 @@ const PrescriptionForm = () => {
           >
             <Form.Item
               label="Search Drug Name"
-              name={["Prescriptions", "DrugNo"]}
+              name="DrugNo"
               hasFeedback
               rules={[
                 {
@@ -168,7 +188,6 @@ const PrescriptionForm = () => {
             >
               {items && (
                 <Select
-                  name="DrugNo"
                   placeholder="Select Drug e.g Paracetamol"
                   showSearch
                   suffixIcon={<SearchOutlined />}
@@ -197,7 +216,7 @@ const PrescriptionForm = () => {
             <div className="d-block d-flex align-items-center justify-content-between gap-2">
               <Form.Item
                 label="Route"
-                name={["Prescriptions", "route"]}
+                name="route"
                 hasFeedback
                 rules={[
                   {
@@ -222,7 +241,7 @@ const PrescriptionForm = () => {
               </Form.Item>
               <Form.Item
                 label="Dosage"
-                name={["Prescriptions", "Dosage"]}
+                name="Dosage"
                 placeholder="Enter Dosage e.g 1 tablet"
                 hasFeedback
                 rules={[
@@ -234,7 +253,6 @@ const PrescriptionForm = () => {
                 className="w-100"
               >
                 <Input
-                  name="Dosage"
                   className="w-100"
                   placeholder="Enter Dosage e.g 1 tablet"
                 />
@@ -243,7 +261,7 @@ const PrescriptionForm = () => {
             <div className="d-block d-flex align-items-center justify-content-between gap-2">
               <Form.Item
                 label="Unit of Measure"
-                name={["Prescriptions", "UnitOfMeasure"]}
+                name="UnitOfMeasure"
                 hasFeedback
                 rules={[
                   {
@@ -254,7 +272,6 @@ const PrescriptionForm = () => {
                 className="w-100"
               >
                 <Select
-                  name="UnitOfMeasure"
                   placeholder="Select Unit e.g ml"
                   className="w-100"
                 >
@@ -267,7 +284,7 @@ const PrescriptionForm = () => {
               </Form.Item>
               <Form.Item
                 label="Frequency per Day"
-                name={["Prescriptions", "prescriptionDose"]}
+                name="prescriptionDose"
                 hasFeedback
                 rules={[
                   {
@@ -278,7 +295,6 @@ const PrescriptionForm = () => {
                 className="w-100"
               >
                 <Select
-                  name="prescriptionDose"
                   placeholder="Select Prescription Dose"
                   className="w-100"
                 >
@@ -294,7 +310,7 @@ const PrescriptionForm = () => {
             <div className="d-block d-flex align-items-center justify-content-between gap-2">
             <Form.Item
                 label="Duration (No of Days)"
-                name={["Prescriptions", "noOfDays"]}
+                name="noOfDays"
                 hasFeedback
                 placeholder="Enter No of Days e.g 1"
                 rules={[
@@ -335,7 +351,7 @@ const PrescriptionForm = () => {
 
             <Form.Item
               label="Prescription Remarks"
-              name={["Prescriptions", "PrescriptionRemarks"]}
+              name="PrescriptionRemarks"
               hasFeedback
             >
               <TextArea
@@ -344,8 +360,8 @@ const PrescriptionForm = () => {
               />
             </Form.Item>
 
-            <div className="d-flex align-items-start gap-2 justify-content-evenly">
-              <Form.Item>
+            <Space>
+            <Form.Item>
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -366,7 +382,8 @@ const PrescriptionForm = () => {
                   Send to Pharmacy
                 </Button>
               </Form.Item>
-            </div>
+            </Space>
+           
           </Form>
         </Card>
       </Col>
@@ -400,6 +417,15 @@ const PrescriptionForm = () => {
         </Card>
       </Col> */}
     </Row>
+
+  <Row>
+    <Col span={24}>
+      <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
+    </Col>
+  </Row>
+
+    </>
+
   );
 };
 

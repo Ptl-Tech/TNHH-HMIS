@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal } from "antd"
-import { PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
 import { useLocation } from "react-router-dom";
@@ -44,7 +44,7 @@ const AddAllergies = () => {
   return (
     <div>
 
-        <NurseInnerHeader title="Allergies and Medications" />
+        <NurseInnerHeader icon={<FileOutlined />} title="Allergies and Medications" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleButtonVisibility} icon={<PlusOutlined />}>

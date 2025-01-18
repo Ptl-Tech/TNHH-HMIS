@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import Loading from "../../../partials/nurse-partials/Loading";
+import { UserAddOutlined } from "@ant-design/icons";
 
 const NextOfKin = () => {
 
@@ -36,7 +37,7 @@ const NextOfKin = () => {
   return (
     
    <div>
-      <NurseInnerHeader title="Next of Kin Information" />
+      <NurseInnerHeader icon={<UserAddOutlined />}title="Next of Kin Information" />
        {
          loadingTriageWaitingList ? (
             <Loading />
