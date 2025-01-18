@@ -10,12 +10,10 @@ import Consumables from "./nurse-patient-file/Consumables";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
-import { HeartOutlined, FileOutlined, FileMarkdownOutlined, UserAddOutlined, MedicineBoxOutlined, SolutionOutlined  } from "@ant-design/icons";
 
 const PatientFile = ({ patientDetails }) => {
   const userRole = useAuth();
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
-  const [activeItem, setActiveItem] = useState('Patient Info');
 
   // Define menu items conditionally
   const menuItems = [
@@ -25,16 +23,14 @@ const PatientFile = ({ patientDetails }) => {
     ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
-    "Consumables",
-    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+    // "Consumables",
+    ...(userRole.userData.departmentName === "Nurse" ? ["Consumables"] : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
-  
 
   const handleOnClick = (item) => {
-    setActiveItem(item.label);
-    switch (item.label) {
+    switch (item) {
       case "Patient Info":
         setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
         break;
@@ -73,12 +69,10 @@ const PatientFile = ({ patientDetails }) => {
         {menuItems.map((item, index) => (
           <Button
             key={index}
-            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
-            className={activeItem === item.label ? "active-button" : ""}
+            type="primary"
             onClick={() => handleOnClick(item)}
           >
-            {item.icon}
-            {item.label}
+            {item}
           </Button>
         ))}
       </div>
