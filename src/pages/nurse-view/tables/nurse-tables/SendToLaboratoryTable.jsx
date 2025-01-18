@@ -1,7 +1,8 @@
 import { Badge, Table } from "antd"
 
 
-const SendToLaboratoryTable = () => {
+const 
+SendToLaboratoryTable = () => {
 
     const columns = [
         {

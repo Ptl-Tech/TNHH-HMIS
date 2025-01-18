@@ -18,18 +18,19 @@ import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
 
 import { FaNotesMedical } from "react-icons/fa6";
 import SickOff from "../../nurse-view/discharges/SickOff";
+import PropTypes from "prop-types";
 
 const { Title } = Typography;
 
-const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
+const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
   const handleOnClick = (item) => {
     switch (item) {
       case "Vitals":
         setSelectedItem(<FormVitals treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-     case'Allergies and Medications':
-     setSelectedItem(<AllergyAndMedication />);
-     break;
+      case 'Allergies and Medications':
+        setSelectedItem(<AllergyAndMedication treatmentNo={treatmentNo} observationNumber={observationNo} patientNumber={patientNo} setIsFormVisible={false} />);
+        break;
 
       default:
 
@@ -42,7 +43,7 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
   const buttonItems = [
     { label: "Vitals", icon: <HeartOutlined /> },
     { label: "Allergies and Medications", icon: <MedicineBoxOutlined /> },
-   
+
   ];
 
   return (
@@ -74,3 +75,9 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
 };
 
 export default ObservationRoom;
+
+ObservationRoom.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+}

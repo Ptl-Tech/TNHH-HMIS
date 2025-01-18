@@ -61,7 +61,7 @@ const ConsultationRoomEvalutionCard = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          <EvaluationCardContent treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} {...patientDetails} role={role}/>
+          <EvaluationCardContent treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} patientDetails={patientDetails} role={role}/>
         </Col>
        
       </Row>

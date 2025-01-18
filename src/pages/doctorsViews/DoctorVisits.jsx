@@ -43,7 +43,7 @@ const DoctorVisits = () => {
   }, [dispatch]);
 
   const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New" 
+    (item) => item.Status === "New"
   );
   const closedConsultationList = treatmentList?.filter(
     (item) => item.Status === "Closed"
@@ -88,7 +88,7 @@ const DoctorVisits = () => {
     }))
     .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
+  const [filteredPatients, setFilteredPatients] = useState("");
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -135,15 +135,18 @@ const DoctorVisits = () => {
       title: "Treatment No",
       dataIndex: "treatmentNo",
       key: "treatmentNo",
-      render: (text) => (
-        <span
-          onClick={() => handleNavigate(text, text.treatmentNo)}
-          className="fw-bold"
-          style={{ color: "green" }}
-        >
-          {text}
-        </span>
-      ),
+      render: (_, record) => {
+        const { color } = getUrgencyColorcode(record.urgency)
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            className="fw-bold"
+            style={{ color: color }}
+          >
+            {record.treatmentNo}
+          </span>
+        )
+      }
     },
     {
       title: "Patient Name",
@@ -225,7 +228,10 @@ const DoctorVisits = () => {
           <Badge
             color={color}
             text={text} // Display urgency text
-            style={{ color: color }}
+            className="fw-bold"
+            style={{ 
+              color: color,
+            }}
           />
         );
       },
@@ -309,7 +315,7 @@ const DoctorVisits = () => {
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={filteredPatients}
+          dataSource={waitingListTableDataSource}
           bordered
           size="middle"
           rowClassName={rowClassName} // Apply the row color

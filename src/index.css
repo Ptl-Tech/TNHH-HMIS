@@ -33,7 +33,7 @@
   background: #0f5689 !important;
 }
 
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+.ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
   background: #0f5689 !important;
 }
 
@@ -145,6 +145,22 @@
   justify-content: flex-end;
   gap: 28px; /* Adjust spacing as needed */
   margin-top: 16px;
+}
+.iframe-scrollbar {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent; /* For Firefox */
+}
+
+.iframe-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .st{

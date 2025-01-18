@@ -15,6 +15,7 @@ const EvaluationCardContent = ({
   patientDetails,
   role
 }) => {
+
   return (
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>

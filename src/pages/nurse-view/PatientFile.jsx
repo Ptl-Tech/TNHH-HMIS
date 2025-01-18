@@ -19,16 +19,16 @@ const PatientFile = ({ patientDetails }) => {
 
   // Define menu items conditionally
   const menuItems = [
-    { label: "Patient Info", icon: <FileOutlined /> },
-    { label: "Medical Info", icon: <FileMarkdownOutlined /> },
-    { label: "Next of Kin", icon: <UserAddOutlined /> },
-    ...(userRole.userData.departmentName === "Doctor"
-      ? [{ label: "Past Doctor Notes", icon: <FileOutlined /> }]
-      : []),
-    { label: "Nursing Notes", icon: <MedicineBoxOutlined /> },
-    ...(userRole.userData.departmentName === "Nurse"
-      ? [{ label: "Treatments History", icon: <SolutionOutlined /> }, { label: "Consumables", icon: <HeartOutlined /> }]
-      : []),
+    "Patient Info",
+    // "Medical Info",
+    "Next of Kin",
+    ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
+    "Nursing Notes",
+    "Treatments History",
+    "Consumables",
+    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+
+    // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
   
 
@@ -38,9 +38,9 @@ const PatientFile = ({ patientDetails }) => {
       case "Patient Info":
         setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
         break;
-      case "Medical Info":
-        setSelectedItem(<MedicalInfo />);
-        break;
+      // case "Medical Info":
+      //   setSelectedItem(<MedicalInfo />);
+      //   break;
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
@@ -50,7 +50,7 @@ const PatientFile = ({ patientDetails }) => {
       case "Nursing Notes":
         setSelectedItem(<NursingNotes />);
         break;
-      case "Treatments History":
+      case "Past Encounters Notes":
         setSelectedItem(<TreatmentHistory />);
         break;
       case "Consumables":
