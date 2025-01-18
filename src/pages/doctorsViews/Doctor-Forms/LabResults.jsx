@@ -67,8 +67,12 @@ const LabResults = () => {
   };
 
   const handleFieldChange = (field, value) => {
-    setLabRequest((prev) => ({ ...prev, [field]: value }));
+    setLabRequest((prev) => ({
+      ...prev,
+      [field]: field === "dueDate" ? moment(value).format("YYYY-MM-DD") : value,
+    }));
   };
+  
 
   const handleSave = () => {
     dispatch(postLabRequest(labRequest)).then((data) => {
@@ -180,10 +184,10 @@ const LabResults = () => {
                 style={{ width: "100%" }}
               >
                 <DatePicker
-                  format="YYYY-MM-DD"
-                  value={moment()} // Set the current date
+                  // format="YYYY-MM-DD"
+                  value={moment().format("YYYY-MM-DD")} // Set the current date
                   style={{ width: "100%" }}
-                  disabled // Disable the field to make it readonly
+                  onChange={(date) => handleFieldChange("dueDate", date)}
                   inputReadOnly // Make the input readonly
                 />
               </Form.Item>

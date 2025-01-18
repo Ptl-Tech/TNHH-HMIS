@@ -27,7 +27,7 @@ export const getDiagnosisLines = (treatmentId) => async (dispatch, getState) => 
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentDiagnosisLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}'`,
+      `${API}data/odatafilter?webservice=QyTreatmentDiagnosisLines&isList=true  &query=$filter=TreatmentNo eq '${treatmentId}'`,
       config
     );
 

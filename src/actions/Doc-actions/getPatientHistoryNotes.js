@@ -8,8 +8,7 @@ export const REQUEST_PATIENT_HISTORY_LINES_SUCCESS = "REQUEST_PATIENT_HISTORY_LI
 export const REQUEST_PATIENT_HISTORY_LINES_FAIL = "REQUEST_PATIENT_HISTORY_LINES_FAIL";
 export const REQUEST_PATIENT_HISTORY_LINES_RESET = "REQUEST_PATIENT_HISTORY_LINES_RESET";
 
-export const getPatientHistorySlice = (patientNo) => async (dispatch, getState) => {
-    console.log('Action patient No:', patientNo)
+export const getPatientHistorySlice = (treatmentNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_PATIENT_HISTORY_LINES });
 
@@ -28,7 +27,7 @@ export const getPatientHistorySlice = (patientNo) => async (dispatch, getState) 
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgPatientHistoryNotes&isList=true&query=$filter=Patient_No eq '${patientNo}'`,
+      `${API}data/odatafilter?webservice=PgPatientHistoryNotes&isList=true&query=$filter=Treatment_No eq '${treatmentNo}'`,
       config
     );
 

@@ -56,12 +56,12 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
       case "Diagnosis Formulation":
         setSelectedItem(<Diagnosis />);
         break;
-      case "Past Encounters Notes":
-        setSelectedItem(
-          // <DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />
-          <TreatmentHistoryTable />
-        );
-        break;
+      // case "Past Encounters Notes":
+      //   setSelectedItem(
+      //     // <DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />
+      //     <TreatmentHistoryTable />
+      //   );
+      //   break;
       case "Aetiology":
         setSelectedItem(
           <FourPsForm
@@ -97,7 +97,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
     { label: "Mental Status Exam", icon: <SolutionOutlined /> },
     { label: "Past Medical History", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
-    { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
+    // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
     { label: "Psychology Notes", icon: <HeartOutlined /> },
   ];

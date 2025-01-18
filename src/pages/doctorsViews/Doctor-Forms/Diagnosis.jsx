@@ -33,6 +33,9 @@ import { EditorState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
+import DiagnosisTable from "../tables/Diagnosis/DiagnosisTable";
+import DiagnosisForm from "./DiagnosisForm";
+import DiagnosisFormulationForm from "./DiagnosisFormulationForm";
 const { Option } = Select;
 
 const Diagnosis = () => {
@@ -44,17 +47,16 @@ const Diagnosis = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { data } = useSelector((state) => state.getDiagnosisSetup);
-  const { loading: diagnosisLinesLoadingData, data:diagnosisLinesData } = useSelector((state) => state.getTreatmentDiagnosisLines);
-
+  const { loading: loadingDiagnosisLines, data: diagnosisLines } = useSelector(
+    (state) => state.getDiagnosisLines
+  );
   const { data: secondaryDiagnosis } = useSelector(
     (state) => state.getSecondaryDiagnosisSetup
   );
   const { loading, error, success } = useSelector(
     (state) => state.postdiagnosis
   );
-  const { loading: diagnosisLinesLoading, data: diagnosisLines } = useSelector(
-    (state) => state.getDiagnosisLines
-  );
+
   const { loading: savePatientHistory } = useSelector(
     (state) => state.postPatientHistory
   );
@@ -66,7 +68,7 @@ const Diagnosis = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const[lastSavedDiagnosis, setLastSavedDiagnosis] = useState([]);
+  const [lastSavedDiagnosis, setLastSavedDiagnosis] = useState([]);
   const [modalContent, setModalContent] = useState({
     type: "info",
     title: "",
@@ -95,8 +97,11 @@ const Diagnosis = () => {
   const handleHistoryClick = () => {
     setHistoryVisible(true);
   };
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Close the modal by updating state
+  };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const plainTextContent = editorState.getCurrentContent().getPlainText();
     form.validateFields().then((values) => {
       const payload = {
@@ -158,14 +163,20 @@ const Diagnosis = () => {
   };
   const handleSubmit = async (values) => {
     let success = true;
-  
+    const activeTab = activeKey; // Get the active tab key
+
     // Filter for unsaved diagnoses
-    const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter((diagnosis) => !diagnosis.diagnosisNo);
-    const lastUnSavedSecondaryDiagnosis = secondaryDiagnosisList.filter((diagnosis) => !diagnosis.diagnosisNo);
-  
+    const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter(
+      (diagnosis) => !diagnosis.diagnosisNo
+    );
+    const lastUnSavedSecondaryDiagnosis = secondaryDiagnosisList.filter(
+      (diagnosis) => !diagnosis.diagnosisNo
+    );
+
     try {
-      if (activeKey === "2") {
+      if (activeTab === "2") {
         // Primary Diagnosis Tab
+        // Send primary diagnoses one by one
         for (let diagnosis of lastUnSavedPrimaryDiagnosis) {
           const diagnosisData = {
             myAction: "create",
@@ -175,23 +186,21 @@ const Diagnosis = () => {
             confirmed: diagnosis.confirmed,
             remarks: diagnosis.remarks,
           };
-  
-          const response = await dispatch(postDiagnosisRequest(diagnosisData));
-  
-          if (response.status === "success") {
-            // Add saved diagnosis to the primary list
-            message.success("Diagnosis saved successfully!");
-            const updatedDiagnosis = { ...diagnosis, diagnosisNo: response.data.diagnosisNo }; // Assume `response.data.diagnosisNo` contains the saved ID
-            setPrimaryDiagnosisList((prevList) => [...prevList, updatedDiagnosis]);
-            form.resetFields();
 
-          } else {
+          const response = await dispatch(postDiagnosisRequest(diagnosisData));
+          console.log("status response:", response);
+          if (response !== "success") {
             success = false;
-            message.error(`Error saving primary diagnosis: ${diagnosis.diagnosisCode}`);
+            message.error(
+              `Error saving primary diagnosis: ${diagnosis.diagnosisCode}`
+            );
           }
         }
-      } else if (activeKey === "3") {
+      }
+
+      if (activeTab === "3") {
         // Secondary Diagnosis Tab
+        // Send secondary diagnoses one by one
         for (let diagnosis of lastUnSavedSecondaryDiagnosis) {
           const diagnosisData = {
             myAction: "create",
@@ -201,24 +210,22 @@ const Diagnosis = () => {
             confirmed: diagnosis.confirmed,
             remarks: diagnosis.remarks,
           };
-  
-          const response = await dispatch(postDiagnosisRequest(diagnosisData));
-  
-          if (response.status === "success") {
-            // Add saved diagnosis to the secondary list
-            message.success("Diagnosis saved successfully!");
 
-            const updatedDiagnosis = { ...diagnosis, diagnosisNo: response.data.diagnosisNo }; // Assume `response.data.diagnosisNo` contains the saved ID
-            setSecondaryDiagnosisList((prevList) => [...prevList, updatedDiagnosis]);
-            form.resetFields();
-          } else {
+          const response = await dispatch(postDiagnosisRequest(diagnosisData));
+          if (response !== "success") {
             success = false;
-            message.error(`Error saving secondary diagnosis: ${diagnosis.diagnosisCode}`);
+            message.error(
+              `Error saving primary diagnosis: ${diagnosis.diagnosisCode}`
+            );
           }
         }
       }
-  
-      if (success) {
+
+      // Show modal with success or error message after all diagnoses are processed
+      if (success && !loading) {
+        message.success("All diagnoses saved successfully!"); // Show success message after all saves
+        dispatch(getDiagnosisLines(treatmentNo));
+        form.resetFields();
         setModalContent({
           type: "success",
           title: "Success",
@@ -241,75 +248,9 @@ const Diagnosis = () => {
         content: "An unexpected error occurred. Please try again.",
       });
     }
-  
+
     setIsModalVisible(true); // Display success/error modal
   };
-  
-
-  const diagnosisLinesColumns = [
-    {
-      title: "Treatment No",
-      dataIndex: "TreatmentNo",
-      key: "TreatmentNo",
-      // render text  in blue color
-      render: (text) => (
-        <span style={{ color: "#0F5689", fontWeight: "bold" }}>{text}</span>
-      ),
-    },
-    {
-      title: "Diagnosis Code",
-      dataIndex: "DiagnosisCode",
-      key: "DiagnosisCode",
-    },
-    {
-      title: "Diagnosis",
-      dataIndex: "DiagnosisName",
-      key: "DiagnosisName",
-    },
-    {
-      title: "Confirmed",
-      dataIndex: "Confirmed",
-      key: "Confirmed",
-      render: (text) => {
-        return (
-          <span style={{ color: text ? "green" : "red", fontWeight: "bold" }}>
-            {text ? "Yes" : "No"}
-          </span>
-        );
-      },
-    },
-
-    {
-      title: "Remarks",
-      dataIndex: "Remarks",
-      key: "Remarks",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (_, record) => (
-        <Button
-          type="link"
-          danger
-          // onClick={() => handleDeleteDiagnosis(record.TreatmentNo)}
-        >
-          Delete
-        </Button>
-      ),
-    },
-  ];
-
-  const dataSource =[
-   {
-    // key: diagnosisLines?.treatmentNo,
-    TreatmentNo: diagnosisLines?.treatmentNo,
-    DiagnosisCode: diagnosisLines?.diagnosisCode,
-    DiagnosisName: diagnosisLines?.diagnosisName,
-    Confirmed: diagnosisLines?.confirmed,
-    Remarks: diagnosisLines?.remarks
-   } 
-  ]
 
   return (
     <div className="mt-4">
@@ -337,40 +278,10 @@ const Diagnosis = () => {
             Add New Diagnosis
           </Button>
         </Col>
-        <Col span={12}>
-          {/* <Button
-            type="default"
-            icon={<FileTextOutlined />}
-            style={{ marginBottom: "16px", width: "100%" }}
-            onClick={handleViewDoctorNotes}
-          >
-            Add Doctor Notes
-          </Button> */}
-        </Col>
       </Row>
-      <Table
-        dataSource={dataSource}
-        columns={diagnosisLinesColumns}
-        size="small"
-        pagination={{
-          position: ["bottom", "right"],
-          showSizeChanger: true,
-          pageSize: 10,
-          style: { marginTop: "16px" },
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`,
-        }}
-      />
-
-      {/* Show the success/error message modal */}
-      {isModalVisible && (
-        <ModalComponent
-          type={modalContent.type}
-          title={modalContent.title}
-          content={modalContent.content}
-          onOk={() => setIsModalVisible(false)}
+      <DiagnosisTable
+       treatmentNo={treatmentNo}
         />
-      )}
 
       {/* Show the diagnosis history modal */}
       <Modal
@@ -383,423 +294,44 @@ const Diagnosis = () => {
         style={{ top: 20 }}
       >
         <Tabs key="1" type="card" activeKey={activeKey} onChange={setActiveKey}>
-          <TabPane tab="Diagnosis Formulation" key="1">
-            <Form form={form} layout="vertical" onFinish={handleSave}>
-              <Row gutter={16}>
-                <Col span={24}>
-                  <Form.Item
-                    name="notes"
-                    label="Notes"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter notes",
-                      },
-                      {
-                        validator: (_, value) => {
-                          if (value && value.length > 2000) {
-                            return Promise.reject(
-                              "Notes cannot exceed 2000 characters"
-                            );
-                          }
-                          return Promise.resolve();
-                        },
-                      },
-                    ]}
-                  >
-                    <Editor
-                      editorState={editorState}
-                      onEditorStateChange={handleEditorChange}
-                      toolbar={{
-                        options: [
-                          "inline",
-                          "blockType",
-                          "list",
-                          "textAlign",
-                          "history",
-                        ],
-                      }}
-                      editorStyle={{
-                        border: "1px solid #f0f0f0",
-                        padding: "10px",
-                        minHeight: "200px",
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  gap: "15px",
-                }}
-              >
-                <Button type="primary" onClick={handleSave}>
-                  Save
-                </Button>
-                <Button
-                  type="default"
-                  onClick={() => setHistoryVisible(false)}
-                  danger
-                >
-                  Close
-                </Button>
-              </div>
-            </Form>
+          {/* <TabPane tab="Diagnosis Formulation" key="1">
+           <DiagnosisFormulationForm
+           form={form}
+           editorState={editorState}
+           setEditorState={setEditorState}
+           onFinish={handleSave}
+           />
+          </TabPane> */}
+          <TabPane tab="Add Primary Diagnosis" key="1">
+            <DiagnosisForm
+              diagnosisType={1}
+              data={data}
+              diagnosisInput={diagnosisInput}
+              setDiagnosisInput={setDiagnosisInput}
+              diagnosisList={primaryDiagnosisList}
+              handleAddDiagnosis={handleAddDiagnosis}
+              handleUpdateDiagnosis={handleUpdateDiagnosis}
+              handleRemoveDiagnosis={handleRemoveDiagnosis}
+              handleSubmit={handleSubmit}
+              loading={loading}
+              OnClose={handleModalClose}
+              />
           </TabPane>
-          <TabPane tab="Add Primary Diagnosis " key="2">
-            <Form
-              layout="vertical"
-              initialValues={{
-                treatmentNo: treatmentNo || "",
-                diagnosisCode: "",
-                dueDate: moment(),
-              }}
-              autoComplete="off"
-            >
-              <Row gutter={24} style={{ paddingBottom: "16px" }}>
-                <Col span={18}>
-                  <Form.Item
-                    name="diagnosisCode"
-                    label=" Primary Diagnosis"
-                    rules={[{ required: true }]}
-                  >
-                    <Select
-                      placeholder="Select Diagnosis"
-                      onChange={setDiagnosisInput}
-                      value={diagnosisInput}
-                      name="diagnosisCode"
-                      size="large"
-                      showSearch
-                      filterOption={(input, option) =>
-                        option?.children
-                          ?.toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                    >
-                      {data?.map((item) => (
-                        <Option key={item.Code} value={item.Code}>
-                          {item.Description}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
 
-                <Col span={6}>
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      icon={<PlusOutlined />}
-                      onClick={() => handleAddDiagnosis(1)} // 1 for Primary
-                      style={{ width: "100%", marginTop: "30px" }}
-                      size="large"
-                    >
-                      Add
-                    </Button>
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              {primaryDiagnosisList.length > 0 && (
-                <div
-                  style={{
-                    marginTop: "16px",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {/* Primary Diagnosis List */}
-                  <div
-                    style={{
-                      display: "flex",
-                      fontWeight: "bold",
-                      padding: "8px 0",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <div style={{ flex: "1" }}>#</div>
-                    <div style={{ flex: "3" }}>Diagnosis Code</div>
-                    <div style={{ flex: "2" }}>Confirmed</div>
-                    <div style={{ flex: "4" }}>Remarks</div>
-                    <div style={{ flex: "1" }}>Action</div>
-                  </div>
-                  {primaryDiagnosisList.map((diagnosis, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        padding: "8px 0",
-                        borderBottom: "1px solid #f0f0f0",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ flex: "1" }}>{index + 1}</div>
-                      <div style={{ flex: "3" }}>
-                        <Input
-                          value={diagnosis.diagnosisCode}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "diagnosisCode",
-                              e.target.value,
-                              1
-                            )
-                          }
-                        />
-                      </div>
-                      <div style={{ flex: "2", marginLeft: "20px" }}>
-                        <Checkbox
-                          checked={diagnosis.confirmed}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "confirmed",
-                              e.target.checked,
-                              1
-                            )
-                          }
-                        >
-                          Confirm
-                        </Checkbox>
-                      </div>
-                      <div style={{ flex: "4" }}>
-                        <Input
-                          value={diagnosis.remarks}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "remarks",
-                              e.target.value,
-                              1
-                            )
-                          }
-                        />
-                      </div>
-                      <div style={{ flex: "1" }}>
-                        <Button
-                          type="text"
-                          danger
-                          onClick={
-                            () => handleRemoveDiagnosis(index, 1) // Passing diagnosisType for primary
-                          }
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div
-                style={{
-                  marginTop: "16px",
-                  marginBottom: "56px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  gap: "15px",
-                }}
-              >
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ width: "150px", float: "right" }}
-                  icon={<SaveOutlined />}
-                  loading={loading}
-                  onClick={() => handleSubmit()}
-                >
-                  Save Diagnosis
-                </Button>
-                <Button
-                  type="default"
-                  onClick={() => setHistoryVisible(false)}
-                  danger
-                >
-                  Close
-                </Button>
-              </div>
-            </Form>
-          </TabPane>
-          <TabPane tab="Add Secondary Diagnosis " key="3">
-            <Form
-              layout="vertical"
-              initialValues={{
-                treatmentNo: treatmentNo || "",
-                diagnosisCode: "",
-                dueDate: moment(),
-              }}
-              autoComplete="off"
-            >
-              <Row gutter={24} style={{ paddingBottom: "16px" }}>
-                <Col span={18}>
-                  <Form.Item
-                    name="secondaryDiagnosisCode"
-                    label="Comorbid Issues"
-                    rules={[{ required: true }]}
-                  >
-                    <Select
-                      placeholder="Select Diagnosis"
-                      onChange={setDiagnosisInput}
-                      value={diagnosisInput}
-                      name="secondaryDiagnosisCode"
-                      // mode="multiple"
-                      showSearch
-                      filterOption={(input, option) =>
-                        option?.children
-                          ?.toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      size="large"
-                      style={{ width: "100%" }}
-                    >
-                      {secondaryDiagnosis?.map((item) => (
-                        <Option
-                          key={item.DiagnosisCode}
-                          value={item.DiagnosisCode}
-                        >
-                          {item.Description}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => handleAddDiagnosis(2)} // 2 for Secondary
-                    style={{ width: "100%", marginTop: "30px" }}
-                    size="large"
-                  >
-                    Add
-                  </Button>
-                </Col>
-              </Row>
-
-              {secondaryDiagnosisList.length > 0 && (
-                <div
-                  style={{
-                    marginTop: "16px",
-                    padding: "8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      fontWeight: "bold",
-                      padding: "8px 0",
-                      borderBottom: "1px solid #ddd",
-                    }}
-                  >
-                    <div style={{ flex: "1" }}>#</div>
-                    <div style={{ flex: "3" }}>Diagnosis Code</div>
-                    <div style={{ flex: "2" }}>Confirmed</div>
-                    <div style={{ flex: "4" }}>Remarks</div>
-                    <div style={{ flex: "1" }}>Action</div>
-                  </div>
-                  {secondaryDiagnosisList.map((diagnosis, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        padding: "8px 0",
-                        borderBottom: "1px solid #f0f0f0",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ flex: "1" }}>{index + 1}</div>
-                      <div style={{ flex: "3" }}>
-                        <Input
-                          value={diagnosis.diagnosisCode}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "diagnosisCode",
-                              e.target.value,
-                              2
-                            )
-                          }
-                        />
-                      </div>
-                      <div style={{ flex: "2", marginLeft: "20px" }}>
-                        <Checkbox
-                          checked={diagnosis.confirmed}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "confirmed",
-                              e.target.checked,
-                              2
-                            )
-                          }
-                        >
-                          Confirm
-                        </Checkbox>
-                      </div>
-                      <div style={{ flex: "4" }}>
-                        <Input
-                          value={diagnosis.remarks}
-                          onChange={(e) =>
-                            handleUpdateDiagnosis(
-                              index,
-                              "remarks",
-                              e.target.value,
-                              2
-                            )
-                          }
-                        />
-                      </div>
-                      <div style={{ flex: "1" }}>
-                        <Button
-                          type="text"
-                          danger
-                          onClick={
-                            () => handleRemoveDiagnosis(index, 2) // Passing diagnosisType for secondary
-                          }
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-<div
-                style={{
-                  marginTop: "16px",
-                  marginBottom: "56px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  gap: "15px",
-                }}
-              >
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  style={{ width: "150px", float: "right" }}
-                  icon={<SaveOutlined />}
-                  loading={loading}
-                  onClick={() => handleSubmit()}
-                >
-                  Save Diagnosis
-                </Button>
-                <Button
-                  type="default"
-                  onClick={() => setHistoryVisible(false)}
-                  danger
-                >
-                  Close
-                </Button>
-              </div>
-            </Form>
+          <TabPane tab="Add Secondary Diagnosis" key="2">
+            <DiagnosisForm
+              diagnosisType={2}
+              data={secondaryDiagnosis}
+              diagnosisInput={diagnosisInput}
+              setDiagnosisInput={setDiagnosisInput}
+              diagnosisList={secondaryDiagnosisList}
+              handleAddDiagnosis={handleAddDiagnosis}
+              handleUpdateDiagnosis={handleUpdateDiagnosis}
+              handleRemoveDiagnosis={handleRemoveDiagnosis}
+              handleSubmit={handleSubmit}
+              loading={loading}
+              OnClose={handleModalClose} 
+              />
           </TabPane>
         </Tabs>
       </Modal>
