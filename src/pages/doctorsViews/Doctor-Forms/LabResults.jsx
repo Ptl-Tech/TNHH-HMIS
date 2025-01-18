@@ -183,7 +183,7 @@ const LabResults = () => {
                   format="YYYY-MM-DD"
                   value={moment()} // Set the current date
                   style={{ width: "100%" }}
-                  disabled // Disable the field to make it readonly
+                  onChange={(date) => handleFieldChange("dueDate", date)}
                   inputReadOnly // Make the input readonly
                 />
               </Form.Item>

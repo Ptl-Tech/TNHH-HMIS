@@ -88,7 +88,7 @@ const DoctorVisits = () => {
     }))
     .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
+  const [filteredPatients, setFilteredPatients] = useState("");
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -309,7 +309,7 @@ const DoctorVisits = () => {
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={filteredPatients}
+          dataSource={waitingListTableDataSource}
           bordered
           size="middle"
           rowClassName={rowClassName} // Apply the row color

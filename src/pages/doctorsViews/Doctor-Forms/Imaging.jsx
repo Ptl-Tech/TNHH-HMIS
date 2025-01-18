@@ -227,7 +227,7 @@ render: (text) =>
             </Form.Item>
           </Col>
 
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="HospitalPartners"
               label="Hospital Partners"
@@ -243,7 +243,7 @@ render: (text) =>
                 <Select.Option value="Option 2">Option 2</Select.Option>
               </Select>
             </Form.Item>
-          </Col>
+          </Col> */}
         </Row>
 
         <div className="my-2">
