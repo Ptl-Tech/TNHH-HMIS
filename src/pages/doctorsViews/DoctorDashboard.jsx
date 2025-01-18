@@ -36,7 +36,7 @@ const DoctorDashboard = () => {
   // Sample data for the cards
   const cardData = [
     {
-      title: " Waiting List Patients",
+      title: "OP Waiting List Patients",
       value: openTreatmentList?.length,
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
@@ -55,7 +55,7 @@ const DoctorDashboard = () => {
     },
     
     {
-      title: "In patients",
+      title: "Inpatients List",
       value: filterInPatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,

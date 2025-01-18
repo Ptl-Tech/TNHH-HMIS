@@ -103,7 +103,7 @@ const PatientSymptoms = ({ treatmentNo }) => {
   };
 
   const handleNext = async () => {
-    await saveNotes();
+    // await saveNotes();
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -254,11 +254,11 @@ const PatientSymptoms = ({ treatmentNo }) => {
               Next
             </Button>
           )}
-          {currentStep === 3 && (
+          {/* {currentStep === 3 && (
             <Button type="primary" onClick={handleSubmit}>
               Submit
             </Button>
-          )}
+          )} */}
         </div>
       </Form>
     </div>

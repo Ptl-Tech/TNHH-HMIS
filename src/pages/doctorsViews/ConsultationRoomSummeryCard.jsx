@@ -27,7 +27,7 @@ const ConsultationRoomSummeryCard = ({ currentPath }) => {
     {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
-      title: "Waiting List",
+      title: "OP Waiting List",
       link: "/Doctor/Consultation-List",
       count: openConsultationList.length,
     },
