@@ -1,60 +1,105 @@
-import React, { useState } from 'react';
-import { Button } from 'antd';
+import React, { useState } from "react";
+import { Button } from "antd";
 import {
   HeartOutlined,
   SolutionOutlined,
   MedicineBoxOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons"; // Import icons
-import { FaNotesMedical } from 'react-icons/fa';
+} from "@ant-design/icons";
+import { FaNotesMedical } from "react-icons/fa";
 
-// Import the components for each label
-import PatientSigns from './PatientSigns';
-import PatientSymptoms from './PatientSyptoms';
-import Diagnosis from './Diagnosis';
-import SickOff from './SickOff'; // Import SickOff component
-import DoctorNotes from '../../nurse-view/nurse-patient-file/DoctorNotes';
-import FourPsForm from './FourPsForm';
-import SuicidalForm from '../../nurse-view/nurse-forms/SuicidalForm';
+// Import components
+import PatientSigns from "./PatientSigns";
+import PatientSymptoms from "./PatientSyptoms";
+import Diagnosis from "./Diagnosis";
+import SickOff from "./SickOff";
+import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
+import FourPsForm from "./FourPsForm";
+import SuicidalForm from "../../nurse-view/nurse-forms/SuicidalForm";
+import PhysicalExamintaion from "../DocAdmission-views/PhysicalExamintaion";
+import PsychologyNotes from "./PsychologyNotes";
+import PastMedicalHistory from "./PastMedicalHistory";
+import TreatmentHistoryTable from "../../nurse-view/tables/nurse-tables/TreatmentHistoryTable";
 
 const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
-  // Function to handle the button clicks and set the corresponding component
+  const [selectedItem, setSelectedItem] = useState(
+    <PatientSigns
+      treatmentNo={treatmentNo}
+      observationNo={observationNo}
+      patientNo={patientNo}
+    />
+  );
+
   const handleOnClick = (item) => {
     switch (item) {
       case "Patient History Notes":
-        setSelectedItem(<PatientSigns treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
+        setSelectedItem(
+          <PatientSigns
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
         break;
-      case  "Mental Systemic Examination Form":
-        setSelectedItem(<PatientSymptoms treatmentNo={treatmentNo} />);
+      case "Physical Examination":
+        setSelectedItem(<PhysicalExamintaion treatmentNo={treatmentNo} patientNo={patientNo}/>);
+        break;
+      case "Mental Status Exam":
+        setSelectedItem(
+          <PatientSymptoms treatmentNo={treatmentNo} patientNo={patientNo} />
+        );
+        break;
+        case "Past Medical History":
+        setSelectedItem(
+          <PastMedicalHistory treatmentNo={treatmentNo} patientNo={patientNo} />
+        )
         break;
       case "Diagnosis Formulation":
         setSelectedItem(<Diagnosis />);
         break;
-      case "Doctor Notes":
-        setSelectedItem(<DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />);
+      case "Past Encounters Notes":
+        setSelectedItem(
+          // <DoctorNotes treatmentNo={treatmentNo} patientNo={patientNo} />
+          <TreatmentHistoryTable />
+        );
         break;
-        case "Aetiology":
-        setSelectedItem(<FourPsForm treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
+      case "Aetiology":
+        setSelectedItem(
+          <FourPsForm
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
         break;
-      case "Suicide Risk Assessment":
-        setSelectedItem(<SuicidalForm />);
+      case "Psychology Notes":
+        setSelectedItem(
+          <PsychologyNotes
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
         break;
       default:
-        setSelectedItem(<PatientSigns treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
+        setSelectedItem(
+          <PatientSigns
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
     }
   };
 
-  // Default selected item on first render
-  const [selectedItem, setSelectedItem] = useState(<PatientSigns treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
-
-  // Button items array to map through
   const buttonItems = [
     { label: "Patient History Notes", icon: <SolutionOutlined /> },
-    { label: "Mental Systemic Examination Form", icon: <SolutionOutlined /> },
+    { label: "Physical Examination", icon: <HeartOutlined /> },
+    { label: "Mental Status Exam", icon: <SolutionOutlined /> },
+    { label: "Past Medical History", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
-    { label: "Doctor Notes", icon: <FaNotesMedical /> },
+    { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
-    { label: "Suicide Risk Assessment", icon: <HeartOutlined /> }
+    { label: "Psychology Notes", icon: <HeartOutlined /> },
   ];
 
   return (
@@ -68,7 +113,6 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
           marginBottom: "10px",
         }}
       >
-        {/* Render buttons dynamically from buttonItems array */}
         {buttonItems.map((item, index) => (
           <Button
             key={index}
@@ -79,14 +123,13 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
               alignItems: "center",
               gap: "5px",
             }}
-            onClick={() => handleOnClick(item.label)} // Handle button click
+            onClick={() => handleOnClick(item.label)}
           >
             {item.icon} {item.label}
           </Button>
         ))}
       </div>
 
-      {/* Display the selected component */}
       <div>{selectedItem}</div>
     </>
   );

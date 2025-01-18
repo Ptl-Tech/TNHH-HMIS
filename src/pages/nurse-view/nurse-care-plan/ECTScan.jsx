@@ -46,7 +46,7 @@ const ECTScan = () => {
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
         >
-          ECT Scan
+          ECT Request
         </Typography.Text>
       </Space>
 
@@ -64,7 +64,7 @@ const ECTScan = () => {
           style={{ width: "100%" }}
           onClick={() => showModal()}
         >
-          <PlusOutlined /> Add ECT
+          <PlusOutlined /> Add ECT Request
         </Button>
         <Button color="default" variant="outlined" style={{ width: "100%" }}>
           <FolderViewOutlined /> Preview ECT
@@ -74,7 +74,7 @@ const ECTScan = () => {
       <ETCTable showModal={showModal} />
 
       <Modal
-        title="ECT Scan"
+        title="ECT Request"
         open={isModalOpen}
         style={{ top: 10 }}
         
@@ -97,16 +97,16 @@ const ECTScan = () => {
           <div className="row">
             <div className="col-12 col-md-6">
               <Form.Item
-                label="Operation"
-                name="operation"
+                label="Procedure"
+                name="Operation"
                 rules={[
-                  { required: true, message: "Please select a operation!" },
+                  { required: true, message: "Please select a procedure!" },
                 ]}
                 hasFeedback
                 style={{ width: "100%" }}
 
               >
-                <Select placeholder="Select an operation"                size="large"
+                <Select placeholder="Select an procedure"                size="large"
                 >
                   <Select.Option value="General">ECT</Select.Option>
                 </Select>
@@ -114,9 +114,9 @@ const ECTScan = () => {
             </div>
             <div className="col-12 col-md-6">
               <Form.Item
-                label="Doctor Name"
+                label="Anesthetist/Anesthesiologist"
                 name="doctorName"
-                rules={[{ required: true, message: "Please select a doctor!" }]}
+                rules={[{ required: true, message: "Please select a anesthetist/anesthesiologist!" }]}
                 hasFeedback
                 style={{ width: "100%" }}
               >
@@ -133,10 +133,10 @@ const ECTScan = () => {
             </div>
            
           </div>
-<div className="row">
-<div className="col-12 ">
+          <div className="row">
+          <div className="col-12 ">
               <Form.Item
-                label="Operation Dates"
+                label="Procedure Dates"
                 rules={[
                   {
                     required: true,
@@ -156,14 +156,14 @@ const ECTScan = () => {
               
               </Form.Item>
             </div>
-</div>
+          </div>
           <Form.Item
-            label="Description"
+            label="ECT procedure notes"
             name="description"
-            rules={[{ required: true, message: "Please enter a description!" }]}
+            rules={[{ required: true, message: "Please enter ECT procedure notes!" }]}
             hasFeedback
           >
-            <TextArea placeholder="Enter description" />
+            <TextArea placeholder="Enter ECT procedure notes" />
           </Form.Item>
         </Form>
       </Modal>

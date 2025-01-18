@@ -1,20 +1,25 @@
-import { Card, Divider, Spin, Typography } from 'antd'
+import { Card, Col, Divider, Row, Spin, Typography } from 'antd'
 import PropTypes from 'prop-types'
 import { LoadingOutlined } from '@ant-design/icons'
+import { calculateAge } from '../../utils/helpers'
+import useFetchAllPatientsHook from '../../hooks/useFetchAllPatientsHook'
 
 
 const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList, loadingAllergies }) => {
-    console.log('patient details', patientDetails)
-      
+
+    const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
+    const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
+
   return (
-    <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
+    <>
+        <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
         <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689' }}>
             <div className="inpatient-details-container-1">
-                <Typography.Text className="patient-name">
-                    {patientDetails?.SearchName|| patientDetails?.Names || 'N/A' }
+                <Typography.Text className="patient-name" style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                    {patientDetails?.PatientName || 'N/A' }
                 </Typography.Text>
-                <Typography.Text className="patient-id">
-                    Patient Number : {patientDetails?.PatientNo||'N/A' }
+                <Typography.Text className="patient-id" style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                    Patient Number : {patientDetails?.Patient_No||'N/A' }
                 </Typography.Text>
             </div>
 
@@ -26,7 +31,7 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
                     Admission No
                     </Typography.Text>
                     <Typography.Text className="hospital-number">
-                        {patientDetails?.CurrentAdmNo||'N/A' }
+                        {patientDetails?.Admission_No ||'N/A' }
                     </Typography.Text>
                 </div>
                 
@@ -36,9 +41,15 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
                     <Typography.Text className="age-and-gender-header">
                     Age and Gender
                     </Typography.Text>
-                    <Typography.Text className="age-and-gender">
-                       {patientDetails?.AgeinYears} years, {patientDetails?.Gender}
-                    </Typography.Text>
+                    {
+                        loadingTriageWaitingList ? (
+                            <Spin indicator={<LoadingOutlined style={{ fontSize: 24, color: '#0f5689' }} spin />} />
+                        ) : (
+                            <Typography.Text className="age-and-gender">
+                                {calculateAge(filteredPatient[0]?.DateOfBirth) || 'N/A'}, {filteredPatient[0]?.Gender || 'N/A'}
+                            </Typography.Text>
+                        )
+                    }
                 </div>
             </div>
         </Card>
@@ -78,7 +89,7 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
 
                 <div className="patient-age-gender-container" style={{ paddingTop: '10px'}}>
                     <Typography.Text style={{ fontWeight: 'bold', color: 'red' }}>
-                        Drug and Medication Allergies
+                        Drug Allergies
                     </Typography.Text>
                     {
                         loadingTriageList || loadingAllergies ? (
@@ -98,6 +109,36 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
             
         </Card>
     </div>
+
+    <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689', marginBottom: '20px' }}>
+        <Row gutter={16}>
+        {[
+        { label: 'Admitting Doctor', key: 'DoctorsName' },
+        { label: 'Admission Date', key: 'Admission_Date' },
+        { label: 'Expected Discharge Date', key: 'Expected_Date_of_Discharge' },
+        { label: 'Ward Name', key: 'Ward' },
+        { label: 'Bed Number', key: 'Bed' },
+        { label: 'Discharge Coming In', key: '' }, // Special case without a key
+        ].map((field, index) => (
+        <Col span={4} key={index}>
+        <Typography.Text
+        className="patient-name"
+        style={{ fontWeight: 'bold', color: '#0f5689', display: 'block' }}
+        >
+        {field.label}
+        </Typography.Text>
+        {field.key ? (
+        <Typography.Text className="patient-name" style={{ marginTop: '10px', display: 'block' }}>
+            {patientDetails?.[field.key] || 'N/A'}
+        </Typography.Text>
+        ) : null}
+        
+        </Col>
+        ))}
+        </Row>
+
+    </Card>
+    </>
   )
 }
 

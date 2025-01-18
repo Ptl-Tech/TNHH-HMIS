@@ -1,13 +1,13 @@
-import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
+import { Button, Col, Divider, Form, Input, message, Row, Space, Table } from 'antd'
 import PropTypes from 'prop-types'
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllergiesAndMedicationsSlice } from '../../../../actions/triage-actions/getAllergiesAndMedicationsSlice';
 import { postAllergiesMedicationSlice } from '../../../../actions/triage-actions/postAllergiesMedicationSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
-import { SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
 
-const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
+const AllergyAndMedication = ({observationNumber, patientNumber, staffNo, setIsFormVisible}) => {
     const dispatch = useDispatch();
     const {allergyMedicationLoading, allergiesMedication} = useSelector((state) => state.getAllergiesAndMedications);
 
@@ -146,12 +146,20 @@ const AllergyAndMedication = ({observationNumber, patientNumber, staffNo}) => {
                       </Col>
                       <Col span={12}>
                           <Form.Item >
+                              <Space>
                               <Button type="primary" htmlType="submit" loading={postAllergyMedicationLoading}><SaveOutlined /> 
                               {
                                 allergiesMedication && Object.keys(allergiesMedication).length > 0 ? 'Add allergies and medication' : 'Save allergies and medication'
                               }
                                   
                               </Button>
+                              <Button variant='outlined' color='danger' 
+                              onClick={()=>setIsFormVisible(false)}
+                              icon={<CloseOutlined />}
+                              >
+                                Cancel
+                              </Button>
+                              </Space>
                           </Form.Item>
                       </Col>
                   </Row>
@@ -193,4 +201,5 @@ AllergyAndMedication.propTypes = {
     observationNumber: PropTypes.string.isRequired,
     patientNumber: PropTypes.string.isRequired,
     staffNo: PropTypes.string.isRequired,
+    setIsFormVisible: PropTypes.bool.isRequired,
   }

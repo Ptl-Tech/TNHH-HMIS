@@ -10,47 +10,51 @@ import Injections from './nurse-care-plan/Injections'
 import Diagnosis from './nurse-care-plan/Diagnosis'
 import useAuth from '../../hooks/useAuth'
 import Prescription from './nurse-care-plan/Prescription'
+import PrescriptionForm from '../doctorsViews/Doctor-Forms/PrescriptionForm'
+import Medication from '../doctorsViews/Doctor-Forms/Medication'
+
 
 const CarePlan = () => {
   const [selectedItem, setSelectedItem] = useState(<AddAllergies />);
   const role = useAuth().userData.departmentName
 
   const handleOnClick = (item) => {
-    switch (item) {
-        case 'Add Allergies':
-            setSelectedItem(<AddAllergies />)
-            break
-        case 'Vitals':
-            setSelectedItem(<Vitals />)
-            break
-        case 'Nursing Rounds':
-            setSelectedItem(<DailyProcess />)
-            break
-        case 'Injections':
-            setSelectedItem(<Injections />)
-            break
-        case 'Diagnosis':
-            setSelectedItem(<Diagnosis />)
-            break
-        case 'Prescription':
-            setSelectedItem(<Prescription />)
-            break
-        case 'Treatments Sheet':
-            setSelectedItem(<TreatmentsSheet />)
-            break
-        case 'ECT':
-            setSelectedItem(<ECTScan />)
-            break
-        case 'TCA / Appointments':
-            setSelectedItem(<TCAAppointments />)
-            break
-        case 'Daily Ward Rounds Notes':
-            setSelectedItem(<DailyProcess />)
-            break
-        default:
-            setSelectedItem(<AddAllergies />)
-    }
-  }
+    
+            switch (item) {
+                case 'Add Allergies':
+                    setSelectedItem(<AddAllergies />)
+                    break
+                case 'Vitals':
+                    setSelectedItem(<Vitals />)
+                    break
+                case 'Nursing Rounds':
+                    setSelectedItem(<DailyProcess />)
+                    break
+                case 'Diagnosis':
+                    setSelectedItem(<Diagnosis />)
+                    break
+                case 'Prescription':
+                    setSelectedItem(<Medication />)
+                    break
+                case 'Treatments Sheet':
+                    setSelectedItem(<TreatmentsSheet />)
+                    break
+                case 'ECT Scan':
+                    setSelectedItem(<ECTScan />)
+                    break
+                case 'TCA / Appointments':
+                    setSelectedItem(<TCAAppointments />)
+                    break
+                case 'Daily Ward Rounds':
+                    setSelectedItem(<DailyProcess />)
+                    break
+                default:
+                    setSelectedItem(<AddAllergies />)
+                    break
+                    }
+         }
+    
+  
 
   return (
     <>
@@ -59,21 +63,22 @@ const CarePlan = () => {
                 [
                     'Allergies',
                     'Vitals',
-                    role === 'Doctor' ? 'Daily Ward Rounds Notes' : 'Nursing Rounds',
-                    'Injections',
+                    role === 'Doctor' ? 'Daily Ward Rounds' : 'Nursing Rounds',
                     'Diagnosis',
                     'Prescription',
-                    'Treatments Sheet',
-                    'ECT',
-                    'TCA / Appointments',
+                    ...(role === 'Nurse' ? ['Treatments Sheet', 'ECT', 'TCA / Appointments'] : []),
                 ].map((item, index) => (
-                    <Button key={index} type="primary" style={{ backgroundColor: '#0f5689' }} 
+                    <Button 
+                        key={index} 
+                        type="primary" 
+                        style={{ backgroundColor: '#0f5689' }} 
                         onClick={() => handleOnClick(item)}
                     >
                         {item}
                     </Button>
                 ))
             }
+
         </div>
 
         <Divider />

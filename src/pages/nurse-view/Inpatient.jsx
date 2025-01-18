@@ -1,16 +1,18 @@
 
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 import useAuth from "../../hooks/useAuth";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { listDoctors } from "../../actions/DropdownListActions";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
 const Impatient = () => {
   const dispatch = useDispatch();
   const userDetails = useAuth();  // Use the custom hook to get user info
+  const { loading, data } = useSelector(state => state.getDoctorsList);
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');
   const [searchAdmissionNumber, setSearchAdmissionNumber] = useState('')
@@ -19,33 +21,54 @@ const Impatient = () => {
 
   const handleNavigate = (record) => {
    if(userDetails.userData.departmentName === 'Nurse'){
-    navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.CurrentAdmNo}`, {
+    navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
    }else{
-    navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.PatientNo}&AdmNo=${record?.CurrentAdmNo}`, {
+    navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
    }
   };
 
-  useEffect(() => {
-    dispatch(getPatientListSlice());
-  }, [dispatch]);
+  const {loadingAdmittedPatients, admittedPatients} = useSelector((state)=>state.getPgAdmissionsAdmitted) || {}
 
-  const { loadingPatientList, allPatientLList } = useSelector((state) => state.getPatientList) || {};
+  const formattedDoctorDetails = useMemo(() => {
+          return data?.map(doctor => ({
+              DoctorID: doctor?.DoctorID,
+              DoctorsName: doctor?.DoctorsName,
+          }));
+      }, [data]);
 
-  const filterInPatients =
-    allPatientLList?.filter((item) => item.Inpatient === true) || [];
+const combinedPatients = admittedPatients?.map(patient => {
+  const matchingDoctor = formattedDoctorDetails?.find(doctor => (
+    patient?.Doctor === doctor?.DoctorID
+  ));
+  return {
+    ...patient,
+    DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
+  };
+});
+console.log('combined patients', combinedPatients)
+     
+    useEffect(() => {
+      dispatch(getPgAdmissionsAdmittedSlice());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!data?.length) {
+        dispatch(listDoctors());
+        }
+    }, [dispatch, data?.length]);
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       
-      <NurseInnerHeader filterInPatients={filterInPatients} title="Current Inpatients" />
+      <NurseInnerHeader filterInPatients={combinedPatients} title="Current Inpatients" />
 
       <FilterInpatientList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchAdmissionNumber}/> 
 
-      <InpatientTable loadingPatientList={loadingPatientList} handleNavigate={handleNavigate} filterInPatients={filterInPatients} searchName={searchName} searchPatientNumber={searchPatientNumber} searchAdmissionNumber={searchAdmissionNumber} />
+      <InpatientTable loadingAdmittedPatients={loadingAdmittedPatients} loading={loading} handleNavigate={handleNavigate} filterInPatients={combinedPatients} searchName={searchName} searchPatientNumber={searchPatientNumber} searchAdmissionNumber={searchAdmissionNumber}/>
 
     </div>
   );

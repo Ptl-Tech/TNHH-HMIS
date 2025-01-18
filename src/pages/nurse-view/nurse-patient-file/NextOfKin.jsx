@@ -1,44 +1,47 @@
-import { Col, List, Row, Space, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Col, List, Row, Typography } from "antd"
 import { useLocation } from "react-router-dom";
+import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import Loading from "../../../partials/nurse-partials/Loading";
 
 const NextOfKin = () => {
 
-  const { patientDetails } = useLocation().state;
+    const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
+    const { patientDetails } = useLocation().state;
+    const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
 
   const data = [
    
-   
     {
         title: 'Next of Kin Full Name',
-        description: patientDetails?.NextOfkinFullName || 'N/A',
+        description: filteredPatient[0]?.NextOfkinFullName || 'N/A',
     },
     {
         title: 'Next of Kin Relationship',
-        description: patientDetails?.NextofkinRelationship || 'N/A',
+        description: filteredPatient[0]?.NextofkinRelationship || 'N/A',
     },
     {
-        title: 'Next of ID Number',
-        description: patientDetails?.NextOfKinIDCardNo || 'N/A',
+        title: 'Next of Kin ID Number',
+        description: filteredPatient[0]?.NextOfKinIDCardNo || 'N/A',
     },
     {
         title: 'Next of Kin Address 1',
-        description: patientDetails?.NextOfkinAddress1 || 'N/A',
+        description: filteredPatient[0]?.NextOfkinAddress1 || 'N/A',
     },
     {
         title: 'Next of Kin Address 2',
-        description: patientDetails?.NextOfkinAddress2 || 'N/A',
+        description: filteredPatient[0]?.NextOfkinAddress2 || 'N/A',
     }
 ]
   return (
+    
    <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-                Patient Next of Kin Information
-            </Typography.Text>
-        </Space>
-        <List 
+      <NurseInnerHeader title="Next of Kin Information" />
+       {
+         loadingTriageWaitingList ? (
+            <Loading />
+         ):(
+            <List 
             itemLayout="horizontal"
             dataSource={data}
             renderItem={item => (
@@ -63,6 +66,8 @@ const NextOfKin = () => {
                 </Row>
             )}
         />
+         )
+       }
    </div>
   )
 }

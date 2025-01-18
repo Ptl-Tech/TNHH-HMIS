@@ -20,14 +20,13 @@ const PatientFile = ({ patientDetails }) => {
     "Patient Info",
     "Medical Info",
     "Next of Kin",
-    "Doctor Notes",
-    ...(userRole.userData.departmentName === "Doctor" ? ["Doctor Notes"] : []),
+    ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
     "Nursing Notes",
     "Treatments History",
     "Consumables",
-    ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
 
-    ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
+    // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
 
   const handleOnClick = (item) => {
@@ -41,7 +40,7 @@ const PatientFile = ({ patientDetails }) => {
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
-      case "Doctor Notes":
+      case "Past Doctor Notes":
         setSelectedItem(<DoctorNotes />);
         break;
       case "Nursing Notes":

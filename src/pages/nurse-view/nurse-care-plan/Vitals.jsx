@@ -7,6 +7,7 @@ import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
 
 const Vitals = () => {
 
@@ -15,11 +16,11 @@ const Vitals = () => {
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { patientDetails } = useLocation().state;
         const [isVitalFormVisible, setIsVitalFormVisible] = useState(false);
+        const role = useAuth().userData.departmentName
 
         const { combinedList, loadingInpatientVitals, loadingTriageList } = useFetchVitalsHook();
 
         const filterVitals = combinedList?.filter(vitals => vitals.PatientNo === patientDetails?.PatientNo);
-   
 
         const handleCancel = () => {
           setIsModalOpen(false);
@@ -63,7 +64,7 @@ const Vitals = () => {
         {
           isVitalFormVisible && (
             
-              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible}/>
+              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible} role={role}/>
            
           )
         }

@@ -23,26 +23,26 @@ const Summery = () => {
         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
           <ProfileOutlined />
           <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Discharge Summery
+              Discharge Summary
           </Typography.Text>
         </Space>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summery
+            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary
           </Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Discharge Summery
+            Preview Discharge Summary
           </Button>
         </div>
 
         <DischargeSummeryTable showModal={showModal}/>
 
 
-        <Modal title="Charge Summery" 
+        <Modal title="Charge Summary" 
           open={isModalOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          okText="Save Discharge Summery"
+          okText="Save Discharge Summary"
         >
             <Form
             

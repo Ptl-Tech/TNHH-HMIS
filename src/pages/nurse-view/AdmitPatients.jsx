@@ -190,10 +190,10 @@ const AdmitPatients = () => {
                             <Button color="danger" variant="outlined" disabled={!selectedRowKey}onClick={handleCancelAdmission}><CloseOutlined /> Cancel Admission</Button>
                             <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
                         </Space>
-                        <Space className="admit-patient-button-container">
+                        {/* <Space className="admit-patient-button-container">
                             <Button type="primary" onClick={()=>exportToExcel(formattedPatientAdmissions, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
                             <Button type="primary" onClick={()=>printToPDF(formattedPatientAdmissions, 'Admission request success list')}><PrinterOutlined /> Print PDF</Button>
-                        </Space>
+                        </Space> */}
                     </div>
                 </Card>
 

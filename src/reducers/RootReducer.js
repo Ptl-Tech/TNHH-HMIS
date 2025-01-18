@@ -186,6 +186,11 @@ import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer"
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
 import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
+import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
+import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
+import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
+import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
+import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -339,4 +344,10 @@ export const rootReducer = combineReducers({
   getBillingList:getBillingListReducer,
   postVisitorList:postVisitorListReducer,
   postPatientHistory:postPatientHistoryNotesReducer,
+  getPatientHistoryNotesReducer:getPatientHistoryNotes,
+  postMSEForm:postMSENotesReducer,
+  getPatientMSE:getPatientMSENotesReducer,
+  getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
+  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer
+
 });

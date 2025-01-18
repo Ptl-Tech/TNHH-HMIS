@@ -169,10 +169,10 @@ useEffect(() => {
                     Verify Patient Admission
                 </Button>
             </Space>
-            <Space className="admit-patient-button-container">
+            {/* <Space className="admit-patient-button-container">
                 <Button type="primary" onClick={()=>exportToExcel(formattedList, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
                 <Button type="primary" onClick={()=>printToPDF(formattedList, 'Admission request success list')}><PrinterOutlined /> Print PDF</Button>
-            </Space>
+            </Space> */}
         </div>
         </Card>
 

@@ -259,7 +259,7 @@ const DoctorAdmissions = () => {
                 Cancel Admission
               </Button>
             </Space>
-            <Space className="admit-patient-button-container">
+            {/* <Space className="admit-patient-button-container">
               <Button
                 type="primary"
                 onClick={() =>
@@ -280,7 +280,7 @@ const DoctorAdmissions = () => {
               >
                 <PrinterOutlined /> Print PDF
               </Button>
-            </Space>
+            </Space> */}
           </div>
           <Table
             scroll={{ x: "max-content", scrollbar: false }}

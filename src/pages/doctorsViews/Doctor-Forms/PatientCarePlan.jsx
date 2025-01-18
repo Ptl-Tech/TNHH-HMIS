@@ -22,7 +22,7 @@ const PatientCarePlan = () => {
   };
 
   const buttonItems = [
-    { label: 'Injection Requests', icon: <FaSyringe /> },
+    // { label: 'Injection Requests', icon: <FaSyringe /> },
     { label: 'Patient Prescription', icon: <FaTablets /> },
   ];
 

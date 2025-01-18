@@ -20,21 +20,26 @@ import useAuth from "../../../hooks/useAuth";
 import { useSelector, useDispatch } from "react-redux";
 import { postDoctorNotes } from "../../../actions/Doc-actions/postDoctorNotes";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import moment from "moment";
 import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { stateToHTML } from 'draft-js-export-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import TreatmentHistoryTable from "../tables/nurse-tables/TreatmentHistoryTable";
+import PastDoctorNotesTable from "../tables/nurse-tables/PastDoctorNotesTable";
 
-const DoctorNotes = ({ treatmentNo, patientNo }) => {
+
+const DoctorNotes = ({ treatmentNo }) => {
   const { loading } = useSelector((state) => state.postDoctorNotes);
   const docDetails = useAuth();
   const dispatch = useDispatch(); // Get the dispatch function
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(true);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const location = useLocation();
   const patientDetails = location.state?.patientDetails || {};
+  const patientNo= new URLSearchParams(location.search).get('PatientNo');  
+
   const role = useAuth().userData.departmentName;
   console.log('patient details', patientDetails.PatientNo);
 
@@ -52,7 +57,7 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
       myAction: "create",
       recId: "",
       treatmentNo: treatmentNo,
-      patientNo: patientDetails?.patientNo, //could'nt get the patientNo from the props
+      patientNo: patientNo, //could'nt get the patientNo from the props
       notesType: form.getFieldValue("notesType"),    
       notes: htmlContent, // Corrected the field name for notes
     };
@@ -106,7 +111,7 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
         >
-          Doctor Notes
+          Past Doctor Notes
         </Typography.Text>
       </Space>
       <div
@@ -119,7 +124,7 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
         }}
       >
         
-            {
+            {/* {
               role === "Doctor" && (
               <Button type="primary" 
               style={{ width: '100%' }} 
@@ -136,16 +141,19 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
               onClick={handleNavigateReadNotes}
               >
                 Read Doctor Notes
-            </Button>
+            </Button> */}
 
       </div>
 
-      {
+      {/* {
         isFormVisible && (
           <Form layout="vertical" 
           style={{ paddingTop: "20px" }} 
           form={form}
           onFinish={handleOnFinish}
+          initialValues={{
+            doctorNotesDate: moment(), // Set current date as the default value
+          }}
           >
             <Row gutter={[16, 16]}>
               <Col span={8}> 
@@ -236,7 +244,9 @@ const DoctorNotes = ({ treatmentNo, patientNo }) => {
         </Form>
         )
       
-      }
+      } */}
+
+      <PastDoctorNotesTable />
       
     </div>
   );

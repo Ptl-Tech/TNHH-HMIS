@@ -308,10 +308,10 @@ useEffect(() => {
             <Button type="primary" disabled={!selectedRowKey} onClick={handleReleaseBed}><DeliveredProcedureOutlined /> Release Bed</Button>
             <Button type="primary" disabled={!selectedRowKey} onClick={handlePostedConsumables}><ExperimentOutlined /> Posted Consumables</Button>
         </Space>
-        <Space className="admit-patient-button-container">
+        {/* <Space className="admit-patient-button-container">
             <Button type="primary" onClick={()=>exportToExcel(formattedPatientDischargeList, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
             <Button type="primary" onClick={()=>printToPDF(formattedPatientDischargeList, 'Admission request success list')}><PrinterOutlined /> Print PDF</Button>
-        </Space>
+        </Space> */}
         </div>
         </Card>
 

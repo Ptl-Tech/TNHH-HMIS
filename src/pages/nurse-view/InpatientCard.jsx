@@ -13,7 +13,7 @@ const InpatientCard = () => {
 
   const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
 
-  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.PatientNo);
+  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.Patient_No);
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>

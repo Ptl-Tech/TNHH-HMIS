@@ -4,29 +4,35 @@ import PropTypes from "prop-types";
 const ETCTable = ({ showModal }) => {
 const columns = [
         {
+            title: 'Requested for',
+            dataIndex: 'requestedFor',
+            key: 'requestedFor',
+        },
+
+        {
+            title: 'Frequency',
+            dataIndex: 'Frequency',
+            key: 'Frequency',
+        },
+        {
             title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
+            dataIndex: 'Date',
+            key: 'Date',
         },
         {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
+            title: 'Doctor',
+            dataIndex: 'Doctor',
+            key: 'Doctor',
         },
         {
-            title: 'Operation',
-            dataIndex: 'operation',
-            key: 'operation',
+            title: 'Requesting Doctor',
+            dataIndex: 'Requesting Doctor',
+            key: 'Requesting Doctor',
         },
         {
-            title: 'Doctor Name',
-            dataIndex: 'doctorName',
-            key: 'doctorName',
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
+            title: 'Doctor',
+            dataIndex: 'Doctor',
+            key: 'Doctor',
         },
         {
             title: 'Actions',
@@ -45,17 +51,6 @@ const columns = [
         }
     ];
 
-    const data = [
-        {
-            key: '1',
-            date: '2023-04-20',
-            time: '10:00 AM',
-            operation: 'ECT',
-            doctorName: 'Dr. John Doe',
-            description: 'This is a description',
-        },
-    ];
-
     const handleEdit = (record) => {
         showModal();
         console.log(record);
@@ -68,7 +63,6 @@ const columns = [
     <Table 
     
        columns={columns} 
-       dataSource={data} 
        className="admit-patient-table"
     />
 </div>

@@ -29,7 +29,7 @@ const FilterTriageList = ({ setSearchName, setSearchPatientNumber, setSearchObse
 export default FilterTriageList
 
 // props validation
-FilterTriageList.prototype = {
+FilterTriageList.propTypes = {
     setSearchName: PropTypes.bool.isRequired,
     setSearchPatientNumber: PropTypes.bool.isRequired,
     setSearchObservationNumber: PropTypes.bool.isRequired

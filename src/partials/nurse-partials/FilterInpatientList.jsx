@@ -29,7 +29,7 @@ const FilterInpatientList = ({ setSearchName, setSearchPatientNumber, setSearchA
 export default FilterInpatientList
 
 // props validation
-FilterInpatientList.prototype = {
+FilterInpatientList.propTypes = {
     setSearchName: PropTypes.bool.isRequired,
     setSearchPatientNumber: PropTypes.bool.isRequired,
     setSearchAdmissionNumber: PropTypes.bool.isRequired

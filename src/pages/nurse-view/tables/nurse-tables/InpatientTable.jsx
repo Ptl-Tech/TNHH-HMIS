@@ -2,66 +2,87 @@ import { Table } from "antd";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
+import { Link } from "react-router-dom";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
-const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, searchName, searchPatientNumber, searchAdmissionNumber }) => {
+const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, loading, searchName, searchPatientNumber, searchAdmissionNumber }) => {
 
     const columns = [
         {
           title: "Adm No",
-          dataIndex: "CurrentAdmNo",
-          key: "CurrentAdmNo",
+          dataIndex: "Admission_No",
+          key: "Admission_No",
           filteredValue: searchAdmissionNumber ? [searchAdmissionNumber] : null,
           onFilter: (value, record) =>
-            record?.CurrentAdmNo ?
-            record.CurrentAdmNo.toLowerCase().includes(value.toLowerCase()) : false,
+            record?.Admission_No ?
+            record.Admission_No.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
           title: "Patient No",
-          dataIndex: "PatientNo",
-          key: "PatientNo",
+          dataIndex: "Patient_No",
+          key: "Patient_No",
           filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
           onFilter: (value, record) =>
-          record?.PatientNo ?
-          record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
-        },
+            record?.Patient_No ?
+            record.Patient_No.toLowerCase().includes(value.toLowerCase()) : false,
+            },
         {
           title: "Names",
-          dataIndex: "SearchName",
-          key: "SearchName",
+          dataIndex: "PatientName",
+          key: "PatientName",
           filteredValue: searchName ? [searchName] : null,
           onFilter: (value, record) =>
-            record?.SearchName ?
-            record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
+            record?.PatientName ?
+            record.PatientName.toLowerCase().includes(value.toLowerCase()) : false,
           render: (_, record) => (
             <a
               onClick={() => handleNavigate(record)}
               style={{ color: "#0f5689" }}
             >
-              {record.SearchName}
+              {record.PatientName}
             </a>
           ),
         },
         {
           title: "Adm Date",
-          dataIndex: "AdmissionsDate",
-          key: "AdmissionsDate",
+          dataIndex: "Admission_Date",
+          key: "Admission_Date",
+          sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date),
+          defaultSortOrder: "ascend", // Ensure default sorting is newest to oldest
         },
+        
         {
           title: "Ward",
           dataIndex: "Ward",
           key: "Ward",
-          render: (ward) => ward || "Not assigned",
+          render: (ward, record) =>
+            ward ? (
+              ward
+            ) : (
+              <Link to={`/assign-ward/${record.Patient_No}`} style={{ color: "red", textDecoration: "none" }}>
+                <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
+                <span>Assign Ward</span>
+              </Link>
+            ),
         },
         {
           title: "Bed",
           dataIndex: "Bed",
           key: "Bed",
-          render: (bed) => bed || "Not assigned",
+          render: (bed, record) =>
+            bed ? (
+              bed
+            ) : (
+              <Link to={`/assign-ward/${record.Patient_No}`} style={{ color: "red", textDecoration: "none" }}>
+                <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
+                <span>Assign Bed</span>
+              </Link>
+            ),
         },
         {
           title: "Doctor",
-          dataIndex: "Doctor",
-          key: "Doctor",
+          dataIndex: "DoctorsName",
+          key: "DoctorsName",
           render: (doctor) => doctor || "Not assigned",
         },
       ];
@@ -78,7 +99,7 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
   return (
     <>
         {
-            loadingPatientList ? (
+            loadingPatientList || loading ? (
                 <Loading />
             ):(
             <Table
@@ -115,7 +136,8 @@ InpatientTable.propTypes = {
     loadingPatientList: PropTypes.bool.isRequired,
     handleNavigate: PropTypes.func.isRequired,
     filterInPatients: PropTypes.array.isRequired,
-    searchName: PropTypes.bool.isRequired,
-    searchPatientNumber: PropTypes.bool.isRequired,
-    searchAdmissionNumber: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    searchName: PropTypes.string.isRequired,
+    searchPatientNumber: PropTypes.string.isRequired,
+    searchAdmissionNumber: PropTypes.string.isRequired
 };
