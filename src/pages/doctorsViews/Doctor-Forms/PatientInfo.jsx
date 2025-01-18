@@ -7,7 +7,7 @@ import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 
 
-const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, role }) => {
+const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, role, EncounterDetails }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
 
@@ -15,23 +15,24 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
 
-    const capitalizeWords = (name) =>
-      name
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(" ");
-  
-    const patientName = patientDetails?.Names
-      ? capitalizeWords(patientDetails.Names)
-      : capitalizeWords(
-          [
-            patientDetails?.Surname,
-            patientDetails?.LastName,
-            patientDetails?.MiddleName,
-          ]
-            .filter(Boolean)
-            .join(" ")
-        );
+
+  const capitalizeWords = (name) =>
+    name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+  const patientName = patientDetails?.Names
+    ? capitalizeWords(patientDetails.Names)
+    : capitalizeWords(
+      [
+        patientDetails?.Surname,
+        patientDetails?.LastName,
+        patientDetails?.MiddleName,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    );
   const handlePrintInvoice = () => {
     const invoiceData = {
       PatientNo: patientNo,
@@ -104,6 +105,7 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
           <InfoRow label="Gender" value={patientDetails?.Gender} />
+          {/* <InfoRow label={'Consulting Doctor'} value={'Ndirangu'} /> */}
         </div>
       </Card>
       <Card
@@ -207,32 +209,32 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
         >
           {
             role === 'Doctor' && (
-                <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
-                    <Button
-                    type="primary"
-                    onClick={() => handleMarkAsCompleted(observationNo)}
-                    style={{ width: "100%", marginBottom: "10px" }}
-                    >
-                    Mark as Completed
-                    </Button>
-                    <Button
-                    type="default"
-                    onClick={() => handleTransferPatient(observationNo)}
-                    style={{ width: "100%" }}
-                    >
-                    Request Patient Review
-                    </Button>
-                    {/* <Button
+              <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
+                <Button
+                  type="primary"
+                  onClick={() => handleMarkAsCompleted(observationNo)}
+                  style={{ width: "100%", marginBottom: "10px" }}
+                >
+                  Mark as Completed
+                </Button>
+                <Button
+                  type="default"
+                  onClick={() => handleTransferPatient(observationNo)}
+                  style={{ width: "100%" }}
+                >
+                  Request Patient Review
+                </Button>
+                {/* <Button
                     type="primary"
                     // style={{ marginTop: "10px", width: "100%" }}
                     onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
                     >
                     Print Interim Invoice
                     </Button> */}
-                </div>
+              </div>
             )
           }
-          
+
         </div>
       </Card>
     </div>

@@ -261,7 +261,7 @@ const CashPatients = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
-      render: (text) => `KSh ${text.toFixed(2)}`,
+      // render: (text) => `KSh ${text.toFixed(2)}`,
     },
     {
       title: "Actions",
