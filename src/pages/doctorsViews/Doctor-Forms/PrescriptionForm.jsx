@@ -270,7 +270,7 @@ const PrescriptionForm = ({ setShowForm }) => {
               </Form.Item>
             </div>
             <div className="d-block d-flex align-items-center justify-content-between gap-2">
-              <Form.Item
+              {/* <Form.Item
                 label="Unit of Measure"
                 name="UnitOfMeasure"
                 hasFeedback
@@ -292,7 +292,7 @@ const PrescriptionForm = ({ setShowForm }) => {
                     </Select.Option>
                   ))}
                 </Select>
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item
                 label="Frequency per Day"
                 name="prescriptionDose"

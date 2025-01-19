@@ -40,8 +40,7 @@ export const getColorByWaitingTime = (observationDateTime) => {
         return { color: "#35AB22", text: "Normal" }; // Default is low urgency
     }
   };
-  
- 
+
 
 
   export const rowClassName = (record) => {
