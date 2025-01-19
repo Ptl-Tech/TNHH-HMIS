@@ -41,16 +41,6 @@ const NursingNotes = () => {
       });
     } else {
       navigate(`/Doctor/Inpatient/Read-nurse-notes`, {
-    if (filterNurseNotes.length > 0) {
-      navigate(`/Nurse/Inpatient/Read-nurse-notes`, {
-        state: {
-          loadingGetNurseAdmissionNotes,
-          filterNurseNotes,
-          patientDetails,
-        },
-      });
-    } else {
-      navigate(`/Doctor/Inpatient/Read-nurse-notes`, {
         state: {
             loadingGetNurseAdmissionNotes,
             filterNurseNotes,
