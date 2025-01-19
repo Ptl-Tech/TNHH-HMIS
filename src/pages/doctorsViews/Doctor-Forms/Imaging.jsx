@@ -10,6 +10,7 @@ import {
   Table,
   Badge,
   message,
+  Tag,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -65,7 +66,7 @@ const Imaging = () => {
 
     try {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
-      
+
       if (response && response.status === 'success') {
         message.success(`Radiology request was successful`);
         dispatch(getPatientRadiologyTest(formTreatmentNo));
@@ -86,28 +87,31 @@ const Imaging = () => {
         dispatch(getPatientRadiologyTest(treatmentNo));
       }
     } else {
-      message.error('No treatment selected');
+      message.error('No Request selected');
     }
   };
-  
+
 
   const columns = [
     {
-        title:"TreatmentNo",
-        dataIndex:"TreatmentNo",
-        key:"TreatmentNo",
-        render: (text) => <Button type="link">{text}</Button>,
+      title: "TreatmentNo",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+      // render: (text) => <Button type="link">{text}</Button>,
     },
     {
       title: "Test Package",
       dataIndex: "RadiologyTypeCode",
       key: "RadiologyTypeCode",
-      render: (text) => <Button type="link">{text}</Button>,
+      // render: (text) => <Button type="link">{text}</Button>,
     },
     {
       title: "Radiology Test Name",
       dataIndex: "RadiologyTypeName",
       key: "RadiologyTypeName",
+      // render: (_, record) => {
+      //   console.log(record)
+      // },
     },
     {
       title: "Date Due",
@@ -124,20 +128,22 @@ const Imaging = () => {
           new: "blue",
           forwarded: "orange",
           cancelled: "red",
+          completed: "green"
         };
-        return <Badge color={statusColors[text?.toLowerCase()]} text={text} />;
+        console.log(text)
+        return <Tag color={statusColors[text?.toLowerCase()]} >{text}</Tag>;
       },
     },
   ];
 
   const dataSource = Array.isArray(radiologyData)
     ? radiologyData
-  : Object.keys(radiologyData).map((key, index) => ({
-    key:index,
-    Treatment:item.TreatmentNo,
-  }));
+    : Object.keys(radiologyData).map((key, index) => ({
+      key: index,
+      Treatment: item.TreatmentNo,
+    }));
 
-    console.log("dateme",dataSource);  
+  console.log("dateme", dataSource);
   return (
     <div>
       <Typography.Title level={5} style={{ marginBottom: "12px" }}>
@@ -146,7 +152,8 @@ const Imaging = () => {
       </Typography.Title>
 
       <div className="d-flex justify-content-between my-4">
-      <Button
+        {!showForm &&
+          <Button
             type="primary"
             htmlType="submit"
             icon={<SendOutlined />}
@@ -156,16 +163,17 @@ const Imaging = () => {
             loading={requestingTest}
 
           >
-            Send to Lab
+            Forward Requests
           </Button>
+        }
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
-          icon={showForm ?   <EyeOutlined />:<PlusOutlined />}
+          icon={showForm ? <EyeOutlined /> : <PlusOutlined />}
         >
           {showForm ? "View Results" : "New Request"}
         </Button>
-        
+
       </div>
 
       {showForm ? (
@@ -174,7 +182,7 @@ const Imaging = () => {
           initialValues={{
             treatmentNo: treatmentNo || "",
             testPackageCode: "",
-            dueDate: moment(),
+            // dueDate: moment(),
           }}
           onFinish={handleSave}
         >
@@ -185,7 +193,7 @@ const Imaging = () => {
                 label="Treatment Number"
                 rules={[{ required: true, message: "Please enter the treatment number." }]}
               >
-                <Input placeholder="Treatment Number" disabled style={{color:"##0f5689", fontWeight:"bold"}} />
+                <Input disabled placeholder="Treatment Number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -218,7 +226,7 @@ const Imaging = () => {
           </Row>
 
           <Button type="primary" htmlType="submit" style={{ marginTop: "16px" }}>
-            Submit Request
+            Save Radiology Request
           </Button>
         </Form>
       ) : (
