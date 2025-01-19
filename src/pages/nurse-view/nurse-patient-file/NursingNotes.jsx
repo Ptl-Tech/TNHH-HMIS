@@ -1,5 +1,5 @@
 import { Button, Form, message } from "antd";
-import { PlusOutlined, EyeOutlined, SaveOutlined, MedicineBoxOutlined } from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined, SaveOutlined, FileProtectOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -113,9 +113,9 @@ const handleOnFinish = async () => {
   return (
     <div>
       
-      <NurseInnerHeader icon={<MedicineBoxOutlined />} title="Nursing Notes" />
+      <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
     
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px', marginTop: '20px' }}>
         {/* Conditionally render buttons based on role */}
         {role == 'Nurse' && (
           <>

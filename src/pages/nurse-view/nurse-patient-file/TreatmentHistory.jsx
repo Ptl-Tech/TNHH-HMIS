@@ -1,5 +1,5 @@
 import { Form, Modal } from "antd"
-import { SolutionOutlined } from "@ant-design/icons"
+import { ExperimentOutlined } from "@ant-design/icons"
 import TreatmentHistoryTable from "../tables/nurse-tables/TreatmentHistoryTable"
 import { useState } from "react";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
@@ -20,7 +20,7 @@ const TreatmentsHistory = () => {
   return (
     <div>
       
-      <NurseInnerHeader icon={<SolutionOutlined />} title="Treatment History" />
+      <NurseInnerHeader icon={<ExperimentOutlined />} title="Past Encounter Notes" />
 
         <TreatmentHistoryTable showModal={showModal}/>
 

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import Loading from "../../../partials/nurse-partials/Loading";
-import { FileOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 
 const PatientInfo = () => {
   const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
@@ -79,7 +79,7 @@ const patientSecondaryInfo = [
   return (
     <div>
         
-        <NurseInnerHeader icon={<FileOutlined />} title="Patient Information" />
+        <NurseInnerHeader icon={<UserOutlined />} title="Patient Information" />
 
         {
           loadingTriageWaitingList ? (

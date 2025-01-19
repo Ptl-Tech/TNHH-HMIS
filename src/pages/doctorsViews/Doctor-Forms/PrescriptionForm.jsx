@@ -10,6 +10,7 @@ import {
   Card,
   List,
   Space,
+  Typography,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
@@ -42,8 +43,8 @@ const PrescriptionForm = () => {
   const filteredPrescriptions = prescriptions.filter(
     (prescription) => prescription.TreatmentNo === treatmentNo
   );
-  
 
+  
   const dispatch = useDispatch();
   const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
   const { loading: savingPrescription, success: prescriptionSaved } =
@@ -146,6 +147,16 @@ const PrescriptionForm = () => {
     dispatch(sendtoPharmacy(treatmentNo));
   };
 
+  const allergyItems = [
+    {
+      title: 'Food Allergies',
+      description: 'Penicillin, Sulphur, Penicillin, Penicillin',
+    },
+    {
+      title: 'Medications Allergies',
+      description: 'Paracetamol, Aspirin, Penicillin, Penicillin',
+    },
+  ]
   return (
     
     <>
@@ -388,35 +399,25 @@ const PrescriptionForm = () => {
           </Form>
         </Card>
       </Col>
-      {/* <Col span={8}>
-        <Card
-          title="Patient Prescription Card"
-          bordered={false}
-          className="card"
-        >
-          <List
+      <Col span={8}>
+      <div>
+        <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', padding: '10px' }}>
+        
+            <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
             itemLayout="horizontal"
-            dataSource={[
-              { name: "Drug Name", description: prescriptionCardData.DrugNo },
-              { name: "Dosage", description: prescriptionCardData.Dosage },
-              { name: "Unit of Measure", description: prescriptionCardData.UnitOfMeasure },
-              { name: "Frequency per Day", description: prescriptionCardData.prescriptionDose },
-              { name: "Route", description: prescriptionCardData.route },
-              { name: "No of Days", description: prescriptionCardData.noOfDays },
-              { name: "Quantity", description: prescriptionCardData.PrescriptionQuantity },
-              { name: "Remarks", description: prescriptionCardData.PrescriptionRemarks },
-            ]}
+            dataSource={allergyItems}
             renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={item.name}
-                  description={item.description}
-                />
-              </List.Item>
+            <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Typography.Text className="allergies-item-list-title">{item.title}</Typography.Text>
+                <Typography.Text>{item.description}</Typography.Text>
+            </List.Item>
             )}
-          />
+            >
+            </List>
+
         </Card>
-      </Col> */}
+      </div>
+      </Col>
     </Row>
 
   <Row>

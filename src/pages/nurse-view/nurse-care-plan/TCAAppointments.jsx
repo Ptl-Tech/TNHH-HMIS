@@ -24,7 +24,7 @@ const TCAAppointments = () => {
         
         <NurseInnerHeader icon={<HeartOutlined />} title="TCA / Appointments" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Appointment</Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview Appointment</Button>
         </div>

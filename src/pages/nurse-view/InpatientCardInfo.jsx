@@ -1,4 +1,4 @@
-import { Card, Col, Divider, Row, Spin, Typography } from 'antd'
+import { Card, Divider, Spin, Typography } from 'antd'
 import PropTypes from 'prop-types'
 import { LoadingOutlined } from '@ant-design/icons'
 import { calculateAge } from '../../utils/helpers'

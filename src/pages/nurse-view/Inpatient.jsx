@@ -49,7 +49,6 @@ const combinedPatients = admittedPatients?.map(patient => {
     DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
   };
 });
-console.log('combined patients', combinedPatients)
      
     useEffect(() => {
       dispatch(getPgAdmissionsAdmittedSlice());

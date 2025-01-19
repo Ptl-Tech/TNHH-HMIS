@@ -40,7 +40,7 @@ const handleStopTreatment = () => {
     <div>
          <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleSendToPharmacy()}><PlusOutlined /> Send to Pharmacy</Button>
           <Button color="danger" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleStopTreatment()}><RotateRightOutlined /> Stop Treatment</Button>
         </div>

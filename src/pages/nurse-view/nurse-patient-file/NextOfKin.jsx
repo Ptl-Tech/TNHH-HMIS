@@ -43,6 +43,7 @@ const NextOfKin = () => {
             <Loading />
          ):(
             <List 
+            style={{ marginTop: '20px' }}
             itemLayout="horizontal"
             dataSource={data}
             renderItem={item => (

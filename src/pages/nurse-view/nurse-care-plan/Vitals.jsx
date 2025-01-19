@@ -51,7 +51,7 @@ const Vitals = () => {
     <div>
       <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Vitals"/>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
            Add Vitals
           </Button>
