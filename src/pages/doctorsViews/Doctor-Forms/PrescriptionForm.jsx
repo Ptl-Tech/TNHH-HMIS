@@ -31,18 +31,16 @@ import { useForm } from "antd/es/form/Form";
 import useAuth from "../../../hooks/useAuth";
 import PrescriptionTable from "../tables/PrescriptionTable";
 import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
+import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
 
-const PrescriptionForm = () => {
+const PrescriptionForm = ({ setShowForm }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); // Get treatmentNo from URL
   const staffNo = useAuth().userData.no;
-  const { loadingPrescriptions, prescriptions} = useSelector((state) => state.getQyPrescriptionLine);
-
-  const filteredPrescriptions = prescriptions.filter(
-    (prescription) => prescription.TreatmentNo === treatmentNo
-  );
-  
+  const { combinedList, loadingAllergies } = useFetchAllergiesAndMedicationsHook();
+  const patientNumber = queryParams.get("PatientNo"); // Get treatmentNo from URL
+  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientNumber); 
 
   const dispatch = useDispatch();
   const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
@@ -133,6 +131,7 @@ const PrescriptionForm = () => {
 
     await dispatch(postPrescriptionDetails(prescription))
     dispatch(getQyPrescriptionLineSlice())
+    setShowForm(false)
     
   };
   
@@ -147,20 +146,16 @@ const PrescriptionForm = () => {
     }
   }, [prescriptionSaved]);
 
-  const handleSendToPharmacy = () => {
-    dispatch(sendtoPharmacy(treatmentNo));
-  };
-
-  const allergyItems = [
+  const transformedData = [
     {
-      title: 'Food Allergies',
-      description: 'Penicillin, Sulphur, Penicillin, Penicillin',
+      title: "Food Allergies",
+      description: filterAllergies.map(item => item.FoodAllergy).filter(Boolean).join(", "),
     },
     {
-      title: 'Medications Allergies',
-      description: 'Paracetamol, Aspirin, Penicillin, Penicillin',
-    },
-  ]
+      title: "Drug Allergies",
+      description: filterAllergies.map(item => item.DrugAllergy).filter(Boolean).join(", "),
+    }
+  ];
   return (
     
     <>
@@ -275,7 +270,7 @@ const PrescriptionForm = () => {
               </Form.Item>
             </div>
             <div className="d-block d-flex align-items-center justify-content-between gap-2">
-              <Form.Item
+              {/* <Form.Item
                 label="Unit of Measure"
                 name="UnitOfMeasure"
                 hasFeedback
@@ -297,7 +292,7 @@ const PrescriptionForm = () => {
                     </Select.Option>
                   ))}
                 </Select>
-              </Form.Item>
+              </Form.Item> */}
               <Form.Item
                 label="Frequency per Day"
                 name="prescriptionDose"
@@ -387,17 +382,6 @@ const PrescriptionForm = () => {
                   Save Prescription
                 </Button>
               </Form.Item>
-              <Form.Item>
-                <Button
-                  type="primary"
-                  onClick={handleSendToPharmacy}
-                  loading={pharmacyPosting}
-                  disabled={!prescriptionSaved}
-                >
-                  <SendOutlined />
-                  Send to Pharmacy
-                </Button>
-              </Form.Item>
             </Space>
            
           </Form>
@@ -409,11 +393,13 @@ const PrescriptionForm = () => {
         
             <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
             itemLayout="horizontal"
-            dataSource={allergyItems}
+            loading={loadingAllergies}
+            dataSource={transformedData}
             renderItem={(item) => (
             <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Typography.Text className="allergies-item-list-title">{item.title}</Typography.Text>
-                <Typography.Text>{item.description}</Typography.Text>
+                <Typography.Text>
+                  {item.description}</Typography.Text>
             </List.Item>
             )}
             >
@@ -423,12 +409,6 @@ const PrescriptionForm = () => {
       </div>
       </Col>
     </Row>
-
-  <Row>
-    <Col span={24}>
-      <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
-    </Col>
-  </Row>
 
     </>
 

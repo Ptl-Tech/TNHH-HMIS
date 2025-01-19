@@ -50,13 +50,7 @@ export const postPrescriptionDetails = (prescription) => async (dispatch, getSta
      dispatch({ type: POST_PRESCRIPTION_SUCCESS, payload: responseData });
 
     if (responseData.status === "success") {
-      Modal.success({
-        title: "Success",
-        content: "Prescription added successfully.",
-        onOk() {
-          // Optional: Close the modal automatically or execute any other logic
-        },
-      });
+      message.success("prescription saved successfully, please proceed send to pharmacy");
     }
    }, 2000);
 
@@ -96,7 +90,7 @@ export const sendtoPharmacy = (treatmentId) => async (dispatch, getState) => {
   
       // Corrected request body structure
       const response = await axios.post(
-        `${API}Doctor/PrescribeDrugs `,
+        `${API}Doctor/PrescribeDrugs`,
         {
           treatmentNo: treatmentId, // Send treatmentNo as part of the request body
         },
