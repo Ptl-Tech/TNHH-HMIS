@@ -1,9 +1,9 @@
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
-import { Link } from "react-router-dom";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, loading, searchName, searchPatientNumber, searchAdmissionNumber }) => {
 
@@ -59,10 +59,10 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
             ward ? (
               ward
             ) : (
-              <Link to={`/assign-ward/${record.Patient_No}`} style={{ color: "red", textDecoration: "none" }}>
+              <Button variant="link" style={{ color: "red", textDecoration: "none" }} onClick={handleClick(record)}>
                 <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
                 <span>Assign Ward</span>
-              </Link>
+              </Button>
             ),
         },
         {
@@ -73,10 +73,10 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
             bed ? (
               bed
             ) : (
-              <Link to={`/assign-ward/${record.Patient_No}`} style={{ color: "red", textDecoration: "none" }}>
+              <Button variant="link" style={{ color: "red", textDecoration: "none" }} onClick={handleClick(record)}>
                 <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
                 <span>Assign Bed</span>
-              </Link>
+              </Button>
             ),
         },
         {
@@ -95,6 +95,13 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
       const handleTableChange = (newPagination) => {
             setPagination(newPagination); // Update pagination settings
       };
+
+      const navigate = useNavigate();
+      const handleClick = (record) => {
+        record?.PatientNo && navigate(`/Nurse/Admit-patient/Patient?PatientNo=${record?.PatientNo}`, {
+          state: { patientDetails: record }
+        });
+      }
       
   return (
     <>

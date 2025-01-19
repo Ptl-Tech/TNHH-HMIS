@@ -1,18 +1,15 @@
 import {
   Form,
-  Input,
   DatePicker,
   Row,
   Col,
   Button,
   Typography,
   Select,
-  Table,
   message,
-  Popconfirm,
   Tag,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getLabRequestSetup } from "../../../actions/Doc-actions/qyLabTestsSetup";
 import { postLabRequest } from "../../../actions/Doc-actions/postLabRequest";
@@ -25,12 +22,10 @@ import moment from "moment";
 import {
   FileTextOutlined,
   SaveOutlined,
-  FileOutlined,
   PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
 } from "@ant-design/icons";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { Option } = Select;
 
@@ -38,7 +33,10 @@ const LabResults = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
+  const role = useAuth().userData.departmentName
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
@@ -55,7 +53,7 @@ const LabResults = () => {
   );
   const [labRequest, setLabRequest] = useState({
     myAction: "create",
-    treatmentNo,
+    treatmentNo: treatmentNo ? treatmentNo : admissionNo,
     testPackageCode: "",
     dueDate: "",
   });
@@ -186,7 +184,10 @@ const LabResults = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Laboratory Request 
       </Typography.Title>
-      <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
+      
+      {
+        role === 'Doctor' ? (
+          <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
          <div className="d-flex justify-content-start align-items-center">
          <Button
               type="primary"
@@ -224,6 +225,10 @@ const LabResults = () => {
         </Button>
       </div>
         </div>
+        ) : (
+          null
+        )
+      }
       
 
       {!showForm ? (

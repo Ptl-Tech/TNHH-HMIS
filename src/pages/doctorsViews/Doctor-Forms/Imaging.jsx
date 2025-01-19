@@ -7,20 +7,19 @@ import {
   Button,
   Typography,
   Select,
-  Table,
-  Badge,
   message,
   Tag,
 } from "antd";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FileSearchOutlined, FileTextOutlined, EyeOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons";
+import { FileTextOutlined, EyeOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import { getRadiologySetup } from "../../../actions/Doc-actions/qyRadiologyTestSetups";
 import { postRadiologyRequest } from "../../../actions/Doc-actions/postRadiolgyRequest";
 import { getPatientRadiologyTest, requestRadiologyTest } from "../../../actions/Doc-actions/requestRadiologyTest";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { Option } = Select;
 
@@ -28,6 +27,7 @@ const Imaging = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const role = useAuth().userData.departmentName
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(true);
@@ -62,13 +62,11 @@ const Imaging = () => {
       dueDate: formattedDueDate,
     };
 
-    console.log("Submitting radiologyRequest:", radiologyRequest);
-
     try {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
 
       if (response && response.status === 'success') {
-        message.success(`Radiology request was successful`);
+        message.success(`Laboratory request was successful`);
         dispatch(getPatientRadiologyTest(formTreatmentNo));
       } else {
         message.error('Failed to submit radiology request');
@@ -130,7 +128,6 @@ const Imaging = () => {
           cancelled: "red",
           completed: "green"
         };
-        console.log(text)
         return <Tag color={statusColors[text?.toLowerCase()]} >{text}</Tag>;
       },
     },
@@ -140,7 +137,7 @@ const Imaging = () => {
     ? radiologyData
     : Object.keys(radiologyData).map((key, index) => ({
       key: index,
-      Treatment: item.TreatmentNo,
+      Treatment: key.TreatmentNo,
     }));
 
   console.log("dateme", dataSource);
@@ -151,7 +148,9 @@ const Imaging = () => {
         Radiology Request
       </Typography.Title>
 
-      <div className="d-flex justify-content-between my-4">
+      {
+        role === 'Doctor' ? (
+          <div className="d-flex justify-content-between my-4">
         {!showForm &&
           <Button
             type="primary"
@@ -175,6 +174,10 @@ const Imaging = () => {
         </Button>
 
       </div>
+        ) : (
+          null
+        )
+      }
 
       {showForm ? (
         <Form

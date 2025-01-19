@@ -15,12 +15,19 @@ const Vitals = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { patientDetails } = useLocation().state;
-        const [isVitalFormVisible, setIsVitalFormVisible] = useState(false);
+        const [isVitalFormVisible, setIsVitalFormVisible] = useState(false)
         const role = useAuth().userData.departmentName
+        const queryParams = new URLSearchParams(location.search);
+        const AdmNo = queryParams.get("AdmNo");
+        const PatientNo = queryParams.get("PatientNo")
 
+        
         const { combinedList, loadingInpatientVitals, loadingTriageList } = useFetchVitalsHook();
-
-        const filterVitals = combinedList?.filter(vitals => vitals.PatientNo === patientDetails?.PatientNo);
+        const filterInpatientVitals = combinedList?.filter((vitals) => 
+          role === 'Nurse'
+          ? vitals.PatientNo === patientDetails?.Patient_No
+          : vitals.PatientNo === PatientNo
+      );
 
         const handleCancel = () => {
           setIsModalOpen(false);
@@ -64,7 +71,7 @@ const Vitals = () => {
         {
           isVitalFormVisible && (
             
-              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible} role={role}/>
+              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible} role={role} admissionNumber={AdmNo} number={PatientNo}/>
            
           )
         }
@@ -72,7 +79,7 @@ const Vitals = () => {
 
         {
           !isVitalFormVisible && (
-            <VitalsTable  rowSelection={rowSelection} filterVitals={filterVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
+            <VitalsTable  rowSelection={rowSelection} filterVitals={filterInpatientVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
           )
         }
 

@@ -3,7 +3,6 @@ import {
     Typography,
   } from "antd";
   import { useEffect, useState } from "react";
-import KetamineTable from "../../nurse-view/tables/nurse-tables/KetamineTable";
 import { useLocation } from "react-router-dom";
 import { FileTextOutlined, PlusOutlined } from "@ant-design/icons"
 import ImplantFormData from "../../nurse-view/nurse-forms/ImplantRequestFormData";

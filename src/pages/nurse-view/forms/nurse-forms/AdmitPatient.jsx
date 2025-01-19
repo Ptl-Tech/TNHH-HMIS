@@ -89,6 +89,7 @@ const AdmitPatientForm = () => {
         setResetMessage(result.payload.message || 'Admission Form Details Submitted Successfully')
         setAlertType('success');
         form.resetFields();
+        navigate(`/Nurse/Inpatient`);
         setIsSubmitting(true);
       }else if(result.type === POST_ADMISSION_FORM_DETAILS_FAILURE){
         setResetMessage( result.payload.message || 'Admission Form Details Failed to Submit');
@@ -282,14 +283,14 @@ const AdmitPatientForm = () => {
                   Save Admission
                 </Button>
             </Form.Item>
-            <Form.Item >
+            {/* <Form.Item >
                 <Button type="primary" 
-                onClick={handleAdmitPatient} 
+                // onClick={handleAdmitPatient} 
                 // disabled={!loadingAdmissionDetails}
                 >
                   Admit Patient
                 </Button>
-            </Form.Item>
+            </Form.Item> */}
         </Space>
         </Form>
         </Card>

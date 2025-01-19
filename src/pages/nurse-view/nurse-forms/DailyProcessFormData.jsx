@@ -12,6 +12,8 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
     const { patientDetails } = useLocation().state;
     const dispatch = useDispatch();
     const { loadingDailyProcedure } = useSelector((state) => state.postDailyProcedureOrProcess);
+    const queryParams = new URLSearchParams(location.search);
+    const AdmNo = queryParams.get("AdmNo");
 
     const handleOnFinish = async (values) => {
         try {
@@ -20,11 +22,11 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
           const visitorData = {
             myAction: "create",
             raceId: "",
-            admissionNo: patientDetails?.CurrentAdmNo,
-            processDescription: values.process,
+            processCode: "someid",
+            admissionNo: patientDetails?.CurrentAdmNo || AdmNo,
+            processDescription: values.processDescription,
             remarks: values.remarks
-          };
-      
+          }; 
           // Dispatch function to handle API call and feedback
           const dispatchDailyProcessData = async (data) => {
             await dispatch(postDailyProcedureOrProcessSlice(data))

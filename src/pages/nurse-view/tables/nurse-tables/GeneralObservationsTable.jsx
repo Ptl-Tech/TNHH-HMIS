@@ -6,13 +6,6 @@ import Loading from '../../../../partials/nurse-partials/Loading';
 const GeneralObservationsTable = ({ ipGetProcedure, loadingGetIpProcedure }) => {
     const columns = [
         {
-          title: 'Process Code',
-          dataIndex: 'ProcessCode',
-          key: 'ProcessCode',
-          fixed: 'left',
-          width: 100,
-        },
-        {
           title: 'Process Description',
           dataIndex: 'Process',
           key: 'Process',

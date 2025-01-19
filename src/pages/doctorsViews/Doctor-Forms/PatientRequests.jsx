@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HeartOutlined, NodeIndexOutlined, MedicineBoxOutlined, ContainerOutlined, ScanOutlined, ManOutlined } from '@ant-design/icons';
+import { HeartOutlined, NodeIndexOutlined, MedicineBoxOutlined, ScanOutlined, ManOutlined } from '@ant-design/icons';
 import LabResults from './LabResults';
 import Imaging from './Imaging';
 import { Button, Space } from 'antd';
