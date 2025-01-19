@@ -273,6 +273,7 @@ const DoctorVisits = () => {
       state: {
         patientNo: record.patientNo,
         observationNo: record.observationNo,
+        patientDetails: record,
       },
     });
   };
