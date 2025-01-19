@@ -5,7 +5,6 @@ import {
   Input,
   Row,
   Select,
-  Table,
   Empty,
   Card,
   List,
@@ -43,8 +42,8 @@ const PrescriptionForm = () => {
   const filteredPrescriptions = prescriptions.filter(
     (prescription) => prescription.TreatmentNo === treatmentNo
   );
-
   
+
   const dispatch = useDispatch();
   const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
   const { loading: savingPrescription, success: prescriptionSaved } =
@@ -64,6 +63,10 @@ const PrescriptionForm = () => {
 
   useEffect(() => {
     dispatch(getItemUnitsOfMeasureSlice());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getQyPrescriptionLineSlice());
   }, [dispatch]);
 
   useEffect(() => {
@@ -125,6 +128,7 @@ const PrescriptionForm = () => {
       remarks: PrescriptionRemarks,
     };
 
+    console.log('prescription', prescription);
     setIsSubmitting(true); // Start the loading simulation
 
     await dispatch(postPrescriptionDetails(prescription))

@@ -3,6 +3,7 @@ import { ExperimentOutlined } from "@ant-design/icons"
 import TreatmentHistoryTable from "../tables/nurse-tables/TreatmentHistoryTable"
 import { useState } from "react";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const TreatmentsHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
