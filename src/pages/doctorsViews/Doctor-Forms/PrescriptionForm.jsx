@@ -125,8 +125,6 @@ const PrescriptionForm = ({ setShowForm }) => {
       route: route,
       remarks: PrescriptionRemarks,
     };
-
-    console.log('prescription', prescription);
     setIsSubmitting(true); // Start the loading simulation
 
     await dispatch(postPrescriptionDetails(prescription))
