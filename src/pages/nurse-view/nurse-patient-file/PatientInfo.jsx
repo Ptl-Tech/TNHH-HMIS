@@ -35,10 +35,10 @@ const PatientInfo = () => {
         title: 'Gender',
         description: filteredPatient[0]?.Gender || 'N/A',
     },
-    {
-        title: 'Marital Status',
-        description: filteredPatient[0]?.MaritalStatus || 'N/A',
-    },
+    // {
+    //     title: 'Marital Status',
+    //     description: filteredPatient[0]?.MaritalStatus || 'N/A',
+    // },
     {
         title: 'Nationality',
         description: filteredPatient[0]?.Nationality || 'N/A',
