@@ -96,7 +96,7 @@ export const sendtoPharmacy = (treatmentId) => async (dispatch, getState) => {
   
       // Corrected request body structure
       const response = await axios.post(
-        `${API}Doctor/PrescribeDrugs `,
+        `${API}Doctor/PrescribeDrugs`,
         {
           treatmentNo: treatmentId, // Send treatmentNo as part of the request body
         },

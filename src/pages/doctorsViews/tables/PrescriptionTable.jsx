@@ -1,4 +1,4 @@
-import { Button, Table } from "antd"
+import { Table } from "antd"
 import Loading from "../../../partials/nurse-partials/Loading"
 import PropTypes from "prop-types"
 
@@ -71,7 +71,7 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions}) => {
       // },
         ]
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div>
          {
            loadingPrescriptions ? (
               <Loading />
