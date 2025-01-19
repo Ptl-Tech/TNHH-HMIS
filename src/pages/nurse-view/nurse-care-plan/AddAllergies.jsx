@@ -48,7 +48,7 @@ const AddAllergies = () => {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleButtonVisibility} icon={<PlusOutlined />}>
-          Add Allergies and Medication
+          {isFormVisible ? 'View List': 'Add Allergies and Medication'}
         </Button>
 
           <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>

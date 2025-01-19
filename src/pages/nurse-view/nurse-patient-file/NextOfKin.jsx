@@ -10,6 +10,7 @@ const NextOfKin = () => {
     const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
     const { patientDetails } = useLocation().state;
     const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
+    console.log(filteredPatient);
 
   const data = [
    
@@ -21,18 +22,18 @@ const NextOfKin = () => {
         title: 'Next of Kin Relationship',
         description: filteredPatient[0]?.NextofkinRelationship || 'N/A',
     },
-    {
+    /* {
         title: 'Next of Kin ID Number',
         description: filteredPatient[0]?.NextOfKinIDCardNo || 'N/A',
-    },
+    }, */
     {
-        title: 'Next of Kin Address 1',
+        title: 'Next of Kin Phone',
         description: filteredPatient[0]?.NextOfkinAddress1 || 'N/A',
     },
-    {
+    /* {
         title: 'Next of Kin Address 2',
         description: filteredPatient[0]?.NextOfkinAddress2 || 'N/A',
-    }
+    } */
 ]
   return (
     

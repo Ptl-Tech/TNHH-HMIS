@@ -5,15 +5,30 @@ import { UserOutlined } from "@ant-design/icons";
 import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
+import { listDoctors } from "../../../actions/DropdownListActions";
+import { getConsultationRoomListSlice } from "../../../actions/nurse-actions/getConsultationRoomSlice";
+import { getSingleConsultationRoomReducer } from "../../../reducers/nurse-reducers/getConsultationRoomReducer";
 
 
-const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, role, EncounterDetails }) => {
+const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, role }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
 
 
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
+
+  // const {consultationRoomDetails, loadingConsultationRoomDetails} = useSelector((state) => state.getSingleConsultationRoom)
+
+  
+  // useEffect(() => {
+  //   if (treatmentNo) {
+  //     dispatch(getSingleConsultationSlice(treatmentNo))
+  //   }
+  // }, [dispatch, treatmentNo]);
+
+  // console.log(loadingConsultationRoomDetails)
+ 
 
 
   const capitalizeWords = (name) =>
@@ -105,7 +120,8 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, ro
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
           <InfoRow label="Gender" value={patientDetails?.Gender} />
-          {/* <InfoRow label={'Consulting Doctor'} value={'Ndirangu'} /> */}
+          {/* {!loadingConsultationRoomDetails && <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} />} */}
+          {/* <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} /> */}
         </div>
       </Card>
       <Card
