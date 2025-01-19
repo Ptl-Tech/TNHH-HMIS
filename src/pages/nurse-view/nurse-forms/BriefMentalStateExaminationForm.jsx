@@ -1,6 +1,6 @@
 import { Button } from "antd"
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
-import { ProfileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { FileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import BriefMentalStateExamFormData from "./BriefMentalStateExamFormData";
 
@@ -11,7 +11,7 @@ const BriefMentalStateExaminationForm = () => {
       }
   return (
     <>
-        <NurseInnerHeader title="Brief Mental Status Exam Form" icon={<ProfileOutlined />} />
+        <NurseInnerHeader icon={<FileOutlined />} title="Brief Mental Status Exam Form"  />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
 

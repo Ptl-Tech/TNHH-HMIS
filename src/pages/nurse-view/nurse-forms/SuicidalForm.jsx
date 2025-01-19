@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal } from 'antd'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import SuicidalFormTable from '../tables/nurse-tables/SuicidalFormTable';
@@ -19,13 +19,13 @@ const SuicidalForm = () => {
     const { ipSuicidalForm, loadingIpSuicidalForm } = useSelector(state => state.getIpSuicidalForm);
     const { loadingSuicidalForm } = useSelector(state => state.postSuicidalForm);
     const [isFormVisible, setIsFormVisible] = useState(false);
-const [suicidalFormData, setSuicidalFormData] = useState({
-  date: '',
-  time: '',
-  handingOver: '',
-  takingOver: '',
-  remarks: ''
-});
+    const [suicidalFormData, setSuicidalFormData] = useState({
+      date: '',
+      time: '',
+      handingOver: '',
+      takingOver: '',
+      remarks: ''
+    });
 
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     const staffNo = userInfo?.userData?.no
@@ -73,7 +73,7 @@ const [suicidalFormData, setSuicidalFormData] = useState({
   return (
     <div>
 
-        <NurseInnerHeader title="Suicidal Precaution Form" />
+        <NurseInnerHeader icon={<FileOutlined/>} title="Suicidal Precaution Form" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           {

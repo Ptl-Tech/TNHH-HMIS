@@ -1,7 +1,8 @@
-import { Form, Modal, Space, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Form, Modal } from "antd"
+import { ExperimentOutlined } from "@ant-design/icons"
 import TreatmentHistoryTable from "../tables/nurse-tables/TreatmentHistoryTable"
 import { useState } from "react";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const TreatmentsHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,12 +19,8 @@ const TreatmentsHistory = () => {
     const [ form ] = Form.useForm();
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-                Treatment History
-            </Typography.Text>
-        </Space>
+      
+      <NurseInnerHeader icon={<ExperimentOutlined />} title="Past Encounter Notes" />
 
         <TreatmentHistoryTable showModal={showModal}/>
 

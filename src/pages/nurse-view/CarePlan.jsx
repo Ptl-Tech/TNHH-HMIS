@@ -6,21 +6,27 @@ import TreatmentsSheet from './nurse-care-plan/TreatmentsSheet'
 import ECTScan from './nurse-care-plan/ECTScan'
 import TCAAppointments from './nurse-care-plan/TCAAppointments'
 import DailyProcess from './nurse-care-plan/DailyProcess'
-import Injections from './nurse-care-plan/Injections'
 import Diagnosis from './nurse-care-plan/Diagnosis'
 import useAuth from '../../hooks/useAuth'
-import Prescription from './nurse-care-plan/Prescription'
-import PrescriptionForm from '../doctorsViews/Doctor-Forms/PrescriptionForm'
 import Medication from '../doctorsViews/Doctor-Forms/Medication'
+import { FileOutlined, FileMarkdownOutlined, MedicineBoxOutlined, SolutionOutlined, HeartOutlined } from '@ant-design/icons'
+import VisitorsList from './nurse-forms/VisitorsList'
+import SuicidalForm from './nurse-forms/SuicidalForm'
+import MentalStateExaminationForm from './nurse-forms/MentalStateExaminationForm'
+import BriefMentalStateExaminationForm from './nurse-forms/BriefMentalStateExaminationForm'
+import DietaryIntakeForm from './nurse-forms/DietaryIntakeForm'
+import JacksonVisualForm from './nurse-forms/JacksonVisualForm'
+
 
 
 const CarePlan = () => {
+   const [activeItem, setActiveItem] = useState('Add Allergies');
   const [selectedItem, setSelectedItem] = useState(<AddAllergies />);
   const role = useAuth().userData.departmentName
 
   const handleOnClick = (item) => {
-    
-            switch (item) {
+            setActiveItem(item.label);
+            switch (item.label) {
                 case 'Add Allergies':
                     setSelectedItem(<AddAllergies />)
                     break
@@ -48,37 +54,51 @@ const CarePlan = () => {
                 case 'Daily Ward Rounds':
                     setSelectedItem(<DailyProcess />)
                     break
+                case 'Visitor List':
+                    setSelectedItem(<VisitorsList />)
+                    break
+                case 'Suicidal Form':
+                    setSelectedItem(<SuicidalForm />)
+                    break
+                case 'MSE Status Level Checklist':
+                    setSelectedItem(<MentalStateExaminationForm />)
+                    break
+                case 'Brief MSE Form':
+                    setSelectedItem(<BriefMentalStateExaminationForm />)
+                    break
+                case 'Dietary Intake Form':
+                    setSelectedItem(<DietaryIntakeForm />)
+                    break
+                case 'Jackson Visual Form':
+                    setSelectedItem(<JacksonVisualForm />)
+                    break
                 default:
                     setSelectedItem(<AddAllergies />)
                     break
-                    }
+                }
          }
-    
-  
-
+    const menuItems = [
+        { label: 'Add Allergies', icon: <FileOutlined /> },
+        { label: 'Vitals', icon: <FileMarkdownOutlined /> },
+         ...role === 'Doctor' ? [{ label: 'Daily Ward Rounds', icon: <FileOutlined /> }] : [],
+        { label: 'Diagnosis', icon: <MedicineBoxOutlined /> },
+        { label: 'Prescription', icon: <SolutionOutlined /> },
+        ...role === 'Nurse' ? [{ label: 'Treatments Sheet', icon: <FileOutlined /> }, { label: 'ECT Scan', icon: <SolutionOutlined /> }, { label: 'TCA / Appointments', icon: <HeartOutlined /> }, { label: 'Visitor List', icon: <FileOutlined /> }, { label: 'Suicidal Form', icon: <FileOutlined /> }, { label: 'MSE Status Level Checklist', icon: <FileOutlined /> }, { label: 'Brief MSE Form', icon: <FileOutlined /> }, { label: 'Dietary Intake Form', icon: <FileOutlined /> }, { label: 'Jackson Visual Form', icon: <FileOutlined /> }] : [],
+    ]
   return (
     <>
         <div style={{ display: 'flex', flex: 1, gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
-            {
-                [
-                    'Allergies',
-                    'Vitals',
-                    role === 'Doctor' ? 'Daily Ward Rounds' : 'Nursing Rounds',
-                    'Diagnosis',
-                    'Prescription',
-                    ...(role === 'Nurse' ? ['Treatments Sheet', 'ECT', 'TCA / Appointments'] : []),
-                ].map((item, index) => (
-                    <Button 
-                        key={index} 
-                        type="primary" 
-                        style={{ backgroundColor: '#0f5689' }} 
-                        onClick={() => handleOnClick(item)}
-                    >
-                        {item}
-                    </Button>
-                ))
-            }
-
+        {menuItems.map((item, index) => (
+          <Button
+            key={index}
+            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+            className={activeItem === item.label ? "active-button" : ""}
+            onClick={() => handleOnClick(item)}
+          >
+            {item.icon}
+            {item.label}
+          </Button>
+        ))}
         </div>
 
         <Divider />

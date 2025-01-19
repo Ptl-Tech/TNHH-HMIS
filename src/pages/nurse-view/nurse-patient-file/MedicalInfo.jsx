@@ -1,5 +1,6 @@
-import { Col, List, Row, Space, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
+import { Col, List, Row, Typography } from "antd"
+import { FileMarkdownOutlined } from "@ant-design/icons"
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 
 const MedicalInfo = () => {
   const data = [
@@ -32,12 +33,7 @@ const MedicalInfo = () => {
 ]
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-                Medical Information
-            </Typography.Text>
-    </Space>
+      <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Medical Information" />
 
     <List
         itemLayout="horizontal"

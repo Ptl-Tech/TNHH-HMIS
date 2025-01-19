@@ -1,5 +1,5 @@
 import { Button, Form, Modal, Select } from 'antd'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import MentalStatusExaminationTable from '../tables/nurse-tables/MentalStatusExaminationTable';
@@ -51,7 +51,7 @@ const MentalStateExaminationForm = () => {
   return (
     <div>
       
-        <NurseInnerHeader title='Mental Status Level Checklist'/>
+        <NurseInnerHeader icon={<FileOutlined/>} title='Mental Status Level Checklist'/>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
           {

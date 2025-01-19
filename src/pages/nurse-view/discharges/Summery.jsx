@@ -1,8 +1,9 @@
-import { Button, DatePicker, Form, Modal, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, DatePicker, Form, Modal } from "antd"
+import { PlusOutlined, FileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import DischargeSummeryTable from "../tables/nurse-tables/DischargeSummeryTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const Summery = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,12 +21,7 @@ const Summery = () => {
   return (
     <div>
 
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Discharge Summary
-          </Typography.Text>
-        </Space>
+        <NurseInnerHeader icon={<FileOutlined/>} title="Discharge Summary" />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
             <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary

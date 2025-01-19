@@ -81,6 +81,7 @@ export const getPatientLabTest = () => async (dispatch, getState) => {
       `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=true`,
       config
     );
+    console.log(data)
 
     dispatch({ type: VIEW_PATIENT_LAB_TEST_SUCCESS, payload: data });
   } catch (error) {

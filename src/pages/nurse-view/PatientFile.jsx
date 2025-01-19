@@ -10,27 +10,30 @@ import Consumables from "./nurse-patient-file/Consumables";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
+import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutlined, FilterOutlined, UserAddOutlined } from "@ant-design/icons";
 
 const PatientFile = ({ patientDetails }) => {
+  const [activeItem, setActiveItem] = useState('Patient Info');
   const userRole = useAuth();
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
   // Define menu items conditionally
   const menuItems = [
-    "Patient Info",
+    {label: "Patient Info", icon: <UserOutlined />},
     // "Medical Info",
-    "Next of Kin",
-    ...(userRole.userData.departmentName === "Doctor" ? ["Past Doctor Notes"] : []),
-    "Nursing Notes",
-    "Treatments History",
-    "Consumables",
-    // ...(userRole.userData.departmentName === "Doctor" ? ["Charges"] : []),
+    {label: "Next of Kin", icon: <UserAddOutlined />},
+    ...(userRole.userData.departmentName === "Doctor" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
+    {label: "Nursing Notes", icon: <FileProtectOutlined />},
+    {label: "Past Encounters Notes", icon: <ExperimentOutlined />},
+    // "Consumables",
+    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Consumables", icon: <FilterOutlined />}] : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
 
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case "Patient Info":
         setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
         break;
@@ -66,13 +69,15 @@ const PatientFile = ({ patientDetails }) => {
   return (
     <>
       <div style={{ display: "flex", flex: 1, gap: "10px", flexWrap: "wrap" }}>
-        {menuItems.map((item, index) => (
+      {menuItems.map((item, index) => (
           <Button
             key={index}
-            type="primary"
+            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+            className={activeItem === item.label ? "active-button" : ""}
             onClick={() => handleOnClick(item)}
           >
-            {item}
+            {item.icon}
+            {item.label}
           </Button>
         ))}
       </div>
