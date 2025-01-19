@@ -10,6 +10,7 @@ import {
   Table,
   Badge,
   message,
+  Tag,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -127,8 +128,10 @@ const Imaging = () => {
           new: "blue",
           forwarded: "orange",
           cancelled: "red",
+          completed: "green"
         };
-        return <Badge color={statusColors[text?.toLowerCase()]} text={text} />;
+        console.log(text)
+        return <Tag color={statusColors[text?.toLowerCase()]} >{text}</Tag>;
       },
     },
   ];
