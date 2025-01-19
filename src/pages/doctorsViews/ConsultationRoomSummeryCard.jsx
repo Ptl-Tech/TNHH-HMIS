@@ -6,14 +6,14 @@ import CountUp from "react-countup";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const ConsultationRoomSummeryCard = ({ currentPath }) => {
+const ConsultationRoomSummeryCard = ({ currentPath, waitingPatient }) => {
   const { patients: treatmentList = [] } =
     useSelector((state) => state.docTreatmentList) || {};
 
   const currentDate = new Date();
   
   // Filter based on TreatmentDate
-  const openConsultationList =treatmentList?.filter(
+  const openConsultationList =waitingPatient?.filter(
     (item) => item.Status === "New" 
   );
   const pendingConsultationList = treatmentList.filter(
@@ -29,7 +29,7 @@ const ConsultationRoomSummeryCard = ({ currentPath }) => {
       icon: <HourglassOutlined />,
       title: "OP Waiting List",
       link: "/Doctor/Consultation-List",
-      count: openConsultationList.length,
+      count: waitingPatient.length,
     },
     {
       backgroundColor: "#0f5689",

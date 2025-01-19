@@ -28,7 +28,6 @@ export const getLabRequestSetup = () => async (dispatch, getState) => {
 
     dispatch({ type: QY_LAB_TEST_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: QY_LAB_TEST_LIST_FAIL, payload: error.message });
   }

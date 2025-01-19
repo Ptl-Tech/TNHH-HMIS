@@ -6,7 +6,6 @@ import {
 } from "../../actions/Doc-actions/getPatientMentalStateNotes.js";
 
 export const getPatientMSENotesReducer = (state = { data: [] }, action) => {
-  console.log("Reducer patient No:", action.payload);
   switch (action.type) {
     case REQUEST_PATIENT_MSE_LINES:
       return { loading: true, data: [] };

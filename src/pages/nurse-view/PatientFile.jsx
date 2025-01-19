@@ -15,6 +15,7 @@ import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutl
 const PatientFile = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState('Patient Info');
   const userRole = useAuth();
+  
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
   // Define menu items conditionally

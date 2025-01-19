@@ -100,6 +100,7 @@ const AdmitPatientForm = () => {
       Status: admissionLines?.Status,
     },
   ];
+  
   // Function to show the modal
   const handleHistoryClick = () => {
     setHistoryVisible(true);
@@ -110,22 +111,29 @@ const AdmitPatientForm = () => {
 
   const handleAdmissionRequest = () => {
     dispatch(requestPatientAdmission(treatmentNo));
-    console.log("Admission request sent for treatmentNo:", treatmentNo);
+
+    if (admissionRequestSuccess) {
+      dispatch(getAdmissionLines(treatmentNo));
+    }
   };
 
-  // Function to handle form submission and dispatch action
   const handlePatientAdmission = () => {
-  const admissionObject = {
-    myAction: "create", // Action type
-    treatmentNo: treatmentNo,
-    dateOfAdmission: moment().format("YYYY-MM-DD"),
-    admissionReason: admissionReason
+    const { admissionReason } = form.getFieldsValue(); 
+    
+    const admissionObject = {
+      myAction: "create", // Action type
+      treatmentNo: treatmentNo,
+      dateOfAdmission: moment().format("YYYY-MM-DD"),
+      admissionReason: admissionReason || "", 
+    };
+
+    dispatch(saveAdmissionDetails(admissionObject));
+     
+    if (admissionRequestSuccess) {
+      dispatch(getAdmissionLines(treatmentNo));
+    }
+    
   };
-
-
-  console.log("Dispatching admission details:", admissionObject); // Log for debugging
-  dispatch(saveAdmissionDetails(admissionObject)); // Dispatch the action with the Admission object
-};
 
   return (
     <div>
@@ -140,33 +148,23 @@ const AdmitPatientForm = () => {
         </Typography.Title>
 
         <div className="d-flex justify-content-end my-2">
-         
           <Button
             type="primary"
             onClick={handleHistoryClick}
             style={{ marginRight: "10px" }}
             icon={<PlusOutlined />}
           >
-           New Admission Request
+            New Admission Request
           </Button>
-          {/* <Button
-            type="default"
-            variant="Dashed"
-            style={{ marginLeft: "10px" }}
-            icon={<CloseCircleOutlined />}
-            danger
-          >
-            Cancel Admission
-          </Button> */}
         </div>
       </div>
 
       {/* Patient Admission Form */}
-       <Table
-          dataSource={dataSource}
-          columns={admissionHistoryColumns}
-          pagination={false}
-        />
+      <Table
+        dataSource={dataSource}
+        columns={admissionHistoryColumns}
+        pagination={false}
+      />
 
       {/* Modal for Patient Admission History */}
       <Modal
@@ -174,74 +172,70 @@ const AdmitPatientForm = () => {
         visible={historyVisible}
         onCancel={handleCancel}
         footer={
-        
-            <Space>
-            <Button type="primary" htmlType="submit" loading={loading}  onClick={handlePatientAdmission}>
-                  <SaveOutlined /> Save Admission Details
-                </Button>
-              <Button
-                type="primary"
-                style={{ marginRight: "10px" }}
-                icon={<IoBedOutline />}
-                loading={loadingAdmissionRequest}
-                onClick={handleAdmissionRequest}
-                disabled={loadingAdmissionRequest} // Prevent clicking until saved
-                className={
-                  loading || admissionRequestSuccess ? "ant-btn-disabled" : ""
-                } // Ensure it appears visually disabled
-              >
-                Request Admission
-              </Button>
-              <Button type="primary" onClick={handleCancel}>
-            Close
-          </Button>
-            </Space>
+          <Space>
+            <Button type="primary" loading={loading} onClick={handlePatientAdmission}>
+              <SaveOutlined /> Save Admission Details
+            </Button>
+            <Button
+              type="primary"
+              style={{ marginRight: "10px" }}
+              icon={<IoBedOutline />}
+              loading={loadingAdmissionRequest}
+              onClick={handleAdmissionRequest}
+              disabled={loadingAdmissionRequest} // Prevent clicking until saved
+              className={loading || admissionRequestSuccess ? "ant-btn-disabled" : ""}
+            >
+              Request Admission
+            </Button>
+            <Button type="primary" onClick={handleCancel}>
+              Close
+            </Button>
+          </Space>
         }
         width={800}
       >
-       <Form
-        layout="vertical"
-        className="admit-patient-card-container"
-        initialValues={{
-          treatmentNo: treatmentNo,
-          admissionReason: "",
-        }}
-        form={form}
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="treatmentNo"
-              label="Treatment Number"
-              rules={[{ required: true }]}
-            >
-              <Input
-                style={{ width: "100%", color: "#0F5689", fontWeight: "bold" }}
-                disabled
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Date of Admission" name="dateOfAdmission">
-              <Input
-                type="text"
-                value={moment().format("DD MMM YYYY")}
-                style={{ fontWeight: "bold", color: "#0F5689" }}
-                disabled
-              />{" "}
-              {/* Default to current date */}
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Admission Reason" name="admissionReason">
-              <TextArea />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-       
+        <Form
+          layout="vertical"
+          className="admit-patient-card-container"
+          initialValues={{
+            treatmentNo: treatmentNo,
+            admissionReason: "",
+          }}
+          form={form}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="treatmentNo"
+                label="Treatment Number"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  style={{ width: "100%", color: "#0F5689", fontWeight: "bold" }}
+                  disabled
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Date of Admission" name="dateOfAdmission">
+                <Input
+                  type="text"
+                  value={moment().format("DD MMM YYYY")}
+                  style={{ fontWeight: "bold", color: "#0F5689" }}
+                  disabled
+                />
+                {/* Default to current date */}
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Admission Reason" name="admissionReason">
+                <TextArea />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
       </Modal>
     </div>
   );

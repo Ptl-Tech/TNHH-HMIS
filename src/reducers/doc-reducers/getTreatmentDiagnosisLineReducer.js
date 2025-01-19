@@ -6,7 +6,6 @@ import {
 } from "../../actions/Doc-actions/getTreatmentDiagnosisLines";
 
 export const getPatientTreamentDiagnosisLinesReducer = (state = { data: [] }, action) => {
-  console.log("Reducer patient No:", action.payload);
   switch (action.type) {
     case REQUEST_TREATMENT_DIAGNOSIS_LINES:
       return { loading: true, data: [] };
