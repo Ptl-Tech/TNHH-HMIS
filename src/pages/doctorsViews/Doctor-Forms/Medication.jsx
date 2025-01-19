@@ -53,7 +53,7 @@ const Medication = () => {
             </Button>
           )
         }
-        
+
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
@@ -69,7 +69,7 @@ const Medication = () => {
         !showForm ? (
           <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
         ) : (
-          <PrescriptionForm />
+          <PrescriptionForm setShowForm={setShowForm}/>
         )
       }
       

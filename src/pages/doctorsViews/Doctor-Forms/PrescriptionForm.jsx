@@ -33,7 +33,7 @@ import PrescriptionTable from "../tables/PrescriptionTable";
 import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
 
-const PrescriptionForm = () => {
+const PrescriptionForm = ({ setShowForm }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); // Get treatmentNo from URL
@@ -131,6 +131,7 @@ const PrescriptionForm = () => {
 
     await dispatch(postPrescriptionDetails(prescription))
     dispatch(getQyPrescriptionLineSlice())
+    setShowForm(false)
     
   };
   

@@ -50,13 +50,7 @@ export const postPrescriptionDetails = (prescription) => async (dispatch, getSta
      dispatch({ type: POST_PRESCRIPTION_SUCCESS, payload: responseData });
 
     if (responseData.status === "success") {
-      Modal.success({
-        title: "Success",
-        content: "Prescription added successfully.",
-        onOk() {
-          // Optional: Close the modal automatically or execute any other logic
-        },
-      });
+      message.success("prescription saved successfully, please proceed send to pharmacy");
     }
    }, 2000);
 
