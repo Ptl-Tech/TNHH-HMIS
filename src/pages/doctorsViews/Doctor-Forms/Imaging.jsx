@@ -185,7 +185,7 @@ const Imaging = () => {
                 label="Treatment Number"
                 rules={[{ required: true, message: "Please enter the treatment number." }]}
               >
-                <Input placeholder="Treatment Number" />
+                <Input placeholder="Treatment Number" disabled style={{color:"##0f5689", fontWeight:"bold"}} />
               </Form.Item>
             </Col>
             <Col span={12}>
