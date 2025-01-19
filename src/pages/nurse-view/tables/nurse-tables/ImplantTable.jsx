@@ -1,9 +1,9 @@
 import { Badge, Table } from "antd"
 import PropTypes from "prop-types";
 
-const ETCTable = ({ loadingETC, data, treatmentNo }) => {
+const ImplantTable = ({ loadingKetamine, data, treatmentNo }) => {
     const filterData = data?.filter((item) => item?.Link_No === treatmentNo);
-    const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
+    const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'Implant')
 const columns = [
         {
             title: 'Visit No',
@@ -68,7 +68,7 @@ const columns = [
     <div style={{ }}>
     <Table 
        dataSource={filterProcedureData} 
-       loading={loadingETC}
+       loading={loadingKetamine}
        columns={columns} 
        className="admit-patient-table"
     />
@@ -76,11 +76,11 @@ const columns = [
   )
 }
 
-export default ETCTable
+export default ImplantTable
 
 //props types validations
-ETCTable.propTypes = {
-    loadingETC: PropTypes.bool.isRequired,
+ImplantTable.propTypes = {
+    loadingKetamine: PropTypes.bool.isRequired,
     data: PropTypes.array.isRequired,
     treatmentNo: PropTypes.string.isRequired
 }

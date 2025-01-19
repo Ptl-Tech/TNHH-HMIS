@@ -21,6 +21,7 @@ import PastMedicalHistory from "./PastMedicalHistory";
 import TreatmentHistoryTable from "../../nurse-view/tables/nurse-tables/TreatmentHistoryTable";
 
 const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
+  const [activeItem, setActiveItem] = useState('Patient History Notes');
   const [selectedItem, setSelectedItem] = useState(
     <PatientSigns
       treatmentNo={treatmentNo}
@@ -30,7 +31,8 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
   );
 
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case "Patient History Notes":
         setSelectedItem(
           <PatientSigns
@@ -114,20 +116,16 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
         }}
       >
         {buttonItems.map((item, index) => (
-          <Button
-            key={index}
-            type="primary"
-            style={{
-              backgroundColor: "#0f5689",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-            }}
-            onClick={() => handleOnClick(item.label)}
-          >
-            {item.icon} {item.label}
-          </Button>
-        ))}
+                  <Button
+                    key={index}
+                    style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+                    className={activeItem === item.label ? "active-button" : ""}
+                    onClick={() => handleOnClick(item)}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Button>
+          ))}
       </div>
 
       <div>{selectedItem}</div>

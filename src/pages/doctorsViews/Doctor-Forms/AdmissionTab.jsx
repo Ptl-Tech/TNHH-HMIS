@@ -7,8 +7,10 @@ import AdmitPatientForm from './AdmitPatient';
 import Referrals from './Referrals';
 
 const AdmissionTab = () => {
+  const [activeItem, setActiveItem] = useState('Admission Requests');
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
     
       case 'Admission Requests':
         setSelectedItem(<AdmitPatientForm />);
@@ -42,23 +44,16 @@ const AdmissionTab = () => {
         style={{ marginBottom: '20px', display: 'flex', flexWrap: 'wrap' }}
       >
         {buttonItems.map((item, index) => (
-          <Button
-            key={index}
-            onClick={() => handleOnClick(item.label)}
-            type="primary"
-            style={{
-            //   backgroundColor: selectedItem === item.label ? '#1890ff' : '',
-            //   color: selectedItem === item.label ? '#fff' : '',
-            //   border: selectedItem === item.label ? '1px solid #1890ff' : '',
-              padding: '10px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            {item.icon} {item.label}
-          </Button>
-        ))}
+                  <Button
+                    key={index}
+                    style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+                    className={activeItem === item.label ? "active-button" : ""}
+                    onClick={() => handleOnClick(item)}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Button>
+            ))}
       </Space>
       <div>{selectedItem}</div>
     </div>

@@ -192,6 +192,8 @@ import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesRedu
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
+import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest } from "./doc-reducers/postDoctorProceduresReducers";
+import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -350,6 +352,11 @@ export const rootReducer = combineReducers({
   getPatientMSE:getPatientMSENotesReducer,
   getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
-  getQyPrescriptionLine:getQyPrescriptionLinesReducer
+  getQyPrescriptionLine:getQyPrescriptionLinesReducer,
+  postPatientETC:postPatientECTRequest,
+  getPatientETC:getPatientECTRequest,
+  postKetamine:postPatientKetamineRequest,
+  getKetamine:getPatientKetamineRequest,
+  postImplant:getPatientKetamineRequest
 
 });
