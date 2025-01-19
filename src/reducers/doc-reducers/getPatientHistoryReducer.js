@@ -6,7 +6,6 @@ import {
 } from "../../actions/Doc-actions/getPatientHistoryNotes";
 
 export const getPatientHistoryNotes = (state = { data: [] }, action) => {
-    console.log('Reducer patient No:', action.payload)
   switch (action.type) {
     case REQUEST_PATIENT_HISTORY_LINES:
       return { loading: true, data: [] };

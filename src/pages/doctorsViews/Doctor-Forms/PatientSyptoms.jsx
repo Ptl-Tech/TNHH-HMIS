@@ -31,7 +31,7 @@ const PatientSymptoms = ({ treatmentNo }) => {
 
   const categories = [
     { step: 0, panels: ["APPEARANCE", "SPEECH"] },
-    { step: 1, panels: ["ATTITUDE", "THINKING & PERCEPTION"] },
+    { step: 1, panels: ["ATTITUDE", "FORM OF THOUGHT"] },
     { step: 2, panels: ["SENSORIUM", "MEMORY"] },
     { step: 3, panels: ["JUDGEMENT", "INSIGHT"] },
   ];
@@ -184,7 +184,7 @@ const PatientSymptoms = ({ treatmentNo }) => {
                {/* Step 2: Mood & Thinking */}
         {currentStep === 1 && (
           <Collapse defaultActiveKey={["1"]} >
-            <Panel header="Mood & Affect" key="1">
+            <Panel header="FORM OF THOUGHT" key="1">
               <Form.Item
                 name="mood"
                 label="Describe Patient Form of Thought."
@@ -197,7 +197,7 @@ const PatientSymptoms = ({ treatmentNo }) => {
               </Form.Item>
               <Form.Item
                 name="mood"
-                label="Describe Patient Thought Content"
+                label="THOUGHT CONTENT"
                 rules={[{ required: true, message: "Please decribe patient Thought Content!" }]}
               >
                 <TextArea

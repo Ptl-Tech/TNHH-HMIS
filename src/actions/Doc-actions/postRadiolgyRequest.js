@@ -26,10 +26,13 @@ export const postRadiologyRequest  = (radiologyRequest) => async (dispatch, getS
         },
       };
   
-  
+  const requestData = {
+    ...radiologyRequest,
+    staffNo: userInfo.userData.no,
+  }
       const response = await axios.post(
         `${API}Doctor/PatientRadiology`,
-        radiologyRequest,
+        requestData,
         config
       );
   
@@ -45,7 +48,7 @@ export const postRadiologyRequest  = (radiologyRequest) => async (dispatch, getS
       }, 2000);
   
       // Return patient ID for further use
-      return responseData.data; // `msg` contains the patient ID
+      return responseData; // `msg` contains the patient ID
     } catch (error) {
      setTimeout(() => {
         dispatch({
