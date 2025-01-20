@@ -187,7 +187,7 @@ const Imaging = () => {
           onFinish={handleSave}
         >
           <Row gutter={24}>
-            <Col span={12}>
+            {/* <Col span={12}>
               <Form.Item
                 name="treatmentNo"
                 label="Treatment Number"
@@ -195,7 +195,7 @@ const Imaging = () => {
               >
                 <Input disabled placeholder="Treatment Number" />
               </Form.Item>
-            </Col>
+            </Col> */}
             <Col span={12}>
               <Form.Item
                 name="dueDate"
@@ -205,16 +205,16 @@ const Imaging = () => {
                 <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
               </Form.Item>
             </Col>
-          </Row>
-
-          <Row gutter={24}>
             <Col span={12}>
               <Form.Item
                 name="testPackageCode"
                 label="Radiology Code"
                 rules={[{ required: true, message: "Please select a radiology code." }]}
               >
-                <Select placeholder="Select Radiology Code">
+                <Select placeholder="Select Radiology Code" showSearch
+                  filterOption={(input, option) =>
+                    option?.children?.toLowerCase().includes(input.toLowerCase())
+                  }>
                   {radiologySetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>
                       {item.Description}
@@ -223,6 +223,10 @@ const Imaging = () => {
                 </Select>
               </Form.Item>
             </Col>
+          </Row>
+
+          <Row gutter={24}>
+           
           </Row>
 
           <Button type="primary" htmlType="submit" style={{ marginTop: "16px" }}>

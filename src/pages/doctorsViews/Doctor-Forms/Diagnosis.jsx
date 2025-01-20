@@ -97,7 +97,7 @@ const Diagnosis = () => {
   const handleHistoryClick = () => {
     setHistoryVisible(true);
   };
-  const handleModalClose = () => {
+  const handleClose = () => {
     setIsModalVisible(false); // Close the modal by updating state
   };
 
@@ -188,13 +188,16 @@ const Diagnosis = () => {
           };
 
           const response = await dispatch(postDiagnosisRequest(diagnosisData));
-          console.log("status response:", response);
           if (response !== "success") {
             success = false;
             message.error(
               `Error saving primary diagnosis: ${diagnosis.diagnosisCode}`
             );
           }
+
+
+          dispatch(getDiagnosisLines(treatmentNo));
+
         }
       }
 
@@ -287,7 +290,7 @@ const Diagnosis = () => {
       <Modal
         title="DIAGNOSTIC FORMULATION"
         visible={historyVisible}
-        onCancel={() => setHistoryVisible(false)}
+        onCancel={handleClose}
         footer={null}
         width={1000}
         maskClosable={false} // Prevents closing the modal by clicking outside
@@ -314,7 +317,7 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-              OnClose={handleModalClose}
+              handleClose={() => setHistoryVisible(false)} 
               />
           </TabPane>
 
@@ -330,7 +333,7 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-              OnClose={handleModalClose} 
+              handleClose={() => setHistoryVisible(false)} 
               />
           </TabPane>
         </Tabs>

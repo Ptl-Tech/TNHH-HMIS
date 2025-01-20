@@ -263,6 +263,10 @@ const LabResults = () => {
                   onChange={(value) =>
                     handleFieldChange("testPackageCode", value)
                   }
+                  showSearch
+                  filterOption={(input, option) =>
+                    option?.children?.toLowerCase().includes(input.toLowerCase())
+                  }
                 >
                   {labTestSetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>

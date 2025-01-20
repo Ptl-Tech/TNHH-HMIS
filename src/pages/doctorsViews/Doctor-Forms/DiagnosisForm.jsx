@@ -16,7 +16,7 @@ const DiagnosisForm = ({
   handleRemoveDiagnosis,
   handleSubmit,
   loading,
-  OnClose,
+  handleClose,
 }) => {
   return (
     <Form
@@ -205,7 +205,7 @@ const DiagnosisForm = ({
         >
           Save Diagnosis
         </Button>
-        <Button type="default" onClick={OnClose} danger>
+        <Button type="default" onClick={handleClose} danger>
           Close
         </Button>
       </div>
