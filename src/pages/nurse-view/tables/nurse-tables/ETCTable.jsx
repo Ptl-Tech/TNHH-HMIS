@@ -1,8 +1,10 @@
 import { Badge, Table } from "antd"
 import PropTypes from "prop-types";
 
-const ETCTable = ({ loadingETC, data, treatmentNo }) => {
-    const filterData = data?.filter((item) => item?.Link_No === treatmentNo);
+const ETCTable = ({ loadingETC, data, treatmentNo, admissionNo }) => {
+  const filterData = data?.filter((item) => 
+    treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
+  );
     const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
 const columns = [
         {
@@ -13,8 +15,8 @@ const columns = [
 
         {
             title: 'Patient No',
-            dataIndex: 'PT_00259',
-            key: 'PT_00259',
+            dataIndex: 'Patient_No',
+            key: 'Patient_No',
         },
         {
             title: 'Procedure Date',
@@ -22,10 +24,6 @@ const columns = [
             key: 'Procedure_Date',
         },
         {
-            title: 'Requested Date',
-            dataIndex: 'Request_Date',
-            key: 'Request_Date',
-        },{
             title: "Procedure Type",
             dataIndex: "Procedure_Type",
             key: "Procedure_Type",
@@ -82,5 +80,6 @@ export default ETCTable
 ETCTable.propTypes = {
     loadingETC: PropTypes.bool.isRequired,
     data: PropTypes.array.isRequired,
-    treatmentNo: PropTypes.string.isRequired
+    treatmentNo: PropTypes.string.isRequired,
+    admissionNo: PropTypes.string
 }

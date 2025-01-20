@@ -8,11 +8,15 @@ import KetamineFormData from "../../nurse-view/nurse-forms/KetamineFormData";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import { listDoctors } from "../../../actions/DropdownListActions";
+import useAuth from "../../../hooks/useAuth";
 
   const Ketamine = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const treatmentNo = queryParams.get("TreatmentNo");
+    const patientNo = queryParams.get("PatientNo");
+    const admissionNo = queryParams.get("AdmNo");
+    const role = useAuth().userData.departmentName
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 
@@ -48,7 +52,9 @@ import { listDoctors } from "../../../actions/DropdownListActions";
             Ketamine Request
         </Typography.Title>
         </div>
-        <div style={{ display: "flex", gap: "10px"}}>
+        {
+          role === 'Doctor' && (
+            <div style={{ display: "flex", gap: "10px"}}>
         
             <Button
             type="primary"
@@ -58,13 +64,27 @@ import { listDoctors } from "../../../actions/DropdownListActions";
             {!showForm ? " New Ketamine Request" : "View Ketamine Requests"}
             </Button>
                 
-        </div>
+            </div>
+          )
+        }
         </div>
   
         {!showForm ? (
-          <KetamineTable loadingKetamine={loadingKetamine} data={data} treatmentNo={treatmentNo}/>
+          <KetamineTable 
+          loadingKetamine={loadingKetamine} 
+          data={data} 
+          treatmentNo={treatmentNo}
+          admissionNo={admissionNo}
+          />
         ) : (
-          <KetamineFormData patientNo={treatmentNo} treatmentNo={treatmentNo} doctors={doctors} loadingDoctors={loadingDoctors} postKetamine={postKetamine}/>
+          <KetamineFormData 
+          patientNo={patientNo} 
+          treatmentNo={treatmentNo} 
+          doctors={doctors} 
+          loadingDoctors={loadingDoctors} 
+          postKetamine={postKetamine}
+          admissionNo={admissionNo}
+          />
         )}
       </>
     );
