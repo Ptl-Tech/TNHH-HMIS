@@ -162,71 +162,45 @@ const Diagnosis = () => {
     }
   };
   const handleSubmit = async (values) => {
-    let success = true;
     const activeTab = activeKey; // Get the active tab key
-
-    // Filter for unsaved diagnoses
+  
     const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter(
       (diagnosis) => !diagnosis.diagnosisNo
     );
     const lastUnSavedSecondaryDiagnosis = secondaryDiagnosisList.filter(
       (diagnosis) => !diagnosis.diagnosisNo
     );
-
+  
+    let success = true; // Tracks overall success
+  
     try {
-      if (activeTab === "2") {
-        // Primary Diagnosis Tab
-        // Send primary diagnoses one by one
-        for (let diagnosis of lastUnSavedPrimaryDiagnosis) {
-          const diagnosisData = {
-            myAction: "create",
-            treatmentNo: treatmentNo || values.treatmentNo,
-            diagnosisType: "1",
-            diagnosisNo: diagnosis.diagnosisCode,
-            confirmed: diagnosis.confirmed,
-            remarks: diagnosis.remarks,
-          };
-
-          const response = await dispatch(postDiagnosisRequest(diagnosisData));
-          if (response !== "success") {
-            success = false;
-            message.error(
-              `Error saving primary diagnosis: ${diagnosis.diagnosisCode}`
-            );
-          }
-
-
-          dispatch(getDiagnosisLines(treatmentNo));
-
+      const diagnosisList =
+        activeTab === "1" ? lastUnSavedPrimaryDiagnosis : lastUnSavedSecondaryDiagnosis;
+  
+      // Process diagnoses based on active tab
+      for (let diagnosis of diagnosisList) {
+        const diagnosisData = {
+          myAction: "create",
+          treatmentNo: treatmentNo || values.treatmentNo,
+          diagnosisType: activeTab,
+          diagnosisNo: diagnosis.diagnosisCode,
+          confirmed: diagnosis.confirmed,
+          remarks: diagnosis.remarks,
+        };
+  
+        const response = await dispatch(postDiagnosisRequest(diagnosisData));
+  
+        if (response.status !== "success") {
+          success = false;
+          message.error(`Error saving diagnosis: ${diagnosis.diagnosisCode}`);
+        } else {
+          message.success(`Diagnosis saved successfully: ${diagnosis.diagnosisCode}`);
         }
       }
-
-      if (activeTab === "3") {
-        // Secondary Diagnosis Tab
-        // Send secondary diagnoses one by one
-        for (let diagnosis of lastUnSavedSecondaryDiagnosis) {
-          const diagnosisData = {
-            myAction: "create",
-            treatmentNo: treatmentNo || values.treatmentNo,
-            diagnosisType: "2",
-            diagnosisNo: diagnosis.diagnosisCode,
-            confirmed: diagnosis.confirmed,
-            remarks: diagnosis.remarks,
-          };
-
-          const response = await dispatch(postDiagnosisRequest(diagnosisData));
-          if (response !== "success") {
-            success = false;
-            message.error(
-              `Error saving primary diagnosis: ${diagnosis.diagnosisCode}`
-            );
-          }
-        }
-      }
-
-      // Show modal with success or error message after all diagnoses are processed
-      if (success && !loading) {
-        message.success("All diagnoses saved successfully!"); // Show success message after all saves
+  
+      // Final feedback
+      if (success) {
+        // message.success("All diagnoses saved successfully!");
         dispatch(getDiagnosisLines(treatmentNo));
         form.resetFields();
         setModalContent({
@@ -242,7 +216,6 @@ const Diagnosis = () => {
         });
       }
     } catch (error) {
-      success = false;
       console.error("Error in handleSubmit:", error);
       message.error("An unexpected error occurred. Please try again.");
       setModalContent({
@@ -251,9 +224,10 @@ const Diagnosis = () => {
         content: "An unexpected error occurred. Please try again.",
       });
     }
-
-    setIsModalVisible(true); // Display success/error modal
+  
+    setIsModalVisible(true); // Show modal after processing
   };
+  
 
   return (
     <div className="mt-4">

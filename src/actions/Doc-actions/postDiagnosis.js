@@ -41,7 +41,7 @@ export const postDiagnosisRequest = (Diagnosis) => async (dispatch, getState) =>
     }, 2000);
 
     
-    return responseData.status; // `msg` contains the patient ID
+    return responseData.data; // `msg` contains the patient ID
   } catch (error) {
     dispatch({
       type: POST_DIAGNOSIS_FAIL,
