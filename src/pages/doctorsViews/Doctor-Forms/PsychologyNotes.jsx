@@ -130,7 +130,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
           paddingBottom: "20px",
         }}
       >
-        {role === "Doctor" && (
+        {/* {role === "Doctor" && (
           <Button
             type="primary"
             style={{ width: "100%" }}
@@ -139,7 +139,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
           >
             Add Doctor Notes
           </Button>
-        )}
+        )} */}
         <Button
           type="primary"
           style={{ width: "100%" }}
@@ -150,7 +150,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
         </Button>
       </div>
 
-      {isFormVisible && (
+     {/*  {isFormVisible && (
         <Form
           layout="vertical"
           style={{ paddingTop: "20px" }}
@@ -177,19 +177,6 @@ const PsychologyNotes = ({ treatmentNo }) => {
                 />
               </Form.Item>
             </Col>
-            {/* <Col span={8}>
-                <Form.Item label="Doctor" name="doctor">
-                  <Input
-                  placeholder="Doctor name"
-                  name="doctor"
-                  value={
-                  docDetails.userData.SearchName ||
-                  `${docDetails.userData.firstName} ${docDetails.userData.lastName}`
-                  }
-                  disabled
-                  />
-                  </Form.Item>
-                </Col> */}
             <Col span={12}>
               <Form.Item
                 label="Notes Type"
@@ -273,7 +260,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
             <Form.Item></Form.Item>
           </Form.Item>
         </Form>
-      )}
+      )} */}
     </div>
   );
 };

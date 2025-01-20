@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Table } from "antd";
+import { Badge, Button, Card, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -242,14 +242,14 @@ const DoctorVisits = () => {
       render: (_, record) => {
         const { color, text } = getUrgencyColorcode(record.urgency);
         return (
-          <Badge
+          <Tag
             color={color}
-            text={text} // Display urgency text
+            // text={text} // Display urgency text
             className="fw-bold"
-            style={{ 
-              color: color,
-            }}
-          />
+            // style={{ 
+            //   color: color,
+            // }}
+          >{text}</Tag>
         );
       },
     },
