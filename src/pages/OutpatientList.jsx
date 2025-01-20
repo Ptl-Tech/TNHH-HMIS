@@ -42,6 +42,7 @@ const OutpatientList = () => {
       );
     }
   }, [patients]);
+  console.log(patients);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;

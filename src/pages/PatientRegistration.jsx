@@ -18,6 +18,7 @@ import {
   listInsuranceOptions,
   listKinsRelationships,
   listSubCounties,
+  listSubCountyWards,
   marketingStrategies,
 } from "../actions/DropdownListActions";
 import { useForm } from "antd/es/form/Form";
@@ -51,6 +52,13 @@ const PatientRegistration = () => {
     success: subCountiesSuccess,
     subCounties: subCountiesPayload,
   } = useSelector((state) => state.subCounties);
+
+  const {
+    loading: subCountyWardsLoading,
+    error: subCountyWardsError,
+    success: subCountyWardsSuccess,
+    subCountyWards: subCountyWardsPayload,
+  } = useSelector((state) => state.subCountyWards);
   const {
     loading: patientListLoading,
     error: patientListError,
@@ -78,6 +86,9 @@ const PatientRegistration = () => {
   const { state } = useLocation(); // Access the state passed via navigate
   const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
+  const [filteredSubCounties, setFilteredSubCounties] = useState([]);
+  const [filteredWards, setFilteredWards] = useState([]);
+  const [filteredCounties, setFilteredCounties] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [age, setAge] = useState(null); // State to hold calculated age
   const [dobError, setDobError] = useState(""); // State for DOB error message
@@ -104,6 +115,7 @@ const PatientRegistration = () => {
     schemeName: "",
     howYouKnewABoutUs: "",
     subCounty: "",
+    countyWard: "",
     email: "",
     residence: "",
     patientStatus: 0,
@@ -112,6 +124,7 @@ const PatientRegistration = () => {
     dispatch(listCountries());
     dispatch(listCounties());
     dispatch(listSubCounties());
+    dispatch(listSubCountyWards());
     dispatch(listKinsRelationships());
     dispatch(listInsuranceOptions());
     dispatch(marketingStrategies());
@@ -123,6 +136,16 @@ const PatientRegistration = () => {
       setFilteredCountries(countriesPayload);
     }
   }, [countriesPayload]);
+
+  useEffect(() => {
+    if (countiesPayload) {
+      setFilteredCounties(countiesPayload);
+    }
+  }, [countiesPayload]);
+
+
+
+
 
   // Handle search input
   const handleSearch = (value) => {
@@ -140,6 +163,49 @@ const PatientRegistration = () => {
     );
     setFilteredCountries(filtered);
   };
+  // Filter subcoiunties based on the selected county
+  useEffect(() => {
+    if (subCountiesPayload) {
+      setFilteredSubCounties(subCountiesPayload);
+    }
+  }, [subCountiesPayload]);
+  
+  useEffect(() => {
+    if (subCountyWardsPayload) {
+      setFilteredWards(subCountyWardsPayload);
+    }
+  }, [subCountyWardsPayload]);
+
+
+  const FilterSubCounties = (countyCode) => {
+    if (!countyCode) {
+      setFilteredSubCounties(subCountiesPayload);
+      return;
+    }
+
+    const filtered = subCountiesPayload.filter(
+      (subCounty) => subCounty.CountyCode === countyCode
+    );
+    setFilteredSubCounties(filtered);
+  };
+
+  const FilterSubCountyWards = (subCounty) => {
+    if (!subCounty) {
+      setFilteredWards(subCountyWardsPayload);
+      return;
+    }
+
+    const filtered = subCountyWardsPayload.filter(
+      (ward) => ward.SubCounty === subCounty  
+    );
+    setFilteredWards(filtered);
+  };
+
+
+
+  // console.log('filtered',patientDet);
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewPatient((prev) => ({ ...prev, [name]: value }));
@@ -171,6 +237,12 @@ const PatientRegistration = () => {
     if (name === "dob") {
       // Format the date as 'YYYY-MM-DD'
       value = value ? moment(value).format("YYYY-MM-DD") : "";
+    }
+    if (name === 'county') {
+      FilterSubCounties(value);
+    }
+    if (name === 'subCounty') {
+      FilterSubCountyWards(value);
     }
     setNewPatient((prev) => ({ ...prev, [name]: value }));
   };
@@ -225,6 +297,8 @@ const PatientRegistration = () => {
       countiesPayload &&
       name === "subCounty" &&
       subCountiesPayload &&
+      name === "CountyWard" &&
+      subCountyWardsPayload &&
       name === "nextOfKinRelationship" &&
       relationshipOptionsPayload &&
       name === "insuranceName" &&
@@ -234,6 +308,7 @@ const PatientRegistration = () => {
       dispatch(listCountries());
       dispatch(listCounties());
       dispatch(listSubCounties());
+      dispatch(listSubCountyWards());      
       dispatch(listKinsRelationships());
       dispatch(listInsuranceOptions());
       dispatch(marketingStrategies());
@@ -254,12 +329,15 @@ const PatientRegistration = () => {
         nationality: patientDet?.Nationality || "",
         county: patientDet?.CountyWardName || "",
         subCounty: patientDet?.SubCountyName || "",
+        countyWard: patientDet?.CountyWardName || "",
         residence: patientDet?.Residence || "",
         nextOfKinFullName: patientDet?.NextOfkinFullName || "",
         nextOfKinRelationShip: patientDet?.NextofkinRelationship || "",
       });
     }
   }, [patientDet]);
+
+  console.log(patientDet)
   
   const handleSavePatient = async (e) => {
     e.preventDefault();
@@ -292,6 +370,7 @@ const PatientRegistration = () => {
       nationality: newPatient.nationality || patientDet.Nationality,
       county: newPatient.county || patientDet.County,
       subCounty: newPatient.subCounty || patientDet.SubCountyName,
+      countyWard: newPatient.countyWard || patientDet.CountyWardName,
       residence: newPatient.residence,
       nextOfKinFullName:
         newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
@@ -631,7 +710,12 @@ const PatientRegistration = () => {
                     value={newPatient.county || patientDet?.CountyWardName}
                     onChange={(value) => handleSelectChange("county", value)}
                     name="county"
-                    onFocus={handleDisplayDropDown}
+                    showSearch
+                    // filterOption = {true}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                    // onFocus={handleDisplayDropDown}
                   >
                     <Select.Option value="">--Select County--</Select.Option>
                     {countiesPayload && countiesPayload.length > 0 ? (
@@ -647,6 +731,7 @@ const PatientRegistration = () => {
                     )}
                   </Select>
                 </div>
+                
                 <div className="col-12 col-md-4">
                   <label className="py-1">
                     Sub County:<span className="text-danger px-1">*</span>
@@ -658,12 +743,17 @@ const PatientRegistration = () => {
                     name="subCounty"
                     onChange={(value) => handleSelectChange("subCounty", value)}
                     onFocus={handleDisplayDropDown}
+                    showSearch
+                    // filterOption = {true}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
                   >
                     <Select.Option value="">
                       --Select Sub County--
                     </Select.Option>
-                    {subCountiesPayload && subCountiesPayload.length > 0 ? (
-                      subCountiesPayload.map((subCounty) => (
+                    {filteredSubCounties && filteredSubCounties.length > 0 ? (
+                      filteredSubCounties.map((subCounty) => (
                         <Select.Option
                           key={subCounty.SubCountyCode}
                           value={subCounty.SubCountyCode}
@@ -678,6 +768,44 @@ const PatientRegistration = () => {
                     )}
                   </Select>
                 </div>
+
+                <div className="col-12 col-md-4">
+                  <label className="py-1">
+                    Ward:<span className="text-danger px-1">*</span>
+                  </label>
+                  <Select
+                    placeholder="Select Sub County"
+                    className="w-100 fw-bold text-center"
+                    value={newPatient.CountyWard || patientDet?.CountyWardName}
+                    name="countyWard"
+                    onChange={(value) => handleSelectChange("countyWard", value)}
+                    onFocus={handleDisplayDropDown}
+                    showSearch
+                    // filterOption = {true}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    <Select.Option value="">
+                      --Select Sub County--
+                    </Select.Option>
+                    {filteredWards && filteredWards.length > 0 ? (
+                      filteredWards.map((ward) => (
+                        <Select.Option
+                          key={ward.Code}
+                          value={ward.Name}
+                        >
+                          {ward.Name}
+                        </Select.Option>
+                      ))
+                    ) : (
+                      <Select.Option value="" disabled>
+                        No wards available
+                      </Select.Option>
+                    )}
+                  </Select>
+                </div>
+
                 <div className="col-12 col-md-4">
                   <label className="py-1">
                     Residence:<span className="text-danger px-1">*</span>

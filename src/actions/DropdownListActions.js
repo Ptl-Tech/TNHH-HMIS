@@ -11,6 +11,9 @@ import {
   SUB_COUNTIES_LIST_REQUEST,
   SUB_COUNTIES_LIST_SUCCESS,
   SUB_COUNTIES_LIST_FAIL,
+  SUB_COUNTY_WARDS_LIST_REQUEST,
+  SUB_COUNTY_WARDS_LIST_SUCCESS,
+  SUB_COUNTY_WARDS_LIST_FAIL,
   CLINICS_LIST_REQUEST,
   CLINICS_LIST_SUCCESS,
   CLINICS_LIST_FAIL,
@@ -38,6 +41,7 @@ import {
 
 
 } from "../constants/DropDownConstants";
+import apiHeaderConfig from "./configHelpers";
 
 const API = "http://217.21.122.62:8085/";
 
@@ -134,6 +138,25 @@ export const listSubCounties = () => async (dispatch, getState) => {
     console.log("data: ", data);
   } catch (error) {
     dispatch({ type: SUB_COUNTIES_LIST_FAIL, payload: error.message });
+  }
+};
+
+export const listSubCountyWards = () => async (dispatch, getState) => {
+  const config = apiHeaderConfig(getState);
+
+  try {
+    dispatch({ type: SUB_COUNTY_WARDS_LIST_REQUEST });
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyCountyWards`,
+      config
+    );
+
+    dispatch({ type: SUB_COUNTY_WARDS_LIST_SUCCESS, payload: data });
+
+    console.log("WARDS data: ", data);
+  } catch (error) {
+    dispatch({ type: SUB_COUNTY_WARDS_LIST_FAIL, payload: error.message });
   }
 };
 
