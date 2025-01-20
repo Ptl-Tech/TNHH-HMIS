@@ -2,7 +2,7 @@ import { Badge, Button, Card, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckOutlined, SearchOutlined } from "@ant-design/icons";
+import { CheckOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
 import { listPatients } from "../../../actions/patientActions";
@@ -42,9 +42,9 @@ const ConsultationRoomPatients = () => {
   useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
- 
+
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Active" 
+    (item) => item.Status === "Active"
   );
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
@@ -53,7 +53,7 @@ const ConsultationRoomPatients = () => {
     IDNumber: patient.IDNumber,
     Age: patient.AgeinYears,
     PatientType: patient.PatientType,
-    Inpatient: patient.Inpatient, 
+    Inpatient: patient.Inpatient,
 
   }));
 
@@ -74,25 +74,25 @@ const ConsultationRoomPatients = () => {
     };
   });
 
- 
+
   const waitingListTableDataSource = combinedList
-  .filter((item) => item.Inpatient !== true)
-  ?.map((item, index) => ({
-    key: index + 1,
-    treatmentNo: item?.TreatmentNo,
-    patientNo: item?.PatientNo,
-    observationNo: item?.ObservationNo,
-    treatmentDate: item?.TreatmentDate,
-    treatmentTime: item?.TreatmentTime,
-    searchName: item?.SearchName,
-    idNumber: item?.IDNumber,
-    age: item?.Age,
-    patientType: item?.PatientType,
-    urgency: item?.UrgencyStatus,
-    Inpatient: item?.Inpatient,
-    Status: item?.Status,
-  }))
-  .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
+    .filter((item) => item.Inpatient !== true)
+    ?.map((item, index) => ({
+      key: index + 1,
+      treatmentNo: item?.TreatmentNo,
+      patientNo: item?.PatientNo,
+      observationNo: item?.ObservationNo,
+      treatmentDate: item?.TreatmentDate,
+      treatmentTime: item?.TreatmentTime,
+      searchName: item?.SearchName,
+      idNumber: item?.IDNumber,
+      age: item?.Age,
+      patientType: item?.PatientType,
+      urgency: item?.UrgencyStatus,
+      Inpatient: item?.Inpatient,
+      Status: item?.Status,
+    }))
+    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
@@ -109,14 +109,14 @@ const ConsultationRoomPatients = () => {
     const isSearching = Object.values(searchParams).some(
       (value) => value.trim() !== ""
     );
-  
+
     if (isSearching) {
       const filtered = waitingListTableDataSource.filter((patient) => {
         const treatmentNo = patient.treatmentNo?.toLowerCase() || "";
         const patientNo = patient.patientNo?.toLowerCase() || "";
         const searchName = patient.searchName?.toLowerCase() || "";
         const urgency = patient.UrgencyStatus || "";
-  
+
         return (
           treatmentNo.includes(searchParams.treatmentNo.toLowerCase()) &&
           searchName.includes(searchParams.searchName.toLowerCase()) &&
@@ -124,7 +124,7 @@ const ConsultationRoomPatients = () => {
           urgency.includes(searchParams.urgency)
         );
       });
-  
+
       // Apply inpatient filter after search filter
       const filteredWithoutInpatients = filtered.filter(
         (item) => item.Inpatient !== true
@@ -134,7 +134,7 @@ const ConsultationRoomPatients = () => {
       setFilteredPatients(waitingListTableDataSource);
     }
   };
-  
+
   const waitingListColumns = [
     {
       title: "#",
@@ -145,15 +145,28 @@ const ConsultationRoomPatients = () => {
       title: "Treatment No",
       dataIndex: "treatmentNo",
       key: "treatmentNo",
-      render: (text) => (
-        <span
-          onClick={() => handleNavigate(text, text.treatmentNo)}
-          className="fw-bold"
-          style={{ color: "green" }}
-        >
-          {text}
-        </span>
-      ),
+      // render: (_, record) => {
+        //     const { color, text } = getUrgencyColorcode(record.urgency);
+        //     return (
+        //       <Badge
+        //         color={color}
+        //         text={text} // Display urgency text
+        //         style={{ color: color }}
+        //       />
+        //     );
+        //   },
+        render: (_, record) => {
+          const { color } = getUrgencyColorcode(record.urgency);
+          return (
+            <span
+              onClick={() => handleNavigate(record, record.treatmentNo)}
+              className="fw-bold"
+              style={{ color: color }}
+            >
+              {record.treatmentNo}
+            </span>
+          )
+        },
     },
     {
       title: "Patient Name",
@@ -245,7 +258,7 @@ const ConsultationRoomPatients = () => {
       dataIndex: "Status",
       key: "Status",
       render: (_, record) => {
-        return <span className="fw-bold text-danger">{record.Status} </span>;
+        return <span className="fw-bold text-dark">{record.Status} </span>;
       },
     },
     {
@@ -256,7 +269,7 @@ const ConsultationRoomPatients = () => {
           type="primary"
           onClick={() => handleNavigate(record, record.treatmentNo)}
         >
-          <CheckOutlined /> Check In
+          <EyeOutlined /> Open
         </Button>
       ),
     },
@@ -264,12 +277,12 @@ const ConsultationRoomPatients = () => {
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
-        state: {
-          patientNo: record.patientNo,
-          observationNo: record.observationNo,
-          patientDetails: record,
-        },
-      });
+      state: {
+        patientNo: record.patientNo,
+        observationNo: record.observationNo,
+        patientDetails: record,
+      },
+    });
   };
 
   return (

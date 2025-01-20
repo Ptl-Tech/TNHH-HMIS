@@ -245,10 +245,10 @@ const CloseList = () => {
       dataIndex: "Status",
       key: "Status",
       render: (_, record) => {
-        return <span className="fw-bold text-danger">{record.Status} </span>;
+        return <span className="fw-bold text-dark">{record.Status} </span>;
       },
     },
-    {
+    /* {
       title: "Check In",
       key: "checkIn",
       render: (_, record) => (
@@ -259,7 +259,7 @@ const CloseList = () => {
           <CheckOutlined /> Check In
         </Button>
       ),
-    },
+    }, */
   ];
 
   const handleNavigate = (record, treatmentNo) => {
