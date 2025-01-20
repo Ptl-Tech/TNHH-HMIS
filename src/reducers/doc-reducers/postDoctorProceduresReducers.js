@@ -53,7 +53,7 @@ export const postPatientImplantRequest = (state = { loading: false }, action) =>
     }
   };
 
-export const postPatientRetamineRequest = (state = { loading: false }, action) => {
+export const postPatientKetamineReducer = (state = { loading: false }, action) => {
     switch (action.type) {
       case POST_PATIENT_KETAMINE_REQUEST_REQUEST:
         return { ...state, loading: true };

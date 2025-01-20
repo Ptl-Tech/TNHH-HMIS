@@ -1,10 +1,13 @@
 import { Button, Divider } from "antd"
 import { useState } from "react"
-import PhysiotherapyRequest from "./requests/PhysiotherapyRequest"
+// import PhysiotherapyRequest from "./requests/PhysiotherapyRequest"
 import { HeartOutlined, FileMarkdownOutlined, MedicineBoxOutlined } from "@ant-design/icons"
 import useAuth from "../../hooks/useAuth"
 import LabResults from "../doctorsViews/Doctor-Forms/LabResults"
 import Imaging from "../doctorsViews/Doctor-Forms/Imaging"
+import Ketamine from "../doctorsViews/Doctor-Forms/Ketamine"
+import ECTScan from "./nurse-care-plan/ECTScan"
+import ImagingRequests from "../doctorsViews/Doctor-Forms/Implants"
 
 
 const Requests = () => {
@@ -19,10 +22,19 @@ const Requests = () => {
         setSelectedItem(<LabResults />);
         break;
       case 'Psychology Requests':
-        setSelectedItem(<PhysiotherapyRequest />);
+        setSelectedItem(<Imaging />);
         break;
       case 'Radiology Requests':
         setSelectedItem(<Imaging />);
+        break;
+      case 'Ketamine Requests':
+        setSelectedItem(< Ketamine/>);
+        break;
+      case 'ECT Requests':
+        setSelectedItem(<ECTScan />);
+        break;
+      case 'Implant Requests':
+        setSelectedItem(<ImagingRequests/>);
         break;
       default:
         setSelectedItem(<LabResults />); // Default fallback
@@ -31,8 +43,10 @@ const Requests = () => {
 
   const menuItems = [
     { label: 'Laboratory Requests', icon: <HeartOutlined /> },
-    ...(userRole.userData.departmentName === "Doctor" ? [{ label: 'Physiotherapy Requests', icon: <FileMarkdownOutlined /> }] : []),
     { label: 'Radiology Requests', icon: <MedicineBoxOutlined /> },
+    { label: 'ECT Requests', icon: <FileMarkdownOutlined /> },
+    { label: 'Ketamine Requests', icon: <FileMarkdownOutlined /> },
+    { label: 'Implant Requests', icon: <FileMarkdownOutlined /> },
   ];
 
   return (

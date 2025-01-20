@@ -11,14 +11,13 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-  const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors}) => {
-    
+  const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingInplant, admissionNo}) => {
     const dispatch = useDispatch();
     const handleOnFinish = async (values) => {
       const formData = {
         myAction: "create",
         recId: "",
-        linkNo: treatmentNo,
+        linkNo: treatmentNo?.trim() ? treatmentNo : admissionNo,
         doctorId: values.doctorName,
         patientNo,
         procedureDate: values.dates.format("YYYY-MM-DD"),
@@ -110,6 +109,8 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
               type="primary"
               htmlType="submit"
               icon={<FileTextOutlined />}
+              loading={loadingInplant}
+              disabled={loadingInplant}
             >
               Request Test
             </Button>
@@ -125,6 +126,8 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
     patientNo: PropTypes.string.isRequired,
     treatmentNo: PropTypes.string.isRequired,
     doctors: PropTypes.array.isRequired,
-    loadingDoctors: PropTypes.bool.isRequired
+    loadingDoctors: PropTypes.bool.isRequired,
+    loadingInplant: PropTypes.bool.isRequired,
+    admissionNo: PropTypes.string,
   };
   

@@ -10,17 +10,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { listDoctors } from "../../../actions/DropdownListActions";
 import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import ImplantTable from "../../nurse-view/tables/nurse-tables/ImplantTable";
+import useAuth from "../../../hooks/useAuth";
   
   
   const ImagingRequests = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const treatmentNo = queryParams.get("TreatmentNo");
+    const patientNo = queryParams.get("PatientNo");
+    const admissionNo = queryParams.get("AdmNo");
+    const role = useAuth().userData.departmentName
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 
     const { loading: loadingKetamine, data } = useSelector(
       (state) => state.getKetamine
+    );
+
+    const { loading: loadingInplant } = useSelector(
+      (state) => state.postImplant
     );
 
     const { loading: loadingDoctors, data: doctors } = useSelector(state => state.getDoctorsList);
@@ -62,9 +70,21 @@ import ImplantTable from "../../nurse-view/tables/nurse-tables/ImplantTable";
         </div>
   
         {!showForm ? (
-          <ImplantTable loadingKetamine={loadingKetamine} data={data} treatmentNo={treatmentNo}/>
+          <ImplantTable 
+            loadingKetamine={loadingKetamine} 
+            data={data} 
+            treatmentNo={treatmentNo}
+            admissionNo={admissionNo}
+          />
         ) : (
-          <ImplantFormData patientNo={treatmentNo} treatmentNo={treatmentNo} doctors={doctors} loadingDoctors={loadingDoctors}/>
+          <ImplantFormData 
+            patientNo={patientNo} 
+            treatmentNo={treatmentNo} 
+            admissionNo={admissionNo}
+            doctors={doctors} 
+            loadingDoctors={loadingDoctors}
+            loadingInplant={loadingInplant}
+          />
         )}
       </div>
     );
