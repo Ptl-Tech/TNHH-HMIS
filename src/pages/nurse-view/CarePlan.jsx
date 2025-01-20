@@ -83,7 +83,7 @@ const CarePlan = () => {
          ...role === 'Doctor' ? [{ label: 'Daily Ward Rounds', icon: <FileOutlined /> }] : [],
         { label: 'Diagnosis', icon: <MedicineBoxOutlined /> },
         { label: 'Prescription', icon: <SolutionOutlined /> },
-        ...role === 'Nurse' ? [{ label: 'Treatments Sheet', icon: <FileOutlined /> }, { label: 'ECT Procedure', icon: <SolutionOutlined /> }, { label: 'TCA / Appointments', icon: <HeartOutlined /> }, { label: 'Visitor List', icon: <FileOutlined /> }, { label: 'Suicidal Form', icon: <FileOutlined /> }, { label: 'MSE Status Level Checklist', icon: <FileOutlined /> }, { label: 'Brief MSE Form', icon: <FileOutlined /> }, { label: 'Dietary Intake Form', icon: <FileOutlined /> }, { label: 'Jackson Visual Form', icon: <FileOutlined /> }] : [],
+        ...role === 'Nurse' ? [{ label: 'Treatments Sheet', icon: <FileOutlined /> }, { label: 'TCA / Appointments', icon: <HeartOutlined /> }, { label: 'Visitor List', icon: <FileOutlined /> }, { label: 'Suicidal Form', icon: <FileOutlined /> }, { label: 'MSE Status Level Checklist', icon: <FileOutlined /> }, { label: 'Brief MSE Form', icon: <FileOutlined /> }, { label: 'Dietary Intake Form', icon: <FileOutlined /> }, { label: 'Jackson Visual Form', icon: <FileOutlined /> }] : [],
     ]
   return (
     <>

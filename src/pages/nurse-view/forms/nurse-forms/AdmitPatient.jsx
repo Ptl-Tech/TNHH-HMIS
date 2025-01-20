@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { POST_ADMISSION_FORM_DETAILS_FAILURE, POST_ADMISSION_FORM_DETAILS_SUCCESS, postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
 import { postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
 import { useGetWardManagementHook } from "../../../../hooks/useGetWardManagementHook";
+import { SaveOutlined } from "@ant-design/icons";
 
 const AdmitPatientForm = () => {
 
@@ -12,8 +13,6 @@ const AdmitPatientForm = () => {
   const location = useLocation();
   const patientDetails = location.state?.patientDetails || {};
   const dispatch = useDispatch();
-
-  console.log('patient details', patientDetails)
 
   const {getBeds, loadingWards, getWards, loadingAdmissionDetails, wardRooms } = useGetWardManagementHook();
 
@@ -27,10 +26,10 @@ const AdmitPatientForm = () => {
   const [alertType, setAlertType] = useState('info');
   
   const patientInfo = [
-    { title: 'Patient Name', value: patientDetails?.Names },
-    { title: 'Patient Number', value: patientDetails?.PatientNo },
-    { title: 'Visit Number', value: patientDetails?.LinkNo },
-    { title: "Doctor's Name", value: patientDetails?.DoctorName }
+    { title: 'Patient Name', value: patientDetails?.PatientName },
+    { title: 'Date of Admission', value: patientDetails?.Admission_Date },
+    { title: 'Expected Discharge date', value: patientDetails?.Expected_Date_of_Discharge },
+    { title: "Doctor's Name", value: patientDetails?.DoctorsName },
   ];
 
   const [form] = Form.useForm();
@@ -179,6 +178,10 @@ const AdmitPatientForm = () => {
         />
       )}
 
+    <Typography.Title level={5} style={{ marginTop: '30px' }}>
+      Select Ward, Room and Bed for Patient
+    </Typography.Title>
+
     <Card style={{ marginTop: '30px' }}>
         <Form layout="vertical" 
         className="admit-patient-card-container"
@@ -279,6 +282,7 @@ const AdmitPatientForm = () => {
                 htmlType="submit"
                 loading={loadingAdmissionDetails}
                 disabled={loadingAdmissionDetails}
+                icon={<SaveOutlined />}
                 >
                   Save Admission
                 </Button>
