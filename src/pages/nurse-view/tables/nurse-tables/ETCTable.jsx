@@ -1,11 +1,44 @@
 import { Badge, Table } from "antd"
-import PropTypes from "prop-types";
+import PropTypes from "prop-types";import { useDispatch, useSelector } from "react-redux";
+// import { getDoctorsList } from "../../../actions/Doc-actions/DoctorActions"; // Import the action to get the doctor list
+import { useEffect, useState } from "react";
+import { listDoctors } from "../../../../actions/DropdownListActions";
+
 
 const ETCTable = ({ loadingETC, data, treatmentNo, admissionNo }) => {
-  const filterData = data?.filter((item) => 
+  const dispatch = useDispatch();
+  const [updatedData, setUpdatedData] = useState([]);
+
+  const {  data: doctors  } = useSelector((state) => state.getDoctorsList);
+
+  useEffect(() => {
+    dispatch(listDoctors()); // Fetch the list of doctors
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (doctors && data) {
+      const doctorsMap = doctors.reduce((acc, doctor) => {
+        acc[doctor.DoctorID] = doctor.DoctorsName;
+        return acc;
+      }, {});
+
+      const newData = data.map((item) => ({
+        ...item,
+        DoctorName: doctorsMap[item.Doctor_ID] || "",
+      }));
+
+      setUpdatedData(newData); // Update the data object with doctor names
+    }
+  }, [doctors, data]);
+
+  console.log('doctorMap', updatedData);
+
+  const filterData = updatedData?.filter((item) => 
     treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
   );
     const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
+
+  // 
 const columns = [
         {
             title: 'Visit No',
@@ -23,20 +56,20 @@ const columns = [
             dataIndex: 'Procedure_Date',
             key: 'Procedure_Date',
         },
-        {
+        /* {
             title: "Procedure Type",
             dataIndex: "Procedure_Type",
             key: "Procedure_Type",
-        },
-        {
+        }, */
+        /* {
             title: 'Requesting Doctor',
             dataIndex: 'Requesting Doctor',
             key: 'Requesting Doctor',
-        },
+        }, */
         {
-            title: 'Doctor',
-            dataIndex: 'Doctor_ID',
-            key: 'Doctor_ID',
+            title: 'Requested to',
+            dataIndex: 'DoctorName',
+            key: 'DoctorName',
         },
         {
             title: "Status",

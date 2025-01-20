@@ -74,7 +74,7 @@ export const routeTypes = [
   },
   {
     value: "6",
-    label: "Intrathical",
+    label: "Intrathecal",
   },
   {
     value: "7",

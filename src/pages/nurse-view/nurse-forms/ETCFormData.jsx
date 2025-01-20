@@ -28,6 +28,8 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
     
         await dispatch(postPatientECTRequest(formData))
         dispatch(getPatientECTRequest())
+      // clear tthe form
+      form.resetFields();
     };
    
     const [form] = Form.useForm();
@@ -48,11 +50,11 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
             <div className="row">
               <div className="col-12 col-md-6">
               <Form.Item
-                  label="Procedure Dates"
+                  label="Procedure Date"
                   rules={[
                     {
                       required: true,
-                      message: "Please select at least one date!",
+                      message: "Please select the procedure date!",
                     },
                   ]}
                   name="dates"
@@ -61,7 +63,7 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
                   <DatePicker
                     size="large"
                      style={{ width: "100%" }}
-                    placeholder="Select dates"
+                    placeholder="Select date"
                   />
                 
                 </Form.Item>
@@ -98,12 +100,12 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
             </div>
             
             <Form.Item
-              label="ECT procedure notes"
+              label="ECT procedure remarks"
               name="description"
-              rules={[{ required: true, message: "Please enter ECT procedure notes!" }]}
+              rules={[{ required: true, message: "Please enter ECT procedure remarks!" }]}
               hasFeedback
             >
-              <TextArea placeholder="Enter ECT procedure notes" />
+              <TextArea placeholder="Enter ECT procedure remarks" />
             </Form.Item>
             <Form.Item>
             <Button

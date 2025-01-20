@@ -26,6 +26,8 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
     
         await dispatch(postPatientImplantRequest(formData))
         dispatch(getPatientKetamineRequest())
+
+        form.resetFields();
     };
    
     const [form] = Form.useForm();
@@ -46,11 +48,11 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
             <div className="row">
               <div className="col-12 col-md-6">
               <Form.Item
-                  label="Procedure Dates"
+                  label="Procedure Date"
                   rules={[
                     {
                       required: true,
-                      message: "Please select at least one date!",
+                      message: "Please select the procedure date!",
                     },
                   ]}
                   name="dates"
@@ -59,14 +61,14 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
                   <DatePicker
                     size="large"
                      style={{ width: "100%" }}
-                    placeholder="Select multiple dates"
+                    placeholder="Select date"
                   />
                 
                 </Form.Item>
               </div>
               <div className="col-12 col-md-6">
                 <Form.Item
-                  label="Anesthetist/Anesthesiologist"
+                  label="Doctor"
                   name="doctorName"
                   rules={[{ required: true, message: "Please select a anesthetist/anesthesiologist!" }]}
                   hasFeedback
@@ -97,12 +99,12 @@ import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../a
             </div>
             
             <Form.Item
-              label="Implant procedure notes"
+              label="Implant procedure remarks"
               name="description"
-              rules={[{ required: true, message: "Please enter ECT procedure notes!" }]}
+              rules={[{ required: true, message: "Please enter ECT procedure remarks!" }]}
               hasFeedback
             >
-              <TextArea placeholder="Enter implant procedure notes" />
+              <TextArea placeholder="Enter implant procedure remarks" />
             </Form.Item>
             <Form.Item>
             <Button

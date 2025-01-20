@@ -27,6 +27,8 @@ import { getPatientKetamineRequest, postPatientKetamineRequest } from "../../../
     
         await dispatch(postPatientKetamineRequest(formData))
         dispatch(getPatientKetamineRequest())
+
+        form.resetFields();
     };
    
     const [form] = Form.useForm();
@@ -47,11 +49,11 @@ import { getPatientKetamineRequest, postPatientKetamineRequest } from "../../../
             <div className="row">
               <div className="col-12 col-md-6">
               <Form.Item
-                  label="Procedure Dates"
+                  label="Procedure Date"
                   rules={[
                     {
                       required: true,
-                      message: "Please select at least one date!",
+                      message: "Please select the procedure date!",
                     },
                   ]}
                   name="dates"
@@ -60,7 +62,7 @@ import { getPatientKetamineRequest, postPatientKetamineRequest } from "../../../
                   <DatePicker
                     size="large"
                      style={{ width: "100%" }}
-                    placeholder="Select dates"
+                    placeholder="Select date"
                   />
                 
                 </Form.Item>
@@ -98,12 +100,12 @@ import { getPatientKetamineRequest, postPatientKetamineRequest } from "../../../
             </div>
             
             <Form.Item
-              label="Ketamine procedure notes"
+              label="Ketamine procedure remarks"
               name="description"
-              rules={[{ required: true, message: "Please enter ECT procedure notes!" }]}
+              rules={[{ required: true, message: "Please enter ECT procedure remarks!" }]}
               hasFeedback
             >
-              <TextArea placeholder="Enter ketamine procedure notes" />
+              <TextArea placeholder="Enter ketamine procedure remarks" />
             </Form.Item>
             <Form.Item>
             <Button
