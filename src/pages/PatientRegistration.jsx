@@ -169,7 +169,7 @@ const PatientRegistration = () => {
       setFilteredSubCounties(subCountiesPayload);
     }
   }, [subCountiesPayload]);
-  
+
   useEffect(() => {
     if (subCountyWardsPayload) {
       setFilteredWards(subCountyWardsPayload);
@@ -196,7 +196,7 @@ const PatientRegistration = () => {
     }
 
     const filtered = subCountyWardsPayload.filter(
-      (ward) => ward.SubCounty === subCounty  
+      (ward) => ward.SubCounty === subCounty
     );
     setFilteredWards(filtered);
   };
@@ -274,9 +274,8 @@ const PatientRegistration = () => {
 
       if (name === "isPrincipleMember" && value) {
         // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${
-          prev.firstName || visitorData?.VisitorName
-        } ${prev.middleName || ""} ${prev.lastName}`
+        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName || visitorData?.VisitorName
+          } ${prev.middleName || ""} ${prev.lastName}`
           .trim()
           .toUpperCase();
       } else if (name === "isPrincipleMember" && !value) {
@@ -308,7 +307,7 @@ const PatientRegistration = () => {
       dispatch(listCountries());
       dispatch(listCounties());
       dispatch(listSubCounties());
-      dispatch(listSubCountyWards());      
+      dispatch(listSubCountyWards());
       dispatch(listKinsRelationships());
       dispatch(listInsuranceOptions());
       dispatch(marketingStrategies());
@@ -322,7 +321,7 @@ const PatientRegistration = () => {
         firstName: patientDet?.FirstName || "",
         middleName: patientDet?.MiddleName || "",
         lastName: patientDet?.LastName || "",
-        gender: patientDet?.Gender==="Male" ? "1" : "2" || "",
+        gender: patientDet?.Gender === "Male" ? "1" : "2" || "",
         dob: patientDet?.DateOfBirth || null,
         phoneNumber: patientDet?.TelephoneNo1 || "",
         email: patientDet?.Email || "",
@@ -338,7 +337,7 @@ const PatientRegistration = () => {
   }, [patientDet]);
 
   console.log(patientDet)
-  
+
   const handleSavePatient = async (e) => {
     e.preventDefault();
 
@@ -585,6 +584,10 @@ const PatientRegistration = () => {
                       patientDet?.Gender
                     }
                     onChange={(value) => handleSelectChange("gender", value)}
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
                   >
                     <Select.Option value="">--Select Gender-- </Select.Option>
                     <Select.Option key={1} value={1}>
@@ -607,8 +610,8 @@ const PatientRegistration = () => {
                     value={
                       newPatient.dob
                         ? moment(newPatient.dob) ||
-                          visitorData?.dateOfBirth ||
-                          patientDet?.DateOfBirth
+                        visitorData?.dateOfBirth ||
+                        patientDet?.DateOfBirth
                         : null
                     }
                     onChange={(date, dateString) =>
@@ -677,10 +680,12 @@ const PatientRegistration = () => {
                     value={newPatient.nationality || patientDet?.Nationality}
                     showSearch
                     onSearch={handleSearch}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
                     onChange={(value) =>
                       handleSelectChange("nationality", value)
                     }
-                    filterOption={false} // Disables default filtering
                   >
                     <Select.Option value="">
                       --Select Nationality--
@@ -715,7 +720,7 @@ const PatientRegistration = () => {
                     filterOption={(input, option) =>
                       option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                     }
-                    // onFocus={handleDisplayDropDown}
+                  // onFocus={handleDisplayDropDown}
                   >
                     <Select.Option value="">--Select County--</Select.Option>
                     {countiesPayload && countiesPayload.length > 0 ? (
@@ -731,7 +736,7 @@ const PatientRegistration = () => {
                     )}
                   </Select>
                 </div>
-                
+
                 <div className="col-12 col-md-4">
                   <label className="py-1">
                     Sub County:<span className="text-danger px-1">*</span>
@@ -774,7 +779,7 @@ const PatientRegistration = () => {
                     Ward:<span className="text-danger px-1">*</span>
                   </label>
                   <Select
-                    placeholder="Select Sub County"
+                    placeholder="Select Ward"
                     className="w-100 fw-bold text-center"
                     value={newPatient.CountyWard || patientDet?.CountyWardName}
                     name="countyWard"
@@ -787,7 +792,7 @@ const PatientRegistration = () => {
                     }
                   >
                     <Select.Option value="">
-                      --Select Sub County--
+                      --Select Ward--
                     </Select.Option>
                     {filteredWards && filteredWards.length > 0 ? (
                       filteredWards.map((ward) => (
@@ -853,12 +858,18 @@ const PatientRegistration = () => {
                     // variant="borderless"
                     name="nextOfKinRelationShip"
                     onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+
+                    showSearch
+                    // filterOption = {true}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
                   >
                     <Select.Option value="">
                       --Select Relationship--
                     </Select.Option>
                     {relationshipOptionsPayload &&
-                    relationshipOptionsPayload.length > 0 ? (
+                      relationshipOptionsPayload.length > 0 ? (
                       relationshipOptionsPayload.map((relation) => (
                         <Select.Option
                           key={relation.Code}
@@ -899,17 +910,24 @@ const PatientRegistration = () => {
                     <span className="text-danger px-1">*</span>
                   </label>
                   <Select
-                    placeholder="Select"
-                    className="w-100 "
+                    placeholder="Select An Option"
+                    className="w-100 fw-bold text-center "
                     value={newPatient.howYouKnewABoutUs}
                     onChange={(value) =>
                       handleSelectChange("howYouKnewABoutUs", value)
                     }
                     name="howYouKnewABoutUs"
                     onFocus={handleDisplayDropDown}
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
                   >
+                    <Select.Option value="">
+                      --Select An Option--
+                    </Select.Option>
                     {marketingStrategiesPayload &&
-                    marketingStrategiesPayload.length > 0 ? (
+                      marketingStrategiesPayload.length > 0 ? (
                       marketingStrategiesPayload.map((list) => (
                         <Select.Option key={list.Code} value={list.Code}>
                           {list.Description}
@@ -917,7 +935,7 @@ const PatientRegistration = () => {
                       ))
                     ) : (
                       <Select.Option value="" disabled>
-                        No List available
+                        No data Available
                       </Select.Option>
                     )}
                   </Select>{" "}
@@ -943,14 +961,12 @@ const PatientRegistration = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {`${
-                      newPatient.firstName?.charAt(0).toUpperCase() ||
+                    {`${newPatient.firstName?.charAt(0).toUpperCase() ||
                       visitorData?.VisitorName?.split(" ")[0]
                         ?.charAt(0)
                         .toUpperCase() ||
                       ""
-                    }${
-                      newPatient.lastName?.charAt(0).toUpperCase() ||
+                      }${newPatient.lastName?.charAt(0).toUpperCase() ||
                       visitorData?.VisitorName?.split(" ")[1]
                         ?.charAt(0)
                         .toUpperCase() ||
@@ -959,7 +975,7 @@ const PatientRegistration = () => {
                         ?.charAt(0)
                         .toUpperCase() ||
                       ""
-                    }`}
+                      }`}
                   </Avatar>
                 </div>
                 <div className="col-12">
@@ -977,12 +993,12 @@ const PatientRegistration = () => {
                     <Select.Option value="">--Select--</Select.Option>
                     <Select.Option value="2">Cash</Select.Option>
                     <Select.Option value="1">Insurance</Select.Option>
-                    <Select.Option value="3">Corporate</Select.Option>
+                    {/* <Select.Option value="3">Corporate</Select.Option> */}
                   </Select>
                 </div>
 
                 {/* Insurance Input Fields */}
-                {newPatient.paymentMode !== "2"  && (
+                {newPatient.paymentMode !== "2" && (
                   <div className="row g-2">
                     <div className="col-12 col-md-6">
                       <label className="py-1">
@@ -999,7 +1015,11 @@ const PatientRegistration = () => {
                           handleSelectChange("insuranceNo", value)
                         }
                         name="insuranceNo"
-                        onFocus={handleDisplayDropDown}
+                        onFocus={handleDisplayDropDown} showSearch
+                        // filterOption = {true}
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                       >
                         <Select.Option value="">
                           --Select Insurance--
@@ -1100,7 +1120,7 @@ const PatientRegistration = () => {
             type="primary"
             className="mx-2"
             onClick={handleSavePatient}
-            // loading={savingPatient}
+          // loading={savingPatient}
           >
             Save Patient
           </Button>

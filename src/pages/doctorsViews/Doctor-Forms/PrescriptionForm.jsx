@@ -40,7 +40,7 @@ const PrescriptionForm = ({ setShowForm }) => {
   const staffNo = useAuth().userData.no;
   const { combinedList, loadingAllergies } = useFetchAllergiesAndMedicationsHook();
   const patientNumber = queryParams.get("PatientNo"); // Get treatmentNo from URL
-  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientNumber); 
+  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientNumber);
 
   const dispatch = useDispatch();
   const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
@@ -130,9 +130,9 @@ const PrescriptionForm = ({ setShowForm }) => {
     await dispatch(postPrescriptionDetails(prescription))
     dispatch(getQyPrescriptionLineSlice())
     setShowForm(false)
-    
+
   };
-  
+
   const handleSearch = (value) => {
     setSearchValue(value);
   };
@@ -155,120 +155,124 @@ const PrescriptionForm = ({ setShowForm }) => {
     }
   ];
   return (
-    
+
     <>
       <Row gutter={24}>
-      {/* drug input card */}
-      <Col span={16}>
-        <Card title="Prescription Form" style={{ padding: "10px 16px" }}>
-          <Form
-            layout="vertical"
-            validateTrigger="onChange"
-            onFinish={onFinish}
-            onValuesChange={onValuesChange}
-            initialValues={{
-              Prescriptions: {
-                PrescriptionNo: treatmentNo, // Set PrescriptionNo to treatmentNo
-                PrescriptionQuantity: "",
-                PrescriptionRemarks: "",
-                DrugGroup: "",
-                DrugNo: "",
-                UnitOfMeasure: "",
-                Dosage: "",
-                prescriptionDose: "",
-                route: "",
-                noOfDays: "",
-                treatmentNo: treatmentNo, // Keep treatmentNo in initial values
-              },
-            }}
-            autoComplete="off"
-          >
-            <Form.Item
-              label="Search Drug Name"
-              name="DrugNo"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a drug",
+        {/* drug input card */}
+        <Col span={16}>
+          <Card title="Prescription Form" style={{ padding: "10px 16px" }}>
+            <Form
+              layout="vertical"
+              validateTrigger="onChange"
+              onFinish={onFinish}
+              onValuesChange={onValuesChange}
+              initialValues={{
+                Prescriptions: {
+                  PrescriptionNo: treatmentNo, // Set PrescriptionNo to treatmentNo
+                  PrescriptionQuantity: "",
+                  PrescriptionRemarks: "",
+                  DrugGroup: "",
+                  DrugNo: "",
+                  UnitOfMeasure: "",
+                  Dosage: "",
+                  prescriptionDose: "",
+                  route: "",
+                  noOfDays: "",
+                  treatmentNo: treatmentNo, // Keep treatmentNo in initial values
                 },
-              ]}
-              className="w-100 my-2"
+              }}
+              autoComplete="off"
             >
-              {items && (
-                <Select
-                  placeholder="Select Drug e.g Paracetamol"
-                  showSearch
-                  suffixIcon={<SearchOutlined />}
-                  onSearch={handleSearch}
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().includes(input.toLowerCase())
-                  }
-                  notFoundContent={
-                    searchValue && items.length === 0 ? (
-                      <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="No drugs found"
-                      />
-                    ) : null
-                  }
-                >
-                  {searchValue &&
-                    items.map((item) => (
-                      <Select.Option key={item.No} value={item.No}>
-                        {item.Description}
-                      </Select.Option>
-                    ))}
-                </Select>
-              )}
-            </Form.Item>
-            <div className="d-block d-flex align-items-center justify-content-between gap-2">
               <Form.Item
-                label="Route"
-                name="route"
+                label="Search Drug Name"
+                name="DrugNo"
                 hasFeedback
                 rules={[
                   {
                     required: true,
-                    message: "Please select a route",
+                    message: "Please select a drug",
                   },
                 ]}
-                className="w-100"
+                className="w-100 my-2"
               >
-                <Select
+                {items && (
+                  <Select
+                    placeholder="Select Drug e.g Paracetamol"
+                    showSearch
+                    suffixIcon={<SearchOutlined />}
+                    onSearch={handleSearch}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().includes(input.toLowerCase())
+                    }
+                    notFoundContent={
+                      searchValue && items.length === 0 ? (
+                        <Empty
+                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                          description="No drugs found"
+                        />
+                      ) : null
+                    }
+                  >
+                    {searchValue &&
+                      items.map((item) => (
+                        <Select.Option key={item.No} value={item.No}>
+                          {item.Description}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                )}
+              </Form.Item>
+              <div className="d-block d-flex align-items-center justify-content-between gap-2">
+                <Form.Item
+                  label="Route"
                   name="route"
-                  placeholder="Select Route e.g oral"
+                  hasFeedback
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select a route",
+                    },
+                  ]}
                   className="w-100"
                 >
-                  {routeTypes &&
-                    routeTypes.map((item) => (
-                      <Select.Option key={item.value} value={item.value}>
-                        {item.label}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                label="Dosage"
-                name="Dosage"
-                placeholder="Enter Dosage e.g 1 tablet"
-                hasFeedback
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter dosage",
-                  },
-                ]}
-                className="w-100"
-              >
-                <Input
-                  className="w-100"
+                  <Select
+                    name="route"
+                    placeholder="Select Route e.g oral"
+                    className="w-100"
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {routeTypes &&
+                      routeTypes.map((item) => (
+                        <Select.Option key={item.value} value={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  label="Dosage"
+                  name="Dosage"
                   placeholder="Enter Dosage e.g 1 tablet"
-                />
-              </Form.Item>
-            </div>
-            <div className="d-block d-flex align-items-center justify-content-between gap-2">
-              {/* <Form.Item
+                  hasFeedback
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter dosage",
+                    },
+                  ]}
+                  className="w-100"
+                >
+                  <Input
+                    className="w-100"
+                    placeholder="Enter Dosage e.g 1 tablet"
+                  />
+                </Form.Item>
+              </div>
+              <div className="d-block d-flex align-items-center justify-content-between gap-2">
+                {/* <Form.Item
                 label="Unit of Measure"
                 name="UnitOfMeasure"
                 hasFeedback
@@ -291,53 +295,57 @@ const PrescriptionForm = ({ setShowForm }) => {
                   ))}
                 </Select>
               </Form.Item> */}
-              <Form.Item
-                label="Frequency per Day"
-                name="prescriptionDose"
-                hasFeedback
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a prescription dose",
-                  },
-                ]}
-                className="w-100"
-              >
-                <Select
-                  placeholder="Select Prescription Dose"
+                <Form.Item
+                  label="Frequency per Day"
+                  name="prescriptionDose"
+                  hasFeedback
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select a prescription dose",
+                    },
+                  ]}
                   className="w-100"
                 >
-                  {prescriptionDoseTypes &&
-                    prescriptionDoseTypes.map((item) => (
-                      <Select.Option key={item.value} value={item.value}>
-                        {item.label}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="d-block d-flex align-items-center justify-content-between gap-2">
-            <Form.Item
-                label="Duration (No of Days)"
-                name="noOfDays"
-                hasFeedback
-                placeholder="Enter No of Days e.g 1"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter no of days",
-                  },
-                ]}
-                className="w-100"
-              >
-                <Input
-                  type="number"
+                  <Select
+                    placeholder="Select Prescription Dose"
+                    className="w-100"
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {prescriptionDoseTypes &&
+                      prescriptionDoseTypes.map((item) => (
+                        <Select.Option key={item.value} value={item.value}>
+                          {item.label}
+                        </Select.Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </div>
+              <div className="d-block d-flex align-items-center justify-content-between gap-2">
+                <Form.Item
+                  label="Duration (No of Days)"
                   name="noOfDays"
+                  hasFeedback
+                  placeholder="Enter No of Days e.g 1"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter no of days",
+                    },
+                  ]}
                   className="w-100"
-                />
-              </Form.Item>
+                >
+                  <Input
+                    type="number"
+                    name="noOfDays"
+                    className="w-100"
+                  />
+                </Form.Item>
 
-              {/* <Form.Item
+                {/* <Form.Item
                 label="Prescription Quantity"
                 name={["Prescriptions", "PrescriptionQuantity"]}
                 hasFeedback
@@ -356,57 +364,57 @@ const PrescriptionForm = ({ setShowForm }) => {
                   className="w-100"
                 />
               </Form.Item> */}
-            </div>
+              </div>
 
-            <Form.Item
-              label="Prescription Remarks"
-              name="PrescriptionRemarks"
-              hasFeedback
-            >
-              <TextArea
-                autoSize={{ minRows: 3, maxRows: 5 }}
+              <Form.Item
+                label="Prescription Remarks"
                 name="PrescriptionRemarks"
-              />
-            </Form.Item>
-
-            <Space>
-            <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={savingPrescription}
-                >
-                  <SaveOutlined />
-                  Save Prescription
-                </Button>
+                hasFeedback
+              >
+                <TextArea
+                  autoSize={{ minRows: 3, maxRows: 5 }}
+                  name="PrescriptionRemarks"
+                />
               </Form.Item>
-            </Space>
-           
-          </Form>
-        </Card>
-      </Col>
-      <Col span={8}>
-      <div>
-        <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', padding: '10px' }}>
-        
-            <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
-            itemLayout="horizontal"
-            loading={loadingAllergies}
-            dataSource={transformedData}
-            renderItem={(item) => (
-            <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <Typography.Text className="allergies-item-list-title">{item.title}</Typography.Text>
-                <Typography.Text>
-                  {item.description}</Typography.Text>
-            </List.Item>
-            )}
-            >
-            </List>
 
-        </Card>
-      </div>
-      </Col>
-    </Row>
+              <Space>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={savingPrescription}
+                  >
+                    <SaveOutlined />
+                    Save Prescription
+                  </Button>
+                </Form.Item>
+              </Space>
+
+            </Form>
+          </Card>
+        </Col>
+        <Col span={8}>
+          <div>
+            <Card className="card" style={{ width: '100%', backgroundColor: '#e5e3e3', border: 'none', padding: '10px' }}>
+
+              <List header={<div style={{ fontSize: '14px', fontWeight: 'bold', color: 'red' }}>Allergies and Chronics</div>}
+                itemLayout="horizontal"
+                loading={loadingAllergies}
+                dataSource={transformedData}
+                renderItem={(item) => (
+                  <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <Typography.Text className="allergies-item-list-title">{item.title}</Typography.Text>
+                    <Typography.Text>
+                      {item.description}</Typography.Text>
+                  </List.Item>
+                )}
+              >
+              </List>
+
+            </Card>
+          </div>
+        </Col>
+      </Row>
 
     </>
 

@@ -131,20 +131,20 @@ const CreateVisitForm = () => {
         isPrincipleMember: newVisit.isPrincipleMember,
         schemeName: newVisit.schemeName,
       };
-  
+
       const appointmentId = await dispatch(createTriageVisit(visitData));
-  
+
       if (appointmentId) {
         message.success("Visit created successfully!");
         setAppointmentId(appointmentId);
-  
+
         // Step 3: Optionally dispatch the visit (triage)
         console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
         message.error("Failed to create visit!");
         setAppointmentId(null);
         setNewVisit({});
-  
+
         // Use previousPath from location.state to navigate back
         navigate(location.state?.previousPath || "/reception/visitors-list");
       }
@@ -153,18 +153,18 @@ const CreateVisitForm = () => {
       message.error("Error occurred while creating visit!");
     }
   };
-  
+
   const dispatchPatient = async (appointmentId) => {
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
     }
-  
+
     try {
       console.log("Dispatching patient with appointment ID:", appointmentId);
       await dispatch(postTriageVisit(appointmentId));
       message.success("Patient has been dispatched successfully!");
-  
+
       // Use previousPath from location.state to navigate back
       navigate(location.state?.previousPath || "/reception/visitors-list");
     } catch (error) {
@@ -172,7 +172,7 @@ const CreateVisitForm = () => {
       message.error("Failed to dispatch patient!");
     }
   };
-  
+
 
   const handleSwitchChange = (name, value) => {
     setNewVisit((prev) => {
@@ -288,6 +288,10 @@ const CreateVisitForm = () => {
                       className="w-100"
                       value={newVisit.clinic}
                       onChange={(value) => handleInputChange("clinic", value)}
+                      showSearch
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
                     >
                       <Select.Option value="">--Select Clinic--</Select.Option>
                       {clinicsPayload &&
@@ -307,6 +311,11 @@ const CreateVisitForm = () => {
                       className="w-100"
                       value={newVisit.doctor} // This will hold the DoctorID
                       onChange={(value) => handleInputChange("doctor", value)} // Update DoctorID
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
                     >
                       <Select.Option value="">--Select Doctor--</Select.Option>
                       {filteredDoctors &&
@@ -334,6 +343,10 @@ const CreateVisitForm = () => {
                       onChange={(value) =>
                         handleInputChange("paymentMode", value)
                       }
+                      showSearch
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
                     >
                       <Select.Option value="">--Select--</Select.Option>
                       <Select.Option value="2">Cash</Select.Option>
@@ -355,6 +368,10 @@ const CreateVisitForm = () => {
                           handleInputChange("insuranceNo", value)
                         }
                         disabled={newVisit.paymentMode !== "1"}
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                       >
                         <Select.Option value="">
                           --Select Insurance--
@@ -381,71 +398,71 @@ const CreateVisitForm = () => {
                 {
                   newVisit.paymentMode === "1" && (
                     <>
-                    <div className="row px-3 py-2 align-items-center justify-content-between">
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Membership No:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Membership No"
-                      value={newVisit.membershipNo}
-                      onChange={(e) =>
-                        handleInputChange("membershipNo", e.target.value)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
+                      <div className="row px-3 py-2 align-items-center justify-content-between">
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Membership No:<span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Membership No"
+                            value={newVisit.membershipNo}
+                            onChange={(e) =>
+                              handleInputChange("membershipNo", e.target.value)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
 
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Insurance Scheme Name:
-                      <span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Insurance Scheme"
-                      value={newVisit.schemeName}
-                      onChange={(e) =>
-                        handleInputChange("schemeName", e.target.value)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
-                </div>
-                <div className="row px-3 py-2 align-items-center justify-content-between">
-                  <div className="col-md-6">
-                    <label className="py-1">
-                      Principal Name:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Principal Name"
-                      value={newVisit.insurancePrincipalMemberName} // Use insurancePrincipalMemberName here
-                      onChange={(e) =>
-                        handleInputChange(
-                          "insurancePrincipalMemberName",
-                          e.target.value
-                        )
-                      }
-                      disabled={
-                        newVisit.paymentMode !== "1" ||
-                        newVisit.isPrincipleMember
-                      } // Disable if the user is the principal member
-                      style={{ width: "100%", fontWeight: "bold", color: "black" }}
-                    />
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Is Principle Member:
-                      <span className="text-danger px-1">*</span>
-                    </label>
-                    <Switch
-                      checked={newVisit.isPrincipleMember}
-                      onChange={(checked) =>
-                        handleSwitchChange("isPrincipleMember", checked)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
-                </div>
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Insurance Scheme Name:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Insurance Scheme"
+                            value={newVisit.schemeName}
+                            onChange={(e) =>
+                              handleInputChange("schemeName", e.target.value)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
+                      </div>
+                      <div className="row px-3 py-2 align-items-center justify-content-between">
+                        <div className="col-md-6">
+                          <label className="py-1">
+                            Principal Name:<span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Principal Name"
+                            value={newVisit.insurancePrincipalMemberName} // Use insurancePrincipalMemberName here
+                            onChange={(e) =>
+                              handleInputChange(
+                                "insurancePrincipalMemberName",
+                                e.target.value
+                              )
+                            }
+                            disabled={
+                              newVisit.paymentMode !== "1" ||
+                              newVisit.isPrincipleMember
+                            } // Disable if the user is the principal member
+                            style={{ width: "100%", fontWeight: "bold", color: "black" }}
+                          />
+                        </div>
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Is Principle Member:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Switch
+                            checked={newVisit.isPrincipleMember}
+                            onChange={(checked) =>
+                              handleSwitchChange("isPrincipleMember", checked)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
+                      </div>
                     </>
                   )
                 }
@@ -469,15 +486,13 @@ const CreateVisitForm = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      {`${
-                        patientData?.firstName?.charAt(0) ||
+                      {`${patientData?.firstName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(0) ||
                         ""
-                      }${
-                        patientData?.lastName?.charAt(0) ||
+                        }${patientData?.lastName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(1).toUpperCase() ||
                         ""
-                      }`}
+                        }`}
                     </Avatar>
                   </div>
                   {/* Add dynamic data fields for patientType, settlementType, clinic, doctor */}
@@ -487,8 +502,8 @@ const CreateVisitForm = () => {
                       {patientData?.paymentMode === "1"
                         ? "Insurance"
                         : patientData?.paymentMode === "2"
-                        ? "Cash"
-                        : existingPatient?.PatientType || "N/A"}
+                          ? "Cash"
+                          : existingPatient?.PatientType || "N/A"}
                     </p>
 
                     <p>
@@ -496,8 +511,8 @@ const CreateVisitForm = () => {
                       {newVisit.paymentMode === "1"
                         ? "Insurance"
                         : newVisit.paymentMode === "2"
-                        ? "Cash"
-                        : "N/A"}
+                          ? "Cash"
+                          : "N/A"}
                     </p>
                     <p>
                       <strong>Clinic:</strong> {newVisit.clinic || "N/A"}
