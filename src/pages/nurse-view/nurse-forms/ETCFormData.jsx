@@ -11,17 +11,20 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-  const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors}) => {
+  const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingPostEtc, admissionNo}) => {
     const dispatch = useDispatch();
     const handleOnFinish = async (values) => {
       const formData = {
         myAction: "create",
         recId: "",
-        linkNo: treatmentNo,
+        doctorId: values.doctorName,
+        linkNo: treatmentNo?.trim() ? treatmentNo : admissionNo,
         patientNo,
         procedureDate: values.dates.format("YYYY-MM-DD"),
         status: 0
       }
+
+      console.log('form data', formData)
     
         await dispatch(postPatientECTRequest(formData))
         dispatch(getPatientECTRequest())
@@ -58,7 +61,7 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
                   <DatePicker
                     size="large"
                      style={{ width: "100%" }}
-                    placeholder="Select multiple dates"
+                    placeholder="Select dates"
                   />
                 
                 </Form.Item>
@@ -107,9 +110,8 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
               type="primary"
               htmlType="submit"
               icon={<FileTextOutlined />}
-            //   onClick={handleLabRequest}
-            //   loading={loadingLabRequest}
-            //   disabled={loadingLabRequestPost}
+              loading={loadingPostEtc}
+              disabled={loadingPostEtc}
             >
               Request Test
             </Button>
@@ -125,6 +127,8 @@ import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Do
     patientNo: PropTypes.string.isRequired,
     treatmentNo: PropTypes.string.isRequired,
     doctors: PropTypes.array.isRequired,
-    loadingDoctors: PropTypes.bool.isRequired
+    loadingDoctors: PropTypes.bool.isRequired,
+    loadingPostEtc: PropTypes.bool.isRequired,
+    admissionNo: PropTypes.string,
   };
   

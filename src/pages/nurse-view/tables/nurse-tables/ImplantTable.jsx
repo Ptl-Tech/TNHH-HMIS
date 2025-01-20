@@ -1,8 +1,10 @@
 import { Badge, Table } from "antd"
 import PropTypes from "prop-types";
 
-const ImplantTable = ({ loadingKetamine, data, treatmentNo }) => {
-    const filterData = data?.filter((item) => item?.Link_No === treatmentNo);
+const ImplantTable = ({ loadingKetamine, data, treatmentNo, admissionNo }) => {
+    const filterData = data?.filter((item) => 
+      treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
+    );
     const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'Implant')
 const columns = [
         {
@@ -13,8 +15,8 @@ const columns = [
 
         {
             title: 'Patient No',
-            dataIndex: 'PT_00259',
-            key: 'PT_00259',
+            dataIndex: 'Patient_No',
+            key: 'Patient_No',
         },
         {
             title: 'Procedure Date',
@@ -82,5 +84,6 @@ export default ImplantTable
 ImplantTable.propTypes = {
     loadingKetamine: PropTypes.bool.isRequired,
     data: PropTypes.array.isRequired,
-    treatmentNo: PropTypes.string.isRequired
+    treatmentNo: PropTypes.string.isRequired,
+    admissionNo: PropTypes.string,
 }

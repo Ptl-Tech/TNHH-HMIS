@@ -192,7 +192,7 @@ import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesRedu
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
-import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest } from "./doc-reducers/postDoctorProceduresReducers";
+import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
 import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
@@ -357,9 +357,9 @@ export const rootReducer = combineReducers({
   getQyPrescriptionLine:getQyPrescriptionLinesReducer,
   postPatientETC:postPatientECTRequest,
   getPatientETC:getPatientECTRequest,
-  postKetamine:postPatientKetamineRequest,
+  postKetamine:postPatientKetamineReducer,
   getKetamine:getPatientKetamineRequest,
-  postImplant:getPatientKetamineRequest,
+  postImplant:postPatientImplantRequest,
   checkInConsulation:postCheckInPatientConfirmReducer,
   markAsCompleted:postMarkAsCompletedReducer,
 

@@ -13,18 +13,24 @@ import ECTFormData from "../nurse-forms/ETCFormData";
 import ETCTable from "../tables/nurse-tables/ETCTable";
 import { getPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import { listDoctors } from "../../../actions/DropdownListActions";
+import useAuth from "../../../hooks/useAuth";
 
 const ECTScan = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientNo = queryParams.get("PatientNo");
+  const admissionNo = queryParams.get("AdmNo");
+  const role = useAuth().userData.departmentName
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and for
 
   const { loading: loadingETC, data } = useSelector(
         (state) => state.getPatientETC
+      );
+      const { loading: loadingPostEtc } = useSelector(
+        (state) => state.postPatientETC
       );
       const { loading: loadingDoctors, data: doctors } = useSelector(state => state.getDoctorsList)
 
@@ -49,24 +55,40 @@ const ECTScan = () => {
         ECT Request
       </Typography.Title>
       </div>
-      <div style={{ display: "flex", gap: "10px"}}>
+      {
+        role === 'Doctor' && (
+          <div style={{ display: "flex", gap: "10px"}}>
     
-        <Button
-          type="primary"
-          onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
-        >
-          {!showForm ? " New ECT Request" : "View ECT Requests"}
-        </Button>
+            <Button
+              type="primary"
+              onClick={() => setShowForm(!showForm)}
+              icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+            >
+              {!showForm ? " New ETC Request" : "View ETC Requests"}
+            </Button>
              
-      </div>
+          </div>
+        )
+      }
       </div>
 
       {!showForm ? (
-        <ETCTable loadingETC={loadingETC} data={data} treatmentNo={treatmentNo}/>
+        <ETCTable 
+        loadingETC={loadingETC} 
+        data={data} 
+        admissionNo={admissionNo}
+        treatmentNo={treatmentNo}
+        />
         
       ) : (
-        <ECTFormData patientNo={patientNo} treatmentNo={treatmentNo} loadingDoctors={loadingDoctors} doctors={doctors}/>
+        <ECTFormData 
+        patientNo={patientNo} 
+        treatmentNo={treatmentNo} 
+        loadingDoctors={loadingDoctors} 
+        doctors={doctors}
+        admissionNo={admissionNo}
+        loadingPostEtc={loadingPostEtc}
+        />
       )}
     </div>
   );
