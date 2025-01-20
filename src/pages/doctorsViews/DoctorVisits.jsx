@@ -245,14 +245,14 @@ const[loading, setLoading]= useState(false)
       render: (_, record) => {
         const { color, text } = getUrgencyColorcode(record.urgency);
         return (
-          <Badge
+          <Tag
             color={color}
-            text={text} // Display urgency text
+            // text={text} // Display urgency text
             className="fw-bold"
-            style={{ 
-              color: color,
-            }}
-          />
+            // style={{ 
+            //   color: color,
+            // }}
+          >{text}</Tag>
         );
       },
     },

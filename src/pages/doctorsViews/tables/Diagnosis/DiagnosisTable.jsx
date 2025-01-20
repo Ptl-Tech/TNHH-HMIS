@@ -52,7 +52,7 @@ const DiagnosisTable = ({ treatmentNo }) => {
       dataIndex: "Remarks", // Updated
       key: "Remarks",
     },
-    {
+    /* {
       title: "Action",
       dataIndex: "action",
       key: "action",
@@ -61,7 +61,7 @@ const DiagnosisTable = ({ treatmentNo }) => {
           Delete
         </Button>
       ),
-    },
+    }, */
   ];
 
   const [pagination, setPagination] = useState({

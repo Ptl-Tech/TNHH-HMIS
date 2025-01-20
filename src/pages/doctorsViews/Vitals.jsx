@@ -42,7 +42,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
       key: "bloodPreasure",
     },
     { title: "SpO₂", dataIndex: "sP02", key: "sP02" },
-    { title: "Pain", dataIndex: "pain", key: "pain" },
+    // { title: "Pain", dataIndex: "pain", key: "pain" },
     { title: "Height (cm)", dataIndex: "height", key: "height" },
     { title: "Weight (kg)", dataIndex: "weight", key: "weight" },
     {

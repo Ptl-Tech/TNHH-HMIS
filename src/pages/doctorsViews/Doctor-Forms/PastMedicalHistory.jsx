@@ -22,7 +22,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
   const notesType = [
     { value: "20", label: "Medical" },
     { value: "21", label: "Surgical" },
-    { value: "22", label: "Obstetric" },
+    // { value: "22", label: "Obstetric" },
     { value: "23", label: "Gynecology" },
   ];
   useEffect(() => {
@@ -35,7 +35,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
     return {
       "20": data.find((item) => item.Notes_Type === "Medical")?.Notes || "",
       "21": data.find((item) => item.Notes_Type === "Surgical")?.Notes || "",
-      "22": data.find((item) => item.Notes_Type === "Obstetric")?.Notes || "",
+      // "22": data.find((item) => item.Notes_Type === "Obstetric")?.Notes || "",
       "23": data.find((item) => item.Notes_Type === "Gynecology")?.Notes || "",
     };
   }, [data]);
@@ -111,7 +111,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
         <Form.Item
           name="notes"
           label={notesType.find((note) => note.value === currentTab)?.label}
-          rules={[{ required: true, message: "Please enter notes" }]}
+          rules={[{ message: "Please enter notes" }]}
         >
           <TextArea placeholder="Enter notes..." autoSize={{ minRows: 3 }} />
         </Form.Item>

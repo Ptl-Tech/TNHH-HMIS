@@ -37,7 +37,7 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
       "16": data.find((item) => item.Notes_Type === "Central Nervous system")?.Notes || "",
       "17": data.find((item) => item.Notes_Type === "Cardiovascular system")?.Notes || "",
       "18": data.find((item) => item.Notes_Type === "Respiratory system")?.Notes || "",
-      "19": data.find((item) => item.Notes_Type === "Per Abdomen")?.Notes || "",
+      "19": data.find((item) => item.Notes_Type === "Abdomen")?.Notes || "",
     };
   }, [data]);
   
