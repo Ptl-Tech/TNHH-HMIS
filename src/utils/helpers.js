@@ -31,17 +31,15 @@ export const getColorByWaitingTime = (observationDateTime) => {
   export const getUrgencyColorcode = (urgency) => {
     switch (urgency) {
       case "Normal":
-        return { color: "#35AB22", text: "Normal" }; // Green for low urgency
+        return { color: "#35AB22", text: "Green" }; // Green for low urgency
       case "Urgent":
-        return { color: "#9F9700", text: "Urgent" }; // Yellow for medium urgency
+        return { color: "#9F9700", text: "Yellow" }; // Yellow for medium urgency
       case "Emergency":
-        return { color: "#EB6965", text: "Emergency" }; // Red for high urgency
+        return { color: "#EB6965", text: "Red" }; // Red for high urgency
       default:
-        return { color: "#35AB22", text: "Normal" }; // Default is low urgency
+        return { color: "#35AB22", text: "Green" }; // Default is low urgency
     }
   };
-
-
 
   export const rowClassName = (record) => {
     const urgency = record.urgency;
