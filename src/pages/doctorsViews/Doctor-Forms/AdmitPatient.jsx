@@ -8,6 +8,7 @@ import {
   Table,
   Typography,
   Modal,
+  DatePicker,
 } from "antd";
 import {
   FileTextOutlined,
@@ -40,7 +41,7 @@ const AdmitPatientForm = () => {
 
   const { loading } = useSelector((state) => state.saveAdmissionDetails);
 
-  const { loading: loadingAdmissionRequest, success: admissionRequestSuccess } =  
+  const { loading: loadingAdmissionRequest, success: admissionRequestSuccess } =
     useSelector((state) => state.requestAdmission);
 
   const { loading: loadingAdmissionLines, data: admissionLines } = useSelector(
@@ -100,7 +101,7 @@ const AdmitPatientForm = () => {
       Status: admissionLines?.Status,
     },
   ];
-  
+
   // Function to show the modal
   const handleHistoryClick = () => {
     setHistoryVisible(true);
@@ -118,21 +119,21 @@ const AdmitPatientForm = () => {
   };
 
   const handlePatientAdmission = () => {
-    const { admissionReason } = form.getFieldsValue(); 
-    
+    const { admissionReason } = form.getFieldsValue();
+
     const admissionObject = {
       myAction: "create", // Action type
       treatmentNo: treatmentNo,
       dateOfAdmission: moment().format("YYYY-MM-DD"),
-      admissionReason: admissionReason || "", 
+      admissionReason: admissionReason || "",
     };
 
     dispatch(saveAdmissionDetails(admissionObject));
-     
+
     if (admissionRequestSuccess) {
       dispatch(getAdmissionLines(treatmentNo));
     }
-    
+
   };
 
   return (
@@ -218,17 +219,17 @@ const AdmitPatientForm = () => {
             </Col>
             <Col span={12}>
               <Form.Item label="Date of Admission" name="dateOfAdmission">
-                <Input
-                  type="text"
-                  value={moment().format("DD MMM YYYY")}
-                  style={{ fontWeight: "bold", color: "#0F5689" }}
-                  disabled
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  style={{ width: "100%" }}
+                  placeholder="Select Date"
+                  // defaultValue={moment()} // Set default date to current date
                 />
                 {/* Default to current date */}
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
+        <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="Admission Reason" name="admissionReason">
                 <TextArea />

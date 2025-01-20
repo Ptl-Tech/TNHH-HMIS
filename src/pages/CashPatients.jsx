@@ -358,12 +358,12 @@ const CashPatients = () => {
       ),
     },
   ];
-  const rowSelection = {
+  /* const rowSelection = {
     selectedRowKeys,
     onChange: (selectedRowKeys) => {
       setSelectedRowKeys(selectedRowKeys);
     },
-  };
+  }; */
 
   const startIdx = (pagination.current - 1) * pagination.pageSize;
   const endIdx = startIdx + pagination.pageSize;
@@ -408,7 +408,7 @@ const CashPatients = () => {
       <Tabs defaultActiveKey="1" size="large" type="card">
         <TabPane tab="Outpatients list" key="1">
           <Table
-           rowSelection={rowSelection}
+          //  rowSelection={rowSelection}
             columns={outpatientColumns}
             dataSource={filteredOutpatients.map((patient) => ({
               ...patient,
@@ -426,7 +426,7 @@ const CashPatients = () => {
         </TabPane>
         <TabPane tab="Inpatients list" key="2">
           <Table
-           rowSelection={rowSelection}
+          //  rowSelection={rowSelection}
             columns={inpatientColumns}
             dataSource={filteredInpatients.map((patient) => ({
               ...patient,

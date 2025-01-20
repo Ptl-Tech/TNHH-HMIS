@@ -19,7 +19,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             staffNo,
             urgencyStatus: values.status,
             tcaStatusRemarks: values.urgencyStatus,
-            observationRemark: values.remarks,
+            ObservationRemarks: values.remarks,
         }
         
         try{
