@@ -6,7 +6,7 @@ import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVital
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 
-const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible, role}) => {
+const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible, role, admissionNumber, number}) => {
 
   const [form] = Form.useForm();
 
@@ -44,8 +44,8 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
         // Common payload properties
         const baseVitals = {
           ...transformedValues,
-          patientNo: patientNumber,
-          observationNo: observationNumber,
+          patientNo: role === 'Doctor' ? number : patientNumber,
+          observationNo: role === 'Doctor' ? admissionNumber : observationNumber,
         };
       
           // Create vitals
@@ -54,6 +54,8 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
             type: 0,
             myAction: "create",
           };
+
+          console.log('base vitals', baseVitals)
     
           const response = await dispatch(postTriageListVitalsSlice(createVitals));
           if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
@@ -409,8 +411,10 @@ export default VitalsFormData
 
 //prop type validation
 VitalsFormData.propTypes = {
-  observationNumber: PropTypes.string.isRequired,
+  observationNumber: PropTypes.string,
   patientNumber: PropTypes.string.isRequired,
   setIsVitalFormVisible: PropTypes.bool.isRequired,
-  role: PropTypes.string.isRequired
+  role: PropTypes.string.isRequired,
+  admissionNumber: PropTypes.string,
+  number: PropTypes.string
 }

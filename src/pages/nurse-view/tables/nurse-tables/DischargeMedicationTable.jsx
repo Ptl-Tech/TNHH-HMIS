@@ -48,26 +48,13 @@ const DischargeMedicationTable = () => {
           ),
         },
       ];
-      
-      const data = [
-        {
-          key: '1',
-          drugName: 'Paracetamol',
-          dosage: '500mg',
-          uom: 'mg',
-          frequency: 'Twice a day',
-          route: 'Oral',
-          duration: '3 days',
-          prescribedBy: 'Dr. John Doe',
-          status: 'Pending',
-        },
-    ];
+    
       return (
-        <div style={{ paddingTop: '30px' }}>
+        <div style={{ paddingTop: '10px' }}>
             <Table 
             
             columns={columns} 
-            dataSource={data} 
+        
             className="admit-patient-table"
             />
     

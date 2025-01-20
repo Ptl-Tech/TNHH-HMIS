@@ -1,4 +1,4 @@
-import { message, Modal } from "antd";
+import { message } from "antd";
 import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";

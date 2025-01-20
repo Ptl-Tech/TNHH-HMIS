@@ -3,7 +3,6 @@ import PatientFile from './PatientFile'
 import CarePlan from './CarePlan'
 import Requests from './Requests'
 import Discharges from './Discharges'
-import NurseForms from './NurseForms'
 import PropTypes from 'prop-types'
 import useAuth from '../../hooks/useAuth'
 

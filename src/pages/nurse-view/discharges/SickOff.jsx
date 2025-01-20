@@ -4,12 +4,14 @@ import { useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import SickOffTable from '../tables/nurse-tables/SickOffTable';
 import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
+import useAuth from '../../../hooks/useAuth';
 
 const SickOff = () => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [selectedRow, setSelectedRow] = useState([]);  
+    const [selectedRow, setSelectedRow] = useState([]); 
+    const role = useAuth().userData.departmentName 
 
     const rowSelection = {
         selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
@@ -51,13 +53,19 @@ const SickOff = () => {
     <div>
         <NurseInnerHeader icon={<UserAddOutlined/>} title="Sick Off" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Sick Off
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleOnClick()}><FolderViewOutlined />
+        {
+          role === 'Doctor' ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Sick Off
+            </Button>
+            <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleOnClick()}><FolderViewOutlined />
             Print Sick Off
-          </Button>
-        </div>
+            </Button>
+            </div>
+          ) : (
+            null
+          )
+        }
 
 
         <SickOffTable rowSelection={rowSelection} />

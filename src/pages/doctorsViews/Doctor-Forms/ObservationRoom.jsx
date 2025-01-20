@@ -23,8 +23,10 @@ import PropTypes from "prop-types";
 const { Title } = Typography;
 
 const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
+  const [activeItem, setActiveItem] = useState('Vitals');
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case "Vitals":
         setSelectedItem(<FormVitals treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
@@ -58,16 +60,16 @@ const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
         }}
       >
         {buttonItems.map((item, index) => (
-          <Button
-            key={index}
-            type="primary"
-            style={{ backgroundColor: "#0f5689", display: "flex", alignItems: "center", gap: "5px" }}
-            onClick={() => handleOnClick(item.label)}
-          >
-            {item.icon}
-            {item.label}
-          </Button>
-        ))}
+                  <Button
+                    key={index}
+                    style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+                    className={activeItem === item.label ? "active-button" : ""}
+                    onClick={() => handleOnClick(item)}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Button>
+                ))}
       </div>
       <div>{selectedItem}</div>
     </>

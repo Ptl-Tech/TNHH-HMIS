@@ -12,6 +12,7 @@ import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
+import { postPatientAdmission } from "../../actions/Doc-actions/Admission/postAdmitPatient";
 
 
 const AdmitPatients = () => {
@@ -110,12 +111,45 @@ const AdmitPatients = () => {
 
     const { pagination, handleTableChange } = useSetTablePagination(formattedPatientAdmissions);
 
-      const handleAdmitPatient = () => {
+      // const handleAdmitPatient = () => {
 
-        selectedRow[0]?.PatientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`, {
-          state: { patientDetails: selectedRow[0] }
-        });
+      //   selectedRow[0]?.PatientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`, {
+      //     state: { patientDetails: selectedRow[0] }
+      //   });
+      // }
+
+      const handleAdmitPatient = async () => {
+        confirm({
+          title: 'Confirm Patient Admission',
+          content: `Are you sure you want to admit ${selectedRow[0]?.Names} ?`,
+          okText: 'Yes',
+          okType: 'danger',
+          cancelText: 'No',
+          onOk(){
+              return new Promise((resolve, reject) => {
+                  handleAdmitPatientAction(selectedRow[0])
+                  .then(resolve) // Resolve the modal when successful
+                  .catch(reject); // Reject on failure
+              });
+          },
+      })
       }
+
+      const handleAdmitPatientAction = async (patientDetails) => {
+          try{
+           await dispatch(postPatientAdmission({admissionNo: patientDetails?.No})).then((data)=>{
+             if(data){
+              message.success('Patient admitted successfully')
+              navigate(`/Nurse/Inpatient`);
+             }else{
+              message.error('Patient admission failed')
+             }
+           })
+          }catch(error){
+            message.error(error.message || 'Unexpected error occurred');
+          }
+        }
+      
 
       const handlePatientCharges = () => {
         selectedRow[0]?.patientNo &&  navigate(`/Nurse/Admit-patient/Charges?PatientNo=${selectedRow[0].patientNo}`);

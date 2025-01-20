@@ -13,12 +13,18 @@ import useAuth from "../../../hooks/useAuth";
 const DailyProcess = () => {
       const { patientDetails } = useLocation().state;
       const role = useAuth().userData.departmentName
+      const queryParams = new URLSearchParams(location.search);
+      const AdmNo = queryParams.get("AdmNo");
 
       const [isDailyProcessFormVisible, setIsDailyProcessFormVisible] = useState(false);
 
       const {loadingGetIpProcedure, ipGetProcedure} = useSelector((state) => state.getQyInpatientProcessProcedure);
       
-      const filterProcedures = ipGetProcedure?.filter(procedure => procedure.AdmissionNo === patientDetails?.CurrentAdmNo);
+      const filterProcedures = ipGetProcedure?.filter(procedure => 
+        role === 'Nurse' 
+          ? procedure.AdmissionNo === patientDetails?.CurrentAdmNo 
+          : procedure.AdmissionNo === AdmNo
+      );
 
       const handleVitalsButtonVisibility = () => {
         setIsDailyProcessFormVisible(!isDailyProcessFormVisible);
@@ -27,10 +33,10 @@ const DailyProcess = () => {
       const dispatch = useDispatch();
   
     useEffect(() => {
-          if(!ipGetProcedure?.length){
+       
             dispatch(getQyInpatientProcessProceduresSlice());
-          }
-        }, [dispatch, ipGetProcedure?.length]);
+         
+        }, [dispatch]);
   
       
   return (
@@ -51,7 +57,7 @@ const DailyProcess = () => {
 
         {
           isDailyProcessFormVisible && (
-            <DailyProcessFormData setIsDailyProcessFormVisible={setIsDailyProcessFormVisible}/>
+            <DailyProcessFormData setIsDailyProcessFormVisible={setIsDailyProcessFormVisible} />
           )
         }  
       

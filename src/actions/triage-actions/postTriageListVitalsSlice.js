@@ -20,6 +20,7 @@ export const postTriageListVitalsSlice = (vitals) => async (dispatch, getState) 
             config
         );
 
+        console.log('data from the API', data)
         dispatch({ type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: data });
         
         return { type: POST_TRIAGE_LIST_VITALS_SUCCESS, payload: data };

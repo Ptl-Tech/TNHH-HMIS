@@ -11,7 +11,7 @@ import { FileMarkdownOutlined, FileOutlined, UserAddOutlined } from "@ant-design
 
 const Discharges = () => {
   const role = useAuth().userData.departmentName;
-  const [selectedItem, setSelectedItem] = useState("Summary");
+  const [selectedItem, setSelectedItem] = useState(role  === 'Doctor' ? "Initiate Discharge" : "Summary");
   const dispatch=useDispatch();
   const { patientDetails } = useLocation().state;
   const { confirm } = Modal;

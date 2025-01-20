@@ -1,31 +1,31 @@
 import { Button, Divider } from "antd"
 import { useState } from "react"
 import PhysiotherapyRequest from "./requests/PhysiotherapyRequest"
-import RadiologyRequest from "./requests/RadiologyRequest"
-import LaboratoryRequest from "./requests/LaboratoryRequest"
 import { HeartOutlined, FileMarkdownOutlined, MedicineBoxOutlined } from "@ant-design/icons"
 import useAuth from "../../hooks/useAuth"
+import LabResults from "../doctorsViews/Doctor-Forms/LabResults"
+import Imaging from "../doctorsViews/Doctor-Forms/Imaging"
 
 
 const Requests = () => {
   const userRole = useAuth();
-  const [selectedItem, setSelectedItem] = useState(<LaboratoryRequest />); // Default component
+  const [selectedItem, setSelectedItem] = useState(<LabResults />); // Default component
   const [activeItem, setActiveItem] = useState('Laboratory Requests');
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);
     switch (item.label) {
       case 'Laboratory Requests':
-        setSelectedItem(<LaboratoryRequest />);
+        setSelectedItem(<LabResults />);
         break;
       case 'Psychology Requests':
         setSelectedItem(<PhysiotherapyRequest />);
         break;
       case 'Radiology Requests':
-        setSelectedItem(<RadiologyRequest />);
+        setSelectedItem(<Imaging />);
         break;
       default:
-        setSelectedItem(<LaboratoryRequest />); // Default fallback
+        setSelectedItem(<LabResults />); // Default fallback
     }
   }
 

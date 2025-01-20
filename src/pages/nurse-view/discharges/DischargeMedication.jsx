@@ -3,9 +3,11 @@ import { PlusOutlined, FileMarkdownOutlined, FolderViewOutlined } from "@ant-des
 import { useState } from "react";
 import DischargeMedicationTable from "../tables/nurse-tables/DischargeMedicationTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
 
 const DischargeMedication = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const role = useAuth().userData.departmentName
     const showModal = () => {
       setIsModalOpen(true);
     };
@@ -22,13 +24,19 @@ const DischargeMedication = () => {
         
         <NurseInnerHeader icon={<FileMarkdownOutlined/>} title="Discharge Medication" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        {
+          role === 'Doctor' ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
             <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Discharge Medication
           </Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
             Preview Discharge Medication
           </Button>
         </div>
+          ) : (
+            null
+          )
+        }
 
 
         <DischargeMedicationTable />

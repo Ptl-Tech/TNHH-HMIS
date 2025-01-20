@@ -4,9 +4,11 @@ import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import DischargeSummeryTable from "../tables/nurse-tables/DischargeSummeryTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
 
 const Summery = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const role = useAuth().userData.departmentName
     const showModal = () => {
       setIsModalOpen(true);
     };
@@ -23,13 +25,19 @@ const Summery = () => {
 
         <NurseInnerHeader icon={<FileOutlined/>} title="Discharge Summary" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Discharge Summary
-          </Button>
-        </div>
+        {
+            role === 'Doctor' ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+                <Button type="primary" style={{ width: '50%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary
+                </Button>
+                <Button color="default" variant="outlined" style={{ width: '50%' }}><FolderViewOutlined />
+                Preview Discharge Summary
+                </Button>
+                </div>
+            ) : (
+                null
+            )
+        }
 
         <DischargeSummeryTable showModal={showModal}/>
 

@@ -39,22 +39,11 @@ const DischargeSummeryTable = ({ showModal }) => {
         }
     ];
 
-    const data = [
-        {
-            key: '1',
-            investigationDone: 'Investigation Done',
-            management: 'Management',
-            finalDiagnosis: 'Final Diagnosis',
-            reviewDate: 'Review Date',
-        },
-    ];
-
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div style={{ paddingTop: '10px' }}>
     <Table 
     
        columns={columns} 
-       dataSource={data} 
        className="admit-patient-table"
     />
 
