@@ -111,7 +111,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
         <Form.Item
           name="notes"
           label={notesType.find((note) => note.value === currentTab)?.label}
-          rules={[{ required: true, message: "Please enter notes" }]}
+          rules={[{ message: "Please enter notes" }]}
         >
           <TextArea placeholder="Enter notes..." autoSize={{ minRows: 3 }} />
         </Form.Item>
