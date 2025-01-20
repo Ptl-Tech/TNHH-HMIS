@@ -46,7 +46,7 @@ const ECTScan = () => {
         style={{ color: "#0F5689" }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
-        ETC Request
+        ECT Request
       </Typography.Title>
       </div>
       <div style={{ display: "flex", gap: "10px"}}>
@@ -56,7 +56,7 @@ const ECTScan = () => {
           onClick={() => setShowForm(!showForm)}
           icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
         >
-          {!showForm ? " New ETC Request" : "View ETC Requests"}
+          {!showForm ? " New ECT Request" : "View ECT Requests"}
         </Button>
              
       </div>

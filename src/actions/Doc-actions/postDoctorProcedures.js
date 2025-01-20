@@ -67,7 +67,7 @@ export const postPatientECTRequest = (prescription) => async (dispatch, getState
      dispatch({ type: POST_PATIENT_ETC_REQUEST_SUCCESS, payload: responseData });
 
     if (responseData.status === "success") {
-      message.success("Patient ETC Requested Successfully");
+      message.success("Patient ECT Requested Successfully");
     }
    }, 2000);
 
@@ -122,7 +122,7 @@ export const postPatientImplantRequest = (prescription) => async (dispatch, getS
        dispatch({ type: POST_PATIENT_IMPLANT_REQUEST_SUCCESS, payload: responseData });
   
       if (responseData.status === "success") {
-        message.success("Patient ETC Requested Successfully");
+        message.success("Patient ECT Requested Successfully");
       }
      }, 2000);
   
@@ -177,7 +177,7 @@ export const postPatientKetamineRequest = (prescription) => async (dispatch, get
        dispatch({ type: POST_PATIENT_KETAMINE_REQUEST_SUCCESS, payload: responseData });
   
       if (responseData.status === "success") {
-        message.success("Patient ETC Requested Successfully");
+        message.success("Patient ECT Requested Successfully");
       }
      }, 2000);
   

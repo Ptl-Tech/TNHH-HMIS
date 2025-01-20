@@ -101,12 +101,12 @@ const DoctorDashboard = () => {
 
     {
       title: "Consultation Room",
-      value: treatmentList?.filter((item) => item.Status === "Pending")?.length,
+      value: treatmentList?.filter((item) => item.Status === "Active")?.length,
       subtitle: "Increase in 30 days",
       icon: <SafetyOutlined />,
       color: "#000",
       backgroundColor: "#ac8342",
-      link: "/Doctor/PendingTreatmentList",
+      link: "/Doctor/Consultation-List",
     },
     {
       title: "Inpatients List",
