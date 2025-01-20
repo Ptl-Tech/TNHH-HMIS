@@ -141,9 +141,9 @@ const EvaluatePatientInTriage = () => {
                           <Tabs.TabPane tab="Allergies and Medication" key="2">
                               <AllergyAndMedication observationNumber={observationNo} patientNumber={patientNo} staffNo={staffNo} />
                           </Tabs.TabPane>
-                          <Tabs.TabPane tab="Injections" key="3">
+                          {/* <Tabs.TabPane tab="Injections" key="3">
                               <Injections observationNumber={observationNo} staffNo={staffNo}/>
-                          </Tabs.TabPane>
+                          </Tabs.TabPane> */}
                           <Tabs.TabPane tab="Dressings" key="4">
                               <Dressing observationNumber={observationNo}  staffNo={staffNo}/>
                           </Tabs.TabPane>

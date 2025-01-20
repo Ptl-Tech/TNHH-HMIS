@@ -258,7 +258,7 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                           }
                   
                           // Ensure value is a valid percentage
-                          const percentageMatch = value.match(/^(\d{1,2}|100)%$/);
+                          const percentageMatch = value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error('SPO2 must be a valid percentage (e.g., 98%).')

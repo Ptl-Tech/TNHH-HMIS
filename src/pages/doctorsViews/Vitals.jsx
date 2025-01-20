@@ -367,7 +367,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
 
                           // Ensure value is a valid percentage
                           const percentageMatch =
-                            value.match(/^(\d{1,2}|100)%$/);
+                            value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error(
