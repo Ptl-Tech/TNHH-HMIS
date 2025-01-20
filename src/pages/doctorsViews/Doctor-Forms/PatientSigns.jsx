@@ -34,6 +34,8 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     9: data.filter((note) => note.Notes_Type === "Premorbid Personality").at(-1)?.Notes || "",
   }), [data]);
 
+  console.log('data', data);
+
 
   //tracking last saved notes
   const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
@@ -73,11 +75,22 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       key: "3",
       title: "Past Psychiatric and Medical History",
       content: (
-        <Form.Item name="5" label="Past Psychiatric and Medical History" rules={[{ required: true }]}>
-          <TextArea placeholder="Enter past psychiatric and medical history..." autoSize={{ minRows: 4 }} />
-        </Form.Item>
+        <>
+          <Form.Item name="5" label="Past Psychiatric and Medical History" rules={[{ required: true }]}>
+            <TextArea placeholder="Enter past psychiatric and medical history..." autoSize={{ minRows: 4 }} />
+          </Form.Item>
+          <Form.Item name="10" label="Medical" rules={[{ required: true }]}>
+          <TextArea placeholder="Enter past medical notes..." autoSize={{ minRows: 4 }} />
+          </Form.Item>
+          <Form.Item name="11" label="Surgical" rules={[{ required: true }]}>
+          <TextArea placeholder="Enter past surgical history notes..." autoSize={{ minRows: 4 }} />
+          </Form.Item>
+          <Form.Item name="12" label="Gynecology" rules={[{ required: true }]}>
+          <TextArea placeholder="Enter past gynecology notes..." autoSize={{ minRows: 4 }} />
+          </Form.Item>
+        </>
       ),
-      notesType: ["5"],
+      notesType: ["5", "10", "11", "12"],
 
     },
     {

@@ -97,7 +97,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
     { label: "Patient History Notes", icon: <SolutionOutlined /> },
     { label: "Physical Examination", icon: <HeartOutlined /> },
     { label: "Mental Status Exam", icon: <SolutionOutlined /> },
-    { label: "Past Medical History", icon: <SolutionOutlined /> },
+    // { label: "Past Medical History", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
