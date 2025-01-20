@@ -4,8 +4,11 @@ import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../../../hooks/useAuth";
 
 const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, loading, searchName, searchPatientNumber, searchAdmissionNumber }) => {
+
+  const role = useAuth().userData.departmentName
 
     const columns = [
         {
@@ -58,12 +61,16 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
           render: (ward, record) =>
             ward ? (
               ward
-            ) : (
-              <Button variant="link" style={{ color: "red", textDecoration: "none" }} onClick={handleClick(record)}>
+            ) : role === "Nurse" ? (
+              <Button
+                variant="link"
+                style={{ color: "red", textDecoration: "none" }}
+                onClick={() => handleClick(record)}
+              >
                 <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
                 <span>Assign Ward</span>
               </Button>
-            ),
+            ) : <span style={{ color: "#0f5689"}}>Not yet assigned</span>, // Renders nothing for roles other than Nurse
         },
         {
           title: "Bed",
@@ -72,12 +79,16 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
           render: (bed, record) =>
             bed ? (
               bed
-            ) : (
-              <Button variant="link" style={{ color: "red", textDecoration: "none" }} onClick={handleClick(record)}>
+            ) : role === "Nurse" ? (
+              <Button
+                variant="link"
+                style={{ color: "red", textDecoration: "none" }}
+                onClick={() => handleClick(record)}
+              >
                 <ExclamationCircleOutlined style={{ color: "red", marginRight: 8 }} />
-                <span>Assign Bed</span>
+                <span>Assign Ward</span>
               </Button>
-            ),
+            ) : <span style={{ color: "#0f5689"}}>Not yet assigned</span>, // Renders nothing for roles other than Nurse
         },
         {
           title: "Doctor",
@@ -98,7 +109,8 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
 
       const navigate = useNavigate();
       const handleClick = (record) => {
-        record?.PatientNo && navigate(`/Nurse/Admit-patient/Patient?PatientNo=${record?.PatientNo}`, {
+        console.log('records from the table', record)
+        record?.Patient_No && navigate(`/Nurse/Admit-patient/Patient?PatientNo=${record?.Patient_No}`, {
           state: { patientDetails: record }
         });
       }
