@@ -22,27 +22,31 @@ const DoctorDashboard = () => {
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
   );
-  const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New"
-  );
+
   // Fetch data when the component loads
   useEffect(() => {
     dispatch(getPatientListSlice());
     dispatch(getTriageWaitingList());
   }, [dispatch]);
 
-  // Selectors to access Redux state
+  // Optimized treatment list calculations
+  const openDoctorVisitList = treatmentList?.filter(
+    (item) => item.Status === "New"
+  );
+  const activeVisitCount = treatmentList?.filter(
+    (item) => item.Status === "Active"
+  )?.length;
+  const closedVisitCount = treatmentList?.filter(
+    (item) => item.Status === "Completed"
+  )?.length;
 
   // Filters for inpatients and outpatients
   const filterInPatients =
-  patients?.filter((item) => item.Inpatient === true) || [];
+    patients?.filter((item) => item.Inpatient === true) || [];
   const filterOutPatients =
-  patients?.filter((item) => item.Inpatient === false) || [];
-  const openTreatmentList = treatmentList?.filter(
-    (item) => item?.Status === "New"
-  );
-  // Combine treatment list with outpatient list
+    patients?.filter((item) => item.Inpatient === false) || [];
 
+  // Combine treatment list with outpatient list
   const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
     SearchName: patient.SearchName,
@@ -86,8 +90,7 @@ const DoctorDashboard = () => {
     }))
     .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-
-  // Card data for the dashboard
+  // Updated card data for the dashboard
   const cardData = [
     {
       title: "OP Waiting List",
@@ -98,15 +101,23 @@ const DoctorDashboard = () => {
       backgroundColor: "#0f5689",
       link: "/Doctor/Consultation-List",
     },
-
     {
       title: "Consultation Room",
-      value: treatmentList?.filter((item) => item.Status === "Pending")?.length,
-      subtitle: "Increase in 30 days",
+      value: activeVisitCount, // Use optimized count
+      subtitle: "Active Consultations",
       icon: <SafetyOutlined />,
       color: "#000",
       backgroundColor: "#ac8342",
-      link: "/Doctor/PendingTreatmentList",
+      link: "/Doctor/PendingConsultationList",
+    },
+    {
+      title: "Closed Consultations",
+      value: closedVisitCount, // New card for closed visits
+      subtitle: "Completed Consultations",
+      icon: <UserOutlined />,
+      color: "#000",
+      backgroundColor: "#5c85d6",
+      link: "/Doctor/ClosedConsultationList",
     },
     {
       title: "Inpatients List",
@@ -115,6 +126,7 @@ const DoctorDashboard = () => {
       icon: <UserAddOutlined />,
       color: "#000",
       backgroundColor: "#b0afaf",
+      link: "/Doctor/Inpatient",
     },
   ];
 

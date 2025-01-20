@@ -1,27 +1,27 @@
-import { Badge, Button, Card, message, Table } from "antd";
+import { Badge, Button, Card, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { CheckOutlined, SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import { listPatients } from "../../actions/patientActions";
-import Loading from "../../partials/nurse-partials/Loading";
-import ConsultationRoomSummeryCard from "./ConsultationRoomSummeryCard";
+import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
+import { listPatients } from "../../../actions/patientActions";
+import Loading from "../../../partials/nurse-partials/Loading";
+import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
 import Search from "antd/es/transfer/search";
-import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import {
   getColorByWaitingTreatmentTime,
   getUrgencyColorcode,
   rowClassName,
-} from "../../utils/helpers";
+} from "../../../utils/helpers";
 import { render } from "react-dom";
-import { postCheckInPatient } from "../../actions/Doc-actions/postCheckInPatient";
-const DoctorVisits = () => {
+const ConsultationRoomPatients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
+  const currentDate = new Date();
 
   const [searchParams, setSearchParams] = useState({
     name: "",
@@ -29,14 +29,12 @@ const DoctorVisits = () => {
     treatmentNo: "",
     urgency: "",
   });
-const[loading, setLoading]= useState(false)
+
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
-    const { loadingCheInPatient: checkInLoading } =
-    useSelector((state) => state.checkInConsulation);
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
@@ -44,27 +42,24 @@ const[loading, setLoading]= useState(false)
   useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
-
-  const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New"
-  );
+ 
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Closed"
+    (item) => item.Status === "Active" 
   );
 
-  const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
+  const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
     SearchName: patient.SearchName,
     IDNumber: patient.IDNumber,
     Age: patient.AgeinYears,
     PatientType: patient.PatientType,
     Inpatient: patient.Inpatient, 
-  }));
-  console.log("patient details",openDoctorVisitListWithPatientDetails);
 
-  const combinedList = openDoctorVisitList.map((room) => {
-    const matchingPatient = openDoctorVisitListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo 
+  }));
+
+  const combinedList = closedConsultationList.map((room) => {
+    const matchingPatient = closedConsultationListWithPatientDetails.find(
+      (patient) => patient.PatientNo === room.PatientNo
     );
 
     return {
@@ -75,9 +70,11 @@ const[loading, setLoading]= useState(false)
       Age: matchingPatient ? matchingPatient.Age : "",
       PatientType: matchingPatient ? matchingPatient.PatientType : "",
       Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
+
     };
   });
 
+ 
   const waitingListTableDataSource = combinedList
   .filter((item) => item.Inpatient !== true)
   ?.map((item, index) => ({
@@ -93,10 +90,11 @@ const[loading, setLoading]= useState(false)
     patientType: item?.PatientType,
     urgency: item?.UrgencyStatus,
     Inpatient: item?.Inpatient,
+    Status: item?.Status,
   }))
   .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-  const [filteredPatients, setFilteredPatients] = useState("");
+  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -147,18 +145,15 @@ const[loading, setLoading]= useState(false)
       title: "Treatment No",
       dataIndex: "treatmentNo",
       key: "treatmentNo",
-      render: (_, record) => {
-        const { color } = getUrgencyColorcode(record.urgency)
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
-            className="fw-bold"
-            style={{ color: color }}
-          >
-            {record.treatmentNo}
-          </span>
-        )
-      }
+      render: (text) => (
+        <span
+          onClick={() => handleNavigate(text, text.treatmentNo)}
+          className="fw-bold"
+          style={{ color: "green" }}
+        >
+          {text}
+        </span>
+      ),
     },
     {
       title: "Patient Name",
@@ -229,34 +224,30 @@ const[loading, setLoading]= useState(false)
         return <span>{record.age} years</span>;
       },
     },
+
     // {
-    //   title:"Inpatient",
-    //   dataIndex: "Inpatient",
-    //   key: "Inpatient",
+    //   title: "Urgency",
+    //   dataIndex: "urgency",
+    //   key: "urgency",
     //   render: (_, record) => {
-    //     return <span>{record.Inpatient ? "Yes" : "No"}</span>;
+    //     const { color, text } = getUrgencyColorcode(record.urgency);
+    //     return (
+    //       <Badge
+    //         color={color}
+    //         text={text} // Display urgency text
+    //         style={{ color: color }}
+    //       />
+    //     );
     //   },
     // },
-
     {
-      title: "Urgency",
-      dataIndex: "urgency",
-      key: "urgency",
+      title: "Completion Status",
+      dataIndex: "Status",
+      key: "Status",
       render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.urgency);
-        return (
-          <Badge
-            color={color}
-            text={text} // Display urgency text
-            className="fw-bold"
-            style={{ 
-              color: color,
-            }}
-          />
-        );
+        return <span className="fw-bold text-danger">{record.Status} </span>;
       },
     },
-
     {
       title: "Check In",
       key: "checkIn",
@@ -272,21 +263,13 @@ const[loading, setLoading]= useState(false)
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    dispatch(postCheckInPatient(treatmentNo)).then((data)=>{
-      if(data.status==='success'){
-        message.success('Patient checked in to the Consultation Room ')
-        navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
-          state: {
-            patientNo: record.patientNo,
-            observationNo: record.observationNo,
-            patientDetails: record,
-          },
-        });
-      }else{
-        message.error('An error occurred, please try again')
-      }
-    })
-   
+    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
+        state: {
+          patientNo: record.patientNo,
+          observationNo: record.observationNo,
+          patientDetails: record,
+        },
+      });
   };
 
   return (
@@ -294,7 +277,7 @@ const[loading, setLoading]= useState(false)
       <ConsultationRoomSummeryCard
         waitingPatient={waitingListTableDataSource}
         currentPath={currentPath}
-        closedConsultationList={closedConsultationList}
+        closedConsultationList={waitingListTableDataSource}
       />
       <Card
         style={{
@@ -339,14 +322,14 @@ const[loading, setLoading]= useState(false)
           />
         </div>
       </Card>
-      {loading ? (
+      {treatmentListLoading ? (
         <Loading />
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={waitingListTableDataSource}
+          dataSource={filteredPatients}
           bordered
-          size="middle"
+          size="small"
           rowClassName={rowClassName} // Apply the row color
           pagination={{
             position: ["bottom", "right"],
@@ -362,4 +345,4 @@ const[loading, setLoading]= useState(false)
 };
 
 
-export default DoctorVisits;
+export default ConsultationRoomPatients;

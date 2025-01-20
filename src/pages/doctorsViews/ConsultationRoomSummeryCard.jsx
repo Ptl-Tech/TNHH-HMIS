@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Typography } from "antd";
-import { HourglassOutlined, StopOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
@@ -16,11 +16,11 @@ const ConsultationRoomSummeryCard = ({ currentPath, waitingPatient }) => {
   const openConsultationList =waitingPatient?.filter(
     (item) => item.Status === "New" 
   );
-  const pendingConsultationList = treatmentList.filter(
-    (item) => new Date(item.TreatmentDate) <= currentDate && item.TreatmentDate !== null
+  const pendingConsultationList =treatmentList?.filter(
+    (item) => item.Status === "Active" 
   );
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Dispatched" 
+    (item) => item.Status === "Completed" 
   );
 
   const cardData = [
@@ -30,6 +30,13 @@ const ConsultationRoomSummeryCard = ({ currentPath, waitingPatient }) => {
       title: "OP Waiting List",
       link: "/Doctor/Consultation-List",
       count: waitingPatient.length,
+    },
+    {
+      backgroundColor: "orange",
+      icon: <ClockCircleOutlined />,
+      title: "In Consultation",
+      link: "/Doctor/PendingConsultationList",
+      count: pendingConsultationList.length,
     },
     {
       backgroundColor: "#0f5689",

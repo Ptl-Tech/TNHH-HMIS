@@ -79,6 +79,7 @@ import ConsultationCard from "./pages/nurse-view/ConsultationCard";
 import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 import ReadDoctorNotes from "./pages/ReadDoctorNotes";
+import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
 
 function App() {
   return (
@@ -203,6 +204,10 @@ function App() {
           <Route
             path="/Doctor/ClosedConsultationList"
             element={<CloseList />}
+          />
+            <Route
+            path="/Doctor/PendingConsultationList"
+            element={<ConsultationRoomPatients />}
           />
 
           <Route

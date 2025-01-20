@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Card, Typography, Avatar, Button } from "antd";
+import { Card, Typography, Avatar, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
 import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
@@ -8,15 +8,17 @@ import { postInterimInvoice } from "../../../actions/Charges-Actions/printInteri
 import { listDoctors } from "../../../actions/DropdownListActions";
 import { getConsultationRoomListSlice } from "../../../actions/nurse-actions/getConsultationRoomSlice";
 import { getSingleConsultationRoomReducer } from "../../../reducers/nurse-reducers/getConsultationRoomReducer";
+import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, role }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
-
-
+  
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
+    const { loadingCheInPatient: markasCompleteLoading, error } =
+    useSelector((state) => state.markAsCompleted);
 
   // const {consultationRoomDetails, loadingConsultationRoomDetails} = useSelector((state) => state.getSingleConsultationRoom)
 
@@ -57,6 +59,24 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, ro
 
     dispatch(postInterimInvoice(invoiceData));
   };
+
+
+  const handleMarkAsCompleted = () => {
+    dispatch(postMarkasCompleted(treatmentNo))
+      .then((data) => {
+        if (data?.status === "success") {
+          message.success("Patient has been Marked as completed");
+        } else {
+          message.error("Failed to mark as completed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error marking as completed:", error);
+        message.error("An error occurred. Please try again.");
+      });
+  };
+  
+
   return (
     <div
       style={{
@@ -228,7 +248,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, ro
               <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
                 <Button
                   type="primary"
-                  onClick={() => handleMarkAsCompleted(observationNo)}
+                  onClick={handleMarkAsCompleted}
                   style={{ width: "100%", marginBottom: "10px" }}
                 >
                   Mark as Completed

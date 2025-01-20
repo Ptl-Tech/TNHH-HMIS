@@ -44,7 +44,7 @@ const CloseList = () => {
   }, [dispatch]);
  
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Dispatched" 
+    (item) => item.Status === "Completed" 
   );
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
@@ -90,6 +90,7 @@ const CloseList = () => {
     patientType: item?.PatientType,
     urgency: item?.UrgencyStatus,
     Inpatient: item?.Inpatient,
+    Status: item?.Status,
   }))
   .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
@@ -224,22 +225,29 @@ const CloseList = () => {
       },
     },
 
+    // {
+    //   title: "Urgency",
+    //   dataIndex: "urgency",
+    //   key: "urgency",
+    //   render: (_, record) => {
+    //     const { color, text } = getUrgencyColorcode(record.urgency);
+    //     return (
+    //       <Badge
+    //         color={color}
+    //         text={text} // Display urgency text
+    //         style={{ color: color }}
+    //       />
+    //     );
+    //   },
+    // },
     {
-      title: "Urgency",
-      dataIndex: "urgency",
-      key: "urgency",
+      title: "Completion Status",
+      dataIndex: "Status",
+      key: "Status",
       render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.urgency);
-        return (
-          <Badge
-            color={color}
-            text={text} // Display urgency text
-            style={{ color: color }}
-          />
-        );
+        return <span className="fw-bold text-danger">{record.Status} </span>;
       },
     },
-
     {
       title: "Check In",
       key: "checkIn",
@@ -320,7 +328,7 @@ const CloseList = () => {
           columns={waitingListColumns}
           dataSource={filteredPatients}
           bordered
-          size="middle"
+          size="small"
           rowClassName={rowClassName} // Apply the row color
           pagination={{
             position: ["bottom", "right"],

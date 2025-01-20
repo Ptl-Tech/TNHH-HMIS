@@ -21,7 +21,6 @@ const { TextArea } = Input;
 
 const PatientSymptoms = ({ treatmentNo }) => {
   const { data } = useSelector((state) => state.getPatientMSE);
-  
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -29,9 +28,13 @@ const PatientSymptoms = ({ treatmentNo }) => {
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
 
+  console.log("Query Params:", queryParams.toString()); // View all query params
+console.log("Extracted PatientNo:", patientNo); // Check the extracted value
+
+
   const categories = [
     { step: 0, panels: ["APPEARANCE", "SPEECH"] },
-    { step: 1, panels: ["ATTITUDE", "FORM OF THOUGHT"] },
+    { step: 1, panels: ["FORM OF THOUGHT", "THOUGHT CONTENT"] },
     { step: 2, panels: ["SENSORIUM", "MEMORY"] },
     { step: 3, panels: ["JUDGEMENT", "INSIGHT"] },
   ];
@@ -42,12 +45,11 @@ const PatientSymptoms = ({ treatmentNo }) => {
     }
   }, [dispatch, patientNo]);
 
-  // Memoize initial values based on Redux data
   const initialValues = useMemo(() => {
     const initial = {};
     data.forEach((note) => {
       if (note.Category && note.Comments) {
-        initial[note.Category.toLowerCase()] = note.Comments; // Map category to form field name
+        initial[note.Category.toLowerCase().replace(/ /g, "_")] = note.Comments; // Map category to form field name
       }
     });
     return initial;
@@ -55,8 +57,6 @@ const PatientSymptoms = ({ treatmentNo }) => {
 
   const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
 
-
-  // Update form field values when patient data is fetched
   useEffect(() => {
     if (initialValues) {
       setLastSavedNotes(initialValues);
@@ -69,22 +69,21 @@ const PatientSymptoms = ({ treatmentNo }) => {
       const values = form.getFieldsValue();
       const currentCategory = categories[currentStep];
 
-      const notesToSave = Object.keys(values)
-        .map((key, index) => {
-          if (lastSavedNotes[key] !== values[key]?.trim()) {
-            return {
-              myAction: "create",
-              recId: "",
-              patientNo: patientNo,
-              date: moment().format("YYYY-MM-DD"),
-              category: currentCategory.panels[index] || "",
-              descriptor: currentCategory.panels[index] || "",
-              comments: values[key]?.trim() || "",
-            };
-          }
-          return null;
-        })
-        .filter(Boolean);
+      const notesToSave = currentCategory.panels.map((panel) => {
+        const fieldName = panel.toLowerCase().replace(/ /g, "_");
+        if (lastSavedNotes[fieldName] !== values[fieldName]?.trim()) {
+          return {
+            myAction: "create",
+            recId: "",
+            patientNo: patientNo,
+            date: moment().format("YYYY-MM-DD"),
+            category: panel,
+            descriptor: panel,
+            comments: values[fieldName]?.trim() || "",
+          };
+        }
+        return null;
+      }).filter(Boolean);
 
       if (notesToSave.length > 0) {
         const responses = await Promise.all(
@@ -102,8 +101,8 @@ const PatientSymptoms = ({ treatmentNo }) => {
     }
   };
 
-  const handleNext = async () => {
-    // await saveNotes();
+  const handleNext = () => {
+    saveNotes();
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -111,12 +110,6 @@ const PatientSymptoms = ({ treatmentNo }) => {
     setCurrentStep((prev) => prev - 1);
   };
 
-  const handleSubmit = async () => {
-    await saveNotes();
-    message.success("Form submission complete!");
-    form.resetFields();
-    setCurrentStep(0);
-  };
   return (
     <div className="mt-4">
       <Typography.Text
@@ -129,19 +122,15 @@ const PatientSymptoms = ({ treatmentNo }) => {
       >
         <FileOutlined /> MSE Form
       </Typography.Text>
-      <Steps
-        current={currentStep}
-        size="small"
-        style={{ marginBottom: 24, marginTop: 24 }}
-      >
+      <Steps current={currentStep} size="small" style={{ marginBottom: 24, marginTop: 24 }}>
         <Step title="Appearance & Speech" />
         <Step title="Mood & Thinking" />
         <Step title="Sensorium & Perception" />
         <Step title="Judgement & Insight" />
       </Steps>
 
-      <Form form={form} layout="vertical" >
-        {/* Step 1: Appearance & Speech */}
+      <Form form={form} layout="vertical">
+        {/* Step 1 */}
         {currentStep === 0 && (
           <Collapse defaultActiveKey={["1", "2"]}>
             <Panel header="Appearance" key="1">
@@ -150,21 +139,8 @@ const PatientSymptoms = ({ treatmentNo }) => {
                 label="Appearance (Personal Identification)"
                 rules={[{ required: true, message: "Please describe appearance!" }]}
               >
-                <TextArea
-                  placeholder="e.g., cooperative, attentive, hostile..."
-                  autoSize={{ minRows: 5}}
-                />
+                <TextArea placeholder="e.g., cooperative, attentive, hostile..." autoSize={{ minRows: 5 }} />
               </Form.Item>
-              {/* <Form.Item
-                name="behavior"
-                label="Behavior and Psychomotor Activity"
-                rules={[{ required: true, message: "Please describe behavior!" }]}
-              >
-                <TextArea
-                  placeholder="e.g., gait, mannerisms, tics..."
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item> */}
             </Panel>
             <Panel header="Speech" key="2">
               <Form.Item
@@ -172,103 +148,70 @@ const PatientSymptoms = ({ treatmentNo }) => {
                 label="Describe patient Speech Pattern"
                 rules={[{ required: true, message: "Please describe speech!" }]}
               >
-                <TextArea
-                  placeholder="e.g., rapid, slow, pressured..."
-                  autoSize={{ minRows: 5 }}
-                />
+                <TextArea placeholder="e.g., rapid, slow, pressured..." autoSize={{ minRows: 5 }} />
               </Form.Item>
             </Panel>
           </Collapse>
         )}
 
-               {/* Step 2: Mood & Thinking */}
+        {/* Step 2 */}
         {currentStep === 1 && (
-          <Collapse defaultActiveKey={["1"]} >
-            <Panel header="FORM OF THOUGHT" key="1">
+          <Collapse defaultActiveKey={["1", "2"]}>
+            <Panel header="Form of Thought" key="1">
               <Form.Item
-                name="mood"
-                label="Describe Patient Form of Thought."
-                rules={[{ required: true, message: "Please describe mood!" }]}
+                name="form_of_thought"
+                label="Describe Patient Form of Thought"
+                rules={[{ required: true, message: "Please describe Form of Thought!" }]}
               >
-                <TextArea
-                  placeholder="e.g., thoughts, dreams, memories..."
-                  autoSize={{ minRows: 6 }}
-                />
+                <TextArea placeholder="e.g., logical, fragmented..." autoSize={{ minRows: 5 }} />
               </Form.Item>
+            </Panel>
+            <Panel header="Thought Content" key="2">
               <Form.Item
-                name="mood"
-                label="THOUGHT CONTENT"
-                rules={[{ required: true, message: "Please decribe patient Thought Content!" }]}
+                name="thought_content"
+                label="Describe Patient Thought Content"
+                rules={[{ required: true, message: "Please describe Thought Content!" }]}
               >
-                <TextArea
-                  placeholder="e.g., thoughts, dreams, memories..."
-                  autoSize={{ minRows: 6 }}
-                />
+                <TextArea placeholder="e.g., delusions, hallucinations..." autoSize={{ minRows: 5 }} />
               </Form.Item>
             </Panel>
           </Collapse>
         )}
 
-        {/* Step 3: Sensorium & Perception */}
+        {/* Step 3 */}
         {currentStep === 2 && (
           <Collapse defaultActiveKey={["1"]}>
             <Panel header="Sensorium" key="1">
               <Form.Item
-                name="alertness"
-                label="Alertness"
-                rules={[
-                  { required: true, message: "Please describe alertness!" },
-                ]}
+                name="sensorium"
+                label="Sensorium"
+                rules={[{ required: true, message: "Please describe sensorium!" }]}
               >
-                <TextArea
-                  placeholder="e.g., attention span, GCS..."
-                  autoSize={{ minRows: 5 }}
-                />
+                <TextArea placeholder="e.g., orientation, perception..." autoSize={{ minRows: 5 }} />
               </Form.Item>
             </Panel>
           </Collapse>
         )}
 
-        {/* Step 4: Judgement & Insight */}
+        {/* Step 4 */}
         {currentStep === 3 && (
           <Collapse defaultActiveKey={["1"]}>
             <Panel header="Judgement & Insight" key="1">
               <Form.Item
                 name="judgement"
                 label="Judgement"
-                rules={[
-                  { required: true, message: "Please describe judgement!" },
-                ]}
+                rules={[{ required: true, message: "Please describe judgement!" }]}
               >
-                <TextArea
-                  placeholder="e.g., social, test judgement..."
-                  autoSize={{ minRows: 5 }}
-                />
+                <TextArea placeholder="e.g., decision-making ability..." autoSize={{ minRows: 5 }} />
               </Form.Item>
             </Panel>
           </Collapse>
         )}
 
-
-<div className="d-block d-md-flex gap-4 justify-content-end align-items-center" style={{ marginTop: 20 }}>
-          <Button type="primary" style={{ marginRight: 8 }} onClick={saveNotes}>
-            Save
-          </Button>
-          {currentStep > 0 && (
-            <Button style={{ marginRight: 8 }} onClick={handlePrev}>
-              Previous
-            </Button>
-          )}
-          {currentStep < 3 && (
-            <Button type="primary" onClick={handleNext}>
-              Next
-            </Button>
-          )}
-          {/* {currentStep === 3 && (
-            <Button type="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          )} */}
+        <div className="d-flex justify-content-end gap-3" style={{ marginTop: 20 }}>
+          {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
+          {currentStep < 3 && <Button type="primary" onClick={handleNext}>Next</Button>}
+          {currentStep === 3 && <Button type="primary" onClick={saveNotes}>Finish</Button>}
         </div>
       </Form>
     </div>
