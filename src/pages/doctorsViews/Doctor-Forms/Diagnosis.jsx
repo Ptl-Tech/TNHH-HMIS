@@ -99,6 +99,12 @@ const Diagnosis = () => {
   };
   const handleClose = () => {
     setIsModalVisible(false); // Close the modal by updating state
+     //reset the diagnosis list
+     if (activeTab === "1") {
+      setPrimaryDiagnosisList([]);
+    } else if (activeTab === "2") {
+      setSecondaryDiagnosisList([]);
+    }
   };
 
   const handleSave = async () => {
@@ -195,6 +201,14 @@ const Diagnosis = () => {
           message.error(`Error saving diagnosis: ${diagnosis.diagnosisCode}`);
         } else {
           message.success(`Diagnosis saved successfully: ${diagnosis.diagnosisCode}`);
+          // Reset the input field
+          setDiagnosisInput("");
+          //reset the diagnosis list
+          if (activeTab === "1") {
+            setPrimaryDiagnosisList([]);
+          } else if (activeTab === "2") {
+            setSecondaryDiagnosisList([]);
+          }
         }
       }
   

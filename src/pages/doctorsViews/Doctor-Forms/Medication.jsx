@@ -41,37 +41,44 @@ const Medication = () => {
       </Typography.Title>
       </div>
       <div style={{ display: "flex", gap: "10px"}}>
-      {
-          !showForm && (
-            <Button
+      <Button
               type="primary"
               icon={<SendOutlined />}
               loading={pharmacyPosting}
               onClick={handleSendToPharmacy}
+// disabled={!selectedRow}
+
             >
               Send to Pharmacy
             </Button>
-          )
-        }
 
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
           icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
         >
+          
           {!showForm ? " New Prescription" : "View Prescriptions"}
         </Button>
              
       </div>
       </div>
-      
+
       {
+        !showForm ? (
+          <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
+        ): (
+          <PrescriptionForm setShowForm={setShowForm}/>
+        )
+      }
+      
+      {/* {
         !showForm ? (
           <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
         ) : (
           <PrescriptionForm setShowForm={setShowForm}/>
         )
-      }
+      } */}
       
     </div>
   )

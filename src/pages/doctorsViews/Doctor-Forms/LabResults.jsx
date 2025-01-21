@@ -23,6 +23,7 @@ import {
   FileTextOutlined,
   SaveOutlined,
   PlusOutlined,
+  OrderedListOutlined,
 } from "@ant-design/icons";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
@@ -219,9 +220,9 @@ const LabResults = () => {
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+          icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
         >
-          {!showForm ? " New Request" : "View History"}
+          {!showForm ? " New Request" : "View List"}
         </Button>
       </div>
         </div>
@@ -254,6 +255,7 @@ const LabResults = () => {
                   style={{ width: "100%" }}
                   onChange={(date) => handleFieldChange("dueDate", date)}
                   inputReadOnly // Make the input readonly
+                  size="large"
                 />
               </Form.Item>
             </Col>
@@ -272,6 +274,7 @@ const LabResults = () => {
                   filterOption={(input, option) =>
                     option?.children?.toLowerCase().includes(input.toLowerCase())
                   }
+                   size="large"
                 >
                   {labTestSetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>

@@ -114,6 +114,14 @@ const CreateVisitForm = () => {
     }
   }, [doctorsPayload, newVisit.clinic]);
   const savepatientVisit = async () => {
+    if (!newVisit.clinic) {
+      message.error("Please select a clinic before saving the visit.");
+      return;
+    }
+    if (!newVisit.doctor) {
+      message.error("Please select a doctor before saving the visit.");
+      return;
+    }
     try {
       // Step 2: Create Triage Visit
       const visitData = {
@@ -155,6 +163,14 @@ const CreateVisitForm = () => {
   };
 
   const dispatchPatient = async (appointmentId) => {
+    if (!newVisit.clinic) {
+      message.error("Please select a clinic before dispatching the patient.");
+      return;
+    }
+    if (!newVisit.doctor) {
+      message.error("Please select a doctor before dispatching the patient.");
+      return;
+    }
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
@@ -316,6 +332,7 @@ const CreateVisitForm = () => {
                       filterOption={(input, option) =>
                         option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                       }
+                      disabled={!newVisit.clinic}
                     >
                       <Select.Option value="">--Select Doctor--</Select.Option>
                       {filteredDoctors &&

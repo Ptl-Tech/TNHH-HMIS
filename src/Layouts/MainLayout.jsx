@@ -63,7 +63,7 @@ const MainLayout = () => {
         children: [
           {
             key: "/reception/Patient-list",
-            label: "OutPatient List",
+            label: "Patient List",
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
           },
           {

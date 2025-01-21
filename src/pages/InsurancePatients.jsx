@@ -73,9 +73,9 @@ const InsurancePatients = () => {
     return {
       ...patient,
       PatientNo: patient.PatientNo,
-      Balance: matchingPatient?.Balance,      
-      OpenInsuranceBalance:matchingPatient?.Open_Insurance_Amount,
-      Inpatient:matchingPatient?.Inpatient
+      Balance: matchingPatient?.Balance ?? 0, // Default to 0 if Balance is undefined
+    OpenInsuranceBalance: matchingPatient?.Open_Insurance_Amount ?? 0,
+      Inpatient:matchingPatient?.Inpatient??false
     };
 
   });
@@ -256,8 +256,11 @@ const InsurancePatients = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
-      render: (text) => `KSh ${text.toFixed(2)}`,
-    },
+      render: (text) => {
+        const balance = text !== undefined && text !== null ? text : 0; // Default to 0 if undefined or null
+        return `KSh ${balance.toFixed(2)}`;
+      },
+    },    
     {
       title: "Actions",
       key: "actions",
@@ -334,8 +337,12 @@ const InsurancePatients = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
-      render: (text) => `KSh ${text.toFixed(2)}`,
-    },
+      render: (text) => {
+        const balance = text !== undefined && text !== null ? text : 0; // Default to 0 if undefined or null
+        return `KSh ${balance.toFixed(2)}`;
+      },
+    }
+    ,
     {
       title: "Actions",
       key: "actions",

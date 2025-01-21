@@ -1,6 +1,7 @@
 import { Table } from "antd"
 import Loading from "../../../partials/nurse-partials/Loading"
 import PropTypes from "prop-types"
+import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable"
 
 
 const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
@@ -85,26 +86,34 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
         loadingPrescriptions ? (
           <Loading />
         ) : (
-          <Table
-            rowKey={(record, index) => (record.ObservationNo || '') + '-' + index}
-            scroll={{ x: 'max-content' }}
-            columns={columns}
-            dataSource={filteredPrescriptions}
-            bordered size='middle'
-          // pagination={{
-          // ...pagination,
-          // total: filterAllergies?.length,
-          // showSizeChanger: true,
-          // showQuickJumper: true,
-          // position: ['bottom', 'right'],
-          // showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-          // onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
-          // onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
-          // style: {
-          // marginTop: '30px',
-          //     }
-          // }}
-          />
+
+<RowSelectionTable
+columns={columns}
+dataSource={filteredPrescriptions}
+onRowSelect={handleEdit}
+
+/>
+
+          // <Table
+          //   rowKey={(record, index) => (record.ObservationNo || '') + '-' + index}
+          //   scroll={{ x: 'max-content' }}
+          //   columns={columns}
+          //   dataSource={filteredPrescriptions}
+          //   bordered size='middle'
+          // // pagination={{
+          // // ...pagination,
+          // // total: filterAllergies?.length,
+          // // showSizeChanger: true,
+          // // showQuickJumper: true,
+          // // position: ['bottom', 'right'],
+          // // showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+          // // onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+          // // onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+          // // style: {
+          // // marginTop: '30px',
+          // //     }
+          // // }}
+          // />
         )
       }
     </div>

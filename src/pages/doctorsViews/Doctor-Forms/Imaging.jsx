@@ -13,7 +13,7 @@ import {
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FileTextOutlined, EyeOutlined, PlusOutlined, SendOutlined } from "@ant-design/icons";
+import { FileTextOutlined, EyeOutlined, PlusOutlined, SendOutlined, OrderedListOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import { getRadiologySetup } from "../../../actions/Doc-actions/qyRadiologyTestSetups";
 import { postRadiologyRequest } from "../../../actions/Doc-actions/postRadiolgyRequest";
@@ -168,9 +168,9 @@ const Imaging = () => {
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <EyeOutlined /> : <PlusOutlined />}
+          icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
         >
-          {showForm ? "View Results" : "New Request"}
+          {showForm ? "View List" : "New Request"}
         </Button>
 
       </div>
@@ -205,19 +205,21 @@ const Imaging = () => {
                 label="Due Date"
                 rules={[{ required: true, message: "Please select a due date." }]}
               >
-                <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+                <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" size="large" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 name="testPackageCode"
-                label="Radiology Code"
+                label="Radiology Test Name"
                 rules={[{ required: true, message: "Please select a radiology code." }]}
               >
                 <Select placeholder="Select Radiology Code" showSearch
                   filterOption={(input, option) =>
                     option?.children?.toLowerCase().includes(input.toLowerCase())
-                  }>
+                  }
+                  size="large" 
+                  >
                   {radiologySetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>
                       {item.Description}
