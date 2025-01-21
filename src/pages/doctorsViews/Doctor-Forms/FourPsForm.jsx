@@ -11,7 +11,7 @@ const { TabPane } = Tabs;
 const { TextArea } = Input;
 
 const FourPsForm = ({ treatmentNo, patientNo }) => {
-  const [currentTab, setCurrentTab] = useState("20");
+  const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const docDetails = useAuth();
@@ -37,7 +37,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
     return {
       "12": data.find((item) => item.Notes_Type === "Predisposing Factors")?.Notes || "",
       "13": data.find((item) => item.Notes_Type === "Precipitating Factors")?.Notes || "",
-      "14": data.find((item) => item.Notes_Type === "Perpetuating Factor")?.Notes || "",
+      "14": data.find((item) => item.Notes_Type === "Perpetuating Factors")?.Notes || "",
       "15": data.find((item) => item.Notes_Type === "Protective Factors")?.Notes || "",
     };
   }, [data]);

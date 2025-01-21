@@ -27,11 +27,14 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
   const initialValues = useMemo(() => ({
     1: data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)?.Notes || "",
     2: data.filter((note) => note.Notes_Type === "Allegations").at(-1)?.Notes || "",
-    4: data.filter((note) => note.Notes_Type === "History of Presenting Complaint").at(-1)?.Notes || "",
-    7: data.filter((note) => note.Notes_Type === "Family History").at(-1)?.Notes || "",
+    3: data.filter((note) => note.Notes_Type === "History of Presenting Complaint").at(-1)?.Notes || "",
+    5: data.filter((note) => note.Notes_Type === "Past Psychiatric and Medical History").at(-1)?.Notes || "",
+    6: data.filter((note) => note.Notes_Type === "Family History").at(-1)?.Notes || "",
     personalHistory: data.filter((note) => note.Notes_Type === "Personal History").at(-1)?.Notes || "",
     8: data.filter((note) => note.Notes_Type === "Forensic History").at(-1)?.Notes || "",
     9: data.filter((note) => note.Notes_Type === "Premorbid Personality").at(-1)?.Notes || "",
+    10: data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes || "",
+    11: data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes || "",
   }), [data]);
 
   console.log('data', data);
@@ -76,21 +79,19 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       title: "Past Psychiatric and Medical History",
       content: (
         <>
-          <Form.Item name="5" label="Past Psychiatric and Medical History" rules={[{ required: true }]}>
-            <TextArea placeholder="Enter past psychiatric and medical history..." autoSize={{ minRows: 4 }} />
-          </Form.Item>
-          <Form.Item name="10" label="Medical" rules={[{ required: true }]}>
+          
+          <Form.Item name="10" label="Medical" >
           <TextArea placeholder="Enter past medical notes..." autoSize={{ minRows: 4 }} />
           </Form.Item>
-          <Form.Item name="11" label="Surgical" rules={[{ required: true }]}>
-          <TextArea placeholder="Enter past surgical history notes..." autoSize={{ minRows: 4 }} />
+          <Form.Item name="5" label="Past Psychiatric History" rules={[{ required: true }]}>
+            <TextArea placeholder="Enter past psychiatric History..." autoSize={{ minRows: 4 }} />
           </Form.Item>
-          <Form.Item name="12" label="Gynecology" rules={[{ required: true }]}>
-          <TextArea placeholder="Enter past gynecology notes..." autoSize={{ minRows: 4 }} />
+          <Form.Item name="11" label="Obstetric & Gynecology">
+          <TextArea placeholder="Enter past Obstetric & Gynecology notes..." autoSize={{ minRows: 4 }} />
           </Form.Item>
         </>
       ),
-      notesType: ["5", "10", "11", "12"],
+      notesType: ["5", "10", "11"],
 
     },
     {
@@ -129,6 +130,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     try {
       const values = await form.validateFields();
       const currentStepData = steps[currentStep];
+      console.log('currentStepData', currentStepData);
       const updatedNotes = currentStepData.notesType
         .map((type) => ({
           myAction: "create",
@@ -158,6 +160,7 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
   };
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
+  // console.log(currentStep, 'currentStep');
 
   return (
     <div className="mt-4">
