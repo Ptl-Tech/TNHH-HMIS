@@ -24,7 +24,7 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
             raceId: "",
             processCode: "someid",
             admissionNo: patientDetails?.CurrentAdmNo || AdmNo,
-            processDescription: values.processDescription,
+            processDescription: 'Progress Notes',
             remarks: values.remarks
           }; 
           // Dispatch function to handle API call and feedback
@@ -69,7 +69,7 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
                 remarks: '',
             }}
             >
-            <Row gutter={[16, 16]}>
+            {/* <Row gutter={[16, 16]}>
                 <Col span={24}>
                     <Form.Item label="Progress Description" name="processDescription"
                     rules={[{ required: true, message: 'Please select a time!' }]}
@@ -80,12 +80,12 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
                     />
                     </Form.Item>
                 </Col>
-            </Row>
+            </Row> */}
             <Row gutter={[16, 16]}>
                 <Col span={24}>
                     <Form.Item label="Progress Remarks" name="remarks"
                     >
-                    <TextArea type='text' placeholder="Enter progress remarks" />
+                    <TextArea type='text' placeholder="Enter progress remarks" autoSize={{ minRows: 10, maxRows: 25 }} />
                     </Form.Item>
                 </Col>
             </Row>

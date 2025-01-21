@@ -6,7 +6,12 @@ import Loading from '../../../../partials/nurse-partials/Loading';
 const GeneralObservationsTable = ({ ipGetProcedure, loadingGetIpProcedure }) => {
     const columns = [
         {
-          title: 'Process Description',
+          title: 'Patient Admission No',
+          dataIndex: 'AdmissionNo',
+          key: 'AdmissionNo',
+        },
+        {
+          title: 'Title',
           dataIndex: 'Process',
           key: 'Process',
         },
@@ -16,11 +21,12 @@ const GeneralObservationsTable = ({ ipGetProcedure, loadingGetIpProcedure }) => 
             key: 'ProcessDate',
             render: (text) => <span>{text ? new Date(text).toLocaleDateString() : ''}</span>
         },
-        {
-          title: 'Remarks',
-          dataIndex: 'Remarks',
-          key: 'Remarks',
-        },
+        // {
+        //     title: 'Time',
+        //     dataIndex: 'ProcessTime',
+        //     key: 'ProcessTime',
+        //     // render: (text) => <span>{text ? new Date(text).toLocaleTimeString() : ''}</span>
+        // },
       ];
       
       const { pagination, handleTableChange } = useSetTablePagination(ipGetProcedure);
