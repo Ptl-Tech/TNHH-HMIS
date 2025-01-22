@@ -72,8 +72,8 @@ export default JacksonVisualFormTable
 
 //props validation
 JacksonVisualFormTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
+    showModal: PropTypes.bool,
     loadingGetJacksonVisual: PropTypes.bool.isRequired,
     getJacksonVisual: PropTypes.array.isRequired,
-    rowSelection: PropTypes.array.isRequired
+    rowSelection: PropTypes.object.isRequired
 }

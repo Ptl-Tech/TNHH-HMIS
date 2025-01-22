@@ -15,7 +15,7 @@ const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loading
           // Construct the visitor data
           const jacksonData = {
             myAction:"create",
-            admissionNo: patientDetails?.CurrentAdmNo,
+            admissionNo: patientDetails?.Admission_No,
             score,
             date: date.format('YYYY-MM-DD'),
             ivLine: iv_line
@@ -89,7 +89,9 @@ const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loading
                 },
                 ]}
                 >
-                <Select>
+                <Select
+                placeholder="Select IV Line"
+                >
                 <Select.Option value="1">Insertion</Select.Option>
                 <Select.Option value="2">Removal</Select.Option>
                 </Select>

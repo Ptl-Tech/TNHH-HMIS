@@ -22,7 +22,7 @@ const MentalStateExaminationForm = () => {
     const { loadingIpGetMentalStatusForm, ipGetMentalStatusForm} = useSelector((state) => state.getMentalStatusExaminationForm);
     const { loadingMentalStatus } = useSelector((state) => state.postMentalStatusExaminationForm);
 
-    const filterMSEFormData = ipGetMentalStatusForm.filter((item) => item?.AdmissionNo === patientDetails?.CurrentAdmNo);
+    const filterMSEFormData = ipGetMentalStatusForm.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
 
     const dispatch = useDispatch();
 
@@ -53,17 +53,14 @@ const MentalStateExaminationForm = () => {
       
         <NurseInnerHeader icon={<FileOutlined/>} title='Mental Status Level Checklist'/>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
           {
             role === "Nurse" && (
               <>
-                <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New MSE Level Checklist
+                <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New MSE Level Checklist
                 </Button>
-                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
                 View MSE Level Checklist
-                </Button>
-                <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                Preview Form
                 </Button>
               </>
             )
@@ -71,7 +68,7 @@ const MentalStateExaminationForm = () => {
 
           {
             role === "Doctor" && (
-              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
+              <Button type="primary" disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
                 View MSE Level Checklist
                 </Button>
             )
