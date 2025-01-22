@@ -69,6 +69,7 @@ import LaboratoryEvaluationCard from "./pages/doctorsViews/tables/lab/Laboratory
 import DoctorAdmissions from "./pages/doctorsViews/DocAdmission-views/DoctorAdmissions";
 import VerifiedAdmission from "./pages/doctorsViews/DocAdmission-views/VerifiedAdmission";
 import AdmittedPatients from "./pages/doctorsViews/DocAdmission-views/AdmittedPatients";
+import PhamarcyDashboard from "./pages/pharmacy-views/PhamarcyDashboard";
 import PhamarcyOutpatient from "./pages/pharmacy-views/PhamarcyOutpatient";
 import PharmacyCard from "./pages/pharmacy-views/PharmacyCard";
 import PharmacyInpatient from "./pages/pharmacy-views/PharmacyInpatient";
@@ -256,6 +257,10 @@ function App() {
           <Route
             path="/Doctor/Admitted-Patients"
             element={<AdmittedPatients />}
+          />
+            <Route
+            path="/Doctor/Pharmacy-Dashboard"
+            element={<PhamarcyDashboard />}
           />
           <Route
             path="/Doctor/Pharmacy-OutPatient"

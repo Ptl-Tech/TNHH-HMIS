@@ -24,6 +24,7 @@ import {
 } from "../../actions/pharmacy-actions/postPharmacyAction";
 import { useDispatch, useSelector } from "react-redux";
 import { getPharmacyLineReturnbyPharmacyNo } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
+import { getNewPharmacyRequests } from "../../actions/pharmacy-actions/getNewPharmacyRequest";
 
 const { Title, Text } = Typography;
 
@@ -32,6 +33,18 @@ const PharmacyCard = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const pharmacyNo = queryParams.get("PharmacyNo");
+
+ const { 
+  data: newPharmacyRequests = [], // Default to an empty array
+} = useSelector((state) => state.getNewPharmacyList);
+
+let singlePharmacyRecord; // Declare it once in the outer scope
+if (pharmacyNo) {
+  singlePharmacyRecord = newPharmacyRequests.find((patient) => {
+    const patientPharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
+    return patientPharmacyNo === pharmacyNo.toLowerCase(); // Match the pharmacyNo
+  });
+}
 
   const { loading: loadingDrugIssuance } = useSelector(
     (state) => state.postDrugIssuance
@@ -47,8 +60,9 @@ const PharmacyCard = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+     dispatch(getNewPharmacyRequests());
     if (pharmacyNo) {
-      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));
+      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));   
     }
   }, [dispatch, pharmacyNo]);
 
@@ -167,56 +181,48 @@ const PharmacyCard = () => {
         </Typography.Title> */}
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Number :</Text> PHA-00025
+            <Text strong>Number :</Text>  {singlePharmacyRecord?.PharmacyNo} 
           </Col>
           <Col span={12}>
-            <Text strong>Patient No. :</Text> P00140
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Names :</Text> JOE HULU WANYAMA
-          </Col>
-          <Col span={12}>
-            <Text strong>Date :</Text> 7/30/2024
+            <Text strong>Patient No. :</Text>  {singlePharmacyRecord?.PatientNo} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Patient Type :</Text> Corporate
+            <Text strong>Names :</Text>  {singlePharmacyRecord?.Names} 
           </Col>
           <Col span={12}>
-            <Text strong>Cash Sale :</Text>
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Location :</Text>
-          </Col>
-          <Col span={12}>
-            <Text strong>Transaction Type :</Text>
+            <Text strong>Date :</Text>  {singlePharmacyRecord?.PharmacyDate} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Request Area :</Text> Doctor
+            <Text strong>Patient Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
           </Col>
-          <Col span={12}>
-            <Text strong>Insurance :</Text>
+           <Col span={12}>
+            <Text strong>Transaction Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Remarks :</Text>
+            <Text strong>Request Area :</Text> {singlePharmacyRecord?.LinkType} 
           </Col>
           <Col span={12}>
-            <Text strong>Status :</Text> New
+            <Text strong>Insurance :</Text> {singlePharmacyRecord?.InsuranceNo} 
+          </Col>
+        </Row>
+        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+          <Col span={12}>
+            <Text strong>Remarks :</Text>  
+          </Col>
+          <Col span={12}>
+            <Text strong>Status :</Text>   
           </Col>
         </Row>
         <Row style={{ padding: "10px 0" }}>
           <Col span={24}>
             <Text strong>Total Price :</Text>{" "}
-            <span style={{ color: "blue" }}>KShs. 20.00</span>
+            <span style={{ color: "blue" }}>{singlePharmacyRecord?.Visit_Total}</span>
           </Col>
         </Row>
       </div>
