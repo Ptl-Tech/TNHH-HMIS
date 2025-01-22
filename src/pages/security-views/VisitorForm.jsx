@@ -368,7 +368,7 @@ const VisitorForm = () => {
               </Col>
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
-                  label="Visitor Category:"
+                  label="Person to See:"
                   name="visitorCategory"
                   rules={[
                     { required: true, message: "Please select a category!" },

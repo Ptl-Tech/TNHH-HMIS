@@ -42,7 +42,7 @@ const ConsultationRoomPatients = () => {
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRY";
-    } else if (role === "psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "New";
@@ -51,7 +51,7 @@ const ConsultationRoomPatients = () => {
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
-    }else if (role === "psychology") {
+    }else if (role === "Psychology") {
       return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "Active";
@@ -227,7 +227,7 @@ const ConsultationRoomPatients = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleNavigate(record, record.treatmentNo)}
+          onClick={() => handleNavigate(record, record.TreatmentNo)}
         >
           <EyeOutlined /> Open
         </Button>
@@ -236,13 +236,18 @@ const ConsultationRoomPatients = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`, {
-      state: {
-        patientNo: record.PatientNo,
-        observationNo: record.ObservationNo,
-        patientDetails: record,
-      },
-    });
+    navigate(
+      role === "Doctor"
+        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+        : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+      {
+        state: {
+          patientNo: record.PatientNo,
+          observationNo: record.ObservationNo,
+          patientDetails: record,
+        },
+      }
+    );
   };
 
   return (

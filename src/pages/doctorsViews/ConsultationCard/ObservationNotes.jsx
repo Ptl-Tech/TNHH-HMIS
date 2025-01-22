@@ -2,6 +2,8 @@ import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTriageList } from '../../../actions/triage-actions/getTriageListSlice';
+import { Button } from 'antd';
+import NurseNotesTable from '../../nurse-view/tables/nurse-tables/NurseNotesTable';
 // import { TextArea } from 'antd';
 
 const ObservationNotes = ({ observationNo, patientNo }) => {
@@ -9,6 +11,7 @@ const ObservationNotes = ({ observationNo, patientNo }) => {
     const dispatch = useDispatch();
 
     const { loadingTriageList, triageList } = useSelector((state) => state.getTriageList) || {};
+    console.log('observation notes', observationNotes);
 
     useEffect(() => {
         dispatch(getTriageList());
@@ -25,16 +28,9 @@ const ObservationNotes = ({ observationNo, patientNo }) => {
     // console.log(observationNotes[0]?.ObservationRemarks);
 
     return (
-        <div className='container'>
-            {observationNotes.length > 0 ? (
-                <div>
-                    <h6>Observation Notes</h6>
-                    <p>{observationNotes[0].ObservationRemarks}</p>
-                </div>
-            ) : (
-                <p>No observation remarks available.</p>
-            )}
-        </div>
+        <> 
+            <NurseNotesTable loadingTriageList={loadingTriageList} observationNotes={observationNotes}/>     
+        </>
     )
 }
 

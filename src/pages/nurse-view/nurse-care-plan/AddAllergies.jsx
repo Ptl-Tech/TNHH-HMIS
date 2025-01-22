@@ -46,13 +46,12 @@ const AddAllergies = () => {
 
         <NurseInnerHeader icon={<FileOutlined />} title="Allergies and Medications" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleButtonVisibility} icon={<PlusOutlined />}>
           {isFormVisible ? 'View List': 'Add Allergies and Medication'}
         </Button>
 
-          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> Preview Allergies and Medications</Button>
+          <Button type="primary" disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
         </div>
 
         {

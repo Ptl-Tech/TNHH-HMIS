@@ -21,7 +21,7 @@ const DoctorVisits = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-
+  
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');
   const [searchVisitNumber, setSearchVisitNumber] = useState('')
@@ -46,7 +46,7 @@ const DoctorVisits = () => {
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRY";
-    } else if (role === "psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "New";
@@ -55,7 +55,7 @@ const DoctorVisits = () => {
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
-    }else if (role === "psychology") {
+    }else if (role === "Psychology") {
       return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "Active";
@@ -235,13 +235,19 @@ const DoctorVisits = () => {
     dispatch(postCheckInPatient(treatmentNo)).then((data)=>{
       if(data.status==='success'){
         message.success('Patient checked in to the Consultation Room ')
-        navigate(`/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`, {
-          state: {
-            patientNo: record.PatientNo,
-            observationNo: record.observationNo,
-            patientDetails: record,
-          },
-        });
+        navigate(
+          role === "Doctor"
+            ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+            : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+          {
+            state: {
+              patientNo: record.PatientNo,
+              observationNo: record.observationNo,
+              patientDetails: record,
+            },
+          }
+        );
+        
       }else{
         message.error('An error occurred, please try again')
       }

@@ -97,6 +97,7 @@ const OutpatientList = () => {
           {record.Activated ? (
             <Tooltip title="View Details">
               <Button
+               type="primary"
                 icon={<EyeOutlined />}
                 onClick={() =>
                   navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
@@ -111,6 +112,7 @@ const OutpatientList = () => {
             <Tooltip title="Create Visit">
               <Button
                 icon={<PlusOutlined />}
+                type="primary"
                 onClick={() =>
                   navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
                     state: { existingPatient: record, previousPath: location.pathname  },

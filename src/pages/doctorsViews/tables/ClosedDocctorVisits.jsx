@@ -39,7 +39,7 @@ const CloseList = () => {
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRY";
-    } else if (role === "psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "New";
@@ -48,7 +48,7 @@ const CloseList = () => {
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
-    }else if (role === "psychology") {
+    }else if (role === "Psychology") {
       return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "Active";
@@ -202,7 +202,9 @@ const CloseList = () => {
       dataIndex: "UrgencyStatus",
       key: "UrgencyStatus",
       render: (_, record) => {
-        return <span className="fw-bold text-dark">{record.UrgencyStatus} </span>;
+        if(record.UrgencyStatus === "0") {
+          return <span className="fw-bold text-danger">Completed </span>;
+        }
       },
     },
     /* {
@@ -220,12 +222,17 @@ const CloseList = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`, {
-      state: {
-        patientNo: record.PatientNo,
-        observationNo: record.ObservationNo,
-      },
-    });
+    navigate(
+      role === "Doctor"
+        ? `/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`
+        : `/Psychology/Consultation/Patient?TreatmentNo=${treatmentNo}`,
+      {
+        state: {
+          patientNo: record.PatientNo,
+          observationNo: record.ObservationNo,
+        },
+      }
+    );
   };
 
   return (

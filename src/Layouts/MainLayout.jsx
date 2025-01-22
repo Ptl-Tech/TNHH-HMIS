@@ -365,6 +365,163 @@ const MainLayout = () => {
       },
     ] : [],
     ];
+
+    const psychologyRoutes = [
+      {
+        key: "/Psychology",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
+
+      {
+        key: "patient-list",
+        icon: <FaUserFriends style={{ color: "#fff" }} />,
+        label: "Patients",
+        children: [
+          {
+            key: "/Psychology/Consultation-List",
+            label: "OutPatients",
+            icon: <TeamOutlined style={{ color: "#fff" }} />,
+          },
+          ...(role === "Psychology"
+            ? [
+                {
+                  key: "/Psychology/Inpatient",
+                  label: "In-Patient List",
+                  icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+                },
+                // {
+                //   key: "/Psychology/Admissions",
+                //   label: "Admissions",
+                //   icon: <FileAddOutlined style={{ color: "#fff" }} />,
+                // },
+              ]
+            : []),
+          {
+            key: "/Psychology/Past-doctor-visit",
+            label: "Past Doctor Visits",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          },
+        ],
+      },
+      
+      
+      // {
+      //   key: "/doctors/appointments",
+      //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //   label: "Appointments",
+      //   children: [
+      //     {
+      //       key: "/reception/appointments/list",
+      //       label: "Appointments",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "upcoming-appointments",
+      //       label: "Upcoming Appointments",
+      //       icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
+      //     },
+      //   ],
+      // },
+      // {
+      //   key: "/psychology/discharge",
+      //   icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+      //   label: "Discharge List",
+      //   children: [
+      //     {
+      //       key: "/Psychology/Discharge-requests",
+      //       label: "Discharge Requests",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //     {
+      //       key: "/Psychology/Discharge-list",
+      //       label: "Discharges List",
+      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
+      //     },
+      //   ],
+      // },
+       ...role === "Doctor" ? [
+      {
+        key: "/doctor/radiology",
+        icon: <RadarChartOutlined style={{ color: "#fff" }} />,
+        label: "Radiology",
+        children: [
+          {
+            key: "/Psychology/Radiology-Patients",
+            label: "Radiology List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          // {
+          //   key: "radiology-inpatient",
+          //   label: "Radiology List InPatient",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "radiology-walkin",
+          //   label: "Walk-in Radiology",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "radiology-history",
+          //   label: "Radiology History",
+          //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          // },
+          
+        ],
+      },
+
+      {
+        key: "/doctor/lab",
+        icon: <ExperimentOutlined style={{ color: "#fff" }} />,
+        label: "Lab",
+        children: [
+          {
+            key: "/Psychology/Lab-Patients",
+            label: "Lab List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          // {
+          //   key: "lab-inpatient",
+          //   label: "Lab List InPatient",
+          //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          // },
+          // {
+          //   key: "lab-history",
+          //   label: "Lab History",
+          //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          // },
+        ],
+      },
+      {
+        key: "/doctor/pharmacy",
+        icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
+        label: "Pharmacy",
+        children: [
+          {
+            key: "/Psychology/Pharmacy-OutPatient",
+            label: "Pharmacy List OutPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/Psychology/Pharmacy-Inpatient",
+            label: "Pharmacy List InPatient",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          
+          {
+            key: "/Psychology/Pharmacy-Returns",
+            label: "Pharmacy List Returns",
+            icon: <CalendarOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/Psychology/Pharmacy-History",
+            label: "Pharmacy History",
+            icon: <HistoryOutlined style={{ color: "#fff" }} />,
+          }
+        ],
+      },
+    ] : [],
+    ];
     // Security Routes
     const securityRoutes = [
       {
@@ -429,6 +586,8 @@ const MainLayout = () => {
       setMenuItems(doctorRoutes);
     } else if (department === "Security") {
       setMenuItems(securityRoutes);
+    }else if(department === 'Psychology'){
+      setMenuItems(psychologyRoutes);
     } else if (department === "Pharmacy") {
       setMenuItems(pharmacyRoutes);
     }
