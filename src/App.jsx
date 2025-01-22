@@ -80,6 +80,7 @@ import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 import ReadDoctorNotes from "./pages/ReadDoctorNotes";
 import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
+import PharmacyDashboard from "./Dashboards/PharmacyDashboard";
 
 function App() {
   return (
@@ -124,7 +125,7 @@ function App() {
           <Route path="Consultation" element={<Admissions />} />
           <Route path="Consultation/Patient" element={<ConsultationCard />} />
           <Route path="Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} />
-          
+
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
 
@@ -205,7 +206,7 @@ function App() {
             path="/Doctor/ClosedConsultationList"
             element={<CloseList />}
           />
-            <Route
+          <Route
             path="/Doctor/PendingConsultationList"
             element={<ConsultationRoomPatients />}
           />
@@ -278,6 +279,18 @@ function App() {
             path="/Security/History-list"
             element={<HistoryVisitorList />}
           />
+        </Route>
+      </Route>
+      <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
+        <Route path="/Pharmacy" element={<MainLayout />}>
+          <Route index element={<PharmacyDashboard />} />
+          <Route path="/Pharmacy/Pharmacy-OutPatient" element={<PhamarcyOutpatient />} />
+          <Route path="/Pharmacy/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
+          <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />
+          <Route path="/Pharmacy/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
+          <Route path="/Pharmacy/Pharmacy-History" element={<PharmacyHistoryList />} />
+          {/* <Route path="/Pharmacy/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} /> */}
+          <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
 
