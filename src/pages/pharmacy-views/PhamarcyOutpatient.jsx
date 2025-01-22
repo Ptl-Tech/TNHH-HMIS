@@ -109,7 +109,7 @@ const PhamarcyOutpatient = () => {
       ),
     },
     {
-      title: "Patient Type",
+      title: "Payment Type",
       dataIndex: "Patient_Type",
       key: "Patient_Type"
     },

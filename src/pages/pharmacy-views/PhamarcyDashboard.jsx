@@ -25,7 +25,7 @@ const PharmacyDashboard = () => {
 
   const cardData = [
     {
-      title: "OP Waiting List",
+      title: "OP Pharmacy List",
       value: outPRequests?.length,
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
@@ -34,7 +34,7 @@ const PharmacyDashboard = () => {
       link: "/Pharmacy/Pharmacy-OutPatient",
     },
     {
-      title: "Inpatients List",
+      title: "IP Pharmacy List",
       value: 0,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
@@ -42,7 +42,7 @@ const PharmacyDashboard = () => {
       backgroundColor: "#b0afaf",
       link: "/Pharmacy/Pharmacy-Inpatient",
     },{
-      title: "Returns",
+      title: "Pharmacy Returns",
       value: 0,  
       subtitle: "Active Consultations",
       icon: <SafetyOutlined />,

@@ -362,6 +362,7 @@ function App() {
           />
         </Route>
       </Route>
+      
       <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
         <Route path="/Pharmacy" element={<MainLayout />}>
           <Route index element={<PhamarcyDashboard />} />
