@@ -77,6 +77,8 @@ const useSignIn = () => {
         navigate('/Psychology');
       } else if (role === 'RADIOLOGY') {
         navigate('/Radiology');
+      } else if (role === 'Pharmacy'){
+        navigate('/Pharmacy')
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);

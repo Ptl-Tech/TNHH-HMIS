@@ -576,6 +576,25 @@ const MainLayout = () => {
       },
     ];
 
+    const pharmacyRoutes = [
+      {
+        key: "/Pharmacy",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Dashboard",
+      },
+      {
+        key: "/Pharmacy/Pharmacy-OutPatient",
+        label: "Pharmacy OutPatients",
+        icon: <TeamOutlined style={{ color: "#fff" }} />,
+      },
+      {
+        key: "/Pharmacy/Pharmacy-Inpatient",
+        label: "Pharmacy In-Patient List",
+        icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+      },     
+    ]
+
+
     // Set the menu items based on the user's department
     if (department === 'Reception') {
       setMenuItems(receptionRoutes);
@@ -589,6 +608,8 @@ const MainLayout = () => {
       setMenuItems(psychologyRoutes);
     } else if (department === 'RADIOLOGY') {
       setMenuItems(radiologyRoutes);
+    } else if (department === "Pharmacy") {
+      setMenuItems(pharmacyRoutes);
     }
   }, []);
 
