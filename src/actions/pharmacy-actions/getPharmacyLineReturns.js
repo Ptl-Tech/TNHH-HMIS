@@ -38,7 +38,7 @@ export const getPharmacyLineReturnList = () => async (dispatch, getState) => {
 
     // Send GET request to fetch Pharmacy Line Returns
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgPharmacyLineReturns&isList=true`,
+      `${API}data/odatafilter?webservice=PgPharmacyLine&isList=true`,
       config
     );
 
@@ -79,7 +79,7 @@ export const getPharmacyLineReturnbyPharmacyNo = (pharmacyNo) => async (dispatch
 
     // Send GET request to fetch Pharmacy Return by Pharmacy Number
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgPharmacyLineReturns&isList=false&query=$filter=PharmacyNo eq '${pharmacyNo}'`,
+      `${API}data/odatafilter?webservice=PgPharmacyLine&isList=true&query=$filter=Pharmacy_No eq '${pharmacyNo}'`,
       config
     );
 

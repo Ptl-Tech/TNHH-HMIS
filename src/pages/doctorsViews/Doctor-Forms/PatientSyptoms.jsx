@@ -19,7 +19,7 @@ const { Step } = Steps;
 const { Panel } = Collapse;
 const { TextArea } = Input;
 
-const PatientSymptoms = ({ treatmentNo }) => {
+const PatientSymptoms = ({ treatmentNo,moveToNextTab }) => {
   const { data } = useSelector((state) => state.getPatientMSE);
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
@@ -95,6 +95,13 @@ console.log("Extracted PatientNo:", patientNo); // Check the extracted value
         } else {
           message.error("Failed to save some notes");
         }
+      }
+      if (currentStep === steps.length - 1) {
+        // Trigger the parent callback to move to the next tab if this is the last step
+        moveToNextTab();
+      } else {
+        // Move to the next step
+        setCurrentStep((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Error during saving notes:", error);

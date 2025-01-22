@@ -335,6 +335,11 @@ const MainLayout = () => {
         icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
         label: "Pharmacy",
         children: [
+           {
+            key: "/Doctor/Pharmacy-Dashboard",
+            label: "Dashboard",
+            icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+          },
           {
             key: "/Doctor/Pharmacy-OutPatient",
             label: "Pharmacy List OutPatient",
