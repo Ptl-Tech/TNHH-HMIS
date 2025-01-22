@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { POST_DISPATCH_TO_DOCTOR_FAIL, POST_DISPATCH_TO_DOCTOR_SUCCESS, postDispatchToDoctorSlice } from "../../../actions/triage-actions/postDispatchToDoctorSlice";
 import { useEffect } from "react";
 import { getQyUrgencyColorCodingSetupSetupSlice } from "../../../actions/nurse-actions/getQyUrgencyColorCodingSetupSlice";
+import { getUrgencyColorcode } from "../../../utils/helpers";
 
 const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchFormVisible }) => {
     const { form } = Form.useForm();
@@ -18,7 +19,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             staffNo,
             urgencyStatus: values.status,
             tcaStatusRemarks: values.urgencyStatus,
-            observationRemark: values.remarks,
+            ObservationRemarks: values.remarks,
         }
         
         try{
@@ -42,6 +43,11 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             dispatch(getQyUrgencyColorCodingSetupSetupSlice())
         }
     }, [dispatch, colorCode?.length]);
+
+    const urgency = colorCode.map((item) => ({
+        label: getUrgencyColorcode(item.UrgencyStatus),
+        value: item.LineNo,
+    }));
   return (
     <>
         <Form
@@ -65,7 +71,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
                         loading={loadingColorCode}
                         placeholder="Select Status"
                         options={colorCode.map((item) => ({
-                            label: item.UrgencyStatus,
+                            label: getUrgencyColorcode(item.UrgencyStatus).text,
                             value: item.LineNo,
                         }))}
                     />

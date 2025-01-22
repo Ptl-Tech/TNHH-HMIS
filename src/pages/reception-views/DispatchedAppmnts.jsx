@@ -4,70 +4,55 @@ import {
   Button,
   Card,
   Col,
-  Dropdown,
   Input,
-  Menu,
   Row,
   Table,
-  Typography,
   Pagination,
-  message,
+  Typography,
 } from "antd";
-import { EyeOutlined, TeamOutlined, DownOutlined } from "@ant-design/icons";
-import { appmntList, postTriageVisit } from "../../actions/patientActions";
-import dayjs from "dayjs";
-import { IoAddOutline } from "react-icons/io5";
+import { TeamOutlined } from "@ant-design/icons";
+import { appmntList } from "../../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 
 const DispatchedAppmnts = () => {
   const { loading, patients } = useSelector((state) => state.appmntList);
-  const currentDate = dayjs().format("YYYY-MM-DD");
-
-  const {
-    loading: postTriageVisitLoading,
-    error: postTriageVisitError,
-    success: postTriageVisitSuccess,
-    payload: postTriageVisitPayload,
-  } = useSelector((state) => state.postTriageVisit);
-
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Keeping AppointmentNo as selected key
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
   });
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(appmntList());
   }, [dispatch]);
 
   useEffect(() => {
-    const filtered = patients.filter((patient) => {
-      const appointmentDate = new Date(patient.AppointmentDate)
-        .toISOString()
-        .split("T")[0];
-      return appointmentDate === currentDate && patient.Status === "Dispatched";
-    });
-    setFilteredPatients(filtered);
+    const today = new Date().toISOString().split("T")[0];
+    const todayPatients = patients.filter(
+      (patient) => patient.AppointmentDate === today
+    );
+    setFilteredPatients(todayPatients);
   }, [patients]);
 
   const handleSearchChange = (e, key) => {
     const value = e.target.value;
     setSearchParams((prev) => ({ ...prev, [key]: value }));
 
-    const filtered = patients.filter((patient) => {
-      const matchesName = patient.SearchNames.toLowerCase().includes(
-        searchParams.SearchNames.toLowerCase()
-      );
-      const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(
-        searchParams.AppointmentNo.toLowerCase()
-      );
+    const filtered = filteredPatients.filter((patient) => {
+      const matchesName =
+        key === "SearchNames"
+          ? patient.SearchNames.toLowerCase().includes(value.toLowerCase())
+          : true;
+      const matchesAppointmentNo =
+        key === "AppointmentNo"
+          ? patient.AppointmentNo.toLowerCase().includes(value.toLowerCase())
+          : true;
 
       return matchesName && matchesAppointmentNo;
     });
@@ -75,56 +60,9 @@ const DispatchedAppmnts = () => {
     setFilteredPatients(filtered);
   };
 
-  const handleMenuClick = async ({ key }) => {
-    if (key === "Triage") {
-      if (selectedRowKeys.length === 0) {
-        message.error("Please select a patient first.");
-        return;
-      }
-
-      const appointmentId = selectedRowKeys[0]; // Using AppointmentNo as Appointment ID
-      await dispatchPatient(appointmentId);
-    } else {
-      console.log(`Dispatching patients to: ${key}`);
-      console.log("Selected Patients:", selectedRowKeys);
-      // Handle dispatch logic for other menu options
-    }
-  };
-
-  const dispatchPatient = async (appointmentId) => {
-    if (!appointmentId) {
-      message.error("Appointment ID is required!");
-      return;
-    }
-
-    try {
-      console.log("Dispatching patient with appointment ID:", appointmentId);
-      await dispatch(postTriageVisit(appointmentId));
-      message.success("Patient has been dispatched successfully!");
-      // Navigate to a different page after successful dispatch, if needed
-      // navigate("/reception/visitors-list");
-      //filter the selected patient from the table
-      const filteredPatients = patients.filter(
-        (patient) => patient.AppointmentNo !== appointmentId
-      );
-      setFilteredPatients(filteredPatients);
-    } catch (error) {
-      console.error("Error dispatching patient:", error);
-      message.error("Failed to dispatch patient!");
-    }
-  };
-
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };
-
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="Triage">Triage</Menu.Item>
-      <Menu.Item key="Pharmacy">Pharmacy</Menu.Item>
-      <Menu.Item key="Clinic">Clinic</Menu.Item>
-    </Menu>
-  );
 
   const columns = [
     {
@@ -136,11 +74,31 @@ const DispatchedAppmnts = () => {
       title: "Patient Name",
       dataIndex: "SearchNames",
       key: "SearchNames",
+      render: (text, record) => {
+        return (
+          <span
+            className="fw-bold"
+            style={{ color: "#0f5689", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
-      title: "Appointment No", // Using AppointmentNo as key
+      title: "Appointment No",
       dataIndex: "AppointmentNo",
       key: "AppointmentNo",
+      render: (text, record) => {
+        return (
+          <span
+            className="fw-bold"
+            style={{ color: "red", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: "Appointment Date",
@@ -160,11 +118,8 @@ const DispatchedAppmnts = () => {
       dataIndex: "AppointmentTime",
       key: "AppointmentTime",
       render: (text, record) => {
-        // Combine AppointmentDate and AppointmentTime to create a valid Date object
         const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
         const dateTime = new Date(dateTimeString);
-
-        // Format time to AM/PM
         return dateTime.toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
@@ -182,12 +137,6 @@ const DispatchedAppmnts = () => {
       dataIndex: "PatientType",
       key: "PatientType",
     },
-    // update visit type
-    // {
-    //   title: "Visit Type",
-    //   dataIndex: "VisitType",
-    //   key: "VisitType",
-    // },
     {
       title: "Waiting At",
       dataIndex: "WaitingAt",
@@ -197,7 +146,16 @@ const DispatchedAppmnts = () => {
       title: "Status",
       dataIndex: "Status",
       key: "Status",
-    },
+      render: (text) => {
+        const color = text === "New" ? "#1890ff" : text === "Dispatched" ? "#52c41a" : "black";
+        return (
+          <span style={{ fontWeight: "bold", color }}>
+            {text.toUpperCase()}
+          </span>
+        );
+      },
+    }
+    
   ];
 
   const startIdx = (pagination.current - 1) * pagination.pageSize;
@@ -222,80 +180,53 @@ const DispatchedAppmnts = () => {
           Find Patient Details by:
         </Typography.Text>
         <Row gutter={16} className="mt-2">
-          <Col span={12}>
-            <Input
-              placeholder="Patient Names"
-              value={searchParams.SearchNames}
-              onChange={(e) => handleSearchChange(e, "SearchNames")}
-            />
-          </Col>
-          <Col span={12}>
-            <Input
-              placeholder="Appointment Number"
-              value={searchParams.AppointmentNo}
-              onChange={(e) => handleSearchChange(e, "AppointmentNo")}
-            />
-          </Col>
-        </Row>
+  <Col span={12}>
+    <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold",            color: "#003F6D",
+ }}>
+      Patient Names:
+    </label>
+    <Input
+      placeholder="Search by Patient Names"
+      value={searchParams.SearchNames}
+      onChange={(e) => handleSearchChange(e, "SearchNames")}
+    />
+  </Col>
+  <Col span={12}>
+    <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold",            color: "#003F6D",
+ }}>
+      Appointment Number:
+    </label>
+    <Input
+      placeholder="Search by Appointment Number"
+      value={searchParams.AppointmentNo}
+      onChange={(e) => handleSearchChange(e, "AppointmentNo")}
+    />
+  </Col>
+</Row>
+
       </Card>
 
-      <div className="mt-4">
-      <Button
-  type="primary"
-  style={{ marginBottom: "16px" }}
-  onClick={() => {
-    if (selectedRowKeys.length > 0) {
-      const selectedPatientNo = selectedRowKeys[0]; // Assuming single selection
-      const selectedPatient = filteredPatients.find(
-        (patient) => patient.AppointmentNo === selectedPatientNo
-      ); // Find the selected patient by AppointmentNo
-
-      navigate(`/reception/Add-Appointment/${selectedPatientNo}`, {
-        state: { existingPatient: selectedPatient }, // Passing full patient details
-      });
-    } else {
-      navigate("/reception/Add-Appointment");
-    }
-  }}
->
-  Create New Visit <IoAddOutline />
-</Button>
-
-
-        <Table
-          columns={columns}
-          loading={loading}
-          dataSource={paginatedData.map((patient) => ({
-            ...patient,
-            key: patient.AppointmentNo, // Set AppointmentNo as the unique key
-          }))}
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys),
-          }}
-          rowClassName={(record) =>
-            record.Status === "New" ? "row-warning" : ""
-          }
-          pagination={false}
-          bordered
-          size="small"
-        />
-        <Pagination
-          total={filteredPatients.length}
-          showTotal={(total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`
-          }
-          defaultPageSize={20}
-          current={pagination.current}
-          onChange={handlePaginationChange}
-          style={{ float: "right", margin: "16px" }}
-        />
-      </div>
-      <style jsx>{`
-        .row-warning {
-          background-color: #faad14 !important;
+      <Table
+        columns={columns}
+        loading={loading}
+        dataSource={paginatedData.map((patient) => ({
+          ...patient,
+          key: patient.AppointmentNo,
+        }))}
+        pagination={false}
+        bordered
+        size="medium"
+      />
+      <Pagination
+        total={filteredPatients.length}
+        showTotal={(total, range) =>
+          `${range[0]}-${range[1]} of ${total} items`
         }
-      `}</style>
+        defaultPageSize={20}
+        current={pagination.current}
+        onChange={handlePaginationChange}
+        style={{ float: "right", margin: "16px" }}
+      />
     </div>
   );
 };

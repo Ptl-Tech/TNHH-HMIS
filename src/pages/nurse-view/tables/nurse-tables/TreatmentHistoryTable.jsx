@@ -1,4 +1,4 @@
-import { Button, Table } from "antd"
+import { Table } from "antd"
 import PropTypes from "prop-types"
 
 const TreatmentHistoryTable = ({ showModal }) => {
@@ -34,20 +34,19 @@ const TreatmentHistoryTable = ({ showModal }) => {
           title: 'Treatment Report',
           dataIndex: 'treatmentReport',
           key: 'treatmentReport',
-          render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
+          // render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
         }
       ]
     
       const data = [
         {
-          key: '1',
-          treatmentNo: 'T0001',
-          date: '12/12/2021',
-          PatientFile: 'Inpatient',
-          branch: 'Bustani',
-          paymentMethod: 'Insurance',
-          treatmentReport: 'View Report',
-          
+          key: '',
+          treatmentNo: '',
+          date: '',
+          PatientFile: '',
+          branch: '',
+          paymentMethod: '',
+          treatmentReport: '',          
         },
       ]
   return (

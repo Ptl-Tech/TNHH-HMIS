@@ -125,9 +125,10 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
     // Return appointment data for further use
     return responseData.appointmentData.appointmentNo; // Return the full appointment data
   } catch (error) {
-    const errorMessage = error.response?.data?.errors || "An unexpected error occurred.";
+    const errorMessage = error.response?.data?.errors ;
     dispatch({ type: TRIAGE_VISIT_FAIL, payload: errorMessage });
-    message.error(errorMessage); // Display the error message using Ant Design
+    console.log(errorMessage);
+    message.error(error.response?.data?.errors); 
   }
 };
 
@@ -246,7 +247,7 @@ export const listPatients = () => async (dispatch, getState) => {
     const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients`, config);
 
     // Filter the patients by branchCode matching GlobalDimension1Code
-    const filteredData = data.filter((patient) => patient.GlobalDimension1Code === branchCode  && patient.Inpatient===false);
+    const filteredData = data.filter((patient) => patient.GlobalDimension1Code === branchCode);
     
 
     dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });

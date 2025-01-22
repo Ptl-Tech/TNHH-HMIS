@@ -1,5 +1,5 @@
 import { Button, Form, Modal, Select } from 'antd'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import DietaryIntakeTable from '../tables/nurse-tables/DietaryIntakeTable';
@@ -26,7 +26,7 @@ const DietaryIntakeForm = () => {
     const { loadingDietaryIntake } = useSelector((state) => state.postDietaryIntakeFormLine);
 
     const filterIpLookupValues = ipLookupValues?.filter((item) => item?.Type === "Dietary Intake Form");
-    const filterDietaryIntakeForm = ipGetDietaryForm?.filter((item) => item?.AdmissionNo === patientDetails?.CurrentAdmNo);
+    const filterDietaryIntakeForm = ipGetDietaryForm?.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
     
       const handleViewForm = () => {
         if(selectedRow[0]) {
@@ -60,20 +60,17 @@ const DietaryIntakeForm = () => {
     
   return (
     <div>
-        <NurseInnerHeader title="Dietary Intake Form" />
+        <NurseInnerHeader icon={<FileOutlined />} title="Dietary Intake Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px', paddingBottom: '20px' }}>
 
           {
             role === "Nurse" && (
                 <>
-                  <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New Dietary Form
+                  <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Dietary Form
                   </Button>
-                  <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                  <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
                   View Form
-                  </Button>
-                  <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                  Preview Form
                   </Button>
                 </>
             )

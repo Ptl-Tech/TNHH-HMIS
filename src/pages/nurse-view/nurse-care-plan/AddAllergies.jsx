@@ -1,16 +1,19 @@
-import { Button, Form, Input, Modal, Space, Typography } from "antd"
-import { ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, Form, Input, Modal } from "antd"
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
 import { useLocation } from "react-router-dom";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
 
 const AddAllergies = () => {
 
         const [ form ] = Form.useForm();
         const [isModalOpen, setIsModalOpen] = useState(false);
         const { patientDetails } = useLocation().state;
+        const [isFormVisible, setIsFormVisible] = useState(false);
 
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
@@ -19,6 +22,10 @@ const AddAllergies = () => {
         const handleCancel = () => {
           setIsModalOpen(false);
         };
+
+        const handleButtonVisibility = () => {
+          setIsFormVisible(!isFormVisible);
+        }
 
         const handleViewAllergies = () => {
           if (selectedRow[0]) {
@@ -37,19 +44,29 @@ const AddAllergies = () => {
   return (
     <div>
 
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Allergies and Medications
-          </Typography.Text>
-        </Space>
+        <NurseInnerHeader icon={<FileOutlined />} title="Allergies and Medications" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
+        <Button type="primary" style={{ width: '100%' }}  onClick={handleButtonVisibility} icon={<PlusOutlined />}>
+          {isFormVisible ? 'View List': 'Add Allergies and Medication'}
+        </Button>
+
           <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> Preview Allergies and Medications</Button>
         </div>
 
-        <AddAllergiesTable rowSelection={rowSelection} filterAllergies={filterAllergies} loadingAllergies={loadingAllergies} loadingTriageList={loadingTriageList} />
+        {
+          isFormVisible && (
+            <AllergyAndMedication setIsFormVisible={setIsFormVisible} />
+          )
+        }
+
+        {
+          !isFormVisible && (
+            <AddAllergiesTable rowSelection={rowSelection} filterAllergies={filterAllergies} loadingAllergies={loadingAllergies} loadingTriageList={loadingTriageList} />
+          )
+        }
+        
 
         <Modal title="Add Allergies and Medications" 
         open={isModalOpen}

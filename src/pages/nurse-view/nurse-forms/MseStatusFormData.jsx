@@ -15,10 +15,12 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
           
           const mentalStateExaminationFormData = {
             myAction: "create",
-            admissionNo: patientDetails?.CurrentAdmNo,
+            admissionNo: patientDetails?.Admission_No,
             status,
             comments,
           }
+
+          console.log('form data', mentalStateExaminationFormData)
   
         // Dispatch function to handle API call and feedback
         const dispatchMentalStateExaminationData = async (data) => {

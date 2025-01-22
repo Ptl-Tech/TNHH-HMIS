@@ -40,7 +40,7 @@ const ReadDoctorNotes = () => {
   
   return (
     <>
-    <NurseInnerHeader title="Read Doctor Notes" />
+    <NurseInnerHeader title="Read Psychology Notes" />
 
     {
         loadingGetDoctorNotes ? (

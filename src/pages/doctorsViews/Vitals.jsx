@@ -42,7 +42,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
       key: "bloodPreasure",
     },
     { title: "SpO₂", dataIndex: "sP02", key: "sP02" },
-    { title: "Pain", dataIndex: "pain", key: "pain" },
+    // { title: "Pain", dataIndex: "pain", key: "pain" },
     { title: "Height (cm)", dataIndex: "height", key: "height" },
     { title: "Weight (kg)", dataIndex: "weight", key: "weight" },
     {
@@ -54,35 +54,51 @@ const FormVitals = ({ observationNo, patientNo }) => {
   ];
 
   // Check if vitalsLines is an object, and map its values into an array
-  const dataSource = vitalsLines
-    .filter((item) => {
-      // Filter based on the observationNo or patientNo, modify this as per your needs
-      return (
-        item.ObservationNo === observationNo || item.PatientNo === patientNo
-      );
-    })
-    .map((item) => ({
-      key: item.LineNo, // Unique key for each row
-      ObservationNo: item.ObservationNo,
-      temperature: item.Temperature,
-      pulseRate: item.PulseRate,
-      respirationRate: item.RespirationRate,
-      bloodPreasure: item.BloodPressure,
-      sP02: item.SP02,
-      pain: item.Pain,
-      height: item.Height,
-      weight: item.Weight,
-      BMI: item.BMI,
-    }));
+ const dataSource = vitalsLines
+  .filter((item) => {
+    // Filter based on the observationNo or patientNo, modify this as per your needs
+    return (
+      item.ObservationNo === observationNo || item.PatientNo === patientNo
+    );
+  })
+  .map((item) => ({
+    key: item.LineNo, // Unique key for each row
+    ObservationNo: item.ObservationNo,
+    temperature: item.Temperature,
+    pulseRate: item.PulseRate,
+    respirationRate: item.RespirationRate,
+    bloodPreasure: item.BloodPressure,
+    sP02: item.SP02,
+    pain: item.Pain,
+    height: item.Height,
+    weight: item.Weight,
+    BMI: item.BMI,
+    DateCreated: item.DateCreated, // Assuming CreatedAt exists in your data
+  }))
+  .sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated)); // Sort by createdAt in descending order
+
 
   useEffect(() => {
     dispatch(getPatientVitalsLinesSlice());
   }, [dispatch]);
-
+  
+  useEffect(() => {
+    if (showForm && dataSource.length > 0) {
+      const latestEntry = dataSource[0];
+      form.setFieldsValue({
+        vitals: {
+          height: latestEntry.height || "",
+          weight: latestEntry.weight || "",
+          bmi: latestEntry.BMI || "",
+        },
+      });
+    }
+  }, [showForm, dataSource, form]);
+  
   const handleToggleForm = () => {
     setShowForm(!showForm);
   };
-
+  
   const onFinish = async (values) => {
     try {
       const {
@@ -99,14 +115,14 @@ const FormVitals = ({ observationNo, patientNo }) => {
       // Transform values
       const transformedValues = {
         pulseRate,
-        pain: parseInt(cleanValue(pain)),
-        height: parseFloat(cleanValue(height)),
-        weight: parseFloat(cleanValue(weight)),
+        // pain: parseInt(cleanValue(pain)),
+        // height: parseFloat(cleanValue(height)),
+        // weight: parseFloat(cleanValue(weight)),
         temperature: parseFloat(cleanValue(temperature)),
         bloodPreasure,
         sP02,
         respirationRate,
-        BMI: calculateBMI(height, weight),
+        // BMI: calculateBMI(height, weight),
       };
 
       // Common payload properties
@@ -123,18 +139,18 @@ const FormVitals = ({ observationNo, patientNo }) => {
         myAction: "create",
       };
 
-      const response = await dispatch(postTriageListVitalsSlice(createVitals));
-      if (response?.status === "success") {
-        message.success("Vitals successfully created");
-        await dispatch(getPatientVitalsLinesSlice());
+    await dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
+      if (data) {
+        message.success("Vitals successfully saved");
+         dispatch(getPatientVitalsLinesSlice());
         //show the table and hide the form
-        await setShowForm(true);
+         setShowForm(false);
       } else {
         message.error("Error saving vitals data");
       }
-
-      // Reload vitals list after successful operation
-      dispatch(getPatientVitalsLinesSlice());
+    })
+      
+           
     } catch (error) {
       // Generic error handling
       message.error("An error occurred while saving vitals data.");
@@ -367,7 +383,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
 
                           // Ensure value is a valid percentage
                           const percentageMatch =
-                            value.match(/^(\d{1,2}|100)%$/);
+                            value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error(
@@ -393,7 +409,42 @@ const FormVitals = ({ observationNo, patientNo }) => {
                 </Col>
               </Row>
               <Row gutter={16}>
-                <Col span={12}>
+              <Col span={12}>
+                  <Form.Item
+                    label="Respiration Rate (bpm)"
+                    name={["vitals", "respirationRate"]}
+                    hasFeedback
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input respiration rate!",
+                      },
+                      {
+                        pattern: /^[0-9]+$/,
+                        message: "Respiration rate must be a valid number!",
+                      },
+                      {
+                        validator(_, value) {
+                          if (!value || (value >= 12 && value <= 25)) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error(
+                              "Respiration rate must be between 12 and 25 bpm!"
+                            )
+                          );
+                        },
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="text"
+                      name="respirationRate"
+                      placeholder="eg 18"
+                    />
+                  </Form.Item>
+                </Col>
+                {/* <Col span={12}>
                   <Form.Item
                     label="Height (cm)"
                     name={["vitals", "height"]}
@@ -436,44 +487,10 @@ const FormVitals = ({ observationNo, patientNo }) => {
                   >
                     <Input type="number" placeholder="eg 70" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Respiration Rate (bpm)"
-                    name={["vitals", "respirationRate"]}
-                    hasFeedback
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input respiration rate!",
-                      },
-                      {
-                        pattern: /^[0-9]+$/,
-                        message: "Respiration rate must be a valid number!",
-                      },
-                      {
-                        validator(_, value) {
-                          if (!value || (value >= 12 && value <= 25)) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error(
-                              "Respiration rate must be between 12 and 25 bpm!"
-                            )
-                          );
-                        },
-                      },
-                    ]}
-                  >
-                    <Input
-                      type="text"
-                      name="respirationRate"
-                      placeholder="eg 18"
-                    />
-                  </Form.Item>
-                </Col>
+{/*                 
                 <Col span={12}>
                   <Form.Item
                     label="Pain (Scale 0-10)"
@@ -496,10 +513,10 @@ const FormVitals = ({ observationNo, patientNo }) => {
                   >
                     <Input type="text" placeholder="eg 1" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row gutter={16}>
-                <Col span={12}>
+                {/* <Col span={12}>
                   <Form.Item label="BMI" name={["vitals", "bmi"]}>
                     <Input
                       type="text"
@@ -507,7 +524,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
                       style={{ color: "#0f5689", fontWeight: "bold" }}
                     />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row>
                 <Col span={24}>

@@ -42,11 +42,9 @@ const CloseList = () => {
   useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
-  const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New" 
-  );
+ 
   const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Dispatched" 
+    (item) => item.Status === "Completed" 
   );
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
@@ -55,6 +53,8 @@ const CloseList = () => {
     IDNumber: patient.IDNumber,
     Age: patient.AgeinYears,
     PatientType: patient.PatientType,
+    Inpatient: patient.Inpatient, 
+
   }));
 
   const combinedList = closedConsultationList.map((room) => {
@@ -69,24 +69,30 @@ const CloseList = () => {
       IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
       Age: matchingPatient ? matchingPatient.Age : "",
       PatientType: matchingPatient ? matchingPatient.PatientType : "",
+      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
+
     };
   });
 
+ 
   const waitingListTableDataSource = combinedList
-    ?.map((item, index) => ({
-      key: index + 1,
-      treatmentNo: item?.TreatmentNo,
-      patientNo: item?.PatientNo,
-      observationNo: item?.ObservationNo,
-      treatmentDate: item?.TreatmentDate,
-      treatmentTime: item?.TreatmentTime,
-      searchName: item?.SearchName,
-      idNumber: item?.IDNumber,
-      age: item?.Age,
-      patientType: item?.PatientType,
-      urgency: item?.UrgencyStatus,
-    }))
-    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
+  .filter((item) => item.Inpatient !== true)
+  ?.map((item, index) => ({
+    key: index + 1,
+    treatmentNo: item?.TreatmentNo,
+    patientNo: item?.PatientNo,
+    observationNo: item?.ObservationNo,
+    treatmentDate: item?.TreatmentDate,
+    treatmentTime: item?.TreatmentTime,
+    searchName: item?.SearchName,
+    idNumber: item?.IDNumber,
+    age: item?.Age,
+    patientType: item?.PatientType,
+    urgency: item?.UrgencyStatus,
+    Inpatient: item?.Inpatient,
+    Status: item?.Status,
+  }))
+  .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
   const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
 
@@ -103,14 +109,14 @@ const CloseList = () => {
     const isSearching = Object.values(searchParams).some(
       (value) => value.trim() !== ""
     );
-
+  
     if (isSearching) {
       const filtered = waitingListTableDataSource.filter((patient) => {
         const treatmentNo = patient.treatmentNo?.toLowerCase() || "";
         const patientNo = patient.patientNo?.toLowerCase() || "";
         const searchName = patient.searchName?.toLowerCase() || "";
         const urgency = patient.UrgencyStatus || "";
-
+  
         return (
           treatmentNo.includes(searchParams.treatmentNo.toLowerCase()) &&
           searchName.includes(searchParams.searchName.toLowerCase()) &&
@@ -118,13 +124,17 @@ const CloseList = () => {
           urgency.includes(searchParams.urgency)
         );
       });
-
-      setFilteredPatients(filtered);
+  
+      // Apply inpatient filter after search filter
+      const filteredWithoutInpatients = filtered.filter(
+        (item) => item.Inpatient !== true
+      );
+      setFilteredPatients(filteredWithoutInpatients);
     } else {
       setFilteredPatients(waitingListTableDataSource);
     }
   };
-
+  
   const waitingListColumns = [
     {
       title: "#",
@@ -215,23 +225,30 @@ const CloseList = () => {
       },
     },
 
+    // {
+    //   title: "Urgency",
+    //   dataIndex: "urgency",
+    //   key: "urgency",
+    //   render: (_, record) => {
+    //     const { color, text } = getUrgencyColorcode(record.urgency);
+    //     return (
+    //       <Badge
+    //         color={color}
+    //         text={text} // Display urgency text
+    //         style={{ color: color }}
+    //       />
+    //     );
+    //   },
+    // },
     {
-      title: "Urgency",
-      dataIndex: "urgency",
-      key: "urgency",
+      title: "Completion Status",
+      dataIndex: "Status",
+      key: "Status",
       render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.urgency);
-        return (
-          <Badge
-            color={color}
-            text={text} // Display urgency text
-            style={{ color: color }}
-          />
-        );
+        return <span className="fw-bold text-dark">{record.Status} </span>;
       },
     },
-
-    {
+    /* {
       title: "Check In",
       key: "checkIn",
       render: (_, record) => (
@@ -242,7 +259,7 @@ const CloseList = () => {
           <CheckOutlined /> Check In
         </Button>
       ),
-    },
+    }, */
   ];
 
   const handleNavigate = (record, treatmentNo) => {
@@ -259,7 +276,7 @@ const CloseList = () => {
       <ConsultationRoomSummeryCard
         waitingPatient={waitingListTableDataSource}
         currentPath={currentPath}
-        closedConsultationList={closedConsultationList}
+        closedConsultationList={waitingListTableDataSource}
       />
       <Card
         style={{
@@ -311,7 +328,7 @@ const CloseList = () => {
           columns={waitingListColumns}
           dataSource={filteredPatients}
           bordered
-          size="middle"
+          size="small"
           rowClassName={rowClassName} // Apply the row color
           pagination={{
             position: ["bottom", "right"],

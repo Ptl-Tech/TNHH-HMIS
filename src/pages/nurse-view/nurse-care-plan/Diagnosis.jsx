@@ -1,12 +1,13 @@
-import { Button, Col, Form, Input, Modal, Row, Select, Space, Typography } from "antd";
+import { Button, Col, Form, Input, Modal, Row } from "antd";
 import { useEffect, useState } from "react";
-import { FolderViewOutlined, ProfileOutlined } from "@ant-design/icons";
+import { FolderViewOutlined, MedicineBoxOutlined } from "@ant-design/icons";
 import DoctorPrescriptionsTable from "../tables/nurse-tables/DoctordiagnosisTable";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import { useDispatch, useSelector } from "react-redux";
 import { getQyTreatmentDiagnosisLinesSlice } from "../../../actions/nurse-actions/getQyTreatmentDiagnosisLinesSlice";
 import { useLocation } from "react-router-dom";
 import { listDoctors } from "../../../actions/DropdownListActions";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const Diagnosis = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,14 +72,9 @@ const Diagnosis = () => {
               }, [dispatch, data.length]);
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Patient Diagnosis
-          </Typography.Text>
-        </Space>
+      <NurseInnerHeader icon={<MedicineBoxOutlined />} title="Diagnosis" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
           <Button type="primary" style={{ width: '100%' }}  onClick={handleViewPrescriptions}><FolderViewOutlined /> View Admission Diagnosis</Button>
           <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewPrescriptions}><FolderViewOutlined /> Submit Final Diagnosis</Button>
         </div>

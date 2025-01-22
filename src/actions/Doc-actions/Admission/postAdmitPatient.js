@@ -13,6 +13,7 @@ export const POST_PATIENT_ADMISSION_RESET = "POST_PATIENT_ADMISSION_RESET";
 
 // Action to POST patient admission
 export const postPatientAdmission = (admissionNo) => async (dispatch, getState) => {
+  console.log('admission number', admissionNo)
   try {
     // Dispatch the POST start action
     dispatch({ type: POST_PATIENT_ADMISSION });
@@ -35,10 +36,10 @@ export const postPatientAdmission = (admissionNo) => async (dispatch, getState) 
 
     // Corrected POST body structure
     const response = await axios.post(
-      `${API}Admission/AdmitPatient  `, // Endpoint for POSTing admission
-      {
-        admissionNo: admissionNo, // Send treatmentNo as part of the POST body
-      },
+      `${API}Admission/AdmitPatient`, // Endpoint for POSTing admission
+      
+      admissionNo
+      ,
       config
     );
 

@@ -1,37 +1,55 @@
 import React, { useEffect } from "react";
-import { Card, Typography, Avatar, Button } from "antd";
+import { Card, Typography, Avatar, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
 import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
+import { listDoctors } from "../../../actions/DropdownListActions";
+import { getConsultationRoomListSlice } from "../../../actions/nurse-actions/getConsultationRoomSlice";
+import { getSingleConsultationRoomReducer } from "../../../reducers/nurse-reducers/getConsultationRoomReducer";
+import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 
 
-const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, role }) => {
+const PatientInfo = ({ patientNo, treatmentNo, patientDetails, observationNo, role }) => {
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
-
-
+  
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
+    const { loadingCheInPatient: markasCompleteLoading, error } =
+    useSelector((state) => state.markAsCompleted);
 
-    const capitalizeWords = (name) =>
-      name
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(" ");
+  // const {consultationRoomDetails, loadingConsultationRoomDetails} = useSelector((state) => state.getSingleConsultationRoom)
+
   
-    const patientName = patientDetails?.Names
-      ? capitalizeWords(patientDetails.Names)
-      : capitalizeWords(
-          [
-            patientDetails?.Surname,
-            patientDetails?.LastName,
-            patientDetails?.MiddleName,
-          ]
-            .filter(Boolean)
-            .join(" ")
-        );
+  // useEffect(() => {
+  //   if (treatmentNo) {
+  //     dispatch(getSingleConsultationSlice(treatmentNo))
+  //   }
+  // }, [dispatch, treatmentNo]);
+
+  // console.log(loadingConsultationRoomDetails)
+ 
+
+
+  const capitalizeWords = (name) =>
+    name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+
+  const patientName = patientDetails?.Names
+    ? capitalizeWords(patientDetails.Names)
+    : capitalizeWords(
+      [
+        patientDetails?.Surname,
+        patientDetails?.LastName,
+        patientDetails?.MiddleName,
+      ]
+        .filter(Boolean)
+        .join(" ")
+    );
   const handlePrintInvoice = () => {
     const invoiceData = {
       PatientNo: patientNo,
@@ -41,6 +59,24 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
 
     dispatch(postInterimInvoice(invoiceData));
   };
+
+
+  const handleMarkAsCompleted = () => {
+    dispatch(postMarkasCompleted(treatmentNo))
+      .then((data) => {
+        if (data?.status === "success") {
+          message.success("Patient has been Marked as completed");
+        } else {
+          message.error("Failed to mark as completed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error marking as completed:", error);
+        message.error("An error occurred. Please try again.");
+      });
+  };
+  
+
   return (
     <div
       style={{
@@ -104,6 +140,8 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
           <InfoRow label="Gender" value={patientDetails?.Gender} />
+          {/* {!loadingConsultationRoomDetails && <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} />} */}
+          {/* <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} /> */}
         </div>
       </Card>
       <Card
@@ -180,7 +218,7 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
             justifyContent: "space-between",
           }}
         >
-          <Typography.Title
+          {/* <Typography.Title
             level={5}
             style={{ fontSize: "14px", color: "black" }}
           >
@@ -194,7 +232,7 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
             }}
           >
             {` KSH. ${patientDetails?.Balance} `}
-          </Typography.Text>
+          </Typography.Text> */}
         </div>
         <div
           style={{
@@ -207,32 +245,32 @@ const PatientInfo = ({ patientNo , treatmentNo, patientDetails, observationNo, r
         >
           {
             role === 'Doctor' && (
-                <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
-                    <Button
-                    type="primary"
-                    onClick={() => handleMarkAsCompleted(observationNo)}
-                    style={{ width: "100%", marginBottom: "10px" }}
-                    >
-                    Mark as Completed
-                    </Button>
-                    <Button
-                    type="default"
-                    onClick={() => handleTransferPatient(observationNo)}
-                    style={{ width: "100%" }}
-                    >
-                    Request Patient Review
-                    </Button>
-                    {/* <Button
+              <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
+                <Button
+                  type="primary"
+                  onClick={handleMarkAsCompleted}
+                  style={{ width: "100%", marginBottom: "10px" }}
+                >
+                  Mark as Completed
+                </Button>
+                <Button
+                  type="default"
+                  onClick={() => handleTransferPatient(observationNo)}
+                  style={{ width: "100%" }}
+                >
+                  Request Patient Review
+                </Button>
+                {/* <Button
                     type="primary"
                     // style={{ marginTop: "10px", width: "100%" }}
                     onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
                     >
                     Print Interim Invoice
                     </Button> */}
-                </div>
+              </div>
             )
           }
-          
+
         </div>
       </Card>
     </div>

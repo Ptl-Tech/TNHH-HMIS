@@ -22,6 +22,7 @@ import {
   appmntList,
   createPatient,
   createTriageVisit,
+  listPatients,
   postTriageVisit,
 } from "../actions/patientActions";
 
@@ -29,13 +30,19 @@ const CreateVisitForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const queryParams = new URLSearchParams(location.search);
+  const patientNo = queryParams.get("PatientNo");
   const { state } = location; // Access the state passed via navigate
   const { patientData, existingPatient, visitData } = state || {}; // Destructure patient data if available
   const { loading, patients: visitPatients } = useSelector(
     (state) => state.appmntList
   );
-
+  const {
+    loading: patientListLoading,
+    error: patientListError,
+    success: patientListSuccess,
+    patients: patientListPayload,
+  } =useSelector((state) => state.patientList);
   const {
     loading: insuranceLoading,
     error: insuranceError,
@@ -99,6 +106,7 @@ const CreateVisitForm = () => {
     dispatch(listInsuranceOptions());
     dispatch(listClinics()); // Ensure clinics are loaded
     dispatch(listDoctors()); // Ensure doctors are loaded
+    dispatch(listPatients());
     dispatch(appmntList());
   }, [dispatch]);
 
@@ -113,58 +121,76 @@ const CreateVisitForm = () => {
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [doctorsPayload, newVisit.clinic]);
-  const savepatientVisit = async () => {
-    try {
-      // Step 2: Create Triage Visit
-      const visitData = {
-        patientNo:
-          patientData?.patientNo ||
-          existingPatient?.PatientNo ||
-          patientData?.PatientNo ||
-          visitData?.PatientNo,
-        clinic: newVisit.clinic,
-        doctor: newVisit.doctor,
-        paymentMode: newVisit.paymentMode,
-        insuranceNo: newVisit.insuranceNo,
-        membershipNo: newVisit.membershipNo,
-        insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
-        isPrincipleMember: newVisit.isPrincipleMember,
-        schemeName: newVisit.schemeName,
-      };
-  
-      const appointmentId = await dispatch(createTriageVisit(visitData));
-  
-      if (appointmentId) {
-        message.success("Visit created successfully!");
-        setAppointmentId(appointmentId);
-  
-        // Step 3: Optionally dispatch the visit (triage)
-        console.log("Triage visit created for Patient ID:", appointmentId);
-      } else {
-        message.error("Failed to create visit!");
-        setAppointmentId(null);
-        setNewVisit({});
-  
-        // Use previousPath from location.state to navigate back
-        navigate(location.state?.previousPath || "/reception/visitors-list");
-      }
-    } catch (error) {
-      console.error("Error creating visit:", error);
-      message.error("Error occurred while creating visit!");
+const savepatientVisit = async () => {
+  if (!newVisit.clinic) {
+    message.error("Please select a clinic before saving the visit.");
+    return;
+  }
+  if (!newVisit.doctor) {
+    message.error("Please select a doctor before saving the visit.");
+    return;
+  }
+
+  try {
+    // Step 2: Create Triage Visit
+    const visitData = {
+      patientNo:
+        patientNo ||
+        patientData?.patientNo ||
+        existingPatient?.PatientNo ||
+        patientData?.PatientNo ||
+        visitData?.PatientNo,
+      clinic: newVisit.clinic,
+      doctor: newVisit.doctor,
+      paymentMode: newVisit.paymentMode || existingPatient?.paymentMode ==="Cash"?"2":"1" || patientData?.paymentMode ==="Cash"?"2":"1" || visitData?.paymentMode ==="Cash"?"2":"1",
+      insuranceNo: newVisit.insuranceNo,
+      membershipNo: newVisit.membershipNo,
+      insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
+      isPrincipleMember: newVisit.isPrincipleMember,
+      schemeName: newVisit.schemeName,
+    };
+
+    // Dispatch the visit creation
+    const appointmentId = await dispatch(createTriageVisit(visitData));
+console.log("Visit created for Patient ID:", appointmentId);
+    if (appointmentId) {
+      message.success("Visit created successfully!");
+      setAppointmentId(appointmentId);
+
+      // Step 3: Optionally dispatch the visit (triage)
+      console.log("Triage visit created for Patient ID:", appointmentId);
+    } else {
+      message.error("Failed to create visit!");
+      setAppointmentId(null);
+      setNewVisit({});
+      // Use previousPath from location.state to navigate back
+      // navigate(location.state?.previousPath || "/reception/visitors-list");
     }
-  };
-  
+  } catch (error) {
+    console.error("Error creating visit:", error);
+    message.error("Error occurred while creating visit!");
+  }
+};
+
   const dispatchPatient = async (appointmentId) => {
+    if (!newVisit.clinic) {
+      message.error("Please select a clinic before dispatching the patient.");
+      return;
+    }
+    if (!newVisit.doctor) {
+      message.error("Please select a doctor before dispatching the patient.");
+      return;
+    }
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
     }
-  
+
     try {
       console.log("Dispatching patient with appointment ID:", appointmentId);
       await dispatch(postTriageVisit(appointmentId));
       message.success("Patient has been dispatched successfully!");
-  
+
       // Use previousPath from location.state to navigate back
       navigate(location.state?.previousPath || "/reception/visitors-list");
     } catch (error) {
@@ -172,7 +198,7 @@ const CreateVisitForm = () => {
       message.error("Failed to dispatch patient!");
     }
   };
-  
+
 
   const handleSwitchChange = (name, value) => {
     setNewVisit((prev) => {
@@ -252,6 +278,7 @@ const CreateVisitForm = () => {
                     <Input
                       label="Patient No"
                       value={
+                        patientNo||
                         patientData?.patientNo ||
                         existingPatient?.PatientNo ||
                         patientData?.PatientNo ||
@@ -288,6 +315,10 @@ const CreateVisitForm = () => {
                       className="w-100"
                       value={newVisit.clinic}
                       onChange={(value) => handleInputChange("clinic", value)}
+                      showSearch
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
                     >
                       <Select.Option value="">--Select Clinic--</Select.Option>
                       {clinicsPayload &&
@@ -307,6 +338,12 @@ const CreateVisitForm = () => {
                       className="w-100"
                       value={newVisit.doctor} // This will hold the DoctorID
                       onChange={(value) => handleInputChange("doctor", value)} // Update DoctorID
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      }
+                      disabled={!newVisit.clinic}
                     >
                       <Select.Option value="">--Select Doctor--</Select.Option>
                       {filteredDoctors &&
@@ -328,17 +365,27 @@ const CreateVisitForm = () => {
                       <span className="text-danger px-1">*</span>
                     </label>
                     <Select
-                      placeholder="Select Settlement Type"
-                      className="w-100"
-                      value={newVisit.paymentMode}
-                      onChange={(value) =>
-                        handleInputChange("paymentMode", value)
-                      }
-                    >
-                      <Select.Option value="">--Select--</Select.Option>
-                      <Select.Option value="2">Cash</Select.Option>
-                      <Select.Option value="1">Insurance</Select.Option>
-                    </Select>
+  placeholder="Select Settlement Type"
+  className="w-100"
+  value={
+    newVisit.paymentMode || 
+    (patientData?.paymentMode === "1"
+      ? "Insurance"
+      : patientData?.paymentMode === "2"
+        ? "Cash"
+        : existingPatient?.PatientType || "N/A")
+  }
+  onChange={(value) => handleInputChange("paymentMode", value)}
+  showSearch
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+>
+  <Select.Option value="">--Select--</Select.Option>
+  <Select.Option value="2">Cash</Select.Option>
+  <Select.Option value="1">Insurance</Select.Option>
+</Select>
+
                   </div>
 
                   {newVisit.paymentMode === "1" && (
@@ -355,6 +402,10 @@ const CreateVisitForm = () => {
                           handleInputChange("insuranceNo", value)
                         }
                         disabled={newVisit.paymentMode !== "1"}
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                       >
                         <Select.Option value="">
                           --Select Insurance--
@@ -381,71 +432,71 @@ const CreateVisitForm = () => {
                 {
                   newVisit.paymentMode === "1" && (
                     <>
-                    <div className="row px-3 py-2 align-items-center justify-content-between">
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Membership No:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Membership No"
-                      value={newVisit.membershipNo}
-                      onChange={(e) =>
-                        handleInputChange("membershipNo", e.target.value)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
+                      <div className="row px-3 py-2 align-items-center justify-content-between">
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Membership No:<span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Membership No"
+                            value={newVisit.membershipNo}
+                            onChange={(e) =>
+                              handleInputChange("membershipNo", e.target.value)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
 
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Insurance Scheme Name:
-                      <span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Insurance Scheme"
-                      value={newVisit.schemeName}
-                      onChange={(e) =>
-                        handleInputChange("schemeName", e.target.value)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
-                </div>
-                <div className="row px-3 py-2 align-items-center justify-content-between">
-                  <div className="col-md-6">
-                    <label className="py-1">
-                      Principal Name:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Input
-                      label="Principal Name"
-                      value={newVisit.insurancePrincipalMemberName} // Use insurancePrincipalMemberName here
-                      onChange={(e) =>
-                        handleInputChange(
-                          "insurancePrincipalMemberName",
-                          e.target.value
-                        )
-                      }
-                      disabled={
-                        newVisit.paymentMode !== "1" ||
-                        newVisit.isPrincipleMember
-                      } // Disable if the user is the principal member
-                      style={{ width: "100%", fontWeight: "bold", color: "black" }}
-                    />
-                  </div>
-                  <div className="col-12 col-md-6">
-                    <label className="py-1">
-                      Is Principle Member:
-                      <span className="text-danger px-1">*</span>
-                    </label>
-                    <Switch
-                      checked={newVisit.isPrincipleMember}
-                      onChange={(checked) =>
-                        handleSwitchChange("isPrincipleMember", checked)
-                      }
-                      disabled={newVisit.paymentMode !== "1"}
-                    />
-                  </div>
-                </div>
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Insurance Scheme Name:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Insurance Scheme"
+                            value={newVisit.schemeName}
+                            onChange={(e) =>
+                              handleInputChange("schemeName", e.target.value)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
+                      </div>
+                      <div className="row px-3 py-2 align-items-center justify-content-between">
+                        <div className="col-md-6">
+                          <label className="py-1">
+                            Principal Name:<span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            label="Principal Name"
+                            value={newVisit.insurancePrincipalMemberName} // Use insurancePrincipalMemberName here
+                            onChange={(e) =>
+                              handleInputChange(
+                                "insurancePrincipalMemberName",
+                                e.target.value
+                              )
+                            }
+                            disabled={
+                              newVisit.paymentMode !== "1" ||
+                              newVisit.isPrincipleMember
+                            } // Disable if the user is the principal member
+                            style={{ width: "100%", fontWeight: "bold", color: "black" }}
+                          />
+                        </div>
+                        <div className="col-12 col-md-6">
+                          <label className="py-1">
+                            Is Principle Member:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Switch
+                            checked={newVisit.isPrincipleMember}
+                            onChange={(checked) =>
+                              handleSwitchChange("isPrincipleMember", checked)
+                            }
+                            disabled={newVisit.paymentMode !== "1"}
+                          />
+                        </div>
+                      </div>
                     </>
                   )
                 }
@@ -469,15 +520,13 @@ const CreateVisitForm = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      {`${
-                        patientData?.firstName?.charAt(0) ||
+                      {`${patientData?.firstName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(0) ||
                         ""
-                      }${
-                        patientData?.lastName?.charAt(0) ||
+                        }${patientData?.lastName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(1).toUpperCase() ||
                         ""
-                      }`}
+                        }`}
                     </Avatar>
                   </div>
                   {/* Add dynamic data fields for patientType, settlementType, clinic, doctor */}
@@ -487,8 +536,8 @@ const CreateVisitForm = () => {
                       {patientData?.paymentMode === "1"
                         ? "Insurance"
                         : patientData?.paymentMode === "2"
-                        ? "Cash"
-                        : existingPatient?.PatientType || "N/A"}
+                          ? "Cash"
+                          : existingPatient?.PatientType || "N/A"}
                     </p>
 
                     <p>
@@ -496,8 +545,8 @@ const CreateVisitForm = () => {
                       {newVisit.paymentMode === "1"
                         ? "Insurance"
                         : newVisit.paymentMode === "2"
-                        ? "Cash"
-                        : "N/A"}
+                          ? "Cash"
+                          : "N/A"}
                     </p>
                     <p>
                       <strong>Clinic:</strong> {newVisit.clinic || "N/A"}

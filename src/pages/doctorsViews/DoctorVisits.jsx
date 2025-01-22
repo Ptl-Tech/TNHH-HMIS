@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Table } from "antd";
+import { Badge, Button, Card, message, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -16,6 +16,7 @@ import {
   rowClassName,
 } from "../../utils/helpers";
 import { render } from "react-dom";
+import { postCheckInPatient } from "../../actions/Doc-actions/postCheckInPatient";
 const DoctorVisits = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,12 +29,14 @@ const DoctorVisits = () => {
     treatmentNo: "",
     urgency: "",
   });
-
+const[loading, setLoading]= useState(false)
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
+    const { loadingCheInPatient: checkInLoading } =
+    useSelector((state) => state.checkInConsulation);
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
@@ -43,7 +46,7 @@ const DoctorVisits = () => {
   }, [dispatch]);
 
   const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New" 
+    (item) => item.Status === "New"
   );
   const closedConsultationList = treatmentList?.filter(
     (item) => item.Status === "Closed"
@@ -55,11 +58,13 @@ const DoctorVisits = () => {
     IDNumber: patient.IDNumber,
     Age: patient.AgeinYears,
     PatientType: patient.PatientType,
+    Inpatient: patient.Inpatient, 
   }));
+  console.log("patient details",openDoctorVisitListWithPatientDetails);
 
   const combinedList = openDoctorVisitList.map((room) => {
     const matchingPatient = openDoctorVisitListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo
+      (patient) => patient.PatientNo === room.PatientNo 
     );
 
     return {
@@ -69,26 +74,29 @@ const DoctorVisits = () => {
       IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
       Age: matchingPatient ? matchingPatient.Age : "",
       PatientType: matchingPatient ? matchingPatient.PatientType : "",
+      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
     };
   });
 
   const waitingListTableDataSource = combinedList
-    ?.map((item, index) => ({
-      key: index + 1,
-      treatmentNo: item?.TreatmentNo,
-      patientNo: item?.PatientNo,
-      observationNo: item?.ObservationNo,
-      treatmentDate: item?.TreatmentDate,
-      treatmentTime: item?.TreatmentTime,
-      searchName: item?.SearchName,
-      idNumber: item?.IDNumber,
-      age: item?.Age,
-      patientType: item?.PatientType,
-      urgency: item?.UrgencyStatus,
-    }))
-    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
+  .filter((item) => item.Inpatient !== true)
+  ?.map((item, index) => ({
+    key: index + 1,
+    treatmentNo: item?.TreatmentNo,
+    patientNo: item?.PatientNo,
+    observationNo: item?.ObservationNo,
+    treatmentDate: item?.TreatmentDate,
+    treatmentTime: item?.TreatmentTime,
+    searchName: item?.SearchName,
+    idNumber: item?.IDNumber,
+    age: item?.Age,
+    patientType: item?.PatientType,
+    urgency: item?.UrgencyStatus,
+    Inpatient: item?.Inpatient,
+  }))
+  .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
 
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
+  const [filteredPatients, setFilteredPatients] = useState("");
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -103,14 +111,14 @@ const DoctorVisits = () => {
     const isSearching = Object.values(searchParams).some(
       (value) => value.trim() !== ""
     );
-
+  
     if (isSearching) {
       const filtered = waitingListTableDataSource.filter((patient) => {
         const treatmentNo = patient.treatmentNo?.toLowerCase() || "";
         const patientNo = patient.patientNo?.toLowerCase() || "";
         const searchName = patient.searchName?.toLowerCase() || "";
         const urgency = patient.UrgencyStatus || "";
-
+  
         return (
           treatmentNo.includes(searchParams.treatmentNo.toLowerCase()) &&
           searchName.includes(searchParams.searchName.toLowerCase()) &&
@@ -118,13 +126,17 @@ const DoctorVisits = () => {
           urgency.includes(searchParams.urgency)
         );
       });
-
-      setFilteredPatients(filtered);
+  
+      // Apply inpatient filter after search filter
+      const filteredWithoutInpatients = filtered.filter(
+        (item) => item.Inpatient !== true
+      );
+      setFilteredPatients(filteredWithoutInpatients);
     } else {
       setFilteredPatients(waitingListTableDataSource);
     }
   };
-
+  
   const waitingListColumns = [
     {
       title: "#",
@@ -135,15 +147,18 @@ const DoctorVisits = () => {
       title: "Treatment No",
       dataIndex: "treatmentNo",
       key: "treatmentNo",
-      render: (text) => (
-        <span
-          onClick={() => handleNavigate(text, text.treatmentNo)}
-          className="fw-bold"
-          style={{ color: "green" }}
-        >
-          {text}
-        </span>
-      ),
+      render: (_, record) => {
+        const { color } = getUrgencyColorcode(record.urgency)
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            className="fw-bold"
+            style={{ color: color }}
+          >
+            {record.treatmentNo}
+          </span>
+        )
+      }
     },
     {
       title: "Patient Name",
@@ -214,6 +229,14 @@ const DoctorVisits = () => {
         return <span>{record.age} years</span>;
       },
     },
+    // {
+    //   title:"Inpatient",
+    //   dataIndex: "Inpatient",
+    //   key: "Inpatient",
+    //   render: (_, record) => {
+    //     return <span>{record.Inpatient ? "Yes" : "No"}</span>;
+    //   },
+    // },
 
     {
       title: "Urgency",
@@ -222,11 +245,14 @@ const DoctorVisits = () => {
       render: (_, record) => {
         const { color, text } = getUrgencyColorcode(record.urgency);
         return (
-          <Badge
+          <Tag
             color={color}
-            text={text} // Display urgency text
-            style={{ color: color }}
-          />
+            // text={text} // Display urgency text
+            className="fw-bold"
+            // style={{ 
+            //   color: color,
+            // }}
+          >{text}</Tag>
         );
       },
     },
@@ -246,12 +272,21 @@ const DoctorVisits = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
-      state: {
-        patientNo: record.patientNo,
-        observationNo: record.observationNo,
-      },
-    });
+    dispatch(postCheckInPatient(treatmentNo)).then((data)=>{
+      if(data.status==='success'){
+        message.success('Patient checked in to the Consultation Room ')
+        navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
+          state: {
+            patientNo: record.patientNo,
+            observationNo: record.observationNo,
+            patientDetails: record,
+          },
+        });
+      }else{
+        message.error('An error occurred, please try again')
+      }
+    })
+   
   };
 
   return (
@@ -304,12 +339,12 @@ const DoctorVisits = () => {
           />
         </div>
       </Card>
-      {treatmentListLoading ? (
+      {loading ? (
         <Loading />
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={filteredPatients}
+          dataSource={waitingListTableDataSource}
           bordered
           size="middle"
           rowClassName={rowClassName} // Apply the row color

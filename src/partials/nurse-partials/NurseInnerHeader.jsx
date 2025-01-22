@@ -1,8 +1,7 @@
 import { Space, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
 import PropTypes from "prop-types"
 
-const NurseInnerHeader = ({ filterInPatients, title }) => {
+const NurseInnerHeader = ({ filterInPatients, icon, title }) => {
   return (
     <>
         <Space
@@ -15,10 +14,11 @@ const NurseInnerHeader = ({ filterInPatients, title }) => {
           position: "relative",
         }}
       >
-        <ProfileOutlined />
+        {icon}
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}
         >
+          
           {title}
 
         </Typography.Text>
@@ -68,4 +68,5 @@ export default NurseInnerHeader
 NurseInnerHeader.propTypes = {
   filterInPatients: PropTypes.array,
   title: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired
 };

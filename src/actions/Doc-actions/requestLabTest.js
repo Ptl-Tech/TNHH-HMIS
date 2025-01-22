@@ -30,24 +30,22 @@ export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
     };
 
     const response = await axios.post(
-      `${API}Doctor/RequestPatientRadiologyTests`,
+      `${API}Doctor/RequestPatientLaboratoryTests`,
       {
+        staffNo: userInfo.userData.no,
         treatmentNo: treatmentId,
       },
       config
     );
 
-    const responseData = {
-      status: response.data.status,
-      data: response.data,
-    };
-
-    setTimeout(() => {
-      dispatch({ type: REQUEST_LAB_TEST_SUCCESS, payload: responseData });
-      message.success("Radiology Test posted Successfully", 2);
+       setTimeout(() => {
+      dispatch({ type: REQUEST_LAB_TEST_SUCCESS, payload: response.data });
+      // message.success("Radiology Test posted Successfully", 2);
     }, 2000);
 
-    return responseData.data; 
+    
+
+    return response.data; 
   } catch (error) {
     setTimeout(() => {
       dispatch({
@@ -83,6 +81,7 @@ export const getPatientLabTest = () => async (dispatch, getState) => {
       `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=true`,
       config
     );
+    console.log(data)
 
     dispatch({ type: VIEW_PATIENT_LAB_TEST_SUCCESS, payload: data });
   } catch (error) {

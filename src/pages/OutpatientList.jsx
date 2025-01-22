@@ -42,6 +42,7 @@ const OutpatientList = () => {
       );
     }
   }, [patients]);
+  console.log(patients);
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -98,7 +99,7 @@ const OutpatientList = () => {
               <Button
                 icon={<EyeOutlined />}
                 onClick={() =>
-                  navigate("/reception/Patient-Registration", {
+                  navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
                     state: { patientDet: record },
                   })
                 }

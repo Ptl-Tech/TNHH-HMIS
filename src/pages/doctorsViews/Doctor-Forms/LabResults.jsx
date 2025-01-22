@@ -1,17 +1,15 @@
 import {
   Form,
-  Input,
   DatePicker,
   Row,
   Col,
   Button,
   Typography,
   Select,
-  Table,
   message,
-  Popconfirm,
+  Tag,
 } from "antd";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getLabRequestSetup } from "../../../actions/Doc-actions/qyLabTestsSetup";
 import { postLabRequest } from "../../../actions/Doc-actions/postLabRequest";
@@ -24,11 +22,11 @@ import moment from "moment";
 import {
   FileTextOutlined,
   SaveOutlined,
-  FileOutlined,
   PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  OrderedListOutlined,
 } from "@ant-design/icons";
+import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { Option } = Select;
 
@@ -36,6 +34,10 @@ const LabResults = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
+  const role = useAuth().userData.departmentName
+  const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
@@ -52,7 +54,7 @@ const LabResults = () => {
   );
   const [labRequest, setLabRequest] = useState({
     myAction: "create",
-    treatmentNo,
+    treatmentNo: treatmentNo ? treatmentNo : admissionNo,
     testPackageCode: "",
     dueDate: "",
   });
@@ -62,80 +64,117 @@ const LabResults = () => {
     dispatch(getPatientLabTest());
   }, [dispatch]);
 
-  const handleLabRequest = () => {
-    dispatch(requestLabTest(treatmentNo));
+  const handleLabRequest = async () => {
+    if (selectedRow && selectedRow.TreatmentNo) {
+      try {
+        const response = await dispatch(requestLabTest(selectedRow.TreatmentNo));
+        console.log("Response from requestLabTest:", response);
+        if (response) {
+          message.success(
+            `Requesting test for ${selectedRow.LaboratoryTestPackageName} with Laboratory No: ${response.laboratoryNo}`
+          );
+          // Refresh the patient lab test data
+          dispatch(getPatientLabTest());
+        } else {
+          message.error("Failed to request the lab test. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error requesting lab test:", error);
+        message.error("An error occurred while requesting the lab test.");
+      }
+    } else {
+      message.warning("Please select a lab test to proceed.");
+    }
   };
+  
 
   const handleFieldChange = (field, value) => {
-    setLabRequest((prev) => ({ ...prev, [field]: value }));
+    setLabRequest((prev) => ({
+      ...prev,
+      [field]: field === "dueDate" ? moment(value).format("YYYY-MM-DD") : value,
+    }));
   };
+  
 
   const handleSave = () => {
     dispatch(postLabRequest(labRequest)).then((data) => {
       if (data.status === "success") message.success(data.status);
+      dispatch(getPatientLabTest());
+      showForm(false);
     });
   };
 
   const columns = [
     {
+      title: "Treatment No",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+    },
+    {
       title: "Test Package",
       dataIndex: "LaboratoryTestPackageCode",
       key: "LaboratoryTestPackageCode",
-      render: (text) => 
-        {
-          return (
-            <Button type="link">
-              {text}
-            </Button>
-          );
-        },
+      render: (text) => {
+        return <Button type="link">{text}</Button>;
+      },
     },
     {
       title: "Test Name",
       dataIndex: "LaboratoryTestPackageName",
       key: "LaboratoryTestPackageName",
     },
-
-    { title: "Due Date", dataIndex: "DateDue", key: "DateDue" },
-    { title: "Results", dataIndex: "Results", key: "Results" },
     {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="d-block d-md-flex justify-content-center align-items-center gap-3">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            title="Edit"
-            onClick={() => handleEdit(record)} // Trigger edit when clicked
-          >
-            Edit
-          </Button>
-          <Button
-            type="primary"
-            icon={<FileOutlined />}
-            title="View"
-            onClick={() => console.log(`View: ${record.key}`)}
-            ghost
-          >
-            View
-          </Button>
-          <Popconfirm
-            title="Are you sure?"
-            onConfirm={() => console.log(`Delete: ${record.key}`)}
-          >
-            <Button type="default" icon={<DeleteOutlined />} danger>
-              Delete
-            </Button>
-          </Popconfirm>
-        </div>
-      ),
+      title: "Due Date",
+      dataIndex: "DateDue",
+      key: "DateDue",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (status) => {
+        let color = "default";
+        switch (status) {
+          case "New":
+            color = "blue";
+            break;
+          case "Forwarded":
+            color = "green";
+            break;
+          case "Cancelled":
+            color = "red";
+            break;
+          default:
+            color = "default";
+        }
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Results",
+      dataIndex: "Results",
+      key: "Results",
     },
   ];
-
+  
+  // const rowSelection = {
+  //   type: "radio", // This ensures only one row can be selected
+  //   selectedRowKeys: selectedRow.length ? [selectedRow[0].key] : [], // Ensure only a single row is selected
+  //   onChange: (selectedRowKeys, selectedRow) => {
+  //     setSelectedRow(selectedRow);
+  //   },
+  // };
+  
+  
+  // Filter the data based on the selected rows  
   const dataSource = Array.isArray(patientLabTest)
-    ? patientLabTest.filter((item) => item.TreatmentNo === treatmentNo)
-    : [];
+  ? patientLabTest
+      .filter((item) => item.TreatmentNo === treatmentNo) // Filter based on TreatmentNo
+      .map((item, index) => ({
+        ...item,
+        key: index, // Ensure unique key
+      }))
+  : [];
 
   return (
     <div>
@@ -144,31 +183,62 @@ const LabResults = () => {
         style={{ color: "#0F5689", marginBottom: "12px" }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
-        Laboratory Request
+        Laboratory Request 
       </Typography.Title>
-
-      <div className="d-flex justify-content-end my-2">
+      
+      {
+        role === 'Doctor' ? (
+          <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
+         <div className="d-flex justify-content-start align-items-center">
+         <Button
+              type="primary"
+              style={{
+                marginTop: "16px",
+                marginBottom: "16px",
+                marginRight: "16px",
+                float: "right",
+                width: "150px",
+              }}
+              icon={<FileTextOutlined />}
+              onClick={handleLabRequest}
+              loading={loadingLabRequest}
+              disabled={!selectedRow}
+            >
+              Request Test
+            </Button>
+          
+          {/* <Popconfirm
+            title="Are you sure?"
+            onConfirm={() => console.log(`Delete: ${record.key}`)}
+          >
+            <Button type="default" icon={<DeleteOutlined />} danger>
+              Delete
+            </Button>
+          </Popconfirm> */}
+         </div>
+          <div className="d-flex justify-content-end my-2">
         <Button
           type="primary"
           onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+          icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
         >
-          {!showForm ? " New Request" : "View History"}
+          {!showForm ? " New Request" : "View List"}
         </Button>
       </div>
+        </div>
+        ) : (
+          null
+        )
+      }
+      
 
       {!showForm ? (
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          pagination={{
-            position: ["bottom", "right"],
-            showSizeChanger: true,
-            pageSize: 10,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-          }}
-        />
+           <RowSelectionTable
+           columns={columns}
+           dataSource={dataSource}
+           onRowSelect={(row) => setSelectedRow(row)} // Update selected row
+           tableProps={{ scroll: { x: 600 } }} // Additional Table props
+         />
       ) : (
         <Form layout="vertical" autoComplete="off">
           <Row gutter={24}>
@@ -180,11 +250,12 @@ const LabResults = () => {
                 style={{ width: "100%" }}
               >
                 <DatePicker
-                  format="YYYY-MM-DD"
-                  value={moment()} // Set the current date
+                  // format="YYYY-MM-DD"
+                  value={moment().format("YYYY-MM-DD")} // Set the current date
                   style={{ width: "100%" }}
-                  disabled // Disable the field to make it readonly
+                  onChange={(date) => handleFieldChange("dueDate", date)}
                   inputReadOnly // Make the input readonly
+                  size="large"
                 />
               </Form.Item>
             </Col>
@@ -199,6 +270,11 @@ const LabResults = () => {
                   onChange={(value) =>
                     handleFieldChange("testPackageCode", value)
                   }
+                  showSearch
+                  filterOption={(input, option) =>
+                    option?.children?.toLowerCase().includes(input.toLowerCase())
+                  }
+                   size="large"
                 >
                   {labTestSetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>
@@ -211,22 +287,7 @@ const LabResults = () => {
           </Row>
 
           <div className="my-2">
-            <Button
-              type="primary"
-              style={{
-                marginTop: "16px",
-                marginBottom: "16px",
-                marginRight: "16px",
-                float: "right",
-                width: "150px",
-              }}
-              icon={<FileTextOutlined />}
-              onClick={handleLabRequest}
-              loading={loadingLabRequest}
-              disabled={loadingLabRequestPost}
-            >
-              Request Test
-            </Button>
+           
             <Button
               type="primary"
               style={{

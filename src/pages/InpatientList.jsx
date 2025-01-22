@@ -75,7 +75,7 @@ const InpatientList = () => {
   } = useSelector((state) => state.getDoctorsList);
 
   const [form] = Form.useForm();
- 
+
 
   useEffect(() => {
     if (patients.length) {
@@ -111,7 +111,7 @@ const InpatientList = () => {
     }
   };
 
-  const handleCreateVisit = async() => {
+  const handleCreateVisit = async () => {
     // Logic for creating a visit
     console.log("Visit created!", newVisit);
     const visitData = {
@@ -121,7 +121,7 @@ const InpatientList = () => {
     };
     const appointmentId = await dispatch(createTriageVisit(visitData));
 
-    if(appointmentId) {
+    if (appointmentId) {
       setAppointmentId(appointmentId);
     }
     console.log("Appointment ID:", appointmentId);
@@ -173,18 +173,18 @@ const InpatientList = () => {
 
   useEffect(() => {
     const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
-  
+
     if (branchCode && doctorsPayload) {
       // Determine the clinic to filter by
-      const clinicToFilterBy = selectedPatient?.SpecialClinics || newVisit.clinic; 
-  
+      const clinicToFilterBy = selectedPatient?.SpecialClinics || newVisit.clinic;
+
       // Filter doctors based on specialization and branch
       const filtered = doctorsPayload.filter(
         (doctor) =>
           doctor.Specialization === clinicToFilterBy && // Match specialization with the clinic
           doctor.GlobalDimension1Code === branchCode // Match branch code
       );
-  
+
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [
@@ -193,7 +193,7 @@ const InpatientList = () => {
     newVisit.clinic, // Include the new visit clinic in dependency
     filteredDoctors,
   ]);
-  
+
   const columns = [
     {
       title: "Patient No",
@@ -246,7 +246,7 @@ const InpatientList = () => {
     <div>
       <h4 className="text-center p-3 text-dark">
         <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
-       InPatient List
+        InPatient List
       </h4>
       <div className="d-flex justify-content-between">
         <Button
@@ -432,12 +432,11 @@ const InpatientList = () => {
                         {`Age: ${moment().diff(
                           moment(selectedPatient.DateOfBirth),
                           "years"
-                        )} years and ${
-                          moment().diff(
-                            moment(selectedPatient.DateOfBirth),
-                            "months"
-                          ) % 12
-                        } months`}
+                        )} years and ${moment().diff(
+                          moment(selectedPatient.DateOfBirth),
+                          "months"
+                        ) % 12
+                          } months`}
                       </span>
                     </Form.Item>
                   </Form>
@@ -520,6 +519,10 @@ const InpatientList = () => {
                           style={{ width: "100%" }}
                           onFocus={handleDisplayDropDown}
                           // disabled={!isEditing}
+                          showSearch
+                          filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
                         >
                           <Select.Option value="">Select Clinic</Select.Option>
                           {clinicsPayload.map((clinic) => (
@@ -541,14 +544,19 @@ const InpatientList = () => {
                         }
                         style={{ width: "100%" }}
                         onFocus={handleDisplayDropDown}
+                        showSearch
+                        // filterOption = {true}
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                       >
-                       <Select.Option value="">--Select Doctor--</Select.Option>
-                    {filteredDoctors &&
-                      filteredDoctors.map((doc) => (
-                        <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
-                          {doc.DoctorsName}
-                        </Select.Option>
-                      ))}
+                        <Select.Option value="">--Select Doctor--</Select.Option>
+                        {filteredDoctors &&
+                          filteredDoctors.map((doc) => (
+                            <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                              {doc.DoctorsName}
+                            </Select.Option>
+                          ))}
                       </Select>
                     </Form.Item>
                   </Form>

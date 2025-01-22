@@ -44,7 +44,7 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
 
     setTimeout(() => {
       dispatch({ type: REQUEST_RADIOLOGY_TEST_SUCCESS, payload: responseData });
-      message.success("Radiology Test posted Successfully", 2);
+      // message.success("Radiology Test posted Successfully", 2);
     }, 2000);
 
     return responseData.data;
@@ -81,7 +81,7 @@ export const getPatientRadiologyTest = (treatmentId) => async (dispatch, getStat
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentRadiologyLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}'`,
+      `${API}data/odatafilter?webservice=QyTreatmentRadiologyLines&isList=true&query=$filter=TreatmentNo eq '${treatmentId}'`,
       config
     );
 

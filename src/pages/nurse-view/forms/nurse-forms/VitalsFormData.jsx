@@ -1,12 +1,12 @@
 import { Button, Col, Form, Input, message, Row, } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { POST_TRIAGE_LIST_VITALS_FAIL, POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
+import { POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 
-const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible}) => {
+const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible, role, admissionNumber, number}) => {
 
   const [form] = Form.useForm();
 
@@ -18,7 +18,6 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
       try {
         const {
           pulseRate,
-          pain,
           height,
           weight,
           temperature,
@@ -30,21 +29,23 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
         // Transform values
         const transformedValues = {
           pulseRate,
-          pain: parseInt(cleanValue(pain)),
-          height: parseFloat(cleanValue(height)),
-          weight: parseFloat(cleanValue(weight)),
           temperature: parseFloat(cleanValue(temperature)),
           bloodPreasure,
           sP02,
           respirationRate,
-          BMI: calculateBMI(height, weight),
+          ...(role !== 'Doctor' && {
+            height: parseFloat(cleanValue(height)) || '',
+            weight: parseFloat(cleanValue(weight)) || '',
+            BMI: calculateBMI(height, weight),
+          }),
         };
+        
     
         // Common payload properties
         const baseVitals = {
           ...transformedValues,
-          patientNo: patientNumber,
-          observationNo: observationNumber,
+          patientNo: role === 'Doctor' ? number : patientNumber,
+          observationNo: role === 'Doctor' ? admissionNumber : observationNumber,
         };
       
           // Create vitals
@@ -53,12 +54,14 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
             type: 0,
             myAction: "create",
           };
+
+          console.log('base vitals', baseVitals)
     
           const response = await dispatch(postTriageListVitalsSlice(createVitals));
           if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
             setIsVitalFormVisible(false);
             message.success(response.payload.message || "Vitals successfully created");
-          } else if(response.type === POST_TRIAGE_LIST_VITALS_FAIL){
+          } else if(response.type === "POST_TRIAGE_LIST_VITALS_FAIL"){
             message.error(response.payload.message ||"Error saving vitals data");
           }
         
@@ -120,7 +123,6 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
               height: '',
               weight: '',
               respirationRate: '',
-              pain: 0,
               bmi: "0.0"
             },
             
@@ -256,7 +258,7 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                           }
                   
                           // Ensure value is a valid percentage
-                          const percentageMatch = value.match(/^(\d{1,2}|100)%$/);
+                          const percentageMatch = value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error('SPO2 must be a valid percentage (e.g., 98%).')
@@ -283,7 +285,9 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={16}>
+            {
+              role === 'Nurse' && (
+                <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Height (cm)" name={['vitals', 'height']}
                 
@@ -336,6 +340,8 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                 </Form.Item>
               </Col>
             </Row>
+              )
+            }
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
@@ -364,33 +370,10 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <Form.Item label="Pain (Scale 0-10)" name={['vitals', 'pain']}
-                validationTrigger={['onBlur', 'onChange']}
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Please input pain level!' },
-                  {
-                    validator(_, value) {
-                      if (value >= 0 && value <= 10) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error('Pain level must be a scale of 0-10 !'));
-                    },
-                  },
-                ]}
-
-                >
-                
-                  <Input type='text' 
-                   
-                    placeholder='eg 1'
-              
-                  />
-                </Form.Item>
-              </Col>
             </Row>
-            <Row gutter={16}>
+            {
+              role === 'Nurse' && (
+                <Row gutter={16}>
               <Col span={12}>
               <Form.Item label="BMI" name={['vitals', 'bmi']}
               >
@@ -404,7 +387,9 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                 </Form.Item>
               </Col>
             </Row>
-
+              )
+            }
+          
             <Col span={12}>
                 <Form.Item >
                     <Button type="primary" loading={loading} htmlType="submit">
@@ -426,7 +411,10 @@ export default VitalsFormData
 
 //prop type validation
 VitalsFormData.propTypes = {
-  observationNumber: PropTypes.string.isRequired,
+  observationNumber: PropTypes.string,
   patientNumber: PropTypes.string.isRequired,
-  setIsVitalFormVisible: PropTypes.bool.isRequired
+  setIsVitalFormVisible: PropTypes.bool.isRequired,
+  role: PropTypes.string.isRequired,
+  admissionNumber: PropTypes.string,
+  number: PropTypes.string
 }

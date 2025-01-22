@@ -22,6 +22,7 @@ import {
   countiesListReducer,
   countriesListReducer,
   subCountiesListReducer,
+  subCountWardsListReducer,
   clinicsListReducer,
   getrelationshipOptionsReducer,
   getInsuranceReducer,
@@ -186,6 +187,16 @@ import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer"
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
 import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
+import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
+import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
+import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
+import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
+import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
+import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
+import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
+import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
+import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
+import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -198,6 +209,7 @@ export const rootReducer = combineReducers({
   countriesList: countriesListReducer,
   countiesList: countiesListReducer,
   subCounties: subCountiesListReducer,
+  subCountyWards: subCountWardsListReducer,
   clinics: clinicsListReducer,
   kinsRelations: getrelationshipOptionsReducer,
   createTriageVisit: patientTriageVisitCreateReducer,
@@ -339,4 +351,18 @@ export const rootReducer = combineReducers({
   getBillingList:getBillingListReducer,
   postVisitorList:postVisitorListReducer,
   postPatientHistory:postPatientHistoryNotesReducer,
+  getPatientHistoryNotesReducer:getPatientHistoryNotes,
+  postMSEForm:postMSENotesReducer,
+  getPatientMSE:getPatientMSENotesReducer,
+  getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
+  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
+  getQyPrescriptionLine:getQyPrescriptionLinesReducer,
+  postPatientETC:postPatientECTRequest,
+  getPatientETC:getPatientECTRequest,
+  postKetamine:postPatientKetamineReducer,
+  getKetamine:getPatientKetamineRequest,
+  postImplant:postPatientImplantRequest,
+  checkInConsulation:postCheckInPatientConfirmReducer,
+  markAsCompleted:postMarkAsCompletedReducer,
+
 });

@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { HeartOutlined, SolutionOutlined, MedicineBoxOutlined, UsergroupAddOutlined, ScanOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import { HeartOutlined, NodeIndexOutlined, MedicineBoxOutlined, ScanOutlined, ManOutlined } from '@ant-design/icons';
 import LabResults from './LabResults';
 import Imaging from './Imaging';
 import { Button, Space } from 'antd';
-import { IoBedOutline } from 'react-icons/io5';
-import AdmitPatientForm from './AdmitPatient';
-import Referrals from './Referrals';
 import ECTScan from '../../nurse-view/nurse-care-plan/ECTScan';
+import Ketamine from './Ketamine';
+import ImagingRequests from './ImagingRequests';
+import Implants from './Implants';
 
 const PatientRequests = () => {
+  const [activeItem, setActiveItem] = useState('Laboratory Requests');
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case 'Laboratory Requests':
         setSelectedItem(<LabResults />);
         break;
@@ -20,6 +22,15 @@ const PatientRequests = () => {
     case 'ECT':
         setSelectedItem(<ECTScan />);
         break;
+    case 'Ketamine':
+        setSelectedItem(<Ketamine />);
+        break;
+    case 'Imaging':
+       setSelectedItem(<ImagingRequests />);
+        break;
+    case 'Implants':
+      setSelectedItem(<Implants />)
+      break;   
       default:
         setSelectedItem(<LabResults />);
     }
@@ -43,6 +54,18 @@ const PatientRequests = () => {
       label: 'ECT',
       icon: <ScanOutlined />,
     },
+    {
+      label: 'Ketamine',
+      icon: <NodeIndexOutlined />,
+    },
+    // {
+    //   label: 'Imaging',
+    //   icon: <ContainerOutlined />,
+    // },
+    {
+      label: 'Implants',
+      icon: <ManOutlined />,
+    },
    
   ];
 
@@ -56,19 +79,12 @@ const PatientRequests = () => {
         {buttonItems.map((item, index) => (
           <Button
             key={index}
-            onClick={() => handleOnClick(item.label)}
-            type="primary"
-            style={{
-            //   backgroundColor: selectedItem === item.label ? '#1890ff' : '',
-            //   color: selectedItem === item.label ? '#fff' : '',
-            //   border: selectedItem === item.label ? '1px solid #1890ff' : '',
-              padding: '10px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
+            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+            className={activeItem === item.label ? "active-button" : ""}
+            onClick={() => handleOnClick(item)}
           >
-            {item.icon} {item.label}
+            {item.icon}
+            {item.label}
           </Button>
         ))}
       </Space>

@@ -7,13 +7,15 @@ import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../actions/nurse-actions/postInitiateDischargeSlice";
 import useAuth from "../../hooks/useAuth";
+import { FileMarkdownOutlined, FileOutlined, UserAddOutlined } from "@ant-design/icons";
 
 const Discharges = () => {
   const role = useAuth().userData.departmentName;
-  const [selectedItem, setSelectedItem] = useState("Summary");
+  const [selectedItem, setSelectedItem] = useState(role  === 'Doctor' ? "Initiate Discharge" : "Summary");
   const dispatch=useDispatch();
   const { patientDetails } = useLocation().state;
   const { confirm } = Modal;
+  const [activeItem, setActiveItem] = useState(() => (role === "Nurse" ? "Summary" : "Initiate Discharge"));
 
   const handleInitiateDischargeAction = async () => {
     try {
@@ -60,7 +62,8 @@ const Discharges = () => {
 }
 
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case "Initiate Discharge":
         handleInitiateDischarge();
         break;
@@ -77,6 +80,12 @@ const Discharges = () => {
         setSelectedItem(<Summery />);
     }
   };
+  const menuItems = [
+    ...(role === "Nurse" ? [] : [{ label: "Initiate Discharge", icon: <FileOutlined /> }]),
+    { label: "Summary", icon: <FileOutlined /> },
+    { label: "Discharge Medication", icon: <FileMarkdownOutlined /> },
+    { label: "Sick Off", icon: <UserAddOutlined /> },
+  ]
   return (
     <>
       <div
@@ -88,22 +97,17 @@ const Discharges = () => {
           marginBottom: "10px",
         }}
       >
-        {[
-        "Initiate Discharge",
-        "Summary",
-        "Discharge Medication",
-        "Sick Off",
-        ]
-        .filter((item) => !(role === "Nurse" && item === "Initiate Discharge")) // Exclude "Initiate Discharge" for Nurse
-        .map((item, index) => (
-        <Button
-        key={index}
-        type="primary"
-        style={{ backgroundColor: "#0f5689" }}
-        onClick={() => handleOnClick(item)}
-        >
-        {item}
-        </Button>
+        
+        {menuItems.map((item, index) => (
+          <Button
+            key={index}
+            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+            className={activeItem === item.label ? "active-button" : ""}
+            onClick={() => handleOnClick(item)}
+          >
+            {item.icon}
+            {item.label}
+          </Button>
         ))}
 
       </div>

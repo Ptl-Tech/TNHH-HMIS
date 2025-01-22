@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { PlusOutlined, FileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useEffect, useState } from "react"
 import VisitorFormTable from "../tables/nurse-tables/VisitorFormTable";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,7 @@ const VisitorsList = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const filterVisitorList = ipVisitors.filter((item) => item.AdmissionNo === patientDetails?.CurrentAdmNo);
+    const filterVisitorList = ipVisitors.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
 
     const handleCancel = () => {
       setIsModalOpen(false);
@@ -55,20 +55,17 @@ const VisitorsList = () => {
   return (
     <div>
          
-         <NurseInnerHeader title="Visitors List" icon={<ProfileOutlined />} />
+         <NurseInnerHeader icon={<FileOutlined />} title="Visitors List"  />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
           
           {
             role === 'Nurse' && (
               <>
-                <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New Visitor
+                <Button type="primary"  onClick={handleButtonVisibility}><PlusOutlined /> New Visitor
                 </Button>
-                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
                 View Visitor Details
-                </Button>
-                <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                Preview Visitor List
                 </Button>
               </>
             )

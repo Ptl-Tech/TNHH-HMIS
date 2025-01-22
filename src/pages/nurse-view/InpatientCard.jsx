@@ -1,19 +1,24 @@
 import { Col, Row } from "antd";
 import InpatientCardInfo from "./InpatientCardInfo";
 import InpatientCardContent from "./InpatientCardContent";
-import { useLocation } from "react-router-dom";
+import { redirect, useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import useFetchAllergiesAndMedicationsHook from "../../hooks/useFetchAllergiesAndMedicationsHook";
 
 const InpatientCard = () => {
   
-  const { patientDetails } = useLocation().state;
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   
   // get combined list and loading states from the hook
 
   const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
 
-  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.PatientNo);
+  const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.Patient_No);
+
+  if (!patientDetails) {
+    return redirect("/login");
+  }
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>

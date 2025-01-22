@@ -1,74 +1,106 @@
-import { Button, Space, Table } from "antd"
-import PropTypes from "prop-types";
+import { Badge, Table } from "antd"
+import PropTypes from "prop-types";import { useDispatch, useSelector } from "react-redux";
+// import { getDoctorsList } from "../../../actions/Doc-actions/DoctorActions"; // Import the action to get the doctor list
+import { useEffect, useState } from "react";
+import { listDoctors } from "../../../../actions/DropdownListActions";
 
-const ETCTable = ({ showModal }) => {
+
+const ETCTable = ({ loadingETC, data, treatmentNo, admissionNo }) => {
+  const dispatch = useDispatch();
+  const [updatedData, setUpdatedData] = useState([]);
+
+  const {  data: doctors  } = useSelector((state) => state.getDoctorsList);
+
+  useEffect(() => {
+    dispatch(listDoctors()); // Fetch the list of doctors
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (doctors && data) {
+      const doctorsMap = doctors.reduce((acc, doctor) => {
+        acc[doctor.DoctorID] = doctor.DoctorsName;
+        return acc;
+      }, {});
+
+      const newData = data.map((item) => ({
+        ...item,
+        DoctorName: doctorsMap[item.Doctor_ID] || "",
+      }));
+
+      setUpdatedData(newData); // Update the data object with doctor names
+    }
+  }, [doctors, data]);
+
+  console.log('doctorMap', updatedData);
+
+  const filterData = updatedData?.filter((item) => 
+    treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
+  );
+    const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
+
+  // 
 const columns = [
         {
-            title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
+            title: 'Visit No',
+            dataIndex: 'Link_No',
+            key: 'Link_No',
         },
-        {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
-        },
-        {
-            title: 'Operation',
-            dataIndex: 'operation',
-            key: 'operation',
-        },
-        {
-            title: 'Doctor Name',
-            dataIndex: 'doctorName',
-            key: 'doctorName',
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
-        {
-            title: 'Actions',
-            dataIndex: 'actions',
-            key: 'actions',
-            render: (_, record) => (
-                <Space>
-                    <Button type="primary"
-                    onClick={() => handleEdit(record)}
-                    >Edit</Button>
-                    <Button color="danger" variant="outlined"
-                    onClick={() => handleDelete(record)}
-                    >Cancel</Button>
-                </Space>
-            ),
-        }
-    ];
 
-    const data = [
         {
-            key: '1',
-            date: '2023-04-20',
-            time: '10:00 AM',
-            operation: 'ECT',
-            doctorName: 'Dr. John Doe',
-            description: 'This is a description',
+            title: 'Patient No',
+            dataIndex: 'Patient_No',
+            key: 'Patient_No',
         },
+        {
+            title: 'Procedure Date',
+            dataIndex: 'Procedure_Date',
+            key: 'Procedure_Date',
+        },
+        /* {
+            title: "Procedure Type",
+            dataIndex: "Procedure_Type",
+            key: "Procedure_Type",
+        }, */
+        /* {
+            title: 'Requesting Doctor',
+            dataIndex: 'Requesting Doctor',
+            key: 'Requesting Doctor',
+        }, */
+        {
+            title: 'Requested to',
+            dataIndex: 'DoctorName',
+            key: 'DoctorName',
+        },
+        {
+            title: "Status",
+            dataIndex: "Status",
+            key: "Status",
+            render: (text, record) => {
+              if (record.Status === '0') {
+                return (
+                  <Badge 
+                    status="success" 
+                    text="Pending" // or any other label
+                  />
+                );
+              } else {
+                return (
+                  <Badge 
+                    status="error" 
+                    text="Approved" // or any other label
+                  />
+                );
+              }
+            },
+          }
+          
     ];
-
-    const handleEdit = (record) => {
-        showModal();
-        console.log(record);
-    };
-    const handleDelete = (record) => {
-        console.log(record);
-    };
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div style={{ }}>
     <Table 
-    
+       dataSource={filterProcedureData} 
+       loading={loadingETC}
        columns={columns} 
-       dataSource={data} 
        className="admit-patient-table"
     />
 </div>
@@ -79,5 +111,8 @@ export default ETCTable
 
 //props types validations
 ETCTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
+    loadingETC: PropTypes.bool.isRequired,
+    data: PropTypes.array.isRequired,
+    treatmentNo: PropTypes.string.isRequired,
+    admissionNo: PropTypes.string
 }

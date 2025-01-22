@@ -12,6 +12,8 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
     const { patientDetails } = useLocation().state;
     const dispatch = useDispatch();
     const { loadingDailyProcedure } = useSelector((state) => state.postDailyProcedureOrProcess);
+    const queryParams = new URLSearchParams(location.search);
+    const AdmNo = queryParams.get("AdmNo");
 
     const handleOnFinish = async (values) => {
         try {
@@ -20,12 +22,11 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
           const visitorData = {
             myAction: "create",
             raceId: "",
-            admissionNo: patientDetails?.CurrentAdmNo,
-            processCode: values.process,
-            processDescription: values.process,
+            processCode: "someid",
+            admissionNo: patientDetails?.CurrentAdmNo || AdmNo,
+            processDescription: 'Progress Notes',
             remarks: values.remarks
-          };
-      
+          }; 
           // Dispatch function to handle API call and feedback
           const dispatchDailyProcessData = async (data) => {
             await dispatch(postDailyProcedureOrProcessSlice(data))
@@ -64,37 +65,27 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
             onFinish={handleOnFinish}
             autoComplete="off"
             initialValues={{
-                process: '',
                 processDescription: '',
                 remarks: '',
             }}
             >
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Form.Item label="Process Code" 
-                    rules={[{ required: true, message: 'Please select process!' }]}
-                    name="process"
-                    hasFeedback
-                    >
-                    <Input type='text' placeholder="Enter value" />
-                </Form.Item>
-                </Col>
-                <Col span={12}>
-                    <Form.Item label="Process Description" name="processDescription"
+            {/* <Row gutter={[16, 16]}>
+                <Col span={24}>
+                    <Form.Item label="Progress Description" name="processDescription"
                     rules={[{ required: true, message: 'Please select a time!' }]}
                     hasFeedback
                     >
-                    <Input type='text' placeholder="Enter description" 
+                    <Input type='text' placeholder="Progress description" 
 
                     />
                     </Form.Item>
                 </Col>
-            </Row>
+            </Row> */}
             <Row gutter={[16, 16]}>
                 <Col span={24}>
-                    <Form.Item label="Remarks" name="remarks"
+                    <Form.Item label="Progress Remarks" name="remarks"
                     >
-                    <TextArea type='text' placeholder="Enter value" />
+                    <TextArea type='text' placeholder="Enter progress remarks" autoSize={{ minRows: 10, maxRows: 25 }} />
                     </Form.Item>
                 </Col>
             </Row>
@@ -104,7 +95,7 @@ const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
                         loading={loadingDailyProcedure}
                         disabled={loadingDailyProcedure}
                     >
-                        Post Daily Process
+                        Post Daily Progress
                     </Button>
                     <Button color="danger" variant="outlined" icon={<CloseOutlined />} onClick={() => setIsDailyProcessFormVisible(false)}
                     >

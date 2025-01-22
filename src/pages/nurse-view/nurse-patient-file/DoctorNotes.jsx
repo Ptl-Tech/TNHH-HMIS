@@ -25,12 +25,15 @@ import { EditorState, convertToRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import { stateToHTML } from 'draft-js-export-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import TreatmentHistoryTable from "../tables/nurse-tables/TreatmentHistoryTable";
+import PastDoctorNotesTable from "../tables/nurse-tables/PastDoctorNotesTable";
+
 
 const DoctorNotes = ({ treatmentNo }) => {
   const { loading } = useSelector((state) => state.postDoctorNotes);
   const docDetails = useAuth();
   const dispatch = useDispatch(); // Get the dispatch function
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(true);
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const location = useLocation();
@@ -108,7 +111,7 @@ const DoctorNotes = ({ treatmentNo }) => {
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
         >
-          Doctor Notes
+          Past Doctor Notes
         </Typography.Text>
       </Space>
       <div
@@ -121,7 +124,7 @@ const DoctorNotes = ({ treatmentNo }) => {
         }}
       >
         
-            {
+            {/* {
               role === "Doctor" && (
               <Button type="primary" 
               style={{ width: '100%' }} 
@@ -138,11 +141,11 @@ const DoctorNotes = ({ treatmentNo }) => {
               onClick={handleNavigateReadNotes}
               >
                 Read Doctor Notes
-            </Button>
+            </Button> */}
 
       </div>
 
-      {
+      {/* {
         isFormVisible && (
           <Form layout="vertical" 
           style={{ paddingTop: "20px" }} 
@@ -241,7 +244,9 @@ const DoctorNotes = ({ treatmentNo }) => {
         </Form>
         )
       
-      }
+      } */}
+
+      <PastDoctorNotesTable />
       
     </div>
   );

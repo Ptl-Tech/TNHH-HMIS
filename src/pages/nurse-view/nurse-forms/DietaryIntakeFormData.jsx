@@ -15,7 +15,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
           // Construct the visitor data
           const visitorData = {
             myAction: "create",
-            admissionNo: patientDetails?.CurrentAdmNo,
+            admissionNo: patientDetails?.Admission_No,
             category,
             comments,
           };
@@ -26,6 +26,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
               .then((result) => {
                 if (result.type === POST_DIETARY_INTAKE_FORM_LINE_SUCCESS) {
                   message.success(`Dietary Intake Form Line saved successfully!`);
+                  setIsFormVisible(false);
                   dispatch(getQyDietaryFormLinesSlice());
                 } else if (result.type === POST_DIETARY_INTAKE_FORM_LINE_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");
@@ -56,28 +57,15 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
             onFinish={handleOnFinish}
             initialValues={
                 {
-                    admissionNo: patientDetails?.CurrentAdmNo,
                     category: '',
                     comments: '',
                 }
             }
         >
       <Row gutter={16}>
-        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-        <Form.Item 
-            label="Admission No" 
-            name="admissionNo"
-            hasFeedback
-            >
-            <Input placeholder="Admission No"
-                type='text'
-                disabled
-            />
-        </Form.Item>
-        </Col>
-        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
         <Form.Item
-        label="Category"    
+        label="Select Dietary Category"    
         name="category"
         hasFeedback
         rules={[
@@ -95,6 +83,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
             value: item.Category,
             label: item.Description,
           }))}
+          allowClear
 
           />
         </Form.Item>

@@ -1,11 +1,17 @@
-import { Button, Form, Modal, Select, Space, Typography } from "antd"
-import { ProfileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, Form, Modal, Select } from "antd"
+import { PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import SendToLaboratoryTable from "../tables/nurse-tables/SendToLaboratoryTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import LabRequestFormData from "../forms/nurse-forms/LabRequestFormData";
+import { useLocation } from "react-router-dom";
 
 const LaboratoryRequest = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const { patientDetails } = useLocation().state;
+
     const showModal = () => {
       setIsModalOpen(true);
     };
@@ -15,27 +21,39 @@ const LaboratoryRequest = () => {
     const handleCancel = () => {
       setIsModalOpen(false);
     };
+
+    const handleVitalsButtonVisibility = () => {
+      setIsFormVisible(!isFormVisible);
+    }
   
     const [ form ] = Form.useForm();
 
   return (
     <div>
-      <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Laboratory Requests
-          </Typography.Text>
-        </Space>
+      
+      <NurseInnerHeader title="Laboratory Request" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Laboratory Request
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Laboratory Request
-          </Button>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+          <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility} ><PlusOutlined /> Add Laboratory Request
+        </Button>
+        <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
+          Preview Laboratory Request
+        </Button>
+      </div>
 
-        <SendToLaboratoryTable />
+      {
+        isFormVisible && (
+          <LabRequestFormData patientDetails={patientDetails} setIsFormVisible={setIsFormVisible} />
+        )
+      }
+
+      { 
+        !isFormVisible && (
+          <SendToLaboratoryTable />
+        )
+      }
+
+        
 
         <Modal title="Charges" 
           open={isModalOpen} 

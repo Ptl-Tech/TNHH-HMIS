@@ -1,5 +1,5 @@
 import { Button, Form, Input, Modal } from 'antd'
-import { PlusOutlined, FolderViewOutlined } from '@ant-design/icons'
+import { PlusOutlined, FolderViewOutlined, FileOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 import TextArea from 'antd/es/input/TextArea';
 import SuicidalFormTable from '../tables/nurse-tables/SuicidalFormTable';
@@ -19,14 +19,9 @@ const SuicidalForm = () => {
     const { ipSuicidalForm, loadingIpSuicidalForm } = useSelector(state => state.getIpSuicidalForm);
     const { loadingSuicidalForm } = useSelector(state => state.postSuicidalForm);
     const [isFormVisible, setIsFormVisible] = useState(false);
-const [suicidalFormData, setSuicidalFormData] = useState({
-  date: '',
-  time: '',
-  handingOver: '',
-  takingOver: '',
-  remarks: ''
-});
 
+    const filterForm = ipSuicidalForm.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
+  
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     const staffNo = userInfo?.userData?.no
     let formattedSffNo = staffNo.charAt(0).toUpperCase() + staffNo.slice(1).toLowerCase();
@@ -39,7 +34,6 @@ const [suicidalFormData, setSuicidalFormData] = useState({
       if(record){
         form.setFieldsValue({
           handingOver: record?.HandingOver || '',
-          takingOver: record?.TakingOver || '',
           remarks: record?.Remarks || ''
         });
       }
@@ -67,25 +61,22 @@ const [suicidalFormData, setSuicidalFormData] = useState({
     }
 
     useEffect(() => {
-        dispatch(getSuicidalFormSlice(patientDetails?.CurrentAdmNo));
-    }, [dispatch, patientDetails?.CurrentAdmNo]);
+        dispatch(getSuicidalFormSlice());
+    }, [dispatch]);
     
   return (
     <div>
 
-        <NurseInnerHeader title="Suicidal Precaution Form" />
+        <NurseInnerHeader icon={<FileOutlined/>} title="Suicidal Precaution Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
           {
             role === 'Nurse' && (
               <>
-                <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New Suicidal Precaution Form
+                <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Suicidal Precaution Form
                 </Button>
-                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
-                View Suicidal Precaution Form
-                </Button>
-                <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                Preview Form
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                View Data
                 </Button>
               </>
             )
@@ -117,7 +108,7 @@ const [suicidalFormData, setSuicidalFormData] = useState({
             <SuicidalFormTable 
             rowSelection={rowSelection}
             showModal={showModal} 
-            ipSuicidalForm={ipSuicidalForm} 
+            ipSuicidalForm={filterForm} 
             loadingIpSuicidalForm={loadingIpSuicidalForm} 
             />
           )

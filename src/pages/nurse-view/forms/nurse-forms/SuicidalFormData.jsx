@@ -10,16 +10,18 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
     const dispatch = useDispatch();
     const handleOnFinish = async (values) => {
         try {
-  
+
           const { handingOver, remarks } = values;
   
           const suicidalFormData = {
             myAction: "create",
-            admissionNo: patientDetails?.CurrentAdmNo,
+            admissionNo: patientDetails?.Admission_No,
             handingOver,
             takingOver: formattedSffNo,
             remarks   
           }
+
+          console.log('form data', suicidalFormData)
   
            // Dispatch function to handle API call and feedback
           const dispatchSuicidalFormData = async (data) => {
@@ -27,6 +29,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
               .then((result) => {
                 if (result.type === POST_SUICIDAL_FORM_SUCCESS) {
                   message.success(`suicidal precaution form has been saved successfully!`);
+                  setIsFormVisible(false);
                   dispatch(getSuicidalFormSlice());
                 } else if (result.type === POST_SUICIDAL_FORM_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");
@@ -65,7 +68,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                   }}
             >
             <Row gutter={16}>
-                <Col span={12}>
+                <Col span={24}>
                     <Form.Item 
                     label="Handing Over Nurse" 
                     name="handingOver"
@@ -86,18 +89,6 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                     />
                     </Form.Item>
                 </Col>
-                <Col span={12}>
-                    <Form.Item 
-                    label="Taking Over" 
-                    name="takingOver"
-                    hasFeedback
-                    >
-                    <Input placeholder="Taking Over Nurse"
-                        type="text"
-                        disabled
-                    />
-                    </Form.Item>
-                </Col>
             </Row>
             <Row>
                 <Col span={24}>
@@ -112,7 +103,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                   }
                 ]}
                 >
-                <TextArea placeholder="Remarks"
+                <TextArea placeholder="Enter Remarks" autoSize={{ minRows: 3 }}
                     type="text"
                     
                 />

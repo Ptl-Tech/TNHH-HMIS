@@ -59,7 +59,7 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadi
       key: 'SP02',
       render: (_, record) => {
         return record.SP02 ? (
-          <span>{record.SP02} %</span>
+          <span>{record.SP02}</span>
         ) : (
           <span>0</span>
         )

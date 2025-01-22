@@ -1,12 +1,13 @@
 import { Button, Col, Form, Input, Modal, Row } from "antd";
 import { useState } from "react";
-import { FolderViewOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { FolderViewOutlined, FolderAddOutlined, FileMarkdownOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
 import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
 
 const Vitals = () => {
 
@@ -14,12 +15,19 @@ const Vitals = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { patientDetails } = useLocation().state;
-        const [isVitalFormVisible, setIsVitalFormVisible] = useState(false);
+        const [isVitalFormVisible, setIsVitalFormVisible] = useState(false)
+        const role = useAuth().userData.departmentName
+        const queryParams = new URLSearchParams(location.search);
+        const AdmNo = queryParams.get("AdmNo");
+        const PatientNo = queryParams.get("PatientNo")
 
+        
         const { combinedList, loadingInpatientVitals, loadingTriageList } = useFetchVitalsHook();
-
-        const filterVitals = combinedList?.filter(vitals => vitals.PatientNo === patientDetails?.PatientNo);
-   
+        const filterInpatientVitals = combinedList?.filter((vitals) => 
+          role === 'Nurse'
+          ? vitals.PatientNo === patientDetails?.Patient_No
+          : vitals.PatientNo === PatientNo
+      );
 
         const handleCancel = () => {
           setIsModalOpen(false);
@@ -48,9 +56,9 @@ const Vitals = () => {
 
   return (
     <div>
-      <NurseInnerHeader title="Vitals"/>
+      <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Vitals"/>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
         <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
            Add Vitals
           </Button>
@@ -63,7 +71,7 @@ const Vitals = () => {
         {
           isVitalFormVisible && (
             
-              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible}/>
+              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible} role={role} admissionNumber={AdmNo} number={PatientNo}/>
            
           )
         }
@@ -71,7 +79,7 @@ const Vitals = () => {
 
         {
           !isVitalFormVisible && (
-            <VitalsTable  rowSelection={rowSelection} filterVitals={filterVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
+            <VitalsTable  rowSelection={rowSelection} filterVitals={filterInpatientVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
           )
         }
 

@@ -79,6 +79,7 @@ import ConsultationCard from "./pages/nurse-view/ConsultationCard";
 import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 import ReadDoctorNotes from "./pages/ReadDoctorNotes";
+import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
 
 function App() {
   return (
@@ -156,7 +157,7 @@ function App() {
           <Route index element={<ReceptionDashboard />} />
 
           <Route
-            path="/reception/Patient-Registration"
+            path="/reception/Patient-Registration/:PatientNo?"
             element={<PatientRegistration />}
           />
           <Route
@@ -204,6 +205,10 @@ function App() {
             path="/Doctor/ClosedConsultationList"
             element={<CloseList />}
           />
+            <Route
+            path="/Doctor/PendingConsultationList"
+            element={<ConsultationRoomPatients />}
+          />
 
           <Route
             path="/Doctor/Consultation/Patient"
@@ -228,6 +233,7 @@ function App() {
             path="/Doctor/Past-doctor-visit/Patient"
             element={<TreatmentCard />}
           />
+          <Route path="/Doctor/Inpatient/Read-nurse-notes" element={<ReadNurseNotes />} />
           <Route
             path="/Doctor/Past-doctor-visit/Patient"
             element={<TreatmentCard />}
