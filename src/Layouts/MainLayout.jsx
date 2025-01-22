@@ -20,6 +20,7 @@ import {
   SolutionOutlined,
   RetweetOutlined,
   LayoutOutlined,
+  UserAddOutlined
   
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
@@ -30,10 +31,12 @@ import Signout from "../Auth/Signout";
 import { BiCoinStack } from "react-icons/bi";
 import { FaUserFriends } from "react-icons/fa";
 import DynamicBreadcrumb from "./DynamicBreadcrumb";
+import useAuth from "../hooks/useAuth";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const MainLayout = () => {
+  const role = useAuth().userData.departmentName
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -65,6 +68,11 @@ const MainLayout = () => {
             key: "/reception/Patient-list",
             label: "Patient List",
             icon: <FileTextOutlined style={{ color: "#fff" }} />,
+          },
+          {
+            key: "/reception/Walkin-patient-list",
+            label: "Walk-in Patient List",
+            icon: <UserAddOutlined style={{ color: "#fff" }} />,
           },
           {
             key: "/reception/converted-patients",
@@ -202,6 +210,7 @@ const MainLayout = () => {
         icon: <AppstoreOutlined style={{ color: "#fff" }} />,
         label: "Dashboard",
       },
+
       {
         key: "patient-list",
         icon: <FaUserFriends style={{ color: "#fff" }} />,
@@ -212,16 +221,20 @@ const MainLayout = () => {
             label: "OutPatients",
             icon: <TeamOutlined style={{ color: "#fff" }} />,
           },
-          {
-            key: "/Doctor/Inpatient",
-            label: "In-Patient List",
-            icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
-          },
-          {
-            key: "/Doctor/Admissions",
-            label: "Admissions",
-            icon: <FileAddOutlined style={{ color: "#fff" }} />,
-          },
+          ...(role === "Doctor"
+            ? [
+                {
+                  key: "/Doctor/Inpatient",
+                  label: "In-Patient List",
+                  icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
+                },
+                {
+                  key: "/Doctor/Admissions",
+                  label: "Admissions",
+                  icon: <FileAddOutlined style={{ color: "#fff" }} />,
+                },
+              ]
+            : []),
           {
             key: "/Doctor/Past-doctor-visit",
             label: "Past Doctor Visits",
@@ -229,6 +242,8 @@ const MainLayout = () => {
           },
         ],
       },
+      
+      
       // {
       //   key: "/doctors/appointments",
       //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
@@ -263,6 +278,7 @@ const MainLayout = () => {
           },
         ],
       },
+       ...role === "Doctor" ? [
       {
         key: "/doctor/radiology",
         icon: <RadarChartOutlined style={{ color: "#fff" }} />,
@@ -342,6 +358,7 @@ const MainLayout = () => {
           }
         ],
       },
+    ] : [],
     ];
     // Security Routes
     const securityRoutes = [

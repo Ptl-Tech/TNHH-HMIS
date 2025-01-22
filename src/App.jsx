@@ -80,6 +80,8 @@ import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 import ReadDoctorNotes from "./pages/ReadDoctorNotes";
 import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
+import WalkInPatientList from "./pages/WalkinPatientList";
+import WalkinRegistration from "./pages/WalkinRegistration";
 
 function App() {
   return (
@@ -166,6 +168,8 @@ function App() {
           />
 
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
+          <Route path="/reception/Walkin-patient-list" element={<WalkInPatientList />} />
+          <Route path="/reception/Register-walkin" element={<WalkinRegistration />} />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
           <Route
             path="/reception/appointments/list"
@@ -266,6 +270,79 @@ function App() {
           <Route path="/Doctor/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
           <Route path="/Doctor/Pharmacy-History" element={<PharmacyHistoryList />} />
           <Route path="/Doctor/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} />
+          <Route path="view-profile" element={<ViewProfile />} />
+        </Route>
+      </Route>
+
+      <Route element={<PrivateRoute allowedDepartments={["Psychology"]} />}>
+        <Route path="/Psychology" element={<MainLayout />}>
+          <Route index element={<DoctorDashboard />} />
+          <Route path="/Psychology/Consultation-List" element={<DoctorVisits />} />
+          <Route
+            path="/Psychology/ClosedConsultationList"
+            element={<CloseList />}
+          />
+            <Route
+            path="/Psychology/PendingConsultationList"
+            element={<ConsultationRoomPatients />}
+          />
+
+          <Route
+            path="/Psychology/Consultation/Patient"
+            element={<ConsultationRoomEvalutionCard />}
+          />
+          <Route path="/Psychology/Inpatient" element={<Inpatient />} />
+          <Route
+            path="/Psychology/Inpatient/Patient-card"
+            element={<InpatientCard />}
+          />
+          <Route path="/Psychology/Admissions" element={<DoctorAdmissions />} />
+          <Route path="/Psychology/Discharge-list" element={<DischargeList />} />
+          <Route
+            path="/Psychology/Discharge-requests"
+            element={<DischargeRequests />}
+          />
+          <Route
+            path="/Psychology/Past-doctor-visit"
+            element={<PastDoctorVisit />}
+          />
+          <Route
+            path="/Psychology/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
+          <Route path="/Psychology/Inpatient/Read-nurse-notes" element={<ReadNurseNotes />} />
+          <Route
+            path="/Psychology/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
+          <Route path="/Psychology/Lab-Patients" element={<LabOutPatient />} />
+          <Route
+            path="/Psychology/Radiology-Patients"
+            element={<RadiologyOutPatient />}
+          />
+          {/* Laboratory Routes */}
+          <Route
+            path="/Psychology/Lab/Patient"
+            element={<LaboratoryEvaluationCard />}
+          />
+
+          <Route
+            path="/Psychology/Approved-Admissions"
+            element={<VerifiedAdmission />}
+          />
+          <Route
+            path="/Psychology/Admitted-Patients"
+            element={<AdmittedPatients />}
+          />
+          <Route
+            path="/Psychology/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route path="/Psychology/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
+          <Route path="/Psychology/Pharmacy-Card" element={<PharmacyCard />} />
+          <Route path="/Psychology/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
+          <Route path="/Psychology/Pharmacy-History" element={<PharmacyHistoryList />} />
+          <Route path="/Psychology/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>

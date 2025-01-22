@@ -22,17 +22,17 @@ const EvaluationCardContent = ({
         <Tabs defaultActiveKey="1">
           
           {
-            role === "Doctor" && (
-              <Tabs.TabPane tab="Triage Room " key="2">
-                <ObservationRoom
-                  treatmentNo={treatmentNo}
-                  observationNo={observationNo}
-                  patientNo={patientNo}
-                />
-              </Tabs.TabPane>
+            (role === "Doctor" || role === "Psychology") && (
+            <Tabs.TabPane tab="Triage Room" key="2">
+            <ObservationRoom
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+            />
+            </Tabs.TabPane>
             )
           }
-          
+
           <Tabs.TabPane tab="Consultation Room " key="3">
             <ConsultationroomDetails
               treatmentNo={treatmentNo}
@@ -40,16 +40,23 @@ const EvaluationCardContent = ({
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Procedures" key="4">
-            <PatientRequests />
-          </Tabs.TabPane>{" "}
-          <Tabs.TabPane tab="Medication" key="5">
-            <PatientCarePlan
-              treatmentNo={treatmentNo}
-              observationNo={observationNo}
-              patientNo={patientNo}
-            />
-          </Tabs.TabPane>
+            {
+              (role === "Doctor" || role === "Nurse") && (
+                <>
+                  <Tabs.TabPane tab="Procedures" key="4">
+                  <PatientRequests />
+                  </Tabs.TabPane>{" "}
+                  <Tabs.TabPane tab="Medication" key="5">
+                  <PatientCarePlan
+                  treatmentNo={treatmentNo}
+                  observationNo={observationNo}
+                  patientNo={patientNo}
+                  />
+                  </Tabs.TabPane>
+                </>
+              )
+            }
+          
           {/* <Tabs.TabPane tab="Doctor Forms" key="6">
             <DocForms />
           </Tabs.TabPane> */}
