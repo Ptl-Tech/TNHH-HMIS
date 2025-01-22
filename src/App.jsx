@@ -80,7 +80,7 @@ import BedOccupancy from "./pages/nurse-view/BedOccupancy";
 import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
 import ReadDoctorNotes from "./pages/ReadDoctorNotes";
 import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
-import WalkInPatientList from "./pages/WalkinPatientList";
+import WalkInPatientList from "./pages/WalkInPatientList";
 import WalkinRegistration from "./pages/WalkinRegistration";
 
 function App() {
