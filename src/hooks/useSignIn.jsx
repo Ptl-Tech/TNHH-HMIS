@@ -19,7 +19,11 @@ const useSignIn = () => {
   const { userInfo, loading, error } = loginHandler;
 
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
-  const { userInfo: verifyOtpUserInfo, success: verifyOtpSuccess, error: verifyOtpError } = verifyOtpHandler;
+  const {
+    userInfo: verifyOtpUserInfo,
+    success: verifyOtpSuccess,
+    error: verifyOtpError,
+  } = verifyOtpHandler;
 
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
   const { success: forgotPwdSuccess, error: forgotPwdError } = forgotPwdHandler;
@@ -37,12 +41,11 @@ const useSignIn = () => {
     console.log('verifyOtpUserSuccess:', verifyOtpSuccess);
   };
 
-
   // Handle forgot password action
   const handleForgotPassword = async () => {
     await dispatch(forgotPassword(staffNo));
     if (forgotPwdSuccess) {
-      navigate("/reset-password");
+      navigate('/reset-password');
     }
   };
 
@@ -69,9 +72,11 @@ const useSignIn = () => {
       } else if (role === 'Security') {
         navigate('/Security');
       } else if (role === 'Nurse') {
-        navigate('/Nurse')
-      }else if(role === 'Psychology'){
-        navigate('/Psychology')
+        navigate('/Nurse');
+      } else if (role === 'Psychology') {
+        navigate('/Psychology');
+      } else if (role === 'RADIOLOGY') {
+        navigate('/Radiology');
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);
@@ -92,7 +97,7 @@ const useSignIn = () => {
     loading,
     error,
     forgotPwdError,
-    setIsOtpRequired
+    setIsOtpRequired,
   };
 };
 
