@@ -83,7 +83,6 @@ import ReadDoctorNotes from "./pages/ReadDoctorNotes";
 import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
 import WalkInPatientList from "./pages/WalkInPatientList";
 import WalkinRegistration from "./pages/WalkinRegistration";
-import PharmacyDashboard from "./Dashboards/PharmacyDashboard";
 
 function App() {
   return (
@@ -365,7 +364,7 @@ function App() {
       </Route>
       <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
         <Route path="/Pharmacy" element={<MainLayout />}>
-          <Route index element={<PharmacyDashboard />} />
+          <Route index element={<PhamarcyDashboard />} />
           <Route path="/Pharmacy/Pharmacy-OutPatient" element={<PhamarcyOutpatient />} />
           <Route path="/Pharmacy/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
           <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />

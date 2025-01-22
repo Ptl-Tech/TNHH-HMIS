@@ -31,7 +31,7 @@ const PharmacyDashboard = () => {
       icon: <HourglassOutlined />,
       color: "#fff",
       backgroundColor: "#0f5689",
-      link: "/Doctor/Pharmacy-OutPatient",
+      link: "/Pharmacy/Pharmacy-OutPatient",
     },
     {
       title: "Inpatients List",
@@ -40,7 +40,7 @@ const PharmacyDashboard = () => {
       icon: <UserAddOutlined />,
       color: "#000",
       backgroundColor: "#b0afaf",
-      link: "/Doctor/Pharmacy-Inpatient",
+      link: "/Pharmacy/Pharmacy-Inpatient",
     },{
       title: "Returns",
       value: 0,  
@@ -48,7 +48,7 @@ const PharmacyDashboard = () => {
       icon: <SafetyOutlined />,
       color: "#000",
       backgroundColor: "#ac8342",
-      link: "/Doctor/Pharmacy-Returns",
+      link: "/Pharmacy/Pharmacy-Returns",
     },
   ];
 

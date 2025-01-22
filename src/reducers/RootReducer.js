@@ -133,6 +133,7 @@ import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmac
 import {
   postArchivePrescriptionReducer,
   postDrugIssuanceReducer,
+  postPrescriptionQuantityReducer,
 } from "./pharmacy-reducers/postPharmacyReducers";
 import {
   getPatientPharmacyReturnLinesReducer,
@@ -344,6 +345,7 @@ export const rootReducer = combineReducers({
   getReferralLines: getReferralLinesReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,
   postDrugIssuance: postDrugIssuanceReducer,
+  postPrescriptionQuantity: postPrescriptionQuantityReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,

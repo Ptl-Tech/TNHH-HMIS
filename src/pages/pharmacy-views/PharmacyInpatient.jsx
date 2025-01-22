@@ -63,7 +63,7 @@ import {
             render: (text, record) => (
               <span
                 style={{ color: "#0F5689", cursor: "pointer" }}
-                onClick={() => navigate(`/Doctor/Pharmacy-Card/${record.PharmacyNo}`)}
+                onClick={() => navigate(`/Pharmacy/Pharmacy-Card/${record.PharmacyNo}`)}
               >
                 {text}
               </span>

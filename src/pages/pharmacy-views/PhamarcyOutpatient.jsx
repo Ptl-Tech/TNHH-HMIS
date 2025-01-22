@@ -48,7 +48,7 @@ const PhamarcyOutpatient = () => {
   const [filtered, setFiltered] = useState([]);
   const {
     loading: newPharmacyRequestsLoading,
-    data: newPharmacyRequests = [], 
+    data: newPharmacyRequests = [],
   } = useSelector((state) => state.getNewPharmacyList);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const PhamarcyOutpatient = () => {
 
   const handleFilterPatients = (updatedFilters) => {
     return newPharmacyRequests.filter((patient) => {
-      const name = patient.Names?.toLowerCase() || "";  
+      const name = patient.Names?.toLowerCase() || "";
       const pharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
       const id = patient.SystemId?.toLowerCase() || "";
 
@@ -80,58 +80,63 @@ const PhamarcyOutpatient = () => {
         (filterSystemId ? id.includes(filterSystemId) : true)
       );
     });
-  }; 
-  
- const handleNavigate = (PharmacyNo) => {
-  navigate({
-    pathname: '/Doctor/Pharmacy-Card',
-    search: `?PharmacyNo=${PharmacyNo}`, // Corrected query string
-  });
- };
-  
+  };
+
+  const handleNavigate = (PharmacyNo) => {
+    navigate({
+      pathname: '/Pharmacy/Pharmacy-Card',
+      search: `?PharmacyNo=${PharmacyNo}`, // Corrected query string
+    });
+  };
+
   const columns = [
-        {
-              title: "Pharmacy No",
-              dataIndex: "PharmacyNo",
-              key: "PharmacyNo",
-            },
-            {
-              title: "Patient Name",
-              dataIndex: "Names",
-              key: "Names",
-              render: (text, record) => (
-                <span
-                  style={{ color: "#0F5689", cursor: "pointer" }}
-                  onClick={() => handleNavigate(record.PharmacyNo)} // Pass PharmacyNo to the handler
-                >
-                  {text}
-                </span>
-              ),
-            },
-            {
-              title: "Request Date",
-              dataIndex: "PharmacyDate",
-              key: "PharmacyDate",
-              render: (date) => moment(date).format("YYYY-MM-DD"),
-            },
-            {
-              title: "Status",
-              dataIndex: "New",
-              key: "New",
-              render: (text, record) => (
-                <span
-                  style={{
-                    color: text ? "green" : "red",
-                    cursor: "pointer",
-                  }}
-                onClick={() => handleNavigate(record.PharmacyNo)}
-                >
-                  {text ? "New" : "Viewed"}
-                </span>
-              ),
-            },
+    {
+      title: "Pharmacy No",
+      dataIndex: "PharmacyNo",
+      key: "PharmacyNo",
+    },
+    {
+      title: "Patient Name",
+      dataIndex: "Names",
+      key: "Names",
+      render: (text, record) => (
+        <span
+          style={{ color: "#0F5689", cursor: "pointer" }}
+          onClick={() => handleNavigate(record.PharmacyNo)} // Pass PharmacyNo to the handler
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: "Patient Type",
+      dataIndex: "Patient_Type",
+      key: "Patient_Type"
+    },
+    {
+      title: "Request Date",
+      dataIndex: "PharmacyDate",
+      key: "PharmacyDate",
+      render: (date) => moment(date).format("YYYY-MM-DD"),
+    },
+    {
+      title: "Action",
+      dataIndex: "New",
+      key: "New",
+      render: (text, record) => (
+        <span
+          style={{
+            color: text ? "green" : "red",
+            cursor: "pointer",
+          }}
+          onClick={() => handleNavigate(record.PharmacyNo)}
+        >
+          {text ? "New" : "View"}
+        </span>
+      ),
+    },
   ]
-   
+
 
   return (
     <div>
@@ -158,13 +163,13 @@ const PhamarcyOutpatient = () => {
             onChange={(e) => handleOnChange(e, "pharmacyNo")}
           />
           <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>or</span>
-           <Search
+          <Search
             placeholder="Search by name"
             allowClear
             value={filters.names}
             onChange={(e) => handleOnChange(e, "names")}
           />
-         
+
           <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>or</span>
           <Search
             placeholder="Search by ID number"
