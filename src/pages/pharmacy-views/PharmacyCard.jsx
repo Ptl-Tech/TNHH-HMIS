@@ -52,7 +52,8 @@ if (pharmacyNo) {
   const { loading: loadingArchivePrescription } = useSelector(
     (state) => state.postArchivePrescription
   );
-  const { loading: loadingPatientReturnLines, data: patientReturnLines } =
+
+  const {  data: pharmacyLineData = [] } =
     useSelector((state) => state.getPatientPharmacyReturnLine);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,22 +81,24 @@ if (pharmacyNo) {
     { title: "Remarks", dataIndex: "remarks", key: "remarks" },
   ];
 
-  const dataSource = [
-    {
-      key: patientReturnLines?.PharmacyReturnLineNo,
-      no: patientReturnLines?.PharmacyReturnLineNo,
-      drugName: patientReturnLines?.DrugName,
-      unitPrice: patientReturnLines?.UnitPrice,
-      totalPrice: patientReturnLines?.TotalPrice,
-      actualQty: patientReturnLines?.ActualQty,
-      dosage: patientReturnLines?.Dosage,
-      frequency: patientReturnLines?.Frequency,
-      take: patientReturnLines?.Take,
-      route: patientReturnLines?.Route,
-      days: patientReturnLines?.Days,
-      remarks: patientReturnLines?.Remarks,
-    },
-  ];
+
+  const dataSource = pharmacyLineData?.map(line => ({
+      ...line,
+      key: line?.PharmacyReturnLineNo,
+      no: line?.No,
+      drugName: line?.DrugName,
+      unitPrice: line?.UnitPrice,
+      totalPrice: line?.TotalAmount,
+      actualQty: line?.ActualQty,
+      dosage: line?.Dosage,
+      frequency: line?.Frequency,
+      take: line?.Take,
+      route: line?.Route,
+      days: line?.Duration_Days,
+      remarks: line?.Remarks,
+  }))
+
+  
 
   const openModal = () => setIsModalOpen(true);
 
