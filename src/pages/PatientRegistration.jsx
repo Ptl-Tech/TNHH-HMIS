@@ -23,9 +23,12 @@ import {
 } from "../actions/DropdownListActions";
 import { useForm } from "antd/es/form/Form";
 import { createPatient, listPatients } from "../actions/patientActions";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const PatientRegistration = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const patientNumber = queryParams.get("PatientNo");
   const {
     loading: countriesLoading,
     error: countriesError,
@@ -84,7 +87,7 @@ const PatientRegistration = () => {
   const [form] = Form.useForm();
 
   const { state } = useLocation(); // Access the state passed via navigate
-  const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
+  const { visitorData,  patientDet } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [filteredSubCounties, setFilteredSubCounties] = useState([]);
   const [filteredWards, setFilteredWards] = useState([]);
@@ -143,10 +146,6 @@ const PatientRegistration = () => {
     }
   }, [countiesPayload]);
 
-
-
-
-
   // Handle search input
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -176,7 +175,6 @@ const PatientRegistration = () => {
     }
   }, [subCountyWardsPayload]);
 
-
   const FilterSubCounties = (countyCode) => {
     if (!countyCode) {
       setFilteredSubCounties(subCountiesPayload);
@@ -201,10 +199,7 @@ const PatientRegistration = () => {
     setFilteredWards(filtered);
   };
 
-
-
   // console.log('filtered',patientDet);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -222,6 +217,8 @@ const PatientRegistration = () => {
           ...prevErrors,
           idNumber: "This Patient is already registered.",
         }));
+
+        //
       } else {
         setErrors((prevErrors) => {
           const { idNumber, ...rest } = prevErrors; // Remove the previous error
@@ -233,15 +230,15 @@ const PatientRegistration = () => {
 
   // Handle select and date changes
   const handleSelectChange = (name, value) => {
-    // If the field is 'dob', format the value as 'YYYY-MM-DD'
-    if (name === "dob") {
-      // Format the date as 'YYYY-MM-DD'
-      value = value ? moment(value).format("YYYY-MM-DD") : "";
-    }
-    if (name === 'county') {
+    // // If the field is 'dob', format the value as 'YYYY-MM-DD'
+    // if (name === "dob") {
+    //   // Format the date as 'YYYY-MM-DD'
+    //   value = value ? moment(value).format("YYYY-MM-DD") : "";
+    // }
+    if (name === "county") {
       FilterSubCounties(value);
     }
-    if (name === 'subCounty') {
+    if (name === "subCounty") {
       FilterSubCountyWards(value);
     }
     setNewPatient((prev) => ({ ...prev, [name]: value }));
@@ -274,8 +271,9 @@ const PatientRegistration = () => {
 
       if (name === "isPrincipleMember" && value) {
         // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${prev.firstName || visitorData?.VisitorName
-          } ${prev.middleName || ""} ${prev.lastName}`
+        updatedPatient.insurancePrinicipalMemberName = `${
+          prev.firstName || visitorData?.VisitorName
+        } ${prev.middleName || ""} ${prev.lastName}`
           .trim()
           .toUpperCase();
       } else if (name === "isPrincipleMember" && !value) {
@@ -324,6 +322,7 @@ const PatientRegistration = () => {
         gender: patientDet?.Gender === "Male" ? "1" : "2" || "",
         dob: patientDet?.DateOfBirth || null,
         phoneNumber: patientDet?.TelephoneNo1 || "",
+        paymentMode: patientDet?.PaymentMode === "Cash" ? "1" :patientDet?.PaymentMode==="Corporate"?"2":"1" || "",
         email: patientDet?.Email || "",
         nationality: patientDet?.Nationality || "",
         county: patientDet?.CountyWardName || "",
@@ -336,96 +335,128 @@ const PatientRegistration = () => {
     }
   }, [patientDet]);
 
-  console.log(patientDet)
+  console.log(patientDet);
 
   const handleSavePatient = async (e) => {
     e.preventDefault();
-
-    // Determine the action (create or edit) based on the patientNumber
+  
+    // Determine if the action is "edit" based on the presence of patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
-
+  
     // Prepare patient data
     const patientData = {
       firstName:
         newPatient.firstName ||
-        visitorData.VisitorName?.split(" ")[0] ||
-        visitorData?.firstName,
+        visitorData?.VisitorName?.split(" ")[0] ||
+        visitorData?.firstName ||
+        patientDet?.FirstName ||
+        "",
       lastName:
         newPatient.lastName ||
-        visitorData.VisitorName?.split(" ")[2] ||
-        visitorData?.lastName,
+        visitorData?.VisitorName?.split(" ")[2] ||
+        visitorData?.lastName ||
+        patientDet?.LastName ||
+        "",
       middleName:
         newPatient.middleName ||
-        visitorData.VisitorName?.split(" ")[1] ||
-        visitorData?.middleName,
-      idNumber: newPatient.idNumber || visitorData?.IDNumber,
+        visitorData?.VisitorName?.split(" ")[1] ||
+        visitorData?.middleName ||
+        patientDet?.MiddleName ||
+        "",
+      idNumber: newPatient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber || "",
       phoneNumber:
         newPatient.phoneNumber ||
         visitorData?.PhoneNumber ||
-        patientDet?.TelephoneNo1,
-      email: newPatient.email || patientDet?.Email,
-      gender: newPatient.gender || patientDet.Gender,
-      dob: newPatient.dob || patientDet.DateOfBirth,
-      nationality: newPatient.nationality || patientDet.Nationality,
-      county: newPatient.county || patientDet.County,
-      subCounty: newPatient.subCounty || patientDet.SubCountyName,
-      countyWard: newPatient.countyWard || patientDet.CountyWardName,
-      residence: newPatient.residence,
+        patientDet?.TelephoneNo1 ||
+        "",
+      email: newPatient.email || patientDet?.Email || "",
+      gender: newPatient.gender || patientDet?.Gender || "",
+      dob: newPatient.dob || patientDet?.DateOfBirth || "",
+      nationality: newPatient.nationality || patientDet?.Nationality || "",
+      county: newPatient.county || patientDet?.County || "",
+      subCounty: newPatient.subCounty || patientDet?.SubCountyName || "",
+      countyWard: newPatient.countyWard || patientDet?.CountyWardName || "",
+      residence: newPatient.residence || "",
       nextOfKinFullName:
-        newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName,
+        newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName || "",
       nextOfKinRelationship:
-        newPatient.nextOfKinRelationShip || patientDet?.NextofkinRelationship,
-      schemeName: newPatient.schemeName || patientDet?.SchemeName,
+        newPatient.nextOfKinRelationShip ||
+        patientDet?.NextofkinRelationship ||
+        "",
+      schemeName: newPatient.schemeName || patientDet?.SchemeName || "",
       nextOfKinPhoneNo:
-        newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo,
-      paymentMode: newPatient.paymentMode || patientDet?.PatientType,
-      insuranceNo: newPatient.insuranceNo || patientDet?.InsuranceNo,
-      insurancePrinicipalMemberName:
-        newPatient.insurancePrinicipalMemberName || patientDet?.SearchName,
+        newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo || "",
+      paymentMode: newPatient.paymentMode || patientDet?.PatientType || "",
+      insuranceNo: newPatient.insuranceNo || patientDet?.InsuranceNo || "",
+      insurancePrincipalMemberName:
+        newPatient.insurancePrinicipalMemberName ||
+        patientDet?.SearchName ||
+        "",
       isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal,
-      membershipNo: newPatient.membershipNo || patientDet?.MembershipNo,
-      insuranceName: newPatient.insuranceName || patientDet?.InsuranceName,
+      membershipNo: newPatient.membershipNo || patientDet?.MembershipNo || "",
+      insuranceName:
+        newPatient.insuranceName || patientDet?.InsuranceName || "",
       howYouKnewABoutUs:
-        newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs,
+        newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs || "",
       myAction: isEditAction ? "edit" : "create",
-      patientNo: patientNumber, // Include patientNo only if editing
+      patientNo: isEditAction ? patientNumber : "", // Include patientNo only if editing
     };
-
-    // Validate the entire form
-    const errors = validateForm(newPatient);
-    setErrors(errors);
-
-    // // If there are any validation errors, show a warning
-    // if (Object.keys(errors).length > 0) {
-    //   message.warning("Please fill in all required fields.");
-    //   return;
-    // }
-
+  
+    // Perform validation only if creating a new patient
+    if (!isEditAction) {
+      const errors = validateForm(newPatient);
+      setErrors(errors);
+  
+      if (Object.keys(errors).length > 0) {
+        message.warning("Please fill in all required fields.");
+        return;
+      }
+    }
+  
     try {
-      // Dispatch the patient creation or update action
-      const responsedata = await dispatch(createPatient(patientData));
-      const patientId = responsedata?.patientNo;
+      // Await the response from dispatch
+      const response = await dispatch(createPatient(patientData));
+  
+      if (response?.patientNo) {
+        if (isEditAction) {
+          message.success("Patient details updated successfully.");
+          
+        } else {
+          message.success("New patient saved successfully.");
+        }
 
-      if (patientId) {
-        message.success("Patient Saved Successfully");
-        // Navigate to Add Appointment page and pass patientId
-        navigate(`/reception/Add-Appointment/${patientId}`, {
-          state: { patientData: patientData },
-        });
+        const isActivated = patientListPayload?.some(
+          (existingPatient) => existingPatient.Activated
+        );
+        if(isActivated) {
+         message.info("Patient already has an active visit");
+         return;
+        }else{
+                  // Navigate to Add Appointment page and pass patientId
+
+          const patientId = response.patientNo;
+          navigate(`/reception/Add-Appointment/${patientId}`, {
+            state: { patientData },
+          });
+        }
+       
       } else {
         message.error("Failed to save patient data. Please try again.");
       }
-
-      console.log(patientId);
     } catch (error) {
       console.error("Error saving patient data:", error);
       message.error("An unexpected error occurred. Please try again.");
     }
   };
-
+  
   // Define the validateForm function
-  const validateForm = (patient, visitorData, patientDet) => {
+  const validateForm = (patient, visitorData, patientDet, newPatient, isEditAction) => {
     const errors = {};
+
+//if is isediting skip validation
+    if (isEditAction) {
+      return errors;
+    }
 
     // Nationality Validation
     if (!patient.nationality || patient.nationality.trim() === "") {
@@ -441,13 +472,13 @@ const PatientRegistration = () => {
     }
 
     // ID Number Validation
-    if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber) {
+    if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber || newPatient.idNumber) {
       const isRegistered = patientListPayload?.some(
         (existingPatient) =>
           existingPatient.IDNumber === patient.idNumber ||
           visitorData?.IDNumber === patient.idNumber
       );
-      if (isRegistered) {
+      if (isRegistered && !isEditAction) {
         errors.idNumber = "This ID/Passport/Birth No is already registered.";
       }
     }
@@ -462,7 +493,7 @@ const PatientRegistration = () => {
           Patient Registration {patientNumber || patientDet?.PatientNo}
         </h4>
         {/* if patientdet exists show edit button */}
-        {patientDet && (
+        {/* {patientDet && (
           <Button
             type="primary"
             style={{ margin: "20px" }}
@@ -470,7 +501,7 @@ const PatientRegistration = () => {
           >
             Edit
           </Button>
-        )}
+        )} */}
       </div>
       <div className="row">
         <div className="col-12 col-md-8">
@@ -517,7 +548,7 @@ const PatientRegistration = () => {
                     value={
                       newPatient.firstName ||
                       visitorData?.VisitorName?.split(" ")[0] ||
-                      patientDet?.SearchName?.split(" ")[0] ||
+                      patientDet?.SearchName?.split(" ")[0]||
                       patientDet?.FirstName?.split(" ")[0]
                     }
                     onChange={handleInputChange}
@@ -576,42 +607,53 @@ const PatientRegistration = () => {
                     <span className="text-danger px-1 fs-6">*</span>
                   </label>
                   <Select
-                    placeholder="--Select Gender--"
-                    className="w-100 text-center fw-bold"
-                    value={
-                      newPatient.gender ||
-                      visitorData?.Gender ||
-                      patientDet?.Gender
-                    }
-                    onChange={(value) => handleSelectChange("gender", value)}
-                    showSearch
-                    filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">--Select Gender-- </Select.Option>
-                    <Select.Option key={1} value={1}>
-                      Male
-                    </Select.Option>
-                    <Select.Option key={2} value={2}>
-                      Female
-                    </Select.Option>
-                  </Select>{" "}
+  placeholder="--Select Gender--"
+  className="w-100 text-center fw-bold"
+  value={
+    // Convert the incoming gender string to the corresponding value
+    newPatient.gender === "male" || newPatient.gender === "Male"
+      ? 1
+      : newPatient.gender === "female" || newPatient.gender === "Female"
+      ? 2
+      : visitorData?.Gender === "male" || visitorData?.Gender === "Male"
+      ? 1
+      : visitorData?.Gender === "female" || visitorData?.Gender === "Female"
+      ? 2
+      : patientDet?.Gender === "male" || patientDet?.Gender === "Male"
+      ? 1
+      : patientDet?.Gender === "female" || patientDet?.Gender === "Female"
+      ? 2
+      : "" // Default to empty if no gender is found
+  }
+  onChange={(value) => handleSelectChange("gender", value)}
+  showSearch
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+>
+  <Select.Option value="">--Select Gender--</Select.Option>
+  <Select.Option key={1} value={1}>
+    Male
+  </Select.Option>
+  <Select.Option key={2} value={2}>
+    Female
+  </Select.Option>
+</Select>
+
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
                     Date of Birth:<span className="text-danger px-1">*</span>
                   </label>
                   <DatePicker
-                    format="YYYY-MM-DD"
+                    // format="YYYY-MM-DD"
                     style={{ width: "100%" }}
                     placeholder="Select Date of Birth"
-                    //defaultValue={moment()} // Set default date to current date
                     value={
                       newPatient.dob
                         ? moment(newPatient.dob) ||
-                        visitorData?.dateOfBirth ||
-                        patientDet?.DateOfBirth
+                          visitorData?.dateOfBirth ||
+                          patientDet?.DateOfBirth
                         : null
                     }
                     onChange={(date, dateString) =>
@@ -681,7 +723,9 @@ const PatientRegistration = () => {
                     showSearch
                     onSearch={handleSearch}
                     filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
                     }
                     onChange={(value) =>
                       handleSelectChange("nationality", value)
@@ -698,119 +742,129 @@ const PatientRegistration = () => {
                       ))
                     ) : (
                       <Select.Option value="" disabled>
-                        No countries available
+                        No data available
                       </Select.Option>
                     )}
                   </Select>
                 </div>
               </div>
-              <div className="row px-3 py-2 align-items-center ">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    County:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select County"
-                    className="w-100 fw-bold text-center"
-                    value={newPatient.county || patientDet?.CountyWardName}
-                    onChange={(value) => handleSelectChange("county", value)}
-                    name="county"
-                    showSearch
-                    // filterOption = {true}
-                    filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  // onFocus={handleDisplayDropDown}
-                  >
-                    <Select.Option value="">--Select County--</Select.Option>
-                    {countiesPayload && countiesPayload.length > 0 ? (
-                      countiesPayload.map((county) => (
-                        <Select.Option key={county.Code} value={county.Code}>
-                          {county.Description}
+              {newPatient.nationality === "KE" && (
+                <div className="row px-3 py-2 align-items-center ">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      County:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select County"
+                      className="w-100 fw-bold text-center"
+                      value={newPatient.county || patientDet?.CountyWardName}
+                      onChange={(value) => handleSelectChange("county", value)}
+                      name="county"
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      // onFocus={handleDisplayDropDown}
+                    >
+                      <Select.Option value="">--Select County--</Select.Option>
+                      {countiesPayload && countiesPayload.length > 0 ? (
+                        countiesPayload.map((county) => (
+                          <Select.Option key={county.Code} value={county.Code}>
+                            {county.Description}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No data available
                         </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No countries available
-                      </Select.Option>
-                    )}
-                  </Select>
-                </div>
+                      )}
+                    </Select>
+                  </div>
 
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Sub County:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select Sub County"
-                    className="w-100 fw-bold text-center"
-                    value={newPatient.subCounty || patientDet?.SubCountyName}
-                    name="subCounty"
-                    onChange={(value) => handleSelectChange("subCounty", value)}
-                    onFocus={handleDisplayDropDown}
-                    showSearch
-                    // filterOption = {true}
-                    filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">
-                      --Select Sub County--
-                    </Select.Option>
-                    {filteredSubCounties && filteredSubCounties.length > 0 ? (
-                      filteredSubCounties.map((subCounty) => (
-                        <Select.Option
-                          key={subCounty.SubCountyCode}
-                          value={subCounty.SubCountyCode}
-                        >
-                          {subCounty.Name}
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Sub County:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select Sub County"
+                      className="w-100 fw-bold text-center"
+                      value={newPatient.subCounty || patientDet?.SubCountyName}
+                      name="subCounty"
+                      onChange={(value) =>
+                        handleSelectChange("subCounty", value)
+                      }
+                      onFocus={handleDisplayDropDown}
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      <Select.Option value="">
+                        --Select Sub County--
+                      </Select.Option>
+                      {filteredSubCounties && filteredSubCounties.length > 0 ? (
+                        filteredSubCounties.map((subCounty) => (
+                          <Select.Option
+                            key={subCounty.SubCountyCode}
+                            value={subCounty.SubCountyCode}
+                          >
+                            {subCounty.Name}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No data available
                         </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No countries available
-                      </Select.Option>
-                    )}
-                  </Select>
-                </div>
+                      )}
+                    </Select>
+                  </div>
 
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Ward:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select Ward"
-                    className="w-100 fw-bold text-center"
-                    value={newPatient.CountyWard || patientDet?.CountyWardName}
-                    name="countyWard"
-                    onChange={(value) => handleSelectChange("countyWard", value)}
-                    onFocus={handleDisplayDropDown}
-                    showSearch
-                    // filterOption = {true}
-                    filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">
-                      --Select Ward--
-                    </Select.Option>
-                    {filteredWards && filteredWards.length > 0 ? (
-                      filteredWards.map((ward) => (
-                        <Select.Option
-                          key={ward.Code}
-                          value={ward.Name}
-                        >
-                          {ward.Name}
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Ward:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select Ward"
+                      className="w-100 fw-bold text-center"
+                      name="countyWard"
+                      value={
+                        newPatient.countyWard || patientDet?.CountyWardName
+                      }
+                      onChange={(value) =>
+                        handleSelectChange("countyWard", value)
+                      }
+                      onFocus={handleDisplayDropDown}
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      <Select.Option value="">--Select Ward--</Select.Option>
+                      {filteredWards && filteredWards.length > 0 ? (
+                        filteredWards.map((ward) => (
+                          <Select.Option key={ward.Code} value={ward.Name}>
+                            {ward.Name}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No wards available
                         </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No wards available
-                      </Select.Option>
-                    )}
-                  </Select>
+                      )}
+                    </Select>
+                  </div>
                 </div>
-
+              )}
+              <div className="row px-3 py-2  align-items-center ">
                 <div className="col-12 col-md-4">
                   <label className="py-1">
                     Residence:<span className="text-danger px-1">*</span>
@@ -858,18 +912,19 @@ const PatientRegistration = () => {
                     // variant="borderless"
                     name="nextOfKinRelationShip"
                     onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-
                     showSearch
                     // filterOption = {true}
                     filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
                     }
                   >
                     <Select.Option value="">
                       --Select Relationship--
                     </Select.Option>
                     {relationshipOptionsPayload &&
-                      relationshipOptionsPayload.length > 0 ? (
+                    relationshipOptionsPayload.length > 0 ? (
                       relationshipOptionsPayload.map((relation) => (
                         <Select.Option
                           key={relation.Code}
@@ -920,14 +975,14 @@ const PatientRegistration = () => {
                     onFocus={handleDisplayDropDown}
                     showSearch
                     filterOption={(input, option) =>
-                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
                     }
                   >
-                    <Select.Option value="">
-                      --Select An Option--
-                    </Select.Option>
+                    <Select.Option value="">--Select An Option--</Select.Option>
                     {marketingStrategiesPayload &&
-                      marketingStrategiesPayload.length > 0 ? (
+                    marketingStrategiesPayload.length > 0 ? (
                       marketingStrategiesPayload.map((list) => (
                         <Select.Option key={list.Code} value={list.Code}>
                           {list.Description}
@@ -961,12 +1016,14 @@ const PatientRegistration = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {`${newPatient.firstName?.charAt(0).toUpperCase() ||
+                    {`${
+                      newPatient.firstName?.charAt(0).toUpperCase() ||
                       visitorData?.VisitorName?.split(" ")[0]
                         ?.charAt(0)
                         .toUpperCase() ||
                       ""
-                      }${newPatient.lastName?.charAt(0).toUpperCase() ||
+                    }${
+                      newPatient.lastName?.charAt(0).toUpperCase() ||
                       visitorData?.VisitorName?.split(" ")[1]
                         ?.charAt(0)
                         .toUpperCase() ||
@@ -975,7 +1032,7 @@ const PatientRegistration = () => {
                         ?.charAt(0)
                         .toUpperCase() ||
                       ""
-                      }`}
+                    }`}
                   </Avatar>
                 </div>
                 <div className="col-12">
@@ -985,7 +1042,7 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Payment Mode"
                     className="w-100"
-                    value={newPatient.paymentMode || patientDet?.PatientType}
+                    value={newPatient.paymentMode || patientDet?.PatientType ==="Corporate"?"1":patientDet?.PatientType==="Cash"?"2":""}  
                     onChange={(value) =>
                       handleSelectChange("paymentMode", value)
                     }
@@ -1015,10 +1072,13 @@ const PatientRegistration = () => {
                           handleSelectChange("insuranceNo", value)
                         }
                         name="insuranceNo"
-                        onFocus={handleDisplayDropDown} showSearch
+                        onFocus={handleDisplayDropDown}
+                        showSearch
                         // filterOption = {true}
                         filterOption={(input, option) =>
-                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
                         }
                       >
                         <Select.Option value="">
@@ -1116,11 +1176,15 @@ const PatientRegistration = () => {
         </div>
 
         <div className="d-flex align-items-center justify-content-end mt-3">
+          {/* a btn to naviaget back to patient list if required */}
+          <Button onClick={() =>  navigate(location.state?.previousPath || "/reception/visitors-list")}>
+          Back
+          </Button>
           <Button
             type="primary"
             className="mx-2"
             onClick={handleSavePatient}
-          // loading={savingPatient}
+            // loading={savingPatient}
           >
             Save Patient
           </Button>

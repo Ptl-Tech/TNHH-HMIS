@@ -157,7 +157,7 @@ function App() {
           <Route index element={<ReceptionDashboard />} />
 
           <Route
-            path="/reception/Patient-Registration"
+            path="/reception/Patient-Registration/:PatientNo?"
             element={<PatientRegistration />}
           />
           <Route

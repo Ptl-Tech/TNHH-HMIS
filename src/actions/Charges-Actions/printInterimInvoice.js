@@ -22,7 +22,7 @@ export const postInterimInvoice = (invoiceData, staffNo) => async (dispatch, get
       `${API_URL}/Reports/PatientInterimInvoice`,
       postDataInvoice,
       config
-    );
+    );      
 
     dispatch({
       type: PRINT_INTERIM_INVOICE_SUCCESS,

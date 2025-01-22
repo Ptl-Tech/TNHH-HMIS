@@ -125,9 +125,10 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
     // Return appointment data for further use
     return responseData.appointmentData.appointmentNo; // Return the full appointment data
   } catch (error) {
-    const errorMessage = error.response?.data?.errors || "An unexpected error occurred.";
+    const errorMessage = error.response?.data?.errors ;
     dispatch({ type: TRIAGE_VISIT_FAIL, payload: errorMessage });
-    message.error(errorMessage); // Display the error message using Ant Design
+    console.log(errorMessage);
+    message.error(error.response?.data?.errors); 
   }
 };
 

@@ -103,8 +103,8 @@ const ConvertedPatients = () => {
             "Patient not found. Please register the patient first.",
             5
           );
-          navigate("/reception/Patient-Registration", {
-            state: { visitorData: visitor, patientNumber: patientNo },
+          navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
+            state: { visitorData: visitor },
           });
         }
       } else {

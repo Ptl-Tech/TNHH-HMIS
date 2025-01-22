@@ -22,6 +22,7 @@ import {
   appmntList,
   createPatient,
   createTriageVisit,
+  listPatients,
   postTriageVisit,
 } from "../actions/patientActions";
 
@@ -29,13 +30,19 @@ const CreateVisitForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const queryParams = new URLSearchParams(location.search);
+  const patientNo = queryParams.get("PatientNo");
   const { state } = location; // Access the state passed via navigate
   const { patientData, existingPatient, visitData } = state || {}; // Destructure patient data if available
   const { loading, patients: visitPatients } = useSelector(
     (state) => state.appmntList
   );
-
+  const {
+    loading: patientListLoading,
+    error: patientListError,
+    success: patientListSuccess,
+    patients: patientListPayload,
+  } =useSelector((state) => state.patientList);
   const {
     loading: insuranceLoading,
     error: insuranceError,
@@ -99,6 +106,7 @@ const CreateVisitForm = () => {
     dispatch(listInsuranceOptions());
     dispatch(listClinics()); // Ensure clinics are loaded
     dispatch(listDoctors()); // Ensure doctors are loaded
+    dispatch(listPatients());
     dispatch(appmntList());
   }, [dispatch]);
 
@@ -113,54 +121,56 @@ const CreateVisitForm = () => {
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [doctorsPayload, newVisit.clinic]);
-  const savepatientVisit = async () => {
-    if (!newVisit.clinic) {
-      message.error("Please select a clinic before saving the visit.");
-      return;
+const savepatientVisit = async () => {
+  if (!newVisit.clinic) {
+    message.error("Please select a clinic before saving the visit.");
+    return;
+  }
+  if (!newVisit.doctor) {
+    message.error("Please select a doctor before saving the visit.");
+    return;
+  }
+
+  try {
+    // Step 2: Create Triage Visit
+    const visitData = {
+      patientNo:
+        patientNo ||
+        patientData?.patientNo ||
+        existingPatient?.PatientNo ||
+        patientData?.PatientNo ||
+        visitData?.PatientNo,
+      clinic: newVisit.clinic,
+      doctor: newVisit.doctor,
+      paymentMode: newVisit.paymentMode || existingPatient?.paymentMode ==="Cash"?"2":"1" || patientData?.paymentMode ==="Cash"?"2":"1" || visitData?.paymentMode ==="Cash"?"2":"1",
+      insuranceNo: newVisit.insuranceNo,
+      membershipNo: newVisit.membershipNo,
+      insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
+      isPrincipleMember: newVisit.isPrincipleMember,
+      schemeName: newVisit.schemeName,
+    };
+
+    // Dispatch the visit creation
+    const appointmentId = await dispatch(createTriageVisit(visitData));
+console.log("Visit created for Patient ID:", appointmentId);
+    if (appointmentId) {
+      message.success("Visit created successfully!");
+      setAppointmentId(appointmentId);
+
+      // Step 3: Optionally dispatch the visit (triage)
+      console.log("Triage visit created for Patient ID:", appointmentId);
+    } else {
+      message.error("Failed to create visit!");
+      setAppointmentId(null);
+      setNewVisit({});
+      // Use previousPath from location.state to navigate back
+      // navigate(location.state?.previousPath || "/reception/visitors-list");
     }
-    if (!newVisit.doctor) {
-      message.error("Please select a doctor before saving the visit.");
-      return;
-    }
-    try {
-      // Step 2: Create Triage Visit
-      const visitData = {
-        patientNo:
-          patientData?.patientNo ||
-          existingPatient?.PatientNo ||
-          patientData?.PatientNo ||
-          visitData?.PatientNo,
-        clinic: newVisit.clinic,
-        doctor: newVisit.doctor,
-        paymentMode: newVisit.paymentMode,
-        insuranceNo: newVisit.insuranceNo,
-        membershipNo: newVisit.membershipNo,
-        insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
-        isPrincipleMember: newVisit.isPrincipleMember,
-        schemeName: newVisit.schemeName,
-      };
-
-      const appointmentId = await dispatch(createTriageVisit(visitData));
-
-      if (appointmentId) {
-        message.success("Visit created successfully!");
-        setAppointmentId(appointmentId);
-
-        // Step 3: Optionally dispatch the visit (triage)
-        console.log("Triage visit created for Patient ID:", appointmentId);
-      } else {
-        message.error("Failed to create visit!");
-        setAppointmentId(null);
-        setNewVisit({});
-
-        // Use previousPath from location.state to navigate back
-        navigate(location.state?.previousPath || "/reception/visitors-list");
-      }
-    } catch (error) {
-      console.error("Error creating visit:", error);
-      message.error("Error occurred while creating visit!");
-    }
-  };
+  } catch (error) {
+    console.error("Error creating visit:", error);
+    message.error("Error occurred while creating visit!");
+  }
+};
 
   const dispatchPatient = async (appointmentId) => {
     if (!newVisit.clinic) {
@@ -268,6 +278,7 @@ const CreateVisitForm = () => {
                     <Input
                       label="Patient No"
                       value={
+                        patientNo||
                         patientData?.patientNo ||
                         existingPatient?.PatientNo ||
                         patientData?.PatientNo ||
@@ -354,21 +365,27 @@ const CreateVisitForm = () => {
                       <span className="text-danger px-1">*</span>
                     </label>
                     <Select
-                      placeholder="Select Settlement Type"
-                      className="w-100"
-                      value={newVisit.paymentMode}
-                      onChange={(value) =>
-                        handleInputChange("paymentMode", value)
-                      }
-                      showSearch
-                      filterOption={(input, option) =>
-                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      <Select.Option value="">--Select--</Select.Option>
-                      <Select.Option value="2">Cash</Select.Option>
-                      <Select.Option value="1">Insurance</Select.Option>
-                    </Select>
+  placeholder="Select Settlement Type"
+  className="w-100"
+  value={
+    newVisit.paymentMode || 
+    (patientData?.paymentMode === "1"
+      ? "Insurance"
+      : patientData?.paymentMode === "2"
+        ? "Cash"
+        : existingPatient?.PatientType || "N/A")
+  }
+  onChange={(value) => handleInputChange("paymentMode", value)}
+  showSearch
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+>
+  <Select.Option value="">--Select--</Select.Option>
+  <Select.Option value="2">Cash</Select.Option>
+  <Select.Option value="1">Insurance</Select.Option>
+</Select>
+
                   </div>
 
                   {newVisit.paymentMode === "1" && (
