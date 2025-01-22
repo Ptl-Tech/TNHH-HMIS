@@ -8,7 +8,7 @@ import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientH
 const { TextArea } = Input;
 const { Step } = Steps;
 
-const PatientSigns = ({ treatmentNo, patientNo }) => {
+const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
   const { loading: saveNotesLoading } = useSelector((state) => state.postPatientHistory);
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
 
@@ -33,8 +33,10 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     personalHistory: data.filter((note) => note.Notes_Type === "Personal History").at(-1)?.Notes || "",
     8: data.filter((note) => note.Notes_Type === "Forensic History").at(-1)?.Notes || "",
     9: data.filter((note) => note.Notes_Type === "Premorbid Personality").at(-1)?.Notes || "",
-    10: data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes || "",
-    11: data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes || "",
+    20: data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes || "",
+    23: data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes || "",
+    7: data.filter((note) => note.Notes_Type === "Past Psychiatric and Medical History").at(-1)?.Notes || "",
+
   }), [data]);
 
   console.log('data', data);
@@ -80,18 +82,18 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
       content: (
         <>
           
-          <Form.Item name="10" label="Medical" >
+          <Form.Item name="20" label="Medical" >
           <TextArea placeholder="Enter past medical notes..." autoSize={{ minRows: 4 }} />
           </Form.Item>
           <Form.Item name="5" label="Past Psychiatric History" rules={[{ required: true }]}>
             <TextArea placeholder="Enter past psychiatric History..." autoSize={{ minRows: 4 }} />
           </Form.Item>
-          <Form.Item name="11" label="Obstetric & Gynecology">
+          <Form.Item name="23" label="Obstetric & Gynecology">
           <TextArea placeholder="Enter past Obstetric & Gynecology notes..." autoSize={{ minRows: 4 }} />
           </Form.Item>
         </>
       ),
-      notesType: ["5", "10", "11"],
+      notesType: ["5", "20", "23"],
 
     },
     {
@@ -130,7 +132,6 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
     try {
       const values = await form.validateFields();
       const currentStepData = steps[currentStep];
-      console.log('currentStepData', currentStepData);
       const updatedNotes = currentStepData.notesType
         .map((type) => ({
           myAction: "create",
@@ -141,23 +142,32 @@ const PatientSigns = ({ treatmentNo, patientNo }) => {
           patientNo,
         }))
         .filter((note) => note.notes?.trim() !== "" && !lastSavedNotes[note.notesType]);
-
+  
       if (updatedNotes.length) {
         const results = await Promise.all(updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note))));
         if (results.every((res) => res === "success")) {
           message.success("Notes saved successfully!");
-          setLastSavedNotes((prev) => ({ ...prev, ...Object.fromEntries(updatedNotes.map((note) => [note.notesType, note.notes])) }));
+          setLastSavedNotes((prev) => ({
+            ...prev,
+            ...Object.fromEntries(updatedNotes.map((note) => [note.notesType, note.notes])),
+          }));
         } else {
           message.error("Failed to save some notes.");
         }
       }
-
-      // set the current step to the next step or the last step if it's the last step
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  
+      if (currentStep === steps.length - 1) {
+        // Trigger the parent callback to move to the next tab if this is the last step
+        moveToNextTab();
+      } else {
+        // Move to the next step
+        setCurrentStep((prev) => prev + 1);
+      }
     } catch (err) {
       console.error("Validation failed:", err);
     }
   };
+  
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
   // console.log(currentStep, 'currentStep');

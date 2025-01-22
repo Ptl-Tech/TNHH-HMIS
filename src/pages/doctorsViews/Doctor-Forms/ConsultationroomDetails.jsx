@@ -20,13 +20,19 @@ import PsychologyNotes from "./PsychologyNotes";
 import PastMedicalHistory from "./PastMedicalHistory";
 import TreatmentHistoryTable from "../../nurse-view/tables/nurse-tables/TreatmentHistoryTable";
 
-const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
-  const [activeItem, setActiveItem] = useState('Patient History Notes');
+const ConsultationroomDetails = ({
+  treatmentNo,
+  observationNo,
+  patientNo,
+  moveToNextTab,
+}) => {
+  const [activeItem, setActiveItem] = useState("Patient History Notes");
   const [selectedItem, setSelectedItem] = useState(
     <PatientSigns
       treatmentNo={treatmentNo}
       observationNo={observationNo}
       patientNo={patientNo}
+      moveToNextTab={() => handleOnClick({ label: "Physical Examination" })} // Pass the next tab handler
     />
   );
 
@@ -39,24 +45,51 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
             treatmentNo={treatmentNo}
             observationNo={observationNo}
             patientNo={patientNo}
+            moveToNextTab={() =>
+              handleOnClick({ label: "Physical Examination" })
+            }
           />
         );
         break;
       case "Physical Examination":
-        setSelectedItem(<PhysicalExamintaion treatmentNo={treatmentNo} patientNo={patientNo}/>);
+        setSelectedItem(
+          <PhysicalExamintaion
+            treatmentNo={treatmentNo}
+            patientNo={patientNo}
+            moveToNextTab={() => handleOnClick({ label: "Mental Status Exam" })}
+          />
+        );
         break;
       case "Mental Status Exam":
         setSelectedItem(
-          <PatientSymptoms treatmentNo={treatmentNo} patientNo={patientNo} />
+          <PatientSymptoms
+            treatmentNo={treatmentNo}
+            patientNo={patientNo}
+            moveToNextTab={() =>
+              handleOnClick({ label: "Past Medical History" })
+            }
+          />
         );
         break;
-        case "Past Medical History":
+      case "Past Medical History":
         setSelectedItem(
-          <PastMedicalHistory treatmentNo={treatmentNo} patientNo={patientNo} />
-        )
+          <PastMedicalHistory
+            treatmentNo={treatmentNo}
+            patientNo={patientNo}
+            moveToNextTab={() =>
+              handleOnClick({ label: "Diagnosis Formulation" })
+            }
+          />
+        );
         break;
       case "Diagnosis Formulation":
-        setSelectedItem(<Diagnosis />);
+        setSelectedItem(
+          <Diagnosis
+            moveToNextTab={() =>
+              handleOnClick({ label: "Aetiology" })
+            }
+          />
+        );
         break;
       // case "Past Encounters Notes":
       //   setSelectedItem(
@@ -70,6 +103,9 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
             treatmentNo={treatmentNo}
             observationNo={observationNo}
             patientNo={patientNo}
+            moveToNextTab={() =>
+              handleOnClick({ label: "Patient History Notes" })
+            }
           />
         );
         break;
@@ -88,6 +124,9 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
             treatmentNo={treatmentNo}
             observationNo={observationNo}
             patientNo={patientNo}
+            moveToNextTab={() =>
+              handleOnClick({ label: "Physical Examination" })
+            }
           />
         );
     }
@@ -116,16 +155,21 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
         }}
       >
         {buttonItems.map((item, index) => (
-                  <Button
-                    key={index}
-                    style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
-                    className={activeItem === item.label ? "active-button" : ""}
-                    onClick={() => handleOnClick(item)}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </Button>
-          ))}
+          <Button
+            key={index}
+            style={{
+              backgroundColor: "#0f5689",
+              color: "#ffffff",
+              border: "none",
+              padding: "18px 20px",
+            }}
+            className={activeItem === item.label ? "active-button" : ""}
+            onClick={() => handleOnClick(item)}
+          >
+            {item.icon}
+            {item.label}
+          </Button>
+        ))}
       </div>
 
       <div>{selectedItem}</div>

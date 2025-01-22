@@ -236,7 +236,7 @@ const ConsultationRoomPatients = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`, {
+    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`, {
       state: {
         patientNo: record.PatientNo,
         observationNo: record.ObservationNo,

@@ -87,7 +87,7 @@ const PatientRegistration = () => {
   const [form] = Form.useForm();
 
   const { state } = useLocation(); // Access the state passed via navigate
-  const { visitorData,  patientDet } = state || {}; // Destructure patient data if available
+  const { visitorData, patientDet } = state || {}; // Destructure patient data if available
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [filteredSubCounties, setFilteredSubCounties] = useState([]);
   const [filteredWards, setFilteredWards] = useState([]);
@@ -316,16 +316,21 @@ const PatientRegistration = () => {
     if (patientDet) {
       setNewPatient({
         idNumber: patientDet?.IDNumber || "",
-        firstName: patientDet?.FirstName || "",
+        firstName: patientDet?.FirstName || patientDet?.SearchName.split(" ")[0] || "",
         middleName: patientDet?.MiddleName || "",
         lastName: patientDet?.LastName || "",
         gender: patientDet?.Gender === "Male" ? "1" : "2" || "",
         dob: patientDet?.DateOfBirth || null,
         phoneNumber: patientDet?.TelephoneNo1 || "",
-        paymentMode: patientDet?.PaymentMode === "Cash" ? "1" :patientDet?.PaymentMode==="Corporate"?"2":"1" || "",
+        paymentMode:
+          patientDet?.PaymentMode === "Cash"
+            ? "1"
+            : patientDet?.PaymentMode === "Corporate"
+            ? "2"
+            : "1" || "",
         email: patientDet?.Email || "",
         nationality: patientDet?.Nationality || "",
-        county: patientDet?.CountyWardName || "",
+        county: patientDet?.CountyWard || "",
         subCounty: patientDet?.SubCountyName || "",
         countyWard: patientDet?.CountyWardName || "",
         residence: patientDet?.Residence || "",
@@ -339,10 +344,10 @@ const PatientRegistration = () => {
 
   const handleSavePatient = async (e) => {
     e.preventDefault();
-  
+
     // Determine if the action is "edit" based on the presence of patientNumber
     const isEditAction = !!patientNumber && patientNumber.trim() !== "";
-  
+
     // Prepare patient data
     const patientData = {
       firstName:
@@ -363,7 +368,11 @@ const PatientRegistration = () => {
         visitorData?.middleName ||
         patientDet?.MiddleName ||
         "",
-      idNumber: newPatient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber || "",
+      idNumber:
+        newPatient.idNumber ||
+        visitorData?.IDNumber ||
+        patientDet?.IDNumber ||
+        "",
       phoneNumber:
         newPatient.phoneNumber ||
         visitorData?.PhoneNumber ||
@@ -401,26 +410,25 @@ const PatientRegistration = () => {
       myAction: isEditAction ? "edit" : "create",
       patientNo: isEditAction ? patientNumber : "", // Include patientNo only if editing
     };
-  
+
     // Perform validation only if creating a new patient
     if (!isEditAction) {
       const errors = validateForm(newPatient);
       setErrors(errors);
-  
+
       if (Object.keys(errors).length > 0) {
         message.warning("Please fill in all required fields.");
         return;
       }
     }
-  
+
     try {
       // Await the response from dispatch
       const response = await dispatch(createPatient(patientData));
-  
+
       if (response?.patientNo) {
         if (isEditAction) {
           message.success("Patient details updated successfully.");
-          
         } else {
           message.success("New patient saved successfully.");
         }
@@ -428,18 +436,17 @@ const PatientRegistration = () => {
         const isActivated = patientListPayload?.some(
           (existingPatient) => existingPatient.Activated
         );
-        if(isActivated) {
-         message.info("Patient already has an active visit");
-         return;
-        }else{
-                  // Navigate to Add Appointment page and pass patientId
+        if (isActivated === true) {
+          message.info("Patient already has an active visit");
+          return;
+        } else {
+          // Navigate to Add Appointment page and pass patientId
 
           const patientId = response.patientNo;
           navigate(`/reception/Add-Appointment/${patientId}`, {
             state: { patientData },
           });
         }
-       
       } else {
         message.error("Failed to save patient data. Please try again.");
       }
@@ -448,12 +455,18 @@ const PatientRegistration = () => {
       message.error("An unexpected error occurred. Please try again.");
     }
   };
-  
+
   // Define the validateForm function
-  const validateForm = (patient, visitorData, patientDet, newPatient, isEditAction) => {
+  const validateForm = (
+    patient,
+    visitorData,
+    patientDet,
+    newPatient,
+    isEditAction
+  ) => {
     const errors = {};
 
-//if is isediting skip validation
+    //if is isediting skip validation
     if (isEditAction) {
       return errors;
     }
@@ -472,7 +485,12 @@ const PatientRegistration = () => {
     }
 
     // ID Number Validation
-    if (patient.idNumber || visitorData?.IDNumber || patientDet?.IDNumber || newPatient.idNumber) {
+    if (
+      patient.idNumber ||
+      visitorData?.IDNumber ||
+      patientDet?.IDNumber ||
+      newPatient.idNumber
+    ) {
       const isRegistered = patientListPayload?.some(
         (existingPatient) =>
           existingPatient.IDNumber === patient.idNumber ||
@@ -548,7 +566,7 @@ const PatientRegistration = () => {
                     value={
                       newPatient.firstName ||
                       visitorData?.VisitorName?.split(" ")[0] ||
-                      patientDet?.SearchName?.split(" ")[0]||
+                      patientDet?.SearchName?.split(" ")[0] ||
                       patientDet?.FirstName?.split(" ")[0]
                     }
                     onChange={handleInputChange}
@@ -607,39 +625,47 @@ const PatientRegistration = () => {
                     <span className="text-danger px-1 fs-6">*</span>
                   </label>
                   <Select
-  placeholder="--Select Gender--"
-  className="w-100 text-center fw-bold"
-  value={
-    // Convert the incoming gender string to the corresponding value
-    newPatient.gender === "male" || newPatient.gender === "Male"
-      ? 1
-      : newPatient.gender === "female" || newPatient.gender === "Female"
-      ? 2
-      : visitorData?.Gender === "male" || visitorData?.Gender === "Male"
-      ? 1
-      : visitorData?.Gender === "female" || visitorData?.Gender === "Female"
-      ? 2
-      : patientDet?.Gender === "male" || patientDet?.Gender === "Male"
-      ? 1
-      : patientDet?.Gender === "female" || patientDet?.Gender === "Female"
-      ? 2
-      : "" // Default to empty if no gender is found
-  }
-  onChange={(value) => handleSelectChange("gender", value)}
-  showSearch
-  filterOption={(input, option) =>
-    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-  }
->
-  <Select.Option value="">--Select Gender--</Select.Option>
-  <Select.Option key={1} value={1}>
-    Male
-  </Select.Option>
-  <Select.Option key={2} value={2}>
-    Female
-  </Select.Option>
-</Select>
-
+                    placeholder="--Select Gender--"
+                    className="w-100 text-center fw-bold"
+                    name="gender"
+                    value={
+                      // Convert the incoming gender string to the corresponding value
+                      newPatient.gender === "male" ||
+                      newPatient.gender === "Male"
+                        ? 1
+                        : newPatient.gender === "female" ||
+                          newPatient.gender === "Female"
+                        ? 2
+                        : visitorData?.Gender === "male" ||
+                          visitorData?.Gender === "Male"
+                        ? 1
+                        : visitorData?.Gender === "female" ||
+                          visitorData?.Gender === "Female"
+                        ? 2
+                        : patientDet?.Gender === "male" ||
+                          patientDet?.Gender === "Male"
+                        ? 1
+                        : patientDet?.Gender === "female" ||
+                          patientDet?.Gender === "Female"
+                        ? 2
+                        : newPatient.gender
+                    }
+                    onChange={(value) => handleSelectChange("gender", value)}
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    <Select.Option value="">--Select Gender--</Select.Option>
+                    <Select.Option key={1} value={1}>
+                      Male
+                    </Select.Option>
+                    <Select.Option key={2} value={2}>
+                      Female
+                    </Select.Option>
+                  </Select>
                 </div>
                 <div className="col-12 col-md-4">
                   <label className="py-1">
@@ -757,9 +783,10 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select County"
                       className="w-100 fw-bold text-center"
+                       name="county"
                       value={newPatient.county || patientDet?.CountyWardName}
                       onChange={(value) => handleSelectChange("county", value)}
-                      name="county"
+                     
                       showSearch
                       // filterOption = {true}
                       filterOption={(input, option) =>
@@ -791,8 +818,9 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select Sub County"
                       className="w-100 fw-bold text-center"
-                      value={newPatient.subCounty || patientDet?.SubCountyName}
                       name="subCounty"
+
+                      value={newPatient.subCounty || patientDet?.SubCountyName}
                       onChange={(value) =>
                         handleSelectChange("subCounty", value)
                       }
@@ -1042,7 +1070,14 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Payment Mode"
                     className="w-100"
-                    value={newPatient.paymentMode || patientDet?.PatientType ==="Corporate"?"1":patientDet?.PatientType==="Cash"?"2":""}  
+                    value={
+                      newPatient.paymentMode ||
+                      patientDet?.PatientType === "Corporate"
+                        ? "1"
+                        : patientDet?.PatientType === "Cash"
+                        ? "2"
+                        : ""
+                    }
                     onChange={(value) =>
                       handleSelectChange("paymentMode", value)
                     }
@@ -1055,9 +1090,9 @@ const PatientRegistration = () => {
                 </div>
 
                 {/* Insurance Input Fields */}
-                {newPatient.paymentMode !== "2" && (
+                {newPatient.paymentMode !== "2" && newPatient.paymentMode !== "" && (
                   <div className="row g-2">
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 ">
                       <label className="py-1">
                         Insurance Name:
                         <span className="text-danger px-1">*</span>
@@ -1100,7 +1135,7 @@ const PatientRegistration = () => {
                         )}
                       </Select>
                     </div>
-                    <div className="col-12 col-md-6">
+                    <div className="col-12 ">
                       <label className="py-1">
                         Membership No:
                         <span className="text-danger px-1">*</span>
@@ -1118,7 +1153,7 @@ const PatientRegistration = () => {
                 )}
 
                 {/* Additional Fields for Insurance */}
-                {newPatient.paymentMode !== "2" && (
+                {newPatient.paymentMode !== "2" && newPatient.paymentMode !== "" && (
                   <>
                     <div className="row g-2 mb-3">
                       <div className="col-12">
@@ -1144,7 +1179,7 @@ const PatientRegistration = () => {
                           placeholder="Enter Principal Name"
                           name="insurancePrincipalMemberName"
                           value={
-                            newPatient.insurancePrincipalMemberName ||
+                            newPatient.insurancePrinicipalMemberName ||
                             patientDet?.InsurancePrincipalMemberName ||
                             ""
                           }
@@ -1177,8 +1212,14 @@ const PatientRegistration = () => {
 
         <div className="d-flex align-items-center justify-content-end mt-3">
           {/* a btn to naviaget back to patient list if required */}
-          <Button onClick={() =>  navigate(location.state?.previousPath || "/reception/visitors-list")}>
-          Back
+          <Button
+            onClick={() =>
+              navigate(
+                location.state?.previousPath || "/reception/visitors-list"
+              )
+            }
+          >
+            Back
           </Button>
           <Button
             type="primary"
