@@ -11,6 +11,7 @@ import useAuth from '../../../../hooks/useAuth';
 const AllergyAndMedication = ({ observationNumber, patientNumber, staffNo }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const role = useAuth().userData.departmentName;
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
   const config = useAuth().userData;
   const { allergyMedicationLoading, allergiesMedication } = useSelector((state) => state.getAllergiesAndMedications);
@@ -22,8 +23,6 @@ const AllergyAndMedication = ({ observationNumber, patientNumber, staffNo }) => 
   useEffect(() => {
     dispatch(getAllergiesAndMedicationsSlice(observationNumber));
   }, [dispatch, observationNumber]);
-
-  console.log('allergiesMedication', allergiesMedication);
 
   const onFinish = (values) => {
     const { complains, foodAllergy, drugAllergy } = values.allergy;
@@ -73,8 +72,6 @@ const AllergyAndMedication = ({ observationNumber, patientNumber, staffNo }) => 
       key: 'assessedBy',
     },
   ]
-
-  console.log("allergiesMedication", allergiesMedication);
 
   const dataSource = allergiesMedication
     .map((item) => ({
@@ -174,7 +171,7 @@ const AllergyAndMedication = ({ observationNumber, patientNumber, staffNo }) => 
             )}
             {/* display the button on the right side of the page */}
 
-            {!showForm && (
+            {!showForm && role !== 'Psychology' && (
               <Row justify='end'>
                 <Button type="primary" className='' onClick={() => setShowForm(true)} icon={<ContactsOutlined />}>Add Allergies</Button>
               </Row>

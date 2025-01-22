@@ -201,6 +201,7 @@ import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorPro
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
+import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -370,5 +371,6 @@ export const rootReducer = combineReducers({
   markAsCompleted:postMarkAsCompletedReducer,
   createWalkInPatient:createWalkInPatientReducer,
   dispatchWalkInLab:dispatchWalkInLabReducer,
-  dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer
+  dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
+  postPsychologyRequest:postPsychologyRequestReducer
 });

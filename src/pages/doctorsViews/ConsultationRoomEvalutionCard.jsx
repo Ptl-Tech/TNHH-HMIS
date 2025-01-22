@@ -12,7 +12,6 @@ const ConsultationRoomEvalutionCard = () => {
   const role = useAuth().userData.departmentName;
   const location = useLocation();
   const dispatch = useDispatch();
-  const { observationNo } = location.state;
 
   // Correct way to get treatmentNo and patientNo from the URL
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
@@ -36,7 +35,13 @@ const ConsultationRoomEvalutionCard = () => {
       <Space className="inpatient-header">
         <DiffOutlined />
         <Typography.Text className="inpatient-header-text">
-          Doctor Evaluation Form
+          {
+            role === "Doctor"
+              ? "Doctor Evaluation Form"
+              : role === "Psychology"
+              ? "Psychology Evaluation Form"
+              : "Nurse Evaluation Form"
+          }
         </Typography.Text>
       </Space>
       <Row gutter={8} className="inpatient-card-container">
@@ -50,7 +55,7 @@ const ConsultationRoomEvalutionCard = () => {
           {loadingPatientDetails ? (
             <Skeleton />
           ) : (
-           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} observationNo={observationNo} patientDetails={patientDetails} role={role}/>
+           <PatientInfo patientNo={patientNo} treatmentNo={treatmentNo} patientDetails={patientDetails} role={role}/>
           )}
 
          
@@ -62,7 +67,7 @@ const ConsultationRoomEvalutionCard = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          <EvaluationCardContent treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} patientDetails={patientDetails} role={role}/>
+          <EvaluationCardContent treatmentNo={treatmentNo} patientNo={patientNo} patientDetails={patientDetails} role={role}/>
         </Col>
        
       </Row>

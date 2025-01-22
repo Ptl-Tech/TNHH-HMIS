@@ -34,7 +34,7 @@ const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
       case 'Allergies and Medications':
         setSelectedItem(<AllergyAndMedication treatmentNo={treatmentNo} observationNumber={observationNo} patientNumber={patientNo} setIsFormVisible={false} />);
         break;
-      case 'Observation Notes':
+      case 'Nurse Notes':
         setSelectedItem(<ObservationNotes treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
       default:
@@ -48,7 +48,7 @@ const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
   const buttonItems = [
     { label: "Vitals", icon: <HeartOutlined /> },
     { label: "Allergies and Medications", icon: <MedicineBoxOutlined /> },
-    { label: "Observation Notes", icon: <MedicineBoxOutlined /> },
+    { label: "Nurse Notes", icon: <MedicineBoxOutlined /> },
 
   ];
 

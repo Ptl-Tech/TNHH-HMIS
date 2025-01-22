@@ -4,29 +4,31 @@ import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-desig
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeConsultationList, closedConsultationList }) => {
   
+  const role = useAuth().userData.departmentName
   const cardData = [
     {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
       title: "OP Waiting List",
-      link: "/Doctor/Consultation-List",
+      ...(role === "Doctor" ? { link: "/Doctor/Consultation-List" } : { link: "/Psychology/Consultation-List" }),
       count: openDoctorVisitList?.length,
     },
     {
       backgroundColor: "orange",
       icon: <ClockCircleOutlined />,
       title: "In Consultation",
-      link: "/Doctor/PendingConsultationList",
+      ...(role === "Doctor" ? { link: "/Doctor/PendingConsultationList" } : { link: "/Psychology/PendingConsultationList" }),
       count: activeConsultationList?.length,
     },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,
       title: "Closed",
-      link: "/Doctor/ClosedConsultationList",
+      ...(role === "Doctor" ? { link: "/Doctor/ClosedConsultationList" } : { link: "/Psychology/ClosedConsultationList" }),
       count: closedConsultationList?.length,
     },
   ];

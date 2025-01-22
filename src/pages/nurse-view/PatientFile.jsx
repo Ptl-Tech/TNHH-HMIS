@@ -27,7 +27,7 @@ const PatientFile = ({ patientDetails }) => {
     {label: "Nursing Notes", icon: <FileProtectOutlined />},
     {label: "Past Encounters Notes", icon: <ExperimentOutlined />},
     // "Consumables",
-    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Consumables", icon: <FilterOutlined />}] : []),
+    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Order Sheet", icon: <FilterOutlined />}] : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];

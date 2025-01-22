@@ -35,7 +35,7 @@ const DoctorDashboard = () => {
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRY";
-    } else if (role === "psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "New";
@@ -44,7 +44,7 @@ const DoctorDashboard = () => {
   const activeVisitCount = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
-    }else if (role === "psychology") {
+    }else if (role === "Psychology") {
       return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
     }
     return item.Status === "Active";

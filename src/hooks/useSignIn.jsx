@@ -70,6 +70,8 @@ const useSignIn = () => {
         navigate('/Security');
       } else if (role === 'Nurse') {
         navigate('/Nurse')
+      }else if(role === 'Psychology'){
+        navigate('/Psychology')
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);

@@ -1,26 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "antd";
 import {
   HeartOutlined,
   SolutionOutlined,
   MedicineBoxOutlined,
 } from "@ant-design/icons";
-import { FaNotesMedical } from "react-icons/fa";
-
 // Import components
 import PatientSigns from "./PatientSigns";
 import PatientSymptoms from "./PatientSyptoms";
 import Diagnosis from "./Diagnosis";
-import SickOff from "./SickOff";
-import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
 import FourPsForm from "./FourPsForm";
-import SuicidalForm from "../../nurse-view/nurse-forms/SuicidalForm";
 import PhysicalExamintaion from "../DocAdmission-views/PhysicalExamintaion";
 import PsychologyNotes from "./PsychologyNotes";
 import PastMedicalHistory from "./PastMedicalHistory";
-import TreatmentHistoryTable from "../../nurse-view/tables/nurse-tables/TreatmentHistoryTable";
+import useAuth from "../../../hooks/useAuth";
+import PropTypes from "prop-types";
 
 const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
+  const role = useAuth().userData.departmentName
   const [activeItem, setActiveItem] = useState('Patient History Notes');
   const [selectedItem, setSelectedItem] = useState(
     <PatientSigns
@@ -101,7 +98,14 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
-    { label: "Psychology Notes", icon: <HeartOutlined /> },
+    {
+      label: (() => {
+        if (role === "Doctor") return "Psychology Notes";
+        if (role === "Psychology") return "Doctor Notes";
+        return "Notes"; // Default value (optional)
+      })(),
+      icon: <HeartOutlined />,
+    },
   ];
 
   return (
@@ -134,3 +138,9 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
 };
 
 export default ConsultationroomDetails;
+// propTypes
+ConsultationroomDetails.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+};

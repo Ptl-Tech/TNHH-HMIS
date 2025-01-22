@@ -257,7 +257,6 @@ const PatientRegistration = () => {
 
     if (years < 2) {
       setDobError("Patient must be at least 2 years old.");
-
       setAge(null);
     } else {
       setDobError("");

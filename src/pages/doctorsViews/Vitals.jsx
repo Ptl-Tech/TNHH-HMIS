@@ -10,11 +10,13 @@ import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
 import { updateTriageListVitalsSlice } from "../../actions/triage-actions/updateTriageListVitalsSlice";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
+import useAuth from "../../hooks/useAuth";
 
 const FormVitals = ({ observationNo, patientNo }) => {
   const [form] = Form.useForm();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
   const dispatch = useDispatch();
+  const role = useAuth().userData.departmentName
 
   const { loading: loadingVitalsLines, vitals: vitalsLines } = useSelector(
     (state) => state.getPatientVital
@@ -193,13 +195,17 @@ const FormVitals = ({ observationNo, patientNo }) => {
             <>
             <div className="d-flex justify-content-end ">
            
-              <Button
-                type="primary"
-                onClick={handleToggleForm}
-                icon={<PlusOutlined />}
-              >
-                Add Vitals
-              </Button>
+              {
+                (role === "Doctor" ) && (
+                  <Button
+                    type="primary"
+                    onClick={handleToggleForm}
+                    style={{ marginBottom: "16px" }}
+                  >
+                    Add Vitals
+                  </Button>
+                )
+              }
             
             </div>
             <Divider />
