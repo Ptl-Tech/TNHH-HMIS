@@ -22,7 +22,7 @@ const JacksonVisualForm = () => {
     const { loadingGetJacksonVisual, getJacksonVisual } = useSelector((state) => state.getJacksonVisualForm);
     const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm);
 
-    const filterJacksonFormData = getJacksonVisual.filter((item) => item.AdmissionNo === patientDetails?.CurrentAdmNo);   
+    const filterJacksonFormData = getJacksonVisual.filter((item) => item.AdmissionNo === patientDetails?.Admission_No);   
 
     const handleButtonVisibility = () => {
       setIsFormVisible(!isFormVisible);
@@ -55,17 +55,14 @@ const JacksonVisualForm = () => {
         
         <NurseInnerHeader icon={<FileOutlined />} title="Jackson Visual Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
           {
             role === 'Nurse' && (
               <>
-                  <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> Add Form
+                  <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Jackson Form
                   </Button>
-                  <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                  <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
                   View Jackson Form
-                  </Button>
-                  <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                  Preview Form
                   </Button>
               </>
             )

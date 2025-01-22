@@ -10,12 +10,13 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
     const [form] = Form.useForm();
     const dispatch = useDispatch();
 
+    console.log('patient details', patientDetails);
     const handleOnFinish = async (values) => {
         try {
           const { visitorName, idNumber, phoneNumber } = values;
           const visitorData = {
             myAction: "create",
-            admissionNo: patientDetails?.CurrentAdmNo,
+            admissionNo: patientDetails?.Admission_No,
             visitorName,
             idNumber,
             phoneNumber,
@@ -27,7 +28,8 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
               .then((result) => {
                 if (result.type === POST_VISITOR_LIST_SUCCESS) {
                   message.success( result.payload.msg || `Visitor has been saved successfully!`);
-                  dispatch(getVisitorsListSlice(patientDetails?.CurrentAdmNo));
+                  dispatch(getVisitorsListSlice());
+                  setIsFormVisible(false);
                 } else if (result.type === POST_VISITOR_LIST_FAILURE) {
                   message.error(result.payload.msg || "Internal server error, please try again later.");
                 }
