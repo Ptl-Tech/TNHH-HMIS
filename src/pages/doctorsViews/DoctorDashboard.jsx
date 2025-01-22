@@ -9,15 +9,15 @@ import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../../hooks/useAuth";
 import moment from "moment";
 import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 import DashboardCard from "../nurse-view/DashboardCard";
 import DashboardStatistics from "../nurse-view/DashboardStatistics";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 
 const DoctorDashboard = () => {
+  const role = useAuth().userData.departmentName
   const dispatch = useDispatch();
   const userDetails = useAuth(); // Use the custom hook to get user info
-  const { loading: treatmentListLoading, patients: treatmentList } =
+  const { patients: treatmentList } =
     useSelector((state) => state.docTreatmentList) || {};
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
@@ -25,20 +25,40 @@ const DoctorDashboard = () => {
 
   // Fetch data when the component loads
   useEffect(() => {
-    dispatch(getPatientListSlice());
     dispatch(getTriageWaitingList());
   }, [dispatch]);
 
-  // Optimized treatment list calculations
-  const openDoctorVisitList = treatmentList?.filter(
-    (item) => item.Status === "New"
-  );
-  const activeVisitCount = treatmentList?.filter(
-    (item) => item.Status === "Active"
-  )?.length;
-  const closedVisitCount = treatmentList?.filter(
-    (item) => item.Status === "Completed"
-  )?.length;
+  useEffect(() => {
+    dispatch(getOutPatientTreatmentList());
+  }, [dispatch]);
+
+  const openDoctorVisitList = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "New" && item.Clinic === "PSYCHIATRY";
+    } else if (role === "psychology") {
+      return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "New";
+  });
+
+  const activeVisitCount = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
+    }else if (role === "psychology") {
+      return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "Active";
+  });
+
+  const closedVisitCount = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "Completed" && item.Clinic === "PSYCHIATRY";
+    }else if (role === "Psychology") {
+      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "Completed";
+  });
+  
 
   // Filters for inpatients and outpatients
   const filterInPatients =
@@ -46,78 +66,34 @@ const DoctorDashboard = () => {
   const filterOutPatients =
     patients?.filter((item) => item.Inpatient === false) || [];
 
-  // Combine treatment list with outpatient list
-  const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
-    PatientNo: patient.PatientNo,
-    SearchName: patient.SearchName,
-    IDNumber: patient.IDNumber,
-    Age: patient.AgeinYears,
-    PatientType: patient.PatientType,
-    Inpatient: patient.Inpatient,
-  }));
-
-  const combinedList = openDoctorVisitList.map((room) => {
-    const matchingPatient = openDoctorVisitListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo
-    );
-
-    return {
-      ...room,
-      PatientNo: room?.PatientNo,
-      SearchName: matchingPatient ? matchingPatient.SearchName : "",
-      IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
-      Age: matchingPatient ? matchingPatient.Age : "",
-      PatientType: matchingPatient ? matchingPatient.PatientType : "",
-      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
-    };
-  });
-
-  const waitingListTableDataSource = combinedList
-    .filter((item) => item.Inpatient !== true)
-    ?.map((item, index) => ({
-      key: index + 1,
-      treatmentNo: item?.TreatmentNo,
-      patientNo: item?.PatientNo,
-      observationNo: item?.ObservationNo,
-      treatmentDate: item?.TreatmentDate,
-      treatmentTime: item?.TreatmentTime,
-      searchName: item?.SearchName,
-      idNumber: item?.IDNumber,
-      age: item?.Age,
-      patientType: item?.PatientType,
-      urgency: item?.UrgencyStatus,
-      Inpatient: item?.Inpatient,
-    }))
-    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
-
   // Updated card data for the dashboard
   const cardData = [
     {
       title: "OP Waiting List",
-      value: waitingListTableDataSource?.length,
+      value: openDoctorVisitList?.length,
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
       color: "#fff",
       backgroundColor: "#0f5689",
-      link: "/Doctor/Consultation-List",
+      link: role === "Doctor" ? "/Doctor/Consultation-List" : "/Psychology/Consultation-List",
     },
     {
       title: "Consultation Room",
-      value: activeVisitCount, // Use optimized count
+      value: activeVisitCount?.length, // Use optimized count
       subtitle: "Active Consultations",
       icon: <SafetyOutlined />,
       color: "#000",
       backgroundColor: "#ac8342",
-      link: "/Doctor/PendingConsultationList",
+      link: role === "Doctor" ? "/Doctor/PendingConsultationList" : "/Psychology/PendingConsultationList",
     },
     {
       title: "Closed Consultations",
-      value: closedVisitCount, // New card for closed visits
+      value: closedVisitCount?.length, // New card for closed visits
       subtitle: "Completed Consultations",
       icon: <UserOutlined />,
       color: "#000",
       backgroundColor: "#5c85d6",
-      link: "/Doctor/ClosedConsultationList",
+      link: role === "Doctor" ? "/Doctor/ClosedConsultationList" : "/Psychology/ClosedConsultationList",
     },
     {
       title: "Inpatients List",
@@ -126,9 +102,10 @@ const DoctorDashboard = () => {
       icon: <UserAddOutlined />,
       color: "#000",
       backgroundColor: "#b0afaf",
-      link: "/Doctor/Inpatient",
+      link: role === "Doctor" ? "/Doctor/Inpatient" : "/Psychology/Inpatient",
     },
   ];
+  
 
   // Helper function to count registrations by date
   const countRegistrationsByDate = (patients) =>

@@ -1,49 +1,33 @@
-import React from "react";
+
 import { Card, Typography } from "antd";
 import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 
-const ConsultationRoomSummeryCard = ({ currentPath, waitingPatient }) => {
-  const { patients: treatmentList = [] } =
-    useSelector((state) => state.docTreatmentList) || {};
-
-  const currentDate = new Date();
+const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeConsultationList, closedConsultationList }) => {
   
-  // Filter based on TreatmentDate
-  const openConsultationList =waitingPatient?.filter(
-    (item) => item.Status === "New" 
-  );
-  const pendingConsultationList =treatmentList?.filter(
-    (item) => item.Status === "Active" 
-  );
-  const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Completed" 
-  );
-
   const cardData = [
     {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
       title: "OP Waiting List",
       link: "/Doctor/Consultation-List",
-      count: openConsultationList.length,
+      count: openDoctorVisitList?.length,
     },
     {
       backgroundColor: "orange",
       icon: <ClockCircleOutlined />,
       title: "In Consultation",
       link: "/Doctor/PendingConsultationList",
-      count: pendingConsultationList.length,
+      count: activeConsultationList?.length,
     },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,
       title: "Closed",
       link: "/Doctor/ClosedConsultationList",
-      count: closedConsultationList.length,
+      count: closedConsultationList?.length,
     },
   ];
 
@@ -97,6 +81,8 @@ const ConsultationRoomSummeryCard = ({ currentPath, waitingPatient }) => {
 ConsultationRoomSummeryCard.propTypes = {
   currentPath: PropTypes.string.isRequired,
   closedConsultationList: PropTypes.array.isRequired,
+  openDoctorVisitList: PropTypes.array.isRequired,
+  activeConsultationList: PropTypes.array.isRequired,
 };
 
 export default ConsultationRoomSummeryCard;

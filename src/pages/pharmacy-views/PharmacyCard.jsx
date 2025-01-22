@@ -24,6 +24,7 @@ import {
 } from "../../actions/pharmacy-actions/postPharmacyAction";
 import { useDispatch, useSelector } from "react-redux";
 import { getPharmacyLineReturnbyPharmacyNo } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
+import { getNewPharmacyRequests } from "../../actions/pharmacy-actions/getNewPharmacyRequest";
 
 const { Title, Text } = Typography;
 
@@ -33,13 +34,26 @@ const PharmacyCard = () => {
   const queryParams = new URLSearchParams(location.search);
   const pharmacyNo = queryParams.get("PharmacyNo");
 
+ const { 
+  data: newPharmacyRequests = [], // Default to an empty array
+} = useSelector((state) => state.getNewPharmacyList);
+
+let singlePharmacyRecord; // Declare it once in the outer scope
+if (pharmacyNo) {
+  singlePharmacyRecord = newPharmacyRequests.find((patient) => {
+    const patientPharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
+    return patientPharmacyNo === pharmacyNo.toLowerCase(); // Match the pharmacyNo
+  });
+}
+
   const { loading: loadingDrugIssuance } = useSelector(
     (state) => state.postDrugIssuance
   );
   const { loading: loadingArchivePrescription } = useSelector(
     (state) => state.postArchivePrescription
   );
-  const { loading: loadingPatientReturnLines, data: patientReturnLines } =
+
+  const {  data: pharmacyLineData = [] } =
     useSelector((state) => state.getPatientPharmacyReturnLine);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,8 +61,9 @@ const PharmacyCard = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+     dispatch(getNewPharmacyRequests());
     if (pharmacyNo) {
-      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));
+      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));   
     }
   }, [dispatch, pharmacyNo]);
 
@@ -66,22 +81,24 @@ const PharmacyCard = () => {
     { title: "Remarks", dataIndex: "remarks", key: "remarks" },
   ];
 
-  const dataSource = [
-    {
-      key: patientReturnLines?.PharmacyReturnLineNo,
-      no: patientReturnLines?.PharmacyReturnLineNo,
-      drugName: patientReturnLines?.DrugName,
-      unitPrice: patientReturnLines?.UnitPrice,
-      totalPrice: patientReturnLines?.TotalPrice,
-      actualQty: patientReturnLines?.ActualQty,
-      dosage: patientReturnLines?.Dosage,
-      frequency: patientReturnLines?.Frequency,
-      take: patientReturnLines?.Take,
-      route: patientReturnLines?.Route,
-      days: patientReturnLines?.Days,
-      remarks: patientReturnLines?.Remarks,
-    },
-  ];
+
+  const dataSource = pharmacyLineData?.map(line => ({
+      ...line,
+      key: line?.PharmacyReturnLineNo,
+      no: line?.No,
+      drugName: line?.DrugName,
+      unitPrice: line?.UnitPrice,
+      totalPrice: line?.TotalAmount,
+      actualQty: line?.ActualQty,
+      dosage: line?.Dosage,
+      frequency: line?.Frequency,
+      take: line?.Take,
+      route: line?.Route,
+      days: line?.Duration_Days,
+      remarks: line?.Remarks,
+  }))
+
+  
 
   const openModal = () => setIsModalOpen(true);
 
@@ -167,56 +184,48 @@ const PharmacyCard = () => {
         </Typography.Title> */}
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Number :</Text> PHA-00025
+            <Text strong>Number :</Text>  {singlePharmacyRecord?.PharmacyNo} 
           </Col>
           <Col span={12}>
-            <Text strong>Patient No. :</Text> P00140
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Names :</Text> JOE HULU WANYAMA
-          </Col>
-          <Col span={12}>
-            <Text strong>Date :</Text> 7/30/2024
+            <Text strong>Patient No. :</Text>  {singlePharmacyRecord?.PatientNo} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Patient Type :</Text> Corporate
+            <Text strong>Names :</Text>  {singlePharmacyRecord?.Names} 
           </Col>
           <Col span={12}>
-            <Text strong>Cash Sale :</Text>
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Location :</Text>
-          </Col>
-          <Col span={12}>
-            <Text strong>Transaction Type :</Text>
+            <Text strong>Date :</Text>  {singlePharmacyRecord?.PharmacyDate} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Request Area :</Text> Doctor
+            <Text strong>Patient Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
           </Col>
-          <Col span={12}>
-            <Text strong>Insurance :</Text>
+           <Col span={12}>
+            <Text strong>Transaction Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
           </Col>
         </Row>
         <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
           <Col span={12}>
-            <Text strong>Remarks :</Text>
+            <Text strong>Request Area :</Text> {singlePharmacyRecord?.LinkType} 
           </Col>
           <Col span={12}>
-            <Text strong>Status :</Text> New
+            <Text strong>Insurance :</Text> {singlePharmacyRecord?.InsuranceNo} 
+          </Col>
+        </Row>
+        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+          <Col span={12}>
+            <Text strong>Remarks :</Text>  
+          </Col>
+          <Col span={12}>
+            <Text strong>Status :</Text>   
           </Col>
         </Row>
         <Row style={{ padding: "10px 0" }}>
           <Col span={24}>
             <Text strong>Total Price :</Text>{" "}
-            <span style={{ color: "blue" }}>KShs. 20.00</span>
+            <span style={{ color: "blue" }}>{singlePharmacyRecord?.Visit_Total}</span>
           </Col>
         </Row>
       </div>
