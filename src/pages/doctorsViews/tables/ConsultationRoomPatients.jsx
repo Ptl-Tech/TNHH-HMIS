@@ -1,36 +1,32 @@
-import { Badge, Button, Card, Table } from "antd";
+import { Button, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CheckOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
-import { listPatients } from "../../../actions/patientActions";
 import Loading from "../../../partials/nurse-partials/Loading";
 import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
-import Search from "antd/es/transfer/search";
 import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import {
   getColorByWaitingTreatmentTime,
   getUrgencyColorcode,
   rowClassName,
 } from "../../../utils/helpers";
-import { render } from "react-dom";
+import useAuth from "../../../hooks/useAuth";
+import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
 const ConsultationRoomPatients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-  const currentDate = new Date();
+  const role = useAuth().userData.departmentName
 
-  const [searchParams, setSearchParams] = useState({
-    name: "",
-    patientNo: "",
-    treatmentNo: "",
-    urgency: "",
-  });
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchVisitNumber, setSearchVisitNumber] = useState('')
 
-  const { triageWaitingList: patients } = useSelector(
+  const { loadingWaitingList, triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
@@ -43,9 +39,32 @@ const ConsultationRoomPatients = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-  const closedConsultationList = treatmentList?.filter(
-    (item) => item.Status === "Active"
-  );
+  const openDoctorVisitList = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "New" && item.Clinic === "PSYCHIATRY";
+    } else if (role === "psychology") {
+      return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "New";
+  });
+
+  const activeConsultationList = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
+    }else if (role === "psychology") {
+      return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "Active";
+  });
+
+  const closedConsultationList = treatmentList?.filter((item) => {
+    if (role === "Doctor") {
+      return item.Status === "Completed" && item.Clinic === "PSYCHIATRY";
+    }else if (role === "Psychology") {
+      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGY";
+    }
+    return item.Status === "Completed";
+  });
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
@@ -57,7 +76,7 @@ const ConsultationRoomPatients = () => {
 
   }));
 
-  const combinedList = closedConsultationList.map((room) => {
+  const combinedList = activeConsultationList.map((room) => {
     const matchingPatient = closedConsultationListWithPatientDetails.find(
       (patient) => patient.PatientNo === room.PatientNo
     );
@@ -74,77 +93,17 @@ const ConsultationRoomPatients = () => {
     };
   });
 
-
-  const waitingListTableDataSource = combinedList
-    .filter((item) => item.Inpatient !== true)
-    ?.map((item, index) => ({
-      key: index + 1,
-      treatmentNo: item?.TreatmentNo,
-      patientNo: item?.PatientNo,
-      observationNo: item?.ObservationNo,
-      treatmentDate: item?.TreatmentDate,
-      treatmentTime: item?.TreatmentTime,
-      searchName: item?.SearchName,
-      idNumber: item?.IDNumber,
-      age: item?.Age,
-      patientType: item?.PatientType,
-      urgency: item?.UrgencyStatus,
-      Inpatient: item?.Inpatient,
-      Status: item?.Status,
-    }))
-    .sort((a, b) => new Date(a.treatmentDate) - new Date(b.treatmentDate));
-
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
-
-  const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    handleFilterPatients({ ...searchParams, [field]: value });
-  };
-
-  const handleFilterPatients = () => {
-    const isSearching = Object.values(searchParams).some(
-      (value) => value.trim() !== ""
-    );
-
-    if (isSearching) {
-      const filtered = waitingListTableDataSource.filter((patient) => {
-        const treatmentNo = patient.treatmentNo?.toLowerCase() || "";
-        const patientNo = patient.patientNo?.toLowerCase() || "";
-        const searchName = patient.searchName?.toLowerCase() || "";
-        const urgency = patient.UrgencyStatus || "";
-
-        return (
-          treatmentNo.includes(searchParams.treatmentNo.toLowerCase()) &&
-          searchName.includes(searchParams.searchName.toLowerCase()) &&
-          patientNo.includes(searchParams.patientNo.toLowerCase()) &&
-          urgency.includes(searchParams.urgency)
-        );
-      });
-
-      // Apply inpatient filter after search filter
-      const filteredWithoutInpatients = filtered.filter(
-        (item) => item.Inpatient !== true
-      );
-      setFilteredPatients(filteredWithoutInpatients);
-    } else {
-      setFilteredPatients(waitingListTableDataSource);
-    }
-  };
-
   const waitingListColumns = [
     {
       title: "#",
       dataIndex: "key",
       key: "key",
+      render: (text, record, index) => index + 1,
     },
     {
       title: "Treatment No",
-      dataIndex: "treatmentNo",
-      key: "treatmentNo",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
       // render: (_, record) => {
         //     const { color, text } = getUrgencyColorcode(record.urgency);
         //     return (
@@ -155,6 +114,10 @@ const ConsultationRoomPatients = () => {
         //       />
         //     );
         //   },
+        filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
+      onFilter: (value, record) =>
+        record?.TreatmentNo ?
+        record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
         render: (_, record) => {
           const { color } = getUrgencyColorcode(record.urgency);
           return (
@@ -163,26 +126,19 @@ const ConsultationRoomPatients = () => {
               className="fw-bold"
               style={{ color: color }}
             >
-              {record.treatmentNo}
+              {record.TreatmentNo}
             </span>
           )
         },
     },
     {
       title: "Patient Name",
-      dataIndex: "searchName",
-      key: "searchName",
-      filterSearch: true,
-      filters: [
-        ...new Set(
-          waitingListTableDataSource.map((item) => ({
-            text: item.searchName,
-            value: item.searchName,
-          }))
-        ),
-      ],
-      onFilter: (value, record) => record.searchName.includes(value),
-      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
+      dataIndex: "SearchName",
+      key: "SearchName",
+      filteredValue: searchName ? [searchName] : null,
+      onFilter: (value, record) =>
+        record?.SearchName ?
+        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
       render: (text, record) => {
         return (
           <span
@@ -197,26 +153,30 @@ const ConsultationRoomPatients = () => {
     },
     {
       title: "Patient No",
-      dataIndex: "patientNo",
-      key: "patientNo",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+      onFilter: (value, record) =>
+        record?.PatientNo ?
+        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
 
     {
       title: "ID Number",
-      dataIndex: "idNumber",
-      key: "idNumber",
+      dataIndex: "IDNumber",
+      key: "IDNumber",
     },
     {
       title: "Treatment Date",
-      dataIndex: "treatmentDate",
-      key: "treatmentDate",
+      dataIndex: "TreatmentDate",
+      key: "TreatmentDate",
     },
     {
       title: "Waiting Time",
-      dataIndex: "treatmentTime",
-      key: "treatmentTime",
+      dataIndex: "TreatmentTime",
+      key: "TreatmentTime",
       render: (_, record) => {
-        const combinedDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
+        const combinedDateTime = `${record.TreatmentDate}T${record.TreatmentTime}`;
         const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), "minute");
         const hours = Math.floor(elapsedMinutes / 60);
         const minutes = elapsedMinutes % 60;
@@ -226,15 +186,15 @@ const ConsultationRoomPatients = () => {
     },
     {
       title: "Patient Type",
-      dataIndex: "patientType",
-      key: "patientType",
+      dataIndex: "PatientType",
+      key: "PatientType",
     },
     {
       title: "Age",
-      dataIndex: "age",
-      key: "age",
+      dataIndex: "Age",
+      key: "Age",
       render: (_, record) => {
-        return <span>{record.age} years</span>;
+        return <span>{record.Age} years</span>;
       },
     },
 
@@ -255,10 +215,10 @@ const ConsultationRoomPatients = () => {
     // },
     {
       title: "Completion Status",
-      dataIndex: "Status",
-      key: "Status",
+      dataIndex: "UrgencyStatus",
+      key: "UrgencyStatus",
       render: (_, record) => {
-        return <span className="fw-bold text-dark">{record.Status} </span>;
+        return <span className="fw-bold text-dark">{record.UrgencyStatus} </span>;
       },
     },
     {
@@ -276,10 +236,10 @@ const ConsultationRoomPatients = () => {
   ];
 
   const handleNavigate = (record, treatmentNo) => {
-    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.patientNo}&TreatmentNo=${treatmentNo}`, {
+    navigate(`/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`, {
       state: {
-        patientNo: record.patientNo,
-        observationNo: record.observationNo,
+        patientNo: record.PatientNo,
+        observationNo: record.ObservationNo,
         patientDetails: record,
       },
     });
@@ -288,59 +248,20 @@ const ConsultationRoomPatients = () => {
   return (
     <div style={{ padding: "10px 10px" }}>
       <ConsultationRoomSummeryCard
-        waitingPatient={waitingListTableDataSource}
         currentPath={currentPath}
-        closedConsultationList={waitingListTableDataSource}
+        openDoctorVisitList={openDoctorVisitList}
+        activeConsultationList={activeConsultationList}
+        closedConsultationList={closedConsultationList}
       />
-      <Card
-        style={{
-          padding: "10px 16px",
-          marginBottom: "10px",
-          backgroundColor: "#fcfafa",
-        }}
-      >
-        <div className="admit-patient-filter-container">
-          <Search
-            placeholder="Search by Treatment No"
-            allowClear
-            value={searchParams.treatmentNo}
-            onChange={(e) => handleSearchChange(e, "treatmentNo")}
-          />
-          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
-            or
-          </span>
-          <Search
-            placeholder="Search by Patient Name"
-            allowClear
-            value={searchParams.searchName}
-            onChange={(e) => handleSearchChange(e, "searchName")}
-          />
-          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
-            or
-          </span>
-          <Search
-            placeholder="Search by Patient No"
-            allowClear
-            value={searchParams.patientNo}
-            onChange={(e) => handleSearchChange(e, "patientNo")}
-          />
-          <span style={{ color: "gray", fontSize: "14px", fontWeight: "bold" }}>
-            or
-          </span>
-          <Search
-            placeholder="Search by Urgency Status"
-            allowClear
-            value={searchParams.urgency}
-            onChange={(e) => handleSearchChange(e, "urgency")}
-          />
-        </div>
-      </Card>
-      {treatmentListLoading ? (
+
+      <FilterConsultationRoom setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchVisitNumber={setSearchVisitNumber}/>
+    
+      {treatmentListLoading || loadingWaitingList? (
         <Loading />
       ) : (
         <Table
           columns={waitingListColumns}
-          dataSource={filteredPatients}
+          dataSource={combinedList}
           bordered
           size="small"
           rowClassName={rowClassName} // Apply the row color

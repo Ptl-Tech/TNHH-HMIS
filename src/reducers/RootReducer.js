@@ -10,6 +10,9 @@ import {
   activePatientsReducer,
   appmntListReducer,
   convertPatientReducer,
+  createWalkInPatientReducer,
+  dispatchWalkInLabReducer,
+  dispatchWalkInPharmacyReducer,
   patientByNoReducer,
   patientCreateReducer,
   patientListReducer,
@@ -196,6 +199,7 @@ import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest,
 import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
+import { dispatchWalkInLab } from "../actions/patientActions";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -362,5 +366,7 @@ export const rootReducer = combineReducers({
   postImplant:postPatientImplantRequest,
   checkInConsulation:postCheckInPatientConfirmReducer,
   markAsCompleted:postMarkAsCompletedReducer,
-
+  createWalkInPatient:createWalkInPatientReducer,
+  dispatchWalkInLab:dispatchWalkInLabReducer,
+  dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer
 });

@@ -32,6 +32,21 @@ import {
   APPMNT_LIST_SUCCESS,
   APPMNT_LIST_FAIL,
 } from "../constants/patientConstants";
+export const CREATE_WALK_IN_PATIENT_REQUEST = "CREATE_WALK_IN_PATIENT_REQUEST";
+export const CREATE_WALK_IN_PATIENT_SUCCESS = "CREATE_WALK_IN_PATIENT_SUCCESS";
+export const CREATE_WALK_IN_PATIENT_FAIL = "CREATE_WALK_IN_PATIENT_FAIL";
+export const CREATE_WALK_IN_PATIENT_RESET = "CREATE_WALK_IN_PATIENT_RESET";
+
+export const DISPATCH_WALK_IN_PATIENT_LAB_REQUEST = "DISPATCH_WALK_IN_PATIENT_LAB_REQUEST";
+export const DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS = "DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS";
+export const DISPATCH_WALK_IN_PATIENT_LAB_FAIL = "DISPATCH_WALK_IN_PATIENT_LAB_FAIL";
+export const DISPATCH_WALK_IN_PATIENT_LAB_RESET = "DISPATCH_WALK_IN_PATIENT_LAB_RESET";
+
+export const DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST = "DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST";
+export const DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS = "DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS";
+export const DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL = "DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL";
+export const DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET = "DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET";
+
 import { message } from "antd";
 import useAuth from "../hooks/useAuth";
 
@@ -56,8 +71,6 @@ export const createPatient = (patient) => async (dispatch, getState) => {
       },
     };
 
-    console.log("patient: ", patient);
-
     const response = await axios.post(
       `${API}Reception/PatientRegistration`,
       patient,
@@ -80,6 +93,147 @@ export const createPatient = (patient) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PATIENT_REGISTER_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error; // Rethrow error for `handleSubmit` to handle
+  }
+};
+
+export const createWalkInPatient = (patient) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: CREATE_WALK_IN_PATIENT_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}Reception/PatientRegistration`,
+      patient,
+      config
+    );
+
+    // Extract response details
+    const responseData = {
+      status: response.data.status,
+      data: response.data, // Assuming `msg` contains the patient ID
+    };
+
+    setTimeout(() => {
+      dispatch({ type: CREATE_WALK_IN_PATIENT_SUCCESS, payload: responseData });
+      console.log("Dispatched Payload:", responseData);
+    }, 2000);
+
+    // Return patient ID for further use
+    return responseData.data; // `msg` contains the patient ID
+  } catch (error) {
+    dispatch({
+      type: CREATE_WALK_IN_PATIENT_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error; // Rethrow error for `handleSubmit` to handle
+  }
+};
+
+export const dispatchWalkInLab = (patient) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: DISPATCH_WALK_IN_PATIENT_LAB_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}Reception/PatientRegistration`,
+      patient,
+      config
+    );
+
+    // Extract response details
+    const responseData = {
+      status: response.data.status,
+      data: response.data, // Assuming `msg` contains the patient ID
+    };
+
+    setTimeout(() => {
+      dispatch({ type: DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS, payload: responseData });
+      console.log("Dispatched Payload:", responseData);
+    }, 2000);
+
+    // Return patient ID for further use
+    return responseData.data; // `msg` contains the patient ID
+  } catch (error) {
+    dispatch({
+      type: DISPATCH_WALK_IN_PATIENT_LAB_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+    message.error(error.message, 5);
+    throw error; // Rethrow error for `handleSubmit` to handle
+  }
+};
+
+export const dispatchWalkInPharmacy = (patient) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}Reception/PatientRegistration`,
+      patient,
+      config
+    );
+
+    // Extract response details
+    const responseData = {
+      status: response.data.status,
+      data: response.data, // Assuming `msg` contains the patient ID
+    };
+
+    setTimeout(() => {
+      dispatch({ type: DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS, payload: responseData });
+      console.log("Dispatched Payload:", responseData);
+    }, 2000);
+
+    // Return patient ID for further use
+    return responseData.data; // `msg` contains the patient ID
+  } catch (error) {
+    dispatch({
+      type: DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL,
       payload: error.response?.data?.message || error.message,
     });
     message.error(error.message, 5);
