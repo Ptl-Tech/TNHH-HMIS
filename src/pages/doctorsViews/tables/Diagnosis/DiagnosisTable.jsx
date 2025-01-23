@@ -12,6 +12,8 @@ const DiagnosisTable = ({ treatmentNo }) => {
     (state) => state.getDiagnosisLines
   );
 
+  console.log("mydiagnosisLines", diagnosisLines);
+
   useEffect(() => {
     if (treatmentNo) {
       dispatch(getDiagnosisLines(treatmentNo));

@@ -35,11 +35,16 @@ const Consumables = () => {
       
       <NurseInnerHeader icon={<FilterOutlined />} title="Order sheets" />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '10px',  marginTop: '20px'}}>
-          <Button type="primary" onClick={handleVitalsButtonVisibility}><PlusOutlined /> 
-            Request order sheet
-          </Button>
-        </div>
+        {
+          !isConsumableFormVisible && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '10px',  marginTop: '20px'}}>
+            <Button type="primary" onClick={handleVitalsButtonVisibility}> 
+            <PlusOutlined />
+            Order Sheets
+            </Button>
+            </div>
+          )
+        }
 
 
 
