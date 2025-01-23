@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Badge, Button, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -119,7 +119,7 @@ const ConsultationRoomPatients = () => {
         record?.TreatmentNo ?
         record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
         render: (_, record) => {
-          const { color } = getUrgencyColorcode(record.urgency);
+          const { color } = getUrgencyColorcode(record.UrgencyStatus);
           return (
             <span
               onClick={() => handleNavigate(record, record.treatmentNo)}
@@ -198,29 +198,30 @@ const ConsultationRoomPatients = () => {
       },
     },
 
-    // {
-    //   title: "Urgency",
-    //   dataIndex: "urgency",
-    //   key: "urgency",
-    //   render: (_, record) => {
-    //     const { color, text } = getUrgencyColorcode(record.urgency);
-    //     return (
-    //       <Badge
-    //         color={color}
-    //         text={text} // Display urgency text
-    //         style={{ color: color }}
-    //       />
-    //     );
-    //   },
-    // },
     {
+      title: "Urgency",
+      dataIndex: "urgency",
+      key: "urgency",
+      render: (_, record) => {
+        const { color, text } = getUrgencyColorcode(record.UrgencyStatus);
+        console.log(record)
+        return (
+          <Badge
+            color={color}
+            text={text} // Display urgency text
+            style={{ color: color }}
+          />
+        );
+      },
+    },
+    /* {
       title: "Completion Status",
       dataIndex: "UrgencyStatus",
       key: "UrgencyStatus",
       render: (_, record) => {
         return <span className="fw-bold text-dark">{record.UrgencyStatus} </span>;
       },
-    },
+    }, */
     {
       title: "Check In",
       key: "checkIn",
