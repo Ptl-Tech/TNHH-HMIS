@@ -63,37 +63,31 @@ const InpatientConsumablesTable = ({ consumables, loadingGetPgOpenPatientConsuma
         };
 
   return (
-    <>
-    {
-            loadingGetPgOpenPatientConsumables ? (
-                
-                <Loading />
-                
-            ) : (
-                <Table 
-                rowKey="SystemId"
-                scroll={{ x: 'max-content' }}
-                columns={columns} 
-                dataSource={consumables} 
-                className="admit-patient-table"
-                bordered size='middle' 
-                pagination={{
-                ...pagination,
-                total: consumables?.length,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                position: ['bottom', 'right'],
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
-                onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
-                style: {
-                marginTop: '30px',
-                    }
-                    }}
-                />
-            )
+    
+          
+    <Table 
+    rowKey="SystemId"
+    scroll={{ x: 'max-content' }}
+    columns={columns} 
+    dataSource={consumables} 
+    className="admit-patient-table"
+    bordered size='middle' 
+    loading={loadingGetPgOpenPatientConsumables}
+    pagination={{
+    ...pagination,
+    total: consumables?.length,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    position: ['bottom', 'right'],
+    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+    onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
+    onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
+    style: {
+    marginTop: '30px',
         }
-    </>
+        }}
+    />
+    
   )
 }
 

@@ -1,23 +1,45 @@
-import { Card, Col, Row, Typography } from "antd";
-import useAuth from "../../hooks/useAuth";
+import { Button, Card, Col, Row, Typography } from "antd";
 import { useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import Loading from "../../partials/nurse-partials/Loading";
 import { convertTime } from "../../utils/helpers";
 import DOMPurify from 'dompurify';
+import moment from "moment";
+import { FileAddOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getNurseAdmissionNotesSlice } from "../../actions/nurse-actions/getNurseAdmissionNotesSlice";
+import { useEffect } from "react";
+import useAuth from "../../hooks/useAuth";
 
 const ReadNurseNotes = () => {
-    const { loadingGetNurseAdmissionNotes, filterNurseNotes, patientDetails } = useLocation().state;
+    const { patientDetails } = useLocation().state;
+    const invalidDate = "0001-01-01";
+    const dispatch = useDispatch();
+    const role = useAuth().userData.departmentName
     
-    const role = useAuth().userData.departmentName; // Get user role from useAuth hook
-    if (role !== "Nurse" && role !== "Doctor") {
-      return <div>Access Denied</div>;
-    }
+    const { loadingGetNurseAdmissionNotes, getNurseNotes } = useSelector((state) => state.getNurseAdmissionNotes);
+
+    const filterNurseNotes = getNurseNotes?.filter((note) => note?.AdmissionNo === patientDetails?.Admission_No);
+
+    console.log('patient details', patientDetails)
+
+    const formatDate = (date) => {
+        if (
+          moment(date).isValid() &&
+          patientDetails?.Expected_Date_of_Discharge !== invalidDate
+        ) {
+          return moment(date).format('dddd, MMMM Do, YYYY');
+        } else {
+          return 'N/A';
+        }
+      };
+    
 
     const patientInfo = [
-        { title: 'Patient Name', value: patientDetails?.SearchName },
-        { title: 'Age in years', value: `${patientDetails?.AgeinYears} Years` },
-        { title: 'Gender', value: patientDetails?.Gender },
+        { title: 'Patient Name', value: patientDetails?.PatientName },
+        { title: 'Admitting Doctor', value: patientDetails?.DoctorsName },
+        { title: 'Admission Date', value: formatDate(patientDetails?.Admission_Date) },
+        { title: 'Expected Discharge Date', value: formatDate(patientDetails?.Expected_Date_of_Discharge) },
       ];
 
       const renderNotes = (notes) => {
@@ -26,26 +48,36 @@ const ReadNurseNotes = () => {
         const sanitizedHtml = DOMPurify.sanitize(notes);
         return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
         };
+
+        useEffect(() => {
+            if(!getNurseNotes?.length){
+              dispatch(getNurseAdmissionNotesSlice());
+            }
+          }, [dispatch, patientDetails?.CurrentAdmNo, getNurseNotes?.length]);
     
   return (
     <>
     
       <NurseInnerHeader title="Read Nurse Notes" />
 
-        <Row gutter={16} style={{ marginTop: '20px' }}>
-        {patientInfo.map((info, index) => (
-        <Col key={index} xs={24} sm={24} md={12} lg={8} xl={8} >
-        <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
-        <Typography.Title level={5}>
-        {info.title}
-        </Typography.Title>
-        <Typography.Text>
-        {info.value}
-        </Typography.Text>
-        </Card>
-        </Col>
-        ))}
-        </Row>
+        { 
+            role === 'Nurse' && (
+                <Row gutter={[16, 16]} style={{ marginTop: '20px' }}>
+                {patientInfo.map((info, index) => (
+                <Col key={index} xs={24} sm={24} md={12} lg={6} xl={6} >
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
+                <Typography.Title level={5}>
+                {info.title}
+                </Typography.Title>
+                <Typography.Text>
+                {info.value}
+                </Typography.Text>
+                </Card>
+                </Col>
+                ))}
+                </Row>
+            )
+        }
 
         {
             loadingGetNurseAdmissionNotes ? (
@@ -88,7 +120,18 @@ const ReadNurseNotes = () => {
         ) : (
         <Row justify="center" style={{ padding: '20px', textAlign: 'center', fontStyle: 'italic', color: 'black' }}>
         <Col>
-        No records found
+            {
+                role !== 'Nurse' ? (
+                    <Typography.Text>Nothing to show</Typography.Text>
+                ) : (
+                    <Button variant="outlined" 
+                        onClick={() => window.history.back()}
+                        icon={<FileAddOutlined />}
+                    >
+                    Please Add Nurse Notes
+            </Button>
+                )
+            }
         </Col>
         </Row>
         )

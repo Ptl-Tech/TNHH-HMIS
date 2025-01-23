@@ -1,5 +1,5 @@
 import { Button } from "antd"
-import { PlusOutlined, PrinterOutlined, HeartOutlined } from "@ant-design/icons"
+import { PlusOutlined, FilterOutlined } from "@ant-design/icons"
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +18,7 @@ const Consumables = () => {
     
     const {loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables} = useSelector(state => state.getPgOpenPatientConsumables);
 
-    const consumables = getPgOpenPatientConsumables?.filter(item => item.Admission_No === patientDetails?.CurrentAdmNo);
+    const consumables = getPgOpenPatientConsumables?.filter(item => item.Admission_No === patientDetails?.Admission_No);
 
     const handleVitalsButtonVisibility = () => {
       setIsConsumableFormVisible(!isConsumableFormVisible);
@@ -33,12 +33,12 @@ const Consumables = () => {
   return (
     <div>
       
-      <NurseInnerHeader icon={<HeartOutlined />} title="Consumables" />
+      <NurseInnerHeader icon={<FilterOutlined />} title="Order sheets" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={handleVitalsButtonVisibility}><PlusOutlined /> Add Consumables</Button>
-
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><PrinterOutlined /> Print Consumables</Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '10px',  marginTop: '20px'}}>
+          <Button type="primary" onClick={handleVitalsButtonVisibility}><PlusOutlined /> 
+            Request order sheet
+          </Button>
         </div>
 
 
