@@ -22,9 +22,9 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
   const notesType = [
     { value: "20", label: "Medical" },
     { value: "21", label: "Surgical" },
-    // { value: "22", label: "Obstetric" },
     { value: "23", label: "Gynecology" },
   ];
+
   useEffect(() => {
     if (treatmentNo) {
       dispatch(getPatientHistorySlice(treatmentNo));
@@ -35,20 +35,24 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
     return {
       "20": data.find((item) => item.Notes_Type === "Medical")?.Notes || "",
       "21": data.find((item) => item.Notes_Type === "Surgical")?.Notes || "",
-      // "22": data.find((item) => item.Notes_Type === "Obstetric")?.Notes || "",
       "23": data.find((item) => item.Notes_Type === "Gynecology")?.Notes || "",
     };
   }, [data]);
-  
 
   useEffect(() => {
     form.setFieldsValue({
       notes: initialValues[currentTab] || "",
     });
   }, [currentTab, initialValues, form]);
-  
+
   const handleTabChange = (key) => {
     setCurrentTab(key);
+  };
+
+  const handleNext = () => {
+    const currentIndex = notesType.findIndex((note) => note.value === currentTab);
+    const nextIndex = (currentIndex + 1) % notesType.length;
+    setCurrentTab(notesType[nextIndex].value);
   };
 
   const handleSave = async () => {
@@ -62,7 +66,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
         notesType: currentTab,
         notes: values.notes,
       };
-      await dispatch(postPatientHistoryNotes(payload));
+       dispatch(postPatientHistoryNotes(payload));
       message.success("Notes saved successfully");
     } catch (error) {
       message.error("Failed to save notes");
@@ -71,7 +75,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
 
   return (
     <div>
-     <Space
+      <Space
         style={{
           color: "#0f5689",
           display: "flex",
@@ -115,9 +119,14 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
         >
           <TextArea placeholder="Enter notes..." autoSize={{ minRows: 3 }} />
         </Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          Save
-        </Button>
+        <Space>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Save
+          </Button>
+          <Button type="default" onClick={handleNext}>
+            Next
+          </Button>
+        </Space>
       </Form>
     </div>
   );
