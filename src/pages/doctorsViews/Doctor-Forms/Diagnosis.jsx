@@ -36,9 +36,11 @@ import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatient
 import DiagnosisTable from "../tables/Diagnosis/DiagnosisTable";
 import DiagnosisForm from "./DiagnosisForm";
 import DiagnosisFormulationForm from "./DiagnosisFormulationForm";
+import useAuth from "../../../hooks/useAuth";
 const { Option } = Select;
 
 const Diagnosis = () => {
+  
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
@@ -258,7 +260,8 @@ const Diagnosis = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Diagnosis
       </Typography.Title>
-      <Row gutter={24}>
+      
+          <Row gutter={24}>
         <Col span={24}>
           <Button
             type="primary"
@@ -270,6 +273,7 @@ const Diagnosis = () => {
           </Button>
         </Col>
       </Row>
+   
       <DiagnosisTable
        treatmentNo={treatmentNo}
         />

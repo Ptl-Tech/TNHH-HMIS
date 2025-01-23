@@ -1,12 +1,13 @@
-import { Button, Col, Form, Input, message, Row, } from 'antd'
+import { Button, Col, Form, Input, message, Row, Space, } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
-import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
+import { getInpatientVitalsSlice } from '../../../../actions/nurse-actions/getInpatientVitalsSlice';
 
-const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible, role, admissionNumber, number}) => {
+const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible}) => {
 
   const [form] = Form.useForm();
 
@@ -18,8 +19,6 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
       try {
         const {
           pulseRate,
-          height,
-          weight,
           temperature,
           bloodPreasure,
           sP02,
@@ -33,19 +32,15 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
           bloodPreasure,
           sP02,
           respirationRate,
-          ...(role !== 'Doctor' && {
-            height: parseFloat(cleanValue(height)) || '',
-            weight: parseFloat(cleanValue(weight)) || '',
-            BMI: calculateBMI(height, weight),
-          }),
+        
         };
         
     
         // Common payload properties
         const baseVitals = {
           ...transformedValues,
-          patientNo: role === 'Doctor' ? number : patientNumber,
-          observationNo: role === 'Doctor' ? admissionNumber : observationNumber,
+          patientNo: patientNumber,
+          observationNo: observationNumber,
         };
       
           // Create vitals
@@ -54,9 +49,7 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
             type: 0,
             myAction: "create",
           };
-
-          console.log('base vitals', baseVitals)
-    
+ 
           const response = await dispatch(postTriageListVitalsSlice(createVitals));
           if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
             setIsVitalFormVisible(false);
@@ -64,10 +57,9 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
           } else if(response.type === "POST_TRIAGE_LIST_VITALS_FAIL"){
             message.error(response.payload.message ||"Error saving vitals data");
           }
+
+          dispatch(getInpatientVitalsSlice());
         
-    
-        // Reload vitals list after successful operation
-        dispatch(getVitalsLinesSlice(observationNumber));
       } catch (error) {
         // Generic error handling
         message.error(error.payload.message || "An error occurred while saving vitals data.");
@@ -284,64 +276,7 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                   />
                 </Form.Item>
               </Col>
-            </Row>
-            {
-              role === 'Nurse' && (
-                <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Height (cm)" name={['vitals', 'height']}
-                
-                validateTrigger={['onBlur', 'onChange']}
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Please input height!' },
-                  {
-                    type: 'number', 
-                    min: 30, 
-                    max: 300, 
-                    transform(value) {
-                      return value ? Number(value) : null;
-                    },
-                    message: 'Height must be between 30 cm and 300 cm!',
-                  },
-                 
-                ]}
-                >
-                  <Input type='number' 
-                    
-                    placeholder='eg 170'
-                    
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Weight (kg)" name={['vitals', 'weight']}
-                  validateTrigger={['onBlur', 'onChange']}
-                  hasFeedback
-                  rules={[
-                    { required: true, message: 'Please input weight!' },
-                    {
-                      type: 'number',
-                      min: 1,
-                      max: 500,
-                      transform(value) {
-                        return value ? Number(value) : null;
-                      },
-                      message: 'Weight must be between 1 kg and 500 kg!',
-                    },
-                    
-                  ]}
-                >
-                  <Input type='number' 
-                  
-                    placeholder='eg 70'
-                
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-              )
-            }
+            </Row>    
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
@@ -370,32 +305,19 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                   />
                 </Form.Item>
               </Col>
+            
+        
             </Row>
-            {
-              role === 'Nurse' && (
-                <Row gutter={16}>
-              <Col span={12}>
-              <Form.Item label="BMI" name={['vitals', 'bmi']}
-              >
-                <Input type='text' 
-                
-                 
-                  disabled
-
-                />
-
-                </Form.Item>
-              </Col>
-            </Row>
-              )
-            }
-          
+            
             <Col span={12}>
                 <Form.Item >
+                  <Space>
                     <Button type="primary" loading={loading} htmlType="submit">
                       <SaveOutlined />
                       Save Vitals
                     </Button>
+                    <Button variant='outlined' color='danger' onClick={() => setIsVitalFormVisible(false)} icon={<CloseOutlined />}>Cancel</Button>
+                  </Space>
                 </Form.Item>
             </Col>
         </Form>
@@ -414,7 +336,5 @@ VitalsFormData.propTypes = {
   observationNumber: PropTypes.string,
   patientNumber: PropTypes.string.isRequired,
   setIsVitalFormVisible: PropTypes.bool.isRequired,
-  role: PropTypes.string.isRequired,
   admissionNumber: PropTypes.string,
-  number: PropTypes.string
 }

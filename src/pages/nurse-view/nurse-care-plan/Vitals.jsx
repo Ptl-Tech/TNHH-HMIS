@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Modal, Row } from "antd";
+import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
 import { useState } from "react";
 import { FolderViewOutlined, FolderAddOutlined, FileMarkdownOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
@@ -7,7 +7,7 @@ import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useAuth from "../../../hooks/useAuth";
+import dayjs from "dayjs";
 
 const Vitals = () => {
 
@@ -16,17 +16,16 @@ const Vitals = () => {
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { patientDetails } = useLocation().state;
         const [isVitalFormVisible, setIsVitalFormVisible] = useState(false)
-        const role = useAuth().userData.departmentName
         const queryParams = new URLSearchParams(location.search);
         const AdmNo = queryParams.get("AdmNo");
         const PatientNo = queryParams.get("PatientNo")
 
         
-        const { combinedList, loadingInpatientVitals, loadingTriageList } = useFetchVitalsHook();
-        const filterInpatientVitals = combinedList?.filter((vitals) => 
-          role === 'Nurse'
-          ? vitals.PatientNo === patientDetails?.Patient_No
-          : vitals.PatientNo === PatientNo
+        const { loadingInpatientVitals, inpatientVitals } = useFetchVitalsHook();
+        const filterInpatientVitals = inpatientVitals?.filter((vitals) => 
+         
+          vitals.PatientNo === patientDetails?.Patient_No
+        
       );
 
         const handleCancel = () => {
@@ -34,6 +33,8 @@ const Vitals = () => {
         };
 
         const handleViewVitals = () => {
+          const date = selectedRow[0]?.DateTaken;
+          const convertedDate = dayjs(date)
           if(selectedRow[0]){
             form.resetFields();
             form.setFieldsValue({
@@ -44,7 +45,8 @@ const Vitals = () => {
               respirationRate: selectedRow[0]?.RespirationRate,
               height: selectedRow[0]?.Height,
               weight: selectedRow[0]?.Weight,
-              bmi: selectedRow[0]?.BMI ? selectedRow[0]?.BMI.toFixed(2) : ''
+              bmi: selectedRow[0]?.BMI ? selectedRow[0]?.BMI.toFixed(2) : '',
+              date: convertedDate
             })
             setIsModalOpen(true);
           }
@@ -56,22 +58,25 @@ const Vitals = () => {
 
   return (
     <div>
-      <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Vitals"/>
+      <NurseInnerHeader icon={<FileMarkdownOutlined />} title="Inpatient Vitals"/>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
-        <Button type="primary" style={{ width: '100%' }}  onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
-           Add Vitals
-          </Button>
-          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined />
-           View Vitals
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined /> Preview Pain Assessment Tool</Button>
-        </div>
+        {
+          !isVitalFormVisible && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
+            <Button type="primary" onClick={handleVitalsButtonVisibility}><FolderAddOutlined />
+              Add Vitals
+              </Button>
+              <Button type="primary" disabled={!selectedRowKey} onClick={handleViewVitals}><FolderViewOutlined />
+              View Vitals
+              </Button>
+            </div>
+          )
+        }
 
         {
           isVitalFormVisible && (
             
-              <VitalsFormData observationNumber={patientDetails?.CurrentAdmNo} patientNumber={patientDetails?.PatientNo } setIsVitalFormVisible={setIsVitalFormVisible} role={role} admissionNumber={AdmNo} number={PatientNo}/>
+              <VitalsFormData observationNumber={patientDetails?.Admission_No} patientNumber={patientDetails?.Patient_No } setIsVitalFormVisible={setIsVitalFormVisible} admissionNumber={AdmNo} number={PatientNo}/>
            
           )
         }
@@ -79,7 +84,7 @@ const Vitals = () => {
 
         {
           !isVitalFormVisible && (
-            <VitalsTable  rowSelection={rowSelection} filterVitals={filterInpatientVitals} loadingInpatientVitals={loadingInpatientVitals} loadingTriageList={loadingTriageList}/>
+            <VitalsTable  rowSelection={rowSelection} filterVitals={filterInpatientVitals} loadingInpatientVitals={loadingInpatientVitals} />
           )
         }
 
@@ -116,6 +121,7 @@ const Vitals = () => {
                   name='pulseRate'
                 >
                   <Input type='text'
+                  disabled
                     
                   />
                 </Form.Item>
@@ -124,7 +130,8 @@ const Vitals = () => {
                 <Form.Item label="Blood Pressure (mmHg)" 
                   name='bloodPreasure'
                   >
-                  <Input type='text' 
+                  <Input type='text'
+                  disabled 
                      
                   />
                 </Form.Item>
@@ -137,6 +144,7 @@ const Vitals = () => {
 
                 >
                   <Input type='number' 
+                  disabled
                       
                   />
                 </Form.Item>
@@ -146,28 +154,8 @@ const Vitals = () => {
                   name='sP02'
                 >
                   <Input type='text' 
+                  disabled
               
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Height (cm)" 
-                name='height'
-              
-                >
-                  <Input type='number' 
-                    
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Weight (kg)" 
-                name='weight'
-                >
-                  <Input type='number' 
-                
                   />
                 </Form.Item>
               </Col>
@@ -176,20 +164,17 @@ const Vitals = () => {
               <Col span={12}>
                 <Form.Item label="Respiration Rate (bpm)" 
                   name='respirationRate'
+                  
                 >
                   <Input type='text' 
-                  
+                   disabled
                   />
                 </Form.Item>
               </Col>
               <Col span={12}>
-              <Form.Item label="BMI" 
-                name='bmi'
-              >
-                <Input type='text' 
-
-                />
-                </Form.Item>
+              <Form.Item label="Date" name='date'>
+                <DatePicker format="DD-MM-YYYY" style={{ width: '100%' }} disabled />
+              </Form.Item>
               </Col>
             </Row>
           </Form>
