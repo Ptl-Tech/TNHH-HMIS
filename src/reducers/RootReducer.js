@@ -115,6 +115,8 @@ import { QySpecimenSampleSetupReducer } from "./doc-reducers/getSampleSetupReduc
 import { RequestPostPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 import { postAdmissionVerificationReducer } from "./doc-reducers/Admission/postAdmissionVerificationReducer";
 import { postAdmissionCancellationReducer } from "./doc-reducers/Admission/cancelPatientAdmissionReducer";
+import { getRadiologyListReducer } from './doc-reducers/getRadiologyListReducers';
+import { getRadiologyDetailsReducer } from './doc-reducers/getRadiologyDetailsReducers';
 import { getVerifiedAdmissionsReducer } from "./doc-reducers/Admission/getVerifiedAdmissionsReducer";
 import { getAdmittedPatientsReducer } from "./doc-reducers/Admission/getAdmittedPatients";
 import {
@@ -133,6 +135,7 @@ import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmac
 import {
   postArchivePrescriptionReducer,
   postDrugIssuanceReducer,
+  postPrescriptionQuantityReducer,
 } from "./pharmacy-reducers/postPharmacyReducers";
 import {
   getPatientPharmacyReturnLinesReducer,
@@ -226,6 +229,8 @@ export const rootReducer = combineReducers({
   getDoctorsList: getdoctorListReducer,
   getEmployees: getemployeesListReducer,
   getEmployeeDetails: getemployeeDetailsReducer,
+  getRadiologyList: getRadiologyListReducer,
+  getRadiologyDetails: getRadiologyDetailsReducer,
   postTriageVisit: postTriageVisitReducer,
   marketingList: getmarketingStrategiesReducer,
   // triageList:triageListReducer,
@@ -346,6 +351,7 @@ export const rootReducer = combineReducers({
   getReferralLines: getReferralLinesReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,
   postDrugIssuance: postDrugIssuanceReducer,
+  postPrescriptionQuantity: postPrescriptionQuantityReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,

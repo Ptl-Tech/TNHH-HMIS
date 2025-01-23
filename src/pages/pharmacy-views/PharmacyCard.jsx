@@ -21,6 +21,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   postArchivePrescription,
   postDrugIssuance,
+  postPrescriptionQuantity,
 } from "../../actions/pharmacy-actions/postPharmacyAction";
 import { useDispatch, useSelector } from "react-redux";
 import { getPharmacyLineReturnbyPharmacyNo } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
@@ -33,18 +34,23 @@ const PharmacyCard = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const pharmacyNo = queryParams.get("PharmacyNo");
+  const [prescriptionData, setPrescriptionData] = useState({});
 
- const { 
-  data: newPharmacyRequests = [], // Default to an empty array
-} = useSelector((state) => state.getNewPharmacyList);
+  const {
+    data: newPharmacyRequests = [], // Default to an empty array
+  } = useSelector((state) => state.getNewPharmacyList);
 
-let singlePharmacyRecord; // Declare it once in the outer scope
-if (pharmacyNo) {
-  singlePharmacyRecord = newPharmacyRequests.find((patient) => {
-    const patientPharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
-    return patientPharmacyNo === pharmacyNo.toLowerCase(); // Match the pharmacyNo
-  });
-}
+  let singlePharmacyRecord; // Declare it once in the outer scope
+  if (pharmacyNo) {
+    singlePharmacyRecord = newPharmacyRequests.find((patient) => {
+      const patientPharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
+      return patientPharmacyNo === pharmacyNo.toLowerCase(); // Match the pharmacyNo
+    });
+  }
+
+  const { data } = useSelector(
+    (state) => state.postPrescriptionQuantity
+  );
 
   const { loading: loadingDrugIssuance } = useSelector(
     (state) => state.postDrugIssuance
@@ -53,7 +59,7 @@ if (pharmacyNo) {
     (state) => state.postArchivePrescription
   );
 
-  const {  data: pharmacyLineData = [] } =
+  const { data: pharmacyLineData = [] } =
     useSelector((state) => state.getPatientPharmacyReturnLine);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,9 +67,9 @@ if (pharmacyNo) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-     dispatch(getNewPharmacyRequests());
+    dispatch(getNewPharmacyRequests());
     if (pharmacyNo) {
-      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));   
+      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));
     }
   }, [dispatch, pharmacyNo]);
 
@@ -72,165 +78,217 @@ if (pharmacyNo) {
     { title: "Drug Name", dataIndex: "drugName", key: "drugName" },
     { title: "Unit Price", dataIndex: "unitPrice", key: "unitPrice" },
     { title: "Total Price", dataIndex: "totalPrice", key: "totalPrice" },
-    { title: "Actual Qty", dataIndex: "actualQty", key: "actualQty" },
-    { title: "Dosage", dataIndex: "dosage", key: "dosage" },
-    { title: "Frequency", dataIndex: "frequency", key: "frequency" },
-    { title: "Take", dataIndex: "take", key: "take" },
+    { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
+    // { title: "Actual Qty", dataIndex: "actualQty", key: "actualQty" },
+    // { title: "Dosage", dataIndex: "dosage", key: "dosage" },
+    // { title: "Frequency", dataIndex: "frequency", key: "frequency" },
+    // { title: "Take", dataIndex: "take", key: "take" },
     { title: "Route", dataIndex: "route", key: "route" },
     { title: "Days", dataIndex: "days", key: "days" },
-    { title: "Remarks", dataIndex: "remarks", key: "remarks" },
+    {
+      title: "Remarks",
+      dataIndex: "remarks",
+      key: "remarks",
+      render: (_, record) => (
+        <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        style={{
+          marginTop: "20px",
+          marginBottom: "10px",
+          border: "1px solid #ddd",
+        }}
+        onClick= {() => openModal(record)}
+      >
+        Edit Quantity
+      </Button>
+      )
+    },
   ];
 
 
-  const dataSource = pharmacyLineData?.map(line => ({
-      ...line,
-      key: line?.PharmacyReturnLineNo,
-      no: line?.No,
-      drugName: line?.DrugName,
-      unitPrice: line?.UnitPrice,
-      totalPrice: line?.TotalAmount,
-      actualQty: line?.ActualQty,
-      dosage: line?.Dosage,
-      frequency: line?.Frequency,
-      take: line?.Take,
-      route: line?.Route,
-      days: line?.Duration_Days,
-      remarks: line?.Remarks,
-  }))
+const dataSource = pharmacyLineData?.map(line => ({
+  ...line,
+  key: line?.PharmacyReturnLineNo,
+  no: line?.No,
+  drugName: line?.DrugName,
+  unitPrice: line?.UnitPrice,
+  totalPrice: line?.TotalAmount,
+  actualQty: line?.ActualQty,
+  dosage: line?.Dosage,
+  frequency: line?.Frequency,
+  take: line?.Take,
+  route: line?.Route,
+  days: line?.Duration_Days,
+  remarks: line?.Remarks,
+}))
 
+
+// set form values and open modal
+
+
+const openModal = (singlePharmacyRecord) => {
+  console.log("Single Pharmacy Record:", singlePharmacyRecord);
+
+  setPrescriptionData({
+    Quantity: singlePharmacyRecord?.Quantity,
+    recId: singlePharmacyRecord.SystemId,
+    pharmacyNo: singlePharmacyRecord?.Pharmacy_No,    
+  });
+
+  form.setFieldsValue({
+    quantity: singlePharmacyRecord?.Quantity,
+    recId: singlePharmacyRecord.SystemId,
+    pharmacyNo: singlePharmacyRecord?.Pharmacy_No,
+  })
+
+  setIsModalOpen(true);
+}
+
+const closeModal = () => {
+  form.resetFields();
+  setIsModalOpen(false);
+};
+
+
+
+const handleFormSubmit = (values) => {
+
+  const prescriptionformData = {
+    ...prescriptionData,
+    myAction: "edit",
+    Quantity: values.quantity,
+  }
   
+  dispatch(postPrescriptionQuantity(prescriptionformData)).then((data) => {
+    if (data.status === "success") {
+      message.success("Prescription updated successfully");
+    } else {
+      message.error("An error occurred, please try again");
+    }
+  })
+  closeModal();
+};
 
-  const openModal = () => setIsModalOpen(true);
+const handleDrugIssuance = () => {
+  dispatch(postDrugIssuance(pharmacyNo));
+};
 
-  const closeModal = () => {
-    form.resetFields();
-    setIsModalOpen(false);
-  };
+const handleArchivePrescription = () => {
+  dispatch(postArchivePrescription(pharmacyNo)).then((data) => {
+    if (data.status === "success") {
+      message.success("Prescription archived successfully");
+    } else {
+      message.error("An error occurred, please try again");
+    }
+  });
+};
 
-  const handleFormSubmit = (values) => {
-    console.log("Prescription Data:", values);
-    closeModal();
-  };
+return (
+  <div style={{ padding: "20px" }}>
+    <Title
+      level={3}
+      style={{
+        color: "#0F5689",
+        marginBottom: "12px",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <MedicineBoxOutlined style={{ marginRight: "8px" }} />
+      Pharmacy Card
+    </Title>
 
-  const handleDrugIssuance = () => {
-    dispatch(postDrugIssuance(pharmacyNo));
-  };
-
-  const handleArchivePrescription = () => {
-    dispatch(postArchivePrescription(pharmacyNo)).then((data) => {
-      if (data.status === "success") {
-        message.success("Prescription archived successfully");
-      } else {
-        message.error("An error occurred, please try again");
-      }
-    });
-  };
-
-  return (
-    <div style={{ padding: "20px" }}>
-      <Title
-        level={3}
-        style={{
-          color: "#0F5689",
-          marginBottom: "12px",
-          display: "flex",
-          alignItems: "center",
-        }}
+    <Row justify="space-between" style={{ marginBottom: "20px" }}>
+      <Button
+        type="primary"
+        onClick={() => navigate("/Pharmacy/Pharmacy-OutPatient")}
+        icon={<IoListOutline />}
       >
-        <MedicineBoxOutlined style={{ marginRight: "8px" }} />
-        Pharmacy Card
-      </Title>
+        Pharmacy List
+      </Button>
 
-      <Row justify="space-between" style={{ marginBottom: "20px" }}>
+      <Row justify="space-between" className="gap-2">
         <Button
           type="primary"
-          onClick={() => navigate("/Doctor/Pharmacy-OutPatient")}
-          icon={<IoListOutline />}
+          onClick={handleDrugIssuance}
+          icon={<PlusOutlined />}
         >
-          Pharmacy List
+          Post Drug Issuance
         </Button>
-
-        <Row justify="space-between" className="gap-2">
-          <Button
-            type="primary"
-            onClick={handleDrugIssuance}
-            icon={<PlusOutlined />}
-          >
-            Post Drug Issuance
-          </Button>
-          <Button
-            type="primary"
-            onClick={handleArchivePrescription}
-            icon={<FaFolderClosed />}
-          >
-            Archive Prescription
-          </Button>
-        </Row>
+        <Button
+          type="primary"
+          onClick={handleArchivePrescription}
+          icon={<FaFolderClosed />}
+        >
+          Archive Prescription
+        </Button>
       </Row>
+    </Row>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: "5px",
-          padding: "10px",
-          backgroundColor: "#f5f5f5",
-          color: "#0F5689",
-          fontWeight: "semibold",
-        }}
-      >
-        {/* <Typography.Title level={5} style={{ color: "#0F5689", fontSize: "16px", marginBottom: "12px", display: "flex", alignItems: "center", }}>
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "5px",
+        padding: "10px",
+        backgroundColor: "#f5f5f5",
+        color: "#0F5689",
+        fontWeight: "semibold",
+      }}
+    >
+      {/* <Typography.Title level={5} style={{ color: "#0F5689", fontSize: "16px", marginBottom: "12px", display: "flex", alignItems: "center", }}>
           <UserOutlined style={{ marginRight: "8px" }} />
             Patient Details
         </Typography.Title> */}
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Number :</Text>  {singlePharmacyRecord?.PharmacyNo} 
-          </Col>
-          <Col span={12}>
-            <Text strong>Patient No. :</Text>  {singlePharmacyRecord?.PatientNo} 
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Names :</Text>  {singlePharmacyRecord?.Names} 
-          </Col>
-          <Col span={12}>
-            <Text strong>Date :</Text>  {singlePharmacyRecord?.PharmacyDate} 
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Patient Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
-          </Col>
-           <Col span={12}>
-            <Text strong>Transaction Type :</Text>  {singlePharmacyRecord?.Patient_Type} 
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Request Area :</Text> {singlePharmacyRecord?.LinkType} 
-          </Col>
-          <Col span={12}>
-            <Text strong>Insurance :</Text> {singlePharmacyRecord?.InsuranceNo} 
-          </Col>
-        </Row>
-        <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-          <Col span={12}>
-            <Text strong>Remarks :</Text>  
-          </Col>
-          <Col span={12}>
-            <Text strong>Status :</Text>   
-          </Col>
-        </Row>
-        <Row style={{ padding: "10px 0" }}>
-          <Col span={24}>
-            <Text strong>Total Price :</Text>{" "}
-            <span style={{ color: "blue" }}>{singlePharmacyRecord?.Visit_Total}</span>
-          </Col>
-        </Row>
-      </div>
+      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+        <Col span={12}>
+          <Text strong>Number :</Text>  {singlePharmacyRecord?.PharmacyNo}
+        </Col>
+        <Col span={12}>
+          <Text strong>Patient No. :</Text>  {singlePharmacyRecord?.PatientNo}
+        </Col>
+      </Row>
+      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+        <Col span={12}>
+          <Text strong>Names :</Text>  {singlePharmacyRecord?.Names}
+        </Col>
+        <Col span={12}>
+          <Text strong>Date :</Text>  {singlePharmacyRecord?.PharmacyDate}
+        </Col>
+      </Row>
+      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+        <Col span={12}>
+          <Text strong>Patient Type :</Text>  {singlePharmacyRecord?.Patient_Type}
+        </Col>
+        <Col span={12}>
+          <Text strong>Transaction Type :</Text>  {singlePharmacyRecord?.Patient_Type}
+        </Col>
+      </Row>
+      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+        <Col span={12}>
+          <Text strong>Request Area :</Text> {singlePharmacyRecord?.LinkType}
+        </Col>
+        <Col span={12}>
+          <Text strong>Insurance :</Text> {singlePharmacyRecord?.InsuranceNo}
+        </Col>
+      </Row>
+      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+        <Col span={12}>
+          <Text strong>Remarks :</Text>
+        </Col>
+        <Col span={12}>
+          <Text strong>Status :</Text>
+        </Col>
+      </Row>
+      <Row style={{ padding: "10px 0" }}>
+        <Col span={24}>
+          <Text strong>Total Price :</Text>{" "}
+          <span style={{ color: "blue" }}>{singlePharmacyRecord?.Visit_Total}</span>
+        </Col>
+      </Row>
+    </div>
 
-      <Button
+    {/*  <Button
         type="primary"
         icon={<PlusOutlined />}
         style={{
@@ -241,45 +299,39 @@ if (pharmacyNo) {
         onClick={openModal}
       >
         Add
-      </Button>
+      </Button> */}
 
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        pagination={false}
-        bordered
-      />
 
-      <Modal
-        title="Add Prescription"
-        visible={isModalOpen}
-        onCancel={closeModal}
-        footer={null}
-      >
-        <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
-          <Form.Item
-            label="Drug Name"
-            name="drugName"
-            rules={[{ required: true, message: "Please enter the drug name!" }]}
-          >
-            <Input placeholder="Enter drug name" />
-          </Form.Item>
-          <Form.Item
-            label="Dosage"
-            name="dosage"
-            rules={[{ required: true, message: "Please enter the dosage!" }]}
-          >
-            <Input placeholder="Enter dosage" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
-  );
+    <Table
+      dataSource={dataSource}
+      columns={columns}
+      pagination={false}
+      bordered
+    />
+
+    <Modal
+      title="Add Prescription"
+      visible={isModalOpen}
+      onCancel={closeModal}
+      footer={null}
+    >
+      <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
+        <Form.Item
+          label="Quantity"
+          name="quantity"
+          rules={[{ required: true, message: "Please enter Quantity!" }]}
+        >
+          <Input placeholder="Enter quantity" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Save
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
+  </div>
+);
 };
 
 export default PharmacyCard;
