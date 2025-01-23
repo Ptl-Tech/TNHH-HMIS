@@ -321,7 +321,7 @@ console.log("Visit created for Patient ID:", appointmentId);
                       }
                     >
                       <Select.Option value="">--Select Clinic--</Select.Option>
-                      {clinicsPayload &&
+                      {clinicsPayload &&  
                         clinicsPayload.map((clinic) => (
                           <Select.Option key={clinic.No} value={clinic.No}>
                             {clinic.Description}
