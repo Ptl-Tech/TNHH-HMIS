@@ -47,6 +47,6 @@ DashboardCard.propTypes = {
         icon: PropTypes.node.isRequired,
         backgroundColor: PropTypes.string.isRequired,
         color: PropTypes.string.isRequired,
-        link: PropTypes.func.isReuired
+        link: PropTypes.string.isRequired,
     })
 }

@@ -1,4 +1,4 @@
-import { Badge, Badge, Button, Table } from "antd";
+import { Badge, Button, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
