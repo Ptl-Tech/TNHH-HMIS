@@ -12,7 +12,7 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
   const [selectedRow, setSelectedRow] = useState([]);
 
   const rowSelection = {
-    type: "checkbox", // Use checkboxes for selection
+    type: "radio", // Use checkboxes for selection
     selectedRowKeys: selectedRow.length ? [selectedRow[0]?.key] : [],
     onChange: (selectedRowKeys, selectedRows) => {
       if (selectedRows.length > 1) {
@@ -30,7 +30,7 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
     <Table
       columns={columns}
       dataSource={dataSource}
-      // rowSelection={rowSelection}
+      rowSelection={rowSelection}
       pagination={{
         position: ["bottom", "right"],
         showSizeChanger: true,

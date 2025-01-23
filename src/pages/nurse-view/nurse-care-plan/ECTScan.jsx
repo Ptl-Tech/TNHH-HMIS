@@ -64,7 +64,7 @@ const ECTScan = () => {
               onClick={() => setShowForm(!showForm)}
               icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
             >
-              {!showForm ? " New ETC Request" : "View ETC Requests"}
+              {!showForm ? " New ECT Request" : "View ECT Requests"}
             </Button>
              
           </div>

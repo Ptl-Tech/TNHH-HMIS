@@ -1,4 +1,4 @@
-import { Badge, Button, Table } from "antd";
+import { Badge, Badge, Button, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -119,7 +119,7 @@ const ConsultationRoomPatients = () => {
         record?.TreatmentNo ?
         record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
         render: (_, record) => {
-          const { color } = getUrgencyColorcode(record.urgency);
+          const { color } = getUrgencyColorcode(record.UrgencyStatus);
           return (
             <span
               onClick={() => handleNavigate(record, record.treatmentNo)}
@@ -213,14 +213,14 @@ const ConsultationRoomPatients = () => {
         );
       },
     },
-    {
-      title: "Completion Status",
-      dataIndex: "Status",
-      key: "Status",
-      render: (_, record) => {
-        return <span className="fw-bold text-success">{record.Status} </span>;
-      },
-    },
+    // {
+    //   title: "Completion Status",
+    //   dataIndex: "Status",
+    //   key: "Status",
+    //   render: (_, record) => {
+    //     return <span className="fw-bold text-success">{record.Status} </span>;
+    //   },
+    // },
     {
       title: "Check In",
       key: "checkIn",
