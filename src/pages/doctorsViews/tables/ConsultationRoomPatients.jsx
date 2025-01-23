@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Badge, Button, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -198,21 +198,21 @@ const ConsultationRoomPatients = () => {
       },
     },
 
-    // {
-    //   title: "Urgency",
-    //   dataIndex: "urgency",
-    //   key: "urgency",
-    //   render: (_, record) => {
-    //     const { color, text } = getUrgencyColorcode(record.urgency);
-    //     return (
-    //       <Badge
-    //         color={color}
-    //         text={text} // Display urgency text
-    //         style={{ color: color }}
-    //       />
-    //     );
-    //   },
-    // },
+    {
+      title: "Urgency",
+      dataIndex: "urgency",
+      key: "urgency",
+      render: (_, record) => {
+        const { color, text } = getUrgencyColorcode(record.urgency);
+        return (
+          <Badge
+            color={color}
+            text={text} // Display urgency text
+            style={{ color: color }}
+          />
+        );
+      },
+    },
     {
       title: "Completion Status",
       dataIndex: "Status",
