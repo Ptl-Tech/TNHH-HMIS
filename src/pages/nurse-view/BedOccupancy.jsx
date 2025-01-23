@@ -57,7 +57,7 @@ export default BedOccupancy
 
 //props validation
 BedOccupancy.propTypes = {
-    getWards: PropTypes.array.isRequired,
-    handleWardChange: PropTypes.func.isRequired,
-    loadingWards: PropTypes.bool.isRequired,
+    getWards: PropTypes.array,
+    handleWardChange: PropTypes.func,
+    loadingWards: PropTypes.bool,
 }

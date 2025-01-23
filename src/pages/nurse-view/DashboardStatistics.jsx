@@ -261,5 +261,5 @@ DashboardStatistics.propTypes = {
       departmentName: PropTypes.string.isRequired,
     }),
   }),
-  chartData: PropTypes.object.isRequired,
+  chartData: PropTypes.array.isRequired,
 };

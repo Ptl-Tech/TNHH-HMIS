@@ -35,7 +35,7 @@ const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
         setSelectedItem(<AllergyAndMedication treatmentNo={treatmentNo} observationNumber={observationNo} patientNumber={patientNo} setIsFormVisible={false} />);
         break;
       case 'Nurse Notes':
-        setSelectedItem(<ObservationNotes treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
+        setSelectedItem(<ObservationNotes treatmentNo={treatmentNo} patientNo={patientNo} />);
         break;
       default:
 
