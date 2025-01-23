@@ -1,7 +1,6 @@
 import { Button, Divider } from "antd";
 import { useState } from "react";
 import PatientInfo from "./nurse-patient-file/PatientInfo";
-import MedicalInfo from "./nurse-patient-file/MedicalInfo";
 import NextOfKin from "./nurse-patient-file/NextOfKin";
 import DoctorNotes from "./nurse-patient-file/DoctorNotes";
 import NursingNotes from "./nurse-patient-file/NursingNotes";
@@ -11,6 +10,7 @@ import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutlined, FilterOutlined, UserAddOutlined } from "@ant-design/icons";
+import ReadNurseNotes from "./ReadNurseNotes";
 
 const PatientFile = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState('Patient Info');
@@ -48,12 +48,12 @@ const PatientFile = ({ patientDetails }) => {
         setSelectedItem(<DoctorNotes />);
         break;
       case "Nursing Notes":
-        setSelectedItem(<NursingNotes />);
+        userRole.userData.departmentName !== 'Nurse' ? setSelectedItem(<ReadNurseNotes/>) : setSelectedItem(<NursingNotes />)
         break;
       case "Past Encounters Notes":
         setSelectedItem(<TreatmentHistory />);
         break;
-      case "Consumables":
+      case "Order Sheet":
         setSelectedItem(<Consumables />);
         break;
       case "Charges":
