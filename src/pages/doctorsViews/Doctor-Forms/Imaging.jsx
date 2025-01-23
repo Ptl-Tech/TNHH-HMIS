@@ -9,6 +9,7 @@ import {
   Select,
   message,
   Tag,
+  Space,
 } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -131,6 +132,22 @@ const Imaging = () => {
         return <Tag color={statusColors[text?.toLowerCase()]} >{text}</Tag>;
       },
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewResult(record)}
+          >
+            View Result
+          </Button>
+        </Space>
+      ),
+    },
+  
   ];
 
   const dataSource = Array.isArray(radiologyData)

@@ -155,6 +155,19 @@ const LabResults = () => {
       dataIndex: "Results",
       key: "Results",
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleViewResults(record)}
+          icon={<FileTextOutlined />}
+        >
+          View Results
+        </Button>
+      ),
+    },
   ];
   
   // const rowSelection = {
@@ -236,7 +249,7 @@ const LabResults = () => {
            <RowSelectionTable
            columns={columns}
            dataSource={dataSource}
-           onRowSelect={(row) => setSelectedRow(row)} // Update selected row
+          //  onRowSelect={(row) => setSelectedRow(row)} // Update selected row
            tableProps={{ scroll: { x: 600 } }} // Additional Table props
          />
       ) : (

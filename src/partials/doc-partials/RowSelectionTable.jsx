@@ -30,7 +30,7 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
     <Table
       columns={columns}
       dataSource={dataSource}
-      rowSelection={rowSelection}
+      // rowSelection={rowSelection}
       pagination={{
         position: ["bottom", "right"],
         showSizeChanger: true,

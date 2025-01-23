@@ -215,10 +215,10 @@ const ConsultationRoomPatients = () => {
     // },
     {
       title: "Completion Status",
-      dataIndex: "UrgencyStatus",
-      key: "UrgencyStatus",
+      dataIndex: "Status",
+      key: "Status",
       render: (_, record) => {
-        return <span className="fw-bold text-dark">{record.UrgencyStatus} </span>;
+        return <span className="fw-bold text-success">{record.Status} </span>;
       },
     },
     {
@@ -238,8 +238,8 @@ const ConsultationRoomPatients = () => {
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === "Doctor"
-        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-        : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
+        : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
