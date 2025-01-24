@@ -74,7 +74,7 @@ import useAuth from "../../../hooks/useAuth";
           loadingKetamine={loadingKetamine} 
           data={data} 
           treatmentNo={treatmentNo}
-          admissionNo={admissionNo}
+          patientNo={patientNo}
           />
         ) : (
           <KetamineFormData 

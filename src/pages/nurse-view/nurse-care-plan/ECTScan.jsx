@@ -34,6 +34,8 @@ const ECTScan = () => {
       );
       const { loading: loadingDoctors, data: doctors } = useSelector(state => state.getDoctorsList)
 
+      console.log('Etc form data', data)
+
   useEffect(() => {
     dispatch(getPatientECTRequest())
   }, [dispatch])
@@ -74,6 +76,7 @@ const ECTScan = () => {
 
       {!showForm ? (
         <ETCTable 
+        patientNo={patientNo}
         loadingETC={loadingETC} 
         data={data} 
         admissionNo={admissionNo}

@@ -32,7 +32,7 @@ const Imaging = () => {
   const role = useAuth().userData.departmentName
 
   const dispatch = useDispatch();
-  const [showForm, setShowForm] = useState(true);
+  const [showForm, setShowForm] = useState(false);
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
   const [modalVisible, setModalVisible] = useState(false);
   const [iframeSrc, setIframeSrc] = useState("");
@@ -42,6 +42,7 @@ const Imaging = () => {
   const { loading: requestingTest } = useSelector(
     (state) => state.requestRadiologyTest
   );
+  console.log('radiologyData', radiologyData);
   useEffect(() => {
     dispatch(getRadiologySetup());
     if (treatmentNo) {
@@ -168,7 +169,6 @@ const Imaging = () => {
       Treatment: key.TreatmentNo,
     }));
 
-  console.log("dateme", dataSource);
   return (
     <div>
       <Typography.Title level={5} style={{ marginBottom: "12px" }}>
@@ -177,7 +177,7 @@ const Imaging = () => {
       </Typography.Title>
 
       {
-        role === 'Doctor' ? (
+        role === 'Doctor' && (
           <div className="d-flex justify-content-between my-4">
         {!showForm &&
           <Button
@@ -202,12 +202,39 @@ const Imaging = () => {
         </Button>
 
       </div>
-        ) : (
-          null
-        )
+      )
+      
       }
+      
 
-      {showForm ? (
+      {!showForm ? (
+          <>
+          <RowSelectionTable
+            dataSource={dataSource}
+            columns={columns}
+            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
+            tableProps={{ scroll: { x: 600 } }} // Additional Table props
+          />
+          <Modal
+          title="Radiology Test Results"
+          visible={modalVisible}
+          onCancel={() => setModalVisible(false)}
+          footer={null}
+          width={800}
+          bodyStyle={{ padding: "16px", textAlign: "center" }}
+        >
+          {noResultsMessage ? (
+            <Typography.Text type="danger">No Results to View</Typography.Text>
+          ) : (
+            <iframe
+              src={iframeSrc}
+              title="Lab Test Results"
+              style={{ width: "100%", height: "500px", border: "none" }}
+            />
+          )}
+        </Modal>
+        </>
+      ) : (
         <Form
           layout="vertical"
           initialValues={{
@@ -263,36 +290,9 @@ const Imaging = () => {
           </Row>
 
           <Button type="primary" htmlType="submit" style={{ marginTop: "16px" }}>
-            Save Radiology Request
+            Save Radiology Request 
           </Button>
         </Form>
-      ) : (
-      <>
-        <RowSelectionTable
-          dataSource={dataSource}
-          columns={columns}
-          onRowSelect={(row) => setSelectedRow(row)} // Update selected row
-          tableProps={{ scroll: { x: 600 } }} // Additional Table props
-        />
-        <Modal
-        title="Radiology Test Results"
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        footer={null}
-        width={800}
-        bodyStyle={{ padding: "16px", textAlign: "center" }}
-      >
-        {noResultsMessage ? (
-          <Typography.Text type="danger">No Results to View</Typography.Text>
-        ) : (
-          <iframe
-            src={iframeSrc}
-            title="Lab Test Results"
-            style={{ width: "100%", height: "500px", border: "none" }}
-          />
-        )}
-      </Modal>
-      </>
       )}
     </div>
   );

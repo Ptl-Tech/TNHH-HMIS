@@ -57,8 +57,7 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
             ):(
             <Form
             
-            layout="vertical" 
-            style={{ paddingTop: '10px'}} 
+            layout="vertical"
             form={form}
             onFinish={handleOnFinish}
             initialValues={{

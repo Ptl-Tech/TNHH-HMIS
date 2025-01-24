@@ -62,27 +62,25 @@ const DietaryIntakeForm = () => {
     <div>
         <NurseInnerHeader icon={<FileOutlined />} title="Dietary Intake Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px', paddingBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px' }}>
 
           {
-            role === "Nurse" && (
+            !isFormVisible && (
+              role === 'Nurse' ? (
                 <>
-                  <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Dietary Form
-                  </Button>
-                  <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
-                  View Form
-                  </Button>
-                </>
-            )
-          }
-          {
-            role === "Doctor" && (
-              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Dietary Form
+                </Button>
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                View Form
+                </Button>
+              </>
+              ) : (
+             <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
               View Form
               </Button>
+              )
             )
           }
-          
         </div>
 
         {

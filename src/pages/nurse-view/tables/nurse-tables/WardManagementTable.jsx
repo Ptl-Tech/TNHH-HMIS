@@ -31,7 +31,6 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
             dataIndex: 'status',
             key: 'status',
             render: (_, text) => {
-                console.log('text', text);
                 if (text.Occupied == true) {
                   return <Tag color="#f50">Occupied</Tag>;
                 } else if (text.Occupied == false) {

@@ -57,27 +57,24 @@ const VisitorsList = () => {
          
          <NurseInnerHeader icon={<FileOutlined />} title="Visitors List"  />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           
           {
-            role === 'Nurse' && (
-              <>
-                <Button type="primary"  onClick={handleButtonVisibility}><PlusOutlined /> New Visitor
-                </Button>
-                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
-                View Visitor Details
-                </Button>
-              </>
-            )
-          }
-
-          {
-            role === 'Doctor' && (
-              <>
-                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
-                  View Visitor Details
-                </Button>
-              </>
+            !isFormVisible && (
+              
+                role === 'Nurse' ? (
+                  <>
+                    <Button type="primary"  onClick={handleButtonVisibility}><PlusOutlined /> New Visitor
+                    </Button>
+                    <Button type="primary" disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
+                    View Visitor Details
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
+                      View Visitor Details
+                  </Button>
+                )
             )
           }
           

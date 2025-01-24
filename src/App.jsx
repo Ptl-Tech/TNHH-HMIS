@@ -19,7 +19,7 @@ import HistoryVisitorList from './pages/HistoryVisitorList';
 import ActiveAppmnts from './pages/ActiveAppmnts';
 import CashPatients from './pages/CashPatients';
 import InsurancePatients from './pages/InsurancePatients';
-import AdmitPatient from './pages/nurse-view/AdmitPatient';
+import AdmitPatient from './pages/nurse-view/forms/nurse-forms/AdmitPatient';
 import PatientCharges from './pages/nurse-view/PatientCharges';
 import ReleaseBed from './pages/nurse-view/ReleaseBed';
 import TransferBed from './pages/nurse-view/TransferBed ';

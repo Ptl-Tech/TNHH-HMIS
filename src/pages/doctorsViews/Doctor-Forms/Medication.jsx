@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 import PrescriptionTable from "../tables/PrescriptionTable";
 import { sendtoPharmacy } from "../../../actions/Doc-actions/postPrescription";
+import useAuth from "../../../hooks/useAuth";
 
 const Medication = () => {
   const dispatch = useDispatch();
@@ -14,6 +15,8 @@ const Medication = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); 
   const { loadingPrescriptions, prescriptions} = useSelector((state) => state.getQyPrescriptionLine);
+  const role = useAuth().userData.departmentName
+
   const filteredPrescriptions = prescriptions.filter(
     (prescription) => prescription.TreatmentNo === treatmentNo
   );
@@ -40,28 +43,32 @@ const Medication = () => {
         Patient Prescription
       </Typography.Title>
       </div>
-      <div style={{ display: "flex", gap: "10px"}}>
-      <Button
-              type="primary"
-              icon={<SendOutlined />}
-              loading={pharmacyPosting}
-              onClick={handleSendToPharmacy}
-// disabled={!selectedRow}
-
-            >
-              Send to Pharmacy
-            </Button>
-
+     {
+       role === "Doctor" && (
+        <div style={{ display: "flex", gap: "10px"}}>
         <Button
-          type="primary"
-          onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
-        >
-          
-          {!showForm ? " New Prescription" : "View Prescriptions"}
-        </Button>
-             
-      </div>
+                type="primary"
+                icon={<SendOutlined />}
+                loading={pharmacyPosting}
+                onClick={handleSendToPharmacy}
+              // disabled={!selectedRow}
+  
+              >
+                Send to Pharmacy
+              </Button>
+  
+          <Button
+            type="primary"
+            onClick={() => setShowForm(!showForm)}
+            icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+          >
+            
+            {!showForm ? " New Prescription" : "View Prescriptions"}
+          </Button>
+               
+        </div>
+       )
+     }
       </div>
 
       {

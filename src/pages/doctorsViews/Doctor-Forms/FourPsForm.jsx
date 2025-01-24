@@ -19,6 +19,8 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);
 
+  console.log('Aetiology notes', data)
+
   
   const notesType = [
     { value: "12", label: "Predisposing Factors" },

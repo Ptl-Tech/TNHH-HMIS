@@ -12,6 +12,8 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
   const { loading: saveNotesLoading } = useSelector((state) => state.postPatientHistory);
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
 
+  console.log('patient history notes', data);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();

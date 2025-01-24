@@ -53,27 +53,24 @@ const MentalStateExaminationForm = () => {
       
         <NurseInnerHeader icon={<FileOutlined/>} title='Mental Status Level Checklist'/>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px'}}>
           {
-            role === "Nurse" && (
-              <>
+            !isFormVisible && (
+              role === 'Nurse' ? (
+                <>
                 <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New MSE Level Checklist
                 </Button>
                 <Button type="primary" disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
                 View MSE Level Checklist
                 </Button>
               </>
-            )
-          }
-
-          {
-            role === "Doctor" && (
-              <Button type="primary" disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
+              ) : (
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewMSEForm}><FolderViewOutlined />
                 View MSE Level Checklist
-                </Button>
+              </Button>
+              )
             )
           }
-        
         </div>
 
         {
