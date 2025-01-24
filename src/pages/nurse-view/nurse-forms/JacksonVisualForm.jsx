@@ -55,34 +55,30 @@ const JacksonVisualForm = () => {
         
         <NurseInnerHeader icon={<FileOutlined />} title="Jackson Visual Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           {
-            role === 'Nurse' && (
-              <>
-                  <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Jackson Form
-                  </Button>
-                  <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
-                  View Jackson Form
-                  </Button>
-              </>
+            !isFormVisible &&(
+              role === 'Nurse' ? (
+                <>
+                <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Jackson Form
+                </Button>
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                View Jackson Form
+                </Button>
+                </>
+              ) : (
+                <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                View Jackson Form
+                </Button>
+              )
             )
           }
-
-          {
-            role === 'Doctor' && (
-              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
-              View Jackson Form
-              </Button>
-            )
-          }
-          
         </div>
 
         {
           isFormVisible && (
             <JacksonVisualFormData 
             patientDetails={patientDetails} 
-            form={form}
             setIsFormVisible={setIsFormVisible}
             loadingJackson={loadingJackson}
             />

@@ -52,12 +52,11 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
     <Form
             
             layout="vertical" 
-            style={{ paddingTop: '10px'}} 
             form={form}
             onFinish={handleOnFinish}
             initialValues={
                 {
-                    category: '',
+                    category: undefined,
                     comments: '',
                 }
             }
@@ -103,6 +102,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
             ]}
             >
             <TextArea placeholder="Comments"
+                autoSize={{ minRows: 3, maxRows: 5 }}
                 type="text"
                 
             />

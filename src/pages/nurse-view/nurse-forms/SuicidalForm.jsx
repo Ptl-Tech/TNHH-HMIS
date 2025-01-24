@@ -69,23 +69,26 @@ const SuicidalForm = () => {
 
         <NurseInnerHeader icon={<FileOutlined/>} title="Suicidal Precaution Form" />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingTop: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           {
-            role === 'Nurse' && (
-              <>
+            !isFormVisible && (
+              role === 'Nurse' ? (
+                <>
                 <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Suicidal Precaution Form
                 </Button>
                 <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
                 View Data
                 </Button>
               </>
-            )
-          }
-          {
-            role === 'Doctor' && (
-              <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
-                View Suicidal Precaution Form
+              ) : (
+                <>
+                  <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Suicidal Precaution Form
                 </Button>
+                <Button type="primary" disabled={!selectedRowKey} onClick={handleViewForm}><FolderViewOutlined />
+                View Data
+                </Button>
+                </>
+              )
             )
           }
           

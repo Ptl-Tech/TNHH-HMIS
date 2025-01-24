@@ -2,7 +2,6 @@ import { Button, Divider } from "antd"
 import { useState } from "react"
 // import PhysiotherapyRequest from "./requests/PhysiotherapyRequest"
 import { HeartOutlined, FileMarkdownOutlined, MedicineBoxOutlined } from "@ant-design/icons"
-import useAuth from "../../hooks/useAuth"
 import LabResults from "../doctorsViews/Doctor-Forms/LabResults"
 import Imaging from "../doctorsViews/Doctor-Forms/Imaging"
 import Ketamine from "../doctorsViews/Doctor-Forms/Ketamine"
@@ -11,7 +10,6 @@ import ImagingRequests from "../doctorsViews/Doctor-Forms/Implants"
 
 
 const Requests = () => {
-  const userRole = useAuth();
   const [selectedItem, setSelectedItem] = useState(<LabResults />); // Default component
   const [activeItem, setActiveItem] = useState('Laboratory Requests');
 

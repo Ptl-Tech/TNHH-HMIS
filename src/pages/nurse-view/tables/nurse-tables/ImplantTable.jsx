@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { listDoctors } from "../../../../actions/DropdownListActions";
 import { useDispatch, useSelector } from "react-redux";
 
-const ImplantTable = ({ loadingKetamine, data, treatmentNo, admissionNo }) => {
+const ImplantTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
   const dispatch = useDispatch();
   const [updatedData, setUpdatedData] = useState([]);
 
@@ -33,7 +33,7 @@ const ImplantTable = ({ loadingKetamine, data, treatmentNo, admissionNo }) => {
   console.log('doctorMap', updatedData);
 
   const filterData = updatedData?.filter((item) =>
-    treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
+    treatmentNo ? item?.Link_No === treatmentNo : item?.Patient_No === patientNo
   );
   const filterProcedureData = filterData?.filter((item) => item.Procedure_Type === 'Implant')
   const columns = [
@@ -116,5 +116,5 @@ ImplantTable.propTypes = {
   loadingKetamine: PropTypes.bool.isRequired,
   data: PropTypes.array.isRequired,
   treatmentNo: PropTypes.string.isRequired,
-  admissionNo: PropTypes.string,
+  patientNo: PropTypes.string,
 }

@@ -20,7 +20,6 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
             comments,
           }
 
-          console.log('form data', mentalStateExaminationFormData)
   
         // Dispatch function to handle API call and feedback
         const dispatchMentalStateExaminationData = async (data) => {
@@ -59,7 +58,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
             onFinish={handleOnFinish}
             initialValues={
               {
-                status: '',
+                status: undefined,
                 comments: '',
               }
             }
@@ -67,6 +66,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
         <Form.Item
         label="Status"    
         name="status"
+        placeholder="Select status"
         hasFeedback
         rules={[
             {
@@ -94,6 +94,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
               ]}
             >
             <TextArea placeholder="Comments"
+                autoSize={{ minRows: 3, maxRows: 5 }}
                 type="text"
                 
             />

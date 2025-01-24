@@ -53,6 +53,7 @@ const LabResults = () => {
     (state) => state.postLabRequest
   );
   const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
+  console.log('patient lab test', patientLabTest)
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
