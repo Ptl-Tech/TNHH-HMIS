@@ -20,14 +20,14 @@ import JacksonVisualForm from './nurse-forms/JacksonVisualForm'
 
 
 const CarePlan = () => {
-   const [activeItem, setActiveItem] = useState('Add Allergies');
+   const [activeItem, setActiveItem] = useState('Allergies and Medications');
   const [selectedItem, setSelectedItem] = useState(<AddAllergies />);
   const role = useAuth().userData.departmentName
 
   const handleOnClick = (item) => {
             setActiveItem(item.label);
             switch (item.label) {
-                case 'Add Allergies':
+                case 'Allergies and Medications':
                     setSelectedItem(<AddAllergies />)
                     break
                 case 'Vitals':
@@ -78,7 +78,7 @@ const CarePlan = () => {
                 }
          }
     const menuItems = [
-        { label: 'Add Allergies', icon: <FileOutlined /> },
+        { label: 'Allergies and Medications', icon: <FileOutlined /> },
         { label: 'Vitals', icon: <FileMarkdownOutlined /> },
          ...role === 'Doctor' ? [{ label: 'Daily Ward Rounds', icon: <FileOutlined /> }] : [],
         { label: 'Diagnosis', icon: <MedicineBoxOutlined /> },

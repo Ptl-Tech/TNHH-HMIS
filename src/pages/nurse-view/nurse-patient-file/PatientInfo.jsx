@@ -4,32 +4,41 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import Loading from "../../../partials/nurse-partials/Loading";
 import { UserOutlined } from "@ant-design/icons";
+import { calculateAge } from "../../../utils/helpers";
 
 const PatientInfo = () => {
   const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
   const { patientDetails } = useLocation().state;
-  const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
- 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const patientNo = queryParams.get("PatientNo");
+
+  const patientNoToUse = patientDetails?.Patient_No || patientNo;
+
+  // Filter the triage waiting list
+  const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientNoToUse);
+
     const patientPrimaryInfo = [
     {
         title: 'Patient Name',
-        description: patientDetails?.PatientName || 'N/A',
+        description: filteredPatient[0]?.SearchName || 'N/A',
     },
     {
-        title: 'Patient ID',
-        description: patientDetails?.Patient_No || 'N/A',
+        title: 'Branch Name',
+        description: filteredPatient[0]?.GlobalDimension1Code || 'N/A',
     },
     {
         title: 'Admission Number',
-        description: patientDetails?.Admission_No || 'N/A',
+        description: filteredPatient[0]?.CurrentAdmNo || 'N/A',
     },
     {
         title: 'Date of Admission',
-        description: patientDetails?.AdmissionsDate || 'N/A',
+        description: filteredPatient[0]?.AdmissionsDate || 'N/A',
     },
     {
-        title: 'Identification Number',
-        description: filteredPatient[0]?.IDNumber || 'N/A',
+        title: 'Age',
+
+        description: calculateAge(filteredPatient[0]?.DateOfBirth) || 'N/A',
     },
     {
         title: 'Gender',

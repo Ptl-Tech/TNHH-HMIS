@@ -17,7 +17,7 @@ const AddAllergies = () => {
 
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
-        const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.PatientNo);
+        const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.Patient_No);
 
         const handleCancel = () => {
           setIsModalOpen(false);
@@ -46,13 +46,19 @@ const AddAllergies = () => {
 
         <NurseInnerHeader icon={<FileOutlined />} title="Allergies and Medications" />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
-        <Button type="primary" style={{ width: '100%' }}  onClick={handleButtonVisibility} icon={<PlusOutlined />}>
-          {isFormVisible ? 'View List': 'Add Allergies and Medication'}
-        </Button>
-
-          <Button type="primary" disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button>
-        </div>
+        
+          {
+            !isFormVisible && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
+              <Button type="primary" onClick={handleButtonVisibility} icon={<PlusOutlined />}>
+              Add Allergies and Medications
+              </Button>
+              {/* <Button type="primary" disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button> */}
+              </div>
+            )
+          }
+          
+        
 
         {
           isFormVisible && (

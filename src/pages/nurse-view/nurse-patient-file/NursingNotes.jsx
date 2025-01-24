@@ -1,10 +1,9 @@
-import { Button, Form, message } from "antd";
-import { PlusOutlined, EyeOutlined, SaveOutlined, FileProtectOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { Button, Form, message, Space } from "antd";
+import { EyeOutlined, SaveOutlined, FileProtectOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { POST_NURSE_ADMISSION_NOTES_FAILURE, POST_NURSE_ADMISSION_NOTES_SUCCESS, postNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
-import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
 import useAuth from "../../../hooks/useAuth";
 
 import { EditorState, convertToRaw } from 'draft-js';
@@ -12,6 +11,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { stateToHTML } from 'draft-js-export-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import PropTypes from "prop-types";
 
 
 const NursingNotes = () => {
@@ -21,38 +21,19 @@ const NursingNotes = () => {
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
   const userDetails = useAuth();
-  const [isVitalFormVisible, setIsVitalFormVisible] = useState(false);
-
-  const { loadingGetNurseAdmissionNotes, getNurseNotes } = useSelector((state) => state.getNurseAdmissionNotes);
 
   const { loadingNurseNotes } = useSelector((state) => state.postNurseAdmissionNotes);
   const navigate = useNavigate();
+  
 
-  const filterNurseNotes = getNurseNotes?.filter((note) => note?.AdmissionNo === patientDetails?.CurrentAdmNo);
     
   const handleNavigateReadNotes = () => {
-    if (filterNurseNotes.length > 0) {
       navigate(`/Nurse/Inpatient/Read-nurse-notes`, {
         state: {
-          loadingGetNurseAdmissionNotes,
-          filterNurseNotes,
           patientDetails,
         },
       });
-    } else {
-      navigate(`/Doctor/Inpatient/Read-nurse-notes`, {
-        state: {
-            loadingGetNurseAdmissionNotes,
-            filterNurseNotes,
-            patientDetails,
-        },
-    });
-    }
-   
   };
-  const handleVitalsButtonVisibility = () => {
-    setIsVitalFormVisible(!isVitalFormVisible);
-  }
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
@@ -72,7 +53,7 @@ const handleOnFinish = async () => {
           recId: '',
           staffNo: userDetails.userData.no,
           branchCode: branchCode,
-          patientNo: patientDetails?.PatientNo,
+          patientNo: patientDetails?.Patient_No,
           admissionNo: patientDetails?.CurrentAdmNo,
           notes: htmlContent,
         };
@@ -104,38 +85,15 @@ const handleOnFinish = async () => {
       }
     };
 
-    useEffect(() => {
-        if(!getNurseNotes?.length){
-          dispatch(getNurseAdmissionNotesSlice());
-        }
-      }, [dispatch, patientDetails?.CurrentAdmNo, getNurseNotes?.length]);
 
   return (
     <div>
       
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
     
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px', marginTop: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '10px' }}>
         {/* Conditionally render buttons based on role */}
-        {role == 'Nurse' && (
-          <>
-              <Button type="primary" 
-              style={{ width: '100%' }} 
-              icon={<PlusOutlined />}
-              onClick={handleVitalsButtonVisibility}
-              >
-                Add Nursing Notes
-              </Button>
-              <Button type="primary" 
-              style={{ width: '100%' }}
-              icon={<EyeOutlined />} 
-              onClick={handleNavigateReadNotes}
-              >
-                Read Nursing Notes
-              </Button>
-          </>
-        )}
-
+        
         {role === 'Doctor' && (
           <>
             {/* Button to view Nursing Notes for Doctor */}
@@ -149,8 +107,7 @@ const handleOnFinish = async () => {
           </>
         )}
       </div>
-      {
-        isVitalFormVisible && ( 
+      
       <Form
 
         layout="vertical" 
@@ -187,6 +144,7 @@ const handleOnFinish = async () => {
         />
       </Form.Item>
       <Form.Item>
+        <Space>
         <Button 
           type="primary" 
           htmlType="submit" 
@@ -195,13 +153,24 @@ const handleOnFinish = async () => {
           disabled={!editorState.getCurrentContent().hasText() || loadingNurseNotes}
         >Save Nursing Notes
         </Button>
+         
+        <Button type="primary" 
+        icon={<EyeOutlined />} 
+        onClick={handleNavigateReadNotes}
+        >
+          Read Nursing Notes
+        </Button>
+        </Space>
+          
       </Form.Item>
       </Form>
-
-        )
-      }
     </div>
   );
 };
 
 export default NursingNotes;
+// props validation
+NursingNotes.propTypes = {
+  setSelectedItem: PropTypes.string,
+  selectedItem: PropTypes.string,
+}
