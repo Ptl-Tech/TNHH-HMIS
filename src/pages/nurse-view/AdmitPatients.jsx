@@ -1,9 +1,8 @@
 import { Card, Col, Row, Space, Typography, Button, Table, Modal, message } from "antd"
-import { PlusOutlined, CloseOutlined, PayCircleOutlined, PrinterOutlined, FileExclamationOutlined } from "@ant-design/icons"
+import { PlusOutlined, CloseOutlined, PayCircleOutlined, InboxOutlined } from "@ant-design/icons"
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { exportToExcel, printToPDF } from "../../utils/helpers";
 import { getPgAdmissionsVerifiedSlice } from "../../actions/nurse-actions/getPgAdmissionsVerifiedSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
@@ -213,16 +212,16 @@ const AdmitPatients = () => {
         <Row style={{ margin: '20px 10px 10px 10px' }}>
             <Col span={24}>
                 
-                <NurseInnerHeader title="Patient Admissions List" />
+                <NurseInnerHeader title="Patient Admissions List" icon={<InboxOutlined />}/>
 
                 <FilterInpatientList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchAdmissionNumber}/>
                     
                 <Card className="admit-patient-card-container">
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Space className="admit-patient-button-container">
-                            <Button type="primary" disabled={!selectedRowKey} onClick={handleAdmitPatient}><PlusOutlined /> Admit Patient</Button>
-                            <Button color="danger" variant="outlined" disabled={!selectedRowKey}onClick={handleCancelAdmission}><CloseOutlined /> Cancel Admission</Button>
-                            <Button type="primary" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
+                            <Button type="primary" size="large" disabled={!selectedRowKey} onClick={handleAdmitPatient}><PlusOutlined /> Admit Patient</Button>
+                            <Button color="danger" size="large" variant="outlined" disabled={!selectedRowKey}onClick={handleCancelAdmission}><CloseOutlined /> Cancel Admission</Button>
+                            <Button type="primary" size="large" disabled={!selectedRowKey} onClick={handlePatientCharges}><PayCircleOutlined /> Charges</Button>
                         </Space>
                         {/* <Space className="admit-patient-button-container">
                             <Button type="primary" onClick={()=>exportToExcel(formattedPatientAdmissions, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>

@@ -1,6 +1,5 @@
-import { Card, Col, Form, Input, Row, Select } from "antd";
+import { Card, Col, Form, Input, Row, Select, Typography } from "antd";
 import PropTypes from "prop-types";
-
 
 const FilterWardManagement = ({
   getWards,
@@ -10,7 +9,8 @@ const FilterWardManagement = ({
   setPsychiatricCoding,
   setCodingReason,
   form,
-  handleOnFinish
+  handleOnFinish,
+  patientNo,
 }) => {
   return (
     <>
@@ -21,23 +21,25 @@ const FilterWardManagement = ({
           borderTop: "3px solid #0f5689",
         }}
       >
-        
-            <Form
-              form={form}
-              onFinish={handleOnFinish}
-            >
-              <Row gutter={[16, 16]}>
-
-                <Col xs={24} md={24} lg={8}>
-                <Form.Item
+        <Form form={form} onFinish={handleOnFinish}>
+          <Row gutter={[16, 16]}>
+            {!patientNo && (
+              <Col xs={24} md={24} lg={16}>
+                <Typography.Title level={5}>
+                  Search to select ward, room and bed
+                </Typography.Title>
+              </Col>
+            )}
+            <Col xs={24} md={24} lg={8}>
+              <Form.Item
                 name={"ward"}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please select a ward",
-                    },
-                  ]}
-                >
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select a ward",
+                  },
+                ]}
+              >
                 <Select
                   size="large"
                   options={getWards?.map((ward) => ({
@@ -55,57 +57,60 @@ const FilterWardManagement = ({
                       .localeCompare((optionB?.label ?? "").toLowerCase())
                   }
                 />
-                </Form.Item>
-                </Col>
-                <Col xs={24} md={24} lg={8}>
-                  
-              <Form.Item 
-              name="psychiatricCoding"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a Psychiatrist Coding",
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  onChange={(value) => setPsychiatricCoding(value)}
-                  placeholder="Select Psychiatric Coding"
-                  showSearch
-                  options={psychiatricCodingOptions?.map((option) => ({
-                    value: option.value,
-                    label: option.label,
-                  }))}
-                  filterSort={(optionA, optionB) =>
-                    (optionA?.label ?? "")
-                      .toLowerCase()
-                      .localeCompare((optionB?.label ?? "").toLowerCase())
-                  }
-                />
               </Form.Item>
+            </Col>
+
+            {patientNo && (
+              <>
+                <Col xs={24} md={24} lg={8}>
+                  <Form.Item
+                    name="psychiatricCoding"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select a Psychiatrist Coding",
+                      },
+                    ]}
+                  >
+                    <Select
+                      size="large"
+                      onChange={(value) => setPsychiatricCoding(value)}
+                      placeholder="Select Psychiatric Coding"
+                      showSearch
+                      options={psychiatricCodingOptions?.map((option) => ({
+                        value: option.value,
+                        label: option.label,
+                      }))}
+                      filterSort={(optionA, optionB) =>
+                        (optionA?.label ?? "")
+                          .toLowerCase()
+                          .localeCompare((optionB?.label ?? "").toLowerCase())
+                      }
+                    />
+                  </Form.Item>
                 </Col>
 
                 <Col xs={24} md={24} lg={8}>
-                <Form.Item 
-                name="codingReason"
-                rules={[
-                    {
-                      required: true,
-                      message: "Please enter a coding reason",
-                    },
-                  ]}
-                >
-                <Input
-                  placeholder="Coding reason"
-                  size="large"
-                  onChange={(e) => setCodingReason(e.target.value)}
-                />
-              </Form.Item>
+                  <Form.Item
+                    name="codingReason"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please enter a coding reason",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Coding reason"
+                      size="large"
+                      onChange={(e) => setCodingReason(e.target.value)}
+                    />
+                  </Form.Item>
                 </Col>
-
-              </Row>
-            </Form>
+              </>
+            )}
+          </Row>
+        </Form>
       </Card>
     </>
   );
@@ -122,4 +127,5 @@ FilterWardManagement.propTypes = {
   setCodingReason: PropTypes.string.isRequired,
   form: PropTypes.object,
   handleOnFinish: PropTypes.func,
+  patientNo: PropTypes.string,
 };
