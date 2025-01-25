@@ -1,20 +1,36 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useSetTableCheckBoxHook from "../../../../hooks/useSetTableCheckBoxHook";
 import { useGetWardManagementHook } from "../../../../hooks/useGetWardManagementHook";
 import { useEffect, useState } from "react";
 import NurseInnerHeader from "../../../../partials/nurse-partials/NurseInnerHeader";
-import { Button, Card, Space, Typography, Row, Col, List, message, Form } from "antd";
+import {
+  Button,
+  Card,
+  Space,
+  Typography,
+  Row,
+  Col,
+  List,
+  message,
+  Form,
+} from "antd";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import FilterWardManagement from "../../../../partials/nurse-partials/FilterWardManagement";
 import DisplayAlert from "../../../../partials/nurse-partials/DisplayAlert";
 import WardManagementTable from "../../tables/nurse-tables/WardManagementTable";
-import { BankOutlined } from "@ant-design/icons";
+import { BankOutlined, InsertRowLeftOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
-import {postAdmissionFormDetailsSlice} from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
-import { POST_ADMISSION_FORM_DETAILS_SUCCESS, POST_ADMISSION_FORM_DETAILS_FAILURE } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
+import { postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
+import {
+  POST_ADMISSION_FORM_DETAILS_SUCCESS,
+  POST_ADMISSION_FORM_DETAILS_FAILURE,
+} from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
 
 const AdmitPatientForm = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
   const { patientDetails } = location.state || {};
   const { selectedRow, selectedRowKey, rowSelection } =
     useSetTableCheckBoxHook();
@@ -31,9 +47,6 @@ const AdmitPatientForm = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [psychiatricCoding, setPsychiatricCoding] = useState(null);
   const [codingReason, setCodingReason] = useState(null);
-  const dispatch = useDispatch();
-  const [form] = Form.useForm();
-
 
   const psychiatricCodingOptions = [
     { label: "Red", value: 0 },
@@ -75,17 +88,26 @@ const AdmitPatientForm = () => {
     setSelectedWard(value);
   }
 
-  const handleOnFinish = async() => {
+  const handleOnFinish = async () => {
     //validate form fields
-    form.validateFields().then(() => {
-      handleAssignBed();
-    }).catch(() => {
-      message.error("Please fill in all required fields");
-    });
+    form
+      .validateFields()
+      .then(() => {
+        handleAssignBed();
+      })
+      .catch(() => {
+        message.error("Please fill in all required fields");
+      });
   };
   const handleAssignBed = async () => {
     if (!selectedRow[0]) {
-      return message.info("Please select bed to assign patient");
+      return message.warning("Please select bed to assign patient");
+    }
+
+    if (selectedRow[0]?.Occupied === true) {
+      return message.warning(
+        "Bed is already occupied, please select another bed"
+      );
     }
 
     const formData = {
@@ -97,19 +119,27 @@ const AdmitPatientForm = () => {
       bed: selectedRow[0]?.BedNo,
       psychiatricCoding,
       codingReason,
-      admissionType: "0"
+      admissionType: "0",
     };
 
     try {
       const result = await dispatch(postAdmissionFormDetailsSlice(formData));
       if (result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS) {
-        message.success(result.payload.message || "Admission Form Details Submitted Successfully");
-        Navigate(`/Nurse/Inpatient`);
+        message.success(
+          result.payload.message ||
+            "Ward, Room and Bed assigned successfully to patient"
+        );
+        navigate(`/Nurse/Inpatient`);
       } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
-        message.error(result.payload.message || "Failed to submit Admission Form Details");
+        message.error(
+          result.payload.message ||
+            "Failed to assign ward, bed and room to patient"
+        );
       }
     } catch (error) {
-      message.error(error.message || "An error occurred");
+      message.error(
+        error.message || "An internal error occurred, please try again"
+      );
     }
   };
 
@@ -135,6 +165,7 @@ const AdmitPatientForm = () => {
       <Card className="admit-patient-card-container">
         <Space>
           <Button
+            size="large"
             type="primary"
             disabled={!selectedRowKey}
             onClick={handleOnFinish}
@@ -185,6 +216,27 @@ const AdmitPatientForm = () => {
                 value: room.Room_No, // The unique identifier for the room
                 label: room.Room_Name, // The display name for the room
               }))}
+              locale={{
+                emptyText: (
+                  <Space
+                    direction="vertical"
+                    size={2} // Adjust vertical spacing between items
+                    style={{ textAlign: "center", marginTop: "20px", marginBottom: "20px" }}
+                  >
+                    <InsertRowLeftOutlined
+                      style={{
+                        fontSize: 48,
+                        color: "#0f5689",
+                        marginBottom: 20,
+                        fontWeight: "normal",
+                      }}
+                    />
+                    <Typography.Text type="secondary" style={{ fontSize: 16 }}>
+                      Please select ward to show rooms
+                    </Typography.Text>
+                  </Space>
+                ),
+              }}
               renderItem={(item) => (
                 <List.Item
                   onClick={() => handleRoom(item.value)}

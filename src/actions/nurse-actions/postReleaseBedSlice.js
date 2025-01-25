@@ -7,13 +7,13 @@ export const POST_RELEASE_BED_FAILURE = 'POST_RELEASE_BED_FAILURE';
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
 
-export const postReleaseBedSlice = (endpoint = '/Inpatient/ReleaseBed', dischargeData) => 
+export const postReleaseBedSlice = (dischargeData) => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: POST_RELEASE_BED_REQUEST });
 
-        const { data } = await axios.post(`${API_URL}${endpoint}`, dischargeData, config);
+        const { data } = await axios.post(`${API_URL}/Inpatient/ReleaseBed`, dischargeData, config);
     
 
         dispatch({ type: POST_RELEASE_BED_SUCCESS, payload: data });
