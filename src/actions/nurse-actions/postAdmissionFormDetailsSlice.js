@@ -24,11 +24,7 @@ export const postAdmissionFormDetailsSlice = (admissionFormData) =>
     
         dispatch({
             type: POST_ADMISSION_FORM_DETAILS_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_ADMISSION_FORM_DETAILS_FAILURE, payload: error };

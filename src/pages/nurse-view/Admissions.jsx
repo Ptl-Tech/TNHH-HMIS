@@ -11,6 +11,7 @@ import useSetTablePagination from "../../hooks/useSetTablePagination";
 import { useNavigate } from "react-router-dom";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterConsultationRoom from "../../partials/nurse-partials/FilterConsultationRoom";
+import { CommentOutlined } from "@ant-design/icons";
 
 const Admissions = () => {
 
@@ -87,11 +88,11 @@ const Admissions = () => {
 
     const handleNavigate = (record) => {
         if(userDetails.userData.departmentName === 'Nurse'){
-         navigate(`/Nurse/Consultation/Patient?TreatmentNo=${record?.treatmentNo}`, {
+         navigate(`/Nurse/Consultation/Patient?TreatmentNo=${record?.TreatmentNo}`, {
            state: { patientDetails: record },
          });
         }else{
-            navigate(`/Doctor/Consultation/Patient?TreatmentNo=${record?.treatmentNo}`, {
+            navigate(`/Doctor/Consultation/Patient?TreatmentNo=${record?.TreatmentNo}`, {
                 state: { patientDetails: record },
             });
         }
@@ -136,8 +137,6 @@ const Admissions = () => {
         });
     }, [combinedList, formattedDoctorDetails]);
 
-    console.log('combined doctor list', combinedListWithDoctors);
-
     const { pagination, handleTableChange } = useSetTablePagination(combinedListWithDoctors);
 
     useEffect(() => {
@@ -159,7 +158,7 @@ const Admissions = () => {
 return (
 <div style={{ margin: '20px 10px 10px 10px' }}>
   
-    <NurseInnerHeader title="Consultation Room" />
+    <NurseInnerHeader title="Consultation Room" icon={<CommentOutlined />} />
 
     <FilterConsultationRoom setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchVisitNumber}/>
 

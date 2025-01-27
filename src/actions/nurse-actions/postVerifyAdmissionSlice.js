@@ -24,11 +24,7 @@ export const postVerifyAdmissionSlice = (admissionData) =>
     
         dispatch({
             type: POST_VERIFY_ADMISSION_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_VERIFY_ADMISSION_FAILURE, payload: error };

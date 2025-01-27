@@ -24,11 +24,7 @@ export const postDietaryIntakeFormLineSlice = ( formData ) =>
     
         dispatch({
             type: POST_DIETARY_INTAKE_FORM_LINE_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_DIETARY_INTAKE_FORM_LINE_FAILURE, payload: error };
