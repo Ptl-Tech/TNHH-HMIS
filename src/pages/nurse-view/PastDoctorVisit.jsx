@@ -1,35 +1,47 @@
 
-import { Button, Table } from "antd"
+import { Button, Card, Col, Input, Row, Table, Typography } from "antd"
 import { ProfileOutlined } from "@ant-design/icons"
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getConsultationRoomListSlice } from "../../actions/nurse-actions/getConsultationRoomSlice";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
-import Loading from "../../partials/nurse-partials/Loading";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
-import FilterConsultationRoom from "../../partials/nurse-partials/FilterConsultationRoom";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 const PastDoctorVisit = () => {
 
-    const [searchName, setSearchName] = useState('');
-    const [searchPatientNumber, setSearchPatientNumber] = useState('');
-    const [searchVisitNumber, setSearchVisitNumber] = useState('')
-    const [searching, setSearching] = useState(false);
-
     const navigate = useNavigate();
     const userDetails = useAuth();
+    const [showList, setShowList] = useState(false);
+    const [filteredPatients, setFilteredPatients] = useState([]);
+
+    const [searchParams, setSearchParams] = useState({
+        SearchName: "",
+        visitNo: "",
+        patientNo: "",
+      });
+
+
+      const handleSearchChange = (e, field) => {
+        const value = e.target.value;
+        setSearchParams((prevState) => ({
+          ...prevState,
+          [field]: value,
+        }));
+        setShowList(true);
+        filterPatients({ ...searchParams, [field]: value });
+      };
 
     const handleNavigate = (record) => {
         if(userDetails.userData.departmentName === 'Nurse'){
-         navigate(`/Nurse/Consultation/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+         navigate(`/Nurse/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
            state: { patientDetails: record },
          });
         }else{
-            navigate(`/Doctor/Consultation/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+            navigate(`/Doctor/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
                 state: { patientDetails: record },
             });
         }
@@ -40,31 +52,16 @@ const PastDoctorVisit = () => {
             title: 'Treatment No',
             dataIndex: 'TreatmentNo',
             key: 'TreatmentNo',
-            filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
-            onFilter: (value, record) =>
-            record.TreatmentNo ?
-            record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
             title: 'Patient No',
             dataIndex: 'PatientNo',
             key: 'PatientNo',
-            filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
-            onFilter: (value, record) =>
-                record?.PatientNo ? record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
         },
         {
             title: 'Patient Names',
             dataIndex: 'SearchName',
             key: 'SearchName',
-            filteredValue: searchName ? [searchName] : null,
-            onFilter: (value, record) => {
-                record.SearchName 
-                ? record.SearchName.toLowerCase().includes(value.toLowerCase())
-                : false
-                setSearching(true);
-                console.log(searching)
-            },
                 render: (_, record) => {
                     return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689' }}>
                         {record.SearchName}
@@ -143,6 +140,18 @@ const PastDoctorVisit = () => {
         });
     }, [combinedList, formattedDoctorDetails]);
 
+    const filterPatients = (params) => {
+        const { SearchName, visitNo, patientNo } = params;
+        const filtered = combinedListWithDoctors.filter((patient) => {
+          return (
+            patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
+            patient.TreatmentNo.toLowerCase().includes(visitNo.toLowerCase()) &&
+            patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase())
+          );
+        });
+        setFilteredPatients(filtered);
+      };
+
     const { pagination, handleTableChange } = useSetTablePagination(combinedListWithDoctors);
 
     
@@ -169,24 +178,63 @@ return (
   
     <NurseInnerHeader title="Past Doctor Visit" icon={<ProfileOutlined />} />
 
-    <FilterConsultationRoom setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchAdmissionNumber={setSearchVisitNumber}/>
 
-    {
-    loadingConsultationRoomList ? (
-        <Loading />
-    ) : (
-        
-        searching ? (
-        <Table 
+    <Card className="card-header mb-4 mt-4 p-4">
+        <Typography.Text
+          style={{
+            color: "#003F6D",
+            fontWeight: "bold",
+            marginBottom: "16px",
+          }}
+        >
+          Find Patient Details by:
+        </Typography.Text>
+        <Row gutter={16} className="mt-2">
+          <Col span={8}>
+            <Input.Search
+              size="large"
+              placeholder="Patient Name"
+              value={searchParams.SearchName}
+              onChange={(e) => handleSearchChange(e, "SearchName")}
+              allowClear
+            />
+          </Col>
+          <Col span={8}>
+            <Input.Search
+              size="large"
+              placeholder="Visit No"
+              value={searchParams.visitNo}
+              onChange={(e) => handleSearchChange(e, "visitNo")}
+              allowClear
+              onSearch={() => filterPatients(searchParams)}
+            />
+          </Col>
+          <Col span={8}>
+            <Input.Search
+              size="large"
+              placeholder="Patient No"
+              value={searchParams.patientNo}
+              onChange={(e) => handleSearchChange(e, "patientNo")}
+              allowClear
+            />
+          </Col>
+        </Row>
+      </Card>
+
+        {
+            showList && (
+                <Table 
         columns={columns} 
         // rowSelection={rowSelection}
+        rowKey={(record) => record.TreatmentNo}
         scroll={{ x: 'max-content' }}
-        dataSource={combinedListWithDoctors} 
+        loading={loadingConsultationRoomList}
+        dataSource={filteredPatients} 
         className="admit-patient-table"
         bordered size='middle' 
         pagination={{
             ...pagination,
-            total: combinedListWithDoctors?.length,
+            total: filteredPatients?.length,
             showSizeChanger: true,
             showQuickJumper: true,
             position: ['bottom', 'right'],
@@ -198,12 +246,8 @@ return (
             }
             }}
         />
-        )
-        : (
-            null
-        )
-    )
-    }
+            )
+        }
 </div>
 );
 }

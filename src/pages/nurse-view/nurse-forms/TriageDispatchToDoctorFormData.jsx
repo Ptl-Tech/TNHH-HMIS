@@ -1,4 +1,4 @@
-import { Button, Col, Form, message, Row, Select } from "antd"
+import { Button, Col, Form, message, Row, Select, Space } from "antd"
 import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
@@ -6,6 +6,7 @@ import { POST_DISPATCH_TO_DOCTOR_FAIL, POST_DISPATCH_TO_DOCTOR_SUCCESS, postDisp
 import { useEffect } from "react";
 import { getQyUrgencyColorCodingSetupSetupSlice } from "../../../actions/nurse-actions/getQyUrgencyColorCodingSetupSlice";
 import { getUrgencyColorcode } from "../../../utils/helpers";
+import { SendOutlined, CloseOutlined } from "@ant-design/icons";
 
 const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchFormVisible }) => {
     const { form } = Form.useForm();
@@ -55,13 +56,13 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             form={form}
             onFinish={handleOnFinish}
             initialValues={{
-                status: '',
+                status: undefined,
                 urgencyStatus: '',
                 observationRemarks: '',
             }}
         >
         <Row gutter={16}>
-            <Col span={12}>
+            <Col span={24}>
                 <Form.Item label="Urgency Status" name="status"
                     hasFeedback
                     rules={[{ required: true, message: 'Please select status!' }]}
@@ -69,7 +70,7 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
                 >
                     <Select 
                         loading={loadingColorCode}
-                        placeholder="Select Status"
+                        placeholder="Select urgency status"
                         options={colorCode.map((item) => ({
                             label: getUrgencyColorcode(item.UrgencyStatus).text,
                             value: item.LineNo,
@@ -80,36 +81,47 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             </Col>
             </Row>
             <Row gutter={16}>
-                <Col span={12}>
+                <Col span={24}>
                     <Form.Item label="Urgency Status Remarks" name="urgencyStatus"
                         hasFeedback
                         
                     >
                         <TextArea 
+                        autoSize={{ minRows: 3, maxRows: 5 }}
                         placeholder="Enter Remarks"
                         />
                     </Form.Item>
                 </Col>
             </Row>
             <Row gutter={16}>
-            <Col span={12}>
+            <Col span={24}>
                 <Form.Item label="Observation Remarks" name="remarks"
                     hasFeedback
                     
                 >
                     <TextArea 
+                    autoSize={{ minRows: 3, maxRows: 5 }}
                     placeholder="Enter Remarks"
                     />
                 </Form.Item>
             </Col>
         </Row>
         <Form.Item>
-            <Button htmlType="submit" type="primary"
-            loading={loadingDispatchToDoctor}
-            disabled={loadingDispatchToDoctor}
-            >
-                Dispatch to Doctor
-            </Button>
+            <Space>
+                <Button htmlType="submit" type="primary"
+                size="large"
+                icon={<SendOutlined />}
+                loading={loadingDispatchToDoctor}
+                disabled={loadingDispatchToDoctor}
+                >
+                    Dispatch to Doctor
+                </Button>
+                <Button htmlType="button" variant="outlined" size="large" color="danger" onClick={() => setIsDispatchFormVisible(false)}
+                    icon={<CloseOutlined />}
+                >
+                    Cancel
+                </Button>
+            </Space>
         </Form.Item>
 
         </Form>

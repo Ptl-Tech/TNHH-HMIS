@@ -13,8 +13,6 @@ const InpatientCardInfo = ({ patientDetails, filterAllergies, loadingTriageList,
 
     const invalidDate = "0001-01-01"; // Define the "invalid" date
 
-    console.log('filteredPatient', filteredPatient);
-
     return (
         <>
             <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
