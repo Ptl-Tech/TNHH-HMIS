@@ -26,11 +26,7 @@ export const postInitiateDischargeSlice = (endpoint = '/Inpatient/InitiateDischa
     
         dispatch({
             type: POST_INITIATE_DISCHARGE_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_INITIATE_DISCHARGE_FAILURE, payload: error };

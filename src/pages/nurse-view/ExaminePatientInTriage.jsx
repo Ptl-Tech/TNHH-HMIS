@@ -1,5 +1,5 @@
-import { Card, Tabs, Row, Col, Avatar, Typography, Button, Space } from 'antd'
-import { UserOutlined, DiffOutlined } from '@ant-design/icons';
+import { Card, Tabs, Row, Col, Avatar, Typography, Button } from 'antd'
+import { UserOutlined, DiffOutlined, SendOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
 import Injections from './forms/triage-forms/Injections';
@@ -52,12 +52,29 @@ const EvaluatePatientInTriage = () => {
 
   return (
     <div style={{ margin: '16px 10px' }}>
-          <Space className="inpatient-header">
-          <DiffOutlined />
-            <Typography.Text className="inpatient-header-text">
-                Triage Observation Form
-            </Typography.Text>
-          </Space>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px'}}>
+          
+            <div>
+              <Typography.Text style={{ fontSize: '18px', color: '#0f5689', fontWeight: '600' }}>
+                  <DiffOutlined style={{ paddingRight: '8px' }} />
+                  Triage Observation Form
+              </Typography.Text>
+            </div>
+            
+
+            {
+              !isDispatchFormVisible && (
+                <div>
+              <Button type="primary" onClick={handleVitalsButtonVisibility} style={{ fontSize: '18px', color: '#ffffff', fontWeight: '500' }}
+               icon={<SendOutlined />}
+              >
+                    Dispatch patient to the Doctor
+              </Button>
+            </div>
+              )
+            }
+           
+          </div>
           <Row>
             {
               loadingPatientDetails ? (
@@ -115,20 +132,20 @@ const EvaluatePatientInTriage = () => {
             )
           }
           </Row>
-          <Card style={{ padding: '10px 16px', marginTop: '10px', marginBottom: '10px' }}>
+          
               
              
-                <Button type="primary" onClick={handleVitalsButtonVisibility} style={{ width: '50%', marginBottom: '10px'}}>
-                          Dispatch patient to the Doctor
-                </Button>
+                
 
               {
                 isDispatchFormVisible && (
+                  <Card style={{ padding: '10px 16px', marginTop: '10px', marginBottom: '10px' }}>
                   <TriageDispatchToDoctorFormData staffNo={staffNo} observationNo={observationNo} setIsDispatchFormVisible={setIsDispatchFormVisible}/>
+                  </Card>
                 )
               }
 
-          </Card>
+        
             {
             !isDispatchFormVisible && (
               <Row gutter={8} className='inpatient-card-container'>

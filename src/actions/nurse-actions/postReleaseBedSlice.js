@@ -24,11 +24,7 @@ export const postReleaseBedSlice = (dischargeData) =>
     
         dispatch({
             type: POST_RELEASE_BED_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_RELEASE_BED_FAILURE, payload: error };
