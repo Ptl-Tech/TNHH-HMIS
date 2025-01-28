@@ -69,5 +69,5 @@ export default NurseInnerHeader
 NurseInnerHeader.propTypes = {
   filterInPatients: PropTypes.array,
   title: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired
+  icon: PropTypes.string
 };

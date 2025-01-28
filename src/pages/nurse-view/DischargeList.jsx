@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { getPgInpatientDischargeListSlice } from "../../actions/nurse-actions/getPgInpatientDischargeListSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
-import { exportToExcel, printToPDF } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { POST_DISCHARGE_PATIENT_FAILURE, POST_DISCHARGE_PATIENT_SUCCESS, postPostDischargeSlice } from "../../actions/nurse-actions/postPostDischargeSlice";
 import { POST_RELEASE_BED_FAILURE, POST_RELEASE_BED_SUCCESS, postReleaseBedSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
