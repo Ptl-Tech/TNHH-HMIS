@@ -10,10 +10,10 @@ import {
   Typography,
   Tooltip,
   Modal,
-  
   Tabs,
+  Dropdown, Menu
 } from "antd";
-import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
+import { EditOutlined, EyeOutlined, FilePdfOutlined, TeamOutlined,DownOutlined  } from "@ant-design/icons";
 import { appmntList, listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
@@ -22,9 +22,9 @@ import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoi
 import TabPane from "antd/es/tabs/TabPane";
 import { getBillingList } from "../actions/Charges-Actions/getBillingList";
 import { saveAs } from "file-saver";
+import ViewInvoice from "./billing/ViewInvoice";
 
 const InsurancePatients = () => {
-  
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
   );
@@ -56,32 +56,31 @@ const InsurancePatients = () => {
   const [billingModalVisible, setBillingModalVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
-    const [pdfBlob, setPdfBlob] = useState(null);
-  
+  const [pdfBlob, setPdfBlob] = useState(null);
+
   const staffNo = useAuth().userData.No;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     dispatch(appmntList());
     dispatch(getBillingList());
   }, [dispatch]);
 
-
-  const formattedBillingList= visitData.map((patient) =>{
-    const matchingPatient=billingData.find((p) => p.PatientNo === patient.PatientNo);
+  const formattedBillingList = visitData.map((patient) => {
+    const matchingPatient = billingData.find(
+      (p) => p.PatientNo === patient.PatientNo
+    );
     return {
       ...patient,
       PatientNo: patient.PatientNo,
       Balance: matchingPatient?.Balance ?? 0, // Default to 0 if Balance is undefined
-    OpenInsuranceBalance: matchingPatient?.Open_Insurance_Amount ?? 0,
-      Inpatient:matchingPatient?.Inpatient??false
+      OpenInsuranceBalance: matchingPatient?.Open_Insurance_Amount ?? 0,
+      Inpatient: matchingPatient?.Inpatient ?? false,
     };
-
   });
   console.log("Formatted Billing List:", formattedBillingList);
 
- 
   useEffect(() => {
     if (selectedPatient) {
       dispatch(getPatientDetails(selectedPatient.PatientNo));
@@ -98,7 +97,6 @@ const InsurancePatients = () => {
     }
   }, [patientDetails, selectedPatient]);
 
- 
   useEffect(() => {
     if (formattedBillingList) {
       // Sort the list based on the AppointmentDate (latest first)
@@ -107,24 +105,20 @@ const InsurancePatients = () => {
         const dateB = new Date(b.AppointmentDate);
         return dateB - dateA; // For descending order
       });
-  
+
       setFilteredOutpatients(
         sortedList.filter(
-          (patient) =>
-            patient.PatientType === "Corporate" && !patient.Inpatient
+          (patient) => patient.PatientType === "Corporate" && !patient.Inpatient
         )
       );
       setFilteredInpatients(
         sortedList.filter(
-          (patient) =>
-            patient.PatientType === "Corporate" && patient.Inpatient
+          (patient) => patient.PatientType === "Corporate" && patient.Inpatient
         )
       );
     }
   }, [formattedBillingList]);
-  
 
-  
   const handleSearchChange = (e, key) => {
     const value = e.target.value.toLowerCase();
     setSearchParams((prev) => ({ ...prev, [key]: value }));
@@ -133,9 +127,10 @@ const InsurancePatients = () => {
       const matchesName = patient.Names?.toLowerCase().includes(
         searchParams.SearchNames.toLowerCase()
       );
-      const matchesAppointmentNo = patient.AppointmentNo?.toLowerCase().includes(
-        searchParams.AppointmentNo.toLowerCase()
-      );
+      const matchesAppointmentNo =
+        patient.AppointmentNo?.toLowerCase().includes(
+          searchParams.AppointmentNo.toLowerCase()
+        );
 
       return matchesName && matchesAppointmentNo;
     });
@@ -145,8 +140,6 @@ const InsurancePatients = () => {
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };
-
-  
 
   const handleBillingSubmit = (patient) => {
     const invoiceData = {
@@ -161,7 +154,9 @@ const InsurancePatients = () => {
         const byteArrays = [];
         for (let offset = 0; offset < byteCharacters.length; offset += 512) {
           const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = Array.from(slice).map((char) => char.charCodeAt(0));
+          const byteNumbers = Array.from(slice).map((char) =>
+            char.charCodeAt(0)
+          );
           byteArrays.push(new Uint8Array(byteNumbers));
         }
         const blob = new Blob(byteArrays, { type: "application/pdf" });
@@ -176,17 +171,16 @@ const InsurancePatients = () => {
     if (pdfBlob && selectedPatient) {
       // Use the patient's name or fallback to a default name if unavailable
       const patientName = selectedPatient?.Names || "Unknown_Patient";
-      const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, '_');  // Replace spaces with underscores for a valid filename
-  
+      const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, "_"); // Replace spaces with underscores for a valid filename
+
       // Trigger the download
       saveAs(pdfBlob, fileName);
     }
   };
-  
 
   const handlePrint = () => {
     if (pdfBlob) {
-      const printWindow = window.open("", "_blank");  // Open a blank window
+      const printWindow = window.open("", "_blank"); // Open a blank window
       const htmlContent = `
         <html>
           <head><title>Invoice</title></head>
@@ -194,9 +188,9 @@ const InsurancePatients = () => {
             <embed src="${pdfBlob}" width="100%" height="100%" />
           </body>
         </html>`;
-      printWindow.document.write(htmlContent);  // Write the content
-      printWindow.document.close();  // Close the document to ensure it renders
-      printWindow.print();  // Trigger the print
+      printWindow.document.write(htmlContent); // Write the content
+      printWindow.document.close(); // Close the document to ensure it renders
+      printWindow.print(); // Trigger the print
     }
   };
   const outpatientColumns = [
@@ -260,24 +254,45 @@ const InsurancePatients = () => {
         const balance = text !== undefined && text !== null ? text : 0; // Default to 0 if undefined or null
         return `KSh ${balance.toFixed(2)}`;
       },
-    },    
+    },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-                  {/* <Tooltip title="View Details">
-                    <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
-                      View Details
-                    </Button>
-                  </Tooltip> */}
-                  <Tooltip title="Bill and Clear">
-                    <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
-                    Print Invoice
-                    </Button>
-                  </Tooltip>
-                </div>
-      ),
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+           <Menu.Item
+          key="view"
+          icon={<EyeOutlined />}
+          onClick={() => navigate(`/reception/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
+        >
+          View
+        </Menu.Item>
+            <Menu.Item
+              key="edit"
+              icon={<EditOutlined />}
+              onClick={() => console.log("Editing", record)}
+            >
+              Edit
+            </Menu.Item>
+            <Menu.Item
+              key="print"
+              icon={<FilePdfOutlined />}
+              onClick={() => handleBillingSubmit(record)}
+            >
+              Print Invoice
+            </Menu.Item>
+          </Menu>
+        );
+  
+        return (
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <Button>
+             <span className="fw-bold text-primary" style={{ cursor: "pointer", fontSize: "16px"}}> ... </span><DownOutlined />
+            </Button>
+          </Dropdown>
+        );
+      },
     },
   ];
   const inpatientColumns = [
@@ -341,25 +356,45 @@ const InsurancePatients = () => {
         const balance = text !== undefined && text !== null ? text : 0; // Default to 0 if undefined or null
         return `KSh ${balance.toFixed(2)}`;
       },
-    }
-    ,
+    },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-       <div style={{ display: "flex", gap: "8px" }}>
-                 {/* <Tooltip title="View Details">
-                   <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
-                     View Details
-                   </Button>
-                 </Tooltip> */}
-                 <Tooltip title="Bill and Clear">
-                   <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
-                   Print Invoice
-                   </Button>
-                 </Tooltip>
-               </div>
-      ),
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+           <Menu.Item
+          key="view"
+          icon={<EyeOutlined />}
+          onClick={() => navigate(`/reception/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
+        >
+          View
+        </Menu.Item>
+            <Menu.Item
+              key="edit"
+              icon={<EditOutlined />}
+              onClick={() => console.log("Editing", record)}
+            >
+              Edit
+            </Menu.Item>
+            <Menu.Item
+              key="print"
+              icon={<FilePdfOutlined />}
+              onClick={() => handleBillingSubmit(record)}
+            >
+              Print Invoice
+            </Menu.Item>
+          </Menu>
+        );
+  
+        return (
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <Button>
+             <span className="fw-bold text-primary" style={{ cursor: "pointer", fontSize: "16px"}}> ... </span><DownOutlined />
+            </Button>
+          </Dropdown>
+        );
+      },
     },
   ];
 
@@ -410,65 +445,74 @@ const InsurancePatients = () => {
       </Card>
 
       <div className="mt-4">
-      <Tabs defaultActiveKey="1" size="large" type="card">
-        <TabPane tab="Outpatients list" key="1">
-          <Table
-                     rowSelection={rowSelection}
-            columns={outpatientColumns}
-            dataSource={filteredOutpatients.map((patient) => ({
-              ...patient,
-              key: patient.AppointmentNo,
-            }))}
-            pagination={{
-              total: filteredOutpatients.length,
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              onChange: handlePaginationChange,
-            }}
-            bordered
-            size="small"
-          />
-        </TabPane>
-        <TabPane tab="Inpatients list" key="2">
-          <Table
-                     rowSelection={rowSelection}
-
-            columns={inpatientColumns}
-            dataSource={filteredInpatients.map((patient) => ({
-              ...patient,
-              key: patient.AppointmentNo,
-            }))}
-            pagination={{
-              total: filteredInpatients.length,
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              onChange: handlePaginationChange,
-            }}
-            bordered
-            size="small"
-          />
-        </TabPane>
-      </Tabs>
+        <Tabs defaultActiveKey="1" size="large" type="card">
+          <TabPane tab="Outpatients list" key="1">
+            <Table
+              rowSelection={rowSelection}
+              columns={outpatientColumns}
+              dataSource={filteredOutpatients.map((patient) => ({
+                ...patient,
+                key: patient.AppointmentNo,
+              }))}
+              pagination={{
+                total: filteredOutpatients.length,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                onChange: handlePaginationChange,
+              }}
+              bordered
+              size="small"
+            />
+          </TabPane>
+          <TabPane tab="Inpatients list" key="2">
+            <Table
+              rowSelection={rowSelection}
+              columns={inpatientColumns}
+              dataSource={filteredInpatients.map((patient) => ({
+                ...patient,
+                key: patient.AppointmentNo,
+              }))}
+              pagination={{
+                total: filteredInpatients.length,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                onChange: handlePaginationChange,
+              }}
+              bordered
+              size="small"
+            />
+          </TabPane>
+        </Tabs>
       </div>
 
-          {/* Modal for previewing and printing/downloading the PDF */}
-              <Modal
+      {/* Modal for previewing and printing/downloading the PDF */}
+      <Modal
         title={`Invoice for ${selectedPatient?.Names}`}
         visible={billingModalVisible}
         onCancel={() => setBillingModalVisible(false)}
         footer={[
-          <Button type="primary" key="download" onClick={handleDownload}>Download</Button>,
-          <Button type="default" key="print" onClick={handlePrint}>Print</Button>,
-          <Button type="primary" key="close" onClick={() => setBillingModalVisible(false)}>Close</Button>,
+          <Button type="primary" key="download" onClick={handleDownload}>
+            Download
+          </Button>,
+          <Button type="default" key="print" onClick={handlePrint}>
+            Print
+          </Button>,
+          <Button
+            type="primary"
+            key="close"
+            onClick={() => setBillingModalVisible(false)}
+          >
+            Close
+          </Button>,
         ]}
         width={800}
         style={{ top: 20 }}
       >
-        <iframe 
-          src={pdfBlob} 
-          width="100%" 
-          height="600px" 
-          style={{ border: "none" }} 
+        <iframe
+          src={pdfBlob}
+          width="100%"
+          height="600px"
+          style={{ border: "none" }}
           className="iframe-scrollbar"
         ></iframe>
       </Modal>
