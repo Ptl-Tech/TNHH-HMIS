@@ -211,6 +211,7 @@ import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderRed
 import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
 import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
 import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
+import { forwardRadiologyResultsReducer, getSingleRadiologyDetailsReducer, postRadiologyResultsReducer } from "./radiology-reducer/radiologyReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -392,4 +393,9 @@ export const rootReducer = combineReducers({
   printReceipt:postReceiptReducer,
   getTransactionList:getTransactionListReducer,
   getChargesSetup:getChargesSetupReducer,
+
+  // radiology reducers
+  postRadiologyResults: postRadiologyResultsReducer,
+  getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,
+  forwardRadiologyResults: forwardRadiologyResultsReducer,
 });
