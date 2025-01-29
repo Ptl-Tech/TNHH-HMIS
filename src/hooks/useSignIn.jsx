@@ -60,7 +60,7 @@ const useSignIn = () => {
 
   // After OTP verification, navigate based on user role
   useEffect(() => {
-    if (verifyOtpUserInfo?.userData) {
+    if (verifyOtpUserInfo?.clear) {
       setOtp(''); // Clear OTP input
       setIsOtpRequired(false); // Hide OTP modal
 
