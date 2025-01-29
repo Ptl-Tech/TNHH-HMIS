@@ -57,7 +57,6 @@ const useSignIn = () => {
       setIsOtpRequired(false);
     }
   }, [userInfo?.sessionToken, verifyOtpSuccess]);
-  // console.log(role)
 
   // After OTP verification, navigate based on user role
   useEffect(() => {
@@ -66,8 +65,6 @@ const useSignIn = () => {
       setIsOtpRequired(false); // Hide OTP modal
 
       const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log('Role: ', role);
-
       if (role === 'Reception') {
         navigate('/reception');
       } else if (role === 'Doctor') {
@@ -78,10 +75,8 @@ const useSignIn = () => {
         navigate('/Nurse');
       } else if (role === 'Psychology') {
         navigate('/Psychology');
-      } else if (role === 'Radiology') {
+      } else if (role === 'RADIOLOGY') {
         navigate('/Radiology');
-      } else if (role === 'Pharmacy'){
-        navigate('/Pharmacy')
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);

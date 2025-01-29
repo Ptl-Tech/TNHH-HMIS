@@ -575,7 +575,7 @@ function App() {
           />
         </Route>
       </Route>
-      <Route element={<PrivateRoute allowedDepartments={['Radiology']} />}>
+      <Route element={<PrivateRoute allowedDepartments={['RADIOLOGY']} />}>
         <Route
           path="/Radiology"
           element={<MainLayout />}

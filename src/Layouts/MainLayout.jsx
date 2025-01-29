@@ -606,7 +606,7 @@ const MainLayout = () => {
       setMenuItems(securityRoutes);
     } else if (department === 'Psychology') {
       setMenuItems(psychologyRoutes);
-    } else if (department === 'Radiology') {
+    } else if (department === 'RADIOLOGY') {
       setMenuItems(radiologyRoutes);
     } else if (department === "Pharmacy") {
       setMenuItems(pharmacyRoutes);
