@@ -206,6 +206,7 @@ import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
+import { getNursingCarePlanReducer, postNursingCarePlanReducer } from "./nurse-reducers/postNursingCarePlanFormReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -381,4 +382,6 @@ export const rootReducer = combineReducers({
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
   postPsychologyRequest:postPsychologyRequestReducer,
   getReceiptHeaders:getReceiptPgHeadersReducer,
+  postNursingCarePlan:postNursingCarePlanReducer,
+  getNursingCarePlan:getNursingCarePlanReducer,
 });
