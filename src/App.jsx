@@ -85,6 +85,8 @@ import ConsultationRoomPatients from './pages/doctorsViews/tables/ConsultationRo
 import WalkInPatientList from './pages/WalkInPatientList';
 import WalkinRegistration from './pages/WalkinRegistration';
 import RadiologyDashboard from './Dashboards/RadiologyDashboard';
+import ViewInvoice from './pages/billing/ViewInvoice';
+import ActiveOutPatients from './pages/billing/ActiveOutPatients';
 
 function App() {
   return (
@@ -317,8 +319,8 @@ function App() {
           />
 
           <Route
-            path="/reception/cash-List"
-            element={<CashPatients />}
+            path="/reception/Billing/Outpatients"
+            element={<ActiveOutPatients />}
           />
           <Route
             path="/reception/insurance-List"
@@ -338,6 +340,10 @@ function App() {
           <Route
             path="/reception/create-visit/:patientNo"
             element={<CreateVisitForm />}
+          />
+           <Route
+            path="/reception/invoice/:ReceiptNo"
+            element={<ViewInvoice />}
           />
         </Route>
       </Route>

@@ -103,7 +103,7 @@ const MainLayout = () => {
         label: 'Billing',
         children: [
           {
-            key: '/reception/cash-List',
+            key: '/reception/Billing/Outpatients',
             label: 'Cash Patients',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },

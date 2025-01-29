@@ -206,6 +206,11 @@ import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
+import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
+import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderReducer";
+import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
+import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
+import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -381,4 +386,10 @@ export const rootReducer = combineReducers({
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
   postPsychologyRequest:postPsychologyRequestReducer,
   getReceiptHeaders:getReceiptPgHeadersReducer,
+  getReceiptLines:getReceiptLinesReducer,
+  getReceiptHeaderLines:getReceiptHeaderReducer,
+  postReceipt:postReceiptHeaderReducer,
+  printReceipt:postReceiptReducer,
+  getTransactionList:getTransactionListReducer,
+  getChargesSetup:getChargesSetupReducer,
 });
