@@ -8,6 +8,7 @@ import {
   Select,
   message,
   Tag,
+  Modal
 } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +43,9 @@ const LabResults = () => {
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [iframeSrc, setIframeSrc] = useState("");
+  const [noResultsMessage, setNoResultsMessage] = useState(false);
   const { data: labTestSetupData } = useSelector(
     (state) => state.getlabRequestSetup
   );
@@ -49,6 +53,7 @@ const LabResults = () => {
     (state) => state.postLabRequest
   );
   const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
+  console.log('patient lab test', patientLabTest)
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
@@ -103,6 +108,15 @@ const LabResults = () => {
       showForm(false);
     });
   };
+  const handleViewResults = (record) => {
+    if (record.Results) {
+      setIframeSrc(record.Results); // Assuming `Results` contains the iframe source URL.
+      setNoResultsMessage(false);
+    } else {
+      setNoResultsMessage(true);
+    }
+    setModalVisible(true);
+  };
 
   const columns = [
     {
@@ -154,6 +168,19 @@ const LabResults = () => {
       title: "Results",
       dataIndex: "Results",
       key: "Results",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleViewResults(record)}
+          icon={<FileTextOutlined />}
+        >
+          View Results
+        </Button>
+      ),
     },
   ];
   
@@ -233,12 +260,32 @@ const LabResults = () => {
       
 
       {!showForm ? (
+          <>
            <RowSelectionTable
            columns={columns}
            dataSource={dataSource}
            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
            tableProps={{ scroll: { x: 600 } }} // Additional Table props
          />
+         <Modal
+         title="Lab Test Results"
+         visible={modalVisible}
+         onCancel={() => setModalVisible(false)}
+         footer={null}
+         width={800}
+         bodyStyle={{ padding: "16px", textAlign: "center" }}
+       >
+         {noResultsMessage ? (
+           <Typography.Text type="danger">No Results to View</Typography.Text>
+         ) : (
+           <iframe
+             src={iframeSrc}
+             title="Lab Test Results"
+             style={{ width: "100%", height: "500px", border: "none" }}
+           />
+         )}
+       </Modal>
+          </>
       ) : (
         <Form layout="vertical" autoComplete="off">
           <Row gutter={24}>

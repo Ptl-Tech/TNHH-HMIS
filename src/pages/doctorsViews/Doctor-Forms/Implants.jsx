@@ -56,7 +56,9 @@ import useAuth from "../../../hooks/useAuth";
             Implant Request
         </Typography.Title>
         </div>
-        <div style={{ display: "flex", gap: "10px"}}>
+        {
+          role === "Doctor" && (
+            <div style={{ display: "flex", gap: "10px"}}>
         
             <Button
             type="primary"
@@ -67,6 +69,8 @@ import useAuth from "../../../hooks/useAuth";
             </Button>
                 
         </div>
+          )
+        }
         </div>
   
         {!showForm ? (
@@ -74,7 +78,7 @@ import useAuth from "../../../hooks/useAuth";
             loadingKetamine={loadingKetamine} 
             data={data} 
             treatmentNo={treatmentNo}
-            admissionNo={admissionNo}
+            patientNo={patientNo}
           />
         ) : (
           <ImplantFormData 

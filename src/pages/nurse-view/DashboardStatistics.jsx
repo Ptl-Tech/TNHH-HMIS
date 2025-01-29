@@ -66,9 +66,9 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                 >
                   {userDetails?.userData?.firstName}
                 </Typography.Title>
-                <Typography.Text style={{ fontSize: "14px", color: "gray" }}>
+                {/* <Typography.Text style={{ fontSize: "14px", color: "gray" }}>
                   Registered {userDetails?.userData?.departmentName || "N/A"}
-                </Typography.Text>
+                </Typography.Text> */}
               </div>
             </div>
             <Divider />
@@ -192,29 +192,7 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
                       </div>
                     </div>
                   </>
-                ) : (
-                  <>
-                    <Typography.Title
-                      level={5}
-                      style={{
-                        fontSize: "14px",
-                        color: "black",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Ward
-                    </Typography.Title>
-                    <Typography.Text
-                      style={{
-                        fontSize: "12px",
-                        color: "gray",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Simon Wing Ward
-                    </Typography.Text>
-                  </>
-                )}
+                ) : ''}
               </div>
             </Space>
           </Card>
@@ -283,5 +261,5 @@ DashboardStatistics.propTypes = {
       departmentName: PropTypes.string.isRequired,
     }),
   }),
-  chartData: PropTypes.object.isRequired,
+  chartData: PropTypes.array.isRequired,
 };

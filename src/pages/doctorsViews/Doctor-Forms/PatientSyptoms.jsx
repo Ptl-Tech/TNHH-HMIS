@@ -96,7 +96,7 @@ console.log("Extracted PatientNo:", patientNo); // Check the extracted value
           message.error("Failed to save some notes");
         }
       }
-      if (currentStep === steps.length - 1) {
+      if (currentStep >= categories.length - 1 || currentStep === categories.length) {
         // Trigger the parent callback to move to the next tab if this is the last step
         moveToNextTab();
       } else {

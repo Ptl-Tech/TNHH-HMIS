@@ -432,9 +432,15 @@ const PatientRegistration = () => {
           message.success("New patient saved successfully.");
         }
 
+       //check if the patient number has an active visit
         const isActivated = patientListPayload?.some(
-          (existingPatient) => existingPatient.Activated
+          (existingPatient) =>
+            existingPatient.PatientNo === patientNumber && existingPatient.Activated===true ||
+            existingPatient.PatientNo === response.patientNo && existingPatient.Activated
         );
+
+        //
+
         if (isActivated === true) {
           message.info("Patient already has an active visit");
           return;
@@ -442,7 +448,7 @@ const PatientRegistration = () => {
           // Navigate to Add Appointment page and pass patientId
 
           const patientId = response.patientNo;
-          navigate(`/reception/Add-Appointment/${patientId}`, {
+          navigate(`/reception/Add-Appointment/Patient?PatientNo=${patientId}`, {
             state: { patientData },
           });
         }
@@ -1069,14 +1075,16 @@ const PatientRegistration = () => {
                   <Select
                     placeholder="Select Payment Mode"
                     className="w-100"
+                    name="paymentMode"
                     value={
                       newPatient.paymentMode ||
-                      patientDet?.PatientType === "Corporate"
+                      (patientDet?.PatientType === "Corporate"
                         ? "1"
                         : patientDet?.PatientType === "Cash"
                         ? "2"
-                        : ""
+                        : "")
                     }
+                    
                     onChange={(value) =>
                       handleSelectChange("paymentMode", value)
                     }

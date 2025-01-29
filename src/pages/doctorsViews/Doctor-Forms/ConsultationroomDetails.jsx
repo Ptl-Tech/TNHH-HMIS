@@ -63,7 +63,7 @@ const ConsultationroomDetails = ({
             treatmentNo={treatmentNo}
             patientNo={patientNo}
             moveToNextTab={() =>
-              handleOnClick({ label: "Past Medical History" })
+              handleOnClick({ label: "Diagnosis Formulation" })
             }
           />
         );

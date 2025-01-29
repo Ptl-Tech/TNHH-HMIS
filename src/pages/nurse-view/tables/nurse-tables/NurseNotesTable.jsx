@@ -10,18 +10,20 @@ const NurseNotesTable = ({ observationNotes, loadingTriageList }) => {
       dataIndex: 'TreatmentNo', 
       key: 'TreatmentNo',
       fixed: 'left',
-      width: 100
+      width: 150
     },
     {
-      title: 'Notes Date',
+      title: 'Notes Type',
       dataIndex: 'LinkType', 
       key: 'LinkType',
       render: (text) => text?.toLowerCase(),
+      width: 150
     },
     {
       title: 'Notes Date',
       dataIndex: 'ObservationDate', 
       key: 'ObservationDate',
+      width: 150
     },
     {
       title: 'Notes',

@@ -24,11 +24,7 @@ export const postJacksonVisualFormSlice = (endpoint = '/InpatientForms/JacksonVi
     
         dispatch({
             type: POST_JACKSON_VISUAL_FORM_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_JACKSON_VISUAL_FORM_FAILURE, payload: error };

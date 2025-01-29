@@ -7,7 +7,26 @@ import {
   POST_ARCHIVE_PRESCRIPTION_SUCCESS,
   POST_ARCHIVE_PRESCRIPTION_FAILURE,
   POST_ARCHIVE_PRESCRIPTION_RESET,
+  POST_EDIT_PRESCRIPTION_REQUEST,
+  POST_EDIT_PRESCRIPTION_SUCCESS,
+  POST_EDIT_PRESCRIPTION_FAILURE,
+  POST_EDIT_PRESCRIPTION_RESET,
 } from "../../actions/pharmacy-actions/postPharmacyAction";
+
+export const postPrescriptionQuantityReducer = (state = { loading: false }, action) => {
+  switch (action.type) {
+    case POST_EDIT_PRESCRIPTION_REQUEST:
+      return { ...state, loading: true };
+    case POST_EDIT_PRESCRIPTION_SUCCESS:
+      return { ...state, loading: false, success: true, data: action.payload };
+    case POST_EDIT_PRESCRIPTION_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+    case POST_EDIT_PRESCRIPTION_RESET:
+      return { loading: false };
+    default:
+      return state;
+  }
+};
 
 export const postDrugIssuanceReducer = (state = { loading: false }, action) => {
   switch (action.type) {

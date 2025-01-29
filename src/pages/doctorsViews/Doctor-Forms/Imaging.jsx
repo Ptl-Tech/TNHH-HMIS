@@ -9,6 +9,8 @@ import {
   Select,
   message,
   Tag,
+  Space,
+  Modal
 } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -30,14 +32,17 @@ const Imaging = () => {
   const role = useAuth().userData.departmentName
 
   const dispatch = useDispatch();
-  const [showForm, setShowForm] = useState(true);
+  const [showForm, setShowForm] = useState(false);
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [iframeSrc, setIframeSrc] = useState("");
+  const [noResultsMessage, setNoResultsMessage] = useState(false);
   const { data: radiologySetupData } = useSelector((state) => state.getRadiologySetup);
   const { data: radiologyData } = useSelector((state) => state.patientRadiologyTest);
   const { loading: requestingTest } = useSelector(
     (state) => state.requestRadiologyTest
   );
+  console.log('radiologyData', radiologyData);
   useEffect(() => {
     dispatch(getRadiologySetup());
     if (treatmentNo) {
@@ -66,7 +71,6 @@ const Imaging = () => {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
 
       if (response && response.status === 'success') {
-        message.success(`Laboratory request was successful`);
         dispatch(getPatientRadiologyTest(formTreatmentNo));
       } else {
         message.error('Failed to submit radiology request');
@@ -88,6 +92,17 @@ const Imaging = () => {
       message.error('No Request selected');
     }
   };
+
+  const handleViewResults = (record) => {
+    if (record.Results) {
+      setIframeSrc(record.Results); // Assuming `Results` contains the iframe source URL.
+      setNoResultsMessage(false);
+    } else {
+      setNoResultsMessage(true);
+    }
+    setModalVisible(true);
+  };
+
 
 
   const columns = [
@@ -131,6 +146,20 @@ const Imaging = () => {
         return <Tag color={statusColors[text?.toLowerCase()]} >{text}</Tag>;
       },
     },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          onClick={() => handleViewResults(record)}
+          icon={<FileTextOutlined />}
+        >
+          View Results
+        </Button>
+      ),
+    },
+  
   ];
 
   const dataSource = Array.isArray(radiologyData)
@@ -140,7 +169,6 @@ const Imaging = () => {
       Treatment: key.TreatmentNo,
     }));
 
-  console.log("dateme", dataSource);
   return (
     <div>
       <Typography.Title level={5} style={{ marginBottom: "12px" }}>
@@ -149,7 +177,7 @@ const Imaging = () => {
       </Typography.Title>
 
       {
-        role === 'Doctor' ? (
+        role === 'Doctor' && (
           <div className="d-flex justify-content-between my-4">
         {!showForm &&
           <Button
@@ -174,12 +202,39 @@ const Imaging = () => {
         </Button>
 
       </div>
-        ) : (
-          null
-        )
+      )
+      
       }
+      
 
-      {showForm ? (
+      {!showForm ? (
+          <>
+          <RowSelectionTable
+            dataSource={dataSource}
+            columns={columns}
+            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
+            tableProps={{ scroll: { x: 600 } }} // Additional Table props
+          />
+          <Modal
+          title="Radiology Test Results"
+          visible={modalVisible}
+          onCancel={() => setModalVisible(false)}
+          footer={null}
+          width={800}
+          bodyStyle={{ padding: "16px", textAlign: "center" }}
+        >
+          {noResultsMessage ? (
+            <Typography.Text type="danger">No Results to View</Typography.Text>
+          ) : (
+            <iframe
+              src={iframeSrc}
+              title="Lab Test Results"
+              style={{ width: "100%", height: "500px", border: "none" }}
+            />
+          )}
+        </Modal>
+        </>
+      ) : (
         <Form
           layout="vertical"
           initialValues={{
@@ -235,16 +290,9 @@ const Imaging = () => {
           </Row>
 
           <Button type="primary" htmlType="submit" style={{ marginTop: "16px" }}>
-            Save Radiology Request
+            Save Radiology Request 
           </Button>
         </Form>
-      ) : (
-        <RowSelectionTable
-          dataSource={dataSource}
-          columns={columns}
-          onRowSelect={(row) => setSelectedRow(row)} // Update selected row
-          tableProps={{ scroll: { x: 600 } }} // Additional Table props
-        />
       )}
     </div>
   );

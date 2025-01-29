@@ -1,50 +1,50 @@
-import { Card, Tabs } from 'antd'
-import PatientFile from './PatientFile'
-import CarePlan from './CarePlan'
-import Requests from './Requests'
-import Discharges from './Discharges'
-import PropTypes from 'prop-types'
-import useAuth from '../../hooks/useAuth'
+import { Card, Tabs } from "antd";
+import PatientFile from "./PatientFile";
+import CarePlan from "./CarePlan";
+import Requests from "./Requests";
+import Discharges from "./Discharges";
+import PropTypes from "prop-types";
+import useAuth from "../../hooks/useAuth";
 
 const InpatientCardContent = () => {
-    const role =useAuth().userData.departmentName
+  const role = useAuth().userData.departmentName;
   return (
     <>
-        <Card className="card">
-            <Tabs 
-            defaultActiveKey="1"
-            type="card"
-            >
-                <Tabs.TabPane tab="Patient File" key="1">
-                    <PatientFile />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab={role === "Nurse" ? "Nursing Tool" : "Daily Review"} key="2">
-                    <CarePlan />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Requests" key="3">
-                    <Requests />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Discharge" key="4">
-                    <Discharges/>
-                </Tabs.TabPane>
-                {/* {
+      <Card className="card">
+        <Tabs defaultActiveKey="1" type="card">
+          <Tabs.TabPane tab="Patient File" key="1">
+            <PatientFile />
+          </Tabs.TabPane>
+          <Tabs.TabPane
+            tab={role === "Nurse" ? "Nursing Tool" : "Daily Review"}
+            key="2"
+          >
+            <CarePlan />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Requests" key="3">
+            <Requests />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Discharge" key="4">
+            <Discharges />
+          </Tabs.TabPane>
+          {/* {
                     role === "Doctor" &&
                     <Tabs.TabPane tab=" OutPatient Notes" key="6">
                         <Discharges/>
                     </Tabs.TabPane>
                 } */}
-                {/* <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : ""} key="5">
+          {/* <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : ""} key="5">
                     <NurseForms/>
                 </Tabs.TabPane> */}
-            </Tabs>
-        </Card>
+        </Tabs>
+      </Card>
     </>
-  )
-}
+  );
+};
 
-export default InpatientCardContent
+export default InpatientCardContent;
 //props validation
 InpatientCardContent.propTypes = {
-    filterAllergies: PropTypes.array,
-    loadingAllergies: PropTypes.bool
-}
+  filterAllergies: PropTypes.array,
+  loadingAllergies: PropTypes.bool,
+};

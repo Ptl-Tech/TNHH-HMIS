@@ -34,13 +34,13 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
       // Construct the visitor data
       const consumableData = {
         myAction: "create",
-        admissionNo: patientDetails?.CurrentAdmNo,
+        admissionNo: patientDetails?.Admission_No,
         recId: "",
         location,
         quantity,
         remarks,
         item,
-        documentNo: patientDetails?.CurrentAdmNo,
+        documentNo: patientDetails?.Admission_No,
         branchCode: branchCode,
         staffNo: userDetails.userData.no,
       };
@@ -101,7 +101,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
         form={form}
         onFinish={handleOnFinish}
         initialValues={{
-          location: "",
+          location: undefined,
           quantity: "",
           remarks: "",
         }}
@@ -216,6 +216,6 @@ export default ConsumablesFormData;
 
 // props validation
 ConsumablesFormData.propTypes = {
-  setIsConsumableFormVisible: PropTypes.bool.isRequired,
+  setIsConsumableFormVisible: PropTypes.bool,
   setConsumablesFormData: PropTypes.array.isRequired,
 };

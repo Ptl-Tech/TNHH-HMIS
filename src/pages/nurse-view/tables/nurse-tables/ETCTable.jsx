@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { listDoctors } from "../../../../actions/DropdownListActions";
 
 
-const ETCTable = ({ loadingETC, data, treatmentNo, admissionNo }) => {
+const ETCTable = ({ loadingETC, data, treatmentNo,patientNo }) => {
   const dispatch = useDispatch();
   const [updatedData, setUpdatedData] = useState([]);
 
@@ -31,10 +31,8 @@ const ETCTable = ({ loadingETC, data, treatmentNo, admissionNo }) => {
     }
   }, [doctors, data]);
 
-  console.log('doctorMap', updatedData);
-
   const filterData = updatedData?.filter((item) => 
-    treatmentNo ? item?.Link_No === treatmentNo : item?.Link_No === admissionNo
+    treatmentNo ? item?.Link_No === treatmentNo : item?.Patient_No === patientNo
   );
     const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
 
@@ -114,5 +112,5 @@ ETCTable.propTypes = {
     loadingETC: PropTypes.bool.isRequired,
     data: PropTypes.array.isRequired,
     treatmentNo: PropTypes.string.isRequired,
-    admissionNo: PropTypes.string
+    patientNo: PropTypes.string,
 }

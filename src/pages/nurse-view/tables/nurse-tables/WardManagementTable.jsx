@@ -1,7 +1,8 @@
-import { Table, Tag } from "antd";
+import { Space, Table, Tag, Typography } from "antd";
 import PropTypes from "prop-types";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { useState } from "react";
+import {InsertRowBelowOutlined} from "@ant-design/icons"
 
 const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
    
@@ -31,7 +32,6 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
             dataIndex: 'status',
             key: 'status',
             render: (_, text) => {
-                console.log('text', text);
                 if (text.Occupied == true) {
                   return <Tag color="#f50">Occupied</Tag>;
                 } else if (text.Occupied == false) {
@@ -66,6 +66,27 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
         dataSource={filteredBeds} 
         rowSelection={rowSelection}
         bordered size='middle' 
+        locale={{
+            emptyText: (
+              <Space
+                direction="vertical"
+                size={2} // Adjust vertical spacing between items
+                style={{ textAlign: "center", marginTop: "20px", marginBottom: "20px" }}
+              >
+                <InsertRowBelowOutlined
+                  style={{
+                    fontSize: 48,
+                    color: "#0f5689",
+                    marginBottom: 20,
+                    fontWeight: "normal",
+                  }}
+                />
+                <Typography.Text type="secondary" style={{ fontSize: 16 }}>
+                  Beds will apperar after you select room on the left side of the pane!
+                </Typography.Text>
+              </Space>
+            ),
+          }}
               pagination={{
                 ...pagination,
                 total: filteredBeds?.length,

@@ -10,7 +10,8 @@ const NurseInnerHeader = ({ filterInPatients, icon, title }) => {
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          paddingBottom: "10px",
+          paddingBottom: "20px",
+          marginBottom: "20px",
           position: "relative",
         }}
       >
@@ -68,5 +69,5 @@ export default NurseInnerHeader
 NurseInnerHeader.propTypes = {
   filterInPatients: PropTypes.array,
   title: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired
+  icon: PropTypes.string
 };

@@ -13,13 +13,20 @@ const BriefMentalStateExaminationForm = () => {
     <>
         <NurseInnerHeader icon={<FileOutlined />} title="Brief Mental Status Exam Form"  />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-
-            <Button type="primary" style={{ width: '100%' }} onClick={handleButtonVisibility}><PlusOutlined /> New Brief MSE form
-            </Button>
-            <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-                View Brief MSE form
-            </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px'}}>
+            
+        {
+            !isFormVisible && (
+                <>
+                    <Button type="primary" onClick={handleButtonVisibility}><PlusOutlined /> New Brief MSE form
+                    </Button>
+                    <Button color="default" variant="outlined"><FolderViewOutlined />
+                    View Brief MSE form
+                    </Button>
+                </>
+            )
+        }
+            
         </div>
 
         {

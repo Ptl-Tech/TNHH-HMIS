@@ -1,4 +1,4 @@
-import { Table } from "antd";
+import { Badge, Table } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -8,6 +8,7 @@ import Loading from "../../../partials/nurse-partials/Loading";
 import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
 import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import {
+  getUrgencyColorcode,
   rowClassName,
 } from "../../../utils/helpers";
 import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
@@ -105,15 +106,18 @@ const CloseList = () => {
       onFilter: (value, record) =>
         record?.TreatmentNo ?
         record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
-      render: (text) => (
-        <span
-          onClick={() => handleNavigate(text, text.TreatmentNo)}
-          className="fw-bold"
-          style={{ color: "green" }}
-        >
-          {text}
-        </span>
-      ),
+        render: (_, record) => {
+          const { color } = getUrgencyColorcode(record.UrgencyStatus);
+          return (
+            <span
+              onClick={() => handleNavigate(record, record.treatmentNo)}
+              className="fw-bold"
+              style={{ color: color }}
+            >
+              {record.TreatmentNo}
+            </span>
+          )
+        },
     },
     {
       title: "Patient Name",
@@ -182,22 +186,22 @@ const CloseList = () => {
       },
     },
 
-    // {
-    //   title: "Urgency",
-    //   dataIndex: "urgency",
-    //   key: "urgency",
-    //   render: (_, record) => {
-    //     const { color, text } = getUrgencyColorcode(record.urgency);
-    //     return (
-    //       <Badge
-    //         color={color}
-    //         text={text} // Display urgency text
-    //         style={{ color: color }}
-    //       />
-    //     );
-    //   },
-    // },
     {
+      title: "Urgency",
+      dataIndex: "urgency",
+      key: "urgency",
+      render: (_, record) => {
+        const { color, text } = getUrgencyColorcode(record.UrgencyStatus);
+        return (
+          <Badge
+            color={color}
+            text={text} // Display urgency text
+            style={{ color: color }}
+          />
+        );
+      },
+    },
+    /* {
       title: "Completion Status",
       dataIndex: "UrgencyStatus",
       key: "UrgencyStatus",
@@ -206,7 +210,7 @@ const CloseList = () => {
           return <span className="fw-bold text-danger">Completed </span>;
         }
       },
-    },
+    }, */
     /* {
       title: "Check In",
       key: "checkIn",

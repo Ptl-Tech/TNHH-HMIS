@@ -12,7 +12,7 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
   const [selectedRow, setSelectedRow] = useState([]);
 
   const rowSelection = {
-    type: "checkbox", // Use checkboxes for selection
+    type: "radio", // Use checkboxes for selection
     selectedRowKeys: selectedRow.length ? [selectedRow[0]?.key] : [],
     onChange: (selectedRowKeys, selectedRows) => {
       if (selectedRows.length > 1) {

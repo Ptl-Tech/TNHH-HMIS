@@ -6,23 +6,25 @@ import PropTypes from "prop-types";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import jacksonVisualImage from "../../../assets/images/jackson-visual-form.jpg";
 
-const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loadingJackson }) => {
+const JacksonVisualFormData = ({ patientDetails, setIsFormVisible, loadingJackson }) => {
     const dispatch = useDispatch();
+    const [form] = Form.useForm();
     const handleOnFinish = async (values) => {
+      
         try {
-          const { score, iv_line, date } = values;
+          const { score, iv_line } = values;
       
           // Construct the visitor data
           const jacksonData = {
             myAction:"create",
             admissionNo: patientDetails?.Admission_No,
             score,
-            date: date.format('YYYY-MM-DD'),
             ivLine: iv_line
           };
       
           // Dispatch function to handle API call and feedback
           const dispatchJacksonVisualFormData = async (data) => {
+            console.log('Jackson visual data', data);
             await dispatch(postJacksonVisualFormSlice('/InpatientForms/JacksonVisualForm', data))
               .then((result) => {
                 if (result.type === POST_JACKSON_VISUAL_FORM_SUCCESS) {
@@ -55,11 +57,10 @@ const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loading
                 <Form
                 onFinish={handleOnFinish}
                 layout="vertical" 
-                style={{ paddingTop: '10px'}} 
                 form={form}
                 initialValues={{
                 score: '',
-                iv_line: '',
+                iv_line: undefined,
                 }}
                 >          
                 <Form.Item 
@@ -89,14 +90,14 @@ const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loading
                 },
                 ]}
                 >
-                <Select
-                placeholder="Select IV Line"
-                >
-                <Select.Option value="1">Insertion</Select.Option>
-                <Select.Option value="2">Removal</Select.Option>
-                </Select>
+                  <Select 
+                      placeholder="Select IV Line"
+                      options={[
+                        { value: '1', label: 'Insertion' },
+                        { value: '2', label: 'Removal' },
+                      ]}
+                  />
                 </Form.Item>
-                </Form>
                 <Form.Item>
                 <Space>
                     <Button type="primary" 
@@ -115,6 +116,7 @@ const JacksonVisualFormData = ({ form, patientDetails, setIsFormVisible, loading
                 </Space>
                 
             </Form.Item>
+            </Form>
             </Col>
             <Col span={12}>
                 <Image 
@@ -134,6 +136,6 @@ export default JacksonVisualFormData
 JacksonVisualFormData.propTypes = {
     form: PropTypes.object.isRequired,
     patientDetails: PropTypes.array.isRequired,
-    setIsFormVisible: PropTypes.bool.isRequired,
+    setIsFormVisible: PropTypes.bool,
     loadingJackson: PropTypes.bool.isRequired
 }

@@ -135,6 +135,7 @@ import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmac
 import {
   postArchivePrescriptionReducer,
   postDrugIssuanceReducer,
+  postPrescriptionQuantityReducer,
 } from "./pharmacy-reducers/postPharmacyReducers";
 import {
   getPatientPharmacyReturnLinesReducer,
@@ -204,6 +205,7 @@ import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPati
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
+import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -349,6 +351,7 @@ export const rootReducer = combineReducers({
   getReferralLines: getReferralLinesReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,
   postDrugIssuance: postDrugIssuanceReducer,
+  postPrescriptionQuantity: postPrescriptionQuantityReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
   getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
@@ -376,5 +379,6 @@ export const rootReducer = combineReducers({
   createWalkInPatient:createWalkInPatientReducer,
   dispatchWalkInLab:dispatchWalkInLabReducer,
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
-  postPsychologyRequest:postPsychologyRequestReducer
+  postPsychologyRequest:postPsychologyRequestReducer,
+  getReceiptHeaders:getReceiptPgHeadersReducer,
 });

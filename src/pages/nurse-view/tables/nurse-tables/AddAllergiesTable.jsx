@@ -53,7 +53,7 @@ const AddAllergiesTable = ({ rowSelection, filterAllergies, loadingAllergies, lo
             scroll={{ x: 'max-content' }}
             columns={columns} 
             dataSource={filterAllergies} 
-            rowSelection={rowSelection}
+            // rowSelection={rowSelection}
             bordered size='middle' 
                 pagination={{
                 ...pagination,

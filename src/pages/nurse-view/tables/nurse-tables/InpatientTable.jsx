@@ -109,7 +109,6 @@ const InpatientTable = ({ loadingPatientList, handleNavigate, filterInPatients, 
 
       const navigate = useNavigate();
       const handleClick = (record) => {
-        console.log('records from the table', record)
         record?.Patient_No && navigate(`/Nurse/Admit-patient/Patient?PatientNo=${record?.Patient_No}`, {
           state: { patientDetails: record }
         });

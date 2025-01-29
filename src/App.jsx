@@ -19,7 +19,7 @@ import HistoryVisitorList from './pages/HistoryVisitorList';
 import ActiveAppmnts from './pages/ActiveAppmnts';
 import CashPatients from './pages/CashPatients';
 import InsurancePatients from './pages/InsurancePatients';
-import AdmitPatient from './pages/nurse-view/AdmitPatient';
+import AdmitPatient from './pages/nurse-view/forms/nurse-forms/AdmitPatient';
 import PatientCharges from './pages/nurse-view/PatientCharges';
 import ReleaseBed from './pages/nurse-view/ReleaseBed';
 import TransferBed from './pages/nurse-view/TransferBed ';
@@ -575,7 +575,7 @@ function App() {
           />
         </Route>
       </Route>
-      <Route element={<PrivateRoute allowedDepartments={['RADIOLOGY']} />}>
+      <Route element={<PrivateRoute allowedDepartments={['Radiology']} />}>
         <Route
           path="/Radiology"
           element={<MainLayout />}
@@ -611,6 +611,19 @@ function App() {
             path="/Security/History-list"
             element={<HistoryVisitorList />}
           />
+        </Route>
+      </Route>
+      
+      <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
+        <Route path="/Pharmacy" element={<MainLayout />}>
+          <Route index element={<PhamarcyDashboard />} />
+          <Route path="/Pharmacy/Pharmacy-OutPatient" element={<PhamarcyOutpatient />} />
+          <Route path="/Pharmacy/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
+          <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />
+          <Route path="/Pharmacy/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
+          <Route path="/Pharmacy/Pharmacy-History" element={<PharmacyHistoryList />} />
+          {/* <Route path="/Pharmacy/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} /> */}
+          <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
 

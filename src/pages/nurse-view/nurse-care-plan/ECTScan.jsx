@@ -34,6 +34,8 @@ const ECTScan = () => {
       );
       const { loading: loadingDoctors, data: doctors } = useSelector(state => state.getDoctorsList)
 
+      console.log('Etc form data', data)
+
   useEffect(() => {
     dispatch(getPatientECTRequest())
   }, [dispatch])
@@ -64,7 +66,7 @@ const ECTScan = () => {
               onClick={() => setShowForm(!showForm)}
               icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
             >
-              {!showForm ? " New ETC Request" : "View ETC Requests"}
+              {!showForm ? " New ECT Request" : "View ECT Requests"}
             </Button>
              
           </div>
@@ -74,6 +76,7 @@ const ECTScan = () => {
 
       {!showForm ? (
         <ETCTable 
+        patientNo={patientNo}
         loadingETC={loadingETC} 
         data={data} 
         admissionNo={admissionNo}
