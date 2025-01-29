@@ -206,6 +206,7 @@ import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
+import { forwardRadiologyResultsReducer, getSingleRadiologyDetailsReducer, postRadiologyResultsReducer } from "./radiology-reducer/radiologyReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -381,4 +382,9 @@ export const rootReducer = combineReducers({
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
   postPsychologyRequest:postPsychologyRequestReducer,
   getReceiptHeaders:getReceiptPgHeadersReducer,
+
+  // radiology reducers
+  postRadiologyResults: postRadiologyResultsReducer,
+  getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,
+  forwardRadiologyResults: forwardRadiologyResultsReducer,
 });

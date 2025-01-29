@@ -1,10 +1,12 @@
-import { Button, Card, Input, Space, Table, Typography } from 'antd';
-import { ProfileOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { Button, Card, Input, Space, Table, Typography, Select } from 'antd';
+import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { getRadiologyList } from '../../../../actions/Doc-actions/getRadiologyList';
+
+const { Option } = Select;
 
 const RadiologyOutPatients = () => {
   const navigate = useNavigate();
@@ -14,16 +16,23 @@ const RadiologyOutPatients = () => {
       title: 'Radiology No',
       dataIndex: 'RadiologyNo',
       key: 'RadiologyNo',
+      sorter: (a, b) => a.RadiologyNo.localeCompare(b.RadiologyNo),
     },
     {
       title: 'Patient No',
       dataIndex: 'PatientNo',
       key: 'PatientNo',
+      sorter: (a, b) => a.PatientNo.localeCompare(b.PatientNo),
     },
     {
       title: 'Patient Names',
       dataIndex: 'names',
       key: 'names',
+      sorter: (a, b) => {
+        const nameA = `${a.Surname} ${a.MiddleName} ${a.LastName}`.toLowerCase();
+        const nameB = `${b.Surname} ${b.MiddleName} ${b.LastName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      },
       render: (_, record) => {
         return (
           <Button
@@ -36,16 +45,17 @@ const RadiologyOutPatients = () => {
         );
       },
     },
-
     {
       title: 'Radiology Date',
       dataIndex: 'RadiologyDate',
       key: 'RadiologyDate',
+      sorter: (a, b) => new Date(a.RadiologyDate) - new Date(b.RadiologyDate),
     },
     {
-      title: 'status',
+      title: 'Status',
       dataIndex: 'Status',
       key: 'Status',
+      sorter: (a, b) => a.Status.localeCompare(b.Status),
       render: (_, record) => {
         let statusColor;
         switch (record.Status) {
@@ -89,6 +99,7 @@ const RadiologyOutPatients = () => {
     },
   ];
 
+
   const dispatch = useDispatch();
 
   const { loading, data } = useSelector((state) => state.getRadiologyList);
@@ -97,7 +108,7 @@ const RadiologyOutPatients = () => {
     if (!data.length) {
       dispatch(getRadiologyList());
     }
-  }, [dispatch]);
+  }, [dispatch, data.length]);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -105,18 +116,36 @@ const RadiologyOutPatients = () => {
     total: data.length,
   });
 
-  const handleNavigate = (record) => {
-    console.log('records from table', record);
+  const [searchCategory, setSearchCategory] = useState('name');
+  const [searchValue, setSearchValue] = useState('');
 
+  const handleNavigate = (record) => {
     navigate({
       pathname: `/Radiology/Radiology-Patient`,
-      search: `?radiologyNo=${record.RadiologyNo}`,
+      search: `?radiologyNo=${record.RadiologyNo}&status=${record.Status}`,
     });
   };
 
   const handleTableChange = (newPagination) => {
-    setPagination(newPagination); // Update pagination settings
+    setPagination(newPagination);
   };
+
+  // Filtered data computation with useMemo
+  const filteredData = useMemo(() => {
+    return data.filter((item) => {
+      if (searchCategory === 'name') {
+        const fullName = `${item.Surname} ${item.MiddleName} ${item.LastName}`.toLowerCase();
+        return fullName.includes(searchValue.toLowerCase());
+      }
+      if (searchCategory === 'patientNo') {
+        return item.PatientNo.toLowerCase().includes(searchValue.toLowerCase());
+      }
+      if (searchCategory === 'radiologyNo') {
+        return item.RadiologyNo?.toLowerCase().includes(searchValue.toLowerCase());
+      }
+      return false;
+    });
+  }, [data, searchCategory, searchValue]);
 
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
@@ -139,30 +168,24 @@ const RadiologyOutPatients = () => {
       </Space>
 
       <Card style={{ padding: '10px 10px 10px 10px' }}>
-        <div className="admit-patient-filter-container">
+        <div className="admit-patient-filter-container" style={{ display: 'flex', gap: '4px', alignItems: 'center', width: "50vw" }}>
+          <Select
+            defaultValue="name"
+            style={{ width: 200 }}
+            onChange={(value) => setSearchCategory(value)}
+          >
+            <Option value="name">Search by Name</Option>
+            <Option value="patientNo">Search by Patient No</Option>
+            <Option value="radiologyNo">Search by Radiology Number</Option>
+          </Select>
           <Input
-            placeholder="search by name"
+            placeholder={`Search by ${searchCategory}`}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             allowClear
-            showCount
-            showSearch
-          />
-          <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>
-            or
-          </span>
-          <Input
-            placeholder="search by patient no"
-            allowClear
-            showCount
-            showSearch
-          />
-          <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>
-            or
-          </span>
-          <Input
-            placeholder="search by id number"
-            allowClear
-            showCount
-            showSearch
+            suffix={
+              <SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
+            }
           />
         </div>
       </Card>
@@ -171,7 +194,7 @@ const RadiologyOutPatients = () => {
       ) : (
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={filteredData}
           className="admit-patient-table"
           bordered
           size="middle"
