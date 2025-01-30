@@ -4,6 +4,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
+import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
 
 const { Text } = Typography;
 
@@ -12,46 +13,44 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
+  const { loading } = useSelector((state) => state.postPatientCharges);
 
-  const [chargesAmount, setChargesAmount] = useState(0);
-  const [transactionType, setTransactionType] = useState("");
+  
+
+  const [selectedCharge, setSelectedCharge] = useState(null);
 
   useEffect(() => {
     dispatch(getTransactionListSetup());
     dispatch(getChargesSetup());
-    console.log(data);
   }, [dispatch]);
 
-  // If transaction type is selected, get the amount
-  useEffect(() => {
-    if (transactionType) {
-      const selectedCharge = charges.find(
-        (item) => item.Transaction_Type === transactionType
-      );
-      setChargesAmount(selectedCharge ? selectedCharge.Amount : 0); // Default to 0 if not found
-    }
-  }, [transactionType, charges]);
+  // If transaction type is selected, get the full charge object
+  const handleTransactionTypeChange = (value) => {
+    const charge = charges.find((item) => item.Transaction_Type === value);
+    setSelectedCharge(charge || null);
+  };
+
+  console.info("Selected visitNo :", visitNo);
 
   const handleSubmit = (values) => {
     const payload = {
-      myAction,            
-      recId,                
-      visitNo,              
-      transactionType: values.transactionType,  
-      charge: transactionType,  
+      myAction:"create",
+      recId:"",
+      visitNo: visitNo || "",
+      transactionType: values.transactionType,
+      charge: selectedCharge ? selectedCharge.Code : "", // Submit charge CODE instead of amount
       quantity: values.quantity,
-      remarks: values.remarks || "",    
+      remarks: values.remarks || "",
     };
-  
+
     console.log("Submitting data:", payload);
-  
-    // dispatch(submitChargeData(payload));
+
+     dispatch(postPatientCharges(payload));
   };
-  
+
   return (
     <Modal
       title={
-        // title and close icon
         <div className="flex justify-between">
           <span className="text-lg font-bold">Add Charges</span>
           <span>
@@ -79,7 +78,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
                 filterOption={(input, option) =>
                   option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
-                onChange={(value) => setTransactionType(value)} // Set transaction type on selection
+                onChange={handleTransactionTypeChange}
               >
                 {data?.map((item) => (
                   <Select.Option key={item.TransactionType} value={item.TransactionType}>
@@ -102,13 +101,12 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              label="Amount"
-              name="charge"
-              initialValue={chargesAmount} 
-              rules={[{ required: true, message: "Please enter amount!" }]}
-            >
-              <Input size="large" type="number" value={chargesAmount} readOnly /> {/* Make the input readonly */}
+            <Form.Item label="Amount">
+              <Input
+                size="large"
+                value={selectedCharge ? selectedCharge.Amount : 0} // Display amount from selected charge
+                readOnly
+              />
             </Form.Item>
           </Col>
         </Row>
