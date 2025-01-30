@@ -6,6 +6,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import AetiologyTable from "../tables/AetiologyTable";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -68,6 +69,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
       };
       await dispatch(postPatientHistoryNotes(payload));
       message.success("Notes saved successfully");
+      dispatch(getPatientHistorySlice(treatmentNo));
     } catch (error) {
       message.error("Failed to save notes");
     }
@@ -123,6 +125,9 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
           Save
         </Button>
       </Form>
+
+      <AetiologyTable data={data}/>
+
     </div>
   );
 };
