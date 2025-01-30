@@ -85,6 +85,7 @@ import ConsultationRoomPatients from './pages/doctorsViews/tables/ConsultationRo
 import WalkInPatientList from './pages/WalkInPatientList';
 import WalkinRegistration from './pages/WalkinRegistration';
 import RadiologyDashboard from './Dashboards/RadiologyDashboard';
+import LabRoutes from './Routes/LabRoutes';
 
 function App() {
   return (
@@ -267,7 +268,6 @@ function App() {
           />
         </Route>
       </Route>
-
       <Route element={<PrivateRoute allowedDepartments={['Reception']} />}>
         <Route
           path="/reception"
@@ -594,6 +594,9 @@ function App() {
           />
         </Route>
       </Route>
+      {/* Lab routes */}
+      {LabRoutes()}
+
       <Route element={<PrivateRoute allowedDepartments={['Security']} />}>
         <Route
           path="/Security"
@@ -613,17 +616,41 @@ function App() {
           />
         </Route>
       </Route>
-      
-      <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
-        <Route path="/Pharmacy" element={<MainLayout />}>
-          <Route index element={<PhamarcyDashboard />} />
-          <Route path="/Pharmacy/Pharmacy-OutPatient" element={<PhamarcyOutpatient />} />
-          <Route path="/Pharmacy/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
-          <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />
-          <Route path="/Pharmacy/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
-          <Route path="/Pharmacy/Pharmacy-History" element={<PharmacyHistoryList />} />
+
+      <Route element={<PrivateRoute allowedDepartments={['Pharmacy']} />}>
+        <Route
+          path="/Pharmacy"
+          element={<MainLayout />}
+        >
+          <Route
+            index
+            element={<PhamarcyDashboard />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Inpatient"
+            element={<PharmacyInpatient />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Card"
+            element={<PharmacyCard />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Returns"
+            element={<PharmacyListReturnLines />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-History"
+            element={<PharmacyHistoryList />}
+          />
           {/* <Route path="/Pharmacy/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} /> */}
-          <Route path="view-profile" element={<ViewProfile />} />
+          <Route
+            path="view-profile"
+            element={<ViewProfile />}
+          />
         </Route>
       </Route>
 

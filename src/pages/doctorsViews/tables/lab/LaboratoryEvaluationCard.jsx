@@ -1,47 +1,52 @@
-import { Row, Space, Typography, Col } from "antd";
-import { UserOutlined, DiffOutlined } from "@ant-design/icons";
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { getPatientDetails } from "../../../../actions/triage-actions/getPatientDetailsSlice";
-import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
-import LabContentCard from "./LabContentCard";
-import PatientCard from "./PatientCard";
+import { DiffOutlined } from '@ant-design/icons';
+import { Row, Space, Typography, Col } from 'antd';
+
+import LabHeader from './LabHeader';
+import LabContentCard from './LabContentCard';
+import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
+import { getLabDetails } from '../../../../actions/Doc-actions/getLabRequestDetails';
+import { getPatientDetails } from '../../../../actions/Doc-actions/OutPatientAction';
 
 const LaboratoryEvaluationCard = () => {
+  // hooks
   const location = useLocation();
   const dispatch = useDispatch();
-  const { state } = useLocation(); // Access the state passed via navigate
-  const { patientNo, labObservationNo, patientLabRecord } = state || {}; // Destructure patient data if available
 
-  const { loadingPatientDetails, patientDetails } = useSelector(
-    (state) => state.getPatientDetails
+  // getting the labNo from the query params and the state values from the state
+  const labNo = new URLSearchParams(location.search).get('LaboratoryNo');
+  const { patientNo, patientLabRecord } = location.state || {};
+
+  // state
+  const { loading: labLoading, data: labData } = useSelector(
+    (state) => state.labDetails,
+  );
+  const { loading: patientLoading, data: patientData } = useSelector(
+    (state) => state.getPatientDetails,
   );
 
   useEffect(() => {
-    dispatch(getPatientDetails(patientNo));
-  }, [dispatch, patientNo]);
+    if (!labData.length) dispatch(getLabDetails(labNo));
+    if (!patientData) dispatch(getPatientDetails(patientNo));
+  }, [dispatch, labNo, patientNo]);
 
-  const patientName =
-    patientDetails?.SearchName ||
-    [
-      patientDetails?.Surname,
-      patientDetails?.FirstName,
-      patientDetails?.MiddleName,
-    ]
-      .filter(Boolean) // Remove null, undefined, or empty strings
-      .join(" "); // Join with a space
+  console.log({ labData, patientData, patientLabRecord });
 
   return (
-    <div style={{ margin: "16px 10px" }}>
+    <div style={{ margin: '16px 10px' }}>
       <Space className="inpatient-header">
         <DiffOutlined />
         <Typography.Text className="inpatient-header-text">
           Laboratory Evaluation Form
         </Typography.Text>
       </Space>
-      <Row gutter={8} className="inpatient-card-container">
+      <Row
+        gutter={8}
+        className="inpatient-card-container"
+      >
         <Col
           xs={24}
           md={24}
@@ -49,13 +54,13 @@ const LaboratoryEvaluationCard = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          {loadingPatientDetails ? (
+          {patientLoading ? (
             <SkeletonLoading />
           ) : (
-           <PatientCard patientNo={patientNo}
-           labObservationNo={labObservationNo}
-            patientLabRecord = {patientLabRecord}
-           />
+            <LabHeader
+              patientData={patientData}
+              patientLabRecord={patientLabRecord}
+            />
           )}
         </Col>
         <Col
@@ -65,15 +70,7 @@ const LaboratoryEvaluationCard = () => {
           xl={24}
           className="inpatient-card-right-col"
         >
-          {loadingPatientDetails ? (
-            <SkeletonLoading />
-          ) : (
-            <LabContentCard
-              patientNo={patientNo}
-              labObservationNo={labObservationNo}
-              patientLabRecord={patientLabRecord}
-            />
-          )}
+          {patientLoading ? <SkeletonLoading /> : <LabContentCard />}
         </Col>
       </Row>
     </div>
