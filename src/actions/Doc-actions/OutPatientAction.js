@@ -48,7 +48,7 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
 
 
   //export const getPatientDetails
-  export const getPatientDetails = () => async (dispatch, getState) => { 
+  export const getPatientDetails = (patientNo) => async (dispatch, getState) => { 
     try {
       dispatch({ type: GET_PATIENT_DETAILS_REQUEST });
   
@@ -74,9 +74,9 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
       // const filteredData = data.filter((patient) => patient.InPatient===false);
       // //patient.GlobalDimension1Code === branchCode  && 
 
-      console.log("filteredData: ", filteredData);
-  
+      
       dispatch({ type: GET_PATIENT_DETAILS_SUCCESS, payload: data });
+      console.log("data fetched", data);
     } catch (error) {
       dispatch({ type: GET_PATIENT_DETAILS_FAILURE, payload: error.message });
     }

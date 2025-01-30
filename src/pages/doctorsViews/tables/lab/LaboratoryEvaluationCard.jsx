@@ -52,10 +52,10 @@ const LaboratoryEvaluationCard = () => {
           {loadingPatientDetails ? (
             <SkeletonLoading />
           ) : (
-           <PatientCard patientNo={patientNo}
-           labObservationNo={labObservationNo}
-            patientLabRecord = {patientLabRecord}
-           />
+            <PatientCard patientNo={patientNo}
+              labObservationNo={labObservationNo}
+              patientLabRecord={patientLabRecord}
+            />
           )}
         </Col>
         <Col

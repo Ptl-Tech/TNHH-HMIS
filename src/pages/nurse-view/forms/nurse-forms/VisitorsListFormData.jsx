@@ -10,7 +10,6 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
     const [form] = Form.useForm();
     const dispatch = useDispatch();
 
-    console.log('patient details', patientDetails);
     const handleOnFinish = async (values) => {
         try {
           const { visitorName, idNumber, phoneNumber } = values;
