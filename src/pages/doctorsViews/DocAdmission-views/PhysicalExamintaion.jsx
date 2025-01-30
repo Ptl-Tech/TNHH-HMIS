@@ -6,6 +6,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import PhysicalExaminationTable from "../tables/Diagnosis/PhysicalExaminationTable";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -39,8 +40,7 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
       "18": data.find((item) => item.Notes_Type === "Respiratory system")?.Notes || "",
       "19": data.find((item) => item.Notes_Type === "Abdomen")?.Notes || "",
     };
-  }, [data]);
-  
+  }, [data]);  
 
   useEffect(() => {
     form.setFieldsValue({
@@ -65,6 +65,7 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
       };
       await dispatch(postPatientHistoryNotes(payload));
       message.success("Notes saved successfully");
+      dispatch(getPatientHistorySlice(treatmentNo));
     } catch (error) {
       message.error("Failed to save notes");
     }
@@ -119,6 +120,9 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
           Save
         </Button>
       </Form>
+
+     <PhysicalExaminationTable data={data} />
+
     </div>
   );
 };
