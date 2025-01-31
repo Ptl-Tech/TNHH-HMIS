@@ -84,6 +84,9 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
                 <Col span={24}>
                     <Form.Item label="Urgency Status Remarks" name="urgencyStatus"
                         hasFeedback
+                        rules={[
+                            { max: 30, message: 'Remarks must be less than 30 characters!' },
+                        ]}
                         
                     >
                         <TextArea 
@@ -97,6 +100,9 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
             <Col span={24}>
                 <Form.Item label="Observation Remarks" name="remarks"
                     hasFeedback
+                    rules={[
+                        { max: 50, message: 'Remarks must be less than 50 characters!' },
+                    ]}
                     
                 >
                     <TextArea 
@@ -109,14 +115,14 @@ const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchF
         <Form.Item>
             <Space>
                 <Button htmlType="submit" type="primary"
-                size="large"
+             
                 icon={<SendOutlined />}
                 loading={loadingDispatchToDoctor}
                 disabled={loadingDispatchToDoctor}
                 >
                     Dispatch to Doctor
                 </Button>
-                <Button htmlType="button" variant="outlined" size="large" color="danger" onClick={() => setIsDispatchFormVisible(false)}
+                <Button htmlType="button" variant="outlined" color="danger" onClick={() => setIsDispatchFormVisible(false)}
                     icon={<CloseOutlined />}
                 >
                     Cancel

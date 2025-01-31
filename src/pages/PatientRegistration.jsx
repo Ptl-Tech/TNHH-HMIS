@@ -311,6 +311,10 @@ const PatientRegistration = () => {
     }
   };
 
+  console.log('visitor data', visitorData);
+  console.log('new patient', newPatient);
+  console.log('patient det', patientDet);
+
   useEffect(() => {
     if (patientDet) {
       setNewPatient({
@@ -491,10 +495,10 @@ const PatientRegistration = () => {
 
     // ID Number Validation
     if (
-      patient.idNumber ||
+      patient?.idNumber ||
       visitorData?.IDNumber ||
       patientDet?.IDNumber ||
-      newPatient.idNumber
+      newPatient?.idNumber
     ) {
       const isRegistered = patientListPayload?.some(
         (existingPatient) =>

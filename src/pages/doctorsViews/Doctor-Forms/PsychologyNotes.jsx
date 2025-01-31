@@ -25,6 +25,7 @@ import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import { stateToHTML } from "draft-js-export-html";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import ReadDoctorNotes from "../../ReadDoctorNotes";
 
 const PsychologyNotes = ({ treatmentNo }) => {
   const { loading } = useSelector((state) => state.postDoctorNotes);
@@ -121,7 +122,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
           Psychology Notes
         </Typography.Text>
       </Space>
-      <div
+      {/* <div
         style={{
           display: "flex",
           alignItems: "center",
@@ -129,7 +130,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
           gap: "20px",
           paddingBottom: "20px",
         }}
-      >
+      > */}
         {/* {role === "Doctor" && (
           <Button
             type="primary"
@@ -140,15 +141,18 @@ const PsychologyNotes = ({ treatmentNo }) => {
             Add Doctor Notes
           </Button>
         )} */}
-        <Button
+        {/* <Button
           type="primary"
           style={{ width: "100%" }}
           icon={<EyeOutlined />}
           onClick={handleNavigateReadNotes}
         >
           Read Past Psychology Notes
-        </Button>
-      </div>
+        </Button> */}
+        
+      {/* </div> */}
+
+      <ReadDoctorNotes />
 
      {/*  {isFormVisible && (
         <Form

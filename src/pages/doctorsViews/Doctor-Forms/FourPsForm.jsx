@@ -15,14 +15,13 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const docDetails = useAuth();
+  const role = useAuth().userData.departmentName;
 
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);
 
-  console.log('Aetiology notes', data)
+  console.log("Aetiology notes", data);
 
-  
   const notesType = [
     { value: "12", label: "Predisposing Factors" },
     { value: "13", label: "Precipitating Factors" },
@@ -38,20 +37,27 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
 
   const initialValues = useMemo(() => {
     return {
-      "12": data.find((item) => item.Notes_Type === "Predisposing Factors")?.Notes || "",
-      "13": data.find((item) => item.Notes_Type === "Precipitating Factors")?.Notes || "",
-      "14": data.find((item) => item.Notes_Type === "Perpetuating Factors")?.Notes || "",
-      "15": data.find((item) => item.Notes_Type === "Protective Factors")?.Notes || "",
+      12:
+        data.find((item) => item.Notes_Type === "Predisposing Factors")
+          ?.Notes || "",
+      13:
+        data.find((item) => item.Notes_Type === "Precipitating Factors")
+          ?.Notes || "",
+      14:
+        data.find((item) => item.Notes_Type === "Perpetuating Factors")
+          ?.Notes || "",
+      15:
+        data.find((item) => item.Notes_Type === "Protective Factors")?.Notes ||
+        "",
     };
   }, [data]);
-  
 
   useEffect(() => {
     form.setFieldsValue({
       notes: initialValues[currentTab] || "",
     });
   }, [currentTab, initialValues, form]);
-  
+
   const handleTabChange = (key) => {
     setCurrentTab(key);
   };
@@ -77,7 +83,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
 
   return (
     <div>
-     <Space
+      <Space
         style={{
           color: "#0f5689",
           display: "flex",
@@ -101,33 +107,42 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
           Aetiology Notes
         </Typography.Title>
       </Space>
-      <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
-        {notesType.map((note) => (
-          <TabPane tab={note.label} key={note.value} />
-        ))}
-      </Tabs>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSave}
-        initialValues={{
-          doctorNotesDate: moment().format("Do MMM YYYY"),
-        }}
-      >
-        <Form.Item
-          name="notes"
-          label={notesType.find((note) => note.value === currentTab)?.label}
-          rules={[{ required: true, message: "Please enter notes" }]}
-        >
-          <TextArea placeholder="Enter notes..." autoSize={{ minRows: 3 }} />
-        </Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
-          Save
-        </Button>
-      </Form>
+      {(role === "Doctor" ||
+        role === "Psychology") && (
+          <>
+            <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
+              {notesType.map((note) => (
+                <TabPane tab={note.label} key={note.value} />
+              ))}
+            </Tabs>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={handleSave}
+              initialValues={{
+                doctorNotesDate: moment().format("Do MMM YYYY"),
+              }}
+            >
+              <Form.Item
+                name="notes"
+                label={
+                  notesType.find((note) => note.value === currentTab)?.label
+                }
+                rules={[{ required: true, message: "Please enter notes" }]}
+              >
+                <TextArea
+                  placeholder="Enter notes..."
+                  autoSize={{ minRows: 3 }}
+                />
+              </Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading}>
+                Save
+              </Button>
+            </Form>
+          </>
+        )}
 
-      <AetiologyTable data={data}/>
-
+      <AetiologyTable data={data} />
     </div>
   );
 };
