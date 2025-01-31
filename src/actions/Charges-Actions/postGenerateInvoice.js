@@ -28,6 +28,9 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
       },
     };
 
+//send patientNo as object not string
+    patientNo = {patientNo: patientNo};
+
     // Make the POST request to the server
     const response = await axios.post(
       `${API}GeneralProcesses/GeneratePatientInsuranceReport`,
