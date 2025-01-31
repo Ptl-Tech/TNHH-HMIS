@@ -75,7 +75,7 @@ const EvaluatePatientInTriage = () => {
             }
            
           </div>
-          <Row>
+          <Row gutter={[8, 8]} style={{ marginBottom: '16px' }}>
             {
               loadingPatientDetails ? (
                 <SkeletonLoading />
@@ -148,10 +148,10 @@ const EvaluatePatientInTriage = () => {
         
             {
             !isDispatchFormVisible && (
-              <Row gutter={8} className='inpatient-card-container'>
+              <Row gutter={[16, 16]} className='inpatient-card-container'>
               <Col xs={24} md={24} lg={24} xl={24}>
                   <Card style={{ padding: '10px 16px' }}>
-                        <Tabs>
+                        <Tabs type='card'>
                           <Tabs.TabPane tab="Vitals" key="1">
                                 <FormVitals observationNumber={observationNo} patientNumber={patientNo} />
                           </Tabs.TabPane>

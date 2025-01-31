@@ -15,12 +15,14 @@ import { useLocation } from "react-router-dom";
 import { getPatientMSESlice } from "../../../actions/Doc-actions/getPatientMentalStateNotes";
 import { postMSENotes } from "../../../actions/Doc-actions/postMentalStateForm";
 import MentalStatusExamTable from "../tables/MentalStatusExamTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { Step } = Steps;
 const { Panel } = Collapse;
 const { TextArea } = Input;
 
 const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
+  const role = useAuth().userData.departmentName;
   const { data } = useSelector((state) => state.getPatientMSE);
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
@@ -116,7 +118,7 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
 
   const handleNext = () => {
     saveNotes();
-    setCurrentStep((prev) => prev + 1);
+    setCurrentStep((prev) => prev++);
   };
 
   const handlePrev = () => {
@@ -133,151 +135,168 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
           marginBottom: "10px",
         }}
       >
-        <FileOutlined /> MSE Form
+        <FileOutlined /> MSE Status Exam
       </Typography.Text>
-      <Steps
-        current={currentStep}
-        size="small"
-        style={{ marginBottom: 24, marginTop: 24 }}
-      >
-        <Step title="Appearance & Speech" />
-        <Step title="Mood & Thinking" />
-        <Step title="Sensorium & Perception" />
-        <Step title="Judgement & Insight" />
-      </Steps>
 
-      <Form form={form} layout="vertical">
-        {/* Step 1 */}
-        {currentStep === 0 && (
-          <Collapse defaultActiveKey={["1", "2"]}>
-            <Panel header="Appearance" key="1">
-              <Form.Item
-                name="appearance"
-                label="Appearance (Personal Identification)"
-                rules={[
-                  { required: true, message: "Please describe appearance!" },
-                ]}
-              >
-                <TextArea
-                  placeholder="e.g., cooperative, attentive, hostile..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-            <Panel header="Speech" key="2">
-              <Form.Item
-                name="speech"
-                label="Describe patient Speech Pattern"
-                rules={[{ required: true, message: "Please describe speech!" }]}
-              >
-                <TextArea
-                  placeholder="e.g., rapid, slow, pressured..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-          </Collapse>
-        )}
+      {(role === "Doctor" || role === "Psychology") && (
+        <>
+          <Steps
+            current={currentStep}
+            size="small"
+            style={{ marginBottom: 24, marginTop: 24 }}
+          >
+            <Step title="Appearance & Speech" />
+            <Step title="Mood & Thinking" />
+            <Step title="Sensorium & Perception" />
+            <Step title="Judgement & Insight" />
+          </Steps>
 
-        {/* Step 2 */}
-        {currentStep === 1 && (
-          <Collapse defaultActiveKey={["1", "2"]}>
-            <Panel header="Form of Thought" key="1">
-              <Form.Item
-                name="form_of_thought"
-                label="Describe Patient Form of Thought"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please describe Form of Thought!",
-                  },
-                ]}
-              >
-                <TextArea
-                  placeholder="e.g., logical, fragmented..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-            <Panel header="Thought Content" key="2">
-              <Form.Item
-                name="thought_content"
-                label="Describe Patient Thought Content"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please describe Thought Content!",
-                  },
-                ]}
-              >
-                <TextArea
-                  placeholder="e.g., delusions, hallucinations..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-          </Collapse>
-        )}
+          <Form form={form} layout="vertical">
+            {/* Step 1 */}
+            {currentStep === 0 && (
+              <Collapse defaultActiveKey={["1", "2"]}>
+                <Panel header="Appearance" key="1">
+                  <Form.Item
+                    name="appearance"
+                    label="Appearance (Personal Identification)"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please describe appearance!",
+                      },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., cooperative, attentive, hostile..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+                <Panel header="Speech" key="2">
+                  <Form.Item
+                    name="speech"
+                    label="Describe patient Speech Pattern"
+                    rules={[
+                      { required: true, message: "Please describe speech!" },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., rapid, slow, pressured..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+              </Collapse>
+            )}
 
-        {/* Step 3 */}
-        {currentStep === 2 && (
-          <Collapse defaultActiveKey={["1"]}>
-            <Panel header="Sensorium" key="1">
-              <Form.Item
-                name="sensorium"
-                label="Sensorium"
-                rules={[
-                  { required: true, message: "Please describe sensorium!" },
-                ]}
-              >
-                <TextArea
-                  placeholder="e.g., orientation, perception..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-          </Collapse>
-        )}
+            {/* Step 2 */}
+            {currentStep === 1 && (
+              <Collapse defaultActiveKey={["1", "2"]}>
+                <Panel header="Form of Thought" key="1">
+                  <Form.Item
+                    name="form_of_thought"
+                    label="Describe Patient Form of Thought"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please describe Form of Thought!",
+                      },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., logical, fragmented..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+                <Panel header="Thought Content" key="2">
+                  <Form.Item
+                    name="thought_content"
+                    label="Describe Patient Thought Content"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please describe Thought Content!",
+                      },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., delusions, hallucinations..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+              </Collapse>
+            )}
 
-        {/* Step 4 */}
-        {currentStep === 3 && (
-          <Collapse defaultActiveKey={["1"]}>
-            <Panel header="Judgement & Insight" key="1">
-              <Form.Item
-                name="judgement"
-                label="Judgement"
-                rules={[
-                  { required: true, message: "Please describe judgement!" },
-                ]}
-              >
-                <TextArea
-                  placeholder="e.g., decision-making ability..."
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Panel>
-          </Collapse>
-        )}
+            {/* Step 3 */}
+            {currentStep === 2 && (
+              <Collapse defaultActiveKey={["1"]}>
+                <Panel header="Sensorium" key="1">
+                  <Form.Item
+                    name="sensorium"
+                    label="Sensorium"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please describe sensorium!",
+                      },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., orientation, perception..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+              </Collapse>
+            )}
 
-        <div
-          className="d-flex justify-content-end gap-3"
-          style={{ marginTop: 20 }}
-        >
-          {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
-          {currentStep < 3 && (
-            <Button type="primary" onClick={handleNext}>
-              Next
-            </Button>
-          )}
-          {currentStep === 3 && (
-            <Button type="primary" onClick={saveNotes}>
-              Finish
-            </Button>
-          )}
-        </div>
-      </Form>
+            {/* Step 4 */}
+            {currentStep === 3 && (
+              <Collapse defaultActiveKey={["1"]}>
+                <Panel header="Judgement & Insight" key="1">
+                  <Form.Item
+                    name="judgement"
+                    label="Judgement"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please describe judgement!",
+                      },
+                    ]}
+                  >
+                    <TextArea
+                      placeholder="e.g., decision-making ability..."
+                      autoSize={{ minRows: 5 }}
+                    />
+                  </Form.Item>
+                </Panel>
+              </Collapse>
+            )}
 
-      <MentalStatusExamTable data={data}/>
+            <div
+              className="d-flex justify-content-end gap-3"
+              style={{ marginTop: 20 }}
+            >
+              {currentStep > 0 && (
+                <Button onClick={handlePrev}>Previous</Button>
+              )}
+
+              {currentStep <= 3 && (
+                <Button
+                  type="primary"
+                  onClick={currentStep === 3 ? saveNotes : handleNext}
+                >
+                  {currentStep === 3 ? "Finish" : "Next"}
+                </Button>
+              )}
+            </div>
+          </Form>
+        </>
+      )}
+
+      <MentalStatusExamTable data={data} />
     </div>
   );
 };

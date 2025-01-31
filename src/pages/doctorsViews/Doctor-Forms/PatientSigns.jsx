@@ -5,11 +5,13 @@ import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { TextArea } = Input;
 const { Step } = Steps;
 
 const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
+  const role = useAuth().userData.departmentName;
   const { loading: saveNotesLoading } = useSelector(
     (state) => state.postPatientHistory
   );
@@ -75,7 +77,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
     }),
     [data]
   );
-
 
   //tracking last saved notes
   const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
@@ -256,29 +257,39 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   return (
     <div className="mt-4">
       <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
-        <FileOutlined /> Patient History
+        <FileOutlined /> Patient History Notes
       </Typography.Text>
-      <Steps current={currentStep} size="small" style={{ marginBottom: 24 }}>
-        {steps.map((step) => (
-          <Step key={step.key} title={step.title} />
-        ))}
-      </Steps>
-      <Form form={form} layout="vertical">
-        {steps[currentStep].content}
-        <div className="steps-action  ">
-          {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
-          <Button
-            type="primary"
-            loading={saveNotesLoading}
-            onClick={handleNext}
-          >
-            {currentStep === steps.length - 1 ? "Finish" : "Next"}
-          </Button>
-        </div>
-      </Form>
+      {(role === "Doctor" || role === "Psychology")
+        && (
+          <>
+            <Steps
+              current={currentStep}
+              size="small"
+              style={{ marginBottom: 24 }}
+            >
+              {steps.map((step) => (
+                <Step key={step.key} title={step.title} />
+              ))}
+            </Steps>
+            <Form form={form} layout="vertical">
+              {steps[currentStep].content}
+              <div className="steps-action  ">
+                {currentStep > 0 && (
+                  <Button onClick={handlePrev}>Previous</Button>
+                )}
+                <Button
+                  type="primary"
+                  loading={saveNotesLoading}
+                  onClick={handleNext}
+                >
+                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
+                </Button>
+              </div>
+            </Form>
+          </>
+        )}
 
       <PatientHistoryNotesTable data={data} />
-
     </div>
   );
 };

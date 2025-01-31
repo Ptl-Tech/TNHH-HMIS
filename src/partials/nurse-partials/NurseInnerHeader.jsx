@@ -10,7 +10,6 @@ const NurseInnerHeader = ({ filterInPatients, icon, title }) => {
           display: "flex",
           alignItems: "center",
           gap: "8px",
-          paddingBottom: "20px",
           marginBottom: "20px",
           position: "relative",
         }}
