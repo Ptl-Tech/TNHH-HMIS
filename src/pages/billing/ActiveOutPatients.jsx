@@ -14,6 +14,7 @@ import {
   Col,
   Typography,
   Modal,
+  Space,
 } from "antd";
 import {
   EditOutlined,
@@ -45,14 +46,12 @@ const ActiveOutPatients = () => {
   );
     const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
       useSelector((state) => state.postInterimInvoice);
-
+      
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
-  const [billingModalVisible, setBillingModalVisible] = useState(false);
+  
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [cashPatients, setCashPatients] = useState([]);
   const [corporatePatients, setCorporatePatients] = useState([]);
@@ -60,7 +59,6 @@ const ActiveOutPatients = () => {
   const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
     []
   );
-    const [pdfBlob, setPdfBlob] = useState(null);
   
 
   useEffect(() => {
@@ -137,78 +135,6 @@ const ActiveOutPatients = () => {
     setFilteredCorporatePatients(filteredCorporate);
   };
 
-  const showModal = (patientNo) => {
-    setIsModalVisible(true);
-    setSelectedPatientNo(patientNo);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setSelectedPatientNo(null);
-  };
-
-  const confirmGenerateInvoice = (patientNo) => {
-    setSelectedPatientNo(patientNo);
-    setIsInvoiceModalVisible(true);
-  };
-
-  const handleConfirmGenerateInvoice = () => {
-    dispatch(postGenerateInvoice(selectedpatientNo));
-    setIsInvoiceModalVisible(false);
-  };
- const handleBillingSubmit = (record) => {
- 
-    const invoiceData = {
-      PatientNo: record.PatientNo,
-      visitNo: record.AppointmentNo,
-      staffNo:staffNo,
-    };
-
-    dispatch(postInterimInvoice(invoiceData)).then((response) => {
-      if (response?.base64) {
-        const byteCharacters = atob(response.base64);
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-          const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = Array.from(slice).map((char) =>
-            char.charCodeAt(0)
-          );
-          byteArrays.push(new Uint8Array(byteNumbers));
-        }
-        const blob = new Blob(byteArrays, { type: "application/pdf" });
-        const blobUrl = URL.createObjectURL(blob);
-        setPdfBlob(blobUrl);
-        setSelectedPatientNo(patient);
-        setBillingModalVisible(true);
-      }
-    });
-  };
-   const handleDownload = () => {
-      if (pdfBlob && selectedPatient) {
-        // Use the patient's name or fallback to a default name if unavailable
-        const patientName = selectedPatient?.Names || "Unknown_Patient";
-        const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, "_"); // Replace spaces with underscores for a valid filename
-  
-        // Trigger the download
-        saveAs(pdfBlob, fileName);
-      }
-    };
-  
-    const handlePrint = () => {
-      if (pdfBlob) {
-        const printWindow = window.open("", "_blank"); // Open a blank window
-        const htmlContent = `
-          <html>
-            <head><title>Invoice</title></head>
-            <body>
-              <embed src="${pdfBlob}" width="100%" height="100%" />
-            </body>
-          </html>`;
-        printWindow.document.write(htmlContent); // Write the content
-        printWindow.document.close(); // Close the document to ensure it renders
-        printWindow.print(); // Trigger the print
-      }
-    };
   const patientColumns = [
     {
       title: "Patient No",
@@ -269,78 +195,26 @@ const ActiveOutPatients = () => {
       render: (text) => `KSh ${text.toFixed(2)}`,
     },
     {
-      title: "Actions",
+      title: "Action",
       key: "actions",
-      render: (_, record) => {
-        const menu = (
-          <Menu>
-            {/* <Menu.Item
-              key="view"
-              icon={<EyeOutlined />}
-              onClick={() =>
-                navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
-                  state: { patientData: record },
-                })
-              }
-            >
-              View
-            </Menu.Item> */}
-            {record.PatientType === "Cash" ? (
-              <Menu.Item
-                key="invoice"
-                icon={<FilePdfOutlined />}
-                onClick={() => showModal(record.PatientNo)}
-              >
-                Generate Receipt
-              </Menu.Item>
-            ) : (
-              <Menu.Item
-                key="invoice"
-                icon={<FilePdfOutlined />}
-                onClick={() => confirmGenerateInvoice(record.PatientNo)}
-              >
-                Generate Invoice
-              </Menu.Item>
-            )}
-
-            <Menu.Item
-              key="edit"
-              icon={<EditOutlined />}
-              onClick={() => console.log("Editing", record)}
-            >
-              View
-            </Menu.Item>
-            {
-              record.PatientType === "Corporate" && (
-                <Menu.Item
-                  key="invoice"
-                  icon={<FilePdfOutlined />}
-                  onClick={() => handleBillingSubmit(record)}
-                >
-                  Print Interim Invoice
-                </Menu.Item>
-              )
-            }
-          </Menu>
-        );
-
-        return (
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button type="primary" size="small">
-              <span
-                className="fw-bold text-white"
-                style={{ cursor: "pointer", fontSize: "16px" }}
-              >
-                ...
-              </span>
-              <DownOutlined />
-            </Button>
-          </Dropdown>
-        );
-      },
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+          type="primary"
+           icon={<EyeOutlined />}
+           onClick={() =>
+             navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
+               state: { patientData: record },
+             })
+           }
+         >
+           View
+          </Button>
+        </Space>
+      ),
     },
   ];
-
+// console.log("patient Data:",patientData);
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
@@ -412,55 +286,7 @@ const ActiveOutPatients = () => {
           />
         </TabPane>
       </Tabs>
-      <ProcessPayment
-        visible={isModalVisible}
-        onClose={handleModalClose}
-        patientNo={selectedpatientNo}
-      />
-      <Modal
-        title="Confirm Invoice Generation"
-        visible={isInvoiceModalVisible}
-        onOk={handleConfirmGenerateInvoice}
-        onCancel={() => setIsInvoiceModalVisible(false)}
-        okText="Yes"
-        cancelText="No"
-      >
-        <p>
-          Are you sure you want to generate an invoice for Patient No:{" "}
-          <strong>{selectedpatientNo}</strong>?
-        </p>
-      </Modal>
-         {/* Modal for previewing and printing/downloading the PDF */}
-            <Modal
-              title={`Invoice for ${selectedpatientNo?.PatientNo}`}
-              visible={billingModalVisible}
-              onCancel={() => setBillingModalVisible(false)}
-              footer={[
-                <Button type="primary" key="download" onClick={handleDownload}>
-                  Download
-                </Button>,
-                <Button type="default" key="print" onClick={handlePrint}>
-                  Print
-                </Button>,
-                <Button
-                  type="primary"
-                  key="close"
-                  onClick={() => setBillingModalVisible(false)}
-                >
-                  Close
-                </Button>,
-              ]}
-              width={800}
-              style={{ top: 20 }}
-            >
-              <iframe
-                src={pdfBlob}
-                width="100%"
-                height="600px"
-                style={{ border: "none" }}
-                className="iframe-scrollbar"
-              ></iframe>
-            </Modal>
+     
     </div>
   );
 };

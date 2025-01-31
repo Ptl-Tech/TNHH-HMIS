@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Row,
@@ -8,75 +8,174 @@ import {
   Button,
   Divider,
   Space,
+  Modal,
+  message,
 } from "antd";
 import {
   DownloadOutlined,
   PrinterOutlined,
   EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaCoins } from "react-icons/fa";
+import { FaCoins, FaReceipt } from "react-icons/fa";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { postReceipt } from "../../actions/Charges-Actions/postReceipt";
 import AddCharges from "./AddCharges";
+import useAuth from "../../hooks/useAuth";
+import { getChargesLines } from "../../actions/Charges-Actions/getChargesLines";
+import { postGenerateInvoice } from "../../actions/Charges-Actions/postGenerateInvoice";
+import { postPrintInvoice } from "../../actions/Charges-Actions/postprintInvoice";
+import PDFViewer from "../../components/PDFView";
+import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
+import ProcessPayment from "./ProcessPayment";
 
 const { Title, Text } = Typography;
 
 const ViewInvoice = () => {
   const dispatch = useDispatch();
-  const navigate= useNavigate();
+  const navigate = useNavigate();
+  const { userData } = useAuth();
   const { state } = useLocation();
-  const { header, lines } = state.patientData; // Extract header and lines
+  const { patientData } = state;
+  // const { header, lines } = state.patientData; // Extract header and lines
   const { loading } = useSelector((state) => state.printReceipt);
+  const { loading: loadingChargesLines, data } = useSelector(
+    (state) => state.getChargesLines
+  );
+  const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-const[appointmentNo, setAppointmentNo] = useState('')
+  const [appointmentNo, setAppointmentNo] = useState("");
+  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [selectedpatientNo, setSelectedPatientNo] = useState("");
+  const [pdfBase64, setPdfBase64] = useState("");
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const[isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] = useState(false);
+  const { loading: generateInvoiceLoading } = useSelector(
+    (state) => state.generateInvoice
+  );
+  const { loading: printInvoiceLoading } = useSelector(
+    (state) => state.printInvoice
+  );
+   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+        useSelector((state) => state.postInterimInvoice);
+        
 
- const handleGoBack = () => {
+  console.log("patientData", patientData);
+
+  useEffect(() => {
+    if (patientNo) {
+      dispatch(getChargesLines(patientNo));
+    }
+    console.log("patientNo", data);
+  }, [dispatch, patientNo]);
+
+  const handleGoBack = () => {
     navigate(-1);
   };
 
+const handleGenerateReceipt = (patientNo) => {
+  setIsGenerateReceiptModalVisible(true);
+};
+
   const handleClose = () => {
     setIsModalVisible(false);
-  
+    setIsInvoiceModalVisible(false);
+    setIsGenerateReceiptModalVisible(false);
   };
 
+  const handlePrintInvoice = (patientNo) => {
+    if (!patientNo) {
+      message.info("Please select a patient to generate an invoice for.");
+      return;
+    }
+    dispatch(postPrintInvoice(patientNo)).then((response) => {
+      if (response?.data.base64) {
+        setPdfBase64(response.data.base64);
+        setShowPDFModal(true); // Open modal to show PDF
+      }
+    });
+  };
+
+  const handlePrintInterimInvoice = (patientData) => {
+    if (!patientData) {
+      message.info("Please select a patient to generate an invoice for.");
+      return;
+    }
+    console.log("patientData", patientData);
+const invoiceData = {
+  PatientNo: patientData.PatientNo,
+      visitNo: patientData.AppointmentNo,
+    };
+
+
+    dispatch(postInterimInvoice(invoiceData)).then((response) => {
+      if (response?.data.base64) {
+        setPdfBase64(response.data.base64);
+        setShowPDFModal(true); // Open modal to show PDF
+      }
+    });
+  };
   const showModal = () => {
-    setAppointmentNo(header[0]?.Patient_Appointment_No); 
+    setAppointmentNo(patientData?.PatientNo);
     setTimeout(() => {
       setIsModalVisible(true);
-    }, 0); 
-  };
-  
-
-  const handlePrintReceipt = () => {
-    const receipt = {
-      recId: "",
-      patientNo: header[0].Patient_No,
-      receiptNo: header[0].No,
-    };
-    console.log(receipt);
-
-    dispatch(postReceipt(receipt));
+    }, 0);
   };
 
-  const grandTotal = lines
+  const confirmGenerateInvoice = (patientNo) => {
+    if (!patientNo) {
+      message.info("Please select a patient to generate an invoice for.");
+      return;
+    }
+    setSelectedPatientNo(patientNo);
+    setIsInvoiceModalVisible(true);
+  };
+
+  const handleConfirmGenerateInvoice = () => {
+    if (!selectedpatientNo) {
+      message.error("No patient selected for invoice generation.");
+      return;
+    }
+    dispatch(postGenerateInvoice(selectedpatientNo)).then((status) => {
+      if (status) {
+        dispatch(getChargesLines(selectedpatientNo));
+      }
+    });
+
+    setIsInvoiceModalVisible(false);
+  };
+
+  // const handlePrintReceipt = () => {
+  //   const receipt = {
+  //     recId: "",
+  //     patientNo: header[0].Patient_No,
+  //     receiptNo: header[0].No,
+  //   };
+  //   console.log(receipt);
+
+  //   dispatch(postReceipt(receipt));
+  // };
+
+  const grandTotal = data
     ?.reduce((total, line) => total + line.Amount, 0)
     .toLocaleString("en-KE", {
       style: "currency",
       currency: "KES",
     });
 
-  const tableData = lines?.map((line, index) => ({
+  const tableData = data?.map((line, index) => ({
     key: index,
-    transactionName: line.TransactionName,
-    payMode: line.PayMode,
+    transactionName: line.TransactionType,
+    chargeName: line.Description,
+    quantity: line.Quantity,
+    billType: line.BillingType,
     amount: line.Amount.toLocaleString("en-KE", {
       style: "currency",
       currency: "KES",
     }),
-    transactionType: line.TransactionType,
   }));
 
   const columns = [
@@ -86,19 +185,24 @@ const[appointmentNo, setAppointmentNo] = useState('')
       key: "transactionName",
     },
     {
-      title: "Payment Mode",
-      dataIndex: "payMode",
-      key: "payMode",
+      title: "Charge Name",
+      dataIndex: "chargeName",
+      key: "chargeName",
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Bill Type",
+      dataIndex: "billType",
+      key: "billType",
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-    },
-    {
-      title: "Transaction Type",
-      dataIndex: "transactionType",
-      key: "transactionType",
     },
   ];
 
@@ -112,21 +216,93 @@ const[appointmentNo, setAppointmentNo] = useState('')
             <br />
             <Text>Phone: +254 700 000 000</Text>
           </Col>
-
+        </Row>
+        <Row justify="end">
           <Col>
             <Space>
               {/* <Button icon={<DownloadOutlined />}>Download</Button> */}
+
+              {patientData?.PatientType === "Corporate" ? (
+                <>
+                  <Button
+                    type="default"
+                    size="medium"
+                    icon={
+                      <PrinterOutlined
+                        style={{ color: "green", size: "29px" }}
+                      />
+                    }
+                    onClick={() =>
+                      confirmGenerateInvoice(patientData?.PatientNo)
+                    } // Ensure patientNo is passed
+                  >
+                    Generate Invoice
+                  </Button>
+                  <Button
+                    type="primary"
+                    size="medium"
+                    icon={<FaCoins />}
+                    onClick={() => handlePrintInvoice(patientData?.PatientNo)}
+                  >
+                    Print Invoice
+                  </Button>
+                  <Button
+                    type="primary"
+                    size="medium"
+                    icon={<FaCoins />}
+                    onClick={() => handlePrintInterimInvoice(patientData)}
+                  >
+                    Print Interim Invoice
+                  </Button>
+                </>
+              ) : (
+               <>
+               <Button
+                  type="primary"
+                  size="medium"
+                  icon={<FaReceipt />}
+                  onClick={() => handleGenerateReceipt(patientData?.PatientNo)}
+                >
+                  Generate Payment 
+                </Button>
+                
+                <Button
+                  icon={
+                    <PrinterOutlined style={{ color: "green", size: "29px" }} />
+                  }
+                  loading={loading}
+                  // onClick={handlePrintReceipt}
+                  size="medium"
+                  // onclick show msg infor of feature not available
+                  onClick={() => message.info("Feature not available at the moment")}
+                >
+                  Print Receipt
+                </Button>
+               </>
+              )}
+            </Space>
+          </Col>
+        </Row>
+        <Row justify="end">
+          <Col className="mt-3">
+            <Space>
               <Button
-                icon={<PrinterOutlined style={{ color: "green", size: "29px" }} />}
-                loading={loading}
-                onClick={handlePrintReceipt}
-                size="large"
+                type="primary"
+                size="medium"
+                icon={<FaCoins />}
+                onClick={showModal}
               >
-                Print Receipt
-              </Button>
-              {/* <Button icon={<EditOutlined />}>Edit</Button> */}
-              <Button type="primary" size="large" icon={<FaCoins />} onClick={showModal}>
                 Add Charges
+              </Button>
+              <Button
+                type="default"
+                size="medium"
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => message.info("Feature not available at the moment")}
+
+              >
+                Waive Charges
               </Button>
             </Space>
           </Col>
@@ -135,7 +311,11 @@ const[appointmentNo, setAppointmentNo] = useState('')
         <Divider />
         <Row justify="space-between">
           <Col>
-            <Title level={4}>Receipt</Title>
+            <Title level={4}>
+              {patientData?.PatientType === "Corporate"
+                ? "Invoice"
+                : " Receipt"}
+            </Title>
           </Col>
           <Col>
             <Button type="primary" onClick={handleGoBack}>
@@ -146,47 +326,48 @@ const[appointmentNo, setAppointmentNo] = useState('')
 
         <Row>
           <Col span={12}>
-            <Text strong>Received From:</Text>
-            <p>{header[0]?.Received_From}</p>
+            <Text strong>Receiving From:</Text>
+            <p>{patientData.Names}</p>
 
             <Text strong>Patient No:</Text>
-            <p>{header[0]?.Patient_No}</p>
+            <p>{patientData.PatientNo}</p>
 
             <Text strong>Appointment No:</Text>
-            <p>{header[0]?.Patient_Appointment_No}</p>
+            <p>{patientData?.AppointmentNo}</p>
 
             <Text strong>Date:</Text>
             <p>
-              {header[0]?.Date
-                ? moment(header[0]?.Date).format("Do MMM YYYY")
+              {patientData?.AppointmentDate
+                ? moment(patientData?.AppointmentDate).format("Do MMM YYYY")
                 : ""}
             </p>
           </Col>
 
           <Col span={12}>
             <Text strong>Cashier:</Text>
-            <p>{header[0]?.Cashier}</p>
+            <p>{userData.searchName}</p>
 
             <Text strong>Amount Received:</Text>
             <p>
-              {header[0]?.Amount_Recieved?.toLocaleString("en-KE", {
+              {data?.Receipt_Amount?.toLocaleString("en-KE", {
                 style: "currency",
                 currency: "KES",
               })}
             </p>
 
             <Text strong>Document Date:</Text>
-            <p>
-              {header[0]?.Document_Date
-                ? moment(header[0]?.Document_Date).format("Do MMM YYYY")
-                : ""}
-            </p>
+            <p>{data?.Date ? moment(data?.Date).format("Do MMM YYYY") : ""}</p>
           </Col>
         </Row>
 
         <Divider />
 
-        <Table dataSource={tableData} columns={columns} pagination={false} />
+        <Table
+          dataSource={tableData}
+          columns={columns}
+          pagination={false}
+          loading={loadingChargesLines}
+        />
 
         <Divider />
 
@@ -206,7 +387,7 @@ const[appointmentNo, setAppointmentNo] = useState('')
               </Col>
               <Col span={12}>
                 <Text style={{ color: "green" }}>
-                  {header[0]?.Total_Amount.toLocaleString("en-KE", {
+                  {data?.Receipt_Amount?.toLocaleString("en-KE", {
                     style: "currency",
                     currency: "KES",
                   })}
@@ -225,8 +406,39 @@ const[appointmentNo, setAppointmentNo] = useState('')
           </Col>
         </Row>
       </Card>
-
-      <AddCharges visible={isModalVisible} onClose={handleClose} visitNo={appointmentNo} />
+      <Modal
+        title="Confirm Invoice Generation"
+        visible={isInvoiceModalVisible}
+        onOk={handleConfirmGenerateInvoice}
+        onCancel={() => setIsInvoiceModalVisible(false)}
+        okText="Yes"
+        cancelText="No"
+      >
+        <p>
+          Are you sure you want to generate an invoice for Patient No:{" "}
+          <strong>{selectedpatientNo}</strong>?
+        </p>
+      </Modal>
+      <AddCharges
+        visible={isModalVisible}
+        onClose={handleClose}
+        visitNo={patientData?.AppointmentNo}
+      />
+      <ProcessPayment
+        visible={isGenerateReceiptModalVisible}
+        onClose={handleClose}
+        patientNo={patientData?.PatientNo}
+        />
+      <Modal
+        title="Invoice Preview"
+        open={showPDFModal}
+        onCancel={() => setShowPDFModal(false)}
+        footer={null}
+        width={800}
+        style={{ top: 2 }}
+      >
+        {pdfBase64 && <PDFViewer base64String={pdfBase64} />}
+      </Modal>
     </div>
   );
 };

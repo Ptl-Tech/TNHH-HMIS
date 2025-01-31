@@ -342,7 +342,7 @@ function App() {
             element={<CreateVisitForm />}
           />
            <Route
-            path="/reception/invoice/:ReceiptNo"
+            path="/reception/invoice/:patientNo"
             element={<ViewInvoice />}
           />
         </Route>
