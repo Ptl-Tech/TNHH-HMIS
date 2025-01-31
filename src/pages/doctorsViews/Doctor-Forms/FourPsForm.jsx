@@ -107,8 +107,8 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
           Aetiology Notes
         </Typography.Title>
       </Space>
-      {role === "Doctor" ||
-        (role === "Psychology" && (
+      {(role === "Doctor" ||
+        role === "Psychology") && (
           <>
             <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
               {notesType.map((note) => (
@@ -140,7 +140,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
               </Button>
             </Form>
           </>
-        ))}
+        )}
 
       <AetiologyTable data={data} />
     </div>

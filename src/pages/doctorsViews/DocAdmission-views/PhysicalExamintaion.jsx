@@ -103,8 +103,8 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
           Physical Examination
         </Typography.Title>
       </Space>
-      {role === "Doctor" ||
-        (role === "Psychology" && (
+      {(role === "Doctor" ||
+        role === "Psychology") && (
           <>
             <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
               {notesType.map((note) => (
@@ -136,7 +136,7 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
               </Button>
             </Form>
           </>
-        ))}
+        )}
 
       <PhysicalExaminationTable data={data} />
     </div>

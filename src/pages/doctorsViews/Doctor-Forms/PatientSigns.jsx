@@ -259,8 +259,8 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
         <FileOutlined /> Patient History Notes
       </Typography.Text>
-      {role === "doctor" ||
-        (role === "Psychology" && (
+      {(role === "Doctor" || role === "Psychology")
+        && (
           <>
             <Steps
               current={currentStep}
@@ -287,7 +287,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
               </div>
             </Form>
           </>
-        ))}
+        )}
 
       <PatientHistoryNotesTable data={data} />
     </div>
