@@ -24,11 +24,7 @@ export const postNurseAdmissionNotesSlice = (endpoint = '/Nurse/NurseAdmissionNo
     
         dispatch({
             type: POST_NURSE_ADMISSION_NOTES_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_NURSE_ADMISSION_NOTES_FAILURE, payload: error };

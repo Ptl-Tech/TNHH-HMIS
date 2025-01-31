@@ -31,6 +31,9 @@ export const postAllergiesMedicationSlice =
 
       return response.data;
     } catch (error) {
-      dispatch({ type: POST_ALLERGIES_MEDICATION_FAIL, payload: error });
+      dispatch({ 
+        type: POST_ALLERGIES_MEDICATION_FAIL, 
+        payload: error 
+      });
     }
   };

@@ -25,11 +25,7 @@ export const postMentalExaminationFormSlice = (endpoint = '/InpatientForms/Menta
     
         dispatch({
             type: POST_MENTAL_EXAMINATION_FORM_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_MENTAL_EXAMINATION_FORM_FAILURE, payload: error };

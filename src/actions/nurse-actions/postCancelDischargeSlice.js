@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import configHelpers from '../configHelpers';
 import axios from "axios";
 
@@ -24,13 +25,9 @@ export const postCancelDischargeSlice = (endpoint = '/Inpatient/CancelDischarge'
     
         dispatch({
             type: POST_CANCEL_DISCHARGE_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
-        return { type: POST_CANCEL_DISCHARGE_FAILURE, payload: error };
+        message.error(error.message, 5);
     }
 };
