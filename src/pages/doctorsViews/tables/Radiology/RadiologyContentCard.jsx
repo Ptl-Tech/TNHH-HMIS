@@ -8,16 +8,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getSingleRadiologyDetails } from '../../../../actions/radiology-actions/radiologyActions';
 import RadiologyTopSection from './RadiologyTopSection';
+import { getRadiologyDetails } from '../../../../actions/Doc-actions/getRadiologyDetails';
 
 const RadiologyContentCard = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const radiologyNo = queryParams.get("radiologyNo");
+  const [rerender, setRerender] = useState(false);
+
   useEffect(() => {
     // fetch the radiology details
     radiologyNo && dispatch(getSingleRadiologyDetails(radiologyNo))
-  }, [dispatch, radiologyNo]);
+  }, [dispatch, radiologyNo, rerender]);
+
+  useEffect(() => {
+    dispatch(getRadiologyDetails(radiologyNo));
+  }, [dispatch, radiologyNo, rerender]);
 
   const { loading, radiologyDetails } = useSelector((state) => state.getSingleRadiologyDetails);
   console.log({ radiologyDetails });
@@ -37,30 +44,6 @@ const RadiologyContentCard = () => {
       {radiologyDetails && <RadiologyTopSection
         radiologyDetails={radiologyDetails}
       />}
-      {
-        // radiologyDetails && <Card title="Radiology Details" bordered={false} style={{ minWidth: "40vw", maxWidth: "50vw" }}>
-        //   <Card.Grid hoverable={false} style={gridStyle}>
-        //     <p style={{ color: "gray", fontWeight: "400" }}>Patient no : </p>
-        //     <p>{radiologyDetails.PatientNo}</p>
-        //   </Card.Grid>
-        //   <Card.Grid hoverable={false} style={gridStyle}>
-        //     <p style={{ color: "gray", fontWeight: "400" }}>Patient Name : </p>
-        //     <p>{radiologyDetails.Surname}&nbsp;{radiologyDetails.LastName}</p>
-        //   </Card.Grid>
-        //   <Card.Grid hoverable={false} style={gridStyle}>
-        //     <p style={{ color: "gray", fontWeight: "400" }}>Status : </p>
-        //     <p>{radiologyDetails.Status}</p>
-        //   </Card.Grid>
-        //   <Card.Grid hoverable={false} style={gridStyle}>
-        //     <p style={{ color: "gray", fontWeight: "400" }}>Treatment No : </p>
-        //     <p>{radiologyDetails.Treatment_No}</p>
-        //   </Card.Grid>
-        //   <Card.Grid hoverable={false} style={gridStyle}>
-        //     <p style={{ color: "gray", fontWeight: "400" }}>Link No : </p>
-        //     {/* <p>{radiologyDetails.Treatment_No}</p> */}
-        //   </Card.Grid>
-        // </Card>
-      }
       <Card
         className="card"
         style={{ padding: '10px 16px', marginTop: '20px' }}
@@ -86,7 +69,7 @@ const RadiologyContentCard = () => {
             }
             key="1"
           >
-            <RadiologyTestRequest />
+            <RadiologyTestRequest rerender={rerender} setRerender={setRerender} radiologyDetails={radiologyDetails} />
           </Tabs.TabPane>
         </Tabs>
       </Card>

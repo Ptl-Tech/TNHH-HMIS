@@ -14,7 +14,7 @@ import {
   PrinterOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaCoins } from "react-icons/fa";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,19 +25,30 @@ const { Title, Text } = Typography;
 
 const ViewInvoice = () => {
   const dispatch = useDispatch();
+  const navigate= useNavigate();
   const { state } = useLocation();
   const { header, lines } = state.patientData; // Extract header and lines
   const { loading } = useSelector((state) => state.printReceipt);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+const[appointmentNo, setAppointmentNo] = useState('')
+
+ const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const handleClose = () => {
     setIsModalVisible(false);
+  
   };
 
   const showModal = () => {
-    setIsModalVisible(true);
+    setAppointmentNo(header[0]?.Patient_Appointment_No); 
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 0); 
   };
+  
 
   const handlePrintReceipt = () => {
     const receipt = {
@@ -104,16 +115,17 @@ const ViewInvoice = () => {
 
           <Col>
             <Space>
-              <Button icon={<DownloadOutlined />}>Download</Button>
+              {/* <Button icon={<DownloadOutlined />}>Download</Button> */}
               <Button
-                icon={<PrinterOutlined />}
+                icon={<PrinterOutlined style={{ color: "green", size: "29px" }} />}
                 loading={loading}
                 onClick={handlePrintReceipt}
+                size="large"
               >
-                Print
+                Print Receipt
               </Button>
-              <Button icon={<EditOutlined />}>Edit</Button>
-              <Button type="primary" icon={<FaCoins />} onClick={showModal}>
+              {/* <Button icon={<EditOutlined />}>Edit</Button> */}
+              <Button type="primary" size="large" icon={<FaCoins />} onClick={showModal}>
                 Add Charges
               </Button>
             </Space>
@@ -121,6 +133,16 @@ const ViewInvoice = () => {
         </Row>
 
         <Divider />
+        <Row justify="space-between">
+          <Col>
+            <Title level={4}>Receipt</Title>
+          </Col>
+          <Col>
+            <Button type="primary" onClick={handleGoBack}>
+              Go Back
+            </Button>
+          </Col>
+        </Row>
 
         <Row>
           <Col span={12}>
@@ -204,7 +226,7 @@ const ViewInvoice = () => {
         </Row>
       </Card>
 
-      <AddCharges visible={isModalVisible} onClose={handleClose} />
+      <AddCharges visible={isModalVisible} onClose={handleClose} visitNo={appointmentNo} />
     </div>
   );
 };

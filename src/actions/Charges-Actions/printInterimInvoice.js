@@ -10,26 +10,33 @@ export const PRINT_INTERIM_INVOICE_RESET = "PRINT_INTERIM_INVOICE_RESET";
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL || "http://217.21.122.62:8085";
 
-export const postInterimInvoice = (invoiceData, staffNo) => async (dispatch, getState) => {
+export const postInterimInvoice = (invoiceData) => async (dispatch, getState) => {
   try {
     dispatch({ type: PRINT_INTERIM_INVOICE_REQUEST });
 
     // Append staffNo to invoiceData
-    const postDataInvoice = { ...invoiceData, staffNo };
 
     const config = apiHeaderConfig(getState);
+
+    //get staffNo from userInfo
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    invoiceData.staffNo = userInfo.userData.no;
+
+    const postDataInvoice = JSON.stringify(invoiceData);
     const response = await axios.post(
-      `${API_URL}/Reports/PatientInterimInvoice`,
+      `${API_URL}/Reports/PatientInterimInvoiceReport`,
       postDataInvoice,
       config
     );      
 
     dispatch({
       type: PRINT_INTERIM_INVOICE_SUCCESS,
-      payload: response.data,
+      payload: response,
     });
     message.success("Invoice printed successfully!", 5);
-    return response.data;
+    return response;
   } catch (error) {
     setTimeout(() => {
       dispatch({

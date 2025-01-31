@@ -206,7 +206,15 @@ import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
+import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
+import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderReducer";
+import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
+import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
+import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
+import { postPatientChargesReducer } from "./ChargesReducers/postPatientChargesReducer";
+import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
 import { getNursingCarePlanReducer, postNursingCarePlanReducer } from "./nurse-reducers/postNursingCarePlanFormReducer";
+import { forwardRadiologyResultsReducer, getSingleRadiologyDetailsReducer, postRadiologyResultsReducer } from "./radiology-reducer/radiologyReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -382,6 +390,19 @@ export const rootReducer = combineReducers({
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
   postPsychologyRequest:postPsychologyRequestReducer,
   getReceiptHeaders:getReceiptPgHeadersReducer,
+  getReceiptLines:getReceiptLinesReducer,
+  getReceiptHeaderLines:getReceiptHeaderReducer,
+  postReceipt:postReceiptHeaderReducer,
+  printReceipt:postReceiptReducer,
+  getTransactionList:getTransactionListReducer,
+  getChargesSetup:getChargesSetupReducer,
+  postPatientCharges:postPatientChargesReducer,
+  generateInvoice:postGenerateInvoiceReducer,
   postNursingCarePlan:postNursingCarePlanReducer,
   getNursingCarePlan:getNursingCarePlanReducer,
+
+  // radiology reducers
+  postRadiologyResults: postRadiologyResultsReducer,
+  getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,
+  forwardRadiologyResults: forwardRadiologyResultsReducer,
 });
