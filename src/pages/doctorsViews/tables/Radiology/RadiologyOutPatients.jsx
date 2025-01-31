@@ -1,4 +1,4 @@
-import { Button, Card, Input, Space, Table, Typography, Select } from 'antd';
+import { Button, Card, Input, Space, Table, Typography, Select, Tabs } from 'antd';
 import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -99,9 +99,7 @@ const RadiologyOutPatients = () => {
     },
   ];
 
-
   const dispatch = useDispatch();
-
   const { loading, data } = useSelector((state) => state.getRadiologyList);
 
   useEffect(() => {
@@ -110,14 +108,9 @@ const RadiologyOutPatients = () => {
     }
   }, [dispatch, data.length]);
 
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: data.length,
-  });
-
   const [searchCategory, setSearchCategory] = useState('name');
   const [searchValue, setSearchValue] = useState('');
+  const [selectedTabKey, setSelectedTabKey] = useState('1'); // Track the selected tab
 
   const handleNavigate = (record) => {
     navigate({
@@ -126,13 +119,18 @@ const RadiologyOutPatients = () => {
     });
   };
 
-  const handleTableChange = (newPagination) => {
-    setPagination(newPagination);
-  };
-
-  // Filtered data computation with useMemo
+  // Filter the data by status and search criteria
   const filteredData = useMemo(() => {
-    return data.filter((item) => {
+    let statusFilteredData = data.filter((item) => {
+      if (selectedTabKey === '1') return item.Status === 'New';
+      if (selectedTabKey === '2') return item.Status === 'Cancelled';
+      if (selectedTabKey === '3') return item.Status === 'Completed';
+      if (selectedTabKey === '4') return item.Status === 'Forwarded';
+      return true; // If no tab is selected, show all
+    });
+
+    // Apply search filter
+    return statusFilteredData.filter((item) => {
       if (searchCategory === 'name') {
         const fullName = `${item.Surname} ${item.MiddleName} ${item.LastName}`.toLowerCase();
         return fullName.includes(searchValue.toLowerCase());
@@ -145,7 +143,12 @@ const RadiologyOutPatients = () => {
       }
       return false;
     });
-  }, [data, searchCategory, searchValue]);
+  }, [data, selectedTabKey, searchCategory, searchValue]);
+
+  // Handle tabs change
+  const handleTabChange = (key) => {
+    setSelectedTabKey(key); // Update selected tab
+  };
 
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
@@ -168,7 +171,7 @@ const RadiologyOutPatients = () => {
       </Space>
 
       <Card style={{ padding: '10px 10px 10px 10px' }}>
-        <div className="admit-patient-filter-container" style={{ display: 'flex', gap: '4px', alignItems: 'center', width: "50vw" }}>
+        <div className="admit-patient-filter-container" style={{ display: 'flex', gap: '4px', alignItems: 'center', width: '50vw' }}>
           <Select
             defaultValue="name"
             style={{ width: 200 }}
@@ -183,45 +186,48 @@ const RadiologyOutPatients = () => {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             allowClear
-            suffix={
-              <SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />
-            }
+            suffix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
           />
         </div>
       </Card>
+
       {loading ? (
         <Loading />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={filteredData}
-          className="admit-patient-table"
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            position: ['bottom', 'right'],
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (page, pageSize) =>
-              handleTableChange({
-                current: page,
-                pageSize,
-                total: pagination.total,
-              }),
-            onShowSizeChange: (current, size) =>
-              handleTableChange({
-                current,
-                pageSize: size,
-                total: pagination.total,
-              }),
-            style: {
-              marginTop: '30px',
-            },
-          }}
-        />
+        <Tabs defaultActiveKey="1" onChange={handleTabChange}>
+          <Tabs.TabPane tab="New" key="1">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Cancelled" key="2">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Completed" key="3">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Forwarded" key="4">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+        </Tabs>
       )}
     </div>
   );

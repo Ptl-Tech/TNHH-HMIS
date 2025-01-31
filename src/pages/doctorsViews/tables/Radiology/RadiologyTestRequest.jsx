@@ -3,11 +3,11 @@ import {
   Table,
   Input,
   Button,
-  Space,
   Upload,
   message,
+  Modal,
 } from "antd";
-import { FileTextOutlined, UploadOutlined } from "@ant-design/icons";
+import { FileTextOutlined, UploadOutlined, EditOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -16,7 +16,7 @@ import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 import { getRadiologyDetails } from "../../../../actions/Doc-actions/getRadiologyDetails";
 import { forwardRadiologyResults, postRadiologyResults } from "../../../../actions/radiology-actions/radiologyActions";
 
-const RadiologyTestRequest = () => {
+const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -25,41 +25,59 @@ const RadiologyTestRequest = () => {
   const status = queryParams.get("status");
 
   const { loading, data } = useSelector((state) => state.getRadiologyDetails);
+  // const { loading: loadingRadiologyDetails, radiologyDetails } = useSelector((state) => state.getSingleRadiologyDetails);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [remarks, setRemarks] = useState({});
   const [attachments, setAttachments] = useState({});
   const [attachmentsBase64, setAttachmentsBase64] = useState({});
 
   useEffect(() => {
     dispatch(getRadiologyDetails(radiologyNo));
-  }, [dispatch, radiologyNo]);
+  }, [dispatch, radiologyNo, modalVisible, rerender]);
 
-  const handleRemarkChange = (recordKey, value) => {
-    setRemarks((prev) => ({ ...prev, [recordKey]: value }));
+  // useEffect(() => {
+  //   setRerender((prev) => !prev)
+  // }, [dispatch, radiologyNo]);
+
+  const openModal = (record) => {
+    setSelectedRecord(record);
+    setModalVisible(true);
   };
 
-  const handleAttachmentChange = (recordKey, file) => {
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedRecord(null);
+  };
+
+  const handleRemarkChange = (value) => {
+    setRemarks((prev) => ({ ...prev, [selectedRecord.key]: value }));
+  };
+
+  const handleAttachmentChange = (file) => {
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result.split(",")[1]; // Extract Base64 part
-      setAttachments((prev) => ({ ...prev, [recordKey]: file }));
-      setAttachmentsBase64((prev) => ({ ...prev, [recordKey]: base64String }));
+      setAttachments((prev) => ({ ...prev, [selectedRecord.key]: file }));
+      setAttachmentsBase64((prev) => ({ ...prev, [selectedRecord.key]: base64String }));
       message.success("Attachment added successfully!");
     };
     reader.readAsDataURL(file); // Convert file to Base64
     return false; // Prevent auto-upload
   };
 
-  const handleSubmit = (recordKey) => {
-    const remark = remarks[recordKey];
-    const attachmentBase64 = attachmentsBase64[recordKey];
-    const record = data[recordKey]; // Retrieve the record by key
+  const handleSubmit = () => {
+    if (!selectedRecord) return;
+
+    const remark = remarks[selectedRecord.key] || "";
+    const attachmentBase64 = attachmentsBase64[selectedRecord.key] || "";
 
     const payload = {
       myAction: "edit",
-      recId: record.SystemId,
-      radiologyNo: record.Radiology_no,
-      radiologyTypeCode: record.Radiology_Type_Code,
+      recId: selectedRecord.SystemId,
+      radiologyNo: selectedRecord.Radiology_no,
+      radiologyTypeCode: selectedRecord.Radiology_Type_Code,
       remarks: remark,
       fileBase64: attachmentBase64 || "",
     };
@@ -67,40 +85,39 @@ const RadiologyTestRequest = () => {
     dispatch(postRadiologyResults(payload))
       .then((res) => {
         if (res.status === "failed") {
-          message.error(`${error.message}`);
-          return
+          message.error(`Failed to submit: ${res.message}`);
+          return;
         }
         if (res.status === "success") {
           message.success("Radiology result submitted successfully!");
+          closeModal();
         }
-
       })
       .catch((error) => {
         message.error(`Failed to submit radiology result: ${error.message}`);
       });
   };
+
   const forwardRequest = () => {
-    const payload = {
-      radiologyNo: radiologyNo,
-    };
+    const payload = { radiologyNo };
+    setRerender((prev) => !prev)
 
     dispatch(forwardRadiologyResults(payload))
       .then((res) => {
         if (res.status === "failed") {
-          message.error(`${error.message}`);
-          return
+          message.error(`Failed to forward: ${res.message}`);
+          return;
         }
         if (res.status === "success") {
-          message.success("Radiology result Forwarded successfully!");
+          message.success("Radiology result forwarded successfully!");
         }
-
       })
       .catch((error) => {
-        message.error(`Failed to submit radiology result: ${error.message}`);
+        message.error(`Failed to forward request: ${error.message}`);
       });
   };
 
-  const columns = status != 'Completed' ? [
+  const columns = [
     {
       title: "Radiology Number",
       dataIndex: "Radiology_no",
@@ -124,71 +141,20 @@ const RadiologyTestRequest = () => {
         record.Performed_Date === "0001-01-01" ? "N/A" : record.Performed_Date,
     },
     {
-      title: "Remark",
-      key: "remark",
+      title: "Result",
+      key: "result",
       render: (_, record) => (
-        <Input
-          // defaultValue={record.Remarks}
-          disabled={record.Completed == true}
-          placeholder={`${record.Completed == true ? "" : "Add a remark"}`}
-          value={record.Completed == true ? record.Remarks : remarks[record.key] || ""}
-          onChange={(e) => handleRemarkChange(record.key, e.target.value)}
-        />
-      ),
-    },
-    {
-      title: "Attachment",
-      key: "attachment",
-      render: (_, record) => (
-        <Upload
-          beforeUpload={(file) => handleAttachmentChange(record.key, file)}
-          fileList={attachments[record.key] ? [attachments[record.key]] : []}
-        >
-          <Button disabled={record.Completed == true} icon={<UploadOutlined />}>Attach File</Button>
-        </Upload>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => {
-        const hasRemark = !!remarks[record.key];
-        const hasAttachment = !!attachments[record.key];
-        const isActionAvailable = hasRemark || hasAttachment;
+        <div>
 
-        return (
-          <Button
-            type="primary"
-            disabled={!isActionAvailable || record.Completed === true}
-            onClick={() => handleSubmit(record.key)}
-          >
-            Done
-          </Button>
-        );
-      },
-    },
-  ] : [
-    {
-      title: "Radiology Number",
-      dataIndex: "Radiology_no",
-      key: "Radiology_no",
-    },
-    {
-      title: "Radiology Type Code",
-      dataIndex: "Radiology_Type_Code",
-      key: "Radiology_Type_Code",
-    },
-    {
-      title: "Radiology Type Name",
-      dataIndex: "Radiology_Type_Name",
-      key: "Radiology_Type_Name",
-    },
-    {
-      title: "Performed Date",
-      dataIndex: "Performed_Date",
-      key: "Performed_Date",
-      render: (_, record) =>
-        record.Performed_Date === "0001-01-01" ? "N/A" : record.Performed_Date,
+          {record.Completed ? (<div style={{ display: "flex", columnGap: "20px", alignItems: "center", justifyItems: "center" }}><p>✅ Completed</p>
+            {radiologyDetails.Status === "New" && <Button type="primary" onClick={() => openModal(record)}>
+              <EditOutlined /> <p>Edit</p>
+            </Button>}
+          </div>) : <Button type="primary" onClick={() => openModal(record)}>
+            Open Results
+          </Button>}
+        </div>
+      ),
     },
   ];
 
@@ -208,21 +174,66 @@ const RadiologyTestRequest = () => {
           columns={columns}
           dataSource={data.map((item, index) => ({
             ...item,
-            key: index, // Add a unique key for each record
+            key: index,
           }))}
           pagination={false}
         />
       )}
-      {status != "Completed" && <div style={{ width: "full", display: "flex", justifyContent: "end", margin: "8px 0px" }}>
-        <Button
-          type="primary"
-          disabled={status == "Completed" || data.find(e => e.Completed === false)}
-          onClick={() => forwardRequest()}
-        >
-          Forward Request
-        </Button>
-      </div>
-      }
+      {radiologyDetails && radiologyDetails.Status === "New" && (
+        <div style={{ display: "flex", justifyContent: "end", margin: "8px 0px" }}>
+          <Button
+            type="primary"
+            disabled={radiologyDetails.Status != "New" || data.some((e) => !e.Completed)}
+            onClick={forwardRequest}
+          >
+            Forward Request
+          </Button>
+        </div>
+      )}
+
+      {/* Modal for Result Submission */}
+      <Modal
+        title="Submit Radiology Result"
+        visible={modalVisible}
+        onCancel={closeModal}
+        footer={[
+          <Button key="cancel" onClick={closeModal}>
+            Cancel
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleSubmit}
+            disabled={!remarks[selectedRecord?.key] && !attachments[selectedRecord?.key]}
+          >
+            Submit
+          </Button>,
+        ]}
+      >
+        {selectedRecord && (
+          <div>
+            {console.log("selectedRecord", selectedRecord)}
+            <Typography.Paragraph>Enter Remarks:</Typography.Paragraph>
+            <Input.TextArea
+              rows={3}
+              defaultValue={selectedRecord.Remarks}
+              placeholder="Add a remark"
+              value={remarks[selectedRecord.key] || selectedRecord.Remarks}
+              onChange={(e) => handleRemarkChange(e.target.value)}
+            />
+
+            <Typography.Paragraph style={{ marginTop: "12px" }}>
+              Upload Attachment:
+            </Typography.Paragraph>
+            <Upload
+              beforeUpload={handleAttachmentChange}
+              fileList={attachments[selectedRecord.key] ? [attachments[selectedRecord.key]] : []}
+            >
+              <Button icon={<UploadOutlined />}>Attach File</Button>
+            </Upload>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
