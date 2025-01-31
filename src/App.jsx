@@ -87,6 +87,7 @@ import WalkinRegistration from './pages/WalkinRegistration';
 import RadiologyDashboard from './Dashboards/RadiologyDashboard';
 import ViewInvoice from './pages/billing/ViewInvoice';
 import ActiveOutPatients from './pages/billing/ActiveOutPatients';
+import ActiveInpatient from './pages/billing/ActiveInpatient';
 
 function App() {
   return (
@@ -322,7 +323,12 @@ function App() {
             path="/reception/Billing/Outpatients"
             element={<ActiveOutPatients />}
           />
-          <Route
+           <Route
+            path="/reception/Billing/Inpatients"
+            element={<ActiveInpatient />}
+          />
+          
+          {/* <Route
             path="/reception/insurance-List"
             element={<InsurancePatients />}
           />
@@ -330,7 +336,7 @@ function App() {
           <Route
             path="/reception/InPatient-list"
             element={<InpatientList />}
-          />
+          /> */}
 
           <Route
             path="/reception/visitors-list"

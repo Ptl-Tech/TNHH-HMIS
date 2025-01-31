@@ -31,7 +31,7 @@ import useAuth from "../../hooks/useAuth";
 const { TabPane } = Tabs;
 const { Search } = Input;
 
-const ActiveOutPatients = () => {
+const ActiveInpatient = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const staffNo = useAuth().userData.no;
@@ -85,10 +85,10 @@ const ActiveOutPatients = () => {
       );
 
       const cash = sortedList.filter(
-        (patient) => patient.PatientType === "Cash" && patient.Inpatient === false
+        (patient) => patient.PatientType === "Cash" && patient.Inpatient === true
       );
       const corporate = sortedList.filter(
-        (patient) => patient.PatientType === "Corporate"&& patient.Inpatient === false
+        (patient) => patient.PatientType === "Corporate"&& patient.Inpatient === true
       );
 
       setCashPatients(cash);
@@ -217,7 +217,7 @@ const ActiveOutPatients = () => {
 // console.log("patient Data:",patientData);
   return (
     <div>
-      <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
+      <h4 className="text-center p-3 text-dark">Inpatient Billing List</h4>
       <Typography.Text
         style={{
           color: "#003F6D",
@@ -291,4 +291,4 @@ const ActiveOutPatients = () => {
   );
 };
 
-export default ActiveOutPatients;
+export default ActiveInpatient;

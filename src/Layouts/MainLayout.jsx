@@ -108,7 +108,7 @@ const MainLayout = () => {
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
           {
-            key: '/reception/insurance-List',
+            key: '/reception/Billing/Inpatients',
             label: 'InPatient',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
