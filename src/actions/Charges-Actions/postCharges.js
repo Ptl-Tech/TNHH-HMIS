@@ -3,14 +3,14 @@ import axios from "axios";
 
 const API = "http://217.21.122.62:8085/";
 
-export const POST_RECEIPT_REQUEST = "POST_RECEIPT_REQUEST";
-export const POST_RECEIPT_SUCCESS = "POST_RECEIPT_SUCCESS";
-export const POST_RECEIPT_FAIL = "POST_RECEIPT_FAIL";
-export const POST_RECEIPT_RESET = "POST_RECEIPT_RESET";
+export const POST_CHARGES_REQUEST = "POST_CHARGES_REQUEST";
+export const POST_CHARGES_SUCCESS = "POST_CHARGES_SUCCESS";
+export const POST_CHARGES_FAIL = "POST_CHARGES_FAIL";
+export const POST_CHARGES_RESET = "POST_CHARGES_RESET";
 
-export const postReceipt = (receipt) => async (dispatch, getState) => {
+export const postPatientCharges = (charges) => async (dispatch, getState) => {
   try {
-    dispatch({ type: POST_RECEIPT_REQUEST });
+    dispatch({ type: POST_CHARGES_REQUEST });
 
     // Get user information and branch code from state and localStorage
     const {
@@ -30,8 +30,8 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
 
     // Make the POST request to the server
     const response = await axios.post(
-      `${API}GeneralProcesses/PostReceipt`,
-      receipt,
+      `${API}GeneralProcesses/PatientCharges`,
+      charges,
       config
     );
 
@@ -40,35 +40,29 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
     if (status === "success" ) {
       // Dispatch success action
       dispatch({
-        type: POST_RECEIPT_SUCCESS,
+        type: POST_CHARGES_SUCCESS,
         payload: { status, },
       });
 
       // Display success message
-      message.success(`Receipt Generated: ${status}`);
+      message.success(`Patient Charges post: ${status}fully.`);
 
-      // Return the receipt number 
+      // Return the CHARGES number 
       return status;
     } else {
-      throw new Error("Invalid response format or missing ReceiptNo.");
+      throw new Error("Invalid response format or missing CHARGESNo.");
     }
   } catch (error) {
-    // Extract error response data
-    const errorResponse = error.response?.data || {};
-    const errorMessage = errorResponse.msg || "Failed to Process Receipt.";
-    const errorStatus = errorResponse.status || "failed";
-
     // Dispatch failure action
     dispatch({
-      type: POST_RECEIPT_FAIL,
-      payload: { status: errorStatus, msg: errorMessage },
+      type: POST_CHARGES_FAIL,
+      payload: error.response?.data?.message || error.errors || error.message,
     });
 
     // Display error message
-    message.error(`${errorStatus.toUpperCase()}: ${errorMessage}`);
+    message.error(error.response?.data?.message || error.errors || "Failed to Post Charges.");
 
     // Rethrow error for handling by other parts of the app
     throw error;
-}
-
+  }
 };

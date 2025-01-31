@@ -99,6 +99,7 @@ const RadiologyOutPatients = () => {
     },
   ];
 
+
   const dispatch = useDispatch();
   const { loading, data } = useSelector((state) => state.getRadiologyList);
 

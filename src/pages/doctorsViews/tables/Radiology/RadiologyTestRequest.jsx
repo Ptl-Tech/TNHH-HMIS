@@ -15,12 +15,17 @@ import { useLocation } from "react-router-dom";
 import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 import { getRadiologyDetails } from "../../../../actions/Doc-actions/getRadiologyDetails";
 import { forwardRadiologyResults, postRadiologyResults } from "../../../../actions/radiology-actions/radiologyActions";
+import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
+import { getRadiologyDetails } from "../../../../actions/Doc-actions/getRadiologyDetails";
+import { forwardRadiologyResults, postRadiologyResults } from "../../../../actions/radiology-actions/radiologyActions";
 
 const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
+  const radiologyNo = queryParams.get("radiologyNo");
+  const status = queryParams.get("status");
   const radiologyNo = queryParams.get("radiologyNo");
   const status = queryParams.get("status");
 
@@ -127,8 +132,14 @@ const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
       title: "Radiology Type Code",
       dataIndex: "Radiology_Type_Code",
       key: "Radiology_Type_Code",
+      title: "Radiology Type Code",
+      dataIndex: "Radiology_Type_Code",
+      key: "Radiology_Type_Code",
     },
     {
+      title: "Radiology Type Name",
+      dataIndex: "Radiology_Type_Name",
+      key: "Radiology_Type_Name",
       title: "Radiology Type Name",
       dataIndex: "Radiology_Type_Name",
       key: "Radiology_Type_Name",
@@ -163,7 +174,9 @@ const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
       <Typography.Title
         level={5}
         style={{ color: "#0F5689", marginBottom: "12px" }}
+        style={{ color: "#0F5689", marginBottom: "12px" }}
       >
+        <FileTextOutlined style={{ marginRight: "8px" }} />
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Radiology Request
       </Typography.Title>
