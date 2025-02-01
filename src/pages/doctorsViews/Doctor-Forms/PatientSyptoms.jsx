@@ -76,8 +76,9 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
           const fieldName = panel.toLowerCase().replace(/ /g, "_");
           if (lastSavedNotes[fieldName] !== values[fieldName]?.trim()) {
             return {
-              myAction: "create",
-              recId: "",
+             //edit action if exists else create
+              myAction: data.some((note) => note.Category === panel) ? "edit" : "create",
+              recId: data.find((note) => note.Category === panel)?.SystemId || "",
               patientNo: patientNo,
               date: moment().format("YYYY-MM-DD"),
               category: panel,

@@ -36,6 +36,7 @@ import {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [form] = Form.useForm();
+
   
     const { state } = useLocation(); // Access the state passed via navigate
     const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
