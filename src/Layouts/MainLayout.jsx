@@ -76,11 +76,11 @@ const MainLayout = () => {
             label: 'Walk-in Patient List',
             icon: <UserAddOutlined style={{ color: '#fff' }} />,
           },
-          {
-            key: '/reception/converted-patients',
-            label: 'Converted Patients',
-            icon: <UserOutlined style={{ color: '#fff' }} />,
-          },
+          // {
+          //   key: '/reception/converted-patients',
+          //   label: 'Converted Patients',
+          //   icon: <UserOutlined style={{ color: '#fff' }} />,
+          // },
         ],
       },
       {

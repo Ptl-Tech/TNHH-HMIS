@@ -50,52 +50,58 @@ const VisitorList = () => {
     dispatch(listPatients());
   }, [dispatch]);
 
+//console where visitors are existing patients
+ if(visitors.IDNumber === patients.IDNumber && visitors.Status === "Entered" && visitors.InitiatedDate === currentDate){
+  console.log("visitors are existing patients", visitors);
+ }
+  
+  //filter the visitors based on date and status only
   useEffect(() => {
-    const applyFilters = () => {
-      setFilterLoading(true);
+    const filtered = visitors.filter((visitor) => {
+      return (
+        dayjs(visitor.InitiatedDate).isSame(currentDate, "day") &&
+        visitor.Status === "Entered"
+      );
+    });
+    setFilteredVisitors(filtered);
+  }, [visitors, currentDate]);
 
-      const filtered = visitors.filter((visitor) => {
-        const isToday = visitor.InitiatedDate === currentDate;
-        const allowedStatuses = visitor.Status === "Entered";
-        if (!isToday || !allowedStatuses) return false;
 
-        const isPatient = patients.some(
-          (patient) => patient.IDNumber === visitor.IDNumber
-        );
-
-        return (
-          !isPatient &&
-          (!searchParams.VisitorName ||
-            visitor.VisitorName?.toLowerCase().includes(
-              searchParams.VisitorName.toLowerCase()
-            )) &&
-          (!searchParams.IdNumber ||
-            visitor.IDNumber?.includes(searchParams.IdNumber)) &&
-          (!searchParams.VisitorPhone ||
-            visitor.PhoneNumber?.includes(searchParams.VisitorPhone))
-        );
-      });
-
-      setFilteredVisitors(filtered);
-      setFilterLoading(false);
-    };
-
-    if (visitors.length && patients.length) {
-      applyFilters();
-    }
-  }, [visitors, patients, searchParams, currentDate]);
 
   const handleSearchChange = (e, field) => {
     setSearchParams({ ...searchParams, [field]: e.target.value });
   };
 
   const getButtonText = (visitor) => {
+    // Check if the visitor is already a patient
+    const isPatient = patients.some(patient => patient.IDNumber === visitor.IDNumber);
     
-    const patient = visitors.find(
-      (patient) => patient.IDNumber === visitor.IDNumber
-    );
-    return patient ? "Create New Visit" : "Convert to Patient";
+    if (isPatient) {
+      return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
+    } else {
+      return "Convert to Patient"; // Show 'Convert to Patient' if the visitor is not yet a patient
+    }
   };
+  
+
+  const handleVisitCreation = (visitor) => {
+    // Check if visitor is already a patient
+    const existingPatient = patients.find(patient => patient.IDNumber === visitor.IDNumber);
+    
+    if (existingPatient) {
+      // If found, create a new visit and navigate
+      message.success("Create a New Visit.");
+      navigate(`/reception/Add-Appointment/${existingPatient.PatientNo}`, {
+        state: { existingPatient }
+      });
+    } else {
+      // If not found, convert to patient
+      openModal(visitor);
+    }
+  };
+  
+   
+  
   const openModal = (visitor) => {
     setSelectedVisitor({
       ...visitor,
@@ -161,13 +167,13 @@ const VisitorList = () => {
     {
       title: "Action",
       render: (_, visitor) => (
-        <Button type="primary" onClick={() => openModal(visitor)}>
+        <Button type="primary" onClick={() => handleVisitCreation(visitor)}>
           {getButtonText(visitor)}
         </Button>
       ),
     },
   ];
-
+  
   return (
     <div className="card mt-4">
       <div className="d-flex justify-content-between align-items-center m-4">
@@ -226,7 +232,7 @@ const VisitorList = () => {
           <Button key="cancel" onClick={() => setIsModalVisible(false)}>
             Cancel
           </Button>,
-          <Button key="convert" type="primary" onClick={handleConvertToPatient}>
+          <Button key="convert" type="primary" disabled={!selectedVisitor} loading={loading} onClick={handleConvertToPatient}>
             Convert to Patient
           </Button>,
         ]}
