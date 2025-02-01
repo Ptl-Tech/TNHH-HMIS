@@ -4,15 +4,14 @@ import { message } from 'antd';
 const API = 'http://217.21.122.62:8085/';
 
 // Action Types
-export const REQUEST_RADIOLOGY_LIST = 'REQUEST_RADIOLOGY_LIST';
-export const REQUEST_RADIOLOGY_LIST_FAIL = 'REQUEST_RADIOLOGY_LIST_FAIL';
-export const REQUEST_RADIOLOGY_LIST_RESET = 'REQUEST_RADIOLOGY_LIST_RESET';
-export const REQUEST_RADIOLOGY_LIST_SUCCESS = 'REQUEST_RADIOLOGY_LIST_SUCCESS';
+export const REQUEST_LAB_DETAILS = 'REQUEST_LAB_DETAILS';
+export const REQUEST_LAB_DETAILS_FAIL = 'REQUEST_LAB_DETAILS_FAIL';
+export const REQUEST_LAB_DETAILS_RESET = 'REQUEST_LAB_DETAILS_RESET';
+export const REQUEST_LAB_DETAILS_SUCCESS = 'REQUEST_LAB_DETAILS_SUCCESS';
 
-// Action to fetch radiology list
-export const getRadiologyList = () => async (dispatch, getState) => {
+export const getLabDetails = (labNo) => async (dispatch, getState) => {
   try {
-    dispatch({ type: REQUEST_RADIOLOGY_LIST });
+    dispatch({ type: REQUEST_LAB_DETAILS });
 
     const {
       otpVerify: { userInfo },
@@ -33,13 +32,13 @@ export const getRadiologyList = () => async (dispatch, getState) => {
 
     // API request
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=PgRadiologyList`,
+      `${API}data/odatafilter?isList=true&webservice=PgLaboratoryTestLines&query=$filter=Laboratory_No eq '${labNo}'`,
       config,
     );
 
     // Dispatch success action with the fetched data
     dispatch({
-      type: REQUEST_RADIOLOGY_LIST_SUCCESS,
+      type: REQUEST_LAB_DETAILS_SUCCESS,
       payload: data,
     });
 
@@ -50,7 +49,7 @@ export const getRadiologyList = () => async (dispatch, getState) => {
       error.response?.data?.message || error.message || 'An error occurred';
 
     dispatch({
-      type: REQUEST_RADIOLOGY_LIST_FAIL,
+      type: REQUEST_LAB_DETAILS_FAIL,
       payload: errorMessage,
     });
 
