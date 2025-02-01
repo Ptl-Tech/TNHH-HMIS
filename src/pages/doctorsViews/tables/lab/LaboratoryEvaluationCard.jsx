@@ -8,7 +8,6 @@ import { Row, Space, Typography, Col } from 'antd';
 import LabHeader from './LabHeader';
 import LabContentCard from './LabContentCard';
 import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
-import { getLabDetails } from '../../../../actions/Doc-actions/getLabRequestDetails';
 import { getPatientDetails } from '../../../../actions/Doc-actions/OutPatientAction';
 
 const LaboratoryEvaluationCard = () => {
@@ -16,24 +15,17 @@ const LaboratoryEvaluationCard = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  // getting the labNo from the query params and the state values from the state
-  const labNo = new URLSearchParams(location.search).get('LaboratoryNo');
+  // getting the state values from the state
   const { patientNo, patientLabRecord } = location.state || {};
 
   // state
-  const { loading: labLoading, data: labData } = useSelector(
-    (state) => state.labDetails,
-  );
   const { loading: patientLoading, data: patientData } = useSelector(
     (state) => state.getPatientDetails,
   );
 
   useEffect(() => {
-    if (!labData.length) dispatch(getLabDetails(labNo));
     if (!patientData) dispatch(getPatientDetails(patientNo));
-  }, [dispatch, labNo, patientNo]);
-
-  console.log({ labData, patientData, patientLabRecord });
+  }, [dispatch, patientNo]);
 
   return (
     <div style={{ margin: '16px 10px' }}>

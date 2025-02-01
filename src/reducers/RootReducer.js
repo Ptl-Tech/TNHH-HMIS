@@ -217,6 +217,10 @@ import { dispatchWalkInLab } from '../actions/patientActions';
 import { postPsychologyRequestReducer } from './doc-reducers/psychologyReducers';
 import { getReceiptPgHeadersReducer } from './doc-reducers/getReceiptPgHeadersReducer';
 
+import { postLabSampleReducer } from './lab-reducers/postLabSampleReducer';
+import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsReducer';
+import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
+
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
   otpVerify: otpVerifyReducer,
@@ -300,6 +304,9 @@ export const rootReducer = combineReducers({
   // lab
   labList: getLabListReducer,
   labDetails: getLabDetailsReducer,
+  getLabTestResults: getLabTestResultsReducer,
+  postLabSample: postLabSampleReducer,
+  postLabTestResults: postLabTestResultsReducer,
   // ************************************* /
 
   getIPVisitors: getVisitorsListReducer,
