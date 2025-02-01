@@ -40,8 +40,8 @@ import useAuth from "../../../hooks/useAuth";
 const { Option } = Select;
 
 const Diagnosis = () => {
-  
   const location = useLocation();
+  const role = useAuth().userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientNo = queryParams.get("PatientNo");
@@ -101,8 +101,8 @@ const Diagnosis = () => {
   };
   const handleClose = () => {
     setIsModalVisible(false); // Close the modal by updating state
-     //reset the diagnosis list
-     if (activeTab === "1") {
+    //reset the diagnosis list
+    if (activeTab === "1") {
       setPrimaryDiagnosisList([]);
     } else if (activeTab === "2") {
       setSecondaryDiagnosisList([]);
@@ -171,20 +171,22 @@ const Diagnosis = () => {
   };
   const handleSubmit = async (values) => {
     const activeTab = activeKey; // Get the active tab key
-  
+
     const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter(
       (diagnosis) => !diagnosis.diagnosisNo
     );
     const lastUnSavedSecondaryDiagnosis = secondaryDiagnosisList.filter(
       (diagnosis) => !diagnosis.diagnosisNo
     );
-  
+
     let success = true; // Tracks overall success
-  
+
     try {
       const diagnosisList =
-        activeTab === "1" ? lastUnSavedPrimaryDiagnosis : lastUnSavedSecondaryDiagnosis;
-  
+        activeTab === "1"
+          ? lastUnSavedPrimaryDiagnosis
+          : lastUnSavedSecondaryDiagnosis;
+
       // Process diagnoses based on active tab
       for (let diagnosis of diagnosisList) {
         const diagnosisData = {
@@ -195,14 +197,16 @@ const Diagnosis = () => {
           confirmed: diagnosis.confirmed,
           remarks: diagnosis.remarks,
         };
-  
+
         const response = await dispatch(postDiagnosisRequest(diagnosisData));
-  
+
         if (response.status !== "success") {
           success = false;
           message.error(`Error saving diagnosis: ${diagnosis.diagnosisCode}`);
         } else {
-          message.success(`Diagnosis saved successfully: ${diagnosis.diagnosisCode}`);
+          message.success(
+            `Diagnosis saved successfully: ${diagnosis.diagnosisCode}`
+          );
           // Reset the input field
           setDiagnosisInput("");
           //reset the diagnosis list
@@ -213,7 +217,7 @@ const Diagnosis = () => {
           }
         }
       }
-  
+
       // Final feedback
       if (success) {
         // message.success("All diagnoses saved successfully!");
@@ -240,10 +244,9 @@ const Diagnosis = () => {
         content: "An unexpected error occurred. Please try again.",
       });
     }
-  
+
     setIsModalVisible(true); // Show modal after processing
   };
-  
 
   return (
     <div className="mt-4">
@@ -260,23 +263,23 @@ const Diagnosis = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Diagnosis
       </Typography.Title>
-      
-          <Row gutter={24}>
-        <Col span={24}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            style={{ marginBottom: "16px", float: "right" }}
-            onClick={handleHistoryClick}
-          >
-            Add New Diagnosis
-          </Button>
-        </Col>
-      </Row>
-   
-      <DiagnosisTable
-       treatmentNo={treatmentNo}
-        />
+
+      {role === "Doctor" && (
+        <Row gutter={24}>
+          <Col span={24}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              style={{ marginBottom: "16px", float: "right" }}
+              onClick={handleHistoryClick}
+            >
+              Add New Diagnosis
+            </Button>
+          </Col>
+        </Row>
+      )}
+
+      <DiagnosisTable treatmentNo={treatmentNo} />
 
       {/* Show the diagnosis history modal */}
       <Modal
@@ -309,8 +312,8 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-              handleClose={() => setHistoryVisible(false)} 
-              />
+              handleClose={() => setHistoryVisible(false)}
+            />
           </TabPane>
 
           <TabPane tab="Add Secondary Diagnosis" key="2">
@@ -325,8 +328,8 @@ const Diagnosis = () => {
               handleRemoveDiagnosis={handleRemoveDiagnosis}
               handleSubmit={handleSubmit}
               loading={loading}
-              handleClose={() => setHistoryVisible(false)} 
-              />
+              handleClose={() => setHistoryVisible(false)}
+            />
           </TabPane>
         </Tabs>
       </Modal>

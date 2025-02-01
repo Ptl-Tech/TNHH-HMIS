@@ -9,7 +9,7 @@ const RadiologyOutPatient = () => {
       <Space className="inpatient-header">
         <DiffOutlined />
         <Typography.Text className="inpatient-header-text">
-          Laboratory Evaluation Form
+          Radiology Evaluation Form
         </Typography.Text>
       </Space>
       <RadiologyContentCard />

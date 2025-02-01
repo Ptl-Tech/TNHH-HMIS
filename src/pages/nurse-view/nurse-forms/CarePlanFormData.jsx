@@ -1,17 +1,94 @@
-import { Button, Col, Form, Row, Space } from "antd";
+import { Button, Col, Form, message, Row, Space } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getNursingCarePlanSlice,
+  POST_NURSING_CARE_PLAN_FAILURE,
+  POST_NURSING_CARE_PLAN_SUCCESS,
+  postNursingCarePlanSlice,
+} from "../../../actions/nurse-actions/postNursingCarePlanFormSlice";
 
-const CarePlanFormData = ({ setIsFormVisible }) => {
-  const [form] = Form.useForm();
+const CarePlanFormData = ({
+  setIsFormVisible,
+  form,
+  patientDetails,
+  isViewing,
+}) => {
+  const dispatch = useDispatch();
+  const { loadingCarePlan } = useSelector((state) => state.postNursingCarePlan);
+
+  const handleResetForm = () => {
+    form.resetFields();
+    setIsFormVisible(false);
+  };
+
+  const handleOnFinish = async (values) => {
+    try {
+      const formData = {
+        myAction: "create",
+        recId: "",
+        admissionNo: patientDetails?.Admission_No,
+        patientNo: patientDetails?.Patient_No,
+        pysicalAssessment: values.Physical_Assessmet_MSA,
+        nursingDiagnosis: values.Nursing_Diagnosis,
+        implementation: values.Implementation,
+        rationale: values.Rationale,
+        evaluation: values.Evaluation,
+      };
+
+      const dispatchFormData = async (data) => {
+        await dispatch(postNursingCarePlanSlice(data))
+          .then((result) => {
+            if (result.type === POST_NURSING_CARE_PLAN_SUCCESS) {
+              message.success(
+                result.payload.msg || `Care plan saved successfully!`
+              );
+              dispatch(getNursingCarePlanSlice());
+              setIsFormVisible(false);
+            } else if (result.type === POST_NURSING_CARE_PLAN_FAILURE) {
+              message.error(
+                result.payload.msg || "Error processing your request."
+              );
+            }
+          })
+          .then(() => {
+            form.resetFields();
+          })
+          .catch((err) => {
+            message.error(
+              err.message || "Internal server error, please try again later."
+            );
+          });
+      };
+
+      // Call the function
+      await dispatchFormData(formData);
+    } catch (error) {
+      message.error(error.message || "An unexpected error occurred.");
+    }
+  };
+
   return (
-    <Form form={form} layout="vertical" style={{ paddingTop: "10px" }}>
+    <Form
+      form={form}
+      layout="vertical"
+      style={{ paddingTop: "10px" }}
+      onFinish={handleOnFinish}
+      initialValues={{
+        Physical_Assessmet_MSA: "",
+        Nursing_Diagnosis: "",
+        Rationale: "",
+        Evaluation: "",
+        Implementation: "",
+      }}
+    >
       <Row gutter={[16, 16]}>
         <Col span={12}>
           <Form.Item
             label="Physical Assessment"
-            name="physicalAssessment"
+            name="Physical_Assessmet_MSA"
             style={{ width: "100%" }}
             rules={[
               {
@@ -29,7 +106,7 @@ const CarePlanFormData = ({ setIsFormVisible }) => {
         <Col span={12}>
           <Form.Item
             label="Nursing Diagnosis"
-            name="nursingDiagnosis"
+            name="Nursing_Diagnosis"
             style={{ width: "100%" }}
             rules={[
               {
@@ -44,12 +121,12 @@ const CarePlanFormData = ({ setIsFormVisible }) => {
             />
           </Form.Item>
         </Col>
-        </Row>
-        <Row gutter={[16, 16]}>
+      </Row>
+      <Row gutter={[16, 16]}>
         <Col span={24}>
           <Form.Item
             label="Implementation"
-            name="implementation"
+            name="Implementation"
             style={{ width: "100%" }}
           >
             <TextArea
@@ -61,7 +138,7 @@ const CarePlanFormData = ({ setIsFormVisible }) => {
         <Col span={24}>
           <Form.Item
             label="Rationale"
-            name="rationale"
+            name="Rationale"
             style={{ width: "100%" }}
           >
             <TextArea
@@ -73,7 +150,7 @@ const CarePlanFormData = ({ setIsFormVisible }) => {
         <Col span={24}>
           <Form.Item
             label="Evaluation"
-            name="evaluation"
+            name="Evaluation"
             style={{ width: "100%" }}
           >
             <TextArea
@@ -85,14 +162,25 @@ const CarePlanFormData = ({ setIsFormVisible }) => {
       </Row>
       <Form.Item>
         <Space>
-          <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-            Save Care Plan
-          </Button>
+          {isViewing ? (
+            null
+          ) : (
+            <Button
+              type="primary"
+              htmlType="submit"
+              icon={<SaveOutlined />}
+              loading={loadingCarePlan}
+              disabled={loadingCarePlan}
+            >
+              Save Care Plan
+            </Button>
+          )
+          }
           <Button
             color="danger"
             variant="outlined"
             icon={<CloseOutlined />}
-            onClick={() => setIsFormVisible(false)}
+            onClick={() => handleResetForm()}
           >
             Cancel
           </Button>
@@ -107,4 +195,7 @@ export default CarePlanFormData;
 //props validation
 CarePlanFormData.propTypes = {
   setIsFormVisible: PropTypes.bool,
+  form: PropTypes.array.isRequired,
+  patientDetails: PropTypes.array.isRequired,
+  isViewing: PropTypes.bool,
 };

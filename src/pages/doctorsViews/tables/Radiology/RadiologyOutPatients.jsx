@@ -1,10 +1,12 @@
-import { Button, Card, Input, Space, Table, Typography } from 'antd';
-import { ProfileOutlined } from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+import { Button, Card, Input, Space, Table, Typography, Select, Tabs } from 'antd';
+import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { getRadiologyList } from '../../../../actions/Doc-actions/getRadiologyList';
+
+const { Option } = Select;
 
 const RadiologyOutPatients = () => {
   const navigate = useNavigate();
@@ -14,16 +16,23 @@ const RadiologyOutPatients = () => {
       title: 'Radiology No',
       dataIndex: 'RadiologyNo',
       key: 'RadiologyNo',
+      sorter: (a, b) => a.RadiologyNo.localeCompare(b.RadiologyNo),
     },
     {
       title: 'Patient No',
       dataIndex: 'PatientNo',
       key: 'PatientNo',
+      sorter: (a, b) => a.PatientNo.localeCompare(b.PatientNo),
     },
     {
       title: 'Patient Names',
       dataIndex: 'names',
       key: 'names',
+      sorter: (a, b) => {
+        const nameA = `${a.Surname} ${a.MiddleName} ${a.LastName}`.toLowerCase();
+        const nameB = `${b.Surname} ${b.MiddleName} ${b.LastName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      },
       render: (_, record) => {
         return (
           <Button
@@ -36,16 +45,17 @@ const RadiologyOutPatients = () => {
         );
       },
     },
-
     {
       title: 'Radiology Date',
       dataIndex: 'RadiologyDate',
       key: 'RadiologyDate',
+      sorter: (a, b) => new Date(a.RadiologyDate) - new Date(b.RadiologyDate),
     },
     {
-      title: 'status',
+      title: 'Status',
       dataIndex: 'Status',
       key: 'Status',
+      sorter: (a, b) => a.Status.localeCompare(b.Status),
       render: (_, record) => {
         let statusColor;
         switch (record.Status) {
@@ -89,33 +99,56 @@ const RadiologyOutPatients = () => {
     },
   ];
 
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const { loading, data } = useSelector((state) => state.getRadiologyList);
 
   useEffect(() => {
     if (!data.length) {
       dispatch(getRadiologyList());
     }
-  }, [dispatch]);
+  }, [dispatch, data.length]);
 
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: data.length,
-  });
+  const [searchCategory, setSearchCategory] = useState('name');
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedTabKey, setSelectedTabKey] = useState('1'); // Track the selected tab
 
   const handleNavigate = (record) => {
-    console.log('records from table', record);
-
     navigate({
       pathname: `/Radiology/Radiology-Patient`,
-      search: `?radiologyNo=${record.RadiologyNo}`,
+      search: `?radiologyNo=${record.RadiologyNo}&status=${record.Status}`,
     });
   };
 
-  const handleTableChange = (newPagination) => {
-    setPagination(newPagination); // Update pagination settings
+  // Filter the data by status and search criteria
+  const filteredData = useMemo(() => {
+    let statusFilteredData = data.filter((item) => {
+      if (selectedTabKey === '1') return item.Status === 'New';
+      if (selectedTabKey === '2') return item.Status === 'Cancelled';
+      if (selectedTabKey === '3') return item.Status === 'Completed';
+      if (selectedTabKey === '4') return item.Status === 'Forwarded';
+      return true; // If no tab is selected, show all
+    });
+
+    // Apply search filter
+    return statusFilteredData.filter((item) => {
+      if (searchCategory === 'name') {
+        const fullName = `${item.Surname} ${item.MiddleName} ${item.LastName}`.toLowerCase();
+        return fullName.includes(searchValue.toLowerCase());
+      }
+      if (searchCategory === 'patientNo') {
+        return item.PatientNo.toLowerCase().includes(searchValue.toLowerCase());
+      }
+      if (searchCategory === 'radiologyNo') {
+        return item.RadiologyNo?.toLowerCase().includes(searchValue.toLowerCase());
+      }
+      return false;
+    });
+  }, [data, selectedTabKey, searchCategory, searchValue]);
+
+  // Handle tabs change
+  const handleTabChange = (key) => {
+    setSelectedTabKey(key); // Update selected tab
   };
 
   return (
@@ -139,66 +172,63 @@ const RadiologyOutPatients = () => {
       </Space>
 
       <Card style={{ padding: '10px 10px 10px 10px' }}>
-        <div className="admit-patient-filter-container">
+        <div className="admit-patient-filter-container" style={{ display: 'flex', gap: '4px', alignItems: 'center', width: '50vw' }}>
+          <Select
+            defaultValue="name"
+            style={{ width: 200 }}
+            onChange={(value) => setSearchCategory(value)}
+          >
+            <Option value="name">Search by Name</Option>
+            <Option value="patientNo">Search by Patient No</Option>
+            <Option value="radiologyNo">Search by Radiology Number</Option>
+          </Select>
           <Input
-            placeholder="search by name"
+            placeholder={`Search by ${searchCategory}`}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             allowClear
-            showCount
-            showSearch
-          />
-          <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>
-            or
-          </span>
-          <Input
-            placeholder="search by patient no"
-            allowClear
-            showCount
-            showSearch
-          />
-          <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>
-            or
-          </span>
-          <Input
-            placeholder="search by id number"
-            allowClear
-            showCount
-            showSearch
+            suffix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
           />
         </div>
       </Card>
+
       {loading ? (
         <Loading />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={data}
-          className="admit-patient-table"
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            position: ['bottom', 'right'],
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (page, pageSize) =>
-              handleTableChange({
-                current: page,
-                pageSize,
-                total: pagination.total,
-              }),
-            onShowSizeChange: (current, size) =>
-              handleTableChange({
-                current,
-                pageSize: size,
-                total: pagination.total,
-              }),
-            style: {
-              marginTop: '30px',
-            },
-          }}
-        />
+        <Tabs defaultActiveKey="1" onChange={handleTabChange}>
+          <Tabs.TabPane tab="New" key="1">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Cancelled" key="2">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Completed" key="3">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Forwarded" key="4">
+            <Table
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 10 }}
+              rowKey="RadiologyNo"
+            />
+          </Tabs.TabPane>
+        </Tabs>
       )}
     </div>
   );

@@ -223,7 +223,7 @@ const DoctorVisits = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleNavigate(record, record.treatmentNo)}
+          onClick={() => handleNavigate(record, record.TreatmentNo)}
         >
           <CheckOutlined /> Check In
         </Button>
@@ -242,7 +242,7 @@ const DoctorVisits = () => {
           {
             state: {
               patientNo: record.PatientNo,
-              observationNo: record.observationNo,
+              observationNo: record.ObservationNo,
               patientDetails: record,
             },
           }

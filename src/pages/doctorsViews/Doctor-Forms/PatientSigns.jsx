@@ -4,15 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
+import useAuth from "../../../hooks/useAuth";
 
 const { TextArea } = Input;
 const { Step } = Steps;
 
-const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
-  const { loading: saveNotesLoading } = useSelector((state) => state.postPatientHistory);
+const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
+  const role = useAuth().userData.departmentName;
+  const { loading: saveNotesLoading } = useSelector(
+    (state) => state.postPatientHistory
+  );
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
-
-  console.log('patient history notes', data);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
@@ -26,23 +29,54 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
   }, [dispatch, treatmentNo]);
 
   // Extract initial values for the form
-  const initialValues = useMemo(() => ({
-    1: data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)?.Notes || "",
-    2: data.filter((note) => note.Notes_Type === "Allegations").at(-1)?.Notes || "",
-    3: data.filter((note) => note.Notes_Type === "History of Presenting Complaint").at(-1)?.Notes || "",
-    5: data.filter((note) => note.Notes_Type === "Past Psychiatric and Medical History").at(-1)?.Notes || "",
-    6: data.filter((note) => note.Notes_Type === "Family History").at(-1)?.Notes || "",
-    personalHistory: data.filter((note) => note.Notes_Type === "Personal History").at(-1)?.Notes || "",
-    8: data.filter((note) => note.Notes_Type === "Forensic History").at(-1)?.Notes || "",
-    9: data.filter((note) => note.Notes_Type === "Premorbid Personality").at(-1)?.Notes || "",
-    20: data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes || "",
-    23: data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes || "",
-    7: data.filter((note) => note.Notes_Type === "Past Psychiatric and Medical History").at(-1)?.Notes || "",
-
-  }), [data]);
-
-  console.log('data', data);
-
+  const initialValues = useMemo(
+    () => ({
+      1:
+        data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)
+          ?.Notes || "",
+      2:
+        data.filter((note) => note.Notes_Type === "Allegations").at(-1)
+          ?.Notes || "",
+      3:
+        data
+          .filter(
+            (note) => note.Notes_Type === "History of Presenting Complaint"
+          )
+          .at(-1)?.Notes || "",
+      5:
+        data
+          .filter(
+            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
+          )
+          .at(-1)?.Notes || "",
+      6:
+        data.filter((note) => note.Notes_Type === "Family History").at(-1)
+          ?.Notes || "",
+      personalHistory:
+        data.filter((note) => note.Notes_Type === "Personal History").at(-1)
+          ?.Notes || "",
+      8:
+        data.filter((note) => note.Notes_Type === "Forensic History").at(-1)
+          ?.Notes || "",
+      9:
+        data
+          .filter((note) => note.Notes_Type === "Premorbid Personality")
+          .at(-1)?.Notes || "",
+      20:
+        data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes ||
+        "",
+      23:
+        data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
+        "",
+      7:
+        data
+          .filter(
+            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
+          )
+          .at(-1)?.Notes || "",
+    }),
+    [data]
+  );
 
   //tracking last saved notes
   const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
@@ -58,11 +92,21 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       title: "Chief Complaints & Allegations",
       content: (
         <>
-          <Form.Item name="1" label="Chief Complaints" rules={[{ required: true }]}>
-            <TextArea placeholder="Enter chief complaints..." autoSize={{ minRows: 3 }} />
+          <Form.Item
+            name="1"
+            label="Chief Complaints"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter chief complaints..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
           <Form.Item name="2" label="Allegations">
-            <TextArea placeholder="Enter allegations..." autoSize={{ minRows: 3 }} />
+            <TextArea
+              placeholder="Enter allegations..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
         </>
       ),
@@ -72,8 +116,15 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       key: "2",
       title: "History of Presenting Illness",
       content: (
-        <Form.Item name="3" label="History of Presenting Illness" rules={[{ required: true }]}>
-          <TextArea placeholder="Describe the illness..." autoSize={{ minRows: 4 }} />
+        <Form.Item
+          name="3"
+          label="History of Presenting Illness"
+          rules={[{ required: true }]}
+        >
+          <TextArea
+            placeholder="Describe the illness..."
+            autoSize={{ minRows: 4 }}
+          />
         </Form.Item>
       ),
       notesType: ["3"],
@@ -83,20 +134,31 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       title: "Past Psychiatric and Medical History",
       content: (
         <>
-          
-          <Form.Item name="20" label="Medical" >
-          <TextArea placeholder="Enter past medical notes..." autoSize={{ minRows: 4 }} />
+          <Form.Item name="20" label="Medical">
+            <TextArea
+              placeholder="Enter past medical notes..."
+              autoSize={{ minRows: 4 }}
+            />
           </Form.Item>
-          <Form.Item name="5" label="Past Psychiatric History" rules={[{ required: true }]}>
-            <TextArea placeholder="Enter past psychiatric History..." autoSize={{ minRows: 4 }} />
+          <Form.Item
+            name="5"
+            label="Past Psychiatric History"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter past psychiatric History..."
+              autoSize={{ minRows: 4 }}
+            />
           </Form.Item>
           <Form.Item name="23" label="Obstetric & Gynecology">
-          <TextArea placeholder="Enter past Obstetric & Gynecology notes..." autoSize={{ minRows: 4 }} />
+            <TextArea
+              placeholder="Enter past Obstetric & Gynecology notes..."
+              autoSize={{ minRows: 4 }}
+            />
           </Form.Item>
         </>
       ),
       notesType: ["5", "20", "23"],
-
     },
     {
       key: "4",
@@ -104,10 +166,16 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       content: (
         <>
           <Form.Item name="6" label="Family History">
-            <TextArea placeholder="Enter family history..." autoSize={{ minRows: 3 }} />
+            <TextArea
+              placeholder="Enter family history..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
           <Form.Item name="7" label="Personal History">
-            <TextArea placeholder="Enter personal history..." autoSize={{ minRows: 3 }} />
+            <TextArea
+              placeholder="Enter personal history..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
         </>
       ),
@@ -119,10 +187,16 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       content: (
         <>
           <Form.Item name="8" label="Forensic History">
-            <TextArea placeholder="Enter forensic history..." autoSize={{ minRows: 3 }} />
+            <TextArea
+              placeholder="Enter forensic history..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
           <Form.Item name="9" label="Premorbid Personality">
-            <TextArea placeholder="Describe premorbid personality..." autoSize={{ minRows: 3 }} />
+            <TextArea
+              placeholder="Describe premorbid personality..."
+              autoSize={{ minRows: 3 }}
+            />
           </Form.Item>
         </>
       ),
@@ -143,21 +217,28 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
           treatmentNo,
           patientNo,
         }))
-        .filter((note) => note.notes?.trim() !== "" && !lastSavedNotes[note.notesType]);
-  
+        .filter(
+          (note) => note.notes?.trim() !== "" && !lastSavedNotes[note.notesType]
+        );
+
       if (updatedNotes.length) {
-        const results = await Promise.all(updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note))));
+        const results = await Promise.all(
+          updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
+        );
         if (results.every((res) => res === "success")) {
           message.success("Notes saved successfully!");
           setLastSavedNotes((prev) => ({
             ...prev,
-            ...Object.fromEntries(updatedNotes.map((note) => [note.notesType, note.notes])),
+            ...Object.fromEntries(
+              updatedNotes.map((note) => [note.notesType, note.notes])
+            ),
           }));
+          dispatch(getPatientHistorySlice(treatmentNo));
         } else {
           message.error("Failed to save some notes.");
         }
       }
-  
+
       if (currentStep === steps.length - 1) {
         // Trigger the parent callback to move to the next tab if this is the last step
         moveToNextTab();
@@ -169,7 +250,6 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
       console.error("Validation failed:", err);
     }
   };
-  
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
   // console.log(currentStep, 'currentStep');
@@ -177,22 +257,39 @@ const PatientSigns = ({ treatmentNo, patientNo,moveToNextTab  }) => {
   return (
     <div className="mt-4">
       <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
-        <FileOutlined /> Patient History
+        <FileOutlined /> Patient History Notes
       </Typography.Text>
-      <Steps current={currentStep} size="small" style={{ marginBottom: 24 }}>
-        {steps.map((step) => (
-          <Step key={step.key} title={step.title} />
-        ))}
-      </Steps>
-      <Form form={form} layout="vertical">
-        {steps[currentStep].content}
-        <div className="steps-action  ">
-          {currentStep > 0 && <Button onClick={handlePrev}>Previous</Button>}
-          <Button type="primary" loading={saveNotesLoading} onClick={handleNext}>
-            {currentStep === steps.length - 1 ? "Finish" : "Next"}
-          </Button>
-        </div>
-      </Form>
+      {(role === "Doctor" || role === "Psychology")
+        && (
+          <>
+            <Steps
+              current={currentStep}
+              size="small"
+              style={{ marginBottom: 24 }}
+            >
+              {steps.map((step) => (
+                <Step key={step.key} title={step.title} />
+              ))}
+            </Steps>
+            <Form form={form} layout="vertical">
+              {steps[currentStep].content}
+              <div className="steps-action  ">
+                {currentStep > 0 && (
+                  <Button onClick={handlePrev}>Previous</Button>
+                )}
+                <Button
+                  type="primary"
+                  loading={saveNotesLoading}
+                  onClick={handleNext}
+                >
+                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
+                </Button>
+              </div>
+            </Form>
+          </>
+        )}
+
+      <PatientHistoryNotesTable data={data} />
     </div>
   );
 };

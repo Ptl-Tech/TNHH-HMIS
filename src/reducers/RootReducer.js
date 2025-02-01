@@ -188,35 +188,39 @@ import { getPgBedsReducer } from './nurse-reducers/getPgBedsReducer';
 import { getPgWardsListReducer } from './nurse-reducers/getPgWardsListReducer';
 import { postAdmissionFormDetailsReducer } from './nurse-reducers/postAdmissionFormDetailsReducer';
 // import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
-import { getPatientVisitReducer } from './doc-reducers/getPatientVisitDetails';
-import { QySecondaryDiagnosisSetupReducer } from './doc-reducers/getSecondaryDiagnosisSetup';
-import { postInterimInvoiceReducer } from './ChargesReducers/postInterimInvoiceReducer';
-import { getQyUrgencyColorCodingSetupReducer } from './nurse-reducers/getQyUrgencyColorCodingSetupReducer';
-import { getPgWardRoomsSetupReducer } from './nurse-reducers/getPgWardRoomsSetupReducer';
-import { postVisitorListReducer } from './nurse-reducers/postVisitorListReducer';
-import { postDoctorNotesReducer } from './doc-reducers/postDoctorNotesReducer';
-import { getBillingListReducer } from './ChargesReducers/getBillingListReducer';
-import { postPatientHistoryNotesReducer } from './doc-reducers/postPatientHistoryNotesReducer';
-import { getPatientHistoryNotes } from './doc-reducers/getPatientHistoryReducer';
-import { postMSENotesReducer } from './doc-reducers/postMSEFormReducer';
-import { getPatientMSENotesReducer } from './doc-reducers/getPatientMSELinesReducer';
-import { getPatientTreamentDiagnosisLinesReducer } from './doc-reducers/getTreatmentDiagnosisLineReducer';
-import { getAdmissionsAdmittedReducer } from './nurse-reducers/getPgAdmissionsAdmittedReducer';
-import { getQyPrescriptionLinesReducer } from './doc-reducers/QyPrescriptionLinesReducer';
-import {
-  postPatientECTRequest,
-  getPatientECTRequest,
-  getPatientKetamineRequest,
-  postPatientKetamineReducer,
-  postPatientImplantRequest,
-} from './doc-reducers/postDoctorProceduresReducers';
-import { postPatientKetamineRequest } from '../actions/Doc-actions/postDoctorProcedures';
-import { postCheckInPatientConfirmReducer } from './doc-reducers/postCheckinPatientReducer';
-import { postMarkAsCompletedReducer } from './doc-reducers/postMarkAsCompleted';
-import { dispatchWalkInLab } from '../actions/patientActions';
-import { postPsychologyRequestReducer } from './doc-reducers/psychologyReducers';
-import { getReceiptPgHeadersReducer } from './doc-reducers/getReceiptPgHeadersReducer';
-
+import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
+import { QySecondaryDiagnosisSetupReducer } from "./doc-reducers/getSecondaryDiagnosisSetup";
+import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
+import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
+import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
+import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
+import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
+import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
+import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
+import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
+import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
+import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
+import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
+import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
+import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
+import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
+import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
+import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
+import { dispatchWalkInLab } from "../actions/patientActions";
+import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
+import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
+import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
+import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderReducer";
+import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
+import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
+import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
+import { postPatientChargesReducer } from "./ChargesReducers/postPatientChargesReducer";
+import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
+import { getNursingCarePlanReducer, postNursingCarePlanReducer } from "./nurse-reducers/postNursingCarePlanFormReducer";
+import { forwardRadiologyResultsReducer, getSingleRadiologyDetailsReducer, postRadiologyResultsReducer } from "./radiology-reducer/radiologyReducer";
+import { getChargesLinesReducer } from "./ChargesReducers/getChargesLines";
+import { postPrintInvoiceReducer } from "./ChargesReducers/postPrintInvoice";
 import { postLabSampleReducer } from './lab-reducers/postLabSampleReducer';
 import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsReducer';
 import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
@@ -381,26 +385,43 @@ export const rootReducer = combineReducers({
   getPatientVisit: getPatientVisitReducer,
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
-  postDoctorNotes: postDoctorNotesReducer,
-  getBillingList: getBillingListReducer,
-  postVisitorList: postVisitorListReducer,
-  postPatientHistory: postPatientHistoryNotesReducer,
-  getPatientHistoryNotesReducer: getPatientHistoryNotes,
-  postMSEForm: postMSENotesReducer,
-  getPatientMSE: getPatientMSENotesReducer,
-  getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
-  getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
-  getQyPrescriptionLine: getQyPrescriptionLinesReducer,
-  postPatientETC: postPatientECTRequest,
-  getPatientETC: getPatientECTRequest,
-  postKetamine: postPatientKetamineReducer,
-  getKetamine: getPatientKetamineRequest,
-  postImplant: postPatientImplantRequest,
-  checkInConsulation: postCheckInPatientConfirmReducer,
-  markAsCompleted: postMarkAsCompletedReducer,
-  createWalkInPatient: createWalkInPatientReducer,
-  dispatchWalkInLab: dispatchWalkInLabReducer,
-  dispatchWalkInPharmacy: dispatchWalkInPharmacyReducer,
-  postPsychologyRequest: postPsychologyRequestReducer,
-  getReceiptHeaders: getReceiptPgHeadersReducer,
+  postDoctorNotes:postDoctorNotesReducer,
+  getBillingList:getBillingListReducer,
+  postVisitorList:postVisitorListReducer,
+  postPatientHistory:postPatientHistoryNotesReducer,
+  getPatientHistoryNotesReducer:getPatientHistoryNotes,
+  postMSEForm:postMSENotesReducer,
+  getPatientMSE:getPatientMSENotesReducer,
+  getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
+  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
+  getQyPrescriptionLine:getQyPrescriptionLinesReducer,
+  postPatientETC:postPatientECTRequest,
+  getPatientETC:getPatientECTRequest,
+  postKetamine:postPatientKetamineReducer,
+  getKetamine:getPatientKetamineRequest,
+  postImplant:postPatientImplantRequest,
+  checkInConsulation:postCheckInPatientConfirmReducer,
+  markAsCompleted:postMarkAsCompletedReducer,
+  createWalkInPatient:createWalkInPatientReducer,
+  dispatchWalkInLab:dispatchWalkInLabReducer,
+  dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
+  postPsychologyRequest:postPsychologyRequestReducer,
+  getReceiptHeaders:getReceiptPgHeadersReducer,
+  getReceiptLines:getReceiptLinesReducer,
+  getReceiptHeaderLines:getReceiptHeaderReducer,
+  postReceipt:postReceiptHeaderReducer,
+  printReceipt:postReceiptReducer,
+  printInvoice:postPrintInvoiceReducer,
+  getTransactionList:getTransactionListReducer,
+  getChargesSetup:getChargesSetupReducer,
+  getChargesLines:getChargesLinesReducer,
+  postPatientCharges:postPatientChargesReducer,
+  generateInvoice:postGenerateInvoiceReducer,
+  postNursingCarePlan:postNursingCarePlanReducer,
+  getNursingCarePlan:getNursingCarePlanReducer,
+
+  // radiology reducers
+  postRadiologyResults: postRadiologyResultsReducer,
+  getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,
+  forwardRadiologyResults: forwardRadiologyResultsReducer,
 });
