@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
+import { useLocation } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -13,10 +14,13 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
-  const { loading } = useSelector((state) => state.postPatientCharges);
+  const { loading, data:postChargesData } = useSelector((state) => state.postPatientCharges);
+  const { loading: generateInvoiceLoading } = useSelector(
+      (state) => state.generateInvoice
+    );
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
   const [filteredCharges, setFilteredCharges] = useState([]);
-  
+    const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
   
 
   const [selectedCharge, setSelectedCharge] = useState(null);
@@ -40,22 +44,41 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
   
   console.info("Selected visitNo :", visitNo);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const payload = {
-      myAction:"create",
-      recId:"",
+      myAction: "create",
+      recId: "",
       visitNo: visitNo || "",
       transactionType: values.transactionType,
       charge: selectedCharge ? selectedCharge.Code : "", // Submit charge CODE instead of amount
       quantity: values.quantity,
       remarks: values.remarks || "",
     };
-
+  
     console.log("Submitting data:", payload);
-
-     dispatch(postPatientCharges(payload));
+  
+    try {
+      // Wait for the result of the dispatch
+    await dispatch(postPatientCharges(payload)).then((postChargesData) => {
+      
+      if (postChargesData === "success") {
+        message.success("Charges added successfully!");
+        console.log('status log', postChargesData);
+      } else {
+        message.error("Failed to add charges.");
+      }
+    })
+  
+     
+    } catch (error) {
+      // Handle error here
+      message.error("An error occurred while submitting the charges.");
+      console.error(error);
+    }
+  
+    onClose();
   };
-
+  
   return (
     <Modal
       title={
