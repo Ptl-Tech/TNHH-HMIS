@@ -50,11 +50,15 @@ const VisitorList = () => {
     dispatch(listPatients());
   }, [dispatch]);
 
-//console where visitors are existing patients
- if(visitors.IDNumber === patients.IDNumber && visitors.Status === "Entered" && visitors.InitiatedDate === currentDate){
-  console.log("visitors are existing patients", visitors);
- }
-  
+  //console where visitors are existing patients
+  if (
+    visitors.IDNumber === patients.IDNumber &&
+    visitors.Status === "Entered" &&
+    visitors.InitiatedDate === currentDate
+  ) {
+    console.log("visitors are existing patients", visitors);
+  }
+
   //filter the visitors based on date and status only
   useEffect(() => {
     const filtered = visitors.filter((visitor) => {
@@ -66,42 +70,75 @@ const VisitorList = () => {
     setFilteredVisitors(filtered);
   }, [visitors, currentDate]);
 
-
-
   const handleSearchChange = (e, field) => {
     setSearchParams({ ...searchParams, [field]: e.target.value });
   };
 
   const getButtonText = (visitor) => {
     // Check if the visitor is already a patient
-    const isPatient = patients.some(patient => patient.IDNumber === visitor.IDNumber);
-    
+    const isPatient = patients.some(
+      (patient) => patient.IDNumber === visitor.IDNumber
+    );
+
     if (isPatient) {
       return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
     } else {
       return "Convert to Patient"; // Show 'Convert to Patient' if the visitor is not yet a patient
     }
   };
-  
+
+  const getWalkInButtonText = (visitor) => {
+    // Check if the visitor is already a patient
+    const isPatient = patients.some(
+      (patient) => patient.IDNumber === visitor.IDNumber
+    );
+
+    if (isPatient) {
+      return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
+    } else {
+      return "Register Walk In "; // Show 'Convert to Patient' if the visitor is not yet a patient
+    }
+  };
 
   const handleVisitCreation = (visitor) => {
     // Check if visitor is already a patient
-    const existingPatient = patients.find(patient => patient.IDNumber === visitor.IDNumber);
-    
+    const existingPatient = patients.find(
+      (patient) => patient.IDNumber === visitor.IDNumber
+    );
+
     if (existingPatient) {
       // If found, create a new visit and navigate
       message.success("Create a New Visit.");
       navigate(`/reception/Add-Appointment/${existingPatient.PatientNo}`, {
-        state: { existingPatient }
+        state: { existingPatient },
       });
     } else {
       // If not found, convert to patient
       openModal(visitor);
     }
   };
-  
-   
-  
+
+  const handleWalkInCreation = (visitor) => {
+    // Check if visitor is already a patient
+    const existingPatient = patients.find(
+      (patient) => patient.IDNumber === visitor.IDNumber
+    );
+
+    if (existingPatient) {
+      // If found, create a new visit and navigate
+      message.success("Create a New Visit.");
+      navigate(`/reception/Add-Appointment/${existingPatient.PatientNo}`, {
+        state: { existingPatient },
+      });
+    } else {
+      // If not found, convert to patient
+      message.success("Create a New Patient.");
+      navigate("/reception/Register-walkin", {
+        state: { visitorData: selectedVisitor },
+      });
+    }
+  };
+
   const openModal = (visitor) => {
     setSelectedVisitor({
       ...visitor,
@@ -111,8 +148,6 @@ const VisitorList = () => {
     });
     setIsModalVisible(true);
   };
-
-  
 
   const handleConvertToPatient = async () => {
     if (!selectedVisitor) return;
@@ -129,10 +164,7 @@ const VisitorList = () => {
             state: { existingPatient },
           });
         } else {
-          message.success(
-            "Register Patient First.",
-            5
-          );
+          message.success("Register Patient First.", 5);
           navigate("/reception/Patient-Registration", {
             state: { visitorData: selectedVisitor, patientNumber: patientNo },
           });
@@ -167,13 +199,18 @@ const VisitorList = () => {
     {
       title: "Action",
       render: (_, visitor) => (
+       <div className="d-flex flex-column gap-3">
         <Button type="primary" onClick={() => handleVisitCreation(visitor)}>
           {getButtonText(visitor)}
         </Button>
+        <Button type="default" onClick={() => handleWalkInCreation(visitor)}>
+          {getWalkInButtonText(visitor)}
+        </Button>
+       </div>
       ),
     },
   ];
-  
+
   return (
     <div className="card mt-4">
       <div className="d-flex justify-content-between align-items-center m-4">
@@ -232,7 +269,13 @@ const VisitorList = () => {
           <Button key="cancel" onClick={() => setIsModalVisible(false)}>
             Cancel
           </Button>,
-          <Button key="convert" type="primary" disabled={!selectedVisitor} loading={loading} onClick={handleConvertToPatient}>
+          <Button
+            key="convert"
+            type="primary"
+            disabled={!selectedVisitor}
+            loading={loading}
+            onClick={handleConvertToPatient}
+          >
             Convert to Patient
           </Button>,
         ]}

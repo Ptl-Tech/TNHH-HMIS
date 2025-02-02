@@ -438,6 +438,14 @@ import {
                 >
                 Save Walk-in Patient
                 </Button>
+                <Button
+                            onClick={() =>
+                              navigate(-1
+                                           )
+                            }
+                          >
+                            Back
+                          </Button>
             </div>
 
             </Card>

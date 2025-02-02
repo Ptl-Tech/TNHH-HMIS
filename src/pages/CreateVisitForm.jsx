@@ -122,14 +122,15 @@ const CreateVisitForm = () => {
     }
   }, [doctorsPayload, newVisit.clinic]);
 const savepatientVisit = async () => {
-  if (!newVisit.clinic) {
-    message.error("Please select a clinic before saving the visit.");
-    return;
+
+  //if clinic is pyschiatry or psychology prompt select doctor else dont show error message
+  if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+    if (!newVisit.doctor) {
+      message.error("Please select a doctor before saving the visit.");
+      return;
+    }
   }
-  if (!newVisit.doctor) {
-    message.error("Please select a doctor before saving the visit.");
-    return;
-  }
+ 
 
   try {
     // Step 2: Create Triage Visit
@@ -173,14 +174,18 @@ console.log("Visit created for Patient ID:", appointmentId);
 };
 
   const dispatchPatient = async (appointmentId) => {
-    if (!newVisit.clinic) {
-      message.error("Please select a clinic before dispatching the patient.");
-      return;
+if(!newVisit.clinic) {
+  message.error("Please select a clinic before saving the visit.");
+  return;
+}
+
+    if (  newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+      if (!newVisit.doctor) {
+        message.error("Please select a doctor before saving the visit.");
+        return;
+      }
     }
-    if (!newVisit.doctor) {
-      message.error("Please select a doctor before dispatching the patient.");
-      return;
-    }
+    
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
