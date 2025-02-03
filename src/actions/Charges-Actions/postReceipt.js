@@ -54,9 +54,7 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
     }
   } catch (error) {
     // Extract error response data
-    const errorResponse = error.response?.data || {};
-    const errorMessage = errorResponse.msg || "Failed to Process Receipt.";
-    const errorStatus = errorResponse.status || "failed";
+    const errorMessage = error.response?.data?.errors ;
 
     // Dispatch failure action
     dispatch({

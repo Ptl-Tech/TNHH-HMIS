@@ -41,7 +41,6 @@ const ViewInvoice = () => {
   const { state } = useLocation();
   const { patientData } = state;
   // const { header, lines } = state.patientData; // Extract header and lines
-  const { loading } = useSelector((state) => state.printReceipt);
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
   );
@@ -265,7 +264,7 @@ const invoiceData = {
                   Generate Payment 
                 </Button>
                 
-                <Button
+                {/* <Button
                   icon={
                     <PrinterOutlined style={{ color: "green", size: "29px" }} />
                   }
@@ -276,7 +275,7 @@ const invoiceData = {
                   onClick={() => message.info("Feature not available at the moment")}
                 >
                   Print Receipt
-                </Button>
+                </Button> */}
                </>
               )}
             </Space>
