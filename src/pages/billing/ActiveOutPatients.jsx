@@ -21,6 +21,7 @@ import {
   EyeOutlined,
   FilePdfOutlined,
   DownOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { FaFileInvoice } from "react-icons/fa";
 import ProcessPayment from "./ProcessPayment";
@@ -44,14 +45,15 @@ const ActiveOutPatients = () => {
   const { loading: generateInvoiceLoading } = useSelector(
     (state) => state.generateInvoice
   );
-    const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-      useSelector((state) => state.postInterimInvoice);
-      
+  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+    useSelector((state) => state.postInterimInvoice);
+
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-  
+
+  const[selectedPatientAmount, setSelectedPatientAmount]=useState("");
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [cashPatients, setCashPatients] = useState([]);
   const [corporatePatients, setCorporatePatients] = useState([]);
@@ -59,7 +61,8 @@ const ActiveOutPatients = () => {
   const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
     []
   );
-  
+  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
+    useState(false);
 
   useEffect(() => {
     dispatch(appmntList());
@@ -76,7 +79,7 @@ const ActiveOutPatients = () => {
           ...patient,
           Balance: matchingPatient?.Balance || 0,
           OpenInsuranceBalance: matchingPatient?.Open_Insurance_Amount || 0,
-          Inpatient: matchingPatient?.Inpatient ,
+          Inpatient: matchingPatient?.Inpatient,
         };
       });
 
@@ -85,10 +88,12 @@ const ActiveOutPatients = () => {
       );
 
       const cash = sortedList.filter(
-        (patient) => patient.PatientType === "Cash" && patient.Inpatient === false
+        (patient) =>
+          patient.PatientType === "Cash" && patient.Inpatient === false
       );
       const corporate = sortedList.filter(
-        (patient) => patient.PatientType === "Corporate"&& patient.Inpatient === false
+        (patient) =>
+          patient.PatientType === "Corporate" && patient.Inpatient === false
       );
 
       setCashPatients(cash);
@@ -134,6 +139,16 @@ const ActiveOutPatients = () => {
     setFilteredCashPatients(filteredCash);
     setFilteredCorporatePatients(filteredCorporate);
   };
+
+  const handleClose = () => {
+    setIsGenerateReceiptModalVisible(false);
+  };
+  const showPaymentModal=(record)=>{
+    setIsGenerateReceiptModalVisible(true);
+    setSelectedPatientNo(record.PatientNo);
+    setSelectedPatientAmount(record.Balance);
+    console.log("pate",patientNo);
+    }
 
   const patientColumns = [
     {
@@ -199,22 +214,35 @@ const ActiveOutPatients = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button
-          type="primary"
-           icon={<EyeOutlined />}
-           onClick={() =>
-             navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
-               state: { patientData: record },
-             })
-           }
-         >
-           View
-          </Button>
+          {record.PatientType === "Cash" ? (
+            <Button
+              type="primary"
+              onClick={() => showPaymentModal(record)}
+              style={{ marginRight: "10px" }}
+            >
+              <DollarOutlined /> Make Payment
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              icon={<EyeOutlined />}
+              onClick={() =>
+                navigate(
+                  `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
+                  {
+                    state: { patientData: record },
+                  }
+                )
+              }
+            >
+              View Details
+            </Button>
+          )}
         </Space>
       ),
     },
   ];
-// console.log("patient Data:",patientData);
+  // console.log("patient Data:",patientData);
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
@@ -286,7 +314,12 @@ const ActiveOutPatients = () => {
           />
         </TabPane>
       </Tabs>
-     
+      <ProcessPayment
+        visible={isGenerateReceiptModalVisible}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
+        amount={selectedPatientAmount}
+      />
     </div>
   );
 };

@@ -89,6 +89,7 @@ import ViewInvoice from './pages/billing/ViewInvoice';
 import ActiveOutPatients from './pages/billing/ActiveOutPatients';
 import ActiveInpatient from './pages/billing/ActiveInpatient';
 import LabRoutes from './Routes/LabRoutes';
+import ViewReceipt from './pages/billing/ViewReceipt';
 
 function App() {
   return (
@@ -350,6 +351,10 @@ function App() {
            <Route
             path="/reception/invoice/:patientNo"
             element={<ViewInvoice />}
+          />
+           <Route
+            path="/reception/Receipt/:patientNo"
+            element={<ViewReceipt />}
           />
         </Route>
       </Route>

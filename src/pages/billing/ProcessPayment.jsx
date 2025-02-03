@@ -6,7 +6,6 @@ import {
   Select,
   DatePicker,
   Button,
-  Checkbox,
   Row,
   Col,
 } from "antd";
@@ -16,54 +15,31 @@ import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHead
 import { getReceiptLines } from "../../actions/Charges-Actions/getReceiptLines";
 import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const { Option } = Select;
 
-const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
+const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.postReceipt);
   const [receiptNo, setReceiptNo] = useState("");
+  const [payMode, setPayMode] = useState(null); // Track selected payment mode
 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
-  const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
+  const { data: receiptHeader } = useSelector(
+    (state) => state.getReceiptHeaderLines
+  );
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const formattedData = {
-          myAction: receiptNo ? "edit" : "create",
-          recId: receiptNo || "",
-          patientNo: patientNo,
-          receiptDate: values.receiptDate.format("YYYY-MM-DD"),
-          depositDate: values.depositDate.format("YYYY-MM-DD"),
-          payMode: values.payMode,
-          amountReceived: parseFloat(values.amountReceived),
-          coPay: values.coPay,
-        };
-  
-        dispatch(postReceiptHeader(formattedData)).then((newReceiptNo) => {
-          if (newReceiptNo) {
-            setReceiptNo(newReceiptNo);
-            dispatch(getReceiptLines(newReceiptNo));
-            dispatch(getReceiptHeader(newReceiptNo));
-            
-            
-          }
-          // Reset form fields after success
-          form.resetFields();
-  
-          // Close the modal
-          onClose(); // Call onClose prop to close the modal
-        });
-      })
-      .catch((info) => {
-        console.error("Validate Failed:", info);
+  useEffect(() => {
+    if (visible) {
+      form.setFieldsValue({
+        receiptDate: moment(), // Set today's date
+        amountReceived: "",
       });
-  };
-  
+    }
+  }, [visible, form]);
+
   useEffect(() => {
     if (receiptNo) {
       dispatch(getReceiptLines(receiptNo));
@@ -71,24 +47,63 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
     }
   }, [dispatch, receiptNo]);
 
-  const handleViewReceipt = () => {
-    if (receiptHeader && receiptLines) {
-      const combinedData = { header: receiptHeader, lines: receiptLines };
-      navigate(`/reception/invoice/Patient?PatientNo=${patientNo}&ReceiptNo=${receiptNo}`, {
-        state: { patientData: combinedData },
-      });
-      console.log("Receipt data:", combinedData);
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
 
+      const formattedData = {
+        myAction: receiptNo ? "edit" : "create",
+        recId: receiptNo || "",
+        patientNo: patientNo,
+        receiptDate: values.receiptDate.format("YYYY-MM-DD"),
+        depositDate: values.receiptDate?.format("YYYY-MM-DD") || null,
+        payMode: values.payMode,
+        amountReceived: parseFloat(values.amountReceived),
+        coPay: values.coPay,
+        ...(values.payMode === 7 && {
+          transactionCode: values.transactionCode,
+          phoneNumber: values.phoneNumber,
+        }), // Include only if Mpesa is selected
+      };
+
+      const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
+
+      if (newReceiptNo) {
+        setReceiptNo(newReceiptNo);
+        await dispatch(getReceiptLines(newReceiptNo));
+        await dispatch(getReceiptHeader(newReceiptNo));
+
+        navigate(
+          `/reception/Receipt/Patient?PatientNo=${patientNo}&ReceiptNo=${newReceiptNo}`,
+          {
+            state: {
+              patientData: { header: receiptHeader, lines: receiptLines },
+            },
+          }
+        );
+        form.resetFields();
+        onClose();
+      }
+    } catch (error) {
+      console.error("Validation or processing failed:", error);
     }
   };
-
 
   return (
     <Modal
       title={
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <span>Generate Payment</span>
-          <CloseOutlined onClick={onClose} style={{ marginRight: 10, fontSize: 16 }} />
+          <CloseOutlined
+            onClick={onClose}
+            style={{ marginRight: 10, fontSize: 16 }}
+          />
         </div>
       }
       visible={visible}
@@ -103,24 +118,18 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
         initialValues={{ payMode: 0, amountReceived: 0, coPay: true }}
       >
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
               label="Receipt Date"
               name="receiptDate"
               rules={[{ required: true, message: "Please select receipt date!" }]}
-              style={{ width: "100%" }}
             >
-              <DatePicker size="large" format="YYYY-MM-DD" style={{ width: "100%" }} />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              label="Deposit Date"
-              name="depositDate"
-              rules={[{ required: true, message: "Please select deposit date!" }]}
-              style={{ width: "100%" }}
-            >
-              <DatePicker size="large" format="YYYY-MM-DD" style={{ width: "100%" }} />
+              <DatePicker
+                size="large"
+                format="YYYY-MM-DD"
+                style={{ width: "100%" }}
+                disabled
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -132,18 +141,12 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
               name="payMode"
               rules={[{ required: true, message: "Please select payment mode!" }]}
             >
-              <Select size="large">
-                <Option value={1}>Cash</Option>
-                <Option value={2}>Cheque</Option>
-                <Option value={3}>EFT</Option>
-                <Option value={4}>Deposit Slip</Option>
-                <Option value={5}>Banker's Cheque</Option>
-                <Option value={6}>RTGS</Option>
+              <Select
+                size="large"
+                onChange={(value) => setPayMode(value)} // Track selected payment mode
+              >
                 <Option value={7}>Mpesa</Option>
-                <Option value={8}>PayPal</Option>
                 <Option value={9}>PDQ</Option>
-                <Option value={10}>RFH</Option>
-                <Option value={11}>Baraka Card</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -154,14 +157,49 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
               name="amountReceived"
               rules={[{ required: true, message: "Please enter amount received!" }]}
             >
-              <Input prefix="KSh" type="number" min={0} step="0.01" placeholder="Amount Received" size="large" />
+              <Input
+                prefix="KSh"
+                type="number"
+                min={0}
+                step="0.01"
+                placeholder="Amount Received"
+                size="large"
+              />
             </Form.Item>
+            <span className="text-success fw-bold fst-italic">
+              Unpaid Amount = {amount}
+            </span>
           </Col>
         </Row>
 
-        <Form.Item name="coPay" valuePropName="checked">
-          <Checkbox>Co-Pay</Checkbox>
-        </Form.Item>
+        {/* Conditional Fields for Mpesa */}
+        {payMode === 7 && (
+          <>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Transaction Code"
+                  name="transactionCode"
+                  // rules={[{ required: true, message: "Please enter transaction code!" }]}
+                >
+                  <Input placeholder="Enter Transaction Code" size="large" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Phone Number"
+                  name="phoneNumber"
+                  // rules={[
+                  //   { required: true, message: "Please enter phone number!" },
+                  //   { pattern: /^[0-9]{10}$/, message: "Enter a valid 10-digit number!" },
+                  // ]}
+                >
+                  <Input placeholder="Enter Phone Number" size="large" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
         <Row>
           <Col span={24}>
@@ -169,25 +207,12 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
               type="primary"
               size="large"
               style={{ width: "100%" }}
-              loading={!receiptNo && loading}
+              loading={!receiptNo && false}
               onClick={handleOk}
             >
-              Post Payment
+              Generate Receipt
             </Button>
           </Col>
-
-          {receiptNo && (
-            <Col span={24}>
-              <Button
-                type="default"
-                size="large"
-                style={{ width: "100%", marginTop: 10 }}
-                onClick={handleViewReceipt}
-              >
-                View Receipt
-              </Button>
-            </Col>
-          )}
         </Row>
       </Form>
     </Modal>
