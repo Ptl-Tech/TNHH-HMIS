@@ -34,6 +34,8 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
     notesType.map((note) => note.label).includes(item.Notes_Type)
   );
 
+  console.log('filtered data', filterCollapseData)
+
   const allNotesPresent = notesType.every((note) =>
     filterCollapseData.some((item) => item.Notes_Type === note.label)
   );
@@ -72,7 +74,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       6:
         data.filter((note) => note.Notes_Type === "Family History").at(-1)
           ?.Notes || "",
-      personalHistory:
+      7:
         data.filter((note) => note.Notes_Type === "Personal History").at(-1)
           ?.Notes || "",
       8:
@@ -88,12 +90,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       23:
         data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
         "",
-      7:
-        data
-          .filter(
-            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
-          )
-          .at(-1)?.Notes || "",
     }),
     [data]
   );
