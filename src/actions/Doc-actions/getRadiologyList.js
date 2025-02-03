@@ -34,7 +34,6 @@ export const getRadiologyList = () => async (dispatch, getState) => {
     // API request
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=PgRadiologyList`,
-
       config,
     );
 

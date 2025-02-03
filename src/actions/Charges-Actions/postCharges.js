@@ -12,13 +12,9 @@ export const postPatientCharges = (charges) => async (dispatch, getState) => {
   try {
     dispatch({ type: POST_CHARGES_REQUEST });
 
-    // Get user information and branch code from state and localStorage
-    const {
-      otpVerify: { userInfo },
-    } = getState();
+    const { otpVerify: { userInfo } } = getState();
     const branchCode = localStorage.getItem("branchCode");
 
-    // Set headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -28,41 +24,35 @@ export const postPatientCharges = (charges) => async (dispatch, getState) => {
       },
     };
 
-    // Make the POST request to the server
+    // API request
     const response = await axios.post(
       `${API}GeneralProcesses/PatientCharges`,
       charges,
       config
     );
 
-    // Extract and validate the response data
     const { status } = response.data;
-    if (status === "success" ) {
-      // Dispatch success action
+
+    if (status === "success") {
       dispatch({
         type: POST_CHARGES_SUCCESS,
-        payload: { status, },
+        payload: response.data,
       });
 
-      // Display success message
-      message.success(`Patient Charges post: ${status}fully.`);
+      message.success(`Patient Charges posted successfully.`);
 
-      // Return the CHARGES number 
-      return status;
-    } else {
-      throw new Error("Invalid response format or missing CHARGESNo.");
-    }
+      // Return status for use in the view method
+    } 
+    return response.data.status;
+
   } catch (error) {
-    // Dispatch failure action
     dispatch({
       type: POST_CHARGES_FAIL,
       payload: error.response?.data?.message || error.errors || error.message,
     });
 
-    // Display error message
-    message.error(error.response?.data?.message || error.errors || "Failed to Post Charges.");
-
-    // Rethrow error for handling by other parts of the app
+    message.error(error.response?.data?.message || error.errors || "Failed to post charges.");
     throw error;
   }
 };
+

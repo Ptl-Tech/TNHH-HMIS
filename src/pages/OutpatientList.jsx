@@ -35,36 +35,38 @@ const OutpatientList = () => {
   const [showList, setShowList] = useState(false);
 
   useEffect(() => {
-    // Filter non-inpatient patients when patients data changes
-    if (patients.length > 0) {
-      setFilteredPatients(
-        patients.filter((patient) => !patient.Inpatient)
-      );
-    }
+    // Don't filter by patient type, show all patients
+    setFilteredPatients(patients);
   }, [patients]);
-  console.log(patients);
-
+  
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    setShowList(true);
-    filterPatients({ ...searchParams, [field]: value });
-  };
 
-  const filterPatients = (params) => {
-    const { SearchName, patientId, patientNo } = params;
-    const filtered = patients.filter((patient) => {
-      return (
-        patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
-        patient.IDNumber.includes(patientId) &&
-        patient.PatientNo.toString().includes(patientNo)
-      );
+    setSearchParams((prevState) => {
+      const updatedParams = { ...prevState, [field]: value };
+      // If all search fields are empty, hide the list
+      if (!updatedParams.SearchName && !updatedParams.patientId && !updatedParams.patientNo) {
+        setShowList(false);
+      } else {
+        // Otherwise, show the list and filter
+        setShowList(true);
+        filterPatients(updatedParams);
+      }
+      return updatedParams;
     });
-    setFilteredPatients(filtered);
-  };
+};
+
+const filterPatients = (params) => {
+  const { SearchName, patientId, patientNo } = params;
+  const filtered = patients.filter((patient) => {
+    return (
+      (!SearchName || patient.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
+      (!patientId || patient.IDNumber.includes(patientId)) &&
+      (!patientNo || patient.PatientNo.toString().includes(patientNo))
+    );
+  });
+  setFilteredPatients(filtered);
+};
 
   const columns = [
     {
@@ -114,7 +116,7 @@ const OutpatientList = () => {
                 icon={<PlusOutlined />}
                 type="primary"
                 onClick={() =>
-                  navigate(`/reception/Add-Appointment/Patient?PatientNo${record.PatientNo}`, {
+                  navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
                     state: { existingPatient: record, previousPath: location.pathname  },
                    
                     

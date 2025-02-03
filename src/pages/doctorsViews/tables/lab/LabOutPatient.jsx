@@ -1,248 +1,289 @@
-import { Button, Card, DatePicker, Form, Input, Space, Table, Typography } from "antd"
-import { ProfileOutlined } from "@ant-design/icons"
-import Modal from "antd/es/modal/Modal";
-import { useEffect, useState } from "react";
-import TextArea from "antd/es/input/TextArea";
-import { useDispatch, useSelector } from "react-redux";
-import { getTriageWaitingList } from "../../../../actions/triage-actions/getTriageWaitingListSlice";
-import { listDoctors } from "../../../../actions/DropdownListActions";
-import Loading from "../../../../partials/nurse-partials/Loading";
-import { getConsultationRoomListSlice } from "../../../../actions/nurse-actions/getConsultationRoomSlice";
-import { getLabList } from "../../../../actions/Doc-actions/getLabList";
-import { render } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from 'react';
+
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { Space, Table, Button, Typography, Input } from 'antd';
+import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
+
+import Loading from '../../../../partials/nurse-partials/Loading';
+import { getLabList } from '../../../../actions/Doc-actions/getLabList';
 
 const LabOutPatient = () => {
-    const navigate=useNavigate();
-    const columns = [
-        {
-            title: 'Lab No',
-            dataIndex: 'LaboratoryNo',
-            key: 'LaboratoryNo',
-        },
-        {
-            title: 'Patient No',
-            dataIndex: 'PatientNo',
-            key: 'PatientNo',
-        },
-        {
-            title: 'Patient Names',
-            dataIndex: 'Patient_Names',
-            key: 'Patient_Names',
-            render: (_, record) => {
-                return <Button type="link" onClick={() => handleNavigate(record, record.LaboratoryNo)} style={{ color: '#0f5689' }}>
-                    {record.Patient_Names}
-                </Button>
-            }
-        },
-        {
-            title: 'Status',
-            dataIndex: 'Status',
-            key: 'Status',
-            render: (_, record) => {
-                let statusColor;
-                switch (record.Status) {
-                    case 'New':
-                        statusColor = 'orange';
-                        break;
-                    case 'Completed':
-                        statusColor = 'green';
-                        break;
-                    case 'Forwarded':
-                        statusColor = 'blue';
-                        break;
-                    case 'Cancelled':
-                        statusColor = 'red';
-                        break;
-                    default:
-                        statusColor = 'gray'; // Default color for unknown statuses
-                }
-                
-                return (
-                    <Typography.Text style={{ color: statusColor, fontWeight: 'bold' }}>
-                        {record.Status}
-                    </Typography.Text>
-                );
-            }
-        },
-        {
-            title: 'Action',
-            dataIndex: 'action',
-            key: 'action',
-            render: (_, record) => {
-                return <Button type="primary" onClick={() => handleNavigate(record, record.LaboratoryNo)}>checkIn Lab</Button>
-            }
-        }
-    ];
+  // hooks
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const searchInput = useRef(null);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState(null);
+  //   state
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const { loadinglabTreatmentHeaders, data: labTreatmentHeaders } = useSelector(
+    (state) => state.labList,
+  );
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: labTreatmentHeaders.length,
+  });
 
-    const [ form ] = Form.useForm();
-    const showModal = (record) => {
-        setSelectedRecord(record);
-        setIsModalOpen(true);
-    };
-    const handleOk = async () => {
-        const formData = await form.validateFields();
-        console.log(selectedRecord);
-    //   setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-      form.resetFields();
-      setIsModalOpen(false);
-    };
-
-    const dispatch = useDispatch();
-
-    const { loadinglabTreatmentHeaders, data: labTreatmentHeaders } = useSelector(state => state.labList);
-   
-    useEffect(() => {
-        if(!labTreatmentHeaders.length) {
-            dispatch(getLabList());
-        }
-    }, [dispatch, labTreatmentHeaders.length]);
-
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-        total: labTreatmentHeaders.length,
-    });
-
-    const handleTableChange = (newPagination) => {
-        setPagination(newPagination); // Update pagination settings
-    };
-
-    const handleNavigate=(record,LaboratoryNo )=>{
-        navigate(`/Doctor/Lab/Patient?LaboratoryNo=${LaboratoryNo}`, { state: { patientNo: record.PatientNo, labObservationNo: record.LaboratoryNo, patientLabRecord: record } });
+  useEffect(() => {
+    if (!labTreatmentHeaders.length) {
+      dispatch(getLabList());
     }
+  }, [dispatch, labTreatmentHeaders.length]);
 
-    const paginatedData = labTreatmentHeaders.slice(
-        (pagination.current - 1) * pagination.pageSize,
-        pagination.current * pagination.pageSize
-    );
+  //   table functions and columns
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? '#1677ff' : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    filterDropdownProps: {
+      onOpenChange(open) {
+        if (open) {
+          setTimeout(() => searchInput.current?.select(), 100);
+        }
+      },
+    },
+    render: (text) => text,
+  });
+  const columns = [
+    {
+      title: 'Doctor Name',
+      key: 'Doctor_Names',
+      dataIndex: 'Doctor_Names',
+      ...getColumnSearchProps('Doctor_Names'),
+      render: (text) => (text ? text : 'N/A'),
+    },
+    {
+      title: 'Lab No',
+      key: 'LaboratoryNo',
+      dataIndex: 'LaboratoryNo',
+      ...getColumnSearchProps('LaboratoryNo'),
+    },
+    {
+      title: 'Patient No',
+      key: 'PatientNo',
+      dataIndex: 'PatientNo',
+      ...getColumnSearchProps('PatientNo'),
+    },
+    {
+      title: 'Patient Names',
+      key: 'Patient_Names',
+      dataIndex: 'Patient_Names',
+      ...getColumnSearchProps('Patient_Names'),
+    },
+    {
+      title: 'Status',
+      key: 'Status',
+      dataIndex: 'Status',
+      render: (_, record) => {
+        let statusColor;
+        switch (record.Status) {
+          case 'New':
+            statusColor = 'orange';
+            break;
+          case 'Completed':
+            statusColor = 'green';
+            break;
+          case 'Forwarded':
+            statusColor = 'blue';
+            break;
+          case 'Cancelled':
+            statusColor = 'red';
+            break;
+          default:
+            statusColor = 'gray'; // Default color for unknown statuses
+        }
+
+        return (
+          <Typography.Text style={{ color: statusColor, fontWeight: 'bold' }}>
+            {record.Status}
+          </Typography.Text>
+        );
+      },
+    },
+    {
+      title: 'Laboratory Date',
+      key: 'LaboratoryDate',
+      dataIndex: 'LaboratoryDate',
+      sorter: (a, b) =>
+        new Date(a.LaboratoryDate).getTime() -
+        new Date(b.LaboratoryDate).getTime(),
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record) => {
+        return (
+          <Button
+            type="primary"
+            onClick={() => handleNavigate(record, record.LaboratoryNo)}
+          >
+            View Requests
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+  };
+
+  const handleNavigate = (record, LaboratoryNo) => {
+    navigate(`/Lab/Patient?LaboratoryNo=${LaboratoryNo}`, {
+      state: {
+        patientNo: record.PatientNo,
+        labObservationNo: record.LaboratoryNo,
+        patientLabRecord: record,
+      },
+    });
+  };
 
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Laboratory List OutPatients
-            </Typography.Text>
-          </Space>
-
-          <Card style={{ padding: '10px 10px 10px 10px'}}>
-            
-              <div className='admit-patient-filter-container'>
-                  <Input placeholder="search by name" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by patient no" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Input placeholder="search by id number" 
-                      allowClear
-                      showCount
-                      showSearch
-                  />
-              </div>
-          </Card>
-
-          {
-            loadinglabTreatmentHeaders ? (
-                <Loading />
-            ):(
-                <Table 
-                columns={columns} 
-                dataSource={labTreatmentHeaders} 
-                className="admit-patient-table"
-                bordered size='middle' 
-                pagination={{
-                    ...pagination,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    position: ['bottom', 'right'],
-                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                    onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
-                    onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
-                    style: {
-                        marginTop: '30px',
-                    }
-                }}
-                />
-            )
-          }
-
-        
-          {/* modal contents */}
-
-        <Modal title="Patient Admissions" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} okText="Submit">
-                <Form layout="vertical" 
-                style={{ paddingTop: '10px'}} 
-                form={form}
-                initialValues={
-                    {
-                        dateOfAdmission: null,
-                        admissionReason: '',
-                        admissionRemarks: '',
-                    }
-                }
-                >
-                    <Form.Item 
-                        label="Date of Admission" 
-                        name="dateOfAdmission"
-                        rules={[{ required: true, message: 'Please enter the date of admission!' }]}
-                    >
-                        <DatePicker style={{ width: '100%'}}
-                        />
-                    </Form.Item>
-                    <Form.Item 
-                        label="Admission Reason" 
-                        name="admissionReason"
-                        rules={[
-                            { required: true, message: 'Please enter the admission reason!' },
-                            {
-                                validator: (_, value) => {
-                                  if (value && value.length > 100) {
-                                    return Promise.reject(new Error('Admission reason cannot exceed 150 characters!'));
-                                  }
-                                  return Promise.resolve();
-                                },
-                            }
-                        ]}
-                    >
-                        
-                        <Input placeholder="Admission Reason" 
-                        />
-                    </Form.Item>
-                    <Form.Item 
-                        label="Admission Remarks" 
-                        name="admissionRemarks"
-                        rules={[
-                            {
-                                validator: (_, value) => {
-                                  if (value && value.length > 200) {
-                                    return Promise.reject(new Error('Admission remarks cannot exceed 150 characters!'));
-                                  }
-                                  return Promise.resolve();
-                                },
-                            }
-                        ]}
-                    >
-                        <TextArea placeholder="Admission Remarks" name="admissionRemarks"
-                            rows={3}
-                        />
-                    </Form.Item>
-                </Form>
-        </Modal>
+      <Space
+        style={{
+          color: '#0f5689',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          paddingBottom: '10px',
+          position: 'relative',
+        }}
+      >
+        <ProfileOutlined />
+        <Typography.Text
+          style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px' }}
+        >
+          Laboratory List OutPatients
+        </Typography.Text>
+      </Space>
+      {loadinglabTreatmentHeaders ? (
+        <Loading />
+      ) : (
+        <Table
+          bordered
+          size="middle"
+          columns={columns}
+          dataSource={labTreatmentHeaders}
+          className="admit-patient-table"
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) =>
+              handleTableChange({
+                current: page,
+                pageSize,
+                total: pagination.total,
+              }),
+            onShowSizeChange: (current, size) =>
+              handleTableChange({
+                current,
+                pageSize: size,
+                total: pagination.total,
+              }),
+            style: {
+              marginTop: '30px',
+            },
+          }}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default LabOutPatient; 
+export default LabOutPatient;

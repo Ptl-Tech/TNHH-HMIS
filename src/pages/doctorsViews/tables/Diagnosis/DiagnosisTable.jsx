@@ -31,8 +31,8 @@ const DiagnosisTable = ({ treatmentNo }) => {
     },
     {
       title: "Diagnosis Code",
-      dataIndex: "DiagnosisCode", // Updated
-      key: "DiagnosisCode",
+      dataIndex: "DiagnosisNo", // Updated
+      key: "DiagnosisNo",
     },
     {
       title: "Diagnosis",

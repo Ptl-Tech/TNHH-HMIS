@@ -122,14 +122,15 @@ const CreateVisitForm = () => {
     }
   }, [doctorsPayload, newVisit.clinic]);
 const savepatientVisit = async () => {
-  if (!newVisit.clinic) {
-    message.error("Please select a clinic before saving the visit.");
-    return;
+
+  //if clinic is pyschiatry or psychology prompt select doctor else dont show error message
+  if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+    if (!newVisit.doctor) {
+      message.error("Please select a doctor before saving the visit.");
+      return;
+    }
   }
-  if (!newVisit.doctor) {
-    message.error("Please select a doctor before saving the visit.");
-    return;
-  }
+ 
 
   try {
     // Step 2: Create Triage Visit
@@ -173,14 +174,18 @@ console.log("Visit created for Patient ID:", appointmentId);
 };
 
   const dispatchPatient = async (appointmentId) => {
-    if (!newVisit.clinic) {
-      message.error("Please select a clinic before dispatching the patient.");
-      return;
+if(!newVisit.clinic) {
+  message.error("Please select a clinic before saving the visit.");
+  return;
+}
+
+    if (  newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+      if (!newVisit.doctor) {
+        message.error("Please select a doctor before saving the visit.");
+        return;
+      }
     }
-    if (!newVisit.doctor) {
-      message.error("Please select a doctor before dispatching the patient.");
-      return;
-    }
+    
     if (!appointmentId) {
       message.error("Appointment ID is required!");
       return;
@@ -233,6 +238,21 @@ console.log("Visit created for Patient ID:", appointmentId);
     (doc) => doc.DoctorID === newVisit.doctor
   );
 
+  const handleEditPatient = () => {
+    if (typeof patientNo !== "string") {
+        console.error("Invalid patientNo:", patientNo);
+        return;
+    }
+
+    // Fetch patientNo starts with WLK navigate to walk-in registration else navigate to outpatient registration with patient data
+    if (patientNo.startsWith("WLK")) {
+        navigate(`/reception/Register-walkin?PatientNo=${patientNo}`, { state: { patientDet: existingPatient } });
+    } else {
+        navigate(`/reception/Patient-Registration?PatientNo=${patientNo}`, { state: { patientDet: existingPatient } });
+    }
+};
+
+
   return (
     <div>
       <div>
@@ -247,6 +267,7 @@ console.log("Visit created for Patient ID:", appointmentId);
             </h4>
           </div>
           <div className=" d-flex align-items-center justify-content-end gap-3">
+            
             <Button
               type="primary"
               size="medium"
@@ -262,6 +283,9 @@ console.log("Visit created for Patient ID:", appointmentId);
               onClick={() => dispatchPatient(appointmentId)}
             >
               Dispatch to Triage
+            </Button>
+            <Button onClick={handleEditPatient}>
+              Edit Patient
             </Button>
           </div>
         </div>

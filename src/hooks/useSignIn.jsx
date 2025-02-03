@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { forgotPassword, login, verifyOtp } from '../actions/userActions';
-import { message } from 'antd';
 
 const useSignIn = () => {
   const [staffNo, setStaffNo] = useState('');
@@ -57,7 +56,6 @@ const useSignIn = () => {
       setIsOtpRequired(false);
     }
   }, [userInfo?.sessionToken, verifyOtpSuccess]);
-  // console.log(role)
 
   // After OTP verification, navigate based on user role
   useEffect(() => {
@@ -66,22 +64,20 @@ const useSignIn = () => {
       setIsOtpRequired(false); // Hide OTP modal
 
       const role = verifyOtpUserInfo?.userData.departmentName;
-      console.log('Role: ', role);
-
       if (role === 'Reception') {
         navigate('/reception');
       } else if (role === 'Doctor') {
         navigate('/Doctor');
+      } else if (role === 'LABORATORY') {
+        navigate('/Lab');
       } else if (role === 'Security') {
         navigate('/Security');
       } else if (role === 'Nurse') {
         navigate('/Nurse');
       } else if (role === 'Psychology') {
         navigate('/Psychology');
-      } else if (role === 'Radiology') {
+      } else if (role === 'RADIOLOGY') {
         navigate('/Radiology');
-      } else if (role === 'Pharmacy'){
-        navigate('/Pharmacy')
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);

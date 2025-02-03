@@ -10,12 +10,28 @@ import useAuth from "../../../hooks/useAuth";
 const { TextArea } = Input;
 const { Step } = Steps;
 
+// Mapping form keys to the corresponding API note type titles.
+const notesTypeMap = {
+  "1": "Chief Complaints",
+  "2": "Allegations",
+  "3": "History of Presenting Illness",
+  "5": "Past Psychiatric and Medical History",
+  "6": "Family History",
+  "7": "Personal History",
+  "8": "Forensic History",
+  "9": "Premorbid Personality",
+  "20": "Medical",
+  "23": "Gynecology"
+};
+
 const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   const role = useAuth().userData.departmentName;
   const { loading: saveNotesLoading } = useSelector(
     (state) => state.postPatientHistory
   );
-  const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+  const { data } = useSelector(
+    (state) => state.getPatientHistoryNotesReducer
+  );
 
   const notesType = [
     { value: "1", label: "Chief Complaints" },
@@ -41,67 +57,52 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-  // Fetch patient history notes
+  // Fetch patient history notes when treatmentNo is available.
   useEffect(() => {
     if (treatmentNo) {
       dispatch(getPatientHistorySlice(treatmentNo));
     }
   }, [dispatch, treatmentNo]);
 
-  // Extract initial values for the form
-  const initialValues = useMemo(
-    () => ({
-      1:
-        data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)
-          ?.Notes || "",
-      2:
-        data.filter((note) => note.Notes_Type === "Allegations").at(-1)
-          ?.Notes || "",
-      3:
-        data
-          .filter(
-            (note) => note.Notes_Type === "History of Presenting Complaint"
-          )
-          .at(-1)?.Notes || "",
-      5:
-        data
-          .filter(
-            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
-          )
-          .at(-1)?.Notes || "",
-      6:
-        data.filter((note) => note.Notes_Type === "Family History").at(-1)
-          ?.Notes || "",
-      personalHistory:
-        data.filter((note) => note.Notes_Type === "Personal History").at(-1)
-          ?.Notes || "",
-      8:
-        data.filter((note) => note.Notes_Type === "Forensic History").at(-1)
-          ?.Notes || "",
-      9:
-        data
-          .filter((note) => note.Notes_Type === "Premorbid Personality")
-          .at(-1)?.Notes || "",
-      20:
-        data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes ||
-        "",
-      23:
-        data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
-        "",
-      7:
-        data
-          .filter(
-            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
-          )
-          .at(-1)?.Notes || "",
-    }),
-    [data]
-  );
+  // Build initial form values based on the fetched data.
+  // The keys here match those in notesTypeMap.
+  const initialValues = useMemo(() => ({
+    "1":
+      data.filter((note) => note.Notes_Type === notesTypeMap["1"]).at(0)
+        ?.Notes || "",
+    "2":
+      data.filter((note) => note.Notes_Type === notesTypeMap["2"]).at(0)
+        ?.Notes || "",
+    "3":
+      data.filter((note) => note.Notes_Type === notesTypeMap["3"]).at(0)
+        ?.Notes || "",
+    "5":
+      data.filter((note) => note.Notes_Type === notesTypeMap["5"]).at(0)
+        ?.Notes || "",
+    "6":
+      data.filter((note) => note.Notes_Type === notesTypeMap["6"]).at(0)
+        ?.Notes || "",
+    "7":
+      data.filter((note) => note.Notes_Type === notesTypeMap["7"]).at(0)
+        ?.Notes || "",
+    "8":
+      data.filter((note) => note.Notes_Type === notesTypeMap["8"]).at(0)
+        ?.Notes || "",
+    "9":
+      data.filter((note) => note.Notes_Type === notesTypeMap["9"]).at(0)
+        ?.Notes || "",
+    "20":
+      data.filter((note) => note.Notes_Type === notesTypeMap["20"]).at(0)
+        ?.Notes || "",
+    "23":
+      data.filter((note) => note.Notes_Type === notesTypeMap["23"]).at(0)
+        ?.Notes || ""
+  }), [data]);
 
-  //tracking last saved notes
+  // Track the latest saved notes using the same keys as initialValues.
   const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
 
-  // Initialize form fields with initial values
+  // Set form fields when initial values change.
   useEffect(() => {
     form.setFieldsValue(initialValues);
   }, [initialValues, form]);
@@ -130,7 +131,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           </Form.Item>
         </>
       ),
-      notesType: ["1", "2"],
+      notesType: ["1", "2"]
     },
     {
       key: "2",
@@ -147,7 +148,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           />
         </Form.Item>
       ),
-      notesType: ["3"],
+      notesType: ["3"]
     },
     {
       key: "3",
@@ -166,19 +167,19 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
             rules={[{ required: true }]}
           >
             <TextArea
-              placeholder="Enter past psychiatric History..."
+              placeholder="Enter past psychiatric history..."
               autoSize={{ minRows: 4 }}
             />
           </Form.Item>
           <Form.Item name="23" label="Obstetric & Gynecology">
             <TextArea
-              placeholder="Enter past Obstetric & Gynecology notes..."
+              placeholder="Enter past obstetric & gynecology notes..."
               autoSize={{ minRows: 4 }}
             />
           </Form.Item>
         </>
       ),
-      notesType: ["5", "20", "23"],
+      notesType: ["5", "20", "23"]
     },
     {
       key: "4",
@@ -199,7 +200,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           </Form.Item>
         </>
       ),
-      notesType: ["6", "7"],
+      notesType: ["6", "7"]
     },
     {
       key: "5",
@@ -220,50 +221,66 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           </Form.Item>
         </>
       ),
-      notesType: ["8", "9"],
-    },
+      notesType: ["8", "9"]
+    }
   ];
 
   const handleNext = async () => {
     try {
       const values = await form.validateFields();
       const currentStepData = steps[currentStep];
+
+      // For each field in the current step, determine if we should create or edit.
       const updatedNotes = currentStepData.notesType
-        .map((type) => ({
-          myAction: "create",
-          recId: "",
-          notesType: type,
-          notes: values[type],
-          treatmentNo,
-          patientNo,
-        }))
-        .filter(
-          (note) => note.notes?.trim() !== "" && !lastSavedNotes[note.notesType]
+        .map((key) => {
+          // Lookup the corresponding API note type title.
+          const actualNotesType = notesTypeMap[key];
+          // Find an existing note by matching on the title.
+          const existingNote = data.find(
+            (note) => note.Notes_Type === actualNotesType
+          );
+          return {
+            formKey: key,
+            myAction: existingNote ? "edit" : "create",
+            recId: existingNote ? existingNote.SystemId : "",
+            // Always pass the integer value from the form key.
+            notesType: parseInt(key, 10),
+            notes: values[key],
+            treatmentNo,
+            patientNo
+          };
+        })
+        // Only send notes that are non-empty and that have changed.
+        .filter((note) =>
+          note.notes?.trim() !== "" &&
+          note.notes !== lastSavedNotes[note.formKey]
         );
 
       if (updatedNotes.length) {
+        console.log("updatedNotes", updatedNotes);
         const results = await Promise.all(
           updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
         );
         if (results.every((res) => res === "success")) {
           message.success("Notes saved successfully!");
+          // Update the lastSavedNotes for the corresponding fields.
           setLastSavedNotes((prev) => ({
             ...prev,
             ...Object.fromEntries(
-              updatedNotes.map((note) => [note.notesType, note.notes])
-            ),
+              updatedNotes.map((note) => [note.formKey, note.notes])
+            )
           }));
+          // Refresh the notes data.
           dispatch(getPatientHistorySlice(treatmentNo));
         } else {
           message.error("Failed to save some notes.");
         }
       }
 
+      // Move to the next step or finish.
       if (currentStep === steps.length - 1) {
-        // Trigger the parent callback to move to the next tab if this is the last step
         moveToNextTab();
       } else {
-        // Move to the next step
         setCurrentStep((prev) => prev + 1);
       }
     } catch (err) {
@@ -272,7 +289,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   };
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
-  // console.log(currentStep, 'currentStep');
 
   return (
     <div className="mt-4">

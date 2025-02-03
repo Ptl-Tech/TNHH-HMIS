@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
+import { useLocation } from "react-router-dom";
 
 const { Text } = Typography;
 
@@ -13,8 +14,13 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
   const dispatch = useDispatch();
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
-  const { loading } = useSelector((state) => state.postPatientCharges);
-
+  const { loading, data:postChargesData } = useSelector((state) => state.postPatientCharges);
+  const { loading: generateInvoiceLoading } = useSelector(
+      (state) => state.generateInvoice
+    );
+  const [selectedTransactionType, setSelectedTransactionType] = useState(null);
+  const [filteredCharges, setFilteredCharges] = useState([]);
+    const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
   
 
   const [selectedCharge, setSelectedCharge] = useState(null);
@@ -26,28 +32,54 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
 
   // If transaction type is selected, get the full charge object
   const handleTransactionTypeChange = (value) => {
-    const charge = charges.find((item) => item.Transaction_Type === value);
+    setSelectedTransactionType(value);
+    setFilteredCharges(charges.filter((item) => item.Transaction_Type === value));
+    console.log("filtered charges:", filteredCharges);
+  };
+  
+  const handleChargeTypeChange = (value) => {
+    const charge = charges.find((item) => item.Description === value);
     setSelectedCharge(charge || null);
   };
-
+  
   console.info("Selected visitNo :", visitNo);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const payload = {
-      myAction:"create",
-      recId:"",
+      myAction: "create",
+      recId: "",
       visitNo: visitNo || "",
       transactionType: values.transactionType,
       charge: selectedCharge ? selectedCharge.Code : "", // Submit charge CODE instead of amount
       quantity: values.quantity,
       remarks: values.remarks || "",
+      patientNo:patientNo
     };
-
+  
     console.log("Submitting data:", payload);
-
-     dispatch(postPatientCharges(payload));
+  
+    try {
+      // Wait for the result of the dispatch
+    await dispatch(postPatientCharges(payload)).then((postChargesData) => {
+      
+      if (postChargesData === "success") {
+        message.success("Charges added successfully!");
+        console.log('status log', postChargesData);
+      } else {
+        message.error("Failed to add charges.");
+      }
+    })
+  
+     
+    } catch (error) {
+      // Handle error here
+      message.error("An error occurred while submitting the charges.");
+      console.error(error);
+    }
+  
+    onClose();
   };
-
+  
   return (
     <Modal
       title={
@@ -70,22 +102,48 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
               name="transactionType"
               rules={[{ required: true, message: "Please enter charge name!" }]}
             >
-              <Select
-                placeholder="Select Service"
-                size="large"
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }
-                onChange={handleTransactionTypeChange}
-              >
-                {data?.map((item) => (
-                  <Select.Option key={item.TransactionType} value={item.TransactionType}>
-                    {item.Description}
-                  </Select.Option>
-                ))}
-              </Select>
+             <Select
+  placeholder="Select Service"
+  size="large"
+  showSearch
+  optionFilterProp="children"
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+  onChange={handleTransactionTypeChange} // Add this
+>
+  {data?.map((item) => (
+    <Select.Option key={item.TransactionType} value={item.TransactionType}>
+      {item.TransactionType}
+    </Select.Option>
+  ))}
+</Select>
+
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item
+              label="Charge Name"
+              name="charge"
+              rules={[{ required: true, message: "Please enter charge name!" }]}
+            >
+             <Select
+  placeholder="Select Charge"
+  size="large"
+  showSearch
+  optionFilterProp="children"
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+  onChange={handleChargeTypeChange}
+>
+  {filteredCharges?.map((item) => (
+    <Select.Option key={item.Code} value={item.Description}>
+      {item.Description}
+    </Select.Option>
+  ))}
+</Select>
+
             </Form.Item>
           </Col>
         </Row>

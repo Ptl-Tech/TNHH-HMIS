@@ -119,7 +119,7 @@ export const createWalkInPatient = (patient) => async (dispatch, getState) => {
     };
 
     const response = await axios.post(
-      `${API}Reception/PatientRegistration`,
+      `${API}Reception/WalkinPatientRegistration `,
       patient,
       config
     );

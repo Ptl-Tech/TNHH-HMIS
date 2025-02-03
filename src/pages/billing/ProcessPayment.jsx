@@ -43,21 +43,27 @@ const ProcessPayment = ({ visible, onClose, patientNo, onPaymentComplete }) => {
           amountReceived: parseFloat(values.amountReceived),
           coPay: values.coPay,
         };
-
+  
         dispatch(postReceiptHeader(formattedData)).then((newReceiptNo) => {
           if (newReceiptNo) {
             setReceiptNo(newReceiptNo);
             dispatch(getReceiptLines(newReceiptNo));
             dispatch(getReceiptHeader(newReceiptNo));
-            form.resetFields();
+            
+            
           }
+          // Reset form fields after success
+          form.resetFields();
+  
+          // Close the modal
+          onClose(); // Call onClose prop to close the modal
         });
       })
       .catch((info) => {
         console.error("Validate Failed:", info);
       });
   };
-
+  
   useEffect(() => {
     if (receiptNo) {
       dispatch(getReceiptLines(receiptNo));

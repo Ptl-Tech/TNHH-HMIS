@@ -1225,9 +1225,8 @@ const PatientRegistration = () => {
           {/* a btn to naviaget back to patient list if required */}
           <Button
             onClick={() =>
-              navigate(
-                location.state?.previousPath || "/reception/visitors-list"
-              )
+              navigate(-1
+                           )
             }
           >
             Back

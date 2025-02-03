@@ -28,6 +28,9 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
       },
     };
 
+//send patientNo as object not string
+    patientNo = {patientNo: patientNo};
+
     // Make the POST request to the server
     const response = await axios.post(
       `${API}GeneralProcesses/GeneratePatientInsuranceReport`,
@@ -40,12 +43,12 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
     if (status === "success" ) {
       // Dispatch success action
       dispatch({
-        type: POST_CHARGES_SUCCESS,
+        type: POST_GENERATE_INVOICE_SUCCESS,
         payload: { status, },
       });
 
       // Display success message
-      message.success(`Patient Charges post: ${status}fully.`);
+      message.success(`Invoice generated: ${status}fully.`);
 
       // Return the CHARGES number 
       return status;

@@ -32,6 +32,9 @@ import { FaUserFriends } from 'react-icons/fa';
 import DynamicBreadcrumb from './DynamicBreadcrumb';
 import useAuth from '../hooks/useAuth';
 
+// routes
+import { labRoutes } from '../Routes/LabRoutes';
+
 const { Header, Content, Footer, Sider } = Layout;
 
 const MainLayout = () => {
@@ -73,11 +76,11 @@ const MainLayout = () => {
             label: 'Walk-in Patient List',
             icon: <UserAddOutlined style={{ color: '#fff' }} />,
           },
-          {
-            key: '/reception/converted-patients',
-            label: 'Converted Patients',
-            icon: <UserOutlined style={{ color: '#fff' }} />,
-          },
+          // {
+          //   key: '/reception/converted-patients',
+          //   label: 'Converted Patients',
+          //   icon: <UserOutlined style={{ color: '#fff' }} />,
+          // },
         ],
       },
       {
@@ -108,7 +111,7 @@ const MainLayout = () => {
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
           {
-            key: '/reception/insurance-List',
+            key: '/reception/Billing/Inpatients',
             label: 'InPatient',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
@@ -578,22 +581,21 @@ const MainLayout = () => {
 
     const pharmacyRoutes = [
       {
-        key: "/Pharmacy",
-        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-        label: "Dashboard",
+        key: '/Pharmacy',
+        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
+        label: 'Dashboard',
       },
       {
-        key: "/Pharmacy/Pharmacy-OutPatient",
-        label: "Pharmacy OutPatients",
-        icon: <TeamOutlined style={{ color: "#fff" }} />,
+        key: '/Pharmacy/Pharmacy-OutPatient',
+        label: 'Pharmacy OutPatients',
+        icon: <TeamOutlined style={{ color: '#fff' }} />,
       },
       {
-        key: "/Pharmacy/Pharmacy-Inpatient",
-        label: "Pharmacy In-Patient List",
-        icon: <UserSwitchOutlined style={{ color: "#fff" }} />,
-      },     
-    ]
-
+        key: '/Pharmacy/Pharmacy-Inpatient',
+        label: 'Pharmacy In-Patient List',
+        icon: <UserSwitchOutlined style={{ color: '#fff' }} />,
+      },
+    ];
 
     // Set the menu items based on the user's department
     if (department === 'Reception') {
@@ -602,13 +604,15 @@ const MainLayout = () => {
       setMenuItems(nurseRoutes);
     } else if (department === 'Doctor') {
       setMenuItems(doctorRoutes);
+    } else if (department === 'LABORATORY') {
+      setMenuItems(labRoutes);
     } else if (department === 'Security') {
       setMenuItems(securityRoutes);
     } else if (department === 'Psychology') {
       setMenuItems(psychologyRoutes);
-    } else if (department === 'Radiology') {
+    } else if (department === 'RADIOLOGY') {
       setMenuItems(radiologyRoutes);
-    } else if (department === "Pharmacy") {
+    } else if (department === 'Pharmacy') {
       setMenuItems(pharmacyRoutes);
     }
   }, []);

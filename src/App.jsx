@@ -87,6 +87,8 @@ import WalkinRegistration from './pages/WalkinRegistration';
 import RadiologyDashboard from './Dashboards/RadiologyDashboard';
 import ViewInvoice from './pages/billing/ViewInvoice';
 import ActiveOutPatients from './pages/billing/ActiveOutPatients';
+import ActiveInpatient from './pages/billing/ActiveInpatient';
+import LabRoutes from './Routes/LabRoutes';
 
 function App() {
   return (
@@ -269,7 +271,6 @@ function App() {
           />
         </Route>
       </Route>
-
       <Route element={<PrivateRoute allowedDepartments={['Reception']} />}>
         <Route
           path="/reception"
@@ -322,7 +323,12 @@ function App() {
             path="/reception/Billing/Outpatients"
             element={<ActiveOutPatients />}
           />
-          <Route
+           <Route
+            path="/reception/Billing/Inpatients"
+            element={<ActiveInpatient />}
+          />
+          
+          {/* <Route
             path="/reception/insurance-List"
             element={<InsurancePatients />}
           />
@@ -330,7 +336,7 @@ function App() {
           <Route
             path="/reception/InPatient-list"
             element={<InpatientList />}
-          />
+          /> */}
 
           <Route
             path="/reception/visitors-list"
@@ -342,7 +348,7 @@ function App() {
             element={<CreateVisitForm />}
           />
            <Route
-            path="/reception/invoice/:ReceiptNo"
+            path="/reception/invoice/:patientNo"
             element={<ViewInvoice />}
           />
         </Route>
@@ -581,7 +587,7 @@ function App() {
           />
         </Route>
       </Route>
-      <Route element={<PrivateRoute allowedDepartments={['Radiology']} />}>
+      <Route element={<PrivateRoute allowedDepartments={['RADIOLOGY']} />}>
         <Route
           path="/Radiology"
           element={<MainLayout />}
@@ -600,6 +606,9 @@ function App() {
           />
         </Route>
       </Route>
+      {/* Lab routes */}
+      {LabRoutes()}
+
       <Route element={<PrivateRoute allowedDepartments={['Security']} />}>
         <Route
           path="/Security"
@@ -619,17 +628,41 @@ function App() {
           />
         </Route>
       </Route>
-      
-      <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
-        <Route path="/Pharmacy" element={<MainLayout />}>
-          <Route index element={<PhamarcyDashboard />} />
-          <Route path="/Pharmacy/Pharmacy-OutPatient" element={<PhamarcyOutpatient />} />
-          <Route path="/Pharmacy/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
-          <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />
-          <Route path="/Pharmacy/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
-          <Route path="/Pharmacy/Pharmacy-History" element={<PharmacyHistoryList />} />
+
+      <Route element={<PrivateRoute allowedDepartments={['Pharmacy']} />}>
+        <Route
+          path="/Pharmacy"
+          element={<MainLayout />}
+        >
+          <Route
+            index
+            element={<PhamarcyDashboard />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Inpatient"
+            element={<PharmacyInpatient />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Card"
+            element={<PharmacyCard />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Returns"
+            element={<PharmacyListReturnLines />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-History"
+            element={<PharmacyHistoryList />}
+          />
           {/* <Route path="/Pharmacy/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} /> */}
-          <Route path="view-profile" element={<ViewProfile />} />
+          <Route
+            path="view-profile"
+            element={<ViewProfile />}
+          />
         </Route>
       </Route>
 
