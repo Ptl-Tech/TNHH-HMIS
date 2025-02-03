@@ -20,7 +20,6 @@ const ConsultationRoomEvalutionCard = () => {
     (state) => state.getPatientDetails
   );
 
-
   useEffect(() => {
     if (patientNo) {
       dispatch(getPatientDetails(patientNo));

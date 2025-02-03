@@ -131,20 +131,15 @@ const ConsultationroomDetails = ({
 
   const buttonItems = [
     { label: "Patient History Notes", icon: <SolutionOutlined /> },
-    { label: "Physical Examination", icon: <HeartOutlined /> },
+     ...(role === "Doctor" ? [{ label: "Physical Examination", icon: <HeartOutlined /> }] : []),
     { label: "Mental Status Exam", icon: <SolutionOutlined /> },
     // { label: "Past Medical History", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
     {
-      label: (() => {
-        if (role === "Doctor") return "Psychology Notes";
-        if (role === "Psychology") return "Doctor Notes";
-        return "Notes"; // Default value (optional)
-      })(),
-      icon: <HeartOutlined />,
-    },
+      ...(role === "Doctor" ? { label: "Psychology Notes", icon: <HeartOutlined /> } : { label: "Doctor Notes", icon: <HeartOutlined /> }),
+    }
   ];
 
   return (

@@ -44,7 +44,7 @@ const Medication = () => {
       </Typography.Title>
       </div>
      {
-       role === "Doctor" && (
+       (role === "Doctor" || role === "Psychology") && (
         <div style={{ display: "flex", gap: "10px"}}>
         <Button
                 type="primary"
