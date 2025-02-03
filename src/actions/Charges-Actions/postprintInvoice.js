@@ -1,0 +1,51 @@
+import axios from "axios";
+import apiHeaderConfig from "../configHelpers";
+import { message } from "antd";
+
+export const PRINT_INVOICE_REQUEST = "PRINT_INVOICE_REQUEST";
+export const PRINT_INVOICE_SUCCESS = "PRINT_INVOICE_SUCCESS";
+export const PRINT_INVOICE_FAIL = "PRINT_INVOICE_FAIL";
+export const PRINT_INVOICE_RESET = "PRINT_INVOICE_RESET";
+
+const API_URL =
+  import.meta.env.VITE_PORTAL_API_BASE_URL || "http://217.21.122.62:8085";
+
+export const postPrintInvoice = (patientNo) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: PRINT_INVOICE_REQUEST });
+
+    // Append staffNo to invoiceData
+
+    const config = apiHeaderConfig(getState);
+
+    //get staffNo from userInfo
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    patientNo = {patientNo: patientNo};
+
+    const response = await axios.post(
+      `${API_URL}/Reports/InsuranceInvoiceReport`,
+      patientNo,
+      config
+    );      
+
+    dispatch({
+      type: PRINT_INVOICE_SUCCESS,
+      payload: response,
+    });
+    message.success("Invoice printed successfully!", 5);
+    return response;
+  } catch (error) {
+    setTimeout(() => {
+      dispatch({
+        type: PRINT_INVOICE_FAIL,
+        payload: error.response?.data?.errors || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
+  } finally {
+    dispatch({ type: PRINT_INVOICE_RESET });
+  }
+};
