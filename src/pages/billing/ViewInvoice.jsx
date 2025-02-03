@@ -45,21 +45,21 @@ const ViewInvoice = () => {
     (state) => state.getChargesLines
   );
   const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
-const branchName = localStorage.getItem("branchCode");
+  const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [pdfBase64, setPdfBase64] = useState("");
   const [showPDFModal, setShowPDFModal] = useState(false);
-  const[isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] = useState(false);
-  
+  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
+    useState(false);
+
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
-   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-        useSelector((state) => state.postInterimInvoice);
-        
+  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+    useSelector((state) => state.postInterimInvoice);
 
   console.log("patientData", patientData);
 
@@ -71,12 +71,14 @@ const branchName = localStorage.getItem("branchCode");
   }, [dispatch, patientNo]);
 
   const handleGoBack = () => {
-    navigate(-1);
+  //if no calculation use (-1) ELSE  /reception/Billing/Outpatients
+  navigate("/reception/Billing/Outpatients", );
+
   };
 
-const handleGenerateReceipt = (patientNo) => {
-  setIsGenerateReceiptModalVisible(true);
-};
+  const handleGenerateReceipt = (patientNo) => {
+    setIsGenerateReceiptModalVisible(true);
+  };
 
   const handleClose = () => {
     setIsModalVisible(false);
@@ -103,11 +105,10 @@ const handleGenerateReceipt = (patientNo) => {
       return;
     }
     console.log("patientData", patientData);
-const invoiceData = {
-  PatientNo: patientData.PatientNo,
+    const invoiceData = {
+      PatientNo: patientData.PatientNo,
       visitNo: patientData.AppointmentNo,
     };
-
 
     dispatch(postInterimInvoice(invoiceData)).then((response) => {
       if (response?.data.base64) {
@@ -212,7 +213,12 @@ const invoiceData = {
             <Title level={3}>Chiromo Hospital Group</Title>
             <Text>Email: info@chiromohg.co.ke</Text>
             <br />
-            <Text>Phone:   {ContactDetails.map((contact) => contact.title===branchName ? contact.value : null)}</Text>
+            <Text>
+              Phone:{" "}
+              {ContactDetails.map((contact) =>
+                contact.title === branchName ? contact.value : null
+              )}
+            </Text>
           </Col>
         </Row>
         <Row justify="end">
@@ -234,7 +240,7 @@ const invoiceData = {
                       confirmGenerateInvoice(patientData?.PatientNo)
                     } // Ensure patientNo is passed
                   >
-                   Post Charges
+                    Post Charges
                   </Button>
                   <Button
                     type="primary"
@@ -254,17 +260,19 @@ const invoiceData = {
                   </Button>
                 </>
               ) : (
-               <>
-               <Button
-                  type="primary"
-                  size="medium"
-                  icon={<FaReceipt />}
-                  onClick={() => handleGenerateReceipt(patientData?.PatientNo)}
-                >
-                  Generate Payment 
-                </Button>
-                
-                {/* <Button
+                <>
+                  <Button
+                    type="primary"
+                    size="medium"
+                    icon={<FaReceipt />}
+                    onClick={() =>
+                      handleGenerateReceipt(patientData?.PatientNo)
+                    }
+                  >
+                    Generate Payment
+                  </Button>
+
+                  {/* <Button
                   icon={
                     <PrinterOutlined style={{ color: "green", size: "29px" }} />
                   }
@@ -276,19 +284,20 @@ const invoiceData = {
                 >
                   Print Receipt
                 </Button> */}
-               </>
+                </>
               )}
             </Space>
           </Col>
         </Row>
         <Row align="middle" justify="space-between">
-        <Col span={12}>
+          <Col span={12}>
             <div className="d-flex justify-content-start gap-2">
-            <Text strong>Cashier:</Text>
-            {/* Capitalize the first letter only since the api returns uppercase */}
-            <p>{userData.firstName.charAt(0).toUpperCase() + userData.firstName.slice(1).toLowerCase()}</p>
-
-           
+              <Text strong>Cashier:</Text>
+              {/* Capitalize the first letter only since the api returns uppercase */}
+              <p>
+                {userData.firstName.charAt(0).toUpperCase() +
+                  userData.firstName.slice(1).toLowerCase()}
+              </p>
             </div>
           </Col>
           <Col span={12} className="mt-3 text-end">
@@ -306,8 +315,9 @@ const invoiceData = {
                 size="medium"
                 icon={<DeleteOutlined />}
                 danger
-                onClick={() => message.info("Feature not available at the moment")}
-
+                onClick={() =>
+                  message.info("Feature Coming Soon!")
+                }
               >
                 Waive Charges
               </Button>
@@ -333,48 +343,49 @@ const invoiceData = {
 
         <Row gutter={16}>
           <Col span={24}>
-           <div className="d-flex justify-content-start gap-4">
-           <Text strong>Receiving From:</Text>
-            <p>{patientData.Names}</p>
+            <div className="d-flex justify-content-start gap-4">
+              <Text strong>Receiving From:</Text>
+              <p>{patientData.Names}</p>
 
-            <Text strong>Patient No:</Text>
-            <p style={{ fontWeight: "bold", color: "brown" }}>{patientData.PatientNo}</p>
-             
-           </div>
+              <Text strong>Patient No:</Text>
+              <p style={{ fontWeight: "bold", color: "brown" }}>
+                {patientData.PatientNo}
+              </p>
+            </div>
 
-           <div className="d-flex justify-content-start gap-4">
-           <Text strong>Appointment No:</Text>
-            <p style={{ fontWeight: "bold", color: "green" }} className="text-primary fw-bold">{patientData?.AppointmentNo}</p>
+            <div className="d-flex justify-content-start gap-4">
+              <Text strong>Appointment No:</Text>
+              <p
+                style={{ fontWeight: "bold", color: "green" }}
+                className="text-primary fw-bold"
+              >
+                {patientData?.AppointmentNo}
+              </p>
 
-            <Text strong>Date:</Text>
-            <p>
-              {patientData?.AppointmentDate
-                ? moment(patientData?.AppointmentDate).format("Do MMM YYYY")
-                : ""}
-            </p>
-           
-           <Text strong>Amount Received:</Text>
-           <p style={{ fontWeight: "bold", color: "green" }}>
-  {patientData?.PatientType === "Corporate"
-    ? grandTotal?.toLocaleString("en-KE", {
-        style: "currency",
-        currency: "KES",
-      })
-    : data?.Receipt_Amount
-        ?.toLocaleString("en-KE", {
-          style: "currency",
-          currency: "KES",
-        })
-        .replace(".00", "")}
-</p>
+              <Text strong>Date:</Text>
+              <p>
+                {patientData?.AppointmentDate
+                  ? moment(patientData?.AppointmentDate).format("Do MMM YYYY")
+                  : ""}
+              </p>
 
+              <Text strong>Amount Received:</Text>
+              <p style={{ fontWeight: "bold", color: "green" }}>
+                {patientData?.PatientType === "Corporate"
+                  ? grandTotal?.toLocaleString("en-KE", {
+                      style: "currency",
+                      currency: "KES",
+                    })
+                  : data?.Receipt_Amount?.toLocaleString("en-KE", {
+                      style: "currency",
+                      currency: "KES",
+                    }).replace(".00", "")}
+              </p>
 
-           {/* <Text strong>Document Date:</Text>
+              {/* <Text strong>Document Date:</Text>
            <p>{data?.Date ? moment(data?.Date).format("Do MMM YYYY") : ""}</p> */}
-           </div>
+            </div>
           </Col>
-
-        
         </Row>
 
         <Divider />
@@ -402,8 +413,8 @@ const invoiceData = {
               {/* hide total received for corporate */}
               {patientData?.PatientType !== "Corporate" && (
                 <Col span={12}>
-                <Text strong>Total Received:</Text>
-              </Col>
+                  <Text strong>Total Received:</Text>
+                </Col>
               )}
               <Col span={12}>
                 <Text style={{ color: "green" }}>
@@ -420,7 +431,9 @@ const invoiceData = {
                 <Text strong>Grand Total:</Text>
               </Col>
               <Col span={12}>
-                <Text style={{ color: "green" }} strong>{grandTotal}</Text>
+                <Text style={{ color: "green" }} strong>
+                  {grandTotal}
+                </Text>
               </Col>
             </Row>
           </Col>
@@ -448,7 +461,7 @@ const invoiceData = {
         visible={isGenerateReceiptModalVisible}
         onClose={handleClose}
         patientNo={patientData?.PatientNo}
-        />
+      />
       <Modal
         title="Invoice Preview"
         open={showPDFModal}

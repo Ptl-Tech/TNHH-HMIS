@@ -1,5 +1,5 @@
 import axios from "axios";
-import { message } from "antd"; // Import Ant Design message for error handling
+import { message } from "antd";
 
 const API = "http://217.21.122.62:8085/";
 
@@ -17,9 +17,12 @@ export const getReceiptHeader = (receiptNo) => async (dispatch, getState) => {
     } = getState();
     const branchCode = localStorage.getItem("branchCode");
 
-    // Validate userInfo and branchCode for better error handling
+    // Handle missing userInfo or branchCode
     if (!userInfo || !branchCode) {
-      throw new Error("User information or branch code is missing");
+      const errorMsg = "User information or branch code is missing";
+      dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: errorMsg });
+      message.error(errorMsg);
+      return;
     }
 
     const config = {
@@ -36,14 +39,20 @@ export const getReceiptHeader = (receiptNo) => async (dispatch, getState) => {
       config
     );
 
+    // Ensure response.data is valid
+    if (!response.data || response.data.length === 0) {
+      const emptyMsg = "No receipt header found";
+      dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: emptyMsg });
+      message.warning(emptyMsg);
+      return;
+    }
+
     dispatch({ type: REQUEST_RECEIPT_HEADER_SUCCESS, payload: response.data });
   } catch (error) {
     const errorMessage =
       error.response?.data?.message || error.message || "Failed to fetch receipt header";
 
-    // Display error message using Ant Design's message component
     message.error(errorMessage);
-
     dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: errorMessage });
   }
 };

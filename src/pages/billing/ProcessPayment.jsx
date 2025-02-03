@@ -24,7 +24,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [receiptNo, setReceiptNo] = useState("");
-  const [payMode, setPayMode] = useState(null); // Track selected payment mode
+  const [payMode, setPayMode] = useState(""); // Track selected payment mode
 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector(
@@ -115,7 +115,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ payMode: 0, amountReceived: 0, coPay: true }}
+        initialValues={{ payMode: "", amountReceived: 0, coPay: true }}
       >
         <Row gutter={16}>
           <Col span={24}>
@@ -123,11 +123,12 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
               label="Receipt Date"
               name="receiptDate"
               rules={[{ required: true, message: "Please select receipt date!" }]}
+
             >
               <DatePicker
                 size="large"
                 format="YYYY-MM-DD"
-                style={{ width: "100%" }}
+                style={{ width: "100%",color: "#0F5689 !important" }}
                 disabled
               />
             </Form.Item>
@@ -144,7 +145,9 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
               <Select
                 size="large"
                 onChange={(value) => setPayMode(value)} // Track selected payment mode
+                placeholder="select Payment option"
               >
+                <Option value="" >--Select Payment Option--</Option>
                 <Option value={7}>Mpesa</Option>
                 <Option value={9}>PDQ</Option>
               </Select>
