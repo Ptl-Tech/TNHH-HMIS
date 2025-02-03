@@ -30,6 +30,7 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
 };
 
 
+
 export const createWalkInPatientReducer = (state = { loading: false }, action) => {
   switch (action.type) {
     case CREATE_WALK_IN_PATIENT_REQUEST:

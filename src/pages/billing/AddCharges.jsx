@@ -53,6 +53,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo }) => {
       charge: selectedCharge ? selectedCharge.Code : "", // Submit charge CODE instead of amount
       quantity: values.quantity,
       remarks: values.remarks || "",
+      patientNo:patientNo
     };
   
     console.log("Submitting data:", payload);

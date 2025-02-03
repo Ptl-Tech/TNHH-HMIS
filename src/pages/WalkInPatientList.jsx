@@ -118,7 +118,7 @@ const WalkInPatientList = () => {
               <Button
                 icon={<PlusOutlined />}
                 onClick={() =>
-                  navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
+                  navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
                     state: { existingPatient: record, previousPath: location.pathname  },
                    
                     
