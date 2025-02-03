@@ -238,6 +238,21 @@ if(!newVisit.clinic) {
     (doc) => doc.DoctorID === newVisit.doctor
   );
 
+  const handleEditPatient = () => {
+    if (typeof patientNo !== "string") {
+        console.error("Invalid patientNo:", patientNo);
+        return;
+    }
+
+    // Fetch patientNo starts with WLK navigate to walk-in registration else navigate to outpatient registration with patient data
+    if (patientNo.startsWith("WLK")) {
+        navigate(`/reception/Register-walkin?PatientNo=${patientNo}`, { state: { patientDet: existingPatient } });
+    } else {
+        navigate(`/reception/Patient-Registration?PatientNo=${patientNo}`, { state: { patientDet: existingPatient } });
+    }
+};
+
+
   return (
     <div>
       <div>
@@ -252,6 +267,7 @@ if(!newVisit.clinic) {
             </h4>
           </div>
           <div className=" d-flex align-items-center justify-content-end gap-3">
+            
             <Button
               type="primary"
               size="medium"
@@ -267,6 +283,9 @@ if(!newVisit.clinic) {
               onClick={() => dispatchPatient(appointmentId)}
             >
               Dispatch to Triage
+            </Button>
+            <Button onClick={handleEditPatient}>
+              Edit Patient
             </Button>
           </div>
         </div>

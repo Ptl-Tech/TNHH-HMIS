@@ -116,7 +116,7 @@ const filterPatients = (params) => {
                 icon={<PlusOutlined />}
                 type="primary"
                 onClick={() =>
-                  navigate(`/reception/Add-Appointment/Patient?PatientNo${record.PatientNo}`, {
+                  navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
                     state: { existingPatient: record, previousPath: location.pathname  },
                    
                     

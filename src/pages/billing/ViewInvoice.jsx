@@ -235,7 +235,7 @@ const invoiceData = {
                       confirmGenerateInvoice(patientData?.PatientNo)
                     } // Ensure patientNo is passed
                   >
-                    Generate Invoice
+                   Post Charges
                   </Button>
                   <Button
                     type="primary"
