@@ -59,11 +59,11 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
     // Dispatch failure action
     dispatch({
       type: POST_RECEIPT_FAIL,
-      payload: { status: errorStatus, msg: errorMessage },
+      payload: errorMessage,
     });
 
     // Display error message
-    message.error(`${errorStatus.toUpperCase()}: ${errorMessage}`);
+    message.error(error.response?.data?.errors); 
 
     // Rethrow error for handling by other parts of the app
     throw error;

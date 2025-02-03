@@ -40,26 +40,16 @@ const { Title, Text } = Typography;
 const ViewReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const receiptNo = new URLSearchParams(useLocation().search).get("ReceiptNo");
+
   const { userData } = useAuth();
   const { state } = useLocation();
   const { patientData } = state;
-  const {  lines } = state.patientData; // Extract header and lines
+  const { lines } = state.patientData; // Extract header and lines
 
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
   );
-  const receiptNo = new URLSearchParams(useLocation().search).get("ReceiptNo");
-
-  const branchName = localStorage.getItem("branchCode");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [appointmentNo, setAppointmentNo] = useState("");
-  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
-  const [selectedpatientNo, setSelectedPatientNo] = useState("");
-  const [pdfBase64, setPdfBase64] = useState("");
-  const [showPDFModal, setShowPDFModal] = useState(false);
-  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
-    useState(false);
-
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
@@ -69,22 +59,44 @@ const ViewReceipt = () => {
   const { data: receiptHeader } = useSelector(
     (state) => state.getReceiptHeaderLines
   );
-  const {loading:printReceiptLoading } = useSelector(
+  const receiptHeaderState = useSelector(
+    (state) => state.getReceiptHeaderLines
+  );
+  console.log("Redux Receipt Header State:", receiptHeaderState);
+
+  const { loading: printReceiptLoading } = useSelector(
     (state) => state.printReceipt
   );
+  const { loading: processReceiptLoading } = useSelector(
+    (state) => state.processReceipt
+  )
 
+  const branchName = localStorage.getItem("branchCode");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [appointmentNo, setAppointmentNo] = useState("");
+  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [selectedpatientNo, setSelectedPatientNo] = useState("");
+    const[selectedPatientAmount, setSelectedPatientAmount]=useState("");
   
-
-
+  const [pdfBase64, setPdfBase64] = useState("");
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
+    useState(false);
+const [showPaymentModal, setShowPaymentModal]=useState(false);
   useEffect(() => {
     if (receiptNo) {
       dispatch(getReceiptLines(receiptNo));
+      console.log("receipt lines", receiptLines);
+    }
+  }, [dispatch, receiptNo]);
+  useEffect(() => {
+    if (receiptNo) {
       dispatch(getReceiptHeader(receiptNo));
     }
   }, [dispatch, receiptNo]);
 
   const handleGoBack = () => {
-    navigate(-1);
+    navigate("/reception/Billing/Outpatients", );
   };
 
   const handleGenerateReceipt = (patientNo) => {
@@ -94,9 +106,8 @@ const ViewReceipt = () => {
   const handleClose = () => {
     setIsModalVisible(false);
     setIsInvoiceModalVisible(false);
-    setIsGenerateReceiptModalVisible(false);
+    setShowPaymentModal(false);
   };
-
 
   const handlePrintReceipt = () => {
     const invoiceData = {
@@ -106,7 +117,7 @@ const ViewReceipt = () => {
     dispatch(printReceipt(invoiceData)).then((response) => {
       if (response?.data.base64) {
         setPdfBase64(response.data.base64);
-        setShowPDFModal(true); 
+        setShowPDFModal(true);
       }
     });
   };
@@ -117,36 +128,41 @@ const ViewReceipt = () => {
     }, 0);
   };
 
+  const handlePaymentModal=()=>{
+    setShowPaymentModal(true);
+    setSelectedPatientNo(receiptHeader[0]?.Patient_No);
+    setSelectedPatientAmount(receiptHeader[0]?.Total_Amount);
+    }
+
   const handleProcessReceipt = () => {
     const receipt = {
       recId: "",
-      patientNo: header[0].Patient_No,
-      receiptNo: header[0].No,
+      patientNo: receiptHeader[0]?.Patient_No,
+      receiptNo: receiptHeader[0]?.No,
     };
 
     dispatch(postReceipt(receipt));
   };
 
-  const grandTotal = lines ||receiptLines
-    ?.reduce((total, line) => total + line.Amount, 0)
-    .toLocaleString("en-KE", {
-      style: "currency",
-      currency: "KES",
-    });
-
-  const tableData =receiptLines?.map((line, index) => ({
+  const tableData = receiptLines?.map((line, index) => ({
     key: index,
+    code:line?.AccountNo,
     transactionName: line.TransactionType,
     chargeName: line.TransactionName,
     // quantity: line.Quantity,
     billType: line.PayMode,
-    amount: line.Amount_Recieved?.toLocaleString("en-KE", {
+    amount: line.Amount?.toLocaleString("en-KE", {
       style: "currency",
       currency: "KES",
     }),
   }));
 
   const columns = [
+    {
+      title: "Code",
+      dataIndex:"code",
+      key:"code"
+    },
     {
       title: "Transaction Name",
       dataIndex: "transactionName",
@@ -213,23 +229,26 @@ const ViewReceipt = () => {
                     size="medium"
                     icon={<FaReceipt />}
                     onClick={() =>
-                      handleGenerateReceipt(patientData?.PatientNo)
+                      handleProcessReceipt(receiptHeader[0]?.Patient_No)
                     }
                   >
-                   Post Receipt
+                    Post Receipt
                   </Button>
 
                   <Button
-  icon={<PrinterOutlined style={{ color: "green", size: "29px" }} />}
-  onClick={() => {
-    console.log("Printing Receipt:", receiptNo);
-    handlePrintReceipt(receiptNo);
-  }}
-  size="medium"
->
-  Print Receipt
-</Button>
-
+                    icon={
+                      <PrinterOutlined
+                        style={{ color: "green", size: "29px" }}
+                      />
+                    }
+                    onClick={() => {
+                      console.log("Printing Receipt:", receiptNo);
+                      handlePrintReceipt(receiptNo);
+                    }}
+                    size="medium"
+                  >
+                    Print Receipt
+                  </Button>
                 </>
               )}
             </Space>
@@ -257,12 +276,20 @@ const ViewReceipt = () => {
                 Add Charges
               </Button>
               <Button
+                type="primary"
+                size="medium"
+                icon={<FaCoins />}
+                onClick={handlePaymentModal}
+              >
+               Initiate Payment
+              </Button>
+              <Button
                 type="default"
                 size="medium"
                 icon={<DeleteOutlined />}
                 danger
                 onClick={() =>
-                  message.info("Feature not available at the moment")
+                  message.info("Feature Coming Soon!")
                 }
               >
                 Waive Charges
@@ -287,11 +314,15 @@ const ViewReceipt = () => {
           <Col span={24}>
             <div className="d-flex justify-content-start gap-4">
               <Text strong>Receiving From:</Text>
-              <p>{receiptHeader.Received_From}</p>
+              <p>{receiptHeader[0]?.Received_From}</p>
 
               <Text strong>Patient No:</Text>
               <p style={{ fontWeight: "bold", color: "brown" }}>
-                {receiptHeader.Patient_No}
+                {receiptHeader[0]?.Patient_No}
+              </p>
+              <Text strong>Receipt No:</Text>
+              <p style={{ fontWeight: "bold", color: "brown" }}>
+                {receiptHeader[0]?.No}
               </p>
             </div>
 
@@ -301,26 +332,26 @@ const ViewReceipt = () => {
                 style={{ fontWeight: "bold", color: "green" }}
                 className="text-primary fw-bold"
               >
-                {receiptHeader?.Patient_Appointment_No}
-                </p>
+                {receiptHeader[0]?.Patient_Appointment_No}{" "}
+              </p>
 
               <Text strong>Date:</Text>
               <p>
-                {receiptHeader?.Date
-                  ? moment(receiptHeader?.Date).format("Do MMM YYYY")
+                {receiptHeader[0]?.Date_Posted
+                  ? moment(patientData?.Date_Posted).format("Do MMM YYYY")
                   : ""}
               </p>
 
               <Text strong>Amount Received:</Text>
               <p style={{ fontWeight: "bold", color: "green" }}>
-              {receiptHeader?.Amount_Recieved?.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    }).replace(".00", "")}
+                {receiptHeader[0]?.Amount_Recieved.toLocaleString("en-KE", {
+                  style: "currency",
+                  currency: "KES",
+                }).replace(".00", "")}
               </p>
 
               {/* <Text strong>Document Date:</Text>
-           <p>{data?.Date ? moment(data?.Date).format("Do MMM YYYY") : ""}</p> */}
+                   <p>{data?.Date ? moment(data?.Date).format("Do MMM YYYY") : ""}</p> */}
             </div>
           </Col>
         </Row>
@@ -352,7 +383,10 @@ const ViewReceipt = () => {
               </Col>
               <Col span={12}>
                 <Text style={{ color: "green" }} strong>
-                  {grandTotal}
+                  {receiptHeader[0]?.Total_Amount.toLocaleString("en-KE", {
+                    style: "currency",
+                    currency: "KES",
+                  }).replace(".00", "")}
                 </Text>
               </Col>
             </Row>
@@ -363,12 +397,13 @@ const ViewReceipt = () => {
       <AddCharges
         visible={isModalVisible}
         onClose={handleClose}
-        visitNo={patientData?.AppointmentNo}
+        visitNo= {receiptHeader[0]?.Patient_Appointment_No}
       />
       <ProcessPayment
-        visible={isGenerateReceiptModalVisible}
+        visible={showPaymentModal}
         onClose={handleClose}
-        patientNo={patientData?.PatientNo}
+        patientNo={receiptHeader[0]?.Patient_No}
+        amount={receiptHeader[0]?.Total_Amount}
       />
       <Modal
         title="Receipt Preview"
