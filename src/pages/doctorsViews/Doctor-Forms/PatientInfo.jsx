@@ -281,7 +281,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             gap: "10px",
           }}
         >
-          <InfoRow label="Patient Number" value={patientDetails?.PatientNo} />
+          <InfoRow label="Patient Number" value={patientDetails?.PatientNo || patientNo} />
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
           <InfoRow label="Gender" value={patientDetails?.Gender} />

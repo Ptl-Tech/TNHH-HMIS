@@ -115,12 +115,28 @@ const PsychologyNotes = ({ treatmentNo }) => {
           paddingTop: "20px",
         }}
       >
-        <ProfileOutlined />
+        {
+          role === "Doctor" ? (
+            <>
+            <ProfileOutlined />
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
         >
           Psychology Notes
         </Typography.Text>
+            </>
+          ) : (
+            <>
+            <ProfileOutlined />
+            <Typography.Text
+              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+            >
+              Doctor Notes
+            </Typography.Text>
+            </>
+          )
+        }
+        
       </Space>
       {/* <div
         style={{
