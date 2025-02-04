@@ -39,8 +39,6 @@ export const getLabTestResults =
         config,
       );
 
-      console.log({ labNo, testCode, data });
-
       // Dispatch success action with the fetched data
       dispatch({
         type: GET_LAB_TEST_RESULTS_SUCCESS,

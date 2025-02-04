@@ -92,11 +92,7 @@ const LabResultsEntry = ({ data, loading }) => {
 
 const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
   const dispatch = useDispatch();
-
-  const { data, loading, error } = useSelector(
-    (state) => state.getLabTestResults,
-  );
-
+  const { data, loading, error } = useSelector((state) => state.getLabTestResults);
   const { LaboratoryTestName } = record || {};
 
   useEffect(() => {
@@ -118,12 +114,15 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
       onCancel={handleCancel}
       extra={<Button onClick={handleCancel}>Cancel</Button>}
     >
-      <ResultsTable
-        data={data}
-        error={error}
-        loading={loading}
-        closeDrawer={handleCancel}
-      />
+      {loading ? (
+        <SkeletonLoading />
+      ) : (
+        <ResultsTable
+          initialData={data}
+          error={error}
+          loading={loading}
+        />
+      )}
     </Drawer>
   );
 };
@@ -135,21 +134,28 @@ const EditableCell = ({
   children,
   record,
   handleSave,
-  handleEdit,
   ...props
 }) => {
   const { Item } = Form;
+  const [value, setValue] = useState(
+    inputType === 'number' ? parseFloat(children) || 0 : children || ''
+  );
+
+  const handleChange = (newValue) => {
+    setValue(newValue);
+    handleSave(record.Specimen_Code, dataIndex, newValue);
+  };
 
   const inputNode =
     inputType === 'number' ? (
       <InputNumber
-        defaultValue={parseFloat(children) || 0}
-        onChange={(value) => (record[dataIndex] = value)} // Update record
+        value={value}
+        onChange={handleChange}
       />
     ) : (
       <Input
-        defaultValue={children || ''}
-        onChange={(e) => (record[dataIndex] = e.target.value)} // Update record
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
       />
     );
 
@@ -169,21 +175,14 @@ const EditableCell = ({
   );
 };
 
-const ResultsTable = ({ data: tableData, error, loading, closeDrawer }) => {
+const ResultsTable = ({ initialData, error, loading }) => {
   const { useForm } = Form;
   const [form] = useForm();
   const dispatch = useDispatch();
 
-  // state
   const [editingKey, setEditingKey] = useState(null);
-  const [results, setResults] = useState(tableData);
-
-  useEffect(() => {
-    console.log({ editableData: results });
-  }, [results]);
-
-  const isEditing = (record) => record.Specimen_Code === editingKey;
-
+  const [results, setResults] = useState([...initialData].map(item => ({...item})));
+  
   const {
     data: labResultsData,
     loading: labResultsLoading,
@@ -191,40 +190,24 @@ const ResultsTable = ({ data: tableData, error, loading, closeDrawer }) => {
   } = useSelector((state) => state.postLabTestResults);
 
   useEffect(() => {
-    setResults(tableData);
-  }, [tableData]);
-
-  const edit = (record) => {
-    if (!record) return;
-    form.setFieldsValue(record);
-    setEditingKey(record.Specimen_Code);
-  };
-
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      console.log({ row });
-
-      const newData = [...results];
-      const index = newData.findIndex((item) => key === item.Specimen_Code);
-      console.log({ index });
-
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setResults(() => newData);
-        setEditingKey(null);
-      } else {
-        newData.push(row);
-        setResults(newData);
-        setEditingKey(null);
-      }
-    } catch (errInfo) {
-      message.error('Plase try again');
+    if (labResultsData) {
+      const { status } = labResultsData;
+      status === 'success'
+        ? message.success('Results submitted successfully!')
+        : message.error('Something went wrong!');
     }
+  }, [labResultsData, labResultsError]);
+
+  const isEditing = (record) => record.Specimen_Code === editingKey;
+  
+  const handleSave = (key, dataIndex, value) => {
+    setResults(prevResults => 
+      prevResults.map(item => 
+        item.Specimen_Code === key 
+          ? { ...item, [dataIndex]: value }
+          : item
+      )
+    );
   };
 
   const columns = labResultsColumns.map((col) => {
@@ -238,30 +221,22 @@ const ResultsTable = ({ data: tableData, error, loading, closeDrawer }) => {
         inputType: col.dataIndex === 'Results' ? 'number' : 'text',
         dataIndex: col.dataIndex,
         editing: isEditing(record),
-        handleEdit: edit,
-        handleSave: save,
+        handleSave,
       }),
     };
   });
 
-  useEffect(() => {
-    if (labResultsData && labResultsData.success)
-      message.success('Results submitted successfully!');
-
-    if (labResultsError) {
-      message.error('Something went wrong!');
-    }
-  }, [labResultsData, labResultsError]);
+  const edit = (record) => {
+    if (!record) return;
+    form.setFieldsValue(record);
+    setEditingKey(record.Specimen_Code);
+  };
 
   const handleSubmit = () => {
     if (editingKey) {
-      save(editingKey);
+      setEditingKey(null);
     } else {
-      try {
-        dispatch(postLabTestResults(results));
-      } catch (error) {
-        message.error('Please try again');
-      }
+      dispatch(postLabTestResults([...results]));
     }
   };
 
@@ -270,39 +245,33 @@ const ResultsTable = ({ data: tableData, error, loading, closeDrawer }) => {
       form={form}
       component={false}
     >
-      {loading || labResultsLoading ? (
-        <SkeletonLoading />
-      ) : (
-        <Table
-          onRow={(record) => ({
-            onClick: () => edit(record),
-            onBlur: () =>
-              useMemo(() => save(record.Specimen_Code), [editingKey]),
-          })}
-          footer={() => (
-            <Flex
-              justify="end"
-              onClick={handleSubmit}
+      <Table
+        onRow={(record) => ({
+          onClick: () => edit(record),
+        })}
+        footer={() => (
+          <Flex
+            justify="end"
+            onClick={handleSubmit}
+          >
+            <Button
+              type="primary"
+              disabled={labResultsLoading}
             >
-              <Button
-                type="primary"
-                disabled={labResultsLoading}
-              >
-                {labResultsLoading
-                  ? 'Loading...'
-                  : editingKey
-                  ? 'Preview'
-                  : 'Submit'}
-              </Button>
-            </Flex>
-          )}
-          columns={columns}
-          components={{ body: { cell: EditableCell } }}
-          dataSource={results}
-          pagination={false}
-          rowClassName="editable-row"
-        />
-      )}
+              {labResultsLoading
+                ? 'Loading...'
+                : editingKey
+                ? 'Preview'
+                : 'Submit'}
+            </Button>
+          </Flex>
+        )}
+        columns={columns}
+        components={{ body: { cell: EditableCell } }}
+        dataSource={results}
+        pagination={false}
+        rowClassName="editable-row"
+      />
     </Form>
   );
 };

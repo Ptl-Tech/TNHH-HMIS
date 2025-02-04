@@ -123,9 +123,7 @@ const SampleForm = ({ closeModal, test }) => {
         ? message.success('Sample submitted successfully')
         : message.error('Could not submit the sample');
     }
-
-    if (loading) message.info('Submitting your sample');
-  }, [data, loading, error]);
+  }, [data, error]);
 
   // handling pushing code
   const onFinish = (sample) => {
