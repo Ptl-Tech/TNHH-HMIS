@@ -66,8 +66,8 @@ const SampleCollection = ({ data, loading }) => {
           />
           <SampleModal
             open={open}
-            test={currentRecord}
             handleOk={handleOk}
+            test={currentRecord}
             handleCancel={handleCancel}
           />
         </>
@@ -94,12 +94,17 @@ const SampleModal = ({ open, test, handleOk, handleCancel }) => {
         </Button>,
       ]}
     >
-      <SampleForm closeModal={handleCancel} />
+      <SampleForm
+        closeModal={handleCancel}
+        test={test}
+      />
     </Modal>
   );
 };
 
-const SampleForm = ({ closeModal }) => {
+const SampleForm = ({ closeModal, test }) => {
+  const { Laboratory_No, LaboratoryTestCode } = test;
+
   // destructor
   const { TextArea } = Input;
   const { Item, useForm } = Form;
@@ -110,19 +115,29 @@ const SampleForm = ({ closeModal }) => {
   const { data, error, loading } = useSelector((state) => state.postLabSample);
 
   useEffect(() => {
-    if (data && data.success) {
-      message.success('Sample submitted successfully');
-    }
+    if (data) {
+      console.log({ data });
 
-    if (error) {
-      message.error('Could not submit the sample');
+      const { status } = data;
+      status === 'success'
+        ? message.success('Sample submitted successfully')
+        : message.error('Could not submit the sample');
     }
   }, [data, error]);
 
   // handling pushing code
   const onFinish = (sample) => {
+    const { remarks } = sample;
+
     // publishing the data to the backend
-    dispatch(postLabSample(sample));
+    dispatch(
+      postLabSample({
+        remarks,
+        myAction: 'create',
+        laboratoryNo: Laboratory_No,
+        labTestCode: LaboratoryTestCode,
+      }),
+    );
     form.resetFields();
     closeModal();
   };
@@ -136,7 +151,7 @@ const SampleForm = ({ closeModal }) => {
       onFinish={onFinish}
     >
       <Item
-        name="description"
+        name="remarks"
         label="Sample Description"
         rules={[
           {
