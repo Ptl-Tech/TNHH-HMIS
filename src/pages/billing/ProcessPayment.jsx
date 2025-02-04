@@ -30,7 +30,9 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
   const { data: receiptHeader } = useSelector(
     (state) => state.getReceiptHeaderLines
   );
-
+  const { loading } = useSelector(
+    (state) => state.postReceipt
+  );
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
@@ -81,9 +83,10 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
             },
           }
         );
-        form.resetFields();
         onClose();
+
       }
+      form.resetFields();
     } catch (error) {
       console.error("Validation or processing failed:", error);
     }
@@ -210,7 +213,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
               type="primary"
               size="large"
               style={{ width: "100%" }}
-              loading={!receiptNo && false}
+              loading={loading}
               onClick={handleOk}
             >
               Generate Receipt

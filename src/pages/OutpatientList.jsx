@@ -18,6 +18,7 @@ import {
 } from "antd";
 import moment from "moment";
 import dayjs from "dayjs";
+import { listPatients } from "../actions/patientActions";
 
 const { Search } = Input;
 
@@ -33,6 +34,10 @@ const OutpatientList = () => {
   });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [showList, setShowList] = useState(false);
+
+useEffect(() => {
+  dispatch(listPatients());
+}, [dispatch]);
 
   useEffect(() => {
     // Don't filter by patient type, show all patients

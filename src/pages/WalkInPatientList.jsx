@@ -20,6 +20,7 @@ import {
 import moment from "moment";
 import dayjs from "dayjs";
 import useSetTableCheckBoxHook from "../hooks/useSetTableCheckBoxHook";
+import { listPatients } from "../actions/patientActions";
 
 const { Search } = Input;
 
@@ -36,6 +37,10 @@ const WalkInPatientList = () => {
   });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [showList, setShowList] = useState(false);
+
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
 
   useEffect(() => {
     // Filter non-inpatient patients when patients data changes

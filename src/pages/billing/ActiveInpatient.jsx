@@ -21,12 +21,14 @@ import {
   EyeOutlined,
   FilePdfOutlined,
   DownOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { FaFileInvoice } from "react-icons/fa";
 import ProcessPayment from "./ProcessPayment";
 import { postGenerateInvoice } from "../../actions/Charges-Actions/postGenerateInvoice";
 import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
 import useAuth from "../../hooks/useAuth";
+import AddCharges from "./AddCharges";
 
 const { TabPane } = Tabs;
 const { Search } = Input;
@@ -44,14 +46,15 @@ const ActiveInpatient = () => {
   const { loading: generateInvoiceLoading } = useSelector(
     (state) => state.generateInvoice
   );
-    const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-      useSelector((state) => state.postInterimInvoice);
-      
+  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+    useSelector((state) => state.postInterimInvoice);
+
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-  
+
+  const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [cashPatients, setCashPatients] = useState([]);
   const [corporatePatients, setCorporatePatients] = useState([]);
@@ -59,7 +62,11 @@ const ActiveInpatient = () => {
   const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
     []
   );
-  
+  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
+    useState(false);
+
+  const [addChargeModal, setAddChargeModal] = useState(false);
+  const [updatedAmounts, setUpdatedAmounts] = useState({});
 
   useEffect(() => {
     dispatch(appmntList());
@@ -135,6 +142,20 @@ const ActiveInpatient = () => {
     setFilteredCorporatePatients(filteredCorporate);
   };
 
+  const handleClose = () => {
+    setIsGenerateReceiptModalVisible(false);
+    setAddChargeModal(false);
+  };
+  const showPaymentModal = (record) => {
+    setIsGenerateReceiptModalVisible(true);
+    setSelectedPatientNo(record.PatientNo);
+    setSelectedPatientAmount(record.Balance);
+  };
+  const showAddChargesModal = (record) => {
+    setAddChargeModal(true);
+    setSelectedPatientNo(record.AppointmentNo);
+  };
+
   const patientColumns = [
     {
       title: "Patient No",
@@ -192,29 +213,66 @@ const ActiveInpatient = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
-      render: (text) => `KSh ${text.toFixed(2)}`,
+      render: (text, record) => {
+        const newBalance =
+          updatedAmounts[record.AppointmentNo] !== undefined
+            ? updatedAmounts[record.AppointmentNo]
+            : text;
+        return (
+          <span style={{ color: newBalance !== text ? "red" : "black" }}>
+            KSh {newBalance.toFixed(2)}
+          </span>
+        );
+      },
+      
     },
     {
       title: "Action",
       key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button
-          type="primary"
-           icon={<EyeOutlined />}
-           onClick={() =>
-             navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
-               state: { patientData: record },
-             })
-           }
-         >
-           View
-          </Button>
-        </Space>
-      ),
+      render: (_, record) => {
+        const currentBalance =
+          updatedAmounts[record.AppointmentNo] !== undefined
+            ? updatedAmounts[record.AppointmentNo]
+            : record.Balance;
+      
+        if (record.PatientType === "Cash") {
+          return (
+            <Space size="middle">
+              {currentBalance > 0 ? (
+                <Button type="primary" onClick={() => showPaymentModal(record)}>
+                  <DollarOutlined /> Make Payment
+                </Button>
+              ) : (
+                <Button type="default" onClick={() => showAddChargesModal(record)}>
+                  <FaFileInvoice /> Add Charges
+                </Button>
+              )}
+            </Space>
+          );
+        } else {
+          return (
+            <Space size="middle">
+              <Button
+                type="primary"
+                icon={<EyeOutlined />}
+                onClick={() =>
+                  navigate(
+                    `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
+                    { state: { patientData: record } }
+                  )
+                }
+              >
+                View Details
+              </Button>
+            </Space>
+          );
+        }
+      },
+      
     },
   ];
-// console.log("patient Data:",patientData);
+console.log("updated Amounts",updatedAmounts);
+  // console.log("patient Data:",patientData);
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Inpatient Billing List</h4>
@@ -286,7 +344,23 @@ const ActiveInpatient = () => {
           />
         </TabPane>
       </Tabs>
-     
+      <ProcessPayment
+        visible={isGenerateReceiptModalVisible}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
+        amount={selectedPatientAmount }
+      />
+      <AddCharges
+  visible={addChargeModal}
+  onClose={handleClose}
+  visitNo={selectedpatientNo}
+  setTotalAmount={(amount) => {
+    setUpdatedAmounts((prev) => ({
+      ...prev,
+      [selectedpatientNo]: (prev[selectedpatientNo] || 0) + amount, // Add new amount to the existing balance
+    }));
+  }}
+/>;
     </div>
   );
 };
