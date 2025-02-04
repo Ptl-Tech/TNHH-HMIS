@@ -6,7 +6,7 @@ export const GET_INPATIENT_VITALS_REQUEST = 'GET_INPATIENT_VITALS_REQUEST';
 export const GET_INPATIENT_VITALS_SUCCESS = 'GET_INPATIENT_VITALS_SUCCESS';
 export const GET_INPATIENT_VITALS_FAILURE = 'GET_INPATIENT_VITALS_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getInpatientVitalsSlice = () => async (dispatch, getState) => {
    

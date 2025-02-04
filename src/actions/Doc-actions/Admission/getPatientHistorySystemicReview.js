@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const REQUEST_PATIENT_SYSTEMIC_REVIEW_LINES = "REQUEST_PATIENT_SYSTEMIC_REVIEW_LINES";
 export const REQUEST_PATIENT_SYSTEMIC_REVIEW_LINES_SUCCESS = "REQUEST_PATIENT_SYSTEMIC_REVIEW_LINES_SUCCESS";

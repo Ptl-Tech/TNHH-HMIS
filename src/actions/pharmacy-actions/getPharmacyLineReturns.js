@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action Types for Pharmacy Return
 export const GET_PHARMACY_RETURN_LIST_REQUEST = "GET_PHARMACY_RETURN_LIST_REQUEST";

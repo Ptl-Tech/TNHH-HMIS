@@ -6,7 +6,7 @@ export const GET_SPECIFIC_INJECTION_REQUEST = 'GET_SPECIFIC_INJECTION_REQUEST';
 export const GET_SPECIFIC_INJECTION_SUCCESS = 'GET_SPECIFIC_INJECTION_SUCCESS';
 export const GET_SPECIFIC_INJECTION_FAILURE = 'GET_SPECIFIC_INJECTION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getSpecificInjectionSlice = () => async (dispatch, getState) => {
    

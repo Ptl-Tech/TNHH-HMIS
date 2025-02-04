@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const QY_HOS_NO_REQUEST = "QY_HOS_NO_REQUEST";
 export const QY_HOS_NO_SUCCESS = "QY_HOS_NO_SUCCESS";

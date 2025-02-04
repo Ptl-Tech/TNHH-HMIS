@@ -11,7 +11,7 @@ export const GET_PATIENT_VITALS_LINES_SUCCESS = 'GET_PATIENT_VITALS_LINES_SUCCES
 export const GET_PATIENT_VITALS_LINES_FAILURE = 'GET_PATIENT_VITALS_LINES_FAILURE';
 export const GET_PATIENT_VITALS_LINES_RESET = 'GET_PATIENT_VITALS_LINES_RESET';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getVitalsLinesSlice = (observationNo) => async (dispatch, getState) => {
    

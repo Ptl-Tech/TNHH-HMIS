@@ -5,7 +5,7 @@ export const GET_PG_OPEN_PATIENT_CONSUMABLES_REQUEST = 'GET_PG_OPEN_PATIENT_CONS
 export const GET_PG_OPEN_PATIENT_CONSUMABLES_SUCCESS = 'GET_PG_OPEN_PATIENT_CONSUMABLES_SUCCESS';
 export const GET_PG_OPEN_PATIENT_CONSUMABLES_FAILURE = 'GET_PG_OPEN_PATIENT_CONSUMABLES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPgOpenPatientConsumablesSlice = () => 
   async (dispatch, getState) => {

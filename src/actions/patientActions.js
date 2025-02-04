@@ -50,7 +50,7 @@ export const DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET = "DISPATCH_WALK_IN_PATIENT
 import { message } from "antd";
 import useAuth from "../hooks/useAuth";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 
 export const createPatient = (patient) => async (dispatch, getState) => {

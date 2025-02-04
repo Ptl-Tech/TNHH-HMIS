@@ -5,7 +5,7 @@ export const GET_QY_TREATMENT_DIAGNOSIS_LINES_REQUEST = 'GET_QY_TREATMENT_DIAGNO
 export const GET_QY_TREATMENT_DIAGNOSIS_LINES_SUCCESS = 'GET_QY_TREATMENT_DIAGNOSIS_LINES_SUCCESS';
 export const GET_QY_TREATMENT_DIAGNOSIS_LINES_FAILURE = 'GET_QY_TREATMENT_DIAGNOSIS_LINES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getQyTreatmentDiagnosisLinesSlice = () => 
   async (dispatch, getState) => {

@@ -6,7 +6,7 @@ export const POST_CANCEL_ADMISSION_REQUEST = 'POST_CANCEL_ADMISSION_REQUEST';
 export const POST_CANCEL_ADMISSION_SUCCESS = 'POST_CANCEL_ADMISSION_SUCCESS';
 export const POST_CANCEL_ADMISSION_FAILURE = 'POST_CANCEL_ADMISSION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postCancelAdmissionSlice = (cancelAdmissionData) => 
   async (dispatch, getState) => {

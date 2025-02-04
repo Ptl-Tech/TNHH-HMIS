@@ -2,7 +2,7 @@ import axios from "axios";
 import { message } from "antd";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // post radiology requests
 export const POST_RADIOLOGY_RESULTS_REQUEST = "POST_RADIOLOGY_RESULTS_REQUEST";

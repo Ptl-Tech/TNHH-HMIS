@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd';
 
-const API = 'http://217.21.122.62:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8085/';
 
 // Action Types
 export const REQUEST_RADIOLOGY_DETAILS = 'REQUEST_RADIOLOGY_DETAILS';

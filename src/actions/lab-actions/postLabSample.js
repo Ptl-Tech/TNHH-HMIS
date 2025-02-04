@@ -6,7 +6,7 @@ export const POST_LAB_SAMPLE_REQUEST = 'POST_LAB_SAMPLE_REQUEST';
 export const POST_LAB_SAMPLE_SUCCESS = 'POST_LAB_SAMPLE_SUCCESS';
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+  import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postLabSample = (sample) => async (dispatch, getState) => {
   try {

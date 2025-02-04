@@ -5,7 +5,7 @@ export const GET_QY_PRESCRIPTION_LINE_REQUEST = 'GET_QY_PRESCRIPTION_LINE_REQUES
 export const GET_QY_PRESCRIPTION_LINE_SUCCESS = 'GET_QY_PRESCRIPTION_LINE_SUCCESS';
 export const GET_QY_PRESCRIPTION_LINE_FAILURE = 'GET_QY_PRESCRIPTION_LINE_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getQyPrescriptionLineSlice = () => 
   async (dispatch, getState) => {
