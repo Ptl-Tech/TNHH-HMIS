@@ -1,7 +1,7 @@
 import axios from "axios";
 import { QY_LAB_TEST_LIST_REQUEST, QY_LAB_TEST_LIST_SUCCESS, QY_LAB_TEST_LIST_FAIL } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 export const getLabRequestSetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_LAB_TEST_LIST_REQUEST });

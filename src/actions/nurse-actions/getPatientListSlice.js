@@ -5,7 +5,7 @@ export const GET_PATIENT_LIST_REQUEST = 'GET_PATIENT_LIST_REQUEST';
 export const GET_PATIENT_LIST_SUCCESS = 'GET_PATIENT_LIST_SUCCESS';
 export const GET_PATIENT_LIST_FAILURE = 'GET_PATIENT_LIST_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPatientListSlice = (endpoint = '/data/odatafilter?webservice=QyPatients') => 
   async (dispatch, getState) => {

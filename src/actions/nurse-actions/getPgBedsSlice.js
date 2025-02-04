@@ -5,7 +5,7 @@ export const GET_PG_BEDS_REQUEST = 'GET_PG_BEDS_REQUEST';
 export const GET_PG_BEDS_SUCCESS = 'GET_PG_BEDS_SUCCESS';
 export const GET_PG_BEDS_FAILURE = 'GET_PG_BEDS_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPgBedsSlice = () => 
   async (dispatch, getState) => {

@@ -8,7 +8,7 @@ export const PRINT_INTERIM_INVOICE_FAIL = "PRINT_INTERIM_INVOICE_FAIL";
 export const PRINT_INTERIM_INVOICE_RESET = "PRINT_INTERIM_INVOICE_RESET";
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || "http://217.21.122.62:8085";
+  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8085";
 
 export const postInterimInvoice = (invoiceData) => async (dispatch, getState) => {
   try {

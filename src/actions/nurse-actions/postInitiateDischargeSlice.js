@@ -5,7 +5,7 @@ export const POST_INITIATE_DISCHARGE_REQUEST = 'POST_INITIATE_DISCHARGE_REQUEST'
 export const POST_INITIATE_DISCHARGE_SUCCESS = 'POST_INITIATE_DISCHARGE_SUCCESS';
 export const POST_INITIATE_DISCHARGE_FAILURE = 'POST_INITIATE_DISCHARGE_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postInitiateDischargeSlice = (endpoint = '/Inpatient/InitiateDischarge', initiateDischargeData) => 
   async (dispatch, getState) => {
