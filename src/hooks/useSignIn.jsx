@@ -76,7 +76,7 @@ const useSignIn = () => {
         navigate('/Nurse');
       } else if (role === 'Psychology') {
         navigate('/Psychology');
-      } else if (role === 'RADIOLOGY') {
+      } else if (role === 'Radiology') {
         navigate('/Radiology');
       }
     }
