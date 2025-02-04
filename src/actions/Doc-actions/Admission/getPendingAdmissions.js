@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure Ant Design's message is imported
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 // Action Types
 export const GET_PENDING_ADMISSION_LIST_REQUEST = "GET_PENDING_ADMISSION_LIST_REQUEST";
 export const GET_PENDING_ADMISSION_LIST_SUCCESS = "GET_PENDING_ADMISSION_LIST_SUCCESS";

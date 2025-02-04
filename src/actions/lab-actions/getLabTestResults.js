@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd';
 
-const API = 'http://217.21.122.62:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8085/';
 
 // Action Types
 export const GET_LAB_TEST_RESULTS_FAIL = 'GET_LAB_TEST_RESULTS_FAIL';
@@ -38,8 +38,6 @@ export const getLabTestResults =
         `${API}data/odatafilter?isList=true&webservice=QyLaboratoryResultsEntry&query=$filter=Laboratory_No eq '${labNo}' and Laboratory_Test_Code eq '${testCode}'`,
         config,
       );
-
-      console.log({ labNo, testCode, data });
 
       // Dispatch success action with the fetched data
       dispatch({

@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const POST_CHARGES_REQUEST = "POST_CHARGES_REQUEST";
 export const POST_CHARGES_SUCCESS = "POST_CHARGES_SUCCESS";

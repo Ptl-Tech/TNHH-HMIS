@@ -5,7 +5,7 @@ export const POST_SUICIDAL_FORM_REQUEST = 'POST_SUICIDAL_FORM_REQUEST';
 export const POST_SUICIDAL_FORM_SUCCESS = 'POST_SUICIDAL_FORM_SUCCESS';
 export const POST_SUICIDAL_FORM_FAILURE = 'POST_SUICIDAL_FORM_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postSuicidalFormSlice = (endpoint = '/InpatientForms/SuicidalPrecautionForm', suicidalFormData) => 
   async (dispatch, getState) => {

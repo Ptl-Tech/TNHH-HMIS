@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action types
 export const POST_PATIENT_HISTORY_NOTES_REQUEST = "POST_PATIENT_HISTORY_NOTES_REQUEST";

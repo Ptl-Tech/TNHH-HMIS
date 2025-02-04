@@ -1,7 +1,7 @@
 import axios from "axios";
 import { QY_DIAGNOSIS_LIST_FAIL, QY_DIAGNOSIS_LIST_REQUEST, QY_DIAGNOSIS_LIST_SUCCESS } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 export const getdiagnosisSetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_DIAGNOSIS_LIST_REQUEST });

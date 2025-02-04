@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import message for error handling
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 
 export const QY_RADIOLOGY_TEST_LIST_REQUEST = "QY_RADIOLOGY_TEST_LIST_REQUEST";

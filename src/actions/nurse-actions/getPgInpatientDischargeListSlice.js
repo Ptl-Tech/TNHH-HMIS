@@ -5,7 +5,7 @@ export const GET_PG_INPATIENT_DISCHARGE_LIST_VERIFIED_REQUEST = 'GET_PG_INPATIEN
 export const GET_PG_INPATIENT_DISCHARGE_LIST_VERIFIED_SUCCESS = 'GET_PG_INPATIENT_DISCHARGE_LIST_VERIFIED_SUCCESS';
 export const GET_PG_INPATIENT_DISCHARGE_LIST_VERIFIED_FAILURE = 'GET_PG_INPATIENT_DISCHARGE_LIST_VERIFIED_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPgInpatientDischargeListSlice = () => 
   async (dispatch, getState) => {

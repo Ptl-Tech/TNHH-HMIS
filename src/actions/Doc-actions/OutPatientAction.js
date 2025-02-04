@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'http://217.21.122.62:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8085/';
 
 export const TREATMENT_LIST_REQUEST = 'TREATMENT_LIST_REQUEST';
 export const TREATMENT_LIST_SUCCESS = 'TREATMENT_LIST_SUCCESS';
