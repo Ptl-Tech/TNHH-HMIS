@@ -39,30 +39,32 @@ const CloseList = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "New" && item.Clinic === "PSYCHOLOGIST";
     }
     return item.Status === "New";
   });
 
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Active" && item.Clinic === "PSYCHIATRIST";
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Active" && item.Clinic === "PSYCHOLOGIST";
     }
     return item.Status === "Active";
   });
 
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Completed" && item.Clinic === "PSYCHIATRIST";
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGIST";
     }
     return item.Status === "Completed";
   });
+
+  console.log('Treatment List', treatmentList);  
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
