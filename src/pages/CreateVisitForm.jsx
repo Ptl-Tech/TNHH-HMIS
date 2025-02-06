@@ -130,27 +130,26 @@ const CreateVisitForm = () => {
       }
     }
 
-    try {
-      // Step 2: Create Triage Visit
-      const visitData = {
-        patientNo:
-          patientNo ||
-          patientData?.patientNo ||
-          existingPatient?.PatientNo ||
-          patientData?.PatientNo ||
-          visitData?.PatientNo,
-        clinic: newVisit.clinic,
-        doctor: newVisit.doctor,
-        paymentMode:
-  newVisit.paymentMode === "Cash" ? "2" :
-  newVisit.paymentMode === "Insurance" ? "1" : "1", // Default to "1" if neither Cash nor Insurance
-
-        insuranceNo: newVisit.insuranceNo,
-        membershipNo: newVisit.membershipNo,
-        insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
-        isPrincipleMember: newVisit.isPrincipleMember,
-        schemeName: newVisit.schemeName,
-      };
+  try {
+    // Step 2: Create Triage Visit
+    const visitData = {
+      patientNo:
+        patientNo ||
+        patientData?.patientNo ||
+        existingPatient?.PatientNo ||
+        patientData?.PatientNo ||
+        visitData?.PatientNo,
+      clinic: newVisit.clinic,
+      doctor: newVisit.doctor,
+      paymentMode:
+      newVisit.paymentMode === "Cash" ? "2" :
+      newVisit.paymentMode === "Insurance" ? "1" : "1", 
+          insuranceNo: newVisit.insuranceNo,
+      membershipNo: newVisit.membershipNo,
+      insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
+      isPrincipleMember: newVisit.isPrincipleMember,
+      schemeName: newVisit.schemeName,
+    };
 
       // Dispatch the visit creation
       const appointmentId = await dispatch(createTriageVisit(visitData));
