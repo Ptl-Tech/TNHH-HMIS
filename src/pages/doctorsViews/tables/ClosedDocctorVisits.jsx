@@ -37,6 +37,9 @@ const CloseList = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
+
+  console.log('consultation list', treatmentList);
+  console.log('user data', useAuth().userData)
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
