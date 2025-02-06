@@ -52,9 +52,9 @@ const VisitorList = () => {
 
   //console where visitors are existing patients
   if (
-    visitors.IDNumber === patients.IDNumber &&
-    visitors.Status === "Entered" &&
-    visitors.InitiatedDate === currentDate
+    visitors?.IDNumber === patients.IDNumber &&
+    visitors?.Status === "Entered" &&
+    visitors?.InitiatedDate === currentDate
   ) {
     console.log("visitors are existing patients", visitors);
   }
@@ -63,8 +63,8 @@ const VisitorList = () => {
   useEffect(() => {
     const filtered = visitors.filter((visitor) => {
       return (
-        dayjs(visitor.InitiatedDate).isSame(currentDate, "day") &&
-        visitor.Status === "Entered"
+        dayjs(visitor?.InitiatedDate).isSame(currentDate, "day") &&
+        visitor?.Status === "Entered"
       );
     });
     setFilteredVisitors(filtered);
@@ -181,7 +181,14 @@ const VisitorList = () => {
   const columns = [
     { title: "Index", dataIndex: "index", render: (_, __, index) => index + 1 },
     { title: "Visitor No", dataIndex: "No" },
-    { title: "Visitor Name", dataIndex: "VisitorName" },
+    {
+      title: "Visitor Name",
+      dataIndex: "VisitorName",
+      render: (_, visitor) =>
+        visitor.VisitorName?.trim()
+          ? visitor.VisitorName
+          : `${visitor.FirstName || ""} ${visitor.MiddleName || ""} ${visitor.LastName || ""}`.trim(),
+    },
     { title: "ID Number", dataIndex: "IDNumber" },
     { title: "Phone Number", dataIndex: "PhoneNumber" },
     {
