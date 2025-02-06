@@ -134,8 +134,9 @@ const VisitorList = () => {
       // If not found, convert to patient
       message.success("Create a New Patient.");
       navigate("/reception/Register-walkin", {
-        state: { visitorData: selectedVisitor },
+        state: { visitorData: visitor },
       });
+      
     }
   };
 

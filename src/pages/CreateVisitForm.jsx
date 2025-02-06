@@ -115,12 +115,12 @@ const CreateVisitForm = () => {
     if (branchCode && doctorsPayload) {
       const filtered = doctorsPayload.filter(
         (doctor) =>
-          doctor.Specialization === newVisit.clinic && // Match specialization with selected clinic
-          doctor.GlobalDimension1Code === branchCode // Match branch code
+          doctor.Specialization === newVisit.clinic
       );
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [doctorsPayload, newVisit.clinic]);
+
   const savepatientVisit = async () => {
     //if clinic is pyschiatry or psychology prompt select doctor else dont show error message
     if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
@@ -427,7 +427,7 @@ const CreateVisitForm = () => {
                       <Select
                         placeholder="Select Insurance"
                         className="w-100"
-                        value={newVisit.insuranceNo}
+                        value={newVisit.insuranceNo || existingPatient.InsuranceNo}
                         onChange={(value) =>
                           handleInputChange("insuranceNo", value)
                         }
@@ -471,7 +471,7 @@ const CreateVisitForm = () => {
                         </label>
                         <Input
                           label="Membership No"
-                          value={newVisit.membershipNo}
+                          value={newVisit.membershipNo || existingPatient.MembershipNo}
                           onChange={(e) =>
                             handleInputChange("membershipNo", e.target.value)
                           }
@@ -486,7 +486,7 @@ const CreateVisitForm = () => {
                         </label>
                         <Input
                           label="Insurance Scheme"
-                          value={newVisit.schemeName}
+                          value={newVisit.schemeName || existingPatient.SchemeName}
                           onChange={(e) =>
                             handleInputChange("schemeName", e.target.value)
                           }

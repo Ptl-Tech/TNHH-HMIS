@@ -18,6 +18,9 @@ import { createPatient, createWalkInPatient, listPatients } from "../actions/pat
 import { useLocation, useNavigate } from "react-router-dom";
 import { SaveOutlined } from "@ant-design/icons";
 const WalkinRegistration = () => {
+  const { state } = useLocation(); // Access the state passed via navigate
+  const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
+  console.log("Visitor Data:", visitorData);
   const {
     loading: patientListLoading,
     error: patientListError,
@@ -42,8 +45,7 @@ const WalkinRegistration = () => {
   } = useSelector((state) => state.createWalkInPatient);
   
 
-  const { state } = useLocation(); // Access the state passed via navigate
-  const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
+ 
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [age, setAge] = useState(null); // State to hold calculated age
