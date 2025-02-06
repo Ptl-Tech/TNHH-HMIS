@@ -27,8 +27,8 @@ const NurseNotesTable = ({ observationNotes, loadingTriageList }) => {
     },
     {
       title: 'Notes',
-      dataIndex: 'StatusRemarks', 
-      key: 'StatusRemarks',
+      dataIndex: 'ObservationRemarks', 
+      key: 'ObservationRemarks',
     },
   ]
 
