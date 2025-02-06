@@ -24,8 +24,12 @@ const Impatient = () => {
     navigate(`/Nurse/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
-   }else{
+   }else if(userDetails.userData.departmentName === 'Doctor'){
     navigate(`/Doctor/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
+      state: { patientDetails: record },
+    });
+   }else{
+    navigate(`/Psychology/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`, {
       state: { patientDetails: record },
     });
    }

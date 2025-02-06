@@ -294,7 +294,7 @@ const Diagnosis = () => {
         Diagnosis
       </Typography.Title>
 
-      {role === "Doctor" && (
+      {(role === "Doctor" || role === "Psychology") && (
         <Row gutter={24}>
           <Col span={24}>
             <Button

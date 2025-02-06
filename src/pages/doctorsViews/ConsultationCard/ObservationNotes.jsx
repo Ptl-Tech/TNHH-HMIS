@@ -6,12 +6,10 @@ import NurseNotesTable from '../../nurse-view/tables/nurse-tables/NurseNotesTabl
 // import { TextArea } from 'antd';
 
 const ObservationNotes = ({ treatmentNo, patientNo }) => {
-    console.log('observation number', treatmentNo, 'patient number', patientNo);
     const [observationNotes, setObservationNotes] = useState([]);
     const dispatch = useDispatch();
 
     const { loadingTriageList, triageList } = useSelector((state) => state.getTriageList) || {};
-    console.log('observation notes', observationNotes);
 
     useEffect(() => {
         dispatch(getTriageList());
