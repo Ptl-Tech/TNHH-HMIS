@@ -143,8 +143,10 @@ const savepatientVisit = async () => {
         visitData?.PatientNo,
       clinic: newVisit.clinic,
       doctor: newVisit.doctor,
-      paymentMode: newVisit.paymentMode || existingPatient?.paymentMode ==="Cash"?"2":"1" || patientData?.paymentMode ==="Cash"?"2":"1" || visitData?.paymentMode ==="Cash"?"2":"1",
-      insuranceNo: newVisit.insuranceNo,
+      paymentMode:
+      newVisit.paymentMode === "Cash" ? "2" :
+      newVisit.paymentMode === "Insurance" ? "1" : "1", 
+          insuranceNo: newVisit.insuranceNo,
       membershipNo: newVisit.membershipNo,
       insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
       isPrincipleMember: newVisit.isPrincipleMember,
