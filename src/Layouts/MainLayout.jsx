@@ -11,7 +11,6 @@ import {
   UserSwitchOutlined,
   FileAddOutlined,
   HistoryOutlined,
-  PicCenterOutlined,
   RadiusUprightOutlined,
   ImportOutlined,
   MedicineBoxOutlined,
@@ -21,6 +20,7 @@ import {
   RetweetOutlined,
   LayoutOutlined,
   UserAddOutlined,
+  UsergroupAddOutlined
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import { FaUserGroup } from 'react-icons/fa6';
@@ -137,13 +137,18 @@ const MainLayout = () => {
         ],
       },
       {
-        icon: <CalendarOutlined style={{ color: '#fff' }} />,
-        label: 'Consultation Room',
+        icon: <UsergroupAddOutlined style={{ color: '#fff' }} />,
+        label: 'Patients',
         children: [
           {
-            key: 'Consultation',
-            label: 'Consultation',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
+            key: 'Consultation-List',
+            label: 'Outpatients List',
+            icon: <UserAddOutlined style={{ color: '#fff' }} />,
+          },
+          {
+            key: 'Inpatient',
+            label: 'Inpatients List',
+            icon: <UserAddOutlined style={{ color: '#fff' }} />,
           },
         ],
       },
@@ -155,17 +160,6 @@ const MainLayout = () => {
             key: 'Admit-patient',
             label: 'Admit Patient',
             icon: <ImportOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <PicCenterOutlined style={{ color: '#fff' }} />,
-        label: 'Inpatients',
-        children: [
-          {
-            key: 'Inpatient',
-            label: 'Inpatient-list',
-            icon: <PicCenterOutlined style={{ color: '#fff' }} />,
           },
         ],
       },

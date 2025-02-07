@@ -120,6 +120,8 @@ export const forgotPassword = (staffNo) => async (dispatch) => {
       config
     );
 
+    console.log('response from the server', data)
+
     dispatch({ type: FORGOT_PWD_SUCCESS, payload: data });
   } catch (errors) {
     dispatch({

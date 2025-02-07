@@ -102,6 +102,7 @@ const Admissions = () => {
         [consultationRoomList]
     );
     
+    console.log('filter consultation rooms', filteredConsultationRooms)
     const formattedTriageWaitingList = useMemo(() => {
         return triageWaitingList?.map(patient => ({
             PatientNo: patient?.PatientNo,

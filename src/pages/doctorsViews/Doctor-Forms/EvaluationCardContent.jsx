@@ -19,7 +19,7 @@ const EvaluationCardContent = ({
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>
         <Tabs defaultActiveKey="1">
-          {(role === "Doctor" || role === "Psychology") && (
+          {(role === "Doctor" || role === "Psychology" || role === "Nurse") && (
             <Tabs.TabPane tab="Triage Room" key="2">
               <ObservationRoom
                 treatmentNo={treatmentNo}
@@ -48,7 +48,7 @@ const EvaluationCardContent = ({
             </>
           )}
 
-          {(role === "Doctor" || role === "Nurse") && (
+          {(role === "Doctor") && (
             <>
               <Tabs.TabPane tab="Procedures" key="4">
                 <PatientRequests />
@@ -60,16 +60,22 @@ const EvaluationCardContent = ({
             <DocForms />
           </Tabs.TabPane> */}
 
-          {role === "Doctor" && (
+          {(role === "Doctor") && (
             <>
               <Tabs.TabPane tab="Admission & Referral" key="7">
                 <AdmissionTab />
               </Tabs.TabPane>
-              <Tabs.TabPane tab="Patient File" key="8">
-                <PatientFile patientDetails={patientDetails} />
-              </Tabs.TabPane>
             </>
           )}
+          {
+            (role === "Nurse" || role === "Doctor") && (
+              <>
+                <Tabs.TabPane tab="Patient File" key="8">
+                <PatientFile patientDetails={patientDetails} />
+              </Tabs.TabPane>
+              </>
+            )
+          }
         </Tabs>
       </Card>
     </div>
