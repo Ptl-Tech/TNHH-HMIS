@@ -267,7 +267,7 @@ const [showPaymentModal, setShowPaymentModal]=useState(false);
           </Col>
           <Col span={12} className="mt-3 text-end">
             <Space align="end">
-              <Button
+              {/* <Button
                 type="primary"
                 size="medium"
                 icon={<FaCoins />}
@@ -282,7 +282,7 @@ const [showPaymentModal, setShowPaymentModal]=useState(false);
                 onClick={handlePaymentModal}
               >
                Initiate Payment
-              </Button>
+              </Button> */}
               <Button
                 type="default"
                 size="medium"

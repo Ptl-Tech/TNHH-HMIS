@@ -74,7 +74,7 @@ const TreatmentCardContent = () => {
       dataIndex: "TreatmentDate",
       key: "TreatmentDate",
       fixed: "left",
-      width: 100,
+      width: 150,
     },
     {
       title: "Treatment Number",

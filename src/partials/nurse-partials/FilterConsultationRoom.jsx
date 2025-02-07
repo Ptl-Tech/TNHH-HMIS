@@ -32,7 +32,7 @@ const FilterConsultationRoom = ({ setSearchName, setSearchPatientNumber, setSear
 export default FilterConsultationRoom
 //props validation
 FilterConsultationRoom.propTypes = {
-    setSearchName: PropTypes.bool.isRequired,
-    setSearchPatientNumber: PropTypes.bool.isRequired,
-    setSearchVisitNumber: PropTypes.bool.isRequired
+    setSearchName: PropTypes.string,
+    setSearchPatientNumber: PropTypes.string,
+    setSearchVisitNumber: PropTypes.string
 }

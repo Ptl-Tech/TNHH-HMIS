@@ -40,8 +40,12 @@ const PastDoctorVisit = () => {
          navigate(`/Nurse/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
            state: { patientDetails: record },
          });
-        }else{
+        }else if(userDetails.userData.departmentName === 'Doctor'){
             navigate(`/Doctor/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+                state: { patientDetails: record },
+            });
+        }else{
+            navigate(`/Psychology/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
                 state: { patientDetails: record },
             });
         }
