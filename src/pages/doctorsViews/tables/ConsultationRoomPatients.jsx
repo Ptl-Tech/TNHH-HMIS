@@ -93,6 +93,7 @@ const ConsultationRoomPatients = () => {
     };
   });
 
+  console.log('combined list', combinedList)
   const waitingListColumns = [
     {
       title: "#",
@@ -162,9 +163,19 @@ const ConsultationRoomPatients = () => {
     },
 
     {
-      title: "ID Number",
-      dataIndex: "IDNumber",
-      key: "IDNumber",
+      title: "Doctor Name",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text, record) => {
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            style={{ color: "#0f5689", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: "Treatment Date",
@@ -239,7 +250,9 @@ const ConsultationRoomPatients = () => {
     navigate(
       role === "Doctor"
         ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
-        : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
+        : role === "Psychology" 
+        ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
+        : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,

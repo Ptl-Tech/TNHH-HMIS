@@ -134,12 +134,17 @@ const DoctorVisits = () => {
       render: (text, record) => {
         return (
           <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
-          >
-            {record?.SearchName}
-          </span>
+        onClick={
+          role !== "Nurse" ? () => handleNavigate(record, record.TreatmentNo) : undefined
+        }
+        className="fw-bold"
+        style={{
+          color: role !== "Nurse" ? "#0f5689" : "inherit",
+          cursor: role !== "Nurse" ? "pointer" : "default",
+        }}
+      >
+        {record?.SearchName}
+      </span>
         );
       },
     },
@@ -217,18 +222,20 @@ const DoctorVisits = () => {
       },
     },
 
-    {
-      title: "Check In",
-      key: "checkIn",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => handleNavigate(record, record.TreatmentNo)}
-        >
-          <CheckOutlined /> Check In
-        </Button>
-      ),
-    },
+    ...role !== "Nurse" ? [
+      {
+        title: "Check In",
+        key: "checkIn",
+        render: (_, record) => (
+          <Button
+            type="primary"
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
+          >
+            <CheckOutlined /> Check In
+          </Button>
+        ),
+      },
+    ] : []
   ];
 
   const handleNavigate = (record, treatmentNo) => {
@@ -238,7 +245,9 @@ const DoctorVisits = () => {
         navigate(
           role === "Doctor"
             ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-            : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+            : role === "Psychology"
+            ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+            : `/Nurse/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
           {
             state: {
               patientNo: record.PatientNo,

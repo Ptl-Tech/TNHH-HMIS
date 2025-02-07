@@ -7,22 +7,18 @@ import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPati
 import Loading from "../../../partials/nurse-partials/Loading";
 import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
 import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
-import {
-  getUrgencyColorcode,
-  rowClassName,
-} from "../../../utils/helpers";
+import { getUrgencyColorcode, rowClassName } from "../../../utils/helpers";
 import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
 import useAuth from "../../../hooks/useAuth";
 const CloseList = () => {
-  const role = useAuth().userData.departmentName
+  const role = useAuth().userData.departmentName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [searchName, setSearchName] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
-  const [searchVisitNumber, setSearchVisitNumber] = useState('')
-  
+  const [searchName, setSearchName] = useState("");
+  const [searchPatientNumber, setSearchPatientNumber] = useState("");
+  const [searchVisitNumber, setSearchVisitNumber] = useState("");
 
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList
@@ -37,9 +33,8 @@ const CloseList = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-
-  console.log('consultation list', treatmentList);
-  console.log('user data', useAuth().userData)
+  console.log("consultation list", treatmentList);
+  console.log("user data", useAuth().userData);
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
@@ -52,7 +47,7 @@ const CloseList = () => {
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Active" && item.Clinic === "PSYCHIATRIST";
-    }else if (role === "Psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "Active" && item.Clinic === "PSYCHOLOGIST";
     }
     return item.Status === "Active";
@@ -61,13 +56,13 @@ const CloseList = () => {
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
       return item.Status === "Completed" && item.Clinic === "PSYCHIATRIST";
-    }else if (role === "Psychology") {
+    } else if (role === "Psychology") {
       return item.Status === "Completed" && item.Clinic === "PSYCHOLOGIST";
     }
     return item.Status === "Completed";
   });
 
-  console.log('Treatment List', treatmentList);  
+  console.log("Treatment List", treatmentList);
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
@@ -75,8 +70,7 @@ const CloseList = () => {
     IDNumber: patient.IDNumber,
     Age: patient.AgeinYears,
     PatientType: patient.PatientType,
-    Inpatient: patient.Inpatient, 
-
+    Inpatient: patient.Inpatient,
   }));
 
   const combinedList = closedConsultationList.map((room) => {
@@ -92,7 +86,6 @@ const CloseList = () => {
       Age: matchingPatient ? matchingPatient.Age : "",
       PatientType: matchingPatient ? matchingPatient.PatientType : "",
       Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
-
     };
   });
 
@@ -109,20 +102,21 @@ const CloseList = () => {
       key: "TreatmentNo",
       filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
       onFilter: (value, record) =>
-        record?.TreatmentNo ?
-        record.TreatmentNo.toLowerCase().includes(value.toLowerCase()) : false,
-        render: (_, record) => {
-          const { color } = getUrgencyColorcode(record.UrgencyStatus);
-          return (
-            <span
-              onClick={() => handleNavigate(record, record.treatmentNo)}
-              className="fw-bold"
-              style={{ color: color }}
-            >
-              {record.TreatmentNo}
-            </span>
-          )
-        },
+        record?.TreatmentNo
+          ? record.TreatmentNo.toLowerCase().includes(value.toLowerCase())
+          : false,
+      render: (_, record) => {
+        const { color } = getUrgencyColorcode(record.UrgencyStatus);
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            className="fw-bold"
+            style={{ color: color }}
+          >
+            {record.TreatmentNo}
+          </span>
+        );
+      },
     },
     {
       title: "Patient Name",
@@ -130,8 +124,9 @@ const CloseList = () => {
       key: "SearchName",
       filteredValue: searchName ? [searchName] : null,
       onFilter: (value, record) =>
-        record?.SearchName ?
-        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
+        record?.SearchName
+          ? record.SearchName.toLowerCase().includes(value.toLowerCase())
+          : false,
       render: (text, record) => {
         return (
           <span
@@ -150,8 +145,9 @@ const CloseList = () => {
       key: "PatientNo",
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
-        record?.PatientNo ?
-        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
+        record?.PatientNo
+          ? record.PatientNo.toLowerCase().includes(value.toLowerCase())
+          : false,
     },
 
     {
@@ -234,7 +230,9 @@ const CloseList = () => {
     navigate(
       role === "Doctor"
         ? `/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`
-        : `/Psychology/Consultation/Patient?TreatmentNo=${treatmentNo}`,
+        : role === "Psychology"
+        ? `/Psychology/Consultation/Patient?TreatmentNo=${treatmentNo}`
+        : `/Nurse/Consultation/Patient?TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
@@ -252,8 +250,12 @@ const CloseList = () => {
         activeConsultationList={activeConsultationList}
         closedConsultationList={closedConsultationList}
       />
-      
-      <FilterConsultationRoom setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchVisitNumber={setSearchVisitNumber}/>
+
+      <FilterConsultationRoom
+        setSearchName={setSearchName}
+        setSearchPatientNumber={setSearchPatientNumber}
+        setSearchVisitNumber={setSearchVisitNumber}
+      />
 
       {treatmentListLoading ? (
         <Loading />
@@ -276,6 +278,5 @@ const CloseList = () => {
     </div>
   );
 };
-
 
 export default CloseList;
