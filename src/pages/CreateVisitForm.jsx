@@ -112,17 +112,34 @@ const CreateVisitForm = () => {
 
   useEffect(() => {
     const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
-    if (branchCode && doctorsPayload) {
-      const filtered = doctorsPayload.filter(
-        (doctor) =>
-          doctor.Specialization === newVisit.clinic 
-
-        // && // Match specialization with selected clinic
-        //   doctor.GlobalDimension1Code === branchCode // Match branch code
-      );
+    if (doctorsPayload) {
+      let filtered;
+  
+      if (newVisit.clinic === "PSYCHOLOGIST") {
+        // If clinic is PSYCHOLOGY, do not filter by branch code
+        filtered = doctorsPayload.filter(
+          (doctor) => doctor.Specialization === newVisit.clinic
+        );
+      } else if (newVisit.clinic === "PSYCHIATRIST") {
+        // If clinic is PSYCHIATRY, filter by both specialization and branch code
+        filtered = doctorsPayload.filter(
+          (doctor) =>
+            doctor.Specialization === newVisit.clinic &&
+            doctor.GlobalDimension1Code === branchCode
+        );
+      } else {
+        // Default filtering for other clinics
+        filtered = doctorsPayload.filter(
+          (doctor) =>
+            doctor.Specialization === newVisit.clinic 
+          // && doctor.GlobalDimension1Code === branchCode
+        );
+      }
+  
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [doctorsPayload, newVisit.clinic]);
+  
   const savepatientVisit = async () => {
     //if clinic is pyschiatry or psychology prompt select doctor else dont show error message
     if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
