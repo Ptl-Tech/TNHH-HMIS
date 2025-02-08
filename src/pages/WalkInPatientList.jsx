@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  PlusOutlined,
-  EyeOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -21,8 +17,6 @@ import moment from "moment";
 import dayjs from "dayjs";
 import useSetTableCheckBoxHook from "../hooks/useSetTableCheckBoxHook";
 import { listPatients } from "../actions/patientActions";
-
-const { Search } = Input;
 
 const WalkInPatientList = () => {
   const dispatch = useDispatch();
@@ -42,11 +36,14 @@ const WalkInPatientList = () => {
     dispatch(listPatients());
   }, [dispatch]);
 
+  // Initial filtering: show only non-inpatients whose PatientNo starts with "WLK_"
   useEffect(() => {
-    // Filter non-inpatient patients when patients data changes
     if (patients.length > 0) {
       setFilteredPatients(
-        patients.filter((patient) => !patient.Inpatient)
+        patients.filter(
+          (patient) =>
+            !patient.Inpatient && patient.PatientNo.startsWith("WLK_")
+        )
       );
     }
   }, [patients]);
@@ -61,28 +58,31 @@ const WalkInPatientList = () => {
     filterPatients({ ...searchParams, [field]: value });
   };
 
+  // This filtering always enforces that only walk-in patients (WLK_ prefix) are returned.
   const filterPatients = (params) => {
     const { SearchName, patientId, patientNo } = params;
     const filtered = patients.filter((patient) => {
       return (
+        !patient.Inpatient &&
+        patient.PatientNo.startsWith("WLK_") && // Always include only walk-in patients
         patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
         patient.IDNumber.includes(patientId) &&
-        patient.PatientNo.toString().includes(patientNo)
+        patient.PatientNo.includes(patientNo)
       );
     });
     setFilteredPatients(filtered);
   };
 
   const handleDispatch = () => {
-    
-  }
+    // Implement dispatch functionality as needed.
+  };
 
   const columns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
       key: "PatientNo",
-      sorter: (a, b) => a.PatientNo - b.PatientNo,
+      sorter: (a, b) => a.PatientNo.localeCompare(b.PatientNo),
     },
     {
       title: "Patient Name",
@@ -98,7 +98,8 @@ const WalkInPatientList = () => {
       dataIndex: "DateRegistered",
       key: "DateRegistered",
       render: (text) => new Date(text).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered),
+      sorter: (a, b) =>
+        new Date(a.DateRegistered) - new Date(b.DateRegistered),
     },
     {
       title: "Actions",
@@ -110,7 +111,7 @@ const WalkInPatientList = () => {
               <Button
                 icon={<EyeOutlined />}
                 onClick={() =>
-                  navigate("/reception/Patient-Registration", {
+                  navigate("/reception/Register-walkin", {
                     state: { patientDet: record },
                   })
                 }
@@ -123,11 +124,15 @@ const WalkInPatientList = () => {
               <Button
                 icon={<PlusOutlined />}
                 onClick={() =>
-                  navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
-                    state: { existingPatient: record, previousPath: location.pathname  },
-                   
-                    
-                  })
+                  navigate(
+                    `/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`,
+                    {
+                      state: {
+                        existingPatient: record,
+                        previousPath: location.pathname,
+                      },
+                    }
+                  )
                 }
               >
                 Create Visit
@@ -179,7 +184,6 @@ const WalkInPatientList = () => {
               value={searchParams.patientId}
               onChange={(e) => handleSearchChange(e, "patientId")}
               allowClear
-              onSearch={() => filterPatients(searchParams)}
             />
           </Col>
           <Col span={6}>
@@ -193,29 +197,42 @@ const WalkInPatientList = () => {
         </Row>
       </Card>
       {showList && (
-  <div className="mt-4">
-    <Space className="admit-patient-button-container" style={{ marginBottom: 16 }}>
-        <Button type="primary" disabled={!selectedRowKey} onClick={handleDispatch}><PlusOutlined />
-            Dispatch to Pharmacy
-         </Button>
-         <Button type="primary" disabled={!selectedRowKey} onClick={handleDispatch}><PlusOutlined />
-         Dispatch to Lab
-         </Button>
-         <Button type="primary" disabled={!selectedRowKey} onClick={handleDispatch}><PlusOutlined />
-            Dispatch to Radiology
-         </Button>
-        
-    </Space>
-    <Table
-     rowKey="PatientNo"
-      columns={columns}
-      rowSelection={rowSelection}
-      dataSource={filteredPatients}
-      pagination={{ pageSize: 10 }}
-    />
-  </div>
-)}
-
+        <div className="mt-4">
+          <Space
+            className="admit-patient-button-container"
+            style={{ marginBottom: 16 }}
+          >
+            <Button
+              type="primary"
+              disabled={!selectedRowKey}
+              onClick={handleDispatch}
+            >
+              <PlusOutlined /> Dispatch to Pharmacy
+            </Button>
+            <Button
+              type="primary"
+              disabled={!selectedRowKey}
+              onClick={handleDispatch}
+            >
+              <PlusOutlined /> Dispatch to Lab
+            </Button>
+            <Button
+              type="primary"
+              disabled={!selectedRowKey}
+              onClick={handleDispatch}
+            >
+              <PlusOutlined /> Dispatch to Radiology
+            </Button>
+          </Space>
+          <Table
+            rowKey="PatientNo"
+            columns={columns}
+            rowSelection={rowSelection}
+            dataSource={filteredPatients}
+            pagination={{ pageSize: 10 }}
+          />
+        </div>
+      )}
     </div>
   );
 };

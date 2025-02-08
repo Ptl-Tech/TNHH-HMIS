@@ -225,6 +225,8 @@ import { postLabSampleReducer } from './lab-reducers/postLabSampleReducer';
 import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsReducer';
 import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
 import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
+import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
+import { getPatientReceiptsHeadersReducer, getPatientReceiptsReducer } from './ChargesReducers/getPatientReceiptsReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -419,6 +421,9 @@ export const rootReducer = combineReducers({
   getChargesLines:getChargesLinesReducer,
   postPatientCharges:postPatientChargesReducer,
   generateInvoice:postGenerateInvoiceReducer,
+  postReverseCharges:postReverseChargeReducer,
+  getPatientReceipt:getPatientReceiptsReducer,
+  getPatientReceiptHeader:getPatientReceiptsHeadersReducer,
   postNursingCarePlan:postNursingCarePlanReducer,
   getNursingCarePlan:getNursingCarePlanReducer,
 

@@ -6,67 +6,60 @@ import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
 import {
   Tabs,
   Table,
-  Dropdown,
-  Menu,
   Button,
   Input,
   Row,
   Col,
   Typography,
-  Modal,
   Space,
 } from "antd";
-import {
-  EditOutlined,
-  EyeOutlined,
-  FilePdfOutlined,
-  DownOutlined,
-  DollarOutlined,
-} from "@ant-design/icons";
-import { FaFileInvoice } from "react-icons/fa";
+import { EyeOutlined, DollarOutlined } from "@ant-design/icons";
+import { FaEye, FaFileInvoice } from "react-icons/fa";
 import ProcessPayment from "./ProcessPayment";
-import { postGenerateInvoice } from "../../actions/Charges-Actions/postGenerateInvoice";
-import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
-import useAuth from "../../hooks/useAuth";
 import AddCharges from "./AddCharges";
+import useAuth from "../../hooks/useAuth";
 
 const { TabPane } = Tabs;
-const { Search } = Input;
 
 const ActiveOutPatients = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const staffNo = useAuth().userData.no;
+  
+  // Redux state data
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
   );
   const { patients: billingData } = useSelector(
     (state) => state.getBillingList
   );
-  const { loading: generateInvoiceLoading } = useSelector(
-    (state) => state.generateInvoice
-  );
-  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-    useSelector((state) => state.postInterimInvoice);
-
+  
+  // Local state
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
-  const [selectedpatientNo, setSelectedPatientNo] = useState("");
+  
+  // Lists for cash & corporate patients
   const [cashPatients, setCashPatients] = useState([]);
   const [corporatePatients, setCorporatePatients] = useState([]);
   const [filteredCashPatients, setFilteredCashPatients] = useState([]);
-  const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
-    []
-  );
+  const [filteredCorporatePatients, setFilteredCorporatePatients] = useState([]);
+  
+  // Modals
   const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
     useState(false);
-
   const [addChargeModal, setAddChargeModal] = useState(false);
+  
+  // To update patient balance in the list when new charges are added
   const [updatedAmounts, setUpdatedAmounts] = useState({});
+  
+  // Track which tab is active: "1" for Cash, "2" for Corporate
+  const [activeTab, setActiveTab] = useState("1");
+  
+  // For cash patients, we allow row selection to display external actions.
+  const [selectedCashRow, setSelectedCashRow] = useState(null);
 
   useEffect(() => {
     dispatch(appmntList());
@@ -110,34 +103,23 @@ const ActiveOutPatients = () => {
 
   const handleSearch = (e, field) => {
     const value = e.target.value.toLowerCase();
-    const updatedSearchParams = {
-      ...searchParams,
-      [field]: value,
-    };
+    const updatedSearchParams = { ...searchParams, [field]: value };
     setSearchParams(updatedSearchParams);
 
     const filteredCash = cashPatients.filter(
       (patient) =>
         (!updatedSearchParams.SearchNames ||
-          patient.Names.toLowerCase().includes(
-            updatedSearchParams.SearchNames
-          )) &&
+          patient.Names.toLowerCase().includes(updatedSearchParams.SearchNames)) &&
         (!updatedSearchParams.AppointmentNo ||
-          patient.AppointmentNo.toLowerCase().includes(
-            updatedSearchParams.AppointmentNo
-          ))
+          patient.AppointmentNo.toLowerCase().includes(updatedSearchParams.AppointmentNo))
     );
 
     const filteredCorporate = corporatePatients.filter(
       (patient) =>
         (!updatedSearchParams.SearchNames ||
-          patient.Names.toLowerCase().includes(
-            updatedSearchParams.SearchNames
-          )) &&
+          patient.Names.toLowerCase().includes(updatedSearchParams.SearchNames)) &&
         (!updatedSearchParams.AppointmentNo ||
-          patient.AppointmentNo.toLowerCase().includes(
-            updatedSearchParams.AppointmentNo
-          ))
+          patient.AppointmentNo.toLowerCase().includes(updatedSearchParams.AppointmentNo))
     );
 
     setFilteredCashPatients(filteredCash);
@@ -148,17 +130,35 @@ const ActiveOutPatients = () => {
     setIsGenerateReceiptModalVisible(false);
     setAddChargeModal(false);
   };
+
   const showPaymentModal = (record) => {
+    // Always use the record's current or updated balance
+    const currentBalance =
+      updatedAmounts[record.AppointmentNo] !== undefined
+        ? updatedAmounts[record.AppointmentNo]
+        : record.Balance;
+    setSelectedPatientAmount(currentBalance);
     setIsGenerateReceiptModalVisible(true);
-    setSelectedPatientNo(record.PatientNo);
-    setSelectedPatientAmount(record.Balance);
-  };
-  const showAddChargesModal = (record) => {
-    setAddChargeModal(true);
-    setSelectedPatientNo(record.AppointmentNo);
   };
 
-  const patientColumns = [
+  const showAddChargesModal = (record) => {
+    setAddChargeModal(true);
+  };
+
+  const handleBalanceUpdate = (patientNo, newBalance) => {
+    setUpdatedAmounts((prev) => ({
+      ...prev,
+      [patientNo]: newBalance,
+    }));
+  };
+
+  const handleViewPatientReceips=(record) => {
+    navigate(`/reception/Patient-Receipts/Patient?VisitNo=${record?.AppointmentNo}`);
+   
+  }
+
+  // Base columns common to both tables
+  const baseColumns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
@@ -226,55 +226,68 @@ const ActiveOutPatients = () => {
           </span>
         );
       },
-      
-    },
-    {
-      title: "Action",
-      key: "actions",
-      render: (_, record) => {
-        const currentBalance =
-          updatedAmounts[record.AppointmentNo] !== undefined
-            ? updatedAmounts[record.AppointmentNo]
-            : record.Balance;
-      
-        if (record.PatientType === "Cash") {
-          return (
-            <Space size="middle">
-              {currentBalance > 0 ? (
-                <Button type="primary" onClick={() => showPaymentModal(record)}>
-                  <DollarOutlined /> Make Payment
-                </Button>
-              ) : (
-                <Button type="default" onClick={() => showAddChargesModal(record)}>
-                  <FaFileInvoice /> Add Charges
-                </Button>
-              )}
-            </Space>
-          );
-        } else {
-          return (
-            <Space size="middle">
-              <Button
-                type="primary"
-                icon={<EyeOutlined />}
-                onClick={() =>
-                  navigate(
-                    `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
-                    { state: { patientData: record } }
-                  )
-                }
-              >
-                View Details
-              </Button>
-            </Space>
-          );
-        }
-      },
-      
     },
   ];
-console.log("updated Amounts",updatedAmounts);
-  // console.log("patient Data:",patientData);
+
+  // For corporate patients, add an inline action column.
+  const corporateColumns = [
+    ...baseColumns,
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          icon={<EyeOutlined />}
+          onClick={() =>
+            navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
+              state: { patientData: record },
+            })
+          }
+        >
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
+  // For cash patients, always render external action buttons.
+  // The buttons are disabled until a row is selected.
+  const renderCashActions = () => (
+    <Space size="middle" style={{ marginTop: "20px" }}>
+      <Button
+        type="primary"
+        onClick={() => showPaymentModal(selectedCashRow)}
+        disabled={!selectedCashRow}
+      >
+        <DollarOutlined /> Make Payment
+      </Button>
+      <Button
+        type="default"
+        onClick={() => showAddChargesModal(selectedCashRow)}
+        disabled={!selectedCashRow}
+      >
+        <FaFileInvoice /> Add Charges
+      </Button>
+      <Button
+        type="primary"
+        onClick={()=>handleViewPatientReceips(selectedCashRow)}
+        disabled={!selectedCashRow}
+      >
+        <FaEye /> View Charges
+      </Button>
+    </Space>
+  );
+
+  // Row selection configuration for cash patients
+  const cashRowSelection = {
+    type: "radio",
+    selectedRowKeys: selectedCashRow ? [selectedCashRow.PatientNo] : [],
+    onChange: (_, selectedRows) => {
+      setSelectedCashRow(selectedRows[0]);
+    },
+  };
+
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
@@ -290,11 +303,7 @@ console.log("updated Amounts",updatedAmounts);
       <Row gutter={16} className="mt-2">
         <Col span={12}>
           <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
+            style={{ color: "#003F6D", fontWeight: "bold", marginBottom: "16px" }}
           >
             Patient Names
           </Typography.Text>
@@ -306,11 +315,7 @@ console.log("updated Amounts",updatedAmounts);
         </Col>
         <Col span={12}>
           <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
+            style={{ color: "#003F6D", fontWeight: "bold", marginBottom: "16px" }}
           >
             Appointment Number:
           </Typography.Text>
@@ -322,10 +327,16 @@ console.log("updated Amounts",updatedAmounts);
         </Col>
       </Row>
 
-      <Tabs defaultActiveKey="1">
+      {/* For Cash Patients, render external action buttons (always visible) */}
+      {activeTab === "1" && (
+        <div style={{ marginBottom: 16 }}>{renderCashActions()}</div>
+      )}
+
+      <Tabs onChange={(key) => setActiveTab(key)} defaultActiveKey="1">
         <TabPane tab="Cash Patients" key="1">
           <Table
-            columns={patientColumns}
+            rowSelection={cashRowSelection}
+            columns={baseColumns} // No inline actions; actions come from the external area.
             dataSource={filteredCashPatients.map((patient) => ({
               ...patient,
               key: patient.PatientNo,
@@ -336,7 +347,8 @@ console.log("updated Amounts",updatedAmounts);
         </TabPane>
         <TabPane tab="Corporate Patients" key="2">
           <Table
-            columns={patientColumns}
+            // For corporate patients, we show inline actions so no rowSelection is needed.
+            columns={corporateColumns}
             dataSource={filteredCorporatePatients.map((patient) => ({
               ...patient,
               key: patient.PatientNo,
@@ -346,23 +358,29 @@ console.log("updated Amounts",updatedAmounts);
           />
         </TabPane>
       </Tabs>
+
       <ProcessPayment
         visible={isGenerateReceiptModalVisible}
         onClose={handleClose}
-        patientNo={selectedpatientNo}
         amount={selectedPatientAmount}
+        patientNo={selectedCashRow?.PatientNo}
       />
+
       <AddCharges
-  visible={addChargeModal}
-  onClose={handleClose}
-  visitNo={selectedpatientNo}
-  setTotalAmount={(amount) => {
-    setUpdatedAmounts((prev) => ({
-      ...prev,
-      [selectedpatientNo]: (prev[selectedpatientNo] || 0) + amount, // Add new amount to the existing balance
-    }));
-  }}
-/>;
+        visible={addChargeModal}
+        onClose={handleClose}
+        // For cash patients, use the selected row’s AppointmentNo.
+        visitNo={selectedCashRow?.AppointmentNo}
+        setTotalAmount={(amount) => {
+          const key = selectedCashRow?.AppointmentNo;
+          if (key) {
+            setUpdatedAmounts((prev) => ({
+              ...prev,
+              [key]: (prev[key] || 0) + amount,
+            }));
+          }
+        }}
+      />
     </div>
   );
 };

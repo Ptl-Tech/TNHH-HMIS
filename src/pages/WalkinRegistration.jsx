@@ -20,7 +20,6 @@ import { SaveOutlined } from "@ant-design/icons";
 const WalkinRegistration = () => {
   const { state } = useLocation(); // Access the state passed via navigate
   const { visitorData, patientNumber, patientDet } = state || {}; // Destructure patient data if available
-  console.log("Visitor Data:", visitorData);
   const {
     loading: patientListLoading,
     error: patientListError,
@@ -461,7 +460,7 @@ const WalkinRegistration = () => {
                     value={
                       newPatient.gender ||
                       visitorData?.Gender ||
-                      patientDet?.Gender
+                      patientDet?.Gender ==="1" ? "Male":"Female"
                     }
                     onChange={(value) => handleSelectChange("gender", value)}
                   >

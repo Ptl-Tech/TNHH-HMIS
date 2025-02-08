@@ -35,18 +35,22 @@ import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader
 import { getReceiptLines } from "../../actions/Charges-Actions/getReceiptLines";
 import { printReceipt } from "../../actions/Charges-Actions/printReceipt";
 import ReversCharge from "./ReversCharge";
+import {
+  getPatientReceiptHeader,
+  getPatientReceiptLines,
+} from "../../actions/Charges-Actions/getPatientReceipts";
 
 const { Title, Text } = Typography;
 
-const ViewReceipt = () => {
+const ViewPatientsReceipts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const receiptNo = new URLSearchParams(useLocation().search).get("ReceiptNo");
-const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
+  const visitNo = new URLSearchParams(useLocation().search).get("VisitNo");
   const { userData } = useAuth();
-  const { state } = useLocation();
-  const { patientData } = state;
-  const { lines } = state.patientData; // Extract header and lines
+  //   const { state } = useLocation();
+  //   const { patientData } = state;
+  //   const { lines } = state.patientData; // Extract header and lines
 
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
@@ -70,7 +74,9 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
   const { data: patientReceipts } = useSelector(
     (state) => state.getPatientReceipt
   );
-  
+  const { data: patientHeader } = useSelector(
+    (state) => state.getPatientReceiptHeader
+  );
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -90,16 +96,16 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
 
   useEffect(() => {
-    if (receiptNo) {
-      dispatch(getReceiptLines(receiptNo));
+    if (visitNo) {
+      dispatch(getPatientReceiptLines(visitNo));
     }
-  }, [dispatch, receiptNo]);
+  }, [dispatch, visitNo]);
 
   useEffect(() => {
-    if (receiptNo) {
-      dispatch(getReceiptHeader(receiptNo));
+    if (visitNo) {
+      dispatch(getPatientReceiptHeader(visitNo));
     }
-  }, [dispatch, receiptNo]);
+  }, [dispatch, visitNo]);
 
   const handleGoBack = () => {
     navigate("/reception/Billing/Outpatients");
@@ -143,21 +149,21 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
-    setSelectedPatientNo(receiptHeader[0]?.Patient_No);
-    setSelectedPatientAmount(receiptHeader[0]?.Total_Amount);
+    setSelectedPatientNo(patientHeader[0]?.Patient_No);
+    setSelectedPatientAmount(patientHeader[0]?.Total_Amount);
   };
 
   // When processing (posting) the receipt, update the state so printing is enabled.
   const handleProcessReceipt = () => {
     const receipt = {
       recId: "",
-      patientNo: receiptHeader[0]?.Patient_No,
-      receiptNo: receiptHeader[0]?.No,
+      patientNo: patientHeader[0]?.Patient_No,
+      receiptNo: patientHeader[0]?.No,
     };
 
     dispatch(postReceipt(receipt)).then((status) => {
       // Assuming a successful post returns data; adjust the check per your API response.
-      if (status && status=="success") {
+      if (status && status == "success") {
         setIsReceiptPosted(true);
         message.success("Receipt posted successfully");
       } else {
@@ -165,9 +171,11 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
       }
     });
   };
+  const totalReceived = patientReceipts?.reduce((acc, line) => acc + line.Amount, 0) || 0;
 
-  const tableData = receiptLines?.map((line, index) => ({
+  const tableData = patientReceipts?.map((line, index) => ({
     key: index,
+    receiptNo: line?.No,
     code: line?.AccountNo,
     transactionName: line.TransactionType,
     chargeName: line.TransactionName,
@@ -179,6 +187,11 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
   }));
 
   const columns = [
+    {
+      title: "Receipt No",
+      dataIndex: "receiptNo",
+      key: "receiptNo",
+    },
     {
       title: "Code",
       dataIndex: "code",
@@ -223,48 +236,30 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
           </Col>
         </Row>
         <Row justify="end">
-          <Col>
-            <Space>
-              {/* For Corporate patients, print receipt immediately */}
-              {patientData?.PatientType === "Corporate" ? (
-                <Button
-                  type="primary"
-                  size="medium"
-                  icon={<FaCoins />}
-                  onClick={() =>
-                    handlePrintReceipt(receiptNo)
-                  }
-                >
-                  Print Receipt
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    type="primary"
-                    size="medium"
-                    icon={<FaReceipt />}
-                    onClick={() =>
-                      handleProcessReceipt(receiptHeader[0]?.Patient_No)
-                    }
-                  >
-                    Post Receipt
-                  </Button>
-                  <Button
-                    icon={<PrinterOutlined style={{ color: "green" }} />}
-                    onClick={() => {
-                      console.log("Printing Receipt:", receiptNo);
-                      handlePrintReceipt(receiptNo);
-                    }}
-                    size="medium"
-                    disabled={!isReceiptPosted} // Only enable if receipt has been posted
-                  >
-                    Print Receipt
-                  </Button>
-                </>
-              )}
-            </Space>
-          </Col>
+         
+          <div className="d-flex flex-md-row gap-2">
+            <Button
+              type="primary"
+              size="medium"
+              icon={<FaReceipt />}
+              onClick={() => handleProcessReceipt(patientHeader[0]?.Patient_No)}
+            >
+              Post Receipt
+            </Button>
+            <Button
+              icon={<PrinterOutlined style={{ color: "green" }} />}
+              onClick={() => {
+                console.log("Printing Receipt:", receiptNo);
+                handlePrintReceipt(receiptNo);
+              }}
+              size="medium"
+              disabled={!isReceiptPosted} // Only enable if receipt has been posted
+            >
+              Print Receipt
+            </Button>
+          </div>
         </Row>
+
         <Row align="middle" justify="space-between">
           <Col span={12}>
             <div className="d-flex justify-content-start gap-2">
@@ -306,16 +301,16 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
           <Col span={24}>
             <div className="d-flex justify-content-start gap-4">
               <Text strong>Receiving From:</Text>
-              <p>{receiptHeader[0]?.Received_From}</p>
+              <p>{patientHeader[0]?.Received_From}</p>
 
               <Text strong>Patient No:</Text>
               <p style={{ fontWeight: "bold", color: "brown" }}>
-                {receiptHeader[0]?.Patient_No}
+                {patientHeader[0]?.Patient_No}
               </p>
-              <Text strong>Receipt No:</Text>
+              {/* <Text strong>Receipt No:</Text>
               <p style={{ fontWeight: "bold", color: "brown" }}>
                 {receiptHeader[0]?.No}
-              </p>
+              </p> */}
             </div>
 
             <div className="d-flex justify-content-start gap-4">
@@ -324,23 +319,23 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
                 style={{ fontWeight: "bold", color: "green" }}
                 className="text-primary fw-bold"
               >
-                {receiptHeader[0]?.Patient_Appointment_No}{" "}
+                {patientHeader[0]?.Patient_Appointment_No}{" "}
               </p>
 
               <Text strong>Date:</Text>
               <p>
-                {receiptHeader[0]?.Date_Posted
-                  ? moment(patientData?.Date_Posted).format("Do MMM YYYY")
+                {patientHeader[0]?.Date_Posted
+                  ? moment(patientHeader[0]?.Date_Posted).format("Do MMM YYYY")
                   : ""}
               </p>
 
-              <Text strong>Amount Received:</Text>
+              {/* <Text strong>Amount Received:</Text>
               <p style={{ fontWeight: "bold", color: "green" }}>
-                {receiptHeader[0]?.Amount_Recieved.toLocaleString("en-KE", {
+                {patientHeader[0]?.Amount_Recieved.toLocaleString("en-KE", {
                   style: "currency",
                   currency: "KES",
                 }).replace(".00", "")}
-              </p>
+              </p> */}
             </div>
           </Col>
         </Row>
@@ -368,14 +363,14 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
           <Col span={10}>
             <Row justify="space-between">
               <Col span={12}>
-                <Text strong>Total Received:</Text>
+                <Text strong>Total Amount:</Text>
               </Col>
               <Col span={12}>
                 <Text style={{ color: "green" }} strong>
-                  {receiptHeader[0]?.Total_Amount.toLocaleString("en-KE", {
-                    style: "currency",
-                    currency: "KES",
-                  }).replace(".00", "")}
+                {totalReceived.toLocaleString("en-KE", {
+        style: "currency",
+        currency: "KES",
+      })}
                 </Text>
               </Col>
             </Row>
@@ -416,4 +411,4 @@ const patientNo= new URLSearchParams(useLocation().search).get("PatientNo");
   );
 };
 
-export default ViewReceipt;
+export default ViewPatientsReceipts;
