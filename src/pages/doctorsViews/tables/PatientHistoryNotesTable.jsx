@@ -6,8 +6,10 @@ import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import useAuth from "../../../hooks/useAuth";
 
 const PatientHistoryNotesTable = ({ data }) => {
+  const role = useAuth().userData.departmentName;
   const useQueryParams = () => {
     return new URLSearchParams(useLocation().search);
   };
@@ -45,16 +47,14 @@ const PatientHistoryNotesTable = ({ data }) => {
   // );
 
   const filterCollapseData = data
-  .filter((item) => notesType?.some((note) => note.label === item.Notes_Type))
-  .map((item) => {
-    const note = notesType?.find((note) => note.label === item.Notes_Type);
-    return {
-      ...item,
-      value: note ? note.value : null, // Add value from notesType
-    };
-  });
-
-  console.log('filtered data', filterCollapseData)
+    .filter((item) => notesType?.some((note) => note.label === item.Notes_Type))
+    .map((item) => {
+      const note = notesType?.find((note) => note.label === item.Notes_Type);
+      return {
+        ...item,
+        value: note ? note.value : null, // Add value from notesType
+      };
+    });
 
   const groupedData = filterCollapseData?.reduce((acc, item) => {
     acc[item.Notes_Type] = {
@@ -65,7 +65,7 @@ const PatientHistoryNotesTable = ({ data }) => {
       Value: item.value, // Include the value in grouped data
     };
     return acc;
-  }, {})
+  }, {});
 
   const handleCollapseChange = (key) => {
     setActiveKey(key); // Store open collapse key
@@ -91,18 +91,16 @@ const PatientHistoryNotesTable = ({ data }) => {
       patientNo,
     };
 
-    const previousActiveKey = activeKey; 
+    const previousActiveKey = activeKey;
 
-    const results = await (
-      dispatch(postPatientHistoryNotes(formData))
-    );
+    const results = await dispatch(postPatientHistoryNotes(formData));
 
     if (results === "success") {
       message.success(
         `Patient ${noteData.Notes_Type} notes updated successfully`
       );
       await dispatch(getPatientHistorySlice(treatmentNo));
-      setActiveKey(previousActiveKey); 
+      setActiveKey(previousActiveKey);
     } else {
       message.error(`Failed to update patient ${noteData.Notes_Type} notes`);
     }
@@ -135,20 +133,22 @@ const PatientHistoryNotesTable = ({ data }) => {
               style={{ color: "black" }}
             />
           )}
-          <Button
-            icon={editing[notesType] ? <SaveOutlined /> : <EditOutlined />}
-            type="primary"
-            loading={saveNotesLoading}
-            disabled={saveNotesLoading}
-            onClick={() =>
-              editing[notesType]
-                ? handleSaveClick(notesType, noteData)
-                : handleEditClick(notesType, noteData)
-            }
-            style={{ marginTop: "20px" }}
-          >
-            {editing[notesType] ? "Save" : "Edit"}
-          </Button>
+          {(role === "Doctor" || role === "Psychology") && (
+            <Button
+              icon={editing[notesType] ? <SaveOutlined /> : <EditOutlined />}
+              type="primary"
+              loading={saveNotesLoading}
+              disabled={saveNotesLoading}
+              onClick={() =>
+                editing[notesType]
+                  ? handleSaveClick(notesType, noteData)
+                  : handleEditClick(notesType, noteData)
+              }
+              style={{ marginTop: "20px" }}
+            >
+              {editing[notesType] ? "Save" : "Edit"}
+            </Button>
+          )}
         </div>
       ),
     })
