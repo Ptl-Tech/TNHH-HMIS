@@ -36,7 +36,7 @@ const EvaluationCardContent = ({
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          {(role === "Doctor" || role === "Psychology") && (
+          {(role === "Doctor" || role === "Nurse") && (
             <>
               <Tabs.TabPane tab="Medication" key="5">
                 <PatientCarePlan
@@ -48,7 +48,7 @@ const EvaluationCardContent = ({
             </>
           )}
 
-          {(role === "Doctor") && (
+          {(role === "Doctor" || role === "Nurse") && (
             <>
               <Tabs.TabPane tab="Procedures" key="4">
                 <PatientRequests />
