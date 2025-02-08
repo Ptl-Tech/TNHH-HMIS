@@ -115,12 +115,14 @@ const CreateVisitForm = () => {
     if (branchCode && doctorsPayload) {
       const filtered = doctorsPayload.filter(
         (doctor) =>
-          doctor.Specialization === newVisit.clinic
+          doctor.Specialization === newVisit.clinic 
+
+        // && // Match specialization with selected clinic
+        //   doctor.GlobalDimension1Code === branchCode // Match branch code
       );
       setFilteredDoctors(filtered); // Update the filtered doctors list
     }
   }, [doctorsPayload, newVisit.clinic]);
-
   const savepatientVisit = async () => {
     //if clinic is pyschiatry or psychology prompt select doctor else dont show error message
     if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
@@ -130,45 +132,40 @@ const CreateVisitForm = () => {
       }
     }
 
-  try {
-    // Step 2: Create Triage Visit
-    const visitData = {
-      patientNo:
-        patientNo ||
-        patientData?.patientNo ||
-        existingPatient?.PatientNo ||
-        patientData?.PatientNo ||
-        visitData?.PatientNo,
-      clinic: newVisit.clinic,
-      doctor: newVisit.doctor,
-      paymentMode:
-      newVisit.paymentMode === "Cash" ? "2" :
-      newVisit.paymentMode === "Insurance" ? "1" : "1", 
-          insuranceNo: newVisit.insuranceNo,
-      membershipNo: newVisit.membershipNo,
-      insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName,
-      isPrincipleMember: newVisit.isPrincipleMember,
-      schemeName: newVisit.schemeName,
-    };
+    try {
+      // Step 2: Create Triage Visit
+      const visitData = {
+        patientNo:
+          patientNo ||
+          patientData?.patientNo ||
+          existingPatient?.PatientNo ||
+          patientData?.PatientNo ||
+          visitData?.PatientNo,
+        clinic: newVisit.clinic,
+        doctor: newVisit.doctor,
+        paymentMode: newVisit.paymentMode,
+        insuranceNo: newVisit.insuranceNo || existingPatient?.InsuranceNo,
+        membershipNo: newVisit.membershipNo || existingPatient?.MembershipNo,
+        insurancePrincipalMemberName: newVisit.insurancePrincipalMemberName || existingPatient?.SearchName,
+        isPrincipleMember: newVisit.isPrincipleMember || existingPatient?.Principal,
+        schemeName: newVisit.schemeName || existingPatient?.SchemeName,
+      };
 
       // Dispatch the visit creation
       const appointmentId = await dispatch(createTriageVisit(visitData));
-      console.log("Visit created for Patient ID:", appointmentId);
       if (appointmentId) {
-        message.success("Visit created successfully!");
+       await message.success("Visit created successfully!");
         setAppointmentId(appointmentId);
 
         // Step 3: Optionally dispatch the visit (triage)
-        console.log("Triage visit created for Patient ID:", appointmentId);
       } else {
-        message.error("Failed to create visit!");
+      await  message.error("Failed to create visit!");
         setAppointmentId(null);
         setNewVisit({});
         // Use previousPath from location.state to navigate back
         // navigate(location.state?.previousPath || "/reception/visitors-list");
       }
     } catch (error) {
-      console.error("Error creating visit:", error);
       message.error("Error occurred while creating visit!");
     }
   };
@@ -395,7 +392,7 @@ const CreateVisitForm = () => {
                       placeholder="Select Settlement Type"
                       className="w-100"
                       value={
-                        newVisit.paymentMode ||
+                        newVisit.paymentMode === "1"? "Insurance" : newVisit.paymentMode === "2" ? "Cash" : existingPatient?.PatientType ||
                         (patientData?.paymentMode === "1"
                           ? "Insurance"
                           : patientData?.paymentMode === "2"
@@ -427,7 +424,7 @@ const CreateVisitForm = () => {
                       <Select
                         placeholder="Select Insurance"
                         className="w-100"
-                        value={newVisit.insuranceNo || existingPatient.InsuranceNo}
+                        value={newVisit.insuranceNo || existingPatient?.InsuranceNo}
                         onChange={(value) =>
                           handleInputChange("insuranceNo", value)
                         }
@@ -471,7 +468,7 @@ const CreateVisitForm = () => {
                         </label>
                         <Input
                           label="Membership No"
-                          value={newVisit.membershipNo || existingPatient.MembershipNo}
+                          value={newVisit.membershipNo || existingPatient?.MembershipNo}
                           onChange={(e) =>
                             handleInputChange("membershipNo", e.target.value)
                           }
@@ -486,7 +483,7 @@ const CreateVisitForm = () => {
                         </label>
                         <Input
                           label="Insurance Scheme"
-                          value={newVisit.schemeName || existingPatient.SchemeName}
+                          value={newVisit.schemeName || existingPatient?.SchemeName}
                           onChange={(e) =>
                             handleInputChange("schemeName", e.target.value)
                           }
@@ -502,7 +499,7 @@ const CreateVisitForm = () => {
                         </label>
                         <Input
                           label="Principal Name"
-                          value={newVisit.insurancePrincipalMemberName} // Use insurancePrincipalMemberName here
+                          value={newVisit.insurancePrincipalMemberName || existingPatient?.SearchName} // Use insurancePrincipalMemberName here
                           onChange={(e) =>
                             handleInputChange(
                               "insurancePrincipalMemberName",
@@ -526,7 +523,7 @@ const CreateVisitForm = () => {
                           <span className="text-danger px-1">*</span>
                         </label>
                         <Switch
-                          checked={newVisit.isPrincipleMember}
+                          checked={newVisit.isPrincipleMember || existingPatient?.Principal}
                           onChange={(checked) =>
                             handleSwitchChange("isPrincipleMember", checked)
                           }
