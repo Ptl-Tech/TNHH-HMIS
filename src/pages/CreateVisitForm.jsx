@@ -406,30 +406,27 @@ const CreateVisitForm = () => {
                       <span className="text-danger px-1">*</span>
                     </label>
                     <Select
-                      placeholder="Select Settlement Type"
-                      className="w-100"
-                      value={
-                        newVisit.paymentMode === "1"? "Insurance" : newVisit.paymentMode === "2" ? "Cash" : existingPatient?.PatientType ||
-                        (patientData?.paymentMode === "1"
-                          ? "Insurance"
-                          : patientData?.paymentMode === "2"
-                          ? "Cash"
-                          : existingPatient?.PatientType || "N/A")
-                      }
-                      onChange={(value) =>
-                        handleInputChange("paymentMode", value)
-                      }
-                      showSearch
-                      filterOption={(input, option) =>
-                        option.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      <Select.Option value="">--Select--</Select.Option>
-                      <Select.Option value="1">Insurance</Select.Option>
-                      <Select.Option value="2">Cash</Select.Option>
-                    </Select>
+  placeholder="Select Settlement Type"
+  className="w-100"
+  value={
+    newVisit.paymentMode === "1"
+      ? "Insurance"
+      : newVisit.paymentMode === "2"
+      ? "Cash"
+     
+      : ""
+  }
+  onChange={(value) => handleInputChange("paymentMode", value)}
+  showSearch
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+>
+  <Select.Option value="">--Select--</Select.Option>
+  <Select.Option value="1">Insurance</Select.Option>
+  <Select.Option value="2">Cash</Select.Option>
+</Select>
+
                   </div>
 
                   {newVisit.paymentMode === "1" && (
@@ -439,38 +436,32 @@ const CreateVisitForm = () => {
                         <span className="text-danger px-1">*</span>
                       </label>
                       <Select
-                        placeholder="Select Insurance"
-                        className="w-100"
-                        value={newVisit.insuranceNo || existingPatient?.InsuranceNo}
-                        onChange={(value) =>
-                          handleInputChange("insuranceNo", value)
-                        }
-                        disabled={newVisit.paymentMode !== "1"}
-                        showSearch
-                        filterOption={(input, option) =>
-                          option.children
-                            .toLowerCase()
-                            .indexOf(input.toLowerCase()) >= 0
-                        }
-                      >
-                        <Select.Option value="">
-                          --Select Insurance--
-                        </Select.Option>
-                        {insurancePayload && insurancePayload.length > 0 ? (
-                          insurancePayload.map((insurance) => (
-                            <Select.Option
-                              key={insurance.No}
-                              value={insurance.No}
-                            >
-                              {insurance.Name}
-                            </Select.Option>
-                          ))
-                        ) : (
-                          <Select.Option value="" disabled>
-                            No data available
-                          </Select.Option>
-                        )}
-                      </Select>
+  placeholder="Select Insurance"
+  className="w-100"
+  value={
+    newVisit.insuranceNo ||
+    (insurancePayload?.find((insurance) => insurance.No === existingPatient?.InsuranceNo)?.No || "")
+  }
+  onChange={(value) => handleInputChange("insuranceNo", value)}
+  disabled={newVisit.paymentMode !== "1"}
+  showSearch
+  allowClear
+  filterOption={(input, option) =>
+    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  }
+>
+  <Select.Option value="">--Select Insurance--</Select.Option>
+  {insurancePayload && insurancePayload.length > 0 ? (
+    insurancePayload.map((insurance) => (
+      <Select.Option key={insurance.No} value={insurance.No}>
+        {insurance.Name}
+      </Select.Option>
+    ))
+  ) : (
+    <Select.Option value="" disabled>No data available</Select.Option>
+  )}
+</Select>
+
                     </div>
                   )}
                 </div>
