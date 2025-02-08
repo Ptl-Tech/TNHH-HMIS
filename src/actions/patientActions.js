@@ -281,7 +281,6 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
   } catch (error) {
     const errorMessage = error.response?.data?.errors ;
     dispatch({ type: TRIAGE_VISIT_FAIL, payload: errorMessage });
-    console.log(errorMessage);
     message.error(error.response?.data?.errors); 
   }
 };
