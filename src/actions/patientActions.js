@@ -328,9 +328,9 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
 //   }
 // };
 
-export const postTriageVisit = (appointmentId) => async (dispatch, getState) => {
+export const postTriageVisit = (visitData) => async (dispatch, getState) => {
   try {
-    dispatch({ type:POST_TRIAGE_VISIT_REQUEST  });
+    dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
 
     const {
       otpVerify: { userInfo },
@@ -340,40 +340,52 @@ export const postTriageVisit = (appointmentId) => async (dispatch, getState) => 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
         branchCode: branchCode,
       },
     };
 
-
     const response = await axios.post(
       `${API}Reception/DispatchToTriage`,
-      { appointmentNo: appointmentId },
+      visitData,
       config
     );
 
-   // Extract response details
+    // Extract response details
     const responseData = {
       status: response.data.status,
-      msg: response.data.observationNo, // Assuming `msg` contains the patient ID
+      msg: response.data.observationNo,
     };
+
+    // Display success message with observation number
+    message.success(
+      `Patient dispatched successfully! Observation No: ${responseData.msg}`,
+      5
+    );
 
     setTimeout(() => {
       console.log("Dispatched Payload:", responseData);
     }, 2000);
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
-    //message with success message and observationNo
-
-
   } catch (error) {
+    // Extract error message from different possible sources
+    const errorMessage =
+      error.response?.data?.errors || // Extract 'errors' field from response
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Failed to dispatch patient!";
+
+    message.error(errorMessage, 5);
+
     dispatch({
       type: POST_TRIAGE_VISIT_FAIL,
-      payload: error.response?.data?.message || error.errors,
+      payload: errorMessage,
     });
-    // message.error(error.message, 5);
-    throw error; // Rethrow error for `handleSubmit` to handle
+
+    throw error;
   }
 };
 

@@ -157,12 +157,14 @@ const ActiveOutPatients = () => {
    
   }
 
-  // Base columns common to both tables
   const baseColumns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
       key: "PatientNo",
+      render: (text) => (
+        <span style={{ fontWeight: "bold", color: "brown" }}>{text}</span>
+      ),
     },
     {
       title: "Patient Name",
@@ -173,6 +175,9 @@ const ActiveOutPatients = () => {
       title: "Appointment No",
       dataIndex: "AppointmentNo",
       key: "AppointmentNo",
+      render: (text) => (
+        <span style={{ fontWeight: "bold", color: "blue" }}>{text}</span>
+      ),
     },
     {
       title: "Patient Type",
@@ -215,20 +220,15 @@ const ActiveOutPatients = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
+      sorter: (a, b) => a.Balance - b.Balance,
       render: (text, record) => {
-        const newBalance =
-          updatedAmounts[record.AppointmentNo] !== undefined
-            ? updatedAmounts[record.AppointmentNo]
-            : text;
-        return (
-          <span style={{ color: newBalance !== text ? "red" : "black" }}>
-            KSh {newBalance.toFixed(2)}
-          </span>
-        );
+        const newBalance = updatedAmounts[record.AppointmentNo] ?? text;
+        const balanceColor = newBalance === 0 ? "green" : newBalance !== text ? "red" : "black";
+        return <span style={{ fontWeight: "bold", color: balanceColor }}>KSh {newBalance.toFixed(2)}</span>;
       },
     },
   ];
-
+  
   // For corporate patients, add an inline action column.
   const corporateColumns = [
     ...baseColumns,
@@ -250,6 +250,7 @@ const ActiveOutPatients = () => {
       ),
     },
   ];
+  
 
   // For cash patients, always render external action buttons.
   // The buttons are disabled until a row is selected.

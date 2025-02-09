@@ -45,7 +45,7 @@ export const getPatientReceiptLines = (visitNo) => async (dispatch, getState) =>
     dispatch({ type: REQUEST_PATIENT_RECEIPT_LINES_SUCCESS, payload: response.data });
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch PATIENT_RECEIPT lines";
+      error.response?.data?.message || error.errors || "Failed to fetch PATIENT_RECEIPT lines";
 
     // Display error message using Ant Design's message component
     message.error(errorMessage);
