@@ -52,6 +52,12 @@ const PastDoctorVisit = () => {
        }; 
  
     const columns = [
+      {
+        title: '#',
+        dataIndex: 'key',
+        key: 'key',
+        render: (_, __, index) => index + 1,
+      },
         {
             title: 'Treatment No',
             dataIndex: 'TreatmentNo',
@@ -67,7 +73,7 @@ const PastDoctorVisit = () => {
             dataIndex: 'SearchName',
             key: 'SearchName',
                 render: (_, record) => {
-                    return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689' }}>
+                    return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689', fontWeight: 'bold' }}>
                         {record.SearchName}
                     </Button>
                 }

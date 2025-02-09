@@ -1,10 +1,10 @@
-import { Space, Typography } from "antd"
-import PropTypes from "prop-types"
+import { Space, Typography } from "antd";
+import PropTypes from "prop-types";
 
 const NurseInnerHeader = ({ filterInPatients, icon, title }) => {
   return (
     <>
-        <Space
+      <Space
         style={{
           color: "#0f5689",
           display: "flex",
@@ -18,55 +18,48 @@ const NurseInnerHeader = ({ filterInPatients, icon, title }) => {
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}
         >
-          
           {title}
-
         </Typography.Text>
-            
-        {
-            filterInPatients && (
-                <Space
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        position: "absolute",
-                        right: "3px",
-                        top: "2px",
-                    }}
-                >
-                    <span
-                        style={{ color: "black", fontSize: "14px", fontWeight: "bold" }}
-                    >
-                        Total Inpatients
-                    </span>
-                    <span
-                        style={{
-                        backgroundColor: "#0f5689",
-                        borderRadius: "50%",
-                        width: "25px",
-                        height: "25px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        color: "white",
-                        }}
-                >
-                        {filterInPatients.length || 0}
-                    </span>
-                </Space>
-            )
-        }
+
+        {filterInPatients && (
+          <Space
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              right: "3px",
+              top: "2px",
+            }}
+          >
+            <div
+              style={{
+                color: "black",
+                fontSize: "14px",
+                backgroundColor: "#e6f7ff",
+                padding: "3px 10px",
+                borderRadius: "5px",
+                display: "flex",
+                gap: "5px",
+                alignItems: "center",
+                fontWeight: "bold",
+              }}
+            >
+              <span>Total Inpatients</span>
+              <span>{filterInPatients.length}</span>
+            </div>
+          </Space>
+        )}
       </Space>
     </>
-  )
-}
+  );
+};
 
-export default NurseInnerHeader
+export default NurseInnerHeader;
 
 // props validation
 NurseInnerHeader.propTypes = {
   filterInPatients: PropTypes.array,
   title: PropTypes.string.isRequired,
-  icon: PropTypes.string
+  icon: PropTypes.string,
 };
