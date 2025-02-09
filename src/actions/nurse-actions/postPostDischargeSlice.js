@@ -24,7 +24,7 @@ export const postPostDischargeSlice = (endpoint = '/Inpatient/PostDischarge', di
     
         dispatch({
             type: POST_DISCHARGE_PATIENT_FAILURE,
-            payload: error.response?.data?.message || error.message,
+            payload: error.response?.data?.errors || error.message,
         });
 
         return { type: POST_DISCHARGE_PATIENT_FAILURE, payload: error };
