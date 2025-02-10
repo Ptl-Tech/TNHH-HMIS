@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Col, Row } from 'antd';
 import { FaUser } from 'react-icons/fa6';
 
 import { getLabList } from '../actions/Doc-actions/getLabList';
@@ -14,19 +15,25 @@ const LabDashboard = () => {
   //   state
   const { data } = useSelector((state) => state.labList);
 
-  const totalLabRequests = data?.length;
-  const newLabRequests = data.filter((dataItem) => dataItem.Status === 'New');
-  const forwadedLabRequests = data.filter(
-    (dataItem) => dataItem.Status === 'Forwaded',
-  );
-  const completedLabRequests = data.filter(
-    (dataItem) => dataItem.Status === 'Completed',
-  );
-
   useEffect(() => {
     // fetch the lab lists
     dispatch(getLabList());
   }, [dispatch]);
+
+  const statuses = [
+    { status: 'Forwaded', backgroundColor: '#0060a3', color: '#fafafa' },
+    { status: 'Review', backgroundColor: '#006d75', color: '#fafafa' },
+    { status: 'Completed', backgroundColor: '#237804', color: '#fafafa' },
+    { status: 'Recalled', backgroundColor: '#391085', color: '#fafafa' },
+    { status: 'Cancelled', backgroundColor: '#ad4e00', color: '#fafafa' },
+  ];
+
+  const viewableData = statuses.map(({ status, backgroundColor, color }) => ({
+    name: `${status} Laboratory Request`,
+    number: data.filter((item) => item.Status === status).length,
+    backgroundColor,
+    color,
+  }));
 
   return (
     <div className="">
@@ -35,72 +42,32 @@ const LabDashboard = () => {
       </div>
       <div className="card-body text-dark">
         <p>Welcome to the Laboratory Dashboard</p>
-        <div className="row gap-3 gap-md-0">
-          {/* new labe requests */}
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Lab/Lab-Patients')}
+        <Row gutter={[16, 16]}>
+          {viewableData.map(({ name, number, backgroundColor, color }) => (
+            <Col
+              xs={{ span: 24 }}
+              sm={{ span: 12 }}
+              md={{ span: 8 }}
+              lg={{ span: 6 }}
+              key={name}
+              className="gutter-row"
             >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <FaUser style={{ marginRight: 8 }} />
-                  New Laboratory Requests
+              <div
+                className="card"
+                style={{ backgroundColor, color }}
+                onClick={() => navigate('/Lab/Lab-Patients')}
+              >
+                <div className="card-body">
+                  <div className="card-title p-2">
+                    <FaUser style={{ marginRight: 8 }} />
+                    {name}
+                  </div>
+                  <p className="text-white">{number || 0}</p>
                 </div>
-                <p className="text-white">{newLabRequests.length}</p>
               </div>
-            </div>
-          </div>
-          {/* forwaded lab requests */}
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Lab/Lab-Patients')}
-            >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <FaUser style={{ marginRight: 8 }} />
-                  Forwarded Laboratory Requests
-                </div>
-                <p className="text-white">{forwadedLabRequests.length}</p>
-              </div>
-            </div>
-          </div>
-          {/* completed lab requests */}
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Lab/Lab-Patient')}
-            >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <FaUser style={{ marginRight: 8 }} />
-                  Completed Laboratory Requests
-                </div>
-                <p className="text-white">{completedLabRequests.length}</p>
-              </div>
-            </div>
-          </div>
-          {/* all lab requests */}
-          <div className="col col-12 col-md-3">
-            <div
-              className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Lab/Lab-Patients')}
-            >
-              <div className="card-body">
-                <div className="card-title p-2">
-                  <FaUser style={{ marginRight: 8 }} />
-                  Total Lab Requests
-                </div>
-                <p className="text-white">{totalLabRequests}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+            </Col>
+          ))}
+        </Row>
       </div>
     </div>
   );

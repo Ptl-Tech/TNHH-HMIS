@@ -309,11 +309,6 @@ function App() {
             path="/Doctor/Radiology-Patients"
             element={<RadiologyOutPatient />}
           />
-          {/* Laboratory Routes */}
-          <Route
-            path="/Doctor/Lab/Patient"
-            element={<LaboratoryEvaluationCard />}
-          />
 
           <Route
             path="/Doctor/Approved-Admissions"
@@ -414,12 +409,6 @@ function App() {
             path="/Psychology/Radiology-Patients"
             element={<RadiologyOutPatient />}
           />
-          {/* Laboratory Routes */}
-          <Route
-            path="/Psychology/Lab/Patient"
-            element={<LaboratoryEvaluationCard />}
-          />
-
           <Route
             path="/Psychology/Approved-Admissions"
             element={<VerifiedAdmission />}

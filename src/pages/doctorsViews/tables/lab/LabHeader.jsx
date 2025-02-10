@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Typography, Row, Col } from 'antd';
 import moment from 'moment';
 
-const LabHeader = ({ patientData, patientLabRecord }) => {
+import { UserOutlined } from '@ant-design/icons';
+import { Avatar, Button, Card, Typography, Row, Col, message } from 'antd';
+import {
+  POST_LAB_TO_DOCTOR_RESET,
+  submitLabRequestToDoctor,
+} from '../../../../actions/lab-actions/postLabRequestToDoctor';
+
+const LabHeader = ({ walkIn, patientData, patientLabRecord }) => {
+  const dispatch = useDispatch();
+
+  const { data, loading, error } = useSelector(
+    (state) => state.postLabRequestToDoctor,
+  );
+
+  useEffect(() => {
+    if (data) {
+      const { status } = data;
+      status === 'success'
+        ? message.success('Lab request submitted to the doctor')
+        : message.error('Could not send the lab request to the doctor');
+
+      dispatch({ type: POST_LAB_TO_DOCTOR_RESET });
+    }
+
+    if (error) {
+      message.error('Something went wrong');
+      dispatch({ type: POST_LAB_TO_DOCTOR_RESET });
+    }
+
+    if (loading) message.info('Submitting the request to the doctor');
+  }, [data, loading, error]);
+
   const capitalizeWords = (name) =>
     name
       .split(' ')
@@ -31,6 +61,15 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
         return 'blue';
       default:
         return 'gray';
+    }
+  };
+
+  const handleMarkAsCompleted = (labNo) => {
+    // TODO: Do this varibaly based on the walk in status
+    if (walkIn) {
+      // do something
+    } else {
+      dispatch(submitLabRequestToDoctor(labNo));
     }
   };
 
@@ -88,7 +127,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
           />
           <InfoRow
             label="Lab Observation Number"
-            value={patientLabRecord.LaboratoryNo}
+            value={patientLabRecord?.LaboratoryNo}
           />
           <InfoRow
             label="Age"
@@ -186,17 +225,17 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
           >
             <Button
               type="primary"
+              disabled={patientLabRecord?.Status === 'Completed' || loading}
               style={{ flex: '1 1 calc(50% - 5px)' }}
-              onClick={() => handleMarkAsCompleted(labObservationNo)}
+              onClick={() =>
+                handleMarkAsCompleted(patientLabRecord?.LaboratoryNo)
+              }
             >
-              Mark as Completed
-            </Button>
-            <Button
-              type="default"
-              style={{ flex: '1 1 calc(50% - 5px)' }}
-              onClick={() => handlePrintInvoice(patientData?.PatientId)}
-            >
-              Print Interim Invoice
+              {patientLabRecord?.Status === 'Completed'
+                ? 'Lab Request Submitted'
+                : loading
+                ? 'Loading...'
+                : 'Mark as Completed'}
             </Button>
           </div>
         </Card>

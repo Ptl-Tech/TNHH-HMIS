@@ -309,7 +309,7 @@ const MainLayout = () => {
               children: [
                 {
                   key: '/Doctor/Lab-Patients',
-                  label: 'Lab List OutPatient',
+                  label: 'Laoratory OutPatient',
                   icon: <CalendarOutlined style={{ color: '#fff' }} />,
                 },
                 // {
@@ -471,7 +471,7 @@ const MainLayout = () => {
               children: [
                 {
                   key: '/Psychology/Lab-Patients',
-                  label: 'Lab List OutPatient',
+                  label: 'Labortory OutPatient',
                   icon: <CalendarOutlined style={{ color: '#fff' }} />,
                 },
                 // {
@@ -598,7 +598,7 @@ const MainLayout = () => {
       setMenuItems(nurseRoutes);
     } else if (department === 'Doctor') {
       setMenuItems(doctorRoutes);
-    } else if (department === 'LABORATORY') {
+    } else if (department === 'Laboratory') {
       setMenuItems(labRoutes);
     } else if (department === 'Security') {
       setMenuItems(securityRoutes);

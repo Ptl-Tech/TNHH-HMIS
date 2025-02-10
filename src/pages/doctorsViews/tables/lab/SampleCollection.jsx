@@ -8,6 +8,7 @@ import { FileTextOutlined } from '@ant-design/icons';
 import { labLinesColumns as defaultColumns } from './utils';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { postLabSample } from '../../../../actions/lab-actions/postLabSample';
+import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
 
 const SampleCollection = ({ data, loading }) => {
   const [open, setOpen] = useState(false);
@@ -53,7 +54,7 @@ const SampleCollection = ({ data, loading }) => {
         style={{ color: '#0F5689', marginBottom: '12px' }}
       >
         <FileTextOutlined style={{ marginRight: '8px' }} />
-        Laboratory Request
+        Sample Collection
       </Typography.Title>
       {loading ? (
         <Loading />
@@ -123,14 +124,18 @@ const SampleForm = ({ closeModal, test }) => {
         ? message.success('Sample submitted successfully')
         : message.error('Could not submit the sample');
     }
+
+    if (error) {
+      message.error('Something went wrong');
+    }
   }, [data, error]);
 
   // handling pushing code
-  const onFinish = (sample) => {
+  const onFinish = async (sample) => {
     const { remarks } = sample;
 
     // publishing the data to the backend
-    dispatch(
+    await dispatch(
       postLabSample({
         remarks,
         myAction: 'create',
@@ -143,35 +148,41 @@ const SampleForm = ({ closeModal, test }) => {
   };
 
   return (
-    <Form
-      form={form}
-      name="sampleForm"
-      layout="vertical"
-      autoComplete="off"
-      onFinish={onFinish}
-    >
-      <Item
-        name="remarks"
-        label="Sample Description"
-        rules={[
-          {
-            required: true,
-            message: 'Please add a description for your sample',
-          },
-        ]}
-      >
-        <TextArea />
-      </Item>
-      <Item label={null}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          disabled={loading}
+    <>
+      {loading ? (
+        <SkeletonLoading />
+      ) : (
+        <Form
+          form={form}
+          name="sampleForm"
+          layout="vertical"
+          autoComplete="off"
+          onFinish={onFinish}
         >
-          {loading ? 'Loading...' : 'Submit Sample'}
-        </Button>
-      </Item>
-    </Form>
+          <Item
+            name="remarks"
+            label="Sample Description"
+            rules={[
+              {
+                required: true,
+                message: 'Please add a description for your sample',
+              },
+            ]}
+          >
+            <TextArea />
+          </Item>
+          <Item label={null}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Submit Sample'}
+            </Button>
+          </Item>
+        </Form>
+      )}
+    </>
   );
 };
 

@@ -9,6 +9,8 @@ import LabHeader from './LabHeader';
 import LabContentCard from './LabContentCard';
 import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
 import { getPatientDetails } from '../../../../actions/Doc-actions/OutPatientAction';
+import { getLabRequest } from '../../../../actions/lab-actions/getLabRequest';
+import Loading from '../../../../partials/nurse-partials/Loading';
 
 const LaboratoryEvaluationCard = () => {
   // hooks
@@ -16,16 +18,28 @@ const LaboratoryEvaluationCard = () => {
   const dispatch = useDispatch();
 
   // getting the state values from the state
-  const { patientNo, patientLabRecord } = location.state || {};
+  const { patientNo, labObservationNo, walkIn } = location.state || {};
 
   // state
   const { loading: patientLoading, data: patientData } = useSelector(
     (state) => state.getPatientDetails,
   );
+  const { data: labRequestData, loading: labRequestLoading } = useSelector(
+    (state) => state.getLabRequest,
+  );
+  const { data: postLabRequestToDoctor } = useSelector(
+    (state) => state.postLabRequestToDoctor,
+  );
 
   useEffect(() => {
-    if (!patientData) dispatch(getPatientDetails(patientNo));
-  }, [dispatch, patientNo]);
+    dispatch(getPatientDetails(patientNo));
+  }, [dispatch, patientNo, postLabRequestToDoctor]);
+
+  useEffect(() => {
+    if (labObservationNo !== labRequestData?.LaboratoryNo) {
+      dispatch(getLabRequest(labObservationNo));
+    }
+  }, [labRequestData, postLabRequestToDoctor, labObservationNo]);
 
   return (
     <div style={{ margin: '16px 10px' }}>
@@ -49,10 +63,17 @@ const LaboratoryEvaluationCard = () => {
           {patientLoading ? (
             <SkeletonLoading />
           ) : (
-            <LabHeader
-              patientData={patientData}
-              patientLabRecord={patientLabRecord}
-            />
+            <>
+              {labRequestLoading ? (
+                <Loading />
+              ) : (
+                <LabHeader
+                  walkIn={walkIn}
+                  patientData={patientData}
+                  patientLabRecord={labRequestData}
+                />
+              )}
+            </>
           )}
         </Col>
         <Col
