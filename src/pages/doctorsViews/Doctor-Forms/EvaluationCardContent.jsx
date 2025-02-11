@@ -68,7 +68,7 @@ const EvaluationCardContent = ({
             </>
           )}
           {
-            (role === "Nurse" || role === "Doctor") && (
+            (role === "Nurse" || role === "Doctor" || role === "Psychology") && (
               <>
                 <Tabs.TabPane tab="Patient File" key="8">
                 <PatientFile patientDetails={patientDetails} />
