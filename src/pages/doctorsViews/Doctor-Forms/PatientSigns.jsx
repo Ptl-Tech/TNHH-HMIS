@@ -34,8 +34,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
     notesType.map((note) => note.label).includes(item.Notes_Type)
   );
 
-  console.log('filtered data', filterCollapseData)
-
   const allNotesPresent = notesType.every((note) =>
     filterCollapseData.some((item) => item.Notes_Type === note.label)
   );
