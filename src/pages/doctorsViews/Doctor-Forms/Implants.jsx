@@ -15,6 +15,7 @@ import useAuth from "../../../hooks/useAuth";
   
   const ImagingRequests = () => {
     const location = useLocation();
+    const patientDetails = location.state?.patientDetails;
     const queryParams = new URLSearchParams(location.search);
     const treatmentNo = queryParams.get("TreatmentNo");
     const patientNo = queryParams.get("PatientNo");
@@ -57,7 +58,8 @@ import useAuth from "../../../hooks/useAuth";
         </Typography.Title>
         </div>
         {
-          role === "Doctor" && (
+          role === "Doctor" &&
+          patientDetails?.Status !== "Completed" && (
             <div style={{ display: "flex", gap: "10px"}}>
         
             <Button

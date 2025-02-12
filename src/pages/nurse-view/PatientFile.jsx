@@ -13,12 +13,14 @@ import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutl
 import ReadNurseNotes from "./ReadNurseNotes";
 import { useDispatch} from "react-redux";
 import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import Loading from "../../partials/nurse-partials/Loading";
+import { useLocation } from "react-router-dom";
 
 const PatientFile = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState('Patient Info');
   const userRole = useAuth();
   const dispatch = useDispatch();
+  const location = useLocation();
+    const patientDetail = location.state?.patientDetails;
 
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
@@ -27,7 +29,8 @@ const PatientFile = ({ patientDetails }) => {
     {label: "Patient Info", icon: <UserOutlined />},
     // "Medical Info",
     {label: "Next of Kin", icon: <UserAddOutlined />},
-    ...(userRole.userData.departmentName === "Doctor" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
+    ...(userRole.userData.departmentName === "Doctor" &&
+      patientDetail?.Status !== "Completed" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Nursing Notes", icon: <FileProtectOutlined />}] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Past Encounters Notes", icon: <ExperimentOutlined />}] : []),
     // "Consumables",

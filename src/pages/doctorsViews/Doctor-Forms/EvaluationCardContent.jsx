@@ -15,7 +15,6 @@ const EvaluationCardContent = ({
   role,
 }) => {
 
-  console.log('patient details tabs component', patientDetails);
   return (
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>

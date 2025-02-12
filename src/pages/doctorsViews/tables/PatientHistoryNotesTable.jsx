@@ -134,9 +134,7 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
               style={{ color: "black" }}
             />
           )}
-          {(role === "Doctor" ||
-            (role === "Psychology" &&
-              patientDetails?.Status !== "Completed")) && (
+          {patientDetails?.Status !== "Completed" && (role === "Doctor" || role === "Psychology") && (
             <Button
               icon={editing[notesType] ? <SaveOutlined /> : <EditOutlined />}
               type="primary"

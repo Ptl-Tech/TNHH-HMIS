@@ -238,14 +238,15 @@ const CloseList = () => {
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === "Doctor"
-        ? `/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}`
+        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
         : role === "Psychology"
-        ? `/Psychology/Consultation/Patient?TreatmentNo=${treatmentNo}`
-        : `/Nurse/Consultation/Patient?TreatmentNo=${treatmentNo}`,
+        ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+        : `/Nurse/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
           observationNo: record.ObservationNo,
+          patientDetails: record,
         },
       }
     );
