@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Form, Input, Button, Tabs, Space, Typography, message } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Tabs,
+  Space,
+  Typography,
+  message,
+  Spin,
+} from "antd";
 import { FiFileText } from "react-icons/fi";
 import moment from "moment";
 import useAuth from "../../../hooks/useAuth";
@@ -7,20 +16,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import AetiologyTable from "../tables/AetiologyTable";
+import { useLocation } from "react-router-dom";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 
 const FourPsForm = ({ treatmentNo, patientNo }) => {
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const role = useAuth().userData.departmentName;
 
-  const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);
-
-  console.log("Aetiology notes", data);
 
   const notesType = [
     { value: "12", label: "Predisposing Factors" },
@@ -81,6 +91,8 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
     }
   };
 
+  if (!patientDetails) return <Spin />;
+
   return (
     <div>
       <Space
@@ -107,42 +119,40 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
           Aetiology Notes
         </Typography.Title>
       </Space>
-      {(role === "Doctor" ||
-        role === "Psychology") && (
-          <>
-            <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
-              {notesType.map((note) => (
-                <TabPane tab={note.label} key={note.value} />
-              ))}
-            </Tabs>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSave}
-              initialValues={{
-                doctorNotesDate: moment().format("Do MMM YYYY"),
-              }}
+      {(role === "Doctor" || role === "Psychology") &&
+        patientDetails?.Status !== "Completed" && (
+        <>
+          <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
+            {notesType.map((note) => (
+              <TabPane tab={note.label} key={note.value} />
+            ))}
+          </Tabs>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSave}
+            initialValues={{
+              doctorNotesDate: moment().format("Do MMM YYYY"),
+            }}
+          >
+            <Form.Item
+              name="notes"
+              label={notesType.find((note) => note.value === currentTab)?.label}
+              rules={[{ required: true, message: "Please enter notes" }]}
             >
-              <Form.Item
-                name="notes"
-                label={
-                  notesType.find((note) => note.value === currentTab)?.label
-                }
-                rules={[{ required: true, message: "Please enter notes" }]}
-              >
-                <TextArea
-                  placeholder="Enter notes..."
-                  autoSize={{ minRows: 3 }}
-                />
-              </Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Save
-              </Button>
-            </Form>
-          </>
-        )}
+              <TextArea
+                placeholder="Enter notes..."
+                autoSize={{ minRows: 3 }}
+              />
+            </Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Save
+            </Button>
+          </Form>
+        </>
+      )}
 
-      <AetiologyTable data={data} />
+      <AetiologyTable data={data} loadingHistory={loadingHistory}/>
     </div>
   );
 };

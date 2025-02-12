@@ -77,9 +77,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const branchCode = localStorage.getItem("branchCode");
 
-  console.log("doctorsPayload", doctorsPayload);
-  console.log("clinicsPayload", clinicsPayload);
-  console.log("selectedClinic", selectedClinic);
+  
 
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
@@ -432,6 +430,8 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               <Button
                 type="primary"
                 onClick={handleMarkAsCompleted}
+                loading={markasCompleteLoading}
+                disabled={markasCompleteLoading}
                 style={{ width: "100%", marginBottom: "10px" }}
               >
                 Mark as Completed

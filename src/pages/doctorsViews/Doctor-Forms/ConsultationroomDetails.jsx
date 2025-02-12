@@ -15,6 +15,8 @@ import PsychologyNotes from "./PsychologyNotes";
 import PastMedicalHistory from "./PastMedicalHistory";
 import useAuth from "../../../hooks/useAuth";
 import PropTypes from "prop-types";
+import PastEncounters from "./PastEncounters";
+import { useLocation } from "react-router-dom";
 
 const ConsultationroomDetails = ({
   treatmentNo,
@@ -22,8 +24,12 @@ const ConsultationroomDetails = ({
   patientNo,
   moveToNextTab,
 }) => {
-  const role = useAuth().userData.departmentName
+
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
+  const role = useAuth().userData.departmentName;
   const [activeItem, setActiveItem] = useState("Patient History Notes");
+  
   const [selectedItem, setSelectedItem] = useState(
     <PatientSigns
       treatmentNo={treatmentNo}
@@ -43,7 +49,12 @@ const ConsultationroomDetails = ({
             observationNo={observationNo}
             patientNo={patientNo}
             moveToNextTab={() =>
-              handleOnClick({ label: "Physical Examination" })
+              handleOnClick({
+                label:
+                  role === "Doctor"
+                    ? "Physical Examination"
+                    : "Mental Status Exam",
+              })
             }
           />
         );
@@ -82,9 +93,7 @@ const ConsultationroomDetails = ({
       case "Diagnosis Formulation":
         setSelectedItem(
           <Diagnosis
-            moveToNextTab={() =>
-              handleOnClick({ label: "Aetiology" })
-            }
+            moveToNextTab={() => handleOnClick({ label: "Aetiology" })}
           />
         );
         break;
@@ -115,6 +124,15 @@ const ConsultationroomDetails = ({
           />
         );
         break;
+      case "Doctor Notes":
+        setSelectedItem(
+          <PastEncounters
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
+        break;
       default:
         setSelectedItem(
           <PatientSigns
@@ -131,15 +149,21 @@ const ConsultationroomDetails = ({
 
   const buttonItems = [
     { label: "Patient History Notes", icon: <SolutionOutlined /> },
-     ...(role === "Doctor" ? [{ label: "Physical Examination", icon: <HeartOutlined /> }] : []),
+    ...(role === "Doctor"
+      ? [{ label: "Physical Examination", icon: <HeartOutlined /> }]
+      : []),
     { label: "Mental Status Exam", icon: <SolutionOutlined /> },
     // { label: "Past Medical History", icon: <SolutionOutlined /> },
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
-    {
-      ...(role === "Doctor" ? { label: "Psychology Notes", icon: <HeartOutlined /> } : { label: "Doctor Notes", icon: <HeartOutlined /> }),
-    }
+    ...(role === "Doctor"
+      ? [{ label: "Psychology Notes", icon: <HeartOutlined /> }]
+      : []),
+
+    ...(role === "Psychology" && patientDetails.Status !== 'Completed'
+      ? [{ label: "Doctor Notes", icon: <HeartOutlined /> }]
+      : []),
   ];
 
   return (

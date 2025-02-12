@@ -21,6 +21,7 @@ const ConsultationRoomPatients = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const role = useAuth().userData.departmentName
+  const doctorId = useAuth().userData.doctorID
 
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');
@@ -41,27 +42,29 @@ const ConsultationRoomPatients = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     }
     return item.Status === "New";
   });
 
+  console.log('open visits', openDoctorVisitList);
+
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }
     return item.Status === "Active";
   });
 
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }
     return item.Status === "Completed";
   });
@@ -93,7 +96,6 @@ const ConsultationRoomPatients = () => {
     };
   });
 
-  console.log('combined list', combinedList)
   const waitingListColumns = [
     {
       title: "#",
