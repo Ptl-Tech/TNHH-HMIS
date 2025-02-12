@@ -232,7 +232,7 @@ const AdmitPatientForm = () => {
                       }}
                     />
                     <Typography.Text type="secondary" style={{ fontSize: 16 }}>
-                      Please select ward to show rooms
+                      Please select ward.
                     </Typography.Text>
                   </Space>
                 ),

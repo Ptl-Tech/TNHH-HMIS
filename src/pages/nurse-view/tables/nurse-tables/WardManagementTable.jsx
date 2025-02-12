@@ -82,7 +82,7 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
                   }}
                 />
                 <Typography.Text type="secondary" style={{ fontSize: 16 }}>
-                  Beds will apperar after you select room on the left side of the pane!
+                  Please select room and ward
                 </Typography.Text>
               </Space>
             ),

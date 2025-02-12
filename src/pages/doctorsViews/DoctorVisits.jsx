@@ -17,6 +17,7 @@ import useAuth from "../../hooks/useAuth";
 import FilterConsultationRoom from "../../partials/nurse-partials/FilterConsultationRoom";
 const DoctorVisits = () => {
   const role = useAuth().userData.departmentName
+  const doctorId = useAuth().userData.doctorID
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -45,27 +46,27 @@ const DoctorVisits = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     }
     return item.Status === "New";
   });
 
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }
     return item.Status === "Active";
   });
 
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }
     return item.Status === "Completed";
   });
@@ -159,9 +160,19 @@ const DoctorVisits = () => {
     },
 
     {
-      title: "ID Number",
-      dataIndex: "IDNumber",
-      key: "IDNumber",
+      title: "Doctor Name",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text, record) => {
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            style={{ color: "#0f5689", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: "Treatment Date",

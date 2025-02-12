@@ -1,21 +1,24 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Button, Steps, Form, Input, Typography, message } from "antd";
+import { useEffect, useState, useMemo } from "react";
+import { Button, Steps, Form, Input, Typography, message, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
 import useAuth from "../../../hooks/useAuth";
+import { useLocation } from "react-router-dom";
 
 const { TextArea } = Input;
 const { Step } = Steps;
 
 const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   const role = useAuth().userData.departmentName;
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const { loading: saveNotesLoading } = useSelector(
     (state) => state.postPatientHistory
   );
-  const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
 
   const notesType = [
     { value: "1", label: "Chief Complaints" },
@@ -116,7 +119,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
               autoSize={{ minRows: 3 }}
             />
           </Form.Item>
-          <Form.Item name="2" label="Allegations">
+          <Form.Item name="2" label="Allegations" rules={[{ required: true }]}>
             <TextArea
               placeholder="Enter allegations..."
               autoSize={{ minRows: 3 }}
@@ -148,7 +151,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       title: "Past Psychiatric and Medical History",
       content: (
         <>
-          <Form.Item name="20" label="Medical">
+          <Form.Item name="20" label="Medical" rules={[{ required: true }]}>
             <TextArea
               placeholder="Enter past medical notes..."
               autoSize={{ minRows: 4 }}
@@ -164,7 +167,11 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
               autoSize={{ minRows: 4 }}
             />
           </Form.Item>
-          <Form.Item name="23" label="Obstetric & Gynecology">
+          <Form.Item
+            name="23"
+            label="Obstetric & Gynecology"
+            rules={[{ required: true }]}
+          >
             <TextArea
               placeholder="Enter past Obstetric & Gynecology notes..."
               autoSize={{ minRows: 4 }}
@@ -179,13 +186,21 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       title: "Family & Personal History",
       content: (
         <>
-          <Form.Item name="6" label="Family History">
+          <Form.Item
+            name="6"
+            label="Family History"
+            rules={[{ required: true }]}
+          >
             <TextArea
               placeholder="Enter family history..."
               autoSize={{ minRows: 3 }}
             />
           </Form.Item>
-          <Form.Item name="7" label="Personal History">
+          <Form.Item
+            name="7"
+            label="Personal History"
+            rules={[{ required: true }]}
+          >
             <TextArea
               placeholder="Enter personal history..."
               autoSize={{ minRows: 3 }}
@@ -200,13 +215,21 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       title: "Forensic & Premorbid Personality",
       content: (
         <>
-          <Form.Item name="8" label="Forensic History">
+          <Form.Item
+            name="8"
+            label="Forensic History"
+            rules={[{ required: true }]}
+          >
             <TextArea
               placeholder="Enter forensic history..."
               autoSize={{ minRows: 3 }}
             />
           </Form.Item>
-          <Form.Item name="9" label="Premorbid Personality">
+          <Form.Item
+            name="9"
+            label="Premorbid Personality"
+            rules={[{ required: true }]}
+          >
             <TextArea
               placeholder="Describe premorbid personality..."
               autoSize={{ minRows: 3 }}
@@ -222,20 +245,20 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
     try {
       const values = await form.validateFields();
       const currentStepData = steps[currentStep];
-      const updatedNotes = currentStepData.notesType
-        .map((type) => ({
-          myAction: "create",
-          recId: "",
-          notesType: type,
-          notes: values[type],
-          treatmentNo,
-          patientNo,
-        }))
-        .filter(
-          (note) => note.notes?.trim() !== "" && !lastSavedNotes[note.notesType]
-        );
+      const updatedNotes = currentStepData?.notesType?.map((type) => ({
+        myAction: "create",
+        recId: "",
+        notesType: type,
+        notes: values[type],
+        treatmentNo,
+        patientNo,
+      }));
+      // ?.filter((note) => {
+      //   console.log(`Filtering note:`, note); // Debug
+      //   return note?.notes?.trim() !== "" && !lastSavedNotes[note.notesType];
+      // });
 
-      if (updatedNotes.length) {
+      if (updatedNotes?.length) {
         const results = await Promise.all(
           updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
         );
@@ -261,48 +284,52 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
         setCurrentStep((prev) => prev + 1);
       }
     } catch (err) {
-      console.error("Validation failed:", err);
+      console.log("some error", err);
     }
   };
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
   // console.log(currentStep, 'currentStep');
 
+  if (!patientDetails) return <Spin />;
+
   return (
     <div className="mt-4">
       <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
         <FileOutlined /> Patient History Notes
       </Typography.Text>
-      {(role === "Doctor" || role === "Psychology") && !allNotesPresent && (
-        <>
-          <Steps
-            current={currentStep}
-            size="small"
-            style={{ marginBottom: 24 }}
-          >
-            {steps.map((step) => (
-              <Step key={step.key} title={step.title} />
-            ))}
-          </Steps>
-          <Form form={form} layout="vertical">
-            {steps[currentStep].content}
-            <div className="steps-action">
-              {currentStep > 0 && (
-                <Button onClick={handlePrev}>Previous</Button>
-              )}
-              <Button
-                type="primary"
-                loading={saveNotesLoading}
-                onClick={handleNext}
-              >
-                {currentStep === steps.length - 1 ? "Finish" : "Next"}
-              </Button>
-            </div>
-          </Form>
-        </>
-      )}
+      {(role === "Doctor" || role === "Psychology") &&
+        !allNotesPresent &&
+        patientDetails?.Status !== "Completed" && (
+          <>
+            <Steps
+              current={currentStep}
+              size="small"
+              style={{ marginBottom: 24 }}
+            >
+              {steps.map((step) => (
+                <Step key={step.key} title={step.title} />
+              ))}
+            </Steps>
+            <Form form={form} layout="vertical">
+              {steps[currentStep].content}
+              <div className="steps-action">
+                {currentStep > 0 && (
+                  <Button onClick={handlePrev}>Previous</Button>
+                )}
+                <Button
+                  type="primary"
+                  loading={saveNotesLoading}
+                  onClick={handleNext}
+                >
+                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
+                </Button>
+              </div>
+            </Form>
+          </>
+        )}
 
-      <PatientHistoryNotesTable data={data} />
+      <PatientHistoryNotesTable data={data} patientDetails={patientDetails} loadingHistory={loadingHistory}/>
     </div>
   );
 };

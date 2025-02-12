@@ -7,8 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import useAuth from "../../../hooks/useAuth";
+import Loading from "../../../partials/nurse-partials/Loading";
 
-const PatientHistoryNotesTable = ({ data }) => {
+const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
   const role = useAuth().userData.departmentName;
   const useQueryParams = () => {
     return new URLSearchParams(useLocation().search);
@@ -133,7 +134,7 @@ const PatientHistoryNotesTable = ({ data }) => {
               style={{ color: "black" }}
             />
           )}
-          {(role === "Doctor" || role === "Psychology") && (
+          {patientDetails?.Status !== "Completed" && (role === "Doctor" || role === "Psychology") && (
             <Button
               icon={editing[notesType] ? <SaveOutlined /> : <EditOutlined />}
               type="primary"
@@ -153,6 +154,8 @@ const PatientHistoryNotesTable = ({ data }) => {
       ),
     })
   );
+
+  if (loadingHistory) return <Loading />;
 
   return (
     <>
@@ -178,4 +181,6 @@ export default PatientHistoryNotesTable;
 // Props validation
 PatientHistoryNotesTable.propTypes = {
   data: PropTypes.array.isRequired,
+  patientDetails: PropTypes.array,
+  loadingHistory: PropTypes.bool,
 };

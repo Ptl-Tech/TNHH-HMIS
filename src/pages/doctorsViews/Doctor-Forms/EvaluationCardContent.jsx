@@ -1,12 +1,11 @@
 import { Card, Tabs } from "antd";
-import React from "react";
 import ObservationRoom from "./ObservationRoom";
 import PatientCarePlan from "./PatientCarePlan";
 import PatientRequests from "./PatientRequests";
-import DocForms from "./DocForms";
 import PatientFile from "../../nurse-view/PatientFile";
 import ConsultationroomDetails from "./ConsultationroomDetails";
 import AdmissionTab from "./AdmissionTab";
+import PropTypes from "prop-types";
 
 const EvaluationCardContent = ({
   treatmentNo,
@@ -15,6 +14,7 @@ const EvaluationCardContent = ({
   patientDetails,
   role,
 }) => {
+
   return (
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>
@@ -83,3 +83,11 @@ const EvaluationCardContent = ({
 };
 
 export default EvaluationCardContent;
+// props validation
+EvaluationCardContent.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+  patientDetails: PropTypes.object,
+  role: PropTypes.string
+};

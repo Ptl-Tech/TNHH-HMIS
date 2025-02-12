@@ -12,6 +12,7 @@ import {
   Modal,
   Table,
   Tabs,
+  Spin,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -41,6 +42,7 @@ const { Option } = Select;
 
 const Diagnosis = () => {
   const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const role = useAuth().userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
@@ -278,6 +280,8 @@ const Diagnosis = () => {
     setIsModalVisible(true); // Show modal after processing
   };
 
+  if (!patientDetails) return <Spin />;
+
   return (
     <div className="mt-4">
       <Typography.Title
@@ -294,7 +298,8 @@ const Diagnosis = () => {
         Diagnosis
       </Typography.Title>
 
-      {(role === "Doctor" || role === "Psychology") && (
+      {(role === "Doctor" || role === "Psychology") &&
+        patientDetails?.Status !== "Completed" && (
         <Row gutter={24}>
           <Col span={24}>
             <Button

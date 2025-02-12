@@ -33,6 +33,7 @@ const { Option } = Select;
 
 const LabResults = () => {
   const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
@@ -53,7 +54,6 @@ const LabResults = () => {
     (state) => state.postLabRequest
   );
   const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
-  console.log('patient lab test', patientLabTest)
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
@@ -214,7 +214,8 @@ const LabResults = () => {
       </Typography.Title>
       
       {
-        role === 'Doctor' ? (
+        role === 'Doctor' &&
+        patientDetails?.Status !== "Completed" ? (
           <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
          <div className="d-flex justify-content-start align-items-center">
          <Button

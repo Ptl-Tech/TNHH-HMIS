@@ -15,6 +15,7 @@ import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWait
 
 const DoctorDashboard = () => {
   const role = useAuth().userData.departmentName
+  const doctorId = useAuth().userData.doctorID
   const dispatch = useDispatch();
   const userDetails = useAuth(); // Use the custom hook to get user info
   const { patients: treatmentList } =
@@ -34,27 +35,27 @@ const DoctorDashboard = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "New" && item.DoctorID === doctorId;
     }
     return item.Status === "New";
   });
 
   const activeVisitCount = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }
     return item.Status === "Active";
   });
 
   const closedVisitCount = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGIST";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }
     return item.Status === "Completed";
   });
