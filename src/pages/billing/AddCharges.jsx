@@ -88,7 +88,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       }
     }
 
-    message.success("All charges submitted successfully!");
+    // message.success("All charges submitted successfully!");
     setChargeList([]);
     setTotalAmount(0);
     onClose();

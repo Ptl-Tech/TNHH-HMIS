@@ -31,6 +31,7 @@ import PDFViewer from "../../components/PDFView";
 import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
 import ProcessPayment from "./ProcessPayment";
 import { ContactDetails } from "../../constants/reception-constants/receptionConstants";
+import ReversCharge from "./ReversCharge";
 
 const { Title, Text } = Typography;
 
@@ -50,11 +51,14 @@ const ViewInvoice = () => {
   const [appointmentNo, setAppointmentNo] = useState("");
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
+  const[selectedPatientAmount, setSelectedPatientAmount] = useState("");
   const [pdfBase64, setPdfBase64] = useState("");
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
     useState(false);
-
+ const [selectedRecId, setSelectedRecId] = useState("");
+  const [ReverseChargeModalVisible, setReverseChargeModalVisible] =
+    useState(false);
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
@@ -84,7 +88,15 @@ const ViewInvoice = () => {
     setIsModalVisible(false);
     setIsInvoiceModalVisible(false);
     setIsGenerateReceiptModalVisible(false);
+    setReverseChargeModalVisible(false);
   };
+const handleReverseCharge = () => {
+  setSelectedPatientNo(data[0]?.Patient_No);
+  setReverseChargeModalVisible(true);
+  setSelectedRecId(data[0]?.SystemId);
+  setSelectedPatientAmount(data[0]?.Amount);
+
+};
 
   const handlePrintInvoice = (patientNo) => {
     if (!patientNo) {
@@ -315,9 +327,7 @@ const ViewInvoice = () => {
                 size="medium"
                 icon={<DeleteOutlined />}
                 danger
-                onClick={() =>
-                  message.info("Feature Coming Soon!")
-                }
+                onClick={handleReverseCharge}
               >
                 Waive Charges
               </Button>
@@ -462,6 +472,13 @@ const ViewInvoice = () => {
         onClose={handleClose}
         patientNo={patientData?.PatientNo}
       />
+      <ReversCharge
+      visible={ReverseChargeModalVisible}
+      onClose={handleClose}
+      patientNo={selectedpatientNo}
+      amount={selectedPatientAmount}
+      recId={selectedRecId}
+    />
       <Modal
         title="Invoice Preview"
         open={showPDFModal}
