@@ -34,16 +34,13 @@ export const printReceipt = (invoiceData) => async (dispatch, getState) => {
       type: PRINT_RECEIPT_SUCCESS,
       payload: response,
     });
-    message.success("Receipt printed successfully!", 5);
     return response;
   } catch (error) {
-    setTimeout(() => {
-      dispatch({
-        type: PRINT_RECEIPT_FAIL,
-        payload: error.response?.data?.errors || error.errors,
-      });
-      message.error(error.response?.data?.errors || error.errors);
-    }, 1200);
+    dispatch({
+      type: PRINT_RECEIPT_FAIL,
+      payload: error.response?.data?.errors || error.errors,
+    });
+    message.error(error.response?.data?.errors || error.errors);
   } finally {
     dispatch({ type: PRINT_RECEIPT_RESET });
   }

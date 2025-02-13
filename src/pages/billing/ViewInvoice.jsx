@@ -10,15 +10,22 @@ import {
   Space,
   Modal,
   message,
+  Tag,
+  Menu,
+  Dropdown,
 } from "antd";
 import {
   DownloadOutlined,
   PrinterOutlined,
   EditOutlined,
   DeleteOutlined,
+  DollarOutlined,
+  StopOutlined,
+  MinusCircleOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaCoins, FaReceipt } from "react-icons/fa";
+import { FaCoins, FaFileInvoice, FaReceipt } from "react-icons/fa";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { postReceipt } from "../../actions/Charges-Actions/postReceipt";
@@ -31,95 +38,118 @@ import PDFViewer from "../../components/PDFView";
 import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
 import ProcessPayment from "./ProcessPayment";
 import { ContactDetails } from "../../constants/reception-constants/receptionConstants";
+import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader";
+import { getReceiptLines } from "../../actions/Charges-Actions/getReceiptLines";
+import { printReceipt } from "../../actions/Charges-Actions/printReceipt";
 import ReversCharge from "./ReversCharge";
+import {
+  getPatientReceiptHeader,
+  getPatientReceiptLines,
+} from "../../actions/Charges-Actions/getPatientReceipts";
+import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
+import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
+import ViewReceipt from "./ViewReceipt";
 
 const { Title, Text } = Typography;
 
 const ViewInvoice = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
   const { userData } = useAuth();
   const { state } = useLocation();
   const { patientData } = state;
-  // const { header, lines } = state.patientData; // Extract header and lines
-  const { loading: loadingChargesLines, data } = useSelector(
-    (state) => state.getChargesLines
+
+  const { loading: chargesLoading, data: chargesList } = useSelector(
+    (state) => state.getUnpostedCharges
   );
-  const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
+
+  const { data: patientHeader } = useSelector(
+    (state) => state.getPatientReceiptHeader
+  );
+
+  const { loading } = useSelector((state) => state.deletePatientCharges);
+
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
-  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [invoiceNo, setinvoiceNo] = useState("");
+  const [viewInvoice, setViewInvoice] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
-  const[selectedPatientAmount, setSelectedPatientAmount] = useState("");
-  const [pdfBase64, setPdfBase64] = useState("");
-  const [showPDFModal, setShowPDFModal] = useState(false);
-  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
-    useState(false);
- const [selectedRecId, setSelectedRecId] = useState("");
+  const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
+  const [selectedRecId, setSelectedRecId] = useState("");
   const [ReverseChargeModalVisible, setReverseChargeModalVisible] =
     useState(false);
-  const { loading: printInvoiceLoading } = useSelector(
-    (state) => state.printInvoice
-  );
-  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-    useSelector((state) => state.postInterimInvoice);
-
-  console.log("patientData", patientData);
+  const [pdfBase64, setPdfBase64] = useState("");
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  // NEW: Track whether the Invoice has been posted.
+  const [isInvoicePosted, setIsInvoicePosted] = useState(false);
+  const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
 
   useEffect(() => {
-    if (patientNo) {
-      dispatch(getChargesLines(patientNo));
+    const appointmentNo = patientData?.ActiveVisitNo;
+    if (appointmentNo) {
+      dispatch(getUnpostedCharges(appointmentNo));
     }
-    console.log("patientNo", data);
-  }, [dispatch, patientNo]);
+  }, [dispatch, patientData?.ActiveVisitNo]);
+
+  useEffect(() => {
+    if (chargesList) {
+      // Recalculate balance from the latest charges list
+      const newTotal = chargesList.reduce(
+        (acc, charge) => acc + charge.Total_Amount,
+        0
+      );
+      setBalance(newTotal);
+    }
+  }, [chargesList]); // Recalculate when chargesList changes
 
   const handleGoBack = () => {
-  //if no calculation use (-1) ELSE  /reception/Billing/Outpatients
-  navigate("/reception/Billing/Outpatients", );
-
+    navigate(-1);
   };
 
-  const handleGenerateReceipt = (patientNo) => {
-    setIsGenerateReceiptModalVisible(true);
+  const confirmGenerateInvoice = () => {
+    setSelectedPatientNo(patientData.PatientNo);
+    setIsInvoiceModalVisible(true);
+  };
+
+  const handleConfirmGenerateInvoice = () => {
+    dispatch(postGenerateInvoice(selectedpatientNo)).then((status) => {
+      if (status) {
+        dispatch(getUnpostedCharges(patientData?.ActiveVisitNo));
+      }
+    });
+
+    setIsInvoiceModalVisible(false);
   };
 
   const handleClose = () => {
     setIsModalVisible(false);
-    setIsInvoiceModalVisible(false);
-    setIsGenerateReceiptModalVisible(false);
+    setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
-  };
-const handleReverseCharge = () => {
-  setSelectedPatientNo(data[0]?.Patient_No);
-  setReverseChargeModalVisible(true);
-  setSelectedRecId(data[0]?.SystemId);
-  setSelectedPatientAmount(data[0]?.Amount);
-
-};
-
-  const handlePrintInvoice = (patientNo) => {
-    if (!patientNo) {
-      message.info("Please select a patient to generate an invoice for.");
-      return;
-    }
-    dispatch(postPrintInvoice(patientNo)).then((response) => {
-      if (response?.data.base64) {
-        setPdfBase64(response.data.base64);
-        setShowPDFModal(true); // Open modal to show PDF
-      }
-    });
+    setViewInvoice(false);
   };
 
-  const handlePrintInterimInvoice = (patientData) => {
-    if (!patientData) {
-      message.info("Please select a patient to generate an invoice for.");
-      return;
-    }
-    console.log("patientData", patientData);
+  const showModal = () => {
+    setAppointmentNo(patientData?.ActiveVisitNo);
+    setSelectedPatientNo(patientData?.Patient_No);
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 0);
+  };
+
+  const showReverseModal = () => {
+    setReverseChargeModalVisible(true);
+    setSelectedRecId(postedCharges[0]?.SystemId);
+  };
+
+  const handlePrintInterimInvoice = () => {
     const invoiceData = {
-      PatientNo: patientData.PatientNo,
-      visitNo: patientData.AppointmentNo,
+      PatientNo: patientData?.PatientNo,
+      visitNo: patientData?.ActiveVisitNo,
     };
 
     dispatch(postInterimInvoice(invoiceData)).then((response) => {
@@ -129,94 +159,152 @@ const handleReverseCharge = () => {
       }
     });
   };
-  const showModal = () => {
-    setAppointmentNo(patientData?.PatientNo);
-    setTimeout(() => {
-      setIsModalVisible(true);
-    }, 0);
-  };
+  const handlePrintInvoice = () => {
+    //if charges are unposted then print interim invoice else print invoice show this in error message
 
-  const confirmGenerateInvoice = (patientNo) => {
-    if (!patientNo) {
-      message.info("Please select a patient to generate an invoice for.");
-      return;
+    if (chargesList?.length > 0) {
+      return message.error("Please post Final Invoice before printing invoice");
     }
-    setSelectedPatientNo(patientNo);
-    setIsInvoiceModalVisible(true);
-  };
 
-  const handleConfirmGenerateInvoice = () => {
-    if (!selectedpatientNo) {
-      message.error("No patient selected for invoice generation.");
-      return;
-    }
-    dispatch(postGenerateInvoice(selectedpatientNo)).then((status) => {
-      if (status) {
-        dispatch(getChargesLines(selectedpatientNo));
+    const patientNo = patientData?.PatientNo;
+
+    dispatch(postPrintInvoice(patientNo)).then((response) => {
+      if (response?.data.base64) {
+        setPdfBase64(response.data.base64);
+        setShowPDFModal(true); // Open modal to show PDF
       }
     });
-
-    setIsInvoiceModalVisible(false);
   };
 
-  // const handlePrintReceipt = () => {
-  //   const receipt = {
-  //     recId: "",
-  //     patientNo: header[0].Patient_No,
-  //     receiptNo: header[0].No,
-  //   };
-  //   console.log(receipt);
+  // When processing (posting) the Invoice, update the state so printing is enabled.
+  const handleProcessInvoice = async () => {
+    const Invoice = {
+      recId: "",
+      patientNo: patientData?.PatientNo,
+      invoiceNo: invoiceNo,
+    };
 
-  //   dispatch(postReceipt(receipt));
-  // };
-
-  const grandTotal = data
-    ?.reduce((total, line) => total + line.Amount, 0)
-    .toLocaleString("en-KE", {
-      style: "currency",
-      currency: "KES",
+    await dispatch(postInvoice(Invoice)).then((status) => {
+      // Assuming a successful post returns data; adjust the check per your API response.
+      if (status && status == "success") {
+        setIsInvoicePosted(true);
+        message.success("Invoice posted successfully");
+      }
     });
+  };
 
-  const tableData = data?.map((line, index) => ({
-    key: index,
-    transactionName: line.TransactionType,
-    chargeName: line.Description,
-    quantity: line.Quantity,
-    billType: line.BillingType,
-    amount: line.Amount.toLocaleString("en-KE", {
-      style: "currency",
-      currency: "KES",
-    }),
-  }));
+  const handleRemoveCharge = (recId) => {
+    const payload = {
+      myAction: "delete",
+      recId: recId,
+      visitNo: "string",
+      transactionType: "string",
+      charge: "string",
+      quantity: 0,
+      remarks: "string",
+    };
+
+    dispatch(deletePatientCharges(payload)).then((status) => {
+      if (status) {
+        dispatch(getUnpostedCharges(patientData?.ActiveVisitNo));
+      }
+    });
+  };
+  const handleReverseCharge = () => {
+    setSelectedPatientNo(patientData?.PatientNo);
+    setReverseChargeModalVisible(true);
+    setSelectedRecId(unpostedCharges[0]?.SystemId);
+    setSelectedPatientAmount(patientData?.Balance || balance);
+  };
+
+  const postedCharges = chargesList?.filter((charge) => charge.Posted) || [];
+  const unpostedCharges = chargesList?.filter((charge) => !charge.Posted) || [];
+
+  // const totalReceived =
+  //   patientInvoice?.reduce((acc, line) => acc + line.Amount, 0) || 0;
 
   const columns = [
+    { title: "Patient No", dataIndex: "Patient_No", key: "Patient_No" },
+    { title: "Date", dataIndex: "Date", key: "Date" },
     {
-      title: "Transaction Name",
-      dataIndex: "transactionName",
-      key: "transactionName",
+      title: "Transaction Type",
+      dataIndex: "Transaction_Type",
+      key: "Transaction_Type",
     },
+    { title: "Code", dataIndex: "Code", key: "Code" },
+    { title: "Description", dataIndex: "Description", key: "Description" },
+    { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
+    { title: "Amount", dataIndex: "Total_Amount", key: "Total_Amount" },
     {
-      title: "Charge Name",
-      dataIndex: "chargeName",
-      key: "chargeName",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-    },
-    {
-      title: "Bill Type",
-      dataIndex: "billType",
-      key: "billType",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
+      title: "Posted",
+      dataIndex: "Posted",
+      key: "Posted",
+      render: (text) => (
+        <Tag color={text ? "green" : "red"}>
+          {text ? "Posted" : "Not Posted"}
+        </Tag>
+      ),
     },
   ];
-
+  const unpostedColumns = [
+    ...columns,
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="ghost"
+            size="large"
+            onClick={() => handleRemoveCharge(record.SystemId)}
+          >
+            <DeleteOutlined />
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+  const menu = (
+    <Menu className="text-start">
+      <Menu.Item key="0">
+        <Button
+          type="text"
+          icon={<PrinterOutlined style={{ color: "green" }} />}
+          onClick={() => handlePrintInterimInvoice()}
+        >
+          Print Interim Invoice
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="1">
+        <Button
+          type="text"
+          icon={<FaFileInvoice style={{ color: "green" }} />}
+          onClick={() => message.info("Feature coming soon!")}
+        >
+          Post Invoice
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <Button
+          type="text"
+          icon={<PrinterOutlined style={{ color: "blue" }} />}
+          onClick={() => handlePrintInvoice()}
+        >
+          Print Invoice
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="3">
+        <Button
+          type="text"
+          icon={<DollarOutlined style={{ color: "gold" }} />}
+          onClick={handleReverseCharge}
+          danger
+        >
+          Waive Charges
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
   return (
     <div>
       <Card style={{ padding: "20px" }}>
@@ -234,78 +322,38 @@ const handleReverseCharge = () => {
           </Col>
         </Row>
         <Row justify="end">
-          <Col>
+          <div className="d-flex flex-md-row gap-2">
+            <Button
+              type="primary"
+              size="medium"
+              icon={<FaCoins />}
+              onClick={showModal}
+            >
+              Add Charges
+            </Button>
+
+            <Button
+              type="default"
+              size="medium"
+              icon={<FaReceipt />}
+              onClick={() => confirmGenerateInvoice()}
+            >
+              Generate Invoice
+            </Button>
             <Space>
-              {/* <Button icon={<DownloadOutlined />}>Download</Button> */}
-
-              {patientData?.PatientType === "Corporate" ? (
-                <>
-                  <Button
-                    type="default"
-                    size="medium"
-                    icon={
-                      <PrinterOutlined
-                        style={{ color: "green", size: "29px" }}
-                      />
-                    }
-                    onClick={() =>
-                      confirmGenerateInvoice(patientData?.PatientNo)
-                    } // Ensure patientNo is passed
-                  >
-                    Post Charges
-                  </Button>
-                  <Button
-                    type="primary"
-                    size="medium"
-                    icon={<FaCoins />}
-                    onClick={() => handlePrintInvoice(patientData?.PatientNo)}
-                  >
-                    Print Invoice
-                  </Button>
-                  <Button
-                    type="primary"
-                    size="medium"
-                    icon={<FaCoins />}
-                    onClick={() => handlePrintInterimInvoice(patientData)}
-                  >
-                    Print Interim Invoice
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    type="primary"
-                    size="medium"
-                    icon={<FaReceipt />}
-                    onClick={() =>
-                      handleGenerateReceipt(patientData?.PatientNo)
-                    }
-                  >
-                    Generate Payment
-                  </Button>
-
-                  {/* <Button
-                  icon={
-                    <PrinterOutlined style={{ color: "green", size: "29px" }} />
-                  }
-                  loading={loading}
-                  // onClick={handlePrintReceipt}
-                  size="medium"
-                  // onclick show msg infor of feature not available
-                  onClick={() => message.info("Feature not available at the moment")}
-                >
-                  Print Receipt
-                </Button> */}
-                </>
-              )}
+              <Dropdown overlay={menu} trigger={["click"]}>
+                <Button type="dashed">
+                  More Actions <MinusCircleOutlined />
+                </Button>
+              </Dropdown>
             </Space>
-          </Col>
+          </div>
         </Row>
+
         <Row align="middle" justify="space-between">
           <Col span={12}>
             <div className="d-flex justify-content-start gap-2">
               <Text strong>Cashier:</Text>
-              {/* Capitalize the first letter only since the api returns uppercase */}
               <p>
                 {userData.firstName.charAt(0).toUpperCase() +
                   userData.firstName.slice(1).toLowerCase()}
@@ -315,21 +363,13 @@ const handleReverseCharge = () => {
           <Col span={12} className="mt-3 text-end">
             <Space align="end">
               <Button
-                type="primary"
-                size="medium"
-                icon={<FaCoins />}
-                onClick={showModal}
-              >
-                Add Charges
-              </Button>
-              <Button
                 type="default"
                 size="medium"
-                icon={<DeleteOutlined />}
-                danger
-                onClick={handleReverseCharge}
+                icon={<UndoOutlined />}
+                style={{ color: "red" }}
+                onClick={() => message.info("Feature coming soon!")}
               >
-                Waive Charges
+                Reverse Posted Charges
               </Button>
             </Space>
           </Col>
@@ -338,11 +378,7 @@ const handleReverseCharge = () => {
         <Divider />
         <Row justify="space-between">
           <Col>
-            <Title level={4}>
-              {patientData?.PatientType === "Corporate"
-                ? "Invoice"
-                : " Receipt"}
-            </Title>
+            <Title level={4}>Insurance Billing </Title>
           </Col>
           <Col>
             <Button type="primary" onClick={handleGoBack}>
@@ -355,7 +391,7 @@ const handleReverseCharge = () => {
           <Col span={24}>
             <div className="d-flex justify-content-start gap-4">
               <Text strong>Receiving From:</Text>
-              <p>{patientData.Names}</p>
+              {patientData.Names}
 
               <Text strong>Patient No:</Text>
               <p style={{ fontWeight: "bold", color: "brown" }}>
@@ -369,43 +405,52 @@ const handleReverseCharge = () => {
                 style={{ fontWeight: "bold", color: "green" }}
                 className="text-primary fw-bold"
               >
-                {patientData?.AppointmentNo}
+                {patientData.ActiveVisitNo}
               </p>
 
-              <Text strong>Date:</Text>
+              <Text strong>Balance:</Text>
               <p>
-                {patientData?.AppointmentDate
-                  ? moment(patientData?.AppointmentDate).format("Do MMM YYYY")
-                  : ""}
-              </p>
-
-              <Text strong>Amount Received:</Text>
-              <p style={{ fontWeight: "bold", color: "green" }}>
-                {patientData?.PatientType === "Corporate"
-                  ? grandTotal?.toLocaleString("en-KE", {
+                {patientData.Balance
+                  ? patientData.Balance.toLocaleString("en-KE", {
                       style: "currency",
                       currency: "KES",
                     })
-                  : data?.Receipt_Amount?.toLocaleString("en-KE", {
+                  : balance.toLocaleString("en-KE", {
                       style: "currency",
                       currency: "KES",
-                    }).replace(".00", "")}
+                    })}
               </p>
 
-              {/* <Text strong>Document Date:</Text>
-           <p>{data?.Date ? moment(data?.Date).format("Do MMM YYYY") : ""}</p> */}
+              <Text strong>Invoice No:</Text>
+              <p style={{ fontWeight: "bold", color: "green" }}>
+                {postedCharges[0]?.Invoice_Number}
+              </p>
             </div>
           </Col>
         </Row>
 
         <Divider />
 
-        <Table
-          dataSource={tableData}
-          columns={columns}
-          pagination={true}
-          loading={loadingChargesLines}
-        />
+        <div className="d-flex  flex-column">
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Unposted Charges </Title>
+            <Table
+              dataSource={unpostedCharges}
+              columns={unpostedColumns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+            />
+          </div>
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Posted Charges </Title>
+            <Table
+              dataSource={postedCharges}
+              columns={columns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+            />
+          </div>
+        </div>
 
         <Divider />
 
@@ -417,35 +462,6 @@ const handleReverseCharge = () => {
               out at{" "}
               <a href="mailto:info@chiromohg.co.ke">info@chiromohg.co.ke</a>.
             </p>
-          </Col>
-          <Col span={10}>
-            <Row justify="space-between">
-              {/* hide total received for corporate */}
-              {patientData?.PatientType !== "Corporate" && (
-                <Col span={12}>
-                  <Text strong>Total Received:</Text>
-                </Col>
-              )}
-              <Col span={12}>
-                <Text style={{ color: "green" }}>
-                  {data?.Receipt_Amount?.toLocaleString("en-KE", {
-                    style: "currency",
-                    currency: "KES",
-                  })}
-                </Text>
-              </Col>
-            </Row>
-
-            <Row justify="space-between">
-              <Col span={12}>
-                <Text strong>Grand Total:</Text>
-              </Col>
-              <Col span={12}>
-                <Text style={{ color: "green" }} strong>
-                  {grandTotal}
-                </Text>
-              </Col>
-            </Row>
           </Col>
         </Row>
       </Card>
@@ -465,20 +481,24 @@ const handleReverseCharge = () => {
       <AddCharges
         visible={isModalVisible}
         onClose={handleClose}
-        visitNo={patientData?.AppointmentNo}
+        visitNo={appointmentNo}
+        refreshTable={() =>
+          dispatch(getUnpostedCharges(patientData?.ActiveVisitNo))
+        }
       />
-      <ProcessPayment
-        visible={isGenerateReceiptModalVisible}
-        onClose={handleClose}
-        patientNo={patientData?.PatientNo}
-      />
+
       <ReversCharge
-      visible={ReverseChargeModalVisible}
-      onClose={handleClose}
-      patientNo={selectedpatientNo}
-      amount={selectedPatientAmount}
-      recId={selectedRecId}
-    />
+        visible={ReverseChargeModalVisible}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
+        amount={selectedPatientAmount}
+        recId={selectedRecId}
+      />
+      <ViewReceipt
+        visible={viewInvoice}
+        onClose={() => setViewInvoice(false)}
+        visitNo={appointmentNo}
+      />
       <Modal
         title="Invoice Preview"
         open={showPDFModal}

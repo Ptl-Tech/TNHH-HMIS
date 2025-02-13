@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  Row,
-  Col,
-} from "antd";
+import { Modal, Form, Input, Select, DatePicker, Button, Row, Col } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
@@ -19,7 +10,13 @@ import moment from "moment";
 
 const { Option } = Select;
 
-const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
+const ProcessPayment = ({
+  visible,
+  onClose,
+  patientNo,
+  amount,
+  onReceiptedNo,
+}) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,9 +27,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
   const { data: receiptHeader } = useSelector(
     (state) => state.getReceiptHeaderLines
   );
-  const { loading } = useSelector(
-    (state) => state.postReceipt
-  );
+  const { loading } = useSelector((state) => state.postReceipt);
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
@@ -72,19 +67,8 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
 
       if (newReceiptNo) {
         setReceiptNo(newReceiptNo);
-        await dispatch(getReceiptLines(newReceiptNo));
-        await dispatch(getReceiptHeader(newReceiptNo));
-
-        navigate(
-          `/reception/Receipt/Patient?PatientNo=${patientNo}&ReceiptNo=${newReceiptNo}`,
-          {
-            state: {
-              patientData: { header: receiptHeader, lines: receiptLines },
-            },
-          }
-        );
+        onReceiptedNo(newReceiptNo);
         onClose();
-
       }
       form.resetFields();
     } catch (error) {
@@ -125,13 +109,14 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
             <Form.Item
               label="Receipt Date"
               name="receiptDate"
-              rules={[{ required: true, message: "Please select receipt date!" }]}
-
+              rules={[
+                { required: true, message: "Please select receipt date!" },
+              ]}
             >
               <DatePicker
                 size="large"
                 format="YYYY-MM-DD"
-                style={{ width: "100%",color: "#0F5689 !important" }}
+                style={{ width: "100%", color: "#0F5689 !important" }}
                 disabled
               />
             </Form.Item>
@@ -143,14 +128,16 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
             <Form.Item
               label="Payment Mode"
               name="payMode"
-              rules={[{ required: true, message: "Please select payment mode!" }]}
+              rules={[
+                { required: true, message: "Please select payment mode!" },
+              ]}
             >
               <Select
                 size="large"
                 onChange={(value) => setPayMode(value)} // Track selected payment mode
                 placeholder="select Payment option"
               >
-                <Option value="" >--Select Payment Option--</Option>
+                <Option value="">--Select Payment Option--</Option>
                 <Option value={7}>Mpesa</Option>
                 <Option value={9}>PDQ</Option>
               </Select>
@@ -161,7 +148,9 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount }) => {
             <Form.Item
               label="Amount Received"
               name="amountReceived"
-              rules={[{ required: true, message: "Please enter amount received!" }]}
+              rules={[
+                { required: true, message: "Please enter amount received!" },
+              ]}
             >
               <Input
                 prefix="KSh"
