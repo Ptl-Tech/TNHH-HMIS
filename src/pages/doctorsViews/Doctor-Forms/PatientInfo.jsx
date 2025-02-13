@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Typography,
@@ -11,12 +11,9 @@ import {
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
-import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
-import { getConsultationRoomListSlice } from "../../../actions/nurse-actions/getConsultationRoomSlice";
-import { getSingleConsultationRoomReducer } from "../../../reducers/nurse-reducers/getConsultationRoomReducer";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import TextArea from "antd/es/input/TextArea";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
@@ -24,7 +21,7 @@ import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import { calculateAge } from "../../../utils/helpers";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
-  const { triageWaitingList, loadingTriageWaitingList } =
+  const { triageWaitingList } =
     useFetchAllPatientsHook();
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
@@ -75,8 +72,6 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const branchCode = localStorage.getItem("branchCode");
-
   
 
   const handleSelectChange = (value) => {
@@ -86,16 +81,6 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
     );
     setFilteredDoctors(matchingDoctors);
   };
-
-  // const {consultationRoomDetails, loadingConsultationRoomDetails} = useSelector((state) => state.getSingleConsultationRoom)
-
-  // useEffect(() => {
-  //   if (treatmentNo) {
-  //     dispatch(getSingleConsultationSlice(treatmentNo))
-  //   }
-  // }, [dispatch, treatmentNo]);
-
-  // console.log(loadingConsultationRoomDetails)
 
   const handleOnFinish = async (values) => {
     const data = {

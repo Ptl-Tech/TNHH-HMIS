@@ -227,6 +227,7 @@ import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReduce
 import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
 import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
 import { getPatientReceiptsHeadersReducer, getPatientReceiptsReducer } from './ChargesReducers/getPatientReceiptsReducer';
+import { getPatientEncounterListReducer } from './doc-reducers/pastDoctorNotesEncounterReducers';
 import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
 import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
 import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
@@ -288,6 +289,9 @@ export const rootReducer = combineReducers({
   appmntList: appmntListReducer,
   docTreatmentList: treatmentListReducer,
   getPatientList: getPatientListReducer,
+  // past encounters
+  getPatientEncounters:getPatientEncounterListReducer,
+  // end
   getConsultationRoom: getConsultationRoomListReducer,
   getPatient: PatientDeetsReducer,
   getSymptoms: QySymptomsSetupReducer,

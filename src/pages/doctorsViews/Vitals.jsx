@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Divider, Form, Input, message, Row, Table } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Col, Divider, Form, Input, message, Row, Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getPatientVitalsLinesSlice,
-  getVitalsLinesSlice,
 } from "../../actions/triage-actions/getVitalsLinesSlice";
 import Loading from "../../partials/nurse-partials/Loading";
 import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
-import { updateTriageListVitalsSlice } from "../../actions/triage-actions/updateTriageListVitalsSlice";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
 import useAuth from "../../hooks/useAuth";
+import {FileTextOutlined} from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const FormVitals = ({ observationNo, patientNo }) => {
   const [form] = Form.useForm();
@@ -30,6 +30,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
       title: "Observation No",
       dataIndex: "ObservationNo",
       key: "ObservationNo",
+      fixed: "left",
+      width: 150,
       render: (text) => (
         <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
       ),
@@ -54,6 +56,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
       title: "BMI",
       dataIndex: "BMI",
       key: "BMI",
+      fixed: "right",
+      width: 150,
       render: (text) => (text !== "-" ? parseFloat(text).toFixed(2) : "-"),
     },
   ];
@@ -107,9 +111,6 @@ const FormVitals = ({ observationNo, patientNo }) => {
     try {
       const {
         pulseRate,
-        pain,
-        height,
-        weight,
         temperature,
         bloodPreasure,
         sP02,
@@ -193,11 +194,17 @@ const FormVitals = ({ observationNo, patientNo }) => {
         <div>
           {!showForm ? (
             <>
-              <div className="d-flex justify-content-end ">
+              <Divider />
+              <Typography.Title level={5} style={{ marginBottom: "12px", color: "#0F5689" }}>
+                <FileTextOutlined style={{ marginRight: "8px" }} />
+                Patient Vitals
+              </Typography.Title>
+              <div className="d-flex" style={{ paddingTop: '20px'}}>
                 {role === "Doctor" &&
                   patientDetails?.Status !== "Completed" && (
                     <Button
                       type="primary"
+                      icon={<PlusOutlined />}
                       onClick={handleToggleForm}
                       style={{ marginBottom: "16px" }}
                     >
@@ -205,8 +212,9 @@ const FormVitals = ({ observationNo, patientNo }) => {
                     </Button>
                   )}
               </div>
-              <Divider />
+
               <Table
+                scroll={{ x: "max-content" }}
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
@@ -556,3 +564,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
 };
 
 export default FormVitals;
+// props validation
+FormVitals.propTypes = {
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+};

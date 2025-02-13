@@ -111,17 +111,17 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
         <>
           <Form.Item
             name="1"
-            label="Chief Complaints"
+            label="Presentation by Patient "
             rules={[{ required: true }]}
           >
             <TextArea
-              placeholder="Enter chief complaints..."
+              placeholder="Enter presentation by patient..."
               autoSize={{ minRows: 3 }}
             />
           </Form.Item>
-          <Form.Item name="2" label="Allegations" rules={[{ required: true }]}>
+          <Form.Item name="2" label="Presentation by Family" rules={[{ required: true }]}>
             <TextArea
-              placeholder="Enter allegations..."
+              placeholder="Enter presentation by family..."
               autoSize={{ minRows: 3 }}
             />
           </Form.Item>

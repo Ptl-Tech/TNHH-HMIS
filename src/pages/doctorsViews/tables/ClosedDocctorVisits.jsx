@@ -1,5 +1,5 @@
 import { Badge, Table } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
@@ -35,58 +35,61 @@ const CloseList = () => {
   }, [dispatch]);
 
  
-  const openDoctorVisitList = treatmentList?.filter((item) => {
-    if (role === "Doctor") {
-      return item.Status === "New" && item.DoctorID === doctorId;
-    } else if (role === "Psychology") {
-      return item.Status === "New" && item.DoctorID === doctorId;
-    }
-    return item.Status === "New";
-  });
-
-  const activeConsultationList = treatmentList?.filter((item) => {
-    if (role === "Doctor") {
-      return item.Status === "Active" && item.DoctorID === doctorId;
-    } else if (role === "Psychology") {
-      return item.Status === "Active" && item.DoctorID === doctorId;
-    }
-    return item.Status === "Active";
-  });
-
-  const closedConsultationList = treatmentList?.filter((item) => {
-    if (role === "Doctor") {
-      return item.Status === "Completed" && item.DoctorID === doctorId;
-    } else if (role === "Psychology") {
-      return item.Status === "Completed" && item.DoctorID === doctorId;
-    }
-    return item.Status === "Completed";
-  });
-
-
-  const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
-    PatientNo: patient.PatientNo,
-    SearchName: patient.SearchName,
-    IDNumber: patient.IDNumber,
-    Age: patient.AgeinYears,
-    PatientType: patient.PatientType,
-    Inpatient: patient.Inpatient,
-  }));
-
-  const combinedList = closedConsultationList.map((room) => {
-    const matchingPatient = closedConsultationListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo
-    );
-
-    return {
-      ...room,
-      PatientNo: room?.PatientNo,
-      SearchName: matchingPatient ? matchingPatient.SearchName : "",
-      IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
-      Age: matchingPatient ? matchingPatient.Age : "",
-      PatientType: matchingPatient ? matchingPatient.PatientType : "",
-      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
-    };
-  });
+  const openDoctorVisitList = useMemo(() => {
+    return treatmentList?.filter((item) => {
+      if (role === "Doctor" || role === "Psychology") {
+        return item.Status === "New" && item.DoctorID === doctorId;
+      }
+      return item.Status === "New";
+    });
+  }, [treatmentList, role, doctorId]);
+  
+  const activeConsultationList = useMemo(() => {
+    return treatmentList?.filter((item) => {
+      if (role === "Doctor" || role === "Psychology") {
+        return item.Status === "Active" && item.DoctorID === doctorId;
+      }
+      return item.Status === "Active";
+    });
+  }, [treatmentList, role, doctorId]);
+  
+  const closedConsultationList = useMemo(() => {
+    return treatmentList?.filter((item) => {
+      if (role === "Doctor" || role === "Psychology") {
+        return item.Status === "Completed" && item.DoctorID === doctorId;
+      }
+      return item.Status === "Completed";
+    });
+  }, [treatmentList, role, doctorId]);
+  
+  const closedConsultationListWithPatientDetails = useMemo(() => {
+    return patients?.map((patient) => ({
+      PatientNo: patient.PatientNo,
+      SearchName: patient.SearchName,
+      IDNumber: patient.IDNumber,
+      Age: patient.AgeinYears,
+      PatientType: patient.PatientType,
+      Inpatient: patient.Inpatient,
+    }));
+  }, [patients]);
+  
+  const combinedList = useMemo(() => {
+    return closedConsultationList.map((room) => {
+      const matchingPatient = closedConsultationListWithPatientDetails.find(
+        (patient) => patient.PatientNo === room.PatientNo
+      );
+  
+      return {
+        ...room,
+        PatientNo: room?.PatientNo,
+        SearchName: matchingPatient?.SearchName || "",
+        IDNumber: matchingPatient?.IDNumber || "",
+        Age: matchingPatient?.Age || "",
+        PatientType: matchingPatient?.PatientType || "",
+        Inpatient: matchingPatient?.Inpatient || "",
+      };
+    });
+  }, [closedConsultationList, closedConsultationListWithPatientDetails]);
 
   const waitingListColumns = [
     {
@@ -238,10 +241,10 @@ const CloseList = () => {
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === "Doctor"
-        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+        ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
         : role === "Psychology"
-        ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-        : `/Nurse/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+        ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+        : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
