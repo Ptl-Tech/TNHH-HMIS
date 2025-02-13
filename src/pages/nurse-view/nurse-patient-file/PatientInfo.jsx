@@ -8,7 +8,7 @@ import { calculateAge } from "../../../utils/helpers";
 
 const PatientInfo = () => {
   const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
-  const { patientDetails } = useLocation().state;
+  const { patientDetails } = useLocation().state || {};
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");

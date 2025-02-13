@@ -1,57 +1,88 @@
-import { Table } from "antd"
+import { Button, Table } from "antd"
 import PropTypes from "prop-types"
+import { useNavigate } from "react-router-dom";
 
-const PastDoctorNotesTable = ({ showModal }) => {
+
+const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingEncounters}) => {
+    const navigate = useNavigate();
+  
 
     const columns = [
     
         {
           title: 'Encounter Number',
-          dataIndex: 'treatmentNo',
-          key: 'treatmentNo',
+          dataIndex: 'TreatmentNo',
+          key: 'TreatmentNo',
+          fixed: 'left',
+          width: 150,
+          render: (text, record) => {
+            return (
+              <span
+                onClick={() => handleNavigateReadNotes(record)}
+                className="fw-bold"
+                style={{ color: "#0f5689", cursor: "pointer" }}
+              >
+                {text.toUpperCase()}
+              </span>
+            );
+          },
         },
         {
             title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
+            dataIndex: 'TreatmentDate',
+            key: 'TreatmentDate',
         },
         {
           title: 'Patient Type',
-          dataIndex: 'patientType',
-          key: 'patientType',
+          dataIndex: 'TreatmentType',
+          key: 'TreatmentType',
+        },
+        {
+          title: 'Clinic',
+          dataIndex: 'Clinic',
+          key: 'Clinic',
         },
         {
           title: 'Branch',
-          dataIndex: 'branch',
-          key: 'branch',
+          dataIndex: 'Branch',
+          key: 'Branch',
         },
         {
             title: 'Added By',
-            dataIndex: 'AddedBy',
-            key: 'AddedBy',
+            dataIndex: 'DoctorsName',
+            key: 'DoctorsName',
         },
         {
           title: 'Action',
           dataIndex: 'action',
           key: 'action',
-          // render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
+          fixed: 'right',
+          width: 200,
+          render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleNavigateReadNotes(record)}>Encounter Summery</Button>
         }
       ]
-    
-      const data = [
-        {
-          key: '',
-          treatmentNo: '',
-          date: '',
-          PatientFile: '',
-          branch: '',
-          paymentMethod: '',
-          treatmentReport: '',          
-        },
-      ]
+  
+      const handleNavigateReadNotes = (record) => {
+        navigate(
+          role === "Doctor"
+            ? `/Doctor/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`
+            : role === "Psychology"
+            ? `/Psychology/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`
+            : `/Nurse/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`,
+          {
+            state: {
+              patientDetails: record
+            },
+          }
+        );
+      };
   return (
     <div style={{ paddingTop: '30px' }}>
-         <Table columns={columns} dataSource={data} />
+         <Table columns={columns} 
+         dataSource={combinedPatients} 
+         loading={loadingDoctors || loadingEncounters}
+         scroll={{ x: "max-content" }}
+          />
     </div>
   )
 }
@@ -60,5 +91,8 @@ export default PastDoctorNotesTable
 
 //props validation
 PastDoctorNotesTable.propTypes = {
-    showModal: PropTypes.func
+    role: PropTypes.string,
+    combinedPatients: PropTypes.array,
+    loadingDoctors: PropTypes.bool,
+    loadingEncounters: PropTypes.bool
 }

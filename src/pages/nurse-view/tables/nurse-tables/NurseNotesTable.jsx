@@ -33,7 +33,7 @@ const NurseNotesTable = ({ observationNotes, loadingTriageList }) => {
   ]
 
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div style={{ paddingTop: '20px' }}>
           <Table columns={columns} dataSource={observationNotes} 
           loading={loadingTriageList}
           rowKey='SystemId'

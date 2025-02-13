@@ -6,6 +6,7 @@ import PatientFile from "../../nurse-view/PatientFile";
 import ConsultationroomDetails from "./ConsultationroomDetails";
 import AdmissionTab from "./AdmissionTab";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 
 const EvaluationCardContent = ({
   treatmentNo,
@@ -14,6 +15,9 @@ const EvaluationCardContent = ({
   patientDetails,
   role,
 }) => {
+  
+  const location = useLocation();
+  const patientDetail = location.state?.patientDetails;
 
   return (
     <div>
@@ -60,22 +64,21 @@ const EvaluationCardContent = ({
             <DocForms />
           </Tabs.TabPane> */}
 
-          {(role === "Doctor") && (
+          {role === "Doctor" && (
             <>
               <Tabs.TabPane tab="Admission & Referral" key="7">
                 <AdmissionTab />
               </Tabs.TabPane>
             </>
           )}
-          {
-            (role === "Nurse" || role === "Doctor" || role === "Psychology") && (
+          {(role === "Nurse" || role === "Doctor" || role === "Psychology") &&
+            patientDetail?.Status !== "Completed" && (
               <>
                 <Tabs.TabPane tab="Patient File" key="8">
-                <PatientFile patientDetails={patientDetails} />
-              </Tabs.TabPane>
+                  <PatientFile patientDetails={patientDetails} />
+                </Tabs.TabPane>
               </>
-            )
-          }
+            )}
         </Tabs>
       </Card>
     </div>
@@ -89,5 +92,5 @@ EvaluationCardContent.propTypes = {
   observationNo: PropTypes.string,
   patientNo: PropTypes.string,
   patientDetails: PropTypes.object,
-  role: PropTypes.string
+  role: PropTypes.string,
 };

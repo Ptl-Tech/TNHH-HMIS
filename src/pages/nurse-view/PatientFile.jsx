@@ -2,7 +2,7 @@ import { Button, Divider } from "antd";
 import { useEffect, useState } from "react";
 import PatientInfo from "./nurse-patient-file/PatientInfo";
 import NextOfKin from "./nurse-patient-file/NextOfKin";
-import DoctorNotes from "./nurse-patient-file/DoctorNotes";
+import PastDoctorNotes from "./nurse-patient-file/PastDoctorNotes";
 import NursingNotes from "./nurse-patient-file/NursingNotes";
 import TreatmentHistory from "./nurse-patient-file/TreatmentHistory";
 import Consumables from "./nurse-patient-file/Consumables";
@@ -20,7 +20,7 @@ const PatientFile = ({ patientDetails }) => {
   const userRole = useAuth();
   const dispatch = useDispatch();
   const location = useLocation();
-    const patientDetail = location.state?.patientDetails;
+  const patientDetail = location.state?.patientDetails;
 
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
@@ -56,7 +56,7 @@ const PatientFile = ({ patientDetails }) => {
         setSelectedItem(<NextOfKin />);
         break;
       case "Past Doctor Notes":
-        setSelectedItem(<DoctorNotes />);
+        setSelectedItem(<PastDoctorNotes />);
         break;
       case "Nursing Notes":
         userRole.userData.departmentName !== 'Nurse' ? setSelectedItem(<ReadNurseNotes/>) : setSelectedItem(<NursingNotes />)

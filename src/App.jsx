@@ -165,6 +165,10 @@ function App() {
             path="Inpatient/Read-nurse-notes"
             element={<ReadNurseNotes />}
           />
+          <Route
+            path="Consultation-List/Encounter"
+            element={<EncounterSummery />}
+          />
 
           <Route path="Observation-Room/:id" element={<NurseObservation />} />
           <Route path="Outpatient-list" element={<NurseOutpatientList />} />
@@ -270,7 +274,7 @@ function App() {
           />
 
           <Route
-            path="/Doctor/Consultation/Patient"
+            path="/Doctor/Consultation-List/Patient"
             element={<ConsultationRoomEvalutionCard />}
           />
           <Route path="/Doctor/Inpatient" element={<Inpatient />} />
@@ -344,6 +348,10 @@ function App() {
             path="/Doctor/Consultation/Read-Doctor-Dotes"
             element={<ReadDoctorNotes />}
           />
+          <Route 
+            path="/Doctor/Consultation-List/Encounter"
+            element={<EncounterSummery />}
+          />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
@@ -365,7 +373,7 @@ function App() {
           />
 
           <Route
-            path="/Psychology/Consultation/Patient"
+            path="/Psychology/Consultation-List/Patient"
             element={<ConsultationRoomEvalutionCard />}
           />
           <Route path="/Psychology/Inpatient" element={<Inpatient />} />
@@ -386,7 +394,7 @@ function App() {
             path="/Psychology/Past-doctor-visit"
             element={<PastDoctorVisit />}
           />
-          <Route path="/Psychology/Encounter/Patient" 
+          <Route path="/Psychology/Consultation-List/Encounter" 
           element={<EncounterSummery />} 
           />
           <Route
