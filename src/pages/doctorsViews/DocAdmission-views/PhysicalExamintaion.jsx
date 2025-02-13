@@ -8,6 +8,7 @@ import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatient
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import PhysicalExaminationTable from "../tables/Diagnosis/PhysicalExaminationTable";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -17,6 +18,8 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("16");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
 
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);
@@ -103,8 +106,8 @@ const PhysicalExamination = ({ treatmentNo, patientNo }) => {
           Physical Examination
         </Typography.Title>
       </Space>
-      {(role === "Doctor" ||
-        role === "Psychology") && (
+      {(role === "Doctor" || role === "Psychology") &&
+        patientDetails?.Status !== "Completed" && (
           <>
             <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
               {notesType.map((note) => (

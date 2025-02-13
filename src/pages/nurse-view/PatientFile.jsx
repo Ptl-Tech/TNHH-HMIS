@@ -11,21 +11,16 @@ import useAuth from "../../hooks/useAuth";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutlined, FilterOutlined, UserAddOutlined } from "@ant-design/icons";
 import ReadNurseNotes from "./ReadNurseNotes";
-import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import Loading from "../../partials/nurse-partials/Loading";
+import { useLocation } from "react-router-dom";
 
 const PatientFile = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState('Patient Info');
   const userRole = useAuth();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const patientNo = queryParams.get("PatientNo");
   const dispatch = useDispatch();
-  const [filterPatient, setFilterPatient] = useState(false);
-  const { loading: treatmentListLoading, patients: treatmentList } =
-  useSelector((state) => state.docTreatmentList);
+  const location = useLocation();
+    const patientDetail = location.state?.patientDetails;
 
   const [selectedItem, setSelectedItem] = useState(<PatientInfo patientDetails={patientDetails} />);
 
@@ -34,11 +29,12 @@ const PatientFile = ({ patientDetails }) => {
     {label: "Patient Info", icon: <UserOutlined />},
     // "Medical Info",
     {label: "Next of Kin", icon: <UserAddOutlined />},
-    ...(userRole.userData.departmentName === "Doctor" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
-    ...(!filterPatient ? [{label: "Nursing Notes", icon: <FileProtectOutlined />}] : []),
-    ...(!filterPatient ? [{label: "Past Encounters Notes", icon: <ExperimentOutlined />}] : []),
+    ...(userRole.userData.departmentName === "Doctor" &&
+      patientDetail?.Status !== "Completed" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
+    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Nursing Notes", icon: <FileProtectOutlined />}] : []),
+    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Past Encounters Notes", icon: <ExperimentOutlined />}] : []),
     // "Consumables",
-    ...(userRole.userData.departmentName === "Nurse" && !filterPatient ? [{label: "Order Sheet", icon: <FilterOutlined />}] : []),
+    ...(userRole.userData.departmentName === "Nurse" ? [{label: "Order Sheet", icon: <FilterOutlined />}] : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
@@ -46,16 +42,6 @@ const PatientFile = ({ patientDetails }) => {
   useEffect(() => {
       dispatch(getOutPatientTreatmentList());
     }, [dispatch]);
-
-    useEffect(() => {
-      if(treatmentList?.length > 0){
-        if(treatmentList?.length > 0){
-          const getFilterPatient = treatmentList?.find((item) => item.PatientNo === patientNo) || {};
-          const isOutpatient = getFilterPatient?.LinkType?.toLowerCase() === "outpatient";
-          setFilterPatient(isOutpatient);
-        }
-      }
-    }, [treatmentList, patientNo]);
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);
@@ -92,9 +78,6 @@ const PatientFile = ({ patientDetails }) => {
     }
   };
 
-  if (treatmentListLoading) {
-    return <Loading />;
-  }
   return (
     <>
       <div style={{ display: "flex", flex: 1, gap: "10px", flexWrap: "wrap" }}>

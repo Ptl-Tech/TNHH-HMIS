@@ -90,6 +90,7 @@ import ActiveOutPatients from "./pages/billing/ActiveOutPatients";
 import ActiveInpatient from "./pages/billing/ActiveInpatient";
 import LabRoutes from "./Routes/LabRoutes";
 import ViewReceipt from "./pages/billing/ViewReceipt";
+import EncounterSummery from "./pages/doctorsViews/EncounterSummery";
 import ViewPatientsReceipts from "./pages/billing/ViewPatientsReceipts";
 
 function App() {
@@ -384,6 +385,9 @@ function App() {
           <Route
             path="/Psychology/Past-doctor-visit"
             element={<PastDoctorVisit />}
+          />
+          <Route path="/Psychology/Encounter/Patient" 
+          element={<EncounterSummery />} 
           />
           <Route
             path="/Psychology/Past-doctor-visit/Patient"
