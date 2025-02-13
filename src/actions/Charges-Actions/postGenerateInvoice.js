@@ -28,8 +28,8 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
       },
     };
 
-//send patientNo as object not string
-    patientNo = {patientNo: patientNo};
+    // Send patientNo as object, not string
+    patientNo = { patientNo: patientNo };
 
     // Make the POST request to the server
     const response = await axios.post(
@@ -40,30 +40,32 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
 
     // Extract and validate the response data
     const { status } = response.data;
-    if (status === "success" ) {
+    if (status === "success") {
       // Dispatch success action
       dispatch({
         type: POST_GENERATE_INVOICE_SUCCESS,
-        payload: { status, },
+        payload: { status },
       });
 
       // Display success message
       message.success(`Invoice generated: ${status}fully.`);
 
-      // Return the CHARGES number 
+      // Return the CHARGES number
       return status;
     } else {
       throw new Error("Invalid response format or missing CHARGESNo.");
     }
   } catch (error) {
+    const errorMessage = error.response?.data?.errors || error.message || "An error occurred.";
+    
     // Dispatch failure action
     dispatch({
       type: POST_GENERATE_INVOICE_FAIL,
-      payload: error.response?.data?.message || error.errors,
+      payload: errorMessage,
     });
 
     // Display error message
-message.error(error.response?.data?.message || error.errors || "An error occurred.");
+    message.error(errorMessage);
 
     // Rethrow error for handling by other parts of the app
     throw error;

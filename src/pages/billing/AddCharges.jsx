@@ -24,7 +24,6 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   const [filteredCharges, setFilteredCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [localChargesList, setLocalChargesList] = useState([]);
-  const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] = useState(false);
 
   useEffect(() => {
     if (chargesList) {
@@ -41,10 +40,10 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   };
 
   useEffect(() => {
-    if (patientNo) {
-      dispatch(getUnpostedCharges(patientNo));
+    if (visitNo) {
+      dispatch(getUnpostedCharges(visitNo));
     }
-  }, [dispatch, patientNo]);
+  }, [dispatch, visitNo]);
 
   useEffect(() => {
     dispatch(getTransactionListSetup());
@@ -80,18 +79,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       onClose();
 
 
-      // Update local charges list
-      setLocalChargesList([...localChargesList, {
-        ...selectedCharge,
-        Quantity: values.quantity,
-        Total_Amount: selectedCharge.Amount * values.quantity,
-        Remarks: values.remarks,
-      }]);
-
-      // Update total amount in parent component
-      const totalAmount = localChargesList.reduce((total, charge) => total + charge.Total_Amount, 0);
-      setTotalAmount(totalAmount);
-
+      
     form.resetFields();
   };
 
@@ -221,12 +209,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
         </div>
       </Form>
 
-      <ProcessPayment
-        visible={isGenerateReceiptModalVisible}
-        onClose={() => setIsGenerateReceiptModalVisible(false)}
-        amount={localChargesList.reduce((total, item) => total + item.Total_Amount, 0)} // Pass total amount
-        patientNo={patientNo}
-      />
+      
     </Modal>
   );
 };

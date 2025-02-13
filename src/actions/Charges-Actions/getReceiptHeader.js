@@ -39,13 +39,7 @@ export const getReceiptHeader = (visitNo) => async (dispatch, getState) => {
       config
     );
 
-    // Ensure response.data is valid
-    if (!response.data || response.data.length === 0) {
-      const emptyMsg = "No receipt header found";
-      dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: emptyMsg });
-      message.warning(emptyMsg);
-      return;
-    }
+ 
 
     dispatch({ type: REQUEST_RECEIPT_HEADER_SUCCESS, payload: response.data });
   } catch (error) {

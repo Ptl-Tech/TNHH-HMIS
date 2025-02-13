@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { postReverseCharges } from "../../actions/Charges-Actions/postReverseCharges";
 
 const ReversCharge = ({ visible, onClose, patientNo, amount, recId }) => {
-    console.log("recId", recId);
-    console.log("amount", amount);
-    console.log("patientNo", patientNo);
+   
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.postReverseCharges);
 
@@ -16,7 +14,7 @@ const ReversCharge = ({ visible, onClose, patientNo, amount, recId }) => {
       patientNo: patientNo,
     };
     await dispatch(postReverseCharges(receiptRec));
-    onClose(); // Close the modal
+    onClose(); 
   };
 
   return (

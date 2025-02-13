@@ -316,49 +316,7 @@ const ActiveOutPatients = () => {
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
-      <Typography.Text
-        style={{
-          color: "#003F6D",
-          fontWeight: "bold",
-          marginBottom: "16px",
-        }}
-      >
-        Search by:
-      </Typography.Text>
-      <Row gutter={16} className="mt-2">
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Patient Names
-          </Typography.Text>
-          <Input
-            placeholder="Patient Names"
-            value={searchParams.SearchNames}
-            onChange={(e) => handleSearch(e, "SearchNames")}
-          />
-        </Col>
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Appointment Number:
-          </Typography.Text>
-          <Input
-            placeholder="Appointment Number"
-            value={searchParams.AppointmentNo}
-            onChange={(e) => handleSearch(e, "AppointmentNo")}
-          />
-        </Col>
-      </Row>
+   
       <div className="d-flex flex-row gap-2 my-3">
         <Button
           type={activeComponent === "cash" ? "primary" : "default"}

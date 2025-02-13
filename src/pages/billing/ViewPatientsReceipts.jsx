@@ -107,14 +107,14 @@ const ViewPatientsReceipts = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // NEW: Track whether the receipt has been posted.
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
-  const [balance, setBalance] = useState(patientData?.totalAmount || 0);
-
+  const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
   useEffect(() => {
-    if (patientNo) {
-      dispatch(getUnpostedCharges(patientNo));
+    const appointmentNo = patientData?.ActiveVisitNo;
+    if (appointmentNo) {
+      dispatch(getUnpostedCharges(appointmentNo));
     }
-  }, [dispatch, patientNo]);
-
+  }, [dispatch, patientData?.ActiveVisitNo]);
+  
   useEffect(() => {
     if (patientNo) {
       dispatch(getPatientReceiptLines(patientNo));
@@ -136,7 +136,7 @@ const ViewPatientsReceipts = () => {
   
 
   const handleGoBack = () => {
-    navigate(`/reception/Billing/Outpatients`|| -1);
+    navigate(-1);
   };
 
   const handleGenerateReceipt = (patientNo) => {
@@ -217,32 +217,12 @@ const ViewPatientsReceipts = () => {
 
     dispatch(deletePatientCharges(payload)).then((status) => {
       if (status) {
-        dispatch(getUnpostedCharges(patientData?.PatientNo));
+        dispatch(getUnpostedCharges(patientData?.ActiveVisitNo));
       }
     });
   };
 
-  const totalReceived =
-    patientReceipts?.reduce((acc, line) => acc + line.Amount, 0) || 0;
-
-  const tableData = [
-    {
-      key: 0,
-      receiptNo: patientData?.receiptNo,
-      transactionName: patientData?.transactionName,
-      chargeName: patientData?.chargeName,
-      quantity: patientData?.quantity,
-      amount: patientData?.totalAmount?.toLocaleString("en-KE", {
-        style: "currency",
-        currency: "KES",
-      }),
-      patientName: patientData?.patientName,
-      patientNo: patientData?.PatientNo,
-      appointmentNo: patientData?.AppointmentNo,
-    },
-  ];
-
-  const postedCharges =
+    const postedCharges =
     chargesList?.filter(
       (charge) => charge.Posted && charge.Transaction_Type !== "ZRECEIPT"
     ) || [];
@@ -472,7 +452,7 @@ const ViewPatientsReceipts = () => {
         visible={isModalVisible}
         onClose={handleClose}
         visitNo={appointmentNo}
-        refreshTable={() => dispatch(getUnpostedCharges(patientNo))}
+        refreshTable={() => dispatch(getUnpostedCharges(appointmentNo))}
       />
       <ProcessPayment
         visible={showPaymentModal}

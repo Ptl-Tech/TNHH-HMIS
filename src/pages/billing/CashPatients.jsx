@@ -42,7 +42,10 @@ const CashPatients = () => {
   // To update patient balance in the list when new charges are added
   const [updatedAmounts, setUpdatedAmounts] = useState({});
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
-
+  const [searchParams, setSearchParams] = useState({
+    SearchNames: "",
+    AppointmentNo: "",
+  });
   // Track which tab is active: "1" for Cash, "2" for Corporate
   const [activeTab, setActiveTab] = useState("1");
 
@@ -55,7 +58,9 @@ const CashPatients = () => {
     if (billingData && billingData.length > 0) {
       const cash = billingData.filter(
         (patient) =>
-          patient.PatientType === "Cash" && patient.Activated && patient.Inpatient === false 
+          patient.PatientType === "Cash" &&
+          patient.Activated &&
+          patient.Inpatient === false
       );
 
       setCashPatients(cash);
@@ -81,7 +86,7 @@ const CashPatients = () => {
           ))
     );
 
-    setFilteredCorporatePatients(filteredCorporate);
+    setFilteredCashPatients(filteredCash);
   };
 
   const handleClose = () => {
@@ -115,8 +120,8 @@ const CashPatients = () => {
   const handleViewPatientReceips = (record) => {
     navigate(
       `/reception/Patient-Charges/Patient?PatientNo=${record?.PatientNo}`,
-{      state: { patientData: record },
-}    );
+      { state: { patientData: record } }
+    );
   };
 
   const menu = (record) => (
@@ -197,7 +202,6 @@ const CashPatients = () => {
       key: "Gender",
     },
 
-   
     {
       title: "Balance",
       dataIndex: "Balance",
@@ -219,7 +223,7 @@ const CashPatients = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-           <Button
+          <Button
             type="default"
             icon={<EyeOutlined />}
             onClick={() =>
@@ -240,6 +244,49 @@ const CashPatients = () => {
 
   return (
     <div>
+      <Typography.Text
+        style={{
+          color: "#003F6D",
+          fontWeight: "bold",
+          marginBottom: "16px",
+        }}
+      >
+        Search by:
+      </Typography.Text>
+      <Row gutter={16} className="mt-2">
+        <Col span={12}>
+          <Typography.Text
+            style={{
+              color: "#003F6D",
+              fontWeight: "bold",
+              marginBottom: "16px",
+            }}
+          >
+            Patient Names
+          </Typography.Text>
+          <Input
+            placeholder="Patient Names"
+            value={searchParams.SearchNames}
+            onChange={(e) => handleSearch(e, "SearchNames")}
+          />
+        </Col>
+        <Col span={12}>
+          <Typography.Text
+            style={{
+              color: "#003F6D",
+              fontWeight: "bold",
+              marginBottom: "16px",
+            }}
+          >
+            Appointment Number:
+          </Typography.Text>
+          <Input
+            placeholder="Appointment Number"
+            value={searchParams.AppointmentNo}
+            onChange={(e) => handleSearch(e, "AppointmentNo")}
+          />
+        </Col>
+      </Row>
       <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)}>
         <TabPane tab="Cash Patients" key="1">
           <Table

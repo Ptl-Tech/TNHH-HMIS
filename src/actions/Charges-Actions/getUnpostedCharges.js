@@ -8,7 +8,7 @@ export const REQUEST_UNPOSTED_CHARGES_SUCCESS = "REQUEST_UNPOSTED_CHARGES_SUCCES
 export const REQUEST_UNPOSTED_CHARGES_FAIL = "REQUEST_UNPOSTED_CHARGES_FAIL";
 export const REQUEST_UNPOSTED_CHARGES_RESET = "REQUEST_UNPOSTED_CHARGES_RESET";
 
-export const getUnpostedCharges = (patientNo) => async (dispatch, getState) => {
+export const getUnpostedCharges = (appointmentNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_UNPOSTED_CHARGES });
 
@@ -32,7 +32,7 @@ export const getUnpostedCharges = (patientNo) => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=QyPatientCharges&isList=true&query=$filter=Patient_No eq '${patientNo}'`,
+      `${API}data/odatafilter?webservice=QyPatientCharges&isList=true&query=$filter=Visit_No eq '${appointmentNo}'`,
       config
     );
 

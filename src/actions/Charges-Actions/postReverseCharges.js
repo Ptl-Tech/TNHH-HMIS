@@ -1,4 +1,4 @@
-import { message } from "antd";
+import { message } from "antd"; 
 import axios from "axios";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
@@ -39,7 +39,7 @@ export const postReverseCharges = (receiptRec) => async (dispatch, getState) => 
     );
 
     // Extract and validate the response data
-    const { status, ReceiptId } = response.data;
+    const { status, ReceiptId, msg } = response.data;
 
     if (status === "success" && ReceiptId) {
       dispatch({
@@ -51,12 +51,12 @@ export const postReverseCharges = (receiptRec) => async (dispatch, getState) => 
 
       return { status, ReceiptId };
     } else {
-      throw new Error("Failed to reverse charges.");
+      throw new Error(msg || "Failed to reverse charges.");
     }
   } catch (error) {
     // Extract error response data safely
     const errorMessage =
-      error.response?.data?.errors || error.message || "An unexpected error occurred.";
+      error.response?.data?.msg || error.message || "An unexpected error occurred.";
 
     dispatch({
       type: POST_REVERSE_CHARGES_FAIL,
