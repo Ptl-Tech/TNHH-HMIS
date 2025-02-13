@@ -4,57 +4,37 @@ import { useNavigate } from "react-router-dom";
 import { appmntList } from "../../actions/patientActions";
 import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
 import {
-  Tabs,
-  Table,
-  Button,
-  Input,
-  Row,
-  Col,
-  Typography,
-  Space,
-  Menu,
-  Dropdown,
-} from "antd";
-import { EyeOutlined, DollarOutlined } from "@ant-design/icons";
-import { FaEye, FaFileInvoice } from "react-icons/fa";
-import ProcessPayment from "./ProcessPayment";
-import AddCharges from "./AddCharges";
-import useAuth from "../../hooks/useAuth";
-import CashPatients from "./CashPatients";
-import InsurancePatients from "./InsurancePatients";
-
-const { TabPane } = Tabs;
-
-const ActiveOutPatients = () => {
+    Tabs,
+    Table,
+    Button,
+    Input,
+    Row,
+    Col,
+    Typography,
+    Space,
+    Menu,
+    Dropdown,
+  } from "antd";
+  import { EyeOutlined, DollarOutlined } from "@ant-design/icons";
+  import { FaEye, FaFileInvoice } from "react-icons/fa";import TabPane from "antd/es/tabs/TabPane";
+  import ProcessPayment from "./ProcessPayment";
+  import AddCharges from "./AddCharges";
+const InsurancePatients = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const staffNo = useAuth().userData.no;
 
-  // Redux state data
-  const { loading, patients: visitData } = useSelector(
-    (state) => state.appmntList
-  );
   const { patients: billingData } = useSelector(
     (state) => state.getBillingList
   );
-
-  // Local state
-  const [searchParams, setSearchParams] = useState({
-    SearchNames: "",
-    AppointmentNo: "",
-  });
-  const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
-
-  // Lists for cash & corporate patients
-  const [cashPatients, setCashPatients] = useState([]);
+ const { loading, patients: visitData } = useSelector(
+    (state) => state.appmntList
+  );
   const [corporatePatients, setCorporatePatients] = useState([]);
-  const [filteredCashPatients, setFilteredCashPatients] = useState([]);
-  const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
+ const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
     []
   );
-
-  const [activeComponent, setActiveComponent] = useState("cash"); // Default to cash patients
-
+    const[patientNo, setPatientNo] = useState(null);
+  const[visitNo, setVisitNo] = useState(null);
   // Modals
   const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
     useState(false);
@@ -62,16 +42,15 @@ const ActiveOutPatients = () => {
 
   // To update patient balance in the list when new charges are added
   const [updatedAmounts, setUpdatedAmounts] = useState({});
+  const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
 
   // Track which tab is active: "1" for Cash, "2" for Corporate
   const [activeTab, setActiveTab] = useState("1");
 
-  // For cash patients, we allow row selection to display external actions.
-  const [patientNo, setPatientNo] = useState(null);
-  const [visitNo, setVisitNo] = useState(null);
+
   useEffect(() => {
-    dispatch(appmntList());
     dispatch(getBillingList());
+      dispatch(appmntList());
   }, [dispatch]);
 
   useEffect(() => {
@@ -92,23 +71,18 @@ const ActiveOutPatients = () => {
         (a, b) => new Date(b.AppointmentDate) - new Date(a.AppointmentDate)
       );
 
-      const cash = sortedList.filter(
-        (patient) =>
-          patient.PatientType === "Cash" && patient.Inpatient === false
-      );
       const corporate = sortedList.filter(
         (patient) =>
           patient.PatientType === "Corporate" && patient.Inpatient === false
       );
+    
 
-      setCashPatients(cash);
       setCorporatePatients(corporate);
 
-      setFilteredCashPatients(cash);
       setFilteredCorporatePatients(corporate);
     }
   }, [visitData, billingData]);
-
+  
   const handleSearch = (e, field) => {
     const value = e.target.value.toLowerCase();
     const updatedSearchParams = { ...searchParams, [field]: value };
@@ -126,19 +100,7 @@ const ActiveOutPatients = () => {
           ))
     );
 
-    const filteredCorporate = corporatePatients.filter(
-      (patient) =>
-        (!updatedSearchParams.SearchNames ||
-          patient.Names.toLowerCase().includes(
-            updatedSearchParams.SearchNames
-          )) &&
-        (!updatedSearchParams.AppointmentNo ||
-          patient.AppointmentNo.toLowerCase().includes(
-            updatedSearchParams.AppointmentNo
-          ))
-    );
-
-    setFilteredCashPatients(filteredCash);
+   
     setFilteredCorporatePatients(filteredCorporate);
   };
 
@@ -179,32 +141,36 @@ const ActiveOutPatients = () => {
   const menu = (record) => (
     <Menu>
       <Menu.Item key="1">
-        {activeTab === "2" && (
+       {activeTab === "2" && (
           <Button
-            type="ghost"
-            icon={<EyeOutlined />}
-            onClick={() =>
-              navigate(
-                `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
-                {
-                  state: { patientData: record },
-                }
-              )
-            }
-          >
-            View
-          </Button>
-        )}
+          type="ghost"
+          icon={<EyeOutlined />}
+          onClick={() =>
+            navigate(`/reception/invoice/Patient?PatientNo=${record.PatientNo}`, {
+              state: { patientData: record },
+            })
+          }
+        >
+          View 
+        </Button>
+       )}
       </Menu.Item>
       <Menu.Item key="2">
-        <Button type="ghost" onClick={() => showAddChargesModal(record)}>
+        <Button
+          type="ghost"
+          onClick={() => showAddChargesModal(record)}
+        >
           <FaFileInvoice /> Add Charges
         </Button>
       </Menu.Item>
       {activeTab === "1" && (
         <>
           <Menu.Item key="3">
-            <Button type="ghost" onClick={() => showPaymentModal(record)}>
+            <Button
+              type="ghost"
+              onClick={() => showPaymentModal(record)}
+          
+            >
               <DollarOutlined /> Make Payment
             </Button>
           </Menu.Item>
@@ -212,8 +178,9 @@ const ActiveOutPatients = () => {
             <Button
               type="ghost"
               onClick={() => handleViewPatientReceips(record)}
+
             >
-              <FaEye /> View
+              <FaEye /> View 
             </Button>
           </Menu.Item>
         </>
@@ -287,13 +254,8 @@ const ActiveOutPatients = () => {
       sorter: (a, b) => a.Balance - b.Balance,
       render: (text, record) => {
         const newBalance = updatedAmounts[record.AppointmentNo] ?? text;
-        const balanceColor =
-          newBalance === 0 ? "green" : newBalance !== text ? "red" : "black";
-        return (
-          <span style={{ fontWeight: "bold", color: balanceColor }}>
-            KSh {newBalance.toFixed(2)}
-          </span>
-        );
+        const balanceColor = newBalance === 0 ? "green" : newBalance !== text ? "red" : "black";
+        return <span style={{ fontWeight: "bold", color: balanceColor }}>KSh {newBalance.toFixed(2)}</span>;
       },
     },
     {
@@ -301,85 +263,42 @@ const ActiveOutPatients = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Dropdown overlay={menu(record)} trigger={["click"]}>
-            <Button
-              style={{ color: "#0f5689", fontSize: "16px", fontWeight: "bold" }}
-            >
-              ...
-            </Button>
+          <Dropdown overlay={menu(record)} trigger={['click']}>
+            <Button style={{ color: '#0f5689', fontSize: '16px', fontWeight: 'bold' }}>...</Button>
           </Dropdown>
         </Space>
       ),
     },
   ];
 
-  return (
-    <div>
-      <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
-      <Typography.Text
-        style={{
-          color: "#003F6D",
-          fontWeight: "bold",
-          marginBottom: "16px",
-        }}
-      >
-        Search by:
-      </Typography.Text>
-      <Row gutter={16} className="mt-2">
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Patient Names
-          </Typography.Text>
-          <Input
-            placeholder="Patient Names"
-            value={searchParams.SearchNames}
-            onChange={(e) => handleSearch(e, "SearchNames")}
-          />
-        </Col>
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Appointment Number:
-          </Typography.Text>
-          <Input
-            placeholder="Appointment Number"
-            value={searchParams.AppointmentNo}
-            onChange={(e) => handleSearch(e, "AppointmentNo")}
-          />
-        </Col>
-      </Row>
-      <div className="d-flex flex-row gap-2 my-3">
-        <Button
-          type={activeComponent === "cash" ? "primary" : "default"}
-          onClick={() => setActiveComponent("cash")}
-          style={{ width:'100%' }}
-        >
-          Cash Patients
-        </Button>
-        <Button
-          type={activeComponent === "insurance" ? "primary" : "default"}
-          onClick={() => setActiveComponent("insurance")}
-          style={{ width:'100%' }}
+  return(
+<div>
+    <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)}>
+        <TabPane tab="corporate Patients" key="1">
+          <Table
+                      columns={baseColumns} // No inline actions; actions come from the external area.
+                      dataSource={filteredCorporatePatients.map((patient) => ({
+                        ...patient,
+                        key: patient.PatientNo,
+                      }))}
+                      pagination={{ pageSize: 25 }}
+                      size="small"
+                    />
+        </TabPane>
+        <TabPane tab="Invoice List" key="2">
+        <Table
+                      columns={baseColumns} // No inline actions; actions come from the external area.
+                      dataSource={filteredCorporatePatients.map((patient) => ({
+                        ...patient,
+                        key: patient.PatientNo,
+                      }))}
+                      pagination={{ pageSize: 25 }}
+                      size="small"
+                    />
+        </TabPane>
+        </Tabs>
 
-        >
-          Insurance Patients
-        </Button>
-      </div>
-
-      {/* Conditionally render components */}
-      {activeComponent === "cash" ? <CashPatients /> : <InsurancePatients />}
-      <ProcessPayment
+        <ProcessPayment
         visible={isGenerateReceiptModalVisible}
         onClose={handleClose}
         amount={selectedPatientAmount}
@@ -401,8 +320,8 @@ const ActiveOutPatients = () => {
           }
         }}
       />
-    </div>
+</div>
   );
 };
 
-export default ActiveOutPatients;
+export default InsurancePatients;

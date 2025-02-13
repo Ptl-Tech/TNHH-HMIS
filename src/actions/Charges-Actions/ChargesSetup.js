@@ -33,7 +33,6 @@ export const getChargesSetup = () => async (dispatch, getState) => {
 
     dispatch({ type: GET_CHARGES_SETUP_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     // Check if it's an axios error
     const errorMessage = error.response

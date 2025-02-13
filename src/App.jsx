@@ -249,7 +249,7 @@ function App() {
             element={<ViewReceipt />}
           />
           <Route
-            path="/reception/Patient-Receipts/:visitNo"
+            path="/reception/Patient-Charges/:patientNo"
             element={<ViewPatientsReceipts />}
           />
         </Route>

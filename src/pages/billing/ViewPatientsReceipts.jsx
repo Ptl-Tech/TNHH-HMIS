@@ -10,12 +10,16 @@ import {
   Space,
   Modal,
   message,
+  Tag,
 } from "antd";
 import {
   DownloadOutlined,
   PrinterOutlined,
   EditOutlined,
   DeleteOutlined,
+  DollarOutlined,
+  StopOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaCoins, FaReceipt } from "react-icons/fa";
@@ -39,18 +43,21 @@ import {
   getPatientReceiptHeader,
   getPatientReceiptLines,
 } from "../../actions/Charges-Actions/getPatientReceipts";
+import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
+import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
+import ViewReceipt from "./ViewReceipt";
 
 const { Title, Text } = Typography;
 
 const ViewPatientsReceipts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const receiptNo = new URLSearchParams(useLocation().search).get("ReceiptNo");
-  const visitNo = new URLSearchParams(useLocation().search).get("VisitNo");
+  const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
   const { userData } = useAuth();
-  //   const { state } = useLocation();
-  //   const { patientData } = state;
-  //   const { lines } = state.patientData; // Extract header and lines
+  const { state } = useLocation();
+  const { patientData } = state;
+
+  console.log("patientData", patientData);
 
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
@@ -58,12 +65,15 @@ const ViewPatientsReceipts = () => {
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
-  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-    useSelector((state) => state.postInterimInvoice);
+
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector(
     (state) => state.getReceiptHeaderLines
   );
+  const { loading: chargesLoading, data: chargesList } = useSelector(
+    (state) => state.getUnpostedCharges
+  );
+
   // For corporate printing we already have a printInvoice action.
   const { loading: printReceiptLoading } = useSelector(
     (state) => state.printReceipt
@@ -78,10 +88,13 @@ const ViewPatientsReceipts = () => {
     (state) => state.getPatientReceiptHeader
   );
 
+  const { loading } = useSelector((state) => state.deletePatientCharges);
+
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
-  const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [receiptNo, setReceiptNo] = useState("");
+  const [viewReceipts, setViewReceipts] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
   const [selectedRecId, setSelectedRecId] = useState("");
@@ -94,32 +107,52 @@ const ViewPatientsReceipts = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // NEW: Track whether the receipt has been posted.
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
+  const [balance, setBalance] = useState(patientData?.totalAmount || 0);
 
   useEffect(() => {
-    if (visitNo) {
-      dispatch(getPatientReceiptLines(visitNo));
+    if (patientNo) {
+      dispatch(getUnpostedCharges(patientNo));
     }
-  }, [dispatch, visitNo]);
+  }, [dispatch, patientNo]);
 
   useEffect(() => {
-    if (visitNo) {
-      dispatch(getPatientReceiptHeader(visitNo));
+    if (patientNo) {
+      dispatch(getPatientReceiptLines(patientNo));
     }
-  }, [dispatch, visitNo]);
+  }, [dispatch, patientNo]);
+
+  useEffect(() => {
+    if (patientNo) {
+      dispatch(getPatientReceiptHeader(patientNo));
+    }
+  }, [dispatch, patientNo]);
+  useEffect(() => {
+    if (chargesList) {
+      // Recalculate balance from the latest charges list
+      const newTotal = chargesList.reduce((acc, charge) => acc + charge.Total_Amount, 0);
+      setBalance(newTotal);
+    }
+  }, [chargesList]); // Recalculate when chargesList changes
+  
 
   const handleGoBack = () => {
-    navigate("/reception/Billing/Outpatients");
+    navigate(`/reception/Billing/Outpatients`|| -1);
   };
 
   const handleGenerateReceipt = (patientNo) => {
     setIsGenerateReceiptModalVisible(true);
   };
 
+  const handleViewReceipts = () => {
+    setViewReceipts(true);
+    setAppointmentNo(patientData?.ActiveVisitNo);
+  };
+
   const handleClose = () => {
     setIsModalVisible(false);
-    setIsInvoiceModalVisible(false);
     setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
+    setViewReceipts(false);
   };
 
   const handlePrintReceipt = () => {
@@ -136,7 +169,8 @@ const ViewPatientsReceipts = () => {
   };
 
   const showModal = () => {
-    setAppointmentNo(patientData?.PatientNo);
+    setAppointmentNo(patientData?.ActiveVisitNo);
+    setSelectedPatientNo(patientData?.Patient_No);
     setTimeout(() => {
       setIsModalVisible(true);
     }, 0);
@@ -149,76 +183,112 @@ const ViewPatientsReceipts = () => {
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
-    setSelectedPatientNo(patientHeader[0]?.Patient_No);
-    setSelectedPatientAmount(patientHeader[0]?.Total_Amount);
+    setSelectedPatientNo(patientData?.PatientNo);
+    setSelectedPatientAmount(patientData?.Balance || balance);
   };
 
   // When processing (posting) the receipt, update the state so printing is enabled.
-  const handleProcessReceipt = () => {
+  const handleProcessReceipt = async () => {
     const receipt = {
       recId: "",
-      patientNo: patientHeader[0]?.Patient_No,
-      receiptNo: patientHeader[0]?.No,
+      patientNo: patientData?.PatientNo,
+      receiptNo: receiptNo,
     };
 
-    dispatch(postReceipt(receipt)).then((status) => {
+    await dispatch(postReceipt(receipt)).then((status) => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
         setIsReceiptPosted(true);
         message.success("Receipt posted successfully");
-      } else {
-        message.error("Failed to post receipt");
       }
     });
   };
-  const totalReceived = patientReceipts?.reduce((acc, line) => acc + line.Amount, 0) || 0;
 
-  const tableData = patientReceipts?.map((line, index) => ({
-    key: index,
-    receiptNo: line?.No,
-    code: line?.AccountNo,
-    transactionName: line.TransactionType,
-    chargeName: line.TransactionName,
-    billType: line.PayMode,
-    amount: line.Amount?.toLocaleString("en-KE", {
-      style: "currency",
-      currency: "KES",
-    }),
-  }));
+  const handleRemoveCharge = (recId) => {
+    const payload = {
+      myAction: "delete",
+      recId: recId,
+      visitNo: "string",
+      transactionType: "string",
+      charge: "string",
+      quantity: 0,
+      remarks: "string",
+    };
 
-  const columns = [
+    dispatch(deletePatientCharges(payload)).then((status) => {
+      if (status) {
+        dispatch(getUnpostedCharges(patientData?.PatientNo));
+      }
+    });
+  };
+
+  const totalReceived =
+    patientReceipts?.reduce((acc, line) => acc + line.Amount, 0) || 0;
+
+  const tableData = [
     {
-      title: "Receipt No",
-      dataIndex: "receiptNo",
-      key: "receiptNo",
-    },
-    {
-      title: "Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Transaction Name",
-      dataIndex: "transactionName",
-      key: "transactionName",
-    },
-    {
-      title: "Charge Name",
-      dataIndex: "chargeName",
-      key: "chargeName",
-    },
-    {
-      title: "Bill Type",
-      dataIndex: "billType",
-      key: "billType",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
+      key: 0,
+      receiptNo: patientData?.receiptNo,
+      transactionName: patientData?.transactionName,
+      chargeName: patientData?.chargeName,
+      quantity: patientData?.quantity,
+      amount: patientData?.totalAmount?.toLocaleString("en-KE", {
+        style: "currency",
+        currency: "KES",
+      }),
+      patientName: patientData?.patientName,
+      patientNo: patientData?.PatientNo,
+      appointmentNo: patientData?.AppointmentNo,
     },
   ];
 
+  const postedCharges =
+    chargesList?.filter(
+      (charge) => charge.Posted && charge.Transaction_Type !== "ZRECEIPT"
+    ) || [];
+  const unpostedCharges = chargesList?.filter((charge) => !charge.Posted) || [];
+
+  const columns = [
+    { title: "Patient No", dataIndex: "Patient_No", key: "Patient_No" },
+    { title: "Date", dataIndex: "Date", key: "Date" },
+    {
+      title: "Transaction Type",
+      dataIndex: "Transaction_Type",
+      key: "Transaction_Type",
+    },
+    { title: "Code", dataIndex: "Code", key: "Code" },
+    { title: "Description", dataIndex: "Description", key: "Description" },
+    { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
+    { title: "Amount", dataIndex: "Total_Amount", key: "Total_Amount" },
+    {
+      title: "Posted",
+      dataIndex: "Posted",
+      key: "Posted",
+      render: (text) => (
+        <Tag color={text ? "green" : "red"}>
+          {text ? "Posted" : "Not Posted"}
+        </Tag>
+      ),
+    },
+  ];
+  const unpostedColumns = [
+    ...columns,
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="ghost"
+            size="large"
+            onClick={() => handleRemoveCharge(record.SystemId)}
+          >
+            <DeleteOutlined />
+          </Button>
+        </Space>
+      ),
+    },
+  ];
   return (
     <div>
       <Card style={{ padding: "20px" }}>
@@ -236,26 +306,33 @@ const ViewPatientsReceipts = () => {
           </Col>
         </Row>
         <Row justify="end">
-         
           <div className="d-flex flex-md-row gap-2">
             <Button
               type="primary"
               size="medium"
+              icon={<FaCoins />}
+              onClick={showModal}
+            >
+              Add Charges
+            </Button>
+            <Button type="default" onClick={() => handlePaymentModal()}>
+              <DollarOutlined /> Initiate Payment
+            </Button>
+            <Button
+              type="primary"
+              size="medium"
               icon={<FaReceipt />}
-              onClick={() => handleProcessReceipt(patientHeader[0]?.Patient_No)}
+              onClick={() => handleProcessReceipt()}
             >
               Post Receipt
             </Button>
             <Button
               icon={<PrinterOutlined style={{ color: "green" }} />}
-              onClick={() => {
-                console.log("Printing Receipt:", receiptNo);
-                handlePrintReceipt(receiptNo);
-              }}
+              onClick={handleViewReceipts}
               size="medium"
-              disabled={!isReceiptPosted} // Only enable if receipt has been posted
+              // disabled={!isReceiptPosted} // Only enable if receipt has been posted
             >
-              Print Receipt
+              View Receipts
             </Button>
           </div>
         </Row>
@@ -288,7 +365,7 @@ const ViewPatientsReceipts = () => {
         <Divider />
         <Row justify="space-between">
           <Col>
-            <Title level={4}>Receipt</Title>
+            <Title level={4}>Cash Billing </Title>
           </Col>
           <Col>
             <Button type="primary" onClick={handleGoBack}>
@@ -301,16 +378,12 @@ const ViewPatientsReceipts = () => {
           <Col span={24}>
             <div className="d-flex justify-content-start gap-4">
               <Text strong>Receiving From:</Text>
-              <p>{patientHeader[0]?.Received_From}</p>
+              {patientData.Names}
 
               <Text strong>Patient No:</Text>
               <p style={{ fontWeight: "bold", color: "brown" }}>
-                {patientHeader[0]?.Patient_No}
+                {patientData.PatientNo}
               </p>
-              {/* <Text strong>Receipt No:</Text>
-              <p style={{ fontWeight: "bold", color: "brown" }}>
-                {receiptHeader[0]?.No}
-              </p> */}
             </div>
 
             <div className="d-flex justify-content-start gap-4">
@@ -319,35 +392,52 @@ const ViewPatientsReceipts = () => {
                 style={{ fontWeight: "bold", color: "green" }}
                 className="text-primary fw-bold"
               >
-                {patientHeader[0]?.Patient_Appointment_No}{" "}
+                {patientData.ActiveVisitNo}
               </p>
 
-              <Text strong>Date:</Text>
+              <Text strong>Balance:</Text>
               <p>
-                {patientHeader[0]?.Date_Posted
-                  ? moment(patientHeader[0]?.Date_Posted).format("Do MMM YYYY")
-                  : ""}
+                {patientData.Balance
+                  ? patientData.Balance.toLocaleString("en-KE", {
+                      style: "currency",
+                      currency: "KES",
+                    })
+                  : balance.toLocaleString("en-KE", {
+                      style: "currency",
+                      currency: "KES",
+                  })}
               </p>
 
-              {/* <Text strong>Amount Received:</Text>
+              <Text strong>Receipt No:</Text>
               <p style={{ fontWeight: "bold", color: "green" }}>
-                {patientHeader[0]?.Amount_Recieved.toLocaleString("en-KE", {
-                  style: "currency",
-                  currency: "KES",
-                }).replace(".00", "")}
-              </p> */}
+                {receiptNo}
+              </p>
             </div>
           </Col>
         </Row>
 
         <Divider />
 
-        <Table
-          dataSource={tableData}
-          columns={columns}
-          pagination={true}
-          loading={loadingChargesLines}
-        />
+        <div className="d-flex  flex-column">
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Unposted Charges </Title>
+            <Table
+              dataSource={unpostedCharges}
+              columns={unpostedColumns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+            />
+          </div>
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Posted Charges </Title>
+            <Table
+              dataSource={postedCharges}
+              columns={columns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+            />
+          </div>
+        </div>
 
         <Divider />
 
@@ -360,34 +450,36 @@ const ViewPatientsReceipts = () => {
               <a href="mailto:info@chiromohg.co.ke">info@chiromohg.co.ke</a>.
             </p>
           </Col>
-          <Col span={10}>
+          {/* <Col span={10}>
             <Row justify="space-between">
               <Col span={12}>
                 <Text strong>Total Amount:</Text>
               </Col>
               <Col span={12}>
                 <Text style={{ color: "green" }} strong>
-                {totalReceived.toLocaleString("en-KE", {
-        style: "currency",
-        currency: "KES",
-      })}
+                  {patientData?.totalAmount?.toLocaleString("en-KE", {
+                    style: "currency",
+                    currency: "KES",
+                  })}
                 </Text>
               </Col>
             </Row>
-          </Col>
+          </Col> */}
         </Row>
       </Card>
 
       <AddCharges
         visible={isModalVisible}
         onClose={handleClose}
-        visitNo={receiptHeader[0]?.Patient_Appointment_No}
+        visitNo={appointmentNo}
+        refreshTable={() => dispatch(getUnpostedCharges(patientNo))}
       />
       <ProcessPayment
         visible={showPaymentModal}
         onClose={handleClose}
-        patientNo={receiptHeader[0]?.Patient_No}
-        amount={receiptHeader[0]?.Total_Amount}
+        patientNo={selectedpatientNo}
+        amount={selectedPatientAmount}
+        onReceiptedNo={setReceiptNo}
       />
       <ReversCharge
         visible={ReverseChargeModalVisible}
@@ -396,7 +488,11 @@ const ViewPatientsReceipts = () => {
         amount={receiptHeader[0]?.Total_Amount}
         recId={selectedRecId}
       />
-
+      <ViewReceipt
+        visible={viewReceipts}
+        onClose={() => setViewReceipts(false)}
+        visitNo={appointmentNo}
+      />
       <Modal
         title="Receipt Preview"
         open={showPDFModal}

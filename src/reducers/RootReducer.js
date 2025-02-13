@@ -227,6 +227,10 @@ import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReduce
 import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
 import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
 import { getPatientReceiptsHeadersReducer, getPatientReceiptsReducer } from './ChargesReducers/getPatientReceiptsReducer';
+import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
+import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
+import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
+import { deletePatientChargesReducer } from './ChargesReducers/deletePatientChargesReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -424,6 +428,9 @@ export const rootReducer = combineReducers({
   postReverseCharges:postReverseChargeReducer,
   getPatientReceipt:getPatientReceiptsReducer,
   getPatientReceiptHeader:getPatientReceiptsHeadersReducer,
+  getUnpostedCharges:getUnpostedChargesReducer,
+  getPostedCharges:getpostedChargesReducer,
+  deletePatientCharges:deletePatientChargesReducer,
   postNursingCarePlan:postNursingCarePlanReducer,
   getNursingCarePlan:getNursingCarePlanReducer,
 

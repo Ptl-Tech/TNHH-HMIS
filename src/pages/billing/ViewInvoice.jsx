@@ -45,8 +45,11 @@ const ViewInvoice = () => {
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
   );
+  const {loading, data:unpostedCharges}=useSelector((state)=>state.getUnpostedCharges);
+  
   const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
   const branchName = localStorage.getItem("branchCode");
+  const[showUnpostedCharges, setShowUnpostedCharges] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
@@ -79,6 +82,22 @@ const ViewInvoice = () => {
   navigate("/reception/Billing/Outpatients", );
 
   };
+
+const ShowUnpostedCharges=() => {
+ //check for unposted charges
+ if(unpostedCharges.length>0){
+  //map the link and activeVisitNo to the unposted charges
+  const  ifPosted= data.map((charge) => ({
+    ...charge,
+    isPosted: unpostedCharges.some((unposted) => unposted.SystemId === charge.SystemId),
+  }));
+
+  //if there are unposted charges show the table
+  if(ifPosted.some((charge) => !charge.isPosted)){
+    setShowUnpostedCharges(true);
+  }
+ }
+}
 
   const handleGenerateReceipt = (patientNo) => {
     setIsGenerateReceiptModalVisible(true);
@@ -158,17 +177,6 @@ const handleReverseCharge = () => {
 
     setIsInvoiceModalVisible(false);
   };
-
-  // const handlePrintReceipt = () => {
-  //   const receipt = {
-  //     recId: "",
-  //     patientNo: header[0].Patient_No,
-  //     receiptNo: header[0].No,
-  //   };
-  //   console.log(receipt);
-
-  //   dispatch(postReceipt(receipt));
-  // };
 
   const grandTotal = data
     ?.reduce((total, line) => total + line.Amount, 0)
@@ -282,20 +290,7 @@ const handleReverseCharge = () => {
                     }
                   >
                     Generate Payment
-                  </Button>
-
-                  {/* <Button
-                  icon={
-                    <PrinterOutlined style={{ color: "green", size: "29px" }} />
-                  }
-                  loading={loading}
-                  // onClick={handlePrintReceipt}
-                  size="medium"
-                  // onclick show msg infor of feature not available
-                  onClick={() => message.info("Feature not available at the moment")}
-                >
-                  Print Receipt
-                </Button> */}
+                  </Button>              
                 </>
               )}
             </Space>
@@ -466,6 +461,7 @@ const handleReverseCharge = () => {
         visible={isModalVisible}
         onClose={handleClose}
         visitNo={patientData?.AppointmentNo}
+        patientNo={patientData?.PatientNo}
       />
       <ProcessPayment
         visible={isGenerateReceiptModalVisible}

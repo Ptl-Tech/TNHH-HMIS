@@ -79,7 +79,7 @@ export const getPatientReceiptHeader = (visitNo) => async (dispatch, getState) =
       };
   
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgReceiptHeaders&isList=true&query=$filter=Patient_Appointment_No eq '${visitNo}'`,
+        `${API}data/odatafilter?webservice=PgReceiptsListPage&isList=true&query=$filter=Patient_Appointment_No eq '${visitNo}'`,
         config
       );
   
