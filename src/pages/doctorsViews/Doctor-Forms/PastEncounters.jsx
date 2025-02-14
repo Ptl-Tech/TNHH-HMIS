@@ -73,10 +73,10 @@ const PastEncounters = () => {
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === "Doctor"
-        ? `/Doctor/Consultation/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
+        ? `/Doctor/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
         : role === "Psychology"
-        ? `/Psychology/Encounter/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
-        : `/Nurse/Consultation/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
+        ? `/Psychology/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
+        : `/Nurse/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
       {
         state: {
           patientDetails: record

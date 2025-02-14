@@ -16,14 +16,12 @@ const ConsultationRoomEvalutionCard = () => {
   // Correct way to get treatmentNo and patientNo from the URL
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
-  const { loadingPatientDetails, patientDetails } = useSelector(
+  const { loading: loadingPatientDetails, data: patientDetails } = useSelector(
     (state) => state.getPatientDetails
   );
 
   useEffect(() => {
-    if (patientNo) {
       dispatch(getPatientDetails(patientNo));
-    }
   }, [dispatch, patientNo]);
 
 

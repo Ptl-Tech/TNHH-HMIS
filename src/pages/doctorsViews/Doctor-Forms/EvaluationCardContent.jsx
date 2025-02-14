@@ -15,7 +15,6 @@ const EvaluationCardContent = ({
   patientDetails,
   role,
 }) => {
-  
   const location = useLocation();
   const patientDetail = location.state?.patientDetails;
 
@@ -64,7 +63,7 @@ const EvaluationCardContent = ({
             <DocForms />
           </Tabs.TabPane> */}
 
-          {role === "Doctor" && (
+          {role === "Doctor" && patientDetail?.Status !== "Completed" && (
             <>
               <Tabs.TabPane tab="Admission & Referral" key="7">
                 <AdmissionTab />

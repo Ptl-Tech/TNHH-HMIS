@@ -17,24 +17,16 @@ import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import TextArea from "antd/es/input/TextArea";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
-import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import { calculateAge } from "../../../utils/helpers";
+import { useLocation } from "react-router-dom";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
-  const { triageWaitingList } =
-    useFetchAllPatientsHook();
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
-  const [patientDetail, setPatientDetail] = useState([]);
+  const location = useLocation();
+  const patient = location.state?.patientDetails || {};
 
-  useEffect(() => {
-    if (patientNo) {
-      const filterPatient = triageWaitingList?.filter(
-        (patient) => patient?.PatientNo === patientNo
-      );
-      setPatientDetail(filterPatient[0]);
-    }
-  }, [patientNo, triageWaitingList]);
+  console.log('patient details', patient)
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -72,7 +64,6 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  
 
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
@@ -197,8 +188,8 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
                 })) || []
               }
               filterOption={(value, option) =>
-                  option?.label.toLowerCase().includes(value.toLowerCase())
-                }
+                option?.label.toLowerCase().includes(value.toLowerCase())
+              }
             />
           </Form.Item>
           {(selectedClinic?.toLowerCase() === "psychiatrist" ||
@@ -265,10 +256,10 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               level={5}
               style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
             >
-              {patientName || patientDetail?.SearchName}
+              {patientName || patientDetails?.SearchName}
             </Typography.Title>
             <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
-              Age: {calculateAge(patientDetail?.DateOfBirth)}
+              Age: {calculateAge(patientDetails?.DateOfBirth)}
             </Typography.Text>
           </div>
         </div>
@@ -297,10 +288,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
           />
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
-          <InfoRow
-            label="Gender"
-            value={patientDetails?.Gender || patientDetail?.Gender}
-          />
+          <InfoRow label="Gender" value={patientDetails?.Gender} />
           {/* {!loadingConsultationRoomDetails && <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} />} */}
           {/* <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} /> */}
         </div>
@@ -346,7 +334,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               fontWeight: "bold",
             }}
           >
-            {patientDetails?.PatientType || patientDetail?.PatientType || "N/A"}
+            {patientDetails?.PatientType || "N/A"}
           </Typography.Text>
         </div>
         <div
@@ -356,7 +344,31 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             justifyContent: "space-between",
           }}
         >
-          {patientDetail?.PatientType === "Cash" ? null : (
+          <Typography.Title
+            level={5}
+            style={{ fontSize: "14px", color: "black" }}
+          >
+            Phone Number
+          </Typography.Title>
+
+          <Typography.Text
+            style={{
+              fontSize: "12px",
+              color: "gray",
+              fontWeight: "bold",
+            }}
+          >
+            {patientDetails?.TelephoneNo1 || "N/A"}
+          </Typography.Text>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+          }}
+        >
+          {patientDetails?.PatientType === "Cash" ? null : (
             <>
               <Typography.Title
                 level={5}
@@ -371,9 +383,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
                   fontWeight: "bold",
                 }}
               >
-                {patientDetails?.SchemeName ||
-                  patientDetail?.SchemeName ||
-                  "N/A"}
+                {patientDetails?.SchemeName || "N/A"}
               </Typography.Text>
             </>
           )}
@@ -385,21 +395,16 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             justifyContent: "space-between",
           }}
         >
-          {/* <Typography.Title
+          <Typography.Title
             level={5}
             style={{ fontSize: "14px", color: "black" }}
           >
-            Patient Bill Balance:
+            Treatment Date
           </Typography.Title>
           <Typography.Text
-            style={{
-              fontSize: "16px",
-              color: "#0f5689",
-              fontWeight: "bold",
-            }}
           >
-            {` KSH. ${patientDetails?.Balance} `}
-          </Typography.Text> */}
+            {patient?.TreatmentDate}
+          </Typography.Text>
         </div>
         <div
           style={{
@@ -410,7 +415,8 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             marginTop: "40px",
           }}
         >
-          {(role === "Doctor" || role === "Psychology") && (
+          {(role === "Doctor" || role === "Psychology") &&
+        patient?.Status !== "Completed" && (
             <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
               <Button
                 type="primary"
