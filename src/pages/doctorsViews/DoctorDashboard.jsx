@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   UserOutlined,
   HourglassOutlined,
@@ -12,6 +12,9 @@ import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatient
 import DashboardCard from "../nurse-view/DashboardCard";
 import DashboardStatistics from "../nurse-view/DashboardStatistics";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { listDoctors } from "../../actions/DropdownListActions";
+
 
 const DoctorDashboard = () => {
   const role = useAuth().userData.departmentName
@@ -24,6 +27,11 @@ const DoctorDashboard = () => {
     (state) => state.getTriageWaitingList
   );
 
+  const { admittedPatients } =
+    useSelector((state) => state.getPgAdmissionsAdmitted) || {};
+
+    const { data } = useSelector((state) => state.getDoctorsList);
+
   // Fetch data when the component loads
   useEffect(() => {
     dispatch(getTriageWaitingList());
@@ -32,6 +40,16 @@ const DoctorDashboard = () => {
   useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
+
+    useEffect(() => {
+      dispatch(getPgAdmissionsAdmittedSlice());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!data?.length) {
+          dispatch(listDoctors());
+        }
+      }, [dispatch, data?.length]);
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
@@ -67,6 +85,36 @@ const DoctorDashboard = () => {
   const filterOutPatients =
     patients?.filter((item) => item.Inpatient === false) || [];
 
+    // get the list of doctors
+  const formattedDoctorDetails = useMemo(() => {
+    return data?.map((doctor) => ({
+      DoctorID: doctor?.DoctorID,
+      DoctorsName: doctor?.DoctorsName,
+    }));
+  }, [data]);
+
+  // getting the list of inpatients and combining with the correponding doctor
+  const combinedPatients = useMemo(() => {
+    if (!admittedPatients || !formattedDoctorDetails) return [];
+  
+    return admittedPatients.map((patient) => {
+      const matchingDoctor = formattedDoctorDetails.find(
+        (doctor) => patient?.Doctor === doctor?.DoctorID
+      );
+      return {
+        ...patient,
+        DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
+      };
+    });
+  }, [admittedPatients, formattedDoctorDetails]);
+
+
+    const filterPatientBasedWithDoctor = useMemo(() => {
+        if (role === "Doctor") {
+          return combinedPatients?.filter((patient) => patient?.Doctor === doctorId);
+        }
+        return combinedPatients;
+      }, [combinedPatients, doctorId, role]);
   // Updated card data for the dashboard
   const cardData = [
     {
@@ -98,7 +146,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "Inpatients List",
-      value: filterInPatients?.length,
+      value: filterPatientBasedWithDoctor?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
       color: "#000",
@@ -109,18 +157,22 @@ const DoctorDashboard = () => {
   
 
   // Helper function to count registrations by date
-  const countRegistrationsByDate = (patients) =>
+  const countRegistrationsByDate = (patients, dateKey) =>
     patients.reduce((acc, patient) => {
-      const date = patient.DateRegistered;
-      if (date !== "0001-01-01") {
+      const date = patient[dateKey];
+      if (date && date !== "0001-01-01") {
         acc[date] = (acc[date] || 0) + 1;
       }
       return acc;
     }, {});
+  
+
+    
 
   // Registration counts for chart data
-  const outPatientCountsByDate = countRegistrationsByDate(filterOutPatients);
-  const inPatientCountsByDate = countRegistrationsByDate(filterInPatients);
+  const mergeOutpatients = [...openDoctorVisitList, ...activeVisitCount, ...closedVisitCount];
+  const outPatientCountsByDate = countRegistrationsByDate(mergeOutpatients, "TreatmentDate");
+  const inPatientCountsByDate = countRegistrationsByDate(filterPatientBasedWithDoctor, "Admission_Date");
 
   // Generate chart data for the last 30 days
   const last30Days = Array.from({ length: 30 }, (_, i) =>

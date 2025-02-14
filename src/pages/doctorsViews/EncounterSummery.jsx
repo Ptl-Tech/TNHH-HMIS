@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
-import useFetchAllPatientsHook from "../../hooks/useFetchAllPatientsHook";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import { Col, Row } from "antd";
 import EncounterSummeryCard from "./EncounterSummeryCard";
