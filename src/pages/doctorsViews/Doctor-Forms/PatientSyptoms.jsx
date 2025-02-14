@@ -7,6 +7,7 @@ import {
   Collapse,
   message,
   Typography,
+  Spin,
 } from "antd";
 import { FileOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,16 +24,15 @@ const { TextArea } = Input;
 
 const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
   const role = useAuth().userData.departmentName;
-  const { data } = useSelector((state) => state.getPatientMSE);
+  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientMSE);
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
 
-  console.log("Query Params:", queryParams.toString()); // View all query params
-  console.log("Extracted PatientNo:", patientNo); // Check the extracted value
 
   const categories = [
     { step: 0, panels: ["APPEARANCE", "SPEECH"] },
@@ -126,6 +126,9 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
     setCurrentStep((prev) => prev - 1);
   };
 
+  
+  if (!patientDetails) return <Spin />;
+
   return (
     <div className="mt-4">
       <Typography.Text
@@ -139,7 +142,8 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
         <FileOutlined /> MSE Status Exam
       </Typography.Text>
 
-      {(role === "Doctor" || role === "Psychology") && (
+      {(role === "Doctor" || role === "Psychology") &&
+        patientDetails?.Status !== "Completed" && (
         <>
           <Steps
             current={currentStep}
@@ -297,7 +301,7 @@ const PatientSymptoms = ({ treatmentNo, moveToNextTab }) => {
         </>
       )}
 
-      <MentalStatusExamTable data={data} />
+      <MentalStatusExamTable data={data} loadingHistory={loadingHistory}/>
     </div>
   );
 };

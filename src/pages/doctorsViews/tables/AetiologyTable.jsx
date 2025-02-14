@@ -1,7 +1,8 @@
 import PropTypes from "prop-types"
 import { Card, Collapse, Empty } from "antd";
+import Loading from "../../../partials/nurse-partials/Loading";
 
-const AetiologyTable = ({ data}) => {
+const AetiologyTable = ({ data, loadingHistory}) => {
     const notesType = [
         { value: "12", label: "Predisposing Factors" },
         { value: "13", label: "Precipitating Factors" },
@@ -38,6 +39,7 @@ const collapseItems = Object.entries(groupedData).map(
   })
 );
 
+if (loadingHistory) return <Loading />;
   return (
     <>
       {filterCollapseData.length === 0 ? (
@@ -59,4 +61,5 @@ export default AetiologyTable
 // PropTypes
 AetiologyTable.propTypes = {
   data: PropTypes.array.isRequired,
+  loadingHistory: PropTypes.bool
 }

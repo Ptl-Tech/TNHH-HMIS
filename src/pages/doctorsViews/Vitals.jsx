@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Divider, Form, Input, message, Row, Table } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Col, Divider, Form, Input, message, Row, Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getPatientVitalsLinesSlice,
-  getVitalsLinesSlice,
 } from "../../actions/triage-actions/getVitalsLinesSlice";
 import Loading from "../../partials/nurse-partials/Loading";
 import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
-import { updateTriageListVitalsSlice } from "../../actions/triage-actions/updateTriageListVitalsSlice";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
 import useAuth from "../../hooks/useAuth";
+import {FileTextOutlined} from "@ant-design/icons";
+import { useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const FormVitals = ({ observationNo, patientNo }) => {
   const [form] = Form.useForm();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName
+  const role = useAuth().userData.departmentName;
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
 
   const { loading: loadingVitalsLines, vitals: vitalsLines } = useSelector(
     (state) => state.getPatientVital
@@ -27,6 +30,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
       title: "Observation No",
       dataIndex: "ObservationNo",
       key: "ObservationNo",
+      fixed: "left",
+      width: 150,
       render: (text) => (
         <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
       ),
@@ -51,39 +56,40 @@ const FormVitals = ({ observationNo, patientNo }) => {
       title: "BMI",
       dataIndex: "BMI",
       key: "BMI",
+      fixed: "right",
+      width: 150,
       render: (text) => (text !== "-" ? parseFloat(text).toFixed(2) : "-"),
     },
   ];
 
   // Check if vitalsLines is an object, and map its values into an array
- const dataSource = vitalsLines
-  .filter((item) => {
-    // Filter based on the observationNo or patientNo, modify this as per your needs
-    return (
-      item.ObservationNo === observationNo || item.PatientNo === patientNo
-    );
-  })
-  .map((item) => ({
-    key: item.LineNo, // Unique key for each row
-    ObservationNo: item.ObservationNo,
-    temperature: item.Temperature,
-    pulseRate: item.PulseRate,
-    respirationRate: item.RespirationRate,
-    bloodPreasure: item.BloodPressure,
-    sP02: item.SP02,
-    pain: item.Pain,
-    height: item.Height,
-    weight: item.Weight,
-    BMI: item.BMI,
-    DateCreated: item.DateCreated, // Assuming CreatedAt exists in your data
-  }))
-  .sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated)); // Sort by createdAt in descending order
-
+  const dataSource = vitalsLines
+    .filter((item) => {
+      // Filter based on the observationNo or patientNo, modify this as per your needs
+      return (
+        item.ObservationNo === observationNo || item.PatientNo === patientNo
+      );
+    })
+    .map((item) => ({
+      key: item.LineNo, // Unique key for each row
+      ObservationNo: item.ObservationNo,
+      temperature: item.Temperature,
+      pulseRate: item.PulseRate,
+      respirationRate: item.RespirationRate,
+      bloodPreasure: item.BloodPressure,
+      sP02: item.SP02,
+      pain: item.Pain,
+      height: item.Height,
+      weight: item.Weight,
+      BMI: item.BMI,
+      DateCreated: item.DateCreated, // Assuming CreatedAt exists in your data
+    }))
+    .sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated)); // Sort by createdAt in descending order
 
   useEffect(() => {
     dispatch(getPatientVitalsLinesSlice());
   }, [dispatch]);
-  
+
   useEffect(() => {
     if (showForm && dataSource.length > 0) {
       const latestEntry = dataSource[0];
@@ -96,18 +102,15 @@ const FormVitals = ({ observationNo, patientNo }) => {
       });
     }
   }, [showForm, dataSource, form]);
-  
+
   const handleToggleForm = () => {
     setShowForm(!showForm);
   };
-  
+
   const onFinish = async (values) => {
     try {
       const {
         pulseRate,
-        pain,
-        height,
-        weight,
         temperature,
         bloodPreasure,
         sP02,
@@ -141,18 +144,16 @@ const FormVitals = ({ observationNo, patientNo }) => {
         myAction: "create",
       };
 
-    await dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
-      if (data) {
-        message.success("Vitals successfully saved");
-         dispatch(getPatientVitalsLinesSlice());
-        //show the table and hide the form
-         setShowForm(false);
-      } else {
-        message.error("Error saving vitals data");
-      }
-    })
-      
-           
+      await dispatch(postTriageListVitalsSlice(createVitals)).then((data) => {
+        if (data) {
+          message.success("Vitals successfully saved");
+          dispatch(getPatientVitalsLinesSlice());
+          //show the table and hide the form
+          setShowForm(false);
+        } else {
+          message.error("Error saving vitals data");
+        }
+      });
     } catch (error) {
       // Generic error handling
       message.error("An error occurred while saving vitals data.");
@@ -193,23 +194,27 @@ const FormVitals = ({ observationNo, patientNo }) => {
         <div>
           {!showForm ? (
             <>
-            <div className="d-flex justify-content-end ">
-           
-              {
-                (role === "Doctor" ) && (
-                  <Button
-                    type="primary"
-                    onClick={handleToggleForm}
-                    style={{ marginBottom: "16px" }}
-                  >
-                    Add Vitals
-                  </Button>
-                )
-              }
-            
-            </div>
-            <Divider />
+              <Divider />
+              <Typography.Title level={5} style={{ marginBottom: "12px", color: "#0F5689" }}>
+                <FileTextOutlined style={{ marginRight: "8px" }} />
+                Patient Vitals
+              </Typography.Title>
+              <div className="d-flex" style={{ paddingTop: '20px'}}>
+                {role === "Doctor" &&
+                  patientDetails?.Status !== "Completed" && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={handleToggleForm}
+                      style={{ marginBottom: "16px" }}
+                    >
+                      Add Vitals
+                    </Button>
+                  )}
+              </div>
+
               <Table
+                scroll={{ x: "max-content" }}
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
@@ -220,7 +225,6 @@ const FormVitals = ({ observationNo, patientNo }) => {
                     `${range[0]}-${range[1]} of ${total} items`,
                 }}
               />
-              
             </>
           ) : (
             <Form
@@ -415,7 +419,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
                 </Col>
               </Row>
               <Row gutter={16}>
-              <Col span={12}>
+                <Col span={12}>
                   <Form.Item
                     label="Respiration Rate (bpm)"
                     name={["vitals", "respirationRate"]}
@@ -496,7 +500,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
                 </Col> */}
               </Row>
               <Row gutter={16}>
-{/*                 
+                {/*                 
                 <Col span={12}>
                   <Form.Item
                     label="Pain (Scale 0-10)"
@@ -560,3 +564,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
 };
 
 export default FormVitals;
+// props validation
+FormVitals.propTypes = {
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+};

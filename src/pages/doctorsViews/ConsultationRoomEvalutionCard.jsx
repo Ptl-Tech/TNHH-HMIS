@@ -43,13 +43,13 @@ const ConsultationRoomEvalutionCard = () => {
           }
         </Typography.Text>
       </Space>
-      <Row gutter={8} className="inpatient-card-container">
+      <Row gutter={8}>
       <Col
           xs={24}
           md={24}
           lg={24}
           xl={24}
-          className="inpatient-card-left-col"
+         
         >
           {loadingPatientDetails ? (
             <Skeleton />
@@ -64,7 +64,7 @@ const ConsultationRoomEvalutionCard = () => {
           md={24}
           lg={24}
           xl={24}
-          className="inpatient-card-left-col"
+         
         >
           <EvaluationCardContent treatmentNo={treatmentNo} patientNo={patientNo} patientDetails={patientDetails} role={role}/>
         </Col>

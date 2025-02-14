@@ -27,13 +27,13 @@ const NurseNotesTable = ({ observationNotes, loadingTriageList }) => {
     },
     {
       title: 'Notes',
-      dataIndex: 'StatusRemarks', 
-      key: 'StatusRemarks',
+      dataIndex: 'ObservationRemarks', 
+      key: 'ObservationRemarks',
     },
   ]
 
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div style={{ paddingTop: '20px' }}>
           <Table columns={columns} dataSource={observationNotes} 
           loading={loadingTriageList}
           rowKey='SystemId'

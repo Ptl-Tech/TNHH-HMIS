@@ -17,6 +17,7 @@ import useAuth from "../../hooks/useAuth";
 import FilterConsultationRoom from "../../partials/nurse-partials/FilterConsultationRoom";
 const DoctorVisits = () => {
   const role = useAuth().userData.departmentName
+  const doctorId = useAuth().userData.doctorID
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -45,27 +46,27 @@ const DoctorVisits = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "New" && item.DoctorID === doctorId;
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "New" && item.DoctorID === doctorId;
     }
     return item.Status === "New";
   });
 
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }
     return item.Status === "Active";
   });
 
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }
     return item.Status === "Completed";
   });
@@ -134,12 +135,17 @@ const DoctorVisits = () => {
       render: (text, record) => {
         return (
           <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
-          >
-            {record?.SearchName}
-          </span>
+        onClick={
+          role !== "Nurse" ? () => handleNavigate(record, record.TreatmentNo) : undefined
+        }
+        className="fw-bold"
+        style={{
+          color: role !== "Nurse" ? "#0f5689" : "inherit",
+          cursor: role !== "Nurse" ? "pointer" : "default",
+        }}
+      >
+        {record?.SearchName}
+      </span>
         );
       },
     },
@@ -154,9 +160,19 @@ const DoctorVisits = () => {
     },
 
     {
-      title: "ID Number",
-      dataIndex: "IDNumber",
-      key: "IDNumber",
+      title: "Doctor Name",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text, record) => {
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            style={{ color: "#0f5689", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: "Treatment Date",
@@ -217,18 +233,20 @@ const DoctorVisits = () => {
       },
     },
 
-    {
-      title: "Check In",
-      key: "checkIn",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => handleNavigate(record, record.TreatmentNo)}
-        >
-          <CheckOutlined /> Check In
-        </Button>
-      ),
-    },
+    ...role !== "Nurse" ? [
+      {
+        title: "Check In",
+        key: "checkIn",
+        render: (_, record) => (
+          <Button
+            type="primary"
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
+          >
+            <CheckOutlined /> Check In
+          </Button>
+        ),
+      },
+    ] : []
   ];
 
   const handleNavigate = (record, treatmentNo) => {
@@ -238,7 +256,9 @@ const DoctorVisits = () => {
         navigate(
           role === "Doctor"
             ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-            : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+            : role === "Psychology"
+            ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+            : `/Nurse/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
           {
             state: {
               patientNo: record.PatientNo,

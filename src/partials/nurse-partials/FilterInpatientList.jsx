@@ -11,13 +11,13 @@ const FilterInpatientList = ({ setSearchName, setSearchPatientNumber, setSearchA
             allowClear
             onChange={(value)=>setSearchName(value.target.value)}
         />
-        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }}>or</span>
+        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }} className="filtersOr">or</span>
         <Input.Search placeholder="search by patient number" 
             size="large"
             allowClear
             onChange={(value)=>setSearchPatientNumber(value.target.value)}
         />
-        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
+        <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold' }} className="filtersOr">or</span>
         <Input.Search placeholder="search admission number" 
             size="large"
             allowClear

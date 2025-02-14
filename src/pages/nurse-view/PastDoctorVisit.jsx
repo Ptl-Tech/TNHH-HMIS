@@ -40,14 +40,24 @@ const PastDoctorVisit = () => {
          navigate(`/Nurse/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
            state: { patientDetails: record },
          });
-        }else{
+        }else if(userDetails.userData.departmentName === 'Doctor'){
             navigate(`/Doctor/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+                state: { patientDetails: record },
+            });
+        }else{
+            navigate(`/Psychology/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
                 state: { patientDetails: record },
             });
         }
        }; 
  
     const columns = [
+      {
+        title: '#',
+        dataIndex: 'key',
+        key: 'key',
+        render: (_, __, index) => index + 1,
+      },
         {
             title: 'Treatment No',
             dataIndex: 'TreatmentNo',
@@ -63,7 +73,7 @@ const PastDoctorVisit = () => {
             dataIndex: 'SearchName',
             key: 'SearchName',
                 render: (_, record) => {
-                    return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689' }}>
+                    return <Button type="link" onClick={()=>handleNavigate(record)} style={{ color: '#0f5689', fontWeight: 'bold' }}>
                         {record.SearchName}
                     </Button>
                 }

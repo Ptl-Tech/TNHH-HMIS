@@ -32,6 +32,31 @@ const DiagnosisForm = ({
           {diagnosisType === 1 && (
             <Form.Item
               name="diagnosisCode"
+              label="Provisional Diagnosis"
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder="Select Diagnosis"
+                onChange={setDiagnosisInput}
+                value={diagnosisInput}
+                name="diagnosisCode"
+                size="large"
+                showSearch
+                filterOption={(input, option) =>
+                  option?.children?.toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {data?.map((item) => (
+                  <Option key={item.Code} value={item.Code}>
+                    {item.Description}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
+          {diagnosisType === 2 && (
+            <Form.Item
+              name="diagnosisCode"
               label="Primary Diagnosis"
               rules={[{ required: true }]}
             >
@@ -56,7 +81,7 @@ const DiagnosisForm = ({
           )}
 
           {/* Secondary Diagnosis Select */}
-          {diagnosisType === 2 && (
+          {diagnosisType === 3 && (
             <Form.Item
               name="secondaryDiagnosisCode"
               label="Comorbid Issues"

@@ -84,6 +84,7 @@ const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
       remarks: remark,
       fileBase64: attachmentBase64 || "",
     };
+    
 
     dispatch(postRadiologyResults(payload))
       .then((res) => {
@@ -150,8 +151,8 @@ const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
         <div>
 
           {record.Completed ? (<div style={{ display: "flex", columnGap: "20px", alignItems: "center", justifyItems: "center" }}><p>✅ Completed</p>
-            {radiologyDetails.Status === "New" && <Button type="primary" onClick={() => openModal(record)}>
-              <EditOutlined /> <p>Edit</p>
+            {radiologyDetails?.Status === "New" && <Button type="primary" onClick={() => openModal(record)}>
+              <EditOutlined /> <span>Edit</span>
             </Button>}
           </div>) : <Button type="primary" onClick={() => openModal(record)}>
             Open Results

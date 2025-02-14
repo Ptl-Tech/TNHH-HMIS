@@ -21,6 +21,7 @@ const ConsultationRoomPatients = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const role = useAuth().userData.departmentName
+  const doctorId = useAuth().userData.doctorID
 
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');
@@ -41,27 +42,29 @@ const ConsultationRoomPatients = () => {
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "New" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "New" && item.DoctorID === doctorId;
     } else if (role === "Psychology") {
-      return item.Status === "New" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "New" && item.DoctorID === doctorId;
     }
     return item.Status === "New";
   });
 
+  console.log('open visits', openDoctorVisitList);
+
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Active" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Active" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Active" && item.DoctorID === doctorId;
     }
     return item.Status === "Active";
   });
 
   const closedConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHIATRY";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }else if (role === "Psychology") {
-      return item.Status === "Completed" && item.Clinic === "PSYCHOLOGY";
+      return item.Status === "Completed" && item.DoctorID === doctorId;
     }
     return item.Status === "Completed";
   });
@@ -162,9 +165,19 @@ const ConsultationRoomPatients = () => {
     },
 
     {
-      title: "ID Number",
-      dataIndex: "IDNumber",
-      key: "IDNumber",
+      title: "Doctor Name",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text, record) => {
+        return (
+          <span
+            onClick={() => handleNavigate(record, record.treatmentNo)}
+            style={{ color: "#0f5689", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: "Treatment Date",
@@ -239,7 +252,9 @@ const ConsultationRoomPatients = () => {
     navigate(
       role === "Doctor"
         ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
-        : `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
+        : role === "Psychology" 
+        ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
+        : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,

@@ -8,7 +8,7 @@ export const REQUEST_RECEIPT_HEADER_SUCCESS = "REQUEST_RECEIPT_HEADER_SUCCESS";
 export const REQUEST_RECEIPT_HEADER_FAIL = "REQUEST_RECEIPT_HEADER_FAIL";
 export const REQUEST_RECEIPT_HEADER_RESET = "REQUEST_RECEIPT_HEADER_RESET";
 
-export const getReceiptHeader = (receiptNo) => async (dispatch, getState) => {
+export const getReceiptHeader = (visitNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_RECEIPT_HEADER });
 
@@ -35,17 +35,11 @@ export const getReceiptHeader = (receiptNo) => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgReceiptHeaders&isList=true&query=$filter=No eq '${receiptNo}'`,
+      `${API}data/odatafilter?webservice=PgReceiptsListPage&isList=true&query=$filter=Patient_Appointment_No eq '${visitNo}'`,
       config
     );
 
-    // Ensure response.data is valid
-    if (!response.data || response.data.length === 0) {
-      const emptyMsg = "No receipt header found";
-      dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: emptyMsg });
-      message.warning(emptyMsg);
-      return;
-    }
+ 
 
     dispatch({ type: REQUEST_RECEIPT_HEADER_SUCCESS, payload: response.data });
   } catch (error) {

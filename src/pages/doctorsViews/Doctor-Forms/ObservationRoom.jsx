@@ -1,27 +1,13 @@
-import React, { useState } from "react";
-import Vitals from "../Vitals";
-import AddAllergies from "../AddAllergies";
+import { useState } from "react";
 import AllergyAndMedication from "../../nurse-view/forms/triage-forms/AllergyAndMedication";
-import Injections from "../../nurse-view/forms/triage-forms/Injections";
-import { Button, Typography } from "antd";
+import { Button } from "antd";
 import {
   HeartOutlined,
-  SolutionOutlined,
   MedicineBoxOutlined,
-  CalendarOutlined,
 } from "@ant-design/icons"; // Import icons
-import Diagnosis from "./Diagnosis";
 import FormVitals from "../Vitals";
-import PatientSigns from "./PatientSigns";
-import PatientSymptoms from "./PatientSyptoms";
-import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
-
-import { FaNotesMedical } from "react-icons/fa6";
-import SickOff from "../../nurse-view/discharges/SickOff";
 import PropTypes from "prop-types";
 import ObservationNotes from "../ConsultationCard/ObservationNotes";
-
-const { Title } = Typography;
 
 const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
   const [activeItem, setActiveItem] = useState('Vitals');

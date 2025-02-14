@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTriageList } from '../../../actions/triage-actions/getTriageListSlice';
 import NurseNotesTable from '../../nurse-view/tables/nurse-tables/NurseNotesTable';
+import { Divider, Typography } from 'antd';
+import { FileTextOutlined } from '@ant-design/icons';
 // import { TextArea } from 'antd';
 
 const ObservationNotes = ({ treatmentNo, patientNo }) => {
-    console.log('observation number', treatmentNo, 'patient number', patientNo);
     const [observationNotes, setObservationNotes] = useState([]);
     const dispatch = useDispatch();
 
     const { loadingTriageList, triageList } = useSelector((state) => state.getTriageList) || {};
-    console.log('observation notes', observationNotes);
 
     useEffect(() => {
         dispatch(getTriageList());
@@ -31,6 +31,11 @@ const ObservationNotes = ({ treatmentNo, patientNo }) => {
 
     return (
         <> 
+            <Divider />
+            <Typography.Title level={5} style={{ marginBottom: "12px", color: "#0F5689" }}>
+                <FileTextOutlined style={{ marginRight: "8px" }} />
+                Observation Notes
+              </Typography.Title>
             <NurseNotesTable loadingTriageList={loadingTriageList} observationNotes={observationNotes}/>     
         </>
     )

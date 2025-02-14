@@ -1,26 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Row, Col, Input, Typography, Button, Select, Table, message } from "antd";
 import { IoCloseOutline } from "react-icons/io5";
+import { FaEdit, FaTrashAlt } from "react-icons/fa"; // For Edit and Delete icons
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
-import { useLocation } from "react-router-dom";
+import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
+import ProcessPayment from "./ProcessPayment";
 
 const { Text } = Typography;
 
-const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount }) => {
+const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount, patientNo,refreshTable }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
   const { loading } = useSelector((state) => state.postPatientCharges);
-  const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
+  const { loading: chargesLoading, data: chargesList } = useSelector((state) => state.getUnpostedCharges);
 
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
   const [filteredCharges, setFilteredCharges] = useState([]);
-  const [chargeList, setChargeList] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
+  const [localChargesList, setLocalChargesList] = useState([]);
+
+  useEffect(() => {
+    if (chargesList) {
+      setLocalChargesList(chargesList.filter(item => item.Transaction_Type !== "ZRECEIPT"));
+    }
+  }, [chargesList]);
+
+  const handleClose = () => {
+    setLocalChargesList([]); // Clear table data on modal close
+    onClose();
+    // Calculate total amount before closing
+    const totalAmount = localChargesList.reduce((total, charge) => total + charge.Total_Amount, 0);
+    setTotalAmount(totalAmount); // Pass total amount to parent component
+  };
+
+  useEffect(() => {
+    if (visitNo) {
+      dispatch(getUnpostedCharges(visitNo));
+    }
+  }, [dispatch, visitNo]);
 
   useEffect(() => {
     dispatch(getTransactionListSetup());
@@ -37,82 +60,87 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
     setSelectedCharge(charge || null);
   };
 
-  const handleAddCharge = (values) => {
+  const handleAddCharge = async (values) => {
     if (!selectedCharge) return;
 
-    const chargeEntry = {
-      key: chargeList.length + 1,
-      description: selectedCharge.Description,
+    const payload = {
+      myAction: "create",
+      recId: "",
+      visitNo: visitNo || "",
+      transactionType: selectedCharge.Transaction_Type,
+      charge: selectedCharge.Code,
       quantity: values.quantity,
-      amount: selectedCharge.Amount * values.quantity,
-      chargeCode: selectedCharge.Code, // Store charge code for submission
-      transactionType: selectedTransactionType,
-      remarks: values.remarks || "",
+      remarks: values.remarks,
+      patientNo: patientNo,
     };
 
-     // Update the local charge list
-  const updatedList = [...chargeList, chargeEntry];
-  setChargeList(updatedList);
+    await dispatch(postPatientCharges(payload));
+    refreshTable();
+      onClose();
 
-  // Calculate the new total amount
-  const newTotalAmount = updatedList.reduce((sum, item) => sum + item.amount, 0);
 
-  // Update the parent component's balance
-  setTotalAmount(newTotalAmount);
+      
     form.resetFields();
   };
 
-  const handleSubmitAll = async () => {
-    if (chargeList.length === 0) {
-      message.warning("No charges added to submit.");
-      return;
-    }
+  const handleDeleteCharge = (chargeId) => {
+    // Implement delete functionality here
+    message.success(`Charge with ID: ${chargeId} deleted!`);
+  };
 
-    for (const charge of chargeList) {
-      const payload = {
-        myAction: "create",
-        recId: "",
-        visitNo: visitNo || "",
-        transactionType: charge.transactionType,
-        charge: charge.chargeCode,
-        quantity: charge.quantity,
-        remarks: charge.remarks,
-        patientNo: patientNo,
-      };
-
-      try {
-        await dispatch(postPatientCharges(payload));
-      } catch (error) {
-        message.error(`Failed to submit charge: ${charge.description}`);
-        console.error(error);
-      }
-    }
-
-    message.success("All charges submitted successfully!");
-    setChargeList([]);
-    setTotalAmount(0);
-    onClose();
+  const handleEditCharge = (chargeId) => {
+    // Implement edit functionality here
+    message.success(`Charge with ID: ${chargeId} edited!`);
   };
 
   const columns = [
-    { title: "Charge Name", dataIndex: "description", key: "description" },
-    { title: "Quantity", dataIndex: "quantity", key: "quantity" },
-    { title: "Amount", dataIndex: "amount", key: "amount" },
+    { title: "Patient No", dataIndex: "Patient_No", key: "Patient_No" },
+    { title: "Date", dataIndex: "Date", key: "Date" },
+    { title: "Transaction Type", dataIndex: "Transaction_Type", key: "Transaction_Type" },
+    { title: "Code", dataIndex: "Code", key: "Code" },
+    { title: "Description", dataIndex: "Description", key: "Description" },
+    { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
+    { title: "Remarks", dataIndex: "Remarks", key: "Remarks" },
+    { title: "Amount", dataIndex: "Total_Amount", key: "Total_Amount" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div>
+          <Button 
+            onClick={() => handleEditCharge(record.Code)} 
+            icon={<FaEdit />} 
+            type="primary" 
+            size="small" 
+            style={{ marginRight: 8 }} 
+          />
+          <Button 
+            onClick={() => handleDeleteCharge(record.Code)} 
+            icon={<FaTrashAlt />} 
+            type="danger" 
+            size="small" 
+          />
+        </div>
+      ),
+    },
   ];
+
+  // Sort the localChargesList by Date (latest first)
+  const sortedChargesList = [...localChargesList].sort((a, b) => b.AuxiliaryIndex1 - a.AuxiliaryIndex1);
 
   return (
     <Modal
       title={
         <div className="flex justify-between">
           <span className="text-lg font-bold">Add Charges</span>
-          <IoCloseOutline className="text-2xl" onClick={onClose} />
+          <IoCloseOutline className="text-2xl" onClick={handleClose} />
         </div>
       }
       visible={visible}
       footer={null}
       style={{ width: "100%", top: "20px" }}
-      width={"80%"}
-      onCancel={onClose}
+      width={"75%"}
+      onCancel={handleClose}
     >
       <Form form={form} layout="vertical" onFinish={handleAddCharge}>
         <Row gutter={16}>
@@ -120,15 +148,13 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             <Form.Item
               label="Service Name"
               name="transactionType"
-              rules={[{ required: true, message: "Please enter charge name!" }]}
-            >
+              rules={[{ required: true, message: "Please enter charge name!" }]}>
               <Select
                 placeholder="Select Service"
                 size="large"
                 showSearch
                 optionFilterProp="children"
-                onChange={handleTransactionTypeChange}
-              >
+                onChange={handleTransactionTypeChange}>
                 {data?.map((item) => (
                   <Select.Option key={item.TransactionType} value={item.TransactionType}>
                     {item.TransactionType}
@@ -141,15 +167,13 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             <Form.Item
               label="Charge Name"
               name="charge"
-              rules={[{ required: true, message: "Please enter charge name!" }]}
-            >
+              rules={[{ required: true, message: "Please enter charge name!" }]}>
               <Select
                 placeholder="Select Charge"
                 size="large"
                 showSearch
                 optionFilterProp="children"
-                onChange={handleChargeTypeChange}
-              >
+                onChange={handleChargeTypeChange}>
                 {filteredCharges?.map((item) => (
                   <Select.Option key={item.Code} value={item.Description}>
                     {item.Description}
@@ -162,8 +186,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             <Form.Item
               label="Quantity"
               name="quantity"
-              rules={[{ required: true, message: "Please enter quantity!" }]}
-            >
+              rules={[{ required: true, message: "Please enter quantity!" }]}>
               <Input size="large" type="number" />
             </Form.Item>
           </Col>
@@ -176,22 +199,17 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Remarks" name="remarks" rules={[{required:true, message:"Please input Remarks!"}]}>
+            <Form.Item label="Remarks" name="remarks" rules={[{ required: true, message: "Please input Remarks!" }]}>
               <Input.TextArea size="large" />
             </Form.Item>
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit">Add Charge</Button>
+          <Button type="primary" htmlType="submit">Save</Button>
         </div>
       </Form>
 
-      <Table dataSource={chargeList} columns={columns} pagination={false} className="mt-4" />
-
-      <div className="d-flex justify-content-end align-items-center gap-3">
-        <Button type="primary" onClick={handleSubmitAll} >Submit</Button>
-        <Button onClick={onClose}>Cancel</Button>
-      </div>
+      
     </Modal>
   );
 };

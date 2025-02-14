@@ -1,7 +1,8 @@
 import { Card, Collapse, Empty } from 'antd';
 import PropTypes from 'prop-types';
+import Loading from '../../../partials/nurse-partials/Loading';
 
-const MentalStatusExamTable = ({ data }) => {
+const MentalStatusExamTable = ({ data, loadingHistory }) => {
     const notesType = [
         { value: '1', label: 'APPEARANCE' },
         { value: '2', label: 'SPEECH' },
@@ -40,7 +41,8 @@ const MentalStatusExamTable = ({ data }) => {
         })
       );
     
-    
+  if(loadingHistory) return <Loading />
+
   return (
     
     <>
@@ -63,4 +65,5 @@ export default MentalStatusExamTable
 // props validation
 MentalStatusExamTable.propTypes = {
   data: PropTypes.array.isRequired,
+  loadingHistory: PropTypes.bool
 };

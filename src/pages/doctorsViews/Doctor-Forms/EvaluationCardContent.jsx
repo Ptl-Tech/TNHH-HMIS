@@ -1,12 +1,12 @@
 import { Card, Tabs } from "antd";
-import React from "react";
 import ObservationRoom from "./ObservationRoom";
 import PatientCarePlan from "./PatientCarePlan";
 import PatientRequests from "./PatientRequests";
-import DocForms from "./DocForms";
 import PatientFile from "../../nurse-view/PatientFile";
 import ConsultationroomDetails from "./ConsultationroomDetails";
 import AdmissionTab from "./AdmissionTab";
+import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 
 const EvaluationCardContent = ({
   treatmentNo,
@@ -15,11 +15,15 @@ const EvaluationCardContent = ({
   patientDetails,
   role,
 }) => {
+  
+  const location = useLocation();
+  const patientDetail = location.state?.patientDetails;
+
   return (
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>
         <Tabs defaultActiveKey="1">
-          {(role === "Doctor" || role === "Psychology") && (
+          {(role === "Doctor" || role === "Psychology" || role === "Nurse") && (
             <Tabs.TabPane tab="Triage Room" key="2">
               <ObservationRoom
                 treatmentNo={treatmentNo}
@@ -36,7 +40,7 @@ const EvaluationCardContent = ({
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          {(role === "Doctor" || role === "Psychology") && (
+          {(role === "Doctor" || role === "Nurse") && (
             <>
               <Tabs.TabPane tab="Medication" key="5">
                 <PatientCarePlan
@@ -65,11 +69,16 @@ const EvaluationCardContent = ({
               <Tabs.TabPane tab="Admission & Referral" key="7">
                 <AdmissionTab />
               </Tabs.TabPane>
-              <Tabs.TabPane tab="Patient File" key="8">
-                <PatientFile patientDetails={patientDetails} />
-              </Tabs.TabPane>
             </>
           )}
+          {(role === "Nurse" || role === "Doctor" || role === "Psychology") &&
+            patientDetail?.Status !== "Completed" && (
+              <>
+                <Tabs.TabPane tab="Patient File" key="8">
+                  <PatientFile patientDetails={patientDetails} />
+                </Tabs.TabPane>
+              </>
+            )}
         </Tabs>
       </Card>
     </div>
@@ -77,3 +86,11 @@ const EvaluationCardContent = ({
 };
 
 export default EvaluationCardContent;
+// props validation
+EvaluationCardContent.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+  patientDetails: PropTypes.object,
+  role: PropTypes.string,
+};

@@ -225,6 +225,13 @@ import { postLabSampleReducer } from './lab-reducers/postLabSampleReducer';
 import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsReducer';
 import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
 import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
+import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
+import { getPatientReceiptsHeadersReducer, getPatientReceiptsReducer } from './ChargesReducers/getPatientReceiptsReducer';
+import { getPatientEncounterListReducer } from './doc-reducers/pastDoctorNotesEncounterReducers';
+import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
+import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
+import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
+import { deletePatientChargesReducer } from './ChargesReducers/deletePatientChargesReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -282,6 +289,9 @@ export const rootReducer = combineReducers({
   appmntList: appmntListReducer,
   docTreatmentList: treatmentListReducer,
   getPatientList: getPatientListReducer,
+  // past encounters
+  getPatientEncounters:getPatientEncounterListReducer,
+  // end
   getConsultationRoom: getConsultationRoomListReducer,
   getPatient: PatientDeetsReducer,
   getSymptoms: QySymptomsSetupReducer,
@@ -419,6 +429,12 @@ export const rootReducer = combineReducers({
   getChargesLines:getChargesLinesReducer,
   postPatientCharges:postPatientChargesReducer,
   generateInvoice:postGenerateInvoiceReducer,
+  postReverseCharges:postReverseChargeReducer,
+  getPatientReceipt:getPatientReceiptsReducer,
+  getPatientReceiptHeader:getPatientReceiptsHeadersReducer,
+  getUnpostedCharges:getUnpostedChargesReducer,
+  getPostedCharges:getpostedChargesReducer,
+  deletePatientCharges:deletePatientChargesReducer,
   postNursingCarePlan:postNursingCarePlanReducer,
   getNursingCarePlan:getNursingCarePlanReducer,
 

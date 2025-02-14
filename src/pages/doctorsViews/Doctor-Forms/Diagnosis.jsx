@@ -12,6 +12,7 @@ import {
   Modal,
   Table,
   Tabs,
+  Spin,
 } from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
@@ -41,6 +42,7 @@ const { Option } = Select;
 
 const Diagnosis = () => {
   const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
   const role = useAuth().userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
@@ -62,6 +64,7 @@ const Diagnosis = () => {
   const { loading: savePatientHistory } = useSelector(
     (state) => state.postPatientHistory
   );
+  const [provisionDiagnosisList, setProvisionDiagnosisList] = useState([]);
   const [primaryDiagnosisList, setPrimaryDiagnosisList] = useState([]);
   const [secondaryDiagnosisList, setSecondaryDiagnosisList] = useState([]);
   const [activeKey, setActiveKey] = useState("1"); // Default active key to Primary Diagnosis
@@ -102,9 +105,12 @@ const Diagnosis = () => {
   const handleClose = () => {
     setIsModalVisible(false); // Close the modal by updating state
     //reset the diagnosis list
-    if (activeTab === "1") {
+    if (activeTab === "1"){
+      setProvisionDiagnosisList([]);
+    }
+    else if (activeTab === "2") {
       setPrimaryDiagnosisList([]);
-    } else if (activeTab === "2") {
+    } else if (activeTab === "3") {
       setSecondaryDiagnosisList([]);
     }
   };
@@ -127,6 +133,7 @@ const Diagnosis = () => {
     });
   };
   const handleAddDiagnosis = (type) => {
+    console.log('clicked', type);
     if (diagnosisInput !== "") {
       const newDiagnosis = {
         diagnosisCode: diagnosisInput,
@@ -134,10 +141,12 @@ const Diagnosis = () => {
         remarks: "",
         diagnosisType: type, // 1 for primary, 2 for secondary
       };
-
       if (type === 1) {
+        setProvisionDiagnosisList((prevList) => [...prevList, newDiagnosis]);
+      }
+      else if (type === 2) {
         setPrimaryDiagnosisList((prevList) => [...prevList, newDiagnosis]);
-      } else if (type === 2) {
+      } else if (type === 3) {
         setSecondaryDiagnosisList((prevList) => [...prevList, newDiagnosis]);
       }
 
@@ -148,10 +157,15 @@ const Diagnosis = () => {
   const handleUpdateDiagnosis = (index, field, value, type) => {
     let updatedList = [];
     if (type === 1) {
+      updatedList = [...provisionDiagnosisList];
+      updatedList[index][field] = value;
+      setProvisionDiagnosisList(updatedList);
+    }
+    else if (type === 2) {
       updatedList = [...primaryDiagnosisList];
       updatedList[index][field] = value;
       setPrimaryDiagnosisList(updatedList);
-    } else if (type === 2) {
+    } else if (type === 3) {
       updatedList = [...secondaryDiagnosisList];
       updatedList[index][field] = value;
       setSecondaryDiagnosisList(updatedList);
@@ -160,10 +174,15 @@ const Diagnosis = () => {
 
   const handleRemoveDiagnosis = (index, type) => {
     if (type === 1) {
+      setProvisionDiagnosisList(
+        provisionDiagnosisList.filter((_, i) => i !== index)
+      );
+    }
+    else if (type === 2) {
       setPrimaryDiagnosisList(
         primaryDiagnosisList.filter((_, i) => i !== index)
       );
-    } else if (type === 2) {
+    } else if (type === 3) {
       setSecondaryDiagnosisList(
         secondaryDiagnosisList.filter((_, i) => i !== index)
       );
@@ -171,6 +190,10 @@ const Diagnosis = () => {
   };
   const handleSubmit = async (values) => {
     const activeTab = activeKey; // Get the active tab key
+
+    const lastUnsavedProvisionDiagnosis = provisionDiagnosisList.filter(
+      (diagnosis) => !diagnosis.diagnosisNo
+    );
 
     const lastUnSavedPrimaryDiagnosis = primaryDiagnosisList.filter(
       (diagnosis) => !diagnosis.diagnosisNo
@@ -182,10 +205,13 @@ const Diagnosis = () => {
     let success = true; // Tracks overall success
 
     try {
+      console.log('active tab', activeTab)
       const diagnosisList =
         activeTab === "1"
-          ? lastUnSavedPrimaryDiagnosis
-          : lastUnSavedSecondaryDiagnosis;
+        ? lastUnsavedProvisionDiagnosis
+        : activeTab === "2"
+        ? lastUnSavedPrimaryDiagnosis
+        : lastUnSavedSecondaryDiagnosis;
 
       // Process diagnoses based on active tab
       for (let diagnosis of diagnosisList) {
@@ -197,6 +223,9 @@ const Diagnosis = () => {
           confirmed: diagnosis.confirmed,
           remarks: diagnosis.remarks,
         };
+
+
+        console.log('diagnosisData', diagnosisData)
 
         const response = await dispatch(postDiagnosisRequest(diagnosisData));
 
@@ -211,8 +240,11 @@ const Diagnosis = () => {
           setDiagnosisInput("");
           //reset the diagnosis list
           if (activeTab === "1") {
+            setProvisionDiagnosisList([]);
+          }
+          else if (activeTab === "2") {
             setPrimaryDiagnosisList([]);
-          } else if (activeTab === "2") {
+          } else if (activeTab === "3") {
             setSecondaryDiagnosisList([]);
           }
         }
@@ -248,6 +280,8 @@ const Diagnosis = () => {
     setIsModalVisible(true); // Show modal after processing
   };
 
+  if (!patientDetails) return <Spin />;
+
   return (
     <div className="mt-4">
       <Typography.Title
@@ -264,7 +298,8 @@ const Diagnosis = () => {
         Diagnosis
       </Typography.Title>
 
-      {role === "Doctor" && (
+      {(role === "Doctor" || role === "Psychology") &&
+        patientDetails?.Status !== "Completed" && (
         <Row gutter={24}>
           <Col span={24}>
             <Button
@@ -300,9 +335,24 @@ const Diagnosis = () => {
            onFinish={handleSave}
            />
           </TabPane> */}
-          <TabPane tab="Add Primary Diagnosis" key="1">
+          <TabPane tab="Add Provisional Diagnosis" key="1">
             <DiagnosisForm
               diagnosisType={1}
+              data={data}
+              diagnosisInput={diagnosisInput}
+              setDiagnosisInput={setDiagnosisInput}
+              diagnosisList={provisionDiagnosisList}
+              handleAddDiagnosis={handleAddDiagnosis}
+              handleUpdateDiagnosis={handleUpdateDiagnosis}
+              handleRemoveDiagnosis={handleRemoveDiagnosis}
+              handleSubmit={handleSubmit}
+              loading={loading}
+              handleClose={() => setHistoryVisible(false)}
+            />
+          </TabPane>
+          <TabPane tab="Add Primary Diagnosis" key="2">
+            <DiagnosisForm
+              diagnosisType={2}
               data={data}
               diagnosisInput={diagnosisInput}
               setDiagnosisInput={setDiagnosisInput}
@@ -316,9 +366,9 @@ const Diagnosis = () => {
             />
           </TabPane>
 
-          <TabPane tab="Add Secondary Diagnosis" key="2">
+          <TabPane tab="Add Secondary Diagnosis" key="3">
             <DiagnosisForm
-              diagnosisType={2}
+              diagnosisType={3}
               data={secondaryDiagnosis}
               diagnosisInput={diagnosisInput}
               setDiagnosisInput={setDiagnosisInput}

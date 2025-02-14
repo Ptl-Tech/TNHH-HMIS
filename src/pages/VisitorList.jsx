@@ -34,6 +34,12 @@ const VisitorList = () => {
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [searchName, setSearchName] = useState("");
+  const [searchPhone, setSearchPhone] = useState("");
+  const [searchIdNumber, setSearchIdNumber] = useState("");
+
+  console.log('search name', searchName)
+
   const currentDate = dayjs().format("YYYY-MM-DD");
 
   const { loading: visitorsLoading, visitors } = useSelector(
@@ -52,19 +58,21 @@ const VisitorList = () => {
 
   //console where visitors are existing patients
   if (
-    visitors.IDNumber === patients.IDNumber &&
-    visitors.Status === "Entered" &&
-    visitors.InitiatedDate === currentDate
+    visitors?.IDNumber === patients.IDNumber &&
+    visitors?.Status === "Entered" &&
+    visitors?.InitiatedDate === currentDate
   ) {
     console.log("visitors are existing patients", visitors);
   }
 
+
+  console.log('visitors', filteredVisitors)
   //filter the visitors based on date and status only
   useEffect(() => {
     const filtered = visitors.filter((visitor) => {
       return (
-        dayjs(visitor.InitiatedDate).isSame(currentDate, "day") &&
-        visitor.Status === "Entered"
+        dayjs(visitor?.InitiatedDate).isSame(currentDate, "day") &&
+        visitor?.Status === "Entered"
       );
     });
     setFilteredVisitors(filtered);
@@ -134,8 +142,9 @@ const VisitorList = () => {
       // If not found, convert to patient
       message.success("Create a New Patient.");
       navigate("/reception/Register-walkin", {
-        state: { visitorData: selectedVisitor },
+        state: { visitorData: visitor },
       });
+      
     }
   };
 
@@ -181,9 +190,37 @@ const VisitorList = () => {
   const columns = [
     { title: "Index", dataIndex: "index", render: (_, __, index) => index + 1 },
     { title: "Visitor No", dataIndex: "No" },
-    { title: "Visitor Name", dataIndex: "VisitorName" },
-    { title: "ID Number", dataIndex: "IDNumber" },
-    { title: "Phone Number", dataIndex: "PhoneNumber" },
+    {
+      title: "Visitor Name",
+      dataIndex: "VisitorName",
+      filteredValue: searchName ? [searchName] : null,
+      onFilter: (value, record) =>
+        record?.VisitorName
+          ? record.VisitorName.toLowerCase().includes(value.toLowerCase())
+          : false,
+      render: (_, visitor) =>
+        visitor.VisitorName?.trim()
+          ? visitor.VisitorName
+          : `${visitor.FirstName || ""} ${visitor.MiddleName || ""} ${
+              visitor.LastName || ""
+            }`.trim(),
+    },
+    { title: "ID Number", 
+      dataIndex: "IDNumber",
+      filteredValue: searchIdNumber ? [searchIdNumber] : null,
+      onFilter: (value, record) =>
+        record?.IDNumber
+          ? record.IDNumber.toLowerCase().includes(value.toLowerCase())
+          : false,
+    },
+    { title: "Phone Number", 
+      dataIndex: "PhoneNumber",
+      filteredValue: searchPhone ? [searchPhone] : null,
+      onFilter: (value, record) =>
+        record?.PhoneNumber
+          ? record.PhoneNumber.toLowerCase().includes(value.toLowerCase())
+          : false,
+    },
     {
       title: "Date of Visit",
       dataIndex: "InitiatedDate",
@@ -199,20 +236,20 @@ const VisitorList = () => {
     {
       title: "Action",
       render: (_, visitor) => (
-       <div className="d-flex flex-column gap-3">
-        <Button type="primary" onClick={() => handleVisitCreation(visitor)}>
-          {getButtonText(visitor)}
-        </Button>
-        <Button type="default" onClick={() => handleWalkInCreation(visitor)}>
-          {getWalkInButtonText(visitor)}
-        </Button>
-       </div>
+        <div className="d-flex flex-column gap-3">
+          <Button type="primary" onClick={() => handleVisitCreation(visitor)}>
+            {getButtonText(visitor)}
+          </Button>
+          <Button type="default" onClick={() => handleWalkInCreation(visitor)}>
+            {getWalkInButtonText(visitor)}
+          </Button>
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="card mt-4">
+    <div className="card mt-4" style={{ padding: "10px"}}>
       <div className="d-flex justify-content-between align-items-center m-4">
         <h5>
           <TeamOutlined style={{ marginRight: 8 }} />
@@ -226,30 +263,30 @@ const VisitorList = () => {
           Refresh
         </Button>
       </div>
-      <Card className="mb-4">
-        <Row gutter={16}>
-          <Col span={6}>
-            <Input
+      <Card className="mb-4" style={{ padding: "30px 10px"}}>
+        <Row gutter={[16, 16]}>
+          <Col span={8}>
+            <Input.Search
               placeholder="ID Number"
-              value={searchParams.IdNumber}
-              onChange={(e) => handleSearchChange(e, "IdNumber")}
+              // value={searchParams.IdNumber}
               allowClear
+              onChange={(value)=>setSearchIdNumber(value.target.value)}
             />
           </Col>
-          <Col span={6}>
-            <Input
+          <Col span={8}>
+            <Input.Search
               placeholder="Visitor Name"
-              value={searchParams.VisitorName}
-              onChange={(e) => handleSearchChange(e, "VisitorName")}
+              // value={searchParams.VisitorName}
               allowClear
+              onChange={(value)=>setSearchName(value.target.value)}
             />
           </Col>
-          <Col span={6}>
-            <Input
+          <Col span={8}>
+            <Input.Search
               placeholder="Visitor Phone"
-              value={searchParams.VisitorPhone}
-              onChange={(e) => handleSearchChange(e, "VisitorPhone")}
+              // value={searchParams.VisitorPhone}
               allowClear
+              onChange={(value)=>setSearchPhone(value.target.value)}
             />
           </Col>
         </Row>

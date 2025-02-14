@@ -6,68 +6,69 @@ import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
 import {
   Tabs,
   Table,
-  Dropdown,
-  Menu,
   Button,
   Input,
   Row,
   Col,
   Typography,
-  Modal,
   Space,
+  Menu,
+  Dropdown,
 } from "antd";
-import {
-  EditOutlined,
-  EyeOutlined,
-  FilePdfOutlined,
-  DownOutlined,
-  DollarOutlined,
-} from "@ant-design/icons";
-import { FaFileInvoice } from "react-icons/fa";
+import { EyeOutlined, DollarOutlined } from "@ant-design/icons";
+import { FaEye, FaFileInvoice } from "react-icons/fa";
 import ProcessPayment from "./ProcessPayment";
-import { postGenerateInvoice } from "../../actions/Charges-Actions/postGenerateInvoice";
-import { postInterimInvoice } from "../../actions/Charges-Actions/printInterimInvoice";
-import useAuth from "../../hooks/useAuth";
 import AddCharges from "./AddCharges";
+import useAuth from "../../hooks/useAuth";
+import CashPatients from "./CashPatients";
+import InsurancePatients from "./InsurancePatients";
 
 const { TabPane } = Tabs;
-const { Search } = Input;
 
 const ActiveOutPatients = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const staffNo = useAuth().userData.no;
+
+  // Redux state data
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
   );
   const { patients: billingData } = useSelector(
     (state) => state.getBillingList
   );
-  const { loading: generateInvoiceLoading } = useSelector(
-    (state) => state.generateInvoice
-  );
-  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
-    useSelector((state) => state.postInterimInvoice);
 
+  // Local state
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
   });
-
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
-  const [selectedpatientNo, setSelectedPatientNo] = useState("");
+
+  // Lists for cash & corporate patients
   const [cashPatients, setCashPatients] = useState([]);
   const [corporatePatients, setCorporatePatients] = useState([]);
   const [filteredCashPatients, setFilteredCashPatients] = useState([]);
   const [filteredCorporatePatients, setFilteredCorporatePatients] = useState(
     []
   );
+
+  const [activeComponent, setActiveComponent] = useState("cash"); // Default to cash patients
+
+  // Modals
   const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
     useState(false);
-
   const [addChargeModal, setAddChargeModal] = useState(false);
+
+  // To update patient balance in the list when new charges are added
   const [updatedAmounts, setUpdatedAmounts] = useState({});
 
+  // Track which tab is active: "1" for Cash, "2" for Corporate
+  const [activeTab, setActiveTab] = useState("1");
+
+  // For cash patients, we allow row selection to display external actions.
+  const [patientNo, setPatientNo] = useState(null);
+  const [visitNo, setVisitNo] = useState(null);
   useEffect(() => {
     dispatch(appmntList());
     dispatch(getBillingList());
@@ -110,10 +111,7 @@ const ActiveOutPatients = () => {
 
   const handleSearch = (e, field) => {
     const value = e.target.value.toLowerCase();
-    const updatedSearchParams = {
-      ...searchParams,
-      [field]: value,
-    };
+    const updatedSearchParams = { ...searchParams, [field]: value };
     setSearchParams(updatedSearchParams);
 
     const filteredCash = cashPatients.filter(
@@ -148,21 +146,89 @@ const ActiveOutPatients = () => {
     setIsGenerateReceiptModalVisible(false);
     setAddChargeModal(false);
   };
+
   const showPaymentModal = (record) => {
+    // Always use the record's current or updated balance
+    const currentBalance =
+      updatedAmounts[record.AppointmentNo] !== undefined
+        ? updatedAmounts[record.AppointmentNo]
+        : record.Balance;
+    setSelectedPatientAmount(currentBalance);
     setIsGenerateReceiptModalVisible(true);
-    setSelectedPatientNo(record.PatientNo);
-    setSelectedPatientAmount(record.Balance);
-  };
-  const showAddChargesModal = (record) => {
-    setAddChargeModal(true);
-    setSelectedPatientNo(record.AppointmentNo);
   };
 
-  const patientColumns = [
+  const showAddChargesModal = (record) => {
+    setAddChargeModal(true);
+    setPatientNo(record.PatientNo);
+    setVisitNo(record.AppointmentNo);
+  };
+
+  const handleBalanceUpdate = (patientNo, newBalance) => {
+    setUpdatedAmounts((prev) => ({
+      ...prev,
+      [patientNo]: newBalance,
+    }));
+  };
+
+  const handleViewPatientReceips = (record) => {
+    navigate(
+      `/reception/Patient-Receipts/Patient?VisitNo=${record?.AppointmentNo}`
+    );
+  };
+
+  const menu = (record) => (
+    <Menu>
+      <Menu.Item key="1">
+        {activeTab === "2" && (
+          <Button
+            type="ghost"
+            icon={<EyeOutlined />}
+            onClick={() =>
+              navigate(
+                `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
+                {
+                  state: { patientData: record },
+                }
+              )
+            }
+          >
+            View
+          </Button>
+        )}
+      </Menu.Item>
+      <Menu.Item key="2">
+        <Button type="ghost" onClick={() => showAddChargesModal(record)}>
+          <FaFileInvoice /> Add Charges
+        </Button>
+      </Menu.Item>
+      {activeTab === "1" && (
+        <>
+          <Menu.Item key="3">
+            <Button type="ghost" onClick={() => showPaymentModal(record)}>
+              <DollarOutlined /> Make Payment
+            </Button>
+          </Menu.Item>
+          <Menu.Item key="4">
+            <Button
+              type="ghost"
+              onClick={() => handleViewPatientReceips(record)}
+            >
+              <FaEye /> View
+            </Button>
+          </Menu.Item>
+        </>
+      )}
+    </Menu>
+  );
+
+  const baseColumns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
       key: "PatientNo",
+      render: (text) => (
+        <span style={{ fontWeight: "bold", color: "brown" }}>{text}</span>
+      ),
     },
     {
       title: "Patient Name",
@@ -173,6 +239,9 @@ const ActiveOutPatients = () => {
       title: "Appointment No",
       dataIndex: "AppointmentNo",
       key: "AppointmentNo",
+      render: (text) => (
+        <span style={{ fontWeight: "bold", color: "blue" }}>{text}</span>
+      ),
     },
     {
       title: "Patient Type",
@@ -215,154 +284,81 @@ const ActiveOutPatients = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
+      sorter: (a, b) => a.Balance - b.Balance,
       render: (text, record) => {
-        const newBalance =
-          updatedAmounts[record.AppointmentNo] !== undefined
-            ? updatedAmounts[record.AppointmentNo]
-            : text;
+        const newBalance = updatedAmounts[record.AppointmentNo] ?? text;
+        const balanceColor =
+          newBalance === 0 ? "green" : newBalance !== text ? "red" : "black";
         return (
-          <span style={{ color: newBalance !== text ? "red" : "black" }}>
+          <span style={{ fontWeight: "bold", color: balanceColor }}>
             KSh {newBalance.toFixed(2)}
           </span>
         );
       },
-      
     },
     {
       title: "Action",
-      key: "actions",
-      render: (_, record) => {
-        const currentBalance =
-          updatedAmounts[record.AppointmentNo] !== undefined
-            ? updatedAmounts[record.AppointmentNo]
-            : record.Balance;
-      
-        if (record.PatientType === "Cash") {
-          return (
-            <Space size="middle">
-              {currentBalance > 0 ? (
-                <Button type="primary" onClick={() => showPaymentModal(record)}>
-                  <DollarOutlined /> Make Payment
-                </Button>
-              ) : (
-                <Button type="default" onClick={() => showAddChargesModal(record)}>
-                  <FaFileInvoice /> Add Charges
-                </Button>
-              )}
-            </Space>
-          );
-        } else {
-          return (
-            <Space size="middle">
-              <Button
-                type="primary"
-                icon={<EyeOutlined />}
-                onClick={() =>
-                  navigate(
-                    `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
-                    { state: { patientData: record } }
-                  )
-                }
-              >
-                View Details
-              </Button>
-            </Space>
-          );
-        }
-      },
-      
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Dropdown overlay={menu(record)} trigger={["click"]}>
+            <Button
+              style={{ color: "#0f5689", fontSize: "16px", fontWeight: "bold" }}
+            >
+              ...
+            </Button>
+          </Dropdown>
+        </Space>
+      ),
     },
   ];
-console.log("updated Amounts",updatedAmounts);
-  // console.log("patient Data:",patientData);
+
   return (
     <div>
       <h4 className="text-center p-3 text-dark">Outpatient Billing List</h4>
-      <Typography.Text
-        style={{
-          color: "#003F6D",
-          fontWeight: "bold",
-          marginBottom: "16px",
-        }}
-      >
-        Search by:
-      </Typography.Text>
-      <Row gutter={16} className="mt-2">
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Patient Names
-          </Typography.Text>
-          <Input
-            placeholder="Patient Names"
-            value={searchParams.SearchNames}
-            onChange={(e) => handleSearch(e, "SearchNames")}
-          />
-        </Col>
-        <Col span={12}>
-          <Typography.Text
-            style={{
-              color: "#003F6D",
-              fontWeight: "bold",
-              marginBottom: "16px",
-            }}
-          >
-            Appointment Number:
-          </Typography.Text>
-          <Input
-            placeholder="Appointment Number"
-            value={searchParams.AppointmentNo}
-            onChange={(e) => handleSearch(e, "AppointmentNo")}
-          />
-        </Col>
-      </Row>
+   
+      <div className="d-flex flex-row gap-2 my-3">
+        <Button
+          type={activeComponent === "cash" ? "primary" : "default"}
+          onClick={() => setActiveComponent("cash")}
+          style={{ width:'100%' }}
+        >
+          Cash Patients
+        </Button>
+        <Button
+          type={activeComponent === "insurance" ? "primary" : "default"}
+          onClick={() => setActiveComponent("insurance")}
+          style={{ width:'100%' }}
 
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Cash Patients" key="1">
-          <Table
-            columns={patientColumns}
-            dataSource={filteredCashPatients.map((patient) => ({
-              ...patient,
-              key: patient.PatientNo,
-            }))}
-            pagination={{ pageSize: 25 }}
-            size="small"
-          />
-        </TabPane>
-        <TabPane tab="Corporate Patients" key="2">
-          <Table
-            columns={patientColumns}
-            dataSource={filteredCorporatePatients.map((patient) => ({
-              ...patient,
-              key: patient.PatientNo,
-            }))}
-            pagination={{ pageSize: 25 }}
-            size="small"
-          />
-        </TabPane>
-      </Tabs>
+        >
+          Insurance Patients
+        </Button>
+      </div>
+
+      {/* Conditionally render components */}
+      {activeComponent === "cash" ? <CashPatients /> : <InsurancePatients />}
       <ProcessPayment
         visible={isGenerateReceiptModalVisible}
         onClose={handleClose}
-        patientNo={selectedpatientNo}
         amount={selectedPatientAmount}
+        patientNo={patientNo}
       />
+
       <AddCharges
-  visible={addChargeModal}
-  onClose={handleClose}
-  visitNo={selectedpatientNo}
-  setTotalAmount={(amount) => {
-    setUpdatedAmounts((prev) => ({
-      ...prev,
-      [selectedpatientNo]: (prev[selectedpatientNo] || 0) + amount, // Add new amount to the existing balance
-    }));
-  }}
-/>;
+        visible={addChargeModal}
+        onClose={handleClose}
+        patientNo={patientNo}
+        visitNo={visitNo}
+        setTotalAmount={(amount) => {
+          const key = selectedCashRow?.AppointmentNo;
+          if (key) {
+            setUpdatedAmounts((prev) => ({
+              ...prev,
+              [key]: (prev[key] || 0) + amount,
+            }));
+          }
+        }}
+      />
     </div>
   );
 };

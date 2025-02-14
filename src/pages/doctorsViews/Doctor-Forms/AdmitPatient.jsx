@@ -34,6 +34,7 @@ const AdmitPatientForm = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const [form] = useForm();
+  const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo"); // Get 'TreatmentNo' from query params
 
@@ -133,7 +134,6 @@ const AdmitPatientForm = () => {
     if (admissionRequestSuccess) {
       dispatch(getAdmissionLines(treatmentNo));
     }
-
   };
 
   return (
@@ -147,17 +147,18 @@ const AdmitPatientForm = () => {
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Patient Admission
         </Typography.Title>
-
-        <div className="d-flex justify-content-end my-2">
-          <Button
-            type="primary"
-            onClick={handleHistoryClick}
-            style={{ marginRight: "10px" }}
-            icon={<PlusOutlined />}
-          >
-            New Admission Request
-          </Button>
-        </div>
+        {patientDetails?.Status !== "Completed" && (
+          <div className="d-flex justify-content-end my-2">
+            <Button
+              type="primary"
+              onClick={handleHistoryClick}
+              style={{ marginRight: "10px" }}
+              icon={<PlusOutlined />}
+            >
+              New Admission Request
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Patient Admission Form */}
@@ -174,7 +175,11 @@ const AdmitPatientForm = () => {
         onCancel={handleCancel}
         footer={
           <Space>
-            <Button type="primary" loading={loading} onClick={handlePatientAdmission}>
+            <Button
+              type="primary"
+              loading={loading}
+              onClick={handlePatientAdmission}
+            >
               <SaveOutlined /> Save Admission Details
             </Button>
             <Button
@@ -184,7 +189,9 @@ const AdmitPatientForm = () => {
               loading={loadingAdmissionRequest}
               onClick={handleAdmissionRequest}
               disabled={loadingAdmissionRequest} // Prevent clicking until saved
-              className={loading || admissionRequestSuccess ? "ant-btn-disabled" : ""}
+              className={
+                loading || admissionRequestSuccess ? "ant-btn-disabled" : ""
+              }
             >
               Request Admission
             </Button>
@@ -212,7 +219,11 @@ const AdmitPatientForm = () => {
                 rules={[{ required: true }]}
               >
                 <Input
-                  style={{ width: "100%", color: "#0F5689", fontWeight: "bold" }}
+                  style={{
+                    width: "100%",
+                    color: "#0F5689",
+                    fontWeight: "bold",
+                  }}
                   disabled
                 />
               </Form.Item>
@@ -229,7 +240,7 @@ const AdmitPatientForm = () => {
               </Form.Item>
             </Col>
           </Row>
-        <Row gutter={16}>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item label="Admission Reason" name="admissionReason">
                 <TextArea />

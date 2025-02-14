@@ -1,81 +1,87 @@
-import React, { useEffect, useState } from "react";
-import { Card, Typography, Avatar, Button, message, Modal, Form, Select } from "antd";
+import { useEffect, useState } from "react";
+import {
+  Card,
+  Typography,
+  Avatar,
+  Button,
+  message,
+  Modal,
+  Form,
+  Select,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
-import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
 import useAuth from "../../../hooks/useAuth";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
-import { getConsultationRoomListSlice } from "../../../actions/nurse-actions/getConsultationRoomSlice";
-import { getSingleConsultationRoomReducer } from "../../../reducers/nurse-reducers/getConsultationRoomReducer";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import TextArea from "antd/es/input/TextArea";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
-
+import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
+import { calculateAge } from "../../../utils/helpers";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
+  const { triageWaitingList } =
+    useFetchAllPatientsHook();
   const dispatch = useDispatch();
   const staffNo = useAuth().userData.No;
+  const [patientDetail, setPatientDetail] = useState([]);
+
+  useEffect(() => {
+    if (patientNo) {
+      const filterPatient = triageWaitingList?.filter(
+        (patient) => patient?.PatientNo === patientNo
+      );
+      setPatientDetail(filterPatient[0]);
+    }
+  }, [patientNo, triageWaitingList]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
-    const { loadingCheInPatient: markasCompleteLoading } =
-    useSelector((state) => state.markAsCompleted);
+  const { loadingCheInPatient: markasCompleteLoading } = useSelector(
+    (state) => state.markAsCompleted
+  );
 
-    const {
-        loading: doctorsLoading,
-        data: doctorsPayload,
-      } = useSelector((state) => state.getDoctorsList);
-    const [form] = Form.useForm();
+  const { loading: doctorsLoading, data: doctorsPayload } = useSelector(
+    (state) => state.getDoctorsList
+  );
+  const [form] = Form.useForm();
 
-    const {
-      loading: loadingPostPsychologyRequest,
-    } = useSelector((state) => state.postPsychologyRequest);
+  const { loading: loadingPostPsychologyRequest } = useSelector(
+    (state) => state.postPsychologyRequest
+  );
 
-    const showModal = () => {
-      setIsModalOpen(true);
-    };
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
 
-    const handleOk = () => {
-      form.submit();
-      setIsModalOpen(false);
-    };
+  const handleOk = () => {
+    form.submit();
+    setIsModalOpen(false);
+  };
 
-    const handleCancel = () => {
-      setIsModalOpen(false);
-    };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
-    const {
-        loading: clinicsLoading,
-        clinics: clinicsPayload,
-      } = useSelector((state) => state.clinics);
+  const { loading: clinicsLoading, clinics: clinicsPayload } = useSelector(
+    (state) => state.clinics
+  );
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const branchCode = localStorage.getItem("branchCode");
+  
 
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
     const matchingDoctors = doctorsPayload.filter(
       (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase()
-      && doctor.GlobalDimension1Code === branchCode
     );
     setFilteredDoctors(matchingDoctors);
   };
 
-  // const {consultationRoomDetails, loadingConsultationRoomDetails} = useSelector((state) => state.getSingleConsultationRoom)
-
-  
-  // useEffect(() => {
-  //   if (treatmentNo) {
-  //     dispatch(getSingleConsultationSlice(treatmentNo))
-  //   }
-  // }, [dispatch, treatmentNo]);
-
-  // console.log(loadingConsultationRoomDetails)
- 
   const handleOnFinish = async (values) => {
     const data = {
       ...values,
@@ -84,15 +90,14 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
       staffNo,
     };
 
-    await dispatch(postPsychologyRequestReviewSlice(data))
-    .then((data) => {
+    await dispatch(postPsychologyRequestReviewSlice(data)).then((data) => {
       if (data?.status === "success") {
         message.success("Request Sent Successfully");
       } else {
         message.error("Failed to send request. Please try again.");
       }
-    })
-  }
+    });
+  };
 
   const capitalizeWords = (name) =>
     name
@@ -103,14 +108,14 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const patientName = patientDetails?.Names
     ? capitalizeWords(patientDetails.Names)
     : capitalizeWords(
-      [
-        patientDetails?.Surname,
-        patientDetails?.LastName,
-        patientDetails?.MiddleName,
-      ]
-        .filter(Boolean)
-        .join(" ")
-    );
+        [
+          patientDetails?.Surname,
+          patientDetails?.LastName,
+          patientDetails?.MiddleName,
+        ]
+          .filter(Boolean)
+          .join(" ")
+      );
   const handlePrintInvoice = () => {
     const invoiceData = {
       PatientNo: patientNo,
@@ -126,7 +131,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(listDoctors()); 
+    dispatch(listDoctors());
   }, [dispatch]);
 
   const handleMarkAsCompleted = () => {
@@ -153,80 +158,85 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
         paddingBottom: "20px",
       }}
     >
-
-      <Modal title="Request Patient Review" 
-      open={isModalOpen} onOk={handleOk} 
-      onCancel={handleCancel}
-      okText="Send Request"
-      confirmLoading={loadingPostPsychologyRequest}
+      <Modal
+        title="Request Patient Review"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Send Request"
+        confirmLoading={loadingPostPsychologyRequest}
       >
         <Form
-          layout="vertical" 
-          style={{ paddingTop: '10px'}} 
+          layout="vertical"
+          style={{ paddingTop: "10px" }}
           form={form}
           onFinish={handleOnFinish}
           initialValues={{
-            date: '',
-            time: '',
-            handingOver: '',
-            takingOver: '',
-            remarks: ''
-            }}
+            date: "",
+            time: "",
+            handingOver: "",
+            takingOver: "",
+            remarks: "",
+          }}
         >
           <Form.Item
             label="Select Clinic"
             name="clinic"
             rules={[{ required: true, message: "Please select clinic" }]}
-            
           >
             <Select
-            showSearch
-            placeholder="Select Clinic"
-            style={{ width: "100%" }}
-            onChange={handleSelectChange}
-            loading={clinicsLoading}
-            options={
-              clinicsPayload?.map((clinic) => ({
-                value: clinic?.No,
-                label: clinic?.Description,
-              })) || []
-            }
-              
+              showSearch
+              placeholder="Select Clinic"
+              style={{ width: "100%" }}
+              onChange={handleSelectChange}
+              loading={clinicsLoading}
+              options={
+                clinicsPayload?.map((clinic) => ({
+                  value: clinic?.No,
+                  label: clinic?.Description,
+                })) || []
+              }
+              filterOption={(value, option) =>
+                  option?.label.toLowerCase().includes(value.toLowerCase())
+                }
             />
-
           </Form.Item>
-          <Form.Item
-            label="Select Doctor"
-            name="doctor"
-            
-          >
-            <Select
-            placeholder="Select Doctor"
-            style={{ width: "100%" }}
-            loading={doctorsLoading}
-            options={[
-                ...filteredDoctors.map((doctor) => ({
+          {(selectedClinic?.toLowerCase() === "psychiatrist" ||
+            selectedClinic?.toLowerCase() === "psychologist") && (
+            <Form.Item
+              label={
+                selectedClinic?.toLowerCase() === "psychiatrist"
+                  ? "Select Psychiatrist"
+                  : "Select Psychologist"
+              }
+              name="doctor"
+            >
+              <Select
+                showSearch
+                placeholder={
+                  selectedClinic?.toLowerCase() === "psychiatrist"
+                    ? "Select Psychiatrist"
+                    : "Select Psychologist"
+                }
+                style={{ width: "100%" }}
+                loading={doctorsLoading}
+                options={filteredDoctors.map((doctor) => ({
                   value: doctor?.DoctorID,
                   label: doctor?.DoctorsName,
-                }))
-              ]}
-              
-            />
+                }))}
+                filterOption={(value, option) =>
+                  option?.label.toLowerCase().includes(value.toLowerCase())
+                }
+              />
+            </Form.Item>
+          )}
 
-          </Form.Item>
-
-          <Form.Item
-            label="Request Reason"
-            name="remarks"
-            
-            
-          >
-            <TextArea 
+          <Form.Item label="Request Reason" name="remarks">
+            <TextArea
               placeholder="Enter Request Reason"
               style={{ width: "100%" }}
               rows={3}
             />
-
           </Form.Item>
         </Form>
       </Modal>
@@ -255,10 +265,10 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               level={5}
               style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
             >
-              {patientName}
+              {patientName || patientDetail?.SearchName}
             </Typography.Title>
             <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
-              DOB: {patientDetails?.DateOfBirth}
+              Age: {calculateAge(patientDetail?.DateOfBirth)}
             </Typography.Text>
           </div>
         </div>
@@ -281,10 +291,16 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             gap: "10px",
           }}
         >
-          <InfoRow label="Patient Number" value={patientDetails?.PatientNo || patientNo} />
+          <InfoRow
+            label="Patient Number"
+            value={patientDetails?.PatientNo || patientNo}
+          />
           <InfoRow label="Treatment Number" value={treatmentNo} />
           {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
-          <InfoRow label="Gender" value={patientDetails?.Gender} />
+          <InfoRow
+            label="Gender"
+            value={patientDetails?.Gender || patientDetail?.Gender}
+          />
           {/* {!loadingConsultationRoomDetails && <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} />} */}
           {/* <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} /> */}
         </div>
@@ -330,7 +346,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               fontWeight: "bold",
             }}
           >
-            {patientDetails?.PatientType}
+            {patientDetails?.PatientType || patientDetail?.PatientType || "N/A"}
           </Typography.Text>
         </div>
         <div
@@ -340,21 +356,27 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             justifyContent: "space-between",
           }}
         >
-          <Typography.Title
-            level={5}
-            style={{ fontSize: "14px", color: "black" }}
-          >
-            Insurance
-          </Typography.Title>
-          <Typography.Text
-            style={{
-              fontSize: "12px",
-              color: "gray",
-              fontWeight: "bold",
-            }}
-          >
-            {patientDetails?.SchemeName || "N/A"}
-          </Typography.Text>
+          {patientDetail?.PatientType === "Cash" ? null : (
+            <>
+              <Typography.Title
+                level={5}
+                style={{ fontSize: "14px", color: "black" }}
+              >
+                Insurance
+              </Typography.Title>
+              <Typography.Text
+                style={{
+                  fontSize: "12px",
+                  color: "gray",
+                  fontWeight: "bold",
+                }}
+              >
+                {patientDetails?.SchemeName ||
+                  patientDetail?.SchemeName ||
+                  "N/A"}
+              </Typography.Text>
+            </>
+          )}
         </div>
         <div
           style={{
@@ -388,36 +410,33 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
             marginTop: "40px",
           }}
         >
-          {
-            (role === 'Doctor' || role === 'Psychology') && (
-              <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
-                <Button
-                  type="primary"
-                  onClick={handleMarkAsCompleted}
-                  style={{ width: "100%", marginBottom: "10px" }}
-                >
-                  Mark as Completed
-                </Button>
-                <Button
-                  type="default"
-                  onClick={showModal}
-                  style={{ width: "100%" }}
-                >
-                  Request Patient Review
-                </Button>
-                {/* <Button
+          {(role === "Doctor" || role === "Psychology") && (
+            <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
+              <Button
+                type="primary"
+                onClick={handleMarkAsCompleted}
+                loading={markasCompleteLoading}
+                disabled={markasCompleteLoading}
+                style={{ width: "100%", marginBottom: "10px" }}
+              >
+                Mark as Completed
+              </Button>
+              <Button
+                type="default"
+                onClick={showModal}
+                style={{ width: "100%" }}
+              >
+                Request Patient Review
+              </Button>
+              {/* <Button
                     type="primary"
                     // style={{ marginTop: "10px", width: "100%" }}
                     onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
                     >
                     Print Interim Invoice
                     </Button> */}
-              </div>
-
-              
-            )
-          }
-
+            </div>
+          )}
         </div>
       </Card>
     </div>

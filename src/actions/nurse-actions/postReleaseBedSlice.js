@@ -1,3 +1,4 @@
+
 import configHelpers from '../configHelpers';
 import axios from "axios";
 
@@ -13,6 +14,7 @@ export const postReleaseBedSlice = (dischargeData) =>
     try {
         dispatch({ type: POST_RELEASE_BED_REQUEST });
 
+
         const { data } = await axios.post(`${API_URL}/Inpatient/ReleaseBed`, dischargeData, config);
     
 
@@ -24,7 +26,7 @@ export const postReleaseBedSlice = (dischargeData) =>
     
         dispatch({
             type: POST_RELEASE_BED_FAILURE,
-            payload: error.response?.data?.message || error.message,
+            payload: error.response?.data?.errors || error.message,
         });
 
         return { type: POST_RELEASE_BED_FAILURE, payload: error };
