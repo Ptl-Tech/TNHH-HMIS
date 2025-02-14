@@ -96,6 +96,9 @@ const LabResultsEntry = ({ data, loading }) => {
       ) : (
         <>
           <Table
+            rowClassName={(record) =>
+              !record.Sample_Collected ? 'disabled-row' : 'editable-row'
+            }
             columns={columns}
             dataSource={data}
             pagination={false}
@@ -118,6 +121,8 @@ const LabResultsEntry = ({ data, loading }) => {
 };
 
 const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
+  console.log({ record });
+
   const items = [
     {
       key: '1',
@@ -128,7 +133,9 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
     {
       key: '2',
       label: (
-        <div onClick={() => handleOpenRemarks(record)}>Add Final Remarks</div>
+        <div onClick={() => handleOpenRemarks(record)}>
+          {record.Remarks ? 'View Final Remarks' : 'Add Final Remarks'}
+        </div>
       ),
     },
   ];
@@ -464,6 +471,7 @@ const ResultsTable = ({ initialData, error, loading }) => {
           component={false}
         >
           <Table
+            rowClassName={'editable-row'}
             onRow={(record) => ({
               onClick: () => edit(record),
             })}
@@ -488,7 +496,6 @@ const ResultsTable = ({ initialData, error, loading }) => {
             components={{ body: { cell: EditableCell } }}
             dataSource={results}
             pagination={false}
-            rowClassName="editable-row"
           />
         </Form>
       )}

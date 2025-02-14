@@ -1,21 +1,56 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Button, Typography, Row, Col, message, Modal } from 'antd';
 import moment from 'moment';
 
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Typography, Row, Col, message } from 'antd';
+import PDFViewer from '../../../../components/PDFView';
 import {
   POST_LAB_TO_DOCTOR_RESET,
   submitLabRequestToDoctor,
 } from '../../../../actions/lab-actions/postLabRequestToDoctor';
+import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
+import {
+  GENERATE_LAB_RESULTS_REPORT_RESET,
+  generateLabResultsReport,
+} from '../../../../actions/lab-actions/generateLabResultsReport';
 
 const LabHeader = ({ walkIn, patientData, patientLabRecord }) => {
   const dispatch = useDispatch();
 
+  console.log({ patientLabRecord });
+
+  const [openReport, setOpenReport] = useState(false);
+  const {
+    data: reportData,
+    loading: reportLoading,
+    error: reportError,
+  } = useSelector((state) => state.generateLabResultsReport);
+  const [currentReportData, setCurrentReportData] = useState(reportData);
   const { data, loading, error } = useSelector(
     (state) => state.postLabRequestToDoctor,
   );
+
+  useEffect(() => {
+    if (reportData) {
+      message.success('Report generated successfully');
+      setCurrentReportData(reportData);
+      dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
+    }
+
+    if (reportLoading) {
+      message.info('Generating Report...');
+    }
+
+    if (reportError) {
+      message.warning(
+        Array.isArray(reportError?.errors)
+          ? reportError.errors[0]
+          : reportError.errors,
+      );
+      dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
+    }
+  }, [reportData, reportLoading, reportError]);
 
   useEffect(() => {
     if (data) {
@@ -28,7 +63,7 @@ const LabHeader = ({ walkIn, patientData, patientLabRecord }) => {
     }
 
     if (error) {
-      message.error('Something went wrong');
+      message.error(error);
       dispatch({ type: POST_LAB_TO_DOCTOR_RESET });
     }
 
@@ -52,222 +87,240 @@ const LabHeader = ({ walkIn, patientData, patientLabRecord }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'Completed':
-        return 'green';
+        return '#237804';
       case 'New':
-        return 'orange';
-      case 'Cancelled':
-        return 'red';
+        return '#ad4e00';
+      case 'Voided':
+        return '#ad4e00';
       case 'Forwaded':
-        return 'blue';
+        return '#0060a3';
+      case 'Review':
+        return '#006d75';
+      case 'Recalled':
+        return '#391085';
       default:
-        return 'gray';
+        return 'black';
     }
   };
 
   const handleMarkAsCompleted = (labNo) => {
-    // TODO: Do this varibaly based on the walk in status
-    if (walkIn) {
-      // do something
-    } else {
-      dispatch(submitLabRequestToDoctor(labNo));
+    dispatch(submitLabRequestToDoctor(labNo));
+  };
+
+  const handleGenerateResultsReport = async () => {
+    await dispatch(generateLabResultsReport(patientLabRecord));
+    setOpenReport(true);
+  };
+
+  const rowData = [
+    {
+      title: 'Patient Information',
+      data: [
+        {
+          highlighted: '#5b8c00',
+          type: 'patientInformation',
+          data: { label: 'Patient Number', value: 'PatientNo' },
+        },
+        {
+          highlighted: '#fa8c16',
+          type: 'patientInformation',
+          data: { label: 'Patient Name', value: 'Names' },
+        },
+        {
+          type: 'patientInformation',
+          data: { label: 'Gender', value: 'Gender' },
+        },
+        {
+          type: 'patientInformation',
+          data: { label: 'Age', value: 'DateOfBirth' },
+          helper: (value) => `${moment().diff(value, 'years')} Years`,
+        },
+        {
+          type: 'patientInformation',
+          data: { label: 'Date of Birth', value: 'DateOfBirth' },
+        },
+      ],
+    },
+    {
+      title: 'Laboratory Information',
+      data: [
+        {
+          highlighted: '#5b8c00',
+          type: 'labInformation',
+          data: { label: 'Laboratory Number', value: 'LaboratoryNo' },
+        },
+        {
+          highlighted: '#fa8c16',
+          type: 'labInformation',
+          data: { label: 'Laboratory Type', value: 'LinkType' },
+        },
+        {
+          type: 'labInformation',
+          data: { label: 'Lab Test Date', value: 'LaboratoryDate' },
+        },
+        {
+          type: 'labInformation',
+          data: { label: 'Lab Test Time', value: 'LaboratoryTime' },
+        },
+        {
+          type: 'labInformation',
+          data: { label: 'Lab Request Area', value: 'Request_Area' },
+        },
+        {
+          type: 'labInformation',
+          highlighted: getStatusColor,
+          data: {
+            value: 'Status',
+            label: 'Lab Request Status',
+          },
+        },
+      ],
+    },
+    {
+      title: 'Lab Actions',
+      data: [
+        {
+          type: 'buttons',
+          data: [
+            {
+              buttonType: 'default',
+              data: {
+                disabled: 'Generate Report',
+                active: 'Generate Report',
+              },
+              style: {
+                display: 'inline',
+                width: 'fit-content',
+              },
+              onClick: (value) => handleGenerateResultsReport(value),
+              disabled: (value) =>
+                !(value === 'Completed' || value === 'Reviewed') ||
+                reportLoading,
+            },
+            {
+              buttonType: 'default',
+              data: {
+                disabled: 'Mark as Completed',
+                active: 'Mark as Completed',
+              },
+              style: {
+                display: 'inline',
+                width: 'fit-content',
+              },
+              onClick: (value) => handleMarkAsCompleted(value),
+              disabled: (value) => value === 'Completed' || loading,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const generateCellData = (cellData, index) => {
+    if (
+      cellData.type === 'patientInformation' ||
+      cellData.type === 'labInformation'
+    ) {
+      return (
+        <InfoRow
+          key={cellData.data.value}
+          cellData={cellData}
+          patientData={patientData}
+          patientLabRecord={patientLabRecord}
+        />
+      );
+    }
+    if (cellData.type === 'buttons') {
+      return (
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {cellData.data.map((button, index) => (
+            <Button
+              key={`button${index}`}
+              style={button.style}
+              type={button.buttonType}
+              disabled={button.disabled(patientLabRecord?.Status)}
+              onClick={() => button.onClick(patientLabRecord?.LaboratoryNo)}
+            >
+              {button.disabled ? button.data.disabled : button.data.active}
+            </Button>
+          ))}
+        </div>
+      );
     }
   };
 
   return (
-    <Row
-      gutter={[16, 16]}
-      style={{ margin: 0 }}
-    >
-      <Col
-        xs={24}
-        md={8}
-      >
-        <Card
-          style={{
-            padding: '10px 16px',
-            background: '#e5e3e3',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            minHeight: '250px',
-          }}
-        >
-          <div
+    <>
+      <Row gutter={[16, 16]}>
+        {rowData.map((colData, index) => (
+          <Col
+            key={index}
+            md={{ span: 8 }}
+            xs={{ span: 24 }}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '16px',
+              display: 'grid',
+              alignContent: 'flex-start',
+              gap: '8px',
             }}
           >
-            <Avatar
-              icon={<UserOutlined />}
-              size={48}
-            />
-            <div>
-              <Typography.Title
-                level={5}
-                style={{ margin: 0 }}
-              >
-                {patientName}
-              </Typography.Title>
-              <Typography.Text style={{ color: 'gray', fontSize: '12px' }}>
-                DOB: {patientData?.DateOfBirth}
-              </Typography.Text>
-            </div>
-          </div>
-          <Typography.Title
-            level={5}
-            style={{ color: '#0F5689', marginBottom: '12px' }}
-          >
-            Patient Information
-          </Typography.Title>
-          <InfoRow
-            label="Patient Number"
-            value={patientData?.PatientNo}
-          />
-          <InfoRow
-            label="Lab Observation Number"
-            value={patientLabRecord?.LaboratoryNo}
-          />
-          <InfoRow
-            label="Age"
-            value={`${moment().diff(patientData?.DateOfBirth, 'years')} Years`}
-          />
-          <InfoRow
-            label="Gender"
-            value={patientData?.Gender}
-          />
-        </Card>
-      </Col>
-      <Col
-        xs={24}
-        md={8}
-      >
-        <Card
-          style={{
-            padding: '10px 16px',
-            background: '#e5e3e3',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            minHeight: '250px',
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ color: '#0F5689', marginBottom: '12px' }}
-          >
-            Lab Information
-          </Typography.Title>
-          <InfoRow
-            label="Laboratory Type"
-            value={patientLabRecord?.LinkType}
-          />
-          <InfoRow
-            label="Lab Test Date"
-            value={patientLabRecord?.LaboratoryDate}
-          />
-          <InfoRow
-            label="Lab Test Time"
-            value={patientLabRecord?.LaboratoryTime}
-          />
-          <InfoRow
-            label="Lab Request Area/Location"
-            value={patientLabRecord?.Request_Area}
-          />
-          <InfoRow
-            label="Lab Test Status"
-            value={
-              <span style={{ color: getStatusColor(patientLabRecord?.Status) }}>
-                {patientLabRecord?.Status || 'N/A'}
-              </span>
-            }
-          />
-        </Card>
-      </Col>
-      <Col
-        xs={24}
-        md={8}
-      >
-        <Card
-          style={{
-            padding: '10px 16px',
-            background: '#e5e3e3',
-            borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-            minHeight: '250px',
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ color: '#0f5689', marginBottom: '12px' }}
-          >
-            Settlement Information
-          </Typography.Title>
-          <InfoRow
-            label="Settlement Type"
-            value={patientData?.PatientType}
-          />
-          <InfoRow
-            label="Insurance"
-            value={patientData?.Insurance_Name || 'N/A'}
-          />
-          <InfoRow
-            label="Patient Bill Balance"
-            value={`KSH. ${patientData?.Balance || '0.00'}`}
-          />
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              marginTop: '16px',
-            }}
-          >
-            <Button
-              type="primary"
-              disabled={patientLabRecord?.Status === 'Completed' || loading}
-              style={{ flex: '1 1 calc(50% - 5px)' }}
-              onClick={() =>
-                handleMarkAsCompleted(patientLabRecord?.LaboratoryNo)
-              }
+            <Typography.Title
+              level={5}
+              style={{ color: '#0F5689', marginBottom: '12px' }}
             >
-              {patientLabRecord?.Status === 'Completed'
-                ? 'Lab Request Submitted'
-                : loading
-                ? 'Loading...'
-                : 'Mark as Completed'}
-            </Button>
-          </div>
-        </Card>
-      </Col>
-    </Row>
+              {colData.title}
+            </Typography.Title>
+            {colData.data.map((cellData, index) =>
+              generateCellData(cellData, index),
+            )}
+          </Col>
+        ))}
+      </Row>
+      <Modal
+        title="Results Report"
+        open={openReport}
+        onCancel={() => setOpenReport(false)}
+        footer={null}
+        width={800}
+        style={{ top: 2 }}
+      >
+        {reportLoading ? (
+          <SkeletonLoading />
+        ) : (
+          <PDFViewer base64String={currentReportData?.base64} />
+        )}
+      </Modal>
+    </>
   );
 };
 
-const InfoRow = ({ label, value }) => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      marginBottom: '8px',
-    }}
-  >
-    <Typography.Title
-      level={5}
-      style={{ fontSize: '14px', margin: 0, color: 'black' }}
-    >
-      {label}
-    </Typography.Title>
+const InfoRow = ({ cellData, patientLabRecord, patientData }) => {
+  const { highlighted, type, data, helper } = cellData || {};
+
+  let value = '';
+  let color = 'gray';
+
+  value =
+    type === 'patientInformation' && patientData
+      ? patientData[data.value]
+      : type === 'labInformation' && patientLabRecord
+      ? (value = patientLabRecord[data.value])
+      : value;
+
+  value = helper ? helper(value) : value;
+
+  if (highlighted) {
+    color = typeof highlighted === 'string' ? highlighted : highlighted(value);
+  }
+
+  return (
     <Typography.Text
-      style={{
-        fontSize: '14px',
-        color: 'gray',
-        fontWeight: 'bold',
-      }}
+      level={5}
+      style={{ display: 'block', fontWeight: 'bold' }}
     >
-      {value || 'N/A'}
+      <span>{`${data.label} :`}</span>
+      <span style={{ color }}>{` ${value}` || 'N/A'}</span>
     </Typography.Text>
-  </div>
-);
+  );
+};
 
 export default LabHeader;

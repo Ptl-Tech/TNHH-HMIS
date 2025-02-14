@@ -250,6 +250,7 @@ import { postLabRequestToDoctorReducer } from './lab-reducers/postLabRequestToDo
 import { getLabRequestReducer } from './lab-reducers/getLabRequestReducer';
 import { getLabTestCodesReducer } from './lab-reducers/getLabtestCodesReducer';
 import { postLabTestReducer } from './lab-reducers/postLabTestReducer';
+import { generateLabResultsReportReducer } from './lab-reducers/generateLabResultsReportReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -345,6 +346,7 @@ export const rootReducer = combineReducers({
   postTestRemarks: postTestRemarksReducer,
   postLabTestResults: postLabTestResultsReducer,
   postLabRequestToDoctor: postLabRequestToDoctorReducer,
+  generateLabResultsReport: generateLabResultsReportReducer,
   // ************************************* /
 
   getIPVisitors: getVisitorsListReducer,

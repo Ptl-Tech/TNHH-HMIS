@@ -13,10 +13,10 @@ import LabResultsEntry from './LabResultsEntry';
 import SampleCollection from './SampleCollection';
 import Charges from '../../../nurse-view/nurse-patient-file/Charges';
 
-import { getLabDetails } from '../../../../actions/Doc-actions/getLabRequestDetails';
 import TestLinesCreation from './TestLinesCreation';
+import { getLabDetails } from '../../../../actions/Doc-actions/getLabRequestDetails';
 
-const LabContentCard = () => {
+const LabContentCard = ({ labRecord }) => {
   // hooks
   const location = useLocation();
   const dispatch = useDispatch();

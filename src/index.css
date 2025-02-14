@@ -33,31 +33,39 @@
   background: #0f5689 !important;
 }
 
-.ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+.ant-table-wrapper .ant-table-thead th.ant-table-column-sort {
   background: #0f5689 !important;
 }
 
-:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper
+  .ant-table-thead
+  th.ant-table-column-sort {
   background: #0f5689 !important;
 }
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper .ant-table-tbody > tr > th{
-  background-color:  #fff !important;
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > th {
+  background-color: #fff !important;
   color: #000 !important;
   font-weight: normal !important;
 }
 
 /* Override submenu background to make it transparent */
-:where(.css-dev-only-do-not-override-191squa).ant-menu-light, :where(.css-dev-only-do-not-override-191squa).ant-menu-light>.ant-menu {
+:where(.css-dev-only-do-not-override-191squa).ant-menu-light,
+:where(.css-dev-only-do-not-override-191squa).ant-menu-light > .ant-menu {
   color: #ffffff;
   background: #0f5689 !important;
 }
-:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light, :where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light>.ant-menu {
+:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light,
+:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light > .ant-menu {
   color: #ffffff;
 }
 
-:where(.css-191squa).ant-menu-light, :where(.css-191squa).ant-menu-light>.ant-menu  {
-    color: #ffffff;
-    background: #0f5689 !important;
+:where(.css-191squa).ant-menu-light,
+:where(.css-191squa).ant-menu-light > .ant-menu {
+  color: #ffffff;
+  background: #0f5689 !important;
 }
 
 .ant-layout-sider-collapsed {
@@ -71,7 +79,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
- background-color:  #0f5689;
+  background-color: #0f5689;
   color: rgb(0, 35, 41);
   padding: 8px 12px 8px 12px;
   position: sticky;
@@ -79,11 +87,11 @@
   top: 0;
   height: 44 !important;
   line-height: 64px;
-  z-index:1;
+  z-index: 1;
 }
 
-.mu{
-  color: #fff
+.mu {
+  color: #fff;
 }
 
 .contentStyle {
@@ -92,11 +100,10 @@
   background-color: #fef9f7;
   overflow-y: hidden !important;
   height: 100%;
-  
 }
 
 .sideStyle {
-  height:100vh;
+  height: 100vh;
   line-height: 22px;
   padding-bottom: 22px;
   color: #fff;
@@ -105,33 +112,29 @@
   left: 0;
   overflow-y: auto !important;
 }
-.text-color{
+.text-color {
   color: #fcfafa;
 }
 .ant-card .ant-card-body {
-  padding: 0px !important; 
-   border-radius: 0 0 8px 8px;
- }
+  padding: 0px !important;
+  border-radius: 0 0 8px 8px;
+}
 
-.sidemenu{
+.sidemenu {
   height: 100dvh !important;
   position: fixed !important;
-  left:0 !important;
+  left: 0 !important;
   top: 0 !important;
   background-color: #002329 !important  ;
   transition: 0.2s ease;
-  color:#ffff !important;
-
-}
-/* .sideStyle .ant-menu-item,
-.sideStyle .ant-menu-submenu-title {
-  color: #3c3c3c !important;
+  color: #ffff !important;
 }
 
-.sideStyle .ant-menu-item-icon,
-.sideStyle .ant-menu-submenu-title .ant-menu-item-icon {
-  color: #3c3c3c !important;
-} */
+
+.ant-menu-submenu-selected .ant-menu-submenu-title {
+  background-color: #ac8342;
+  color: #ffffff !important;
+}
 
 /* Add this CSS in your stylesheet */
 .custom-input {
@@ -163,7 +166,7 @@
   background: transparent;
 }
 
-.st{
+.st {
   color: rgb(177, 211, 177);
 }
 
@@ -178,7 +181,7 @@
   box-shadow: none;
   background-color: transparent;
   padding: 5px 0;
-  width:100%;
+  width: 100%;
 }
 
 /* Focus state for Select input */
@@ -198,13 +201,11 @@
 .modal-title-content {
   background-color: #f5f5dc; /* Light greyish cream */
   padding: 20px;
-  
 }
 
 .modal-logo-container {
   margin-bottom: 10px; /* Space between logo and title */
-  text-align:center;
-
+  text-align: center;
 }
 
 .modal-logo {
@@ -213,7 +214,7 @@
 }
 
 .custom-header {
-  background-color: #E89641;
+  background-color: #e89641;
   font-weight: bold; /* Optional */
 }
 
@@ -243,22 +244,19 @@
   background-color: #ffd6d6; /* Light red */
 }
 
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert .ant-alert-close-icon .anticon-close {
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert
+  .ant-alert-close-icon
+  .anticon-close {
   color: #0f5689 !important;
 }
-
 
 main {
   overflow-y: scroll !important;
   height: 100%;
-
-  
 }
 .ant-layout .ant-layout-sider-trigger {
   display: none !important;
 }
-
-
 
 @media screen and (max-width: 768px) {
   .sideStyle {
@@ -273,11 +271,11 @@ main {
     height: 100dvh !important;
     overflow-y: scroll !important;
   }
-  
+
   .ant-layout-sider-collapsed {
     flex: 0 0 80px !important;
     max-width: 0px !important;
-    min-width:0px !important;
+    min-width: 0px !important;
     width: 0 !important;
   }
   .contentStyle {
@@ -289,30 +287,27 @@ main {
   main {
     margin-left: 0 !important;
   }
-
-
-  
 }
 
 /* Define the keyframes for the dot animation */
 @keyframes dot-blink {
   0% {
-    content: "";
+    content: '';
   }
   33% {
-    content: ".";
+    content: '.';
   }
   66% {
-    content: "..";
+    content: '..';
   }
   100% {
-    content: "...";
+    content: '...';
   }
 }
 
 /* Style for loading dots */
 .loading-dots::after {
-  content: "";
+  content: '';
   animation: dot-blink 1.5s infinite steps(1);
 }
 
@@ -349,11 +344,11 @@ main {
   }
 }
 
-.admit-patient-table{
+.admit-patient-table {
   margin-top: 30px;
 }
 
-.inpatient-header{
+.inpatient-header {
   display: flex;
   color: #0f5689;
   align-items: center;
@@ -361,78 +356,78 @@ main {
   padding-bottom: 10px;
 }
 
-.inpatient-header .inpatient-header-text{
+.inpatient-header .inpatient-header-text {
   font-weight: bold;
   color: #0f5689;
   font-size: 16px;
 }
-.inpatient-card-container{
+.inpatient-card-container {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
 
-.inpatient-card-container .inpatient-card-left-col .card{
-  padding: 10px 16px
+.inpatient-card-container .inpatient-card-left-col .card {
+  padding: 10px 16px;
 }
-.inpatient-card-container .inpatient-card-right-col .card{
-  padding: 10px 16px
+.inpatient-card-container .inpatient-card-right-col .card {
+  padding: 10px 16px;
 }
-.inpatient-details-container-1{
+.inpatient-details-container-1 {
   display: flex;
   justify-content: center;
   justify-content: space-between;
   align-items: center;
 }
-.inpatient-card-right-col .patient-name{
+.inpatient-card-right-col .patient-name {
   font-weight: bold;
   color: #0f5689;
   font-size: 16px;
 }
-.inpatient-card-right-col .patient-id{
+.inpatient-card-right-col .patient-id {
   color: gray;
   font-size: 14px;
 }
-.inpatient-details-container-2{
+.inpatient-details-container-2 {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
 }
-.inpatient-details-container-2 .patient-hospital-number-container{
+.inpatient-details-container-2 .patient-hospital-number-container {
   display: flex;
   flex-direction: column;
 }
 
-.inpatient-details-container-2 .patient-age-gender-container{
+.inpatient-details-container-2 .patient-age-gender-container {
   display: flex;
   flex-direction: column;
 }
 
-.patient-hospital-number-container .hospital-number-header{
+.patient-hospital-number-container .hospital-number-header {
   font-size: 14px;
 }
-.patient-hospital-number-container .hospital-number{
-  font-size: 14px;
-  color: gray;
-}
-.patient-age-gender-container .age-and-gender{
+.patient-hospital-number-container .hospital-number {
   font-size: 14px;
   color: gray;
 }
-.inpatient-details-container-2 .age-and-gender-container{
+.patient-age-gender-container .age-and-gender {
+  font-size: 14px;
+  color: gray;
+}
+.inpatient-details-container-2 .age-and-gender-container {
   display: flex;
   flex-direction: column;
 }
-.age-and-gender-container .age-and-gender-header{
+.age-and-gender-container .age-and-gender-header {
   font-size: 14px;
 }
-.age-and-gender-container .age-and-gender{
+.age-and-gender-container .age-and-gender {
   font-size: 14px;
   color: gray;
 }
-.print-button-container{
+.print-button-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -441,11 +436,10 @@ main {
 }
 
 @media screen and (max-width: 768px) {
-  .print-button-container{
+  .print-button-container {
     flex-direction: column;
     align-items: flex-start;
   }
-  
 }
 
 @media (max-width: 992px) {
@@ -454,45 +448,44 @@ main {
     gap: 10px;
   }
 }
-.dashboard-statistics-container{
+.dashboard-statistics-container {
   display: flex;
 }
 
 @media screen and (max-width: 768px) {
-  .dashboard-statistics-container{
+  .dashboard-statistics-container {
     gap: 10px;
   }
-  
 }
-.allergies-card{
+.allergies-card {
   margin-top: 10px;
   padding: 10px 16px;
 }
-.allergies-item-list-title{
+.allergies-item-list-title {
   font-weight: bold;
   font-size: 14px;
 }
 
-.treatment-card-buttons{
+.treatment-card-buttons {
   display: flex;
   gap: 10px;
 }
-.treatment-card-patient-treatment-info{
+.treatment-card-patient-treatment-info {
   margin-top: 10px;
   padding: 10px 16px;
 }
 
-.ant-table-wrapper .ant-table-row-expand-icon{
+.ant-table-wrapper .ant-table-row-expand-icon {
   color: #0f5689 !important;
   border: 1px solid #0f5689 !important;
 }
 
-.dashboard-card{
+.dashboard-card {
   flex: 1;
 }
 
 @media screen and (max-width: 768px) {
-  .dashboard-card{
+  .dashboard-card {
     flex: unset;
     width: 100%;
   }
@@ -509,19 +502,25 @@ main {
   font-size: 14px !important;
 }
 
-.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
+.ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
   background-color: #0f5689 !important;
   color: #ffffff !important;
   border: none !important;
 }
-.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab-active {
+.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active,
+.ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab-active {
   background-color: #dddada !important;
 }
 
-.active-button{
+.active-button {
   background-color: #cac6c6 !important;
   color: black !important;
   border: none !important;
 }
 
-
+.disabled-row {
+  pointer-events: none;
+  opacity: 0.5;
+  background-color: #f5f5f5;
+}

@@ -64,6 +64,9 @@ const SampleCollection = ({ data, loading }) => {
             columns={columns}
             dataSource={data}
             pagination={false}
+            rowClassName={(record) =>
+              record.Sample_Collected ? 'disabled-row' : ''
+            }
           />
           <SampleModal
             open={open}

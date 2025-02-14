@@ -155,7 +155,7 @@ const LabResults = () => {
           case "Forwarded":
             color = "green";
             break;
-          case "Cancelled":
+          case "Voided":
             color = "red";
             break;
           default:

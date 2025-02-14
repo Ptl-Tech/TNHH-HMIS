@@ -8,8 +8,9 @@ import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
 
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { getLabList } from '../../../../actions/Doc-actions/getLabList';
+import { filterByCategory, filterByStatus } from './utils';
 
-const LabRequests = ({ status, inPatient }) => {
+const LabRequests = ({ status, requestType }) => {
   // hooks
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,8 +25,7 @@ const LabRequests = ({ status, inPatient }) => {
 
   const labTreatmentHeadersData = labTreatmentHeaders.filter(
     (item) =>
-      (inPatient ? item.Inpatient : !item.Inpatient) &&
-      (status ? status === item.Status : true),
+      filterByCategory(item, requestType) && filterByStatus(item, status),
   );
 
   console.log({ labTreatmentHeadersData });
@@ -188,7 +188,7 @@ const LabRequests = ({ status, inPatient }) => {
           case 'Forwarded':
             statusColor = 'blue';
             break;
-          case 'Cancelled':
+          case 'Voided':
             statusColor = 'red';
             break;
           default:
@@ -220,7 +220,11 @@ const LabRequests = ({ status, inPatient }) => {
             type="primary"
             onClick={() => handleNavigate(record, record.LaboratoryNo)}
           >
-            View Requests
+            {record.Status === 'Completed'
+              ? 'View Results'
+              : record.Status === 'Recalled'
+              ? 'Review Results'
+              : 'View Requests'}
           </Button>
         );
       },
@@ -232,7 +236,7 @@ const LabRequests = ({ status, inPatient }) => {
   };
 
   const handleNavigate = (record, LaboratoryNo) => {
-    navigate(`/Lab/Lab-Outpatient/Lab-Request?LaboratoryNo=${LaboratoryNo}`, {
+    navigate(`/Lab/Outpatient/Lab-Request?LaboratoryNo=${LaboratoryNo}`, {
       state: {
         patientNo: record.PatientNo,
         labObservationNo: record.LaboratoryNo,
