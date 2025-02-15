@@ -7,6 +7,7 @@ import EvaluationCardContent from "./Doctor-Forms/EvaluationCardContent";
 import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppmntDetails } from "../../actions/getAppmntDetails";
+import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const EncounterSummery = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const EncounterSummery = () => {
   const dispatch = useDispatch();
 
   const { loading: loadingPatientDetail, data: patientDetail } = useSelector((state) => state.getPatientVisit);
+  const { data } = useFetchPatientDetailsHook(patientDetails?.PatientNo);
 
   useEffect(() => {
     dispatch(getAppmntDetails(patientDetails?.LinkNo));
@@ -37,7 +39,7 @@ const EncounterSummery = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          <EncounterSummeryCard patientDetails={patientDetail} otherPatientDetails={otherPatientDetails} loadingPatientDetail={loadingPatientDetail}/>
+          <EncounterSummeryCard patientDetails={patientDetail} otherPatientDetails={otherPatientDetails} loadingPatientDetail={loadingPatientDetail} data={data} />
 
         </Col>
         <Col

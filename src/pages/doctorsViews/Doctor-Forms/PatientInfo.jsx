@@ -26,7 +26,6 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const location = useLocation();
   const patient = location.state?.patientDetails || {};
 
-  console.log('patient details', patient)
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -90,23 +89,6 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
     });
   };
 
-  const capitalizeWords = (name) =>
-    name
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-
-  const patientName = patientDetails?.Names
-    ? capitalizeWords(patientDetails.Names)
-    : capitalizeWords(
-        [
-          patientDetails?.Surname,
-          patientDetails?.LastName,
-          patientDetails?.MiddleName,
-        ]
-          .filter(Boolean)
-          .join(" ")
-      );
   const handlePrintInvoice = () => {
     const invoiceData = {
       PatientNo: patientNo,
@@ -256,7 +238,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
               level={5}
               style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
             >
-              {patientName || patientDetails?.SearchName}
+              {patientDetails?.Names || patientDetails?.SearchName || patient.SearchName || ""}
             </Typography.Title>
             <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
               Age: {calculateAge(patientDetails?.DateOfBirth)}
@@ -303,6 +285,44 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
+        <Typography.Title
+          level={5}
+          style={{
+            color: "#0f5689",
+            fontSize: "14px",
+            margin: "10px 0 10px 0",
+          }}
+        >
+          Doctor's Name
+        </Typography.Title>
+        
+        <Typography.Title
+          level={5}
+          style={{
+            fontSize: "14px",
+            margin: "10px 0 10px 0",
+          }}
+        >
+          {patient?.DoctorsName || "N/A"}
+        </Typography.Title>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography.Title
+            level={5}
+            style={{ fontSize: "14px", color: "black" }}
+          >
+            Treatment Date
+          </Typography.Title>
+          <Typography.Text
+          >
+            {patient?.TreatmentDate}
+          </Typography.Text>
+        </div>
         <Typography.Title
           level={5}
           style={{
@@ -391,28 +411,10 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
         <div
           style={{
             display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ fontSize: "14px", color: "black" }}
-          >
-            Treatment Date
-          </Typography.Title>
-          <Typography.Text
-          >
-            {patient?.TreatmentDate}
-          </Typography.Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
             gap: "8px",
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: "40px",
+            marginTop: "20px",
           }}
         >
           {(role === "Doctor" || role === "Psychology") &&
