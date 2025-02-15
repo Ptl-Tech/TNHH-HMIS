@@ -255,10 +255,10 @@ const DoctorVisits = () => {
         message.success('Patient checked in to the Consultation Room ')
         navigate(
           role === "Doctor"
-            ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+            ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
             : role === "Psychology"
-            ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-            : `/Nurse/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+            ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
+            : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
           {
             state: {
               patientNo: record.PatientNo,
