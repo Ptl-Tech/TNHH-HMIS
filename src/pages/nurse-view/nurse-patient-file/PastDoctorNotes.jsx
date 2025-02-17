@@ -46,8 +46,6 @@ const DoctorNotes = () => {
     dispatch(listDoctors());
   }, [dispatch]);
 
-  console.log('encounters', combinedPatients)
-
   return (
     <div>
       <Space

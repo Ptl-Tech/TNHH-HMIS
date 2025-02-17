@@ -2,7 +2,6 @@ import { Card, Tabs, Row, Col, Avatar, Typography, Button } from 'antd'
 import { UserOutlined, DiffOutlined, SendOutlined } from '@ant-design/icons';
 import FormVitals from './forms/triage-forms/Vitals';
 import AllergyAndMedication from './forms/triage-forms/AllergyAndMedication';
-import Injections from './forms/triage-forms/Injections';
 import Dressing from './forms/triage-forms/Dressing';
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -32,8 +31,7 @@ const EvaluatePatientInTriage = () => {
       dispatch(getPatientDetails(patientNo))
   }, [dispatch, patientNo])
 
-  const { loadingPatientDetails, patientDetails } = useSelector((state) => state.getPatientDetails);
-  console.log('patient details', patientDetails)
+  const { loading: loadingPatientDetails, data:patientDetails } = useSelector((state) => state.getPatientDetails);
 
   const patientName = patientDetails?.SearchName 
   || [patientDetails?.Surname, patientDetails?.FirstName, patientDetails?.MiddleName]

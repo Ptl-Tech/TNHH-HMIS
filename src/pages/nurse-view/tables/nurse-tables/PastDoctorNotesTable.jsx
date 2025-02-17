@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingEncounters}) => {
     const navigate = useNavigate();
-  
 
     const columns = [
     
@@ -18,7 +17,7 @@ const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingE
           render: (text, record) => {
             return (
               <span
-                onClick={() => handleNavigateReadNotes(record)}
+                onClick={() => handleNavigate(record)}
                 className="fw-bold"
                 style={{ color: "#0f5689", cursor: "pointer" }}
               >
@@ -43,12 +42,7 @@ const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingE
           key: 'Clinic',
         },
         {
-          title: 'Branch',
-          dataIndex: 'Branch',
-          key: 'Branch',
-        },
-        {
-            title: 'Added By',
+            title: 'Doctor Name',
             dataIndex: 'DoctorsName',
             key: 'DoctorsName',
         },
@@ -58,11 +52,11 @@ const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingE
           key: 'action',
           fixed: 'right',
           width: 200,
-          render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleNavigateReadNotes(record)}>Encounter Summery</Button>
+          render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleNavigate(record)}>Encounter Summery</Button>
         }
       ]
   
-      const handleNavigateReadNotes = (record) => {
+      const handleNavigate = (record) => {
         navigate(
           role === "Doctor"
             ? `/Doctor/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`
@@ -82,6 +76,8 @@ const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingE
          dataSource={combinedPatients} 
          loading={loadingDoctors || loadingEncounters}
          scroll={{ x: "max-content" }}
+          bordered
+          size="small"
           />
     </div>
   )
