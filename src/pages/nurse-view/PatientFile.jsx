@@ -29,7 +29,7 @@ const PatientFile = ({ patientDetails }) => {
     {label: "Patient Info", icon: <UserOutlined />},
     // "Medical Info",
     {label: "Next of Kin", icon: <UserAddOutlined />},
-    ...(userRole.userData.departmentName === "Doctor" &&
+    ...(userRole.userData.departmentName === "Doctor" || userRole.userData.departmentName === "Psychology" &&
       patientDetail?.Status !== "Completed" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Nursing Notes", icon: <FileProtectOutlined />}] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Past Encounters Notes", icon: <ExperimentOutlined />}] : []),

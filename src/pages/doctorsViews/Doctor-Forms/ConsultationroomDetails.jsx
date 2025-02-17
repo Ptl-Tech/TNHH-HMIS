@@ -35,7 +35,7 @@ const ConsultationroomDetails = ({
       treatmentNo={treatmentNo}
       observationNo={observationNo}
       patientNo={patientNo}
-      moveToNextTab={() => handleOnClick({ label: "Physical Examination" })} // Pass the next tab handler
+      moveToNextTab={() => handleOnClick({ label: role === "Doctor" ? "Physical Examination" : "Mental Status Exam"})} // Pass the next tab handler
     />
   );
 
@@ -157,13 +157,13 @@ const ConsultationroomDetails = ({
     { label: "Diagnosis Formulation", icon: <MedicineBoxOutlined /> },
     // { label: "Past Encounters Notes", icon: <FaNotesMedical /> },
     { label: "Aetiology", icon: <HeartOutlined /> },
-    ...(role === "Doctor"
-      ? [{ label: "Psychology Notes", icon: <HeartOutlined /> }]
-      : []),
+    // ...(role === "Doctor"
+    //   ? [{ label: "Psychology Notes", icon: <HeartOutlined /> }]
+    //   : []),
 
-    ...(role === "Psychology" && patientDetails.Status !== 'Completed'
-      ? [{ label: "Doctor Notes", icon: <HeartOutlined /> }]
-      : []),
+    // ...(role === "Psychology" && patientDetails.Status !== 'Completed'
+    //   ? [{ label: "Doctor Notes", icon: <HeartOutlined /> }]
+    //   : []),
   ];
 
   return (
