@@ -35,7 +35,12 @@ const LaboratoryEvaluationCard = () => {
   }, [dispatch, patientNo, postLabRequestToDoctor]);
 
   useEffect(() => {
-    if (labObservationNo !== labRequestData?.LaboratoryNo) {
+    console.log({ postLabRequestToDoctor });
+
+    if (
+      labObservationNo !== labRequestData?.LaboratoryNo ||
+      postLabRequestToDoctor?.status === 'success'
+    ) {
       dispatch(getLabRequest(labObservationNo));
     }
   }, [labRequestData, postLabRequestToDoctor, labObservationNo]);

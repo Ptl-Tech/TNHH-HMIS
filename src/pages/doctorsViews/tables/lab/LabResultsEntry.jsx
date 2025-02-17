@@ -249,19 +249,6 @@ const RemarkForm = ({ record, handleCancel }) => {
     (state) => state.postTestRemarks,
   );
 
-  useEffect(() => {
-    if (data) {
-      const { status } = data;
-      status === 'success'
-        ? message.success('Remarks submitted successfully')
-        : message.error('Could not submit the remarks');
-    }
-
-    if (error) message.error('Something went wrong');
-
-    if (loading) message.info('Submitting your remark');
-  }, [data, error]);
-
   // handling pushing code
   const onFinish = async (data) => {
     const { remarks } = data;
