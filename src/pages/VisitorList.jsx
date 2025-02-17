@@ -38,7 +38,6 @@ const VisitorList = () => {
   const [searchPhone, setSearchPhone] = useState("");
   const [searchIdNumber, setSearchIdNumber] = useState("");
 
-  console.log('search name', searchName)
 
   const currentDate = dayjs().format("YYYY-MM-DD");
 
@@ -66,7 +65,6 @@ const VisitorList = () => {
   }
 
 
-  console.log('visitors', filteredVisitors)
   //filter the visitors based on date and status only
   useEffect(() => {
     const filtered = visitors.filter((visitor) => {
@@ -265,6 +263,14 @@ const VisitorList = () => {
       </div>
       <Card className="mb-4" style={{ padding: "30px 10px"}}>
         <Row gutter={[16, 16]}>
+        <Col span={8}>
+            <Input.Search
+              placeholder="Visitor Name"
+              // value={searchParams.VisitorName}
+              allowClear
+              onChange={(value)=>setSearchName(value.target.value)}
+            />
+          </Col>
           <Col span={8}>
             <Input.Search
               placeholder="ID Number"
@@ -273,14 +279,7 @@ const VisitorList = () => {
               onChange={(value)=>setSearchIdNumber(value.target.value)}
             />
           </Col>
-          <Col span={8}>
-            <Input.Search
-              placeholder="Visitor Name"
-              // value={searchParams.VisitorName}
-              allowClear
-              onChange={(value)=>setSearchName(value.target.value)}
-            />
-          </Col>
+         
           <Col span={8}>
             <Input.Search
               placeholder="Visitor Phone"

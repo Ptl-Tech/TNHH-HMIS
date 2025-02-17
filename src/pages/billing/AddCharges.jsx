@@ -136,7 +136,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
           <IoCloseOutline className="text-2xl" onClick={handleClose} />
         </div>
       }
-      visible={visible}
+      open={visible}
       footer={null}
       style={{ width: "100%", top: "20px" }}
       width={"75%"}

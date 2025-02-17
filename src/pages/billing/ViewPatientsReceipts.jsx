@@ -406,6 +406,7 @@ const ViewPatientsReceipts = () => {
               columns={unpostedColumns}
               rowKey="Code"
               pagination={{ pageSize: 5 }}
+              // loading={chargesLoading}
             />
           </div>
           <div className="d-flex flex-column text-start">
@@ -415,6 +416,8 @@ const ViewPatientsReceipts = () => {
               columns={columns}
               rowKey="Code"
               pagination={{ pageSize: 5 }}
+              loading={chargesLoading}
+
             />
           </div>
         </div>

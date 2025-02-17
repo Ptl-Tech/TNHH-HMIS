@@ -82,7 +82,11 @@ const ViewReceipt = ({ visitNo, visible, onClose }) => {
     <div>
       <Modal visible={visible} onCancel={onClose} style={{ top: 20 }} width={700}>
         <Typography.Title level={4}>Receipt Details</Typography.Title>
-        <Table dataSource={receiptHeader} columns={columns} rowKey="No" />
+        <Table 
+  dataSource={[...(receiptHeader || [])].sort((a, b) => b.No - a.No)} 
+  columns={columns} 
+  rowKey="No" 
+/>
       </Modal>
 
       <Modal title="Receipt PDF" open={showPDFModal} onCancel={() => setShowPDFModal(false)} style={{ top: 2 }}>
