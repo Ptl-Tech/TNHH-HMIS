@@ -3,8 +3,6 @@ import PropTypes from "prop-types"
 import Loading from "../../partials/nurse-partials/Loading"
 
 const EncounterSummeryCard = ({ patientDetails, loadingPatientDetail, otherPatientDetails, data }) => {
-    console.log('other details', otherPatientDetails)
-    console.log('data', data)
 
   if(loadingPatientDetail) return <Loading />
   return (
