@@ -93,6 +93,7 @@ const useSignIn = () => {
     otp,
     setOtp,
     isOtpRequired,
+    setIsOtpRequired,
     handleLogin,
     handleVerifyOtp,
     loading,
