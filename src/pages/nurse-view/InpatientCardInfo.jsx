@@ -2,24 +2,14 @@ import { Card, Divider, Spin, Typography } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { calculateAge } from "../../utils/helpers";
 import moment from "moment/moment";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getPatientDetails } from "../../actions/triage-actions/getPatientDetailsSlice";
 import PropTypes from "prop-types";
+import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
-const InpatientCardInfo = ({ patientDetails }) => {
+const InpatientCardInfo = ({ patientDetail }) => {
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
-  const { loading: loadingPatientDetails, data: patientDetail } = useSelector(
-    (state) => state.getPatientDetails
-  );
-  const dispatch = useDispatch();
-
-  console.log('patientDetails', patientDetails)
-
-  useEffect(() => {
-    dispatch(getPatientDetails(patientNo));
-  }, [dispatch, patientNo]);
+  
+  const { loadingPatientDetails, patientDetails} = useFetchPatientDetailsHook(patientNo);
 
   const invalidDate = "0001-01-01"; // Define the "invalid" date
 
@@ -42,13 +32,13 @@ const InpatientCardInfo = ({ patientDetails }) => {
               className="patient-name"
               style={{ fontWeight: "bold", color: "#0f5689" }}
             >
-              {patientDetail?.Names || "N/A"}
+              {patientDetails?.SearchName || "N/A"}
             </Typography.Text>
             <Typography.Text
               className="patient-id"
               style={{ fontWeight: "bold", color: "#0f5689" }}
             >
-              Patient Number : {patientDetail?.PatientNo || "N/A"}
+              Patient Number : {patientDetails?.PatientNo || "N/A"}
             </Typography.Text>
           </div>
 
@@ -60,7 +50,7 @@ const InpatientCardInfo = ({ patientDetails }) => {
                 Admission No
               </Typography.Text>
               <Typography.Text className="hospital-number">
-                {patientDetail?.CurrentAdmNo || "N/A"}
+                {patientDetails?.CurrentAdmNo || "N/A"}
               </Typography.Text>
             </div>
 
@@ -81,8 +71,8 @@ const InpatientCardInfo = ({ patientDetails }) => {
                 />
               ) : (
                 <Typography.Text className="age-and-gender">
-                  {calculateAge(patientDetail?.DateOfBirth) || "N/A"},{" "}
-                  {patientDetail?.Gender || "N/A"}
+                  {calculateAge(patientDetails?.DateOfBirth) || "N/A"},{" "}
+                  {patientDetails?.Gender || "N/A"}
                 </Typography.Text>
               )}
             </div>
@@ -153,7 +143,7 @@ const InpatientCardInfo = ({ patientDetails }) => {
                 Ward and Room Number
               </Typography.Text>
               <Typography.Text key={patientDetails?.Admission_Date}>
-                {patientDetails?.Ward || "N/A"}, {patientDetails?.Bed || "N/A"}
+                {patientDetail?.Ward || "N/A"}, {patientDetail?.Bed || "N/A"}
               </Typography.Text>
             </div>
 
@@ -206,5 +196,5 @@ const InpatientCardInfo = ({ patientDetails }) => {
 export default InpatientCardInfo;
 // props validations
 InpatientCardInfo.propTypes = {
-  patientDetails: PropTypes.object,
+  patientDetail: PropTypes.object,
 };

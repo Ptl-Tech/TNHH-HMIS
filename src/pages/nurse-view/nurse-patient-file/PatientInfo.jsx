@@ -1,88 +1,79 @@
 import { Card, Col, Row, Typography } from "antd"
 import { useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import Loading from "../../../partials/nurse-partials/Loading";
 import { UserOutlined } from "@ant-design/icons";
 import { calculateAge } from "../../../utils/helpers";
+import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
 const PatientInfo = () => {
-  const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
-  const { patientDetails } = useLocation().state || {};
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
 
-  const patientNoToUse = patientDetails?.Patient_No || patientNo;
-
-  // Filter the triage waiting list
-  const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientNoToUse);
+  const { loadingPatientDetails, patientDetails} = useFetchPatientDetailsHook(patientNo);
 
     const patientPrimaryInfo = [
     {
         title: 'Patient Name',
-        description: filteredPatient[0]?.SearchName || 'N/A',
+        description: patientDetails?.SearchName || 'N/A',
     },
     {
         title: 'Branch Name',
-        description: filteredPatient[0]?.GlobalDimension1Code || 'N/A',
+        description: patientDetails?.GlobalDimension1Code || 'N/A',
     },
     {
         title: 'Admission Number',
-        description: filteredPatient[0]?.CurrentAdmNo || 'N/A',
+        description: patientDetails?.CurrentAdmNo || 'N/A',
     },
     {
         title: 'Date of Admission',
-        description: filteredPatient[0]?.AdmissionsDate || 'N/A',
+        description: patientDetails?.AdmissionsDate || 'N/A',
     },
     {
         title: 'Age',
 
-        description: calculateAge(filteredPatient[0]?.DateOfBirth) || 'N/A',
+        description: calculateAge(patientDetails?.DateOfBirth) || 'N/A',
     },
     {
         title: 'Gender',
-        description: filteredPatient[0]?.Gender || 'N/A',
+        description: patientDetails?.Gender || 'N/A',
     },
-    // {
-    //     title: 'Marital Status',
-    //     description: filteredPatient[0]?.MaritalStatus || 'N/A',
-    // },
     {
         title: 'Nationality',
-        description: filteredPatient[0]?.Nationality || 'N/A',
+        description: patientDetails?.Nationality || 'N/A',
     },
 ]
 
 const patientSecondaryInfo = [
     {
         title: 'Date of Birth',
-        description: filteredPatient[0]?.DateOfBirth || 'N/A',
+        description: patientDetails?.DateOfBirth || 'N/A',
     },
     {
         title: 'Address 1',
-        description: filteredPatient[0]?.SpouseAddress2 || 'N/A',
+        description: patientDetails?.SpouseAddress2 || 'N/A',
     },
     {
         title: 'Address 2',
-        description: filteredPatient[0]?.SpouseAddress1 || 'N/A',
+        description: patientDetails?.SpouseAddress1 || 'N/A',
     },
     {
         title: 'County Ward',
-        description: filteredPatient[0]?.CountyWard || 'N/A',
+        description: patientDetails?.CountyWard || 'N/A',
     },
     {
         title: 'Sub County',
-        description: filteredPatient[0]?.SubCountyName || 'N/A',
+        description: patientDetails?.SubCountyName || 'N/A',
     },
     
     {
         title: 'Home Telephone',
-        description: filteredPatient[0]?.TelephoneNo2 || 'N/A',
+        description: patientDetails?.TelephoneNo2 || 'N/A',
     },
     {
         title: 'Mobile Phone',
-        description: filteredPatient[0]?.TelephoneNo1 || 'N/A',
+        description: patientDetails?.TelephoneNo1 || 'N/A',
     }
 ]
   return (
@@ -91,7 +82,7 @@ const patientSecondaryInfo = [
         <NurseInnerHeader icon={<UserOutlined />} title="Patient Information" />
 
         {
-          loadingTriageWaitingList ? (
+          loadingPatientDetails ? (
             <Loading />
           ):(
             <Row gutter={16} style={{ marginTop: '20px' }}>

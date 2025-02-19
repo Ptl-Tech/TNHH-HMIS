@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import axios from 'axios';
 
 const API = 'https://chiromo.potestastechnologies.net:8085/';

@@ -47,7 +47,7 @@ const PatientFile = ({ patientDetails }) => {
     setActiveItem(item.label);
     switch (item.label) {
       case "Patient Info":
-        setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
+        setSelectedItem(<PatientInfo />);
         break;
       // case "Medical Info":
       //   setSelectedItem(<MedicalInfo />);
@@ -67,9 +67,9 @@ const PatientFile = ({ patientDetails }) => {
       case "Order Sheet":
         setSelectedItem(<Consumables />);
         break;
-      case "Charges":
-        setSelectedItem(<Charges/>);
-        break;
+      // case "Charges":
+      //   setSelectedItem(<Charges/>);
+      //   break;
         case "TCA":
         setSelectedItem(<TCAAppointments/>);
         break;
