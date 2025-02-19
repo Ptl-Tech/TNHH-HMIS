@@ -531,21 +531,23 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
     const {
       otpVerify: { userInfo },
     } = getState();
+    const branchCode = localStorage.getItem("branchCode");
 
     const config = {
       headers: {
         "Content-Type": "application/json",
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
       },
     };
 
     // Fetch patient details by patientNo
-    const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&$filter=patientNo eq '${patientNo}'&isList=false`, config);
+    const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
 
     // Check if a patient was found
-    if (data.length > 0) {
-      dispatch({ type: PATIENT_LIST_SUCCESS, payload: data[0] });
+    if (data && Object.keys(data).length > 0) {
+      dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } else {
       dispatch({ type: PATIENT_LIST_FAIL, payload: "Patient not found" });
       message.warning("No patient found with the provided patient number.", 5);

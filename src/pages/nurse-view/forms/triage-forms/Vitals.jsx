@@ -311,19 +311,19 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                           );
                         }
           
-                        const [systolic, diastolic] = value.split('/').map(Number);
-                        if (
-                          systolic < 90 ||
-                          systolic > 200 ||
-                          diastolic < 60 ||
-                          diastolic > 120
-                        ) {
-                          return Promise.reject(
-                            new Error(
-                              'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
-                            )
-                          );
-                        }
+                        // const [systolic, diastolic] = value.split('/').map(Number);
+                        // if (
+                        //   systolic < 90 ||
+                        //   systolic > 200 ||
+                        //   diastolic < 60 ||
+                        //   diastolic > 120
+                        // ) {
+                        //   return Promise.reject(
+                        //     new Error(
+                        //       'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
+                        //     )
+                        //   );
+                        // }
           
                         return Promise.resolve();
                       },

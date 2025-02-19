@@ -120,7 +120,7 @@ export const dispatchWalkInPharmacyReducer = (state = { loading: false }, action
     }
   };
 
-  export const patientListReducer = (state = { patients: [] }, action) => {
+  export const patientListReducer = (state = { loading: false, patients: [] }, action) => {
     switch (action.type) {
       case PATIENT_LIST_REQUEST:
         return { loading: true, patients: [] };
