@@ -93,9 +93,9 @@ export const createPatient = (patient) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PATIENT_REGISTER_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: error.response?.data?.errors || error.message,
     });
-    message.error(error.message, 5);
+    // message.error(error.message, 5);
     throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
@@ -359,16 +359,13 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
     };
 
     // Display success message with observation number
-    message.success(
-      `Patient dispatched successfully! Observation No: ${responseData.msg}`,
-      5
-    );
-
-    setTimeout(() => {
-      console.log("Dispatched Payload:", responseData);
-    }, 2000);
+    // message.success(
+    //   `Patient dispatched successfully! Observation No: ${responseData.msg}`,
+    //   5
+    // );
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
+    return responseData.msg;
   } catch (error) {
     // Extract error message from different possible sources
     const errorMessage =

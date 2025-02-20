@@ -47,7 +47,10 @@ const VisitorList = () => {
   const { loading: patientsLoading, patients } = useSelector(
     (state) => state.patientList
   );
-
+  const { loading: convertPatientLoading } = useSelector(
+    (state) => state.convertPatient
+  );
+  
   const loading = visitorsLoading || patientsLoading || filterLoading;
 
   useEffect(() => {
@@ -99,8 +102,11 @@ const VisitorList = () => {
       (patient) => patient.IDNumber === visitor.IDNumber
     );
 
-    if (isPatient) {
+    if (isPatient && isPatient.Walkin) {
+      return "Create Walk In visit"; // Show 'Create Visit' if the visitor is a patient
+    }else if (isPatient && !isPatient.Walkin) {
       return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
+    
     } else {
       return "Register Walk In "; // Show 'Convert to Patient' if the visitor is not yet a patient
     }
@@ -308,8 +314,8 @@ const VisitorList = () => {
           <Button
             key="convert"
             type="primary"
-            disabled={!selectedVisitor}
-            loading={loading}
+            disabled={!selectedVisitor || convertPatientLoading}
+            loading={convertPatientLoading}
             onClick={handleConvertToPatient}
           >
             Convert to Patient

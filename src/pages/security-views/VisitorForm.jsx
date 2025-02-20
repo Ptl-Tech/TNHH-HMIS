@@ -18,6 +18,8 @@ import {
   createVisitor,
   getVisitorsList,
 } from "../../actions/visitorsActions";
+import LoadingSkeleton from "../../components/LoadingSkeleton";
+import { read } from "xlsx";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
@@ -187,7 +189,8 @@ const VisitorForm = () => {
         MiddleName: "",
         LastName: "",
       });
-
+//set loading to false
+      setLoadingVisitorCheck(false);
       setVisitorExistsError("");
     }
   };
@@ -283,7 +286,8 @@ const VisitorForm = () => {
           <Typography.Title level={5} style={{ color: "#ac8342" }}>
             Visitor Details
           </Typography.Title>
-          <Form form={form} layout="vertical">
+         <LoadingSkeleton loading={admitVisitorLoading} rows={3} avatar={true}>
+         <Form form={form} layout="vertical">
             <Row gutter={[16, 16]}>
               {/* First Row */}
               <Col xs={24} sm={12} md={8}>
@@ -477,6 +481,7 @@ const VisitorForm = () => {
               )}
             </Row>
           </Form>
+          </LoadingSkeleton>
         </Card>
       </div>
       <div className="col-12 my-3">
