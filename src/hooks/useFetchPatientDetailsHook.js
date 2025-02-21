@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPatientDetails } from "../actions/Doc-actions/OutPatientAction";
+import { getPatientByNo } from "../actions/patientActions";
 
 const useFetchPatientDetailsHook = (patientNo) => {
   const dispatch = useDispatch();
 
-  const { loading, data } = useSelector((state) => state.getPatientDetails) || {};
+  const { loading:loadingPatientDetails, patients:patientDetails } = useSelector((state) => state.patientList) || {};
 
   useEffect(() => {
-    dispatch(getPatientDetails(patientNo))
+    dispatch(getPatientByNo(patientNo))
   }, [dispatch, patientNo]);
 
-  return { loading, data };
+  return { loadingPatientDetails, patientDetails };
 }
 
 export default useFetchPatientDetailsHook

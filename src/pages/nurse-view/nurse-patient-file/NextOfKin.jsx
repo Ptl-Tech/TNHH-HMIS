@@ -1,78 +1,79 @@
-import { Col, List, Row, Typography } from "antd"
+import { Col, List, Row, Typography } from "antd";
 import { useLocation } from "react-router-dom";
-import useFetchAllPatientsHook from "../../../hooks/useFetchAllPatientsHook";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import Loading from "../../../partials/nurse-partials/Loading";
 import { UserAddOutlined } from "@ant-design/icons";
+import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
 const NextOfKin = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const patientNo = queryParams.get("PatientNo");
 
-    const { loadingTriageWaitingList, triageWaitingList } = useFetchAllPatientsHook();
-    const { patientDetails } = useLocation().state;
-    const filteredPatient = triageWaitingList?.filter(patient => patient.PatientNo === patientDetails?.Patient_No);
-    console.log(filteredPatient);
+  const { loadingPatientDetails, patientDetails} = useFetchPatientDetailsHook(patientNo);
 
   const data = [
-   
     {
-        title: 'Next of Kin Full Name',
-        description: filteredPatient[0]?.NextOfkinFullName || 'N/A',
+      title: "Next of Kin Full Name",
+      description: patientDetails?.NextOfkinFullName || "N/A",
     },
     {
-        title: 'Next of Kin Relationship',
-        description: filteredPatient[0]?.NextofkinRelationship || 'N/A',
+      title: "Next of Kin Relationship",
+      description: patientDetails?.NextofkinRelationship || "N/A",
     },
     /* {
         title: 'Next of Kin ID Number',
         description: filteredPatient[0]?.NextOfKinIDCardNo || 'N/A',
     }, */
     {
-        title: 'Next of Kin Phone',
-        description: filteredPatient[0]?.NextOfkinAddress1 || 'N/A',
+      title: "Next of Kin Phone",
+      description: patientDetails?.NextOfkinAddress1 || "N/A",
     },
     /* {
         title: 'Next of Kin Address 2',
         description: filteredPatient[0]?.NextOfkinAddress2 || 'N/A',
     } */
-]
+  ];
   return (
-    
-   <div>
-      <NurseInnerHeader icon={<UserAddOutlined />}title="Next of Kin Information" />
-       {
-         loadingTriageWaitingList ? (
-            <Loading />
-         ):(
-            <List 
-            style={{ marginTop: '20px' }}
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={item => (
-                <Row 
-                    key={item.id} 
-                    gutter={8} 
-                    align="middle" 
-                    style={{
-                        marginBottom: '10px',
-                        borderBottom: '1px solid #e8e8e8', // Adds a subtle bottom border
-                        paddingBottom: '10px' // Adds space between the content and border
-                    }}
+    <div>
+      <NurseInnerHeader
+        icon={<UserAddOutlined />}
+        title="Next of Kin Information"
+      />
+      {loadingPatientDetails ? (
+        <Loading />
+      ) : (
+        <List
+          style={{ marginTop: "20px" }}
+          itemLayout="horizontal"
+          dataSource={data}
+          renderItem={(item) => (
+            <Row
+              key={item.id}
+              gutter={8}
+              align="middle"
+              style={{
+                marginBottom: "10px",
+                borderBottom: "1px solid #e8e8e8", // Adds a subtle bottom border
+                paddingBottom: "10px", // Adds space between the content and border
+              }}
+            >
+              <Col xs={24} sm={12}>
+                <Typography.Text
+                  style={{ fontSize: "14px", fontWeight: "bold" }}
                 >
-                    <Col xs={24} sm={12}>
-                        <Typography.Text style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                            {item.title}
-                        </Typography.Text>
-                    </Col>
-                    <Col xs={24} sm={12}>
-                        <Typography.Text>{item.description}</Typography.Text>
-                    </Col>
-                </Row>
-            )}
+                  {item.title}
+                </Typography.Text>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Typography.Text>{item.description}</Typography.Text>
+              </Col>
+            </Row>
+          )}
         />
-         )
-       }
-   </div>
-  )
-}
+      )}
+    </div>
+  );
+};
 
-export default NextOfKin
+export default NextOfKin;

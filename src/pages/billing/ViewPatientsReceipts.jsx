@@ -46,6 +46,7 @@ import {
 import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
 import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
 import ViewReceipt from "./ViewReceipt";
+import LoadingSkeleton from "../../components/LoadingSkeleton";
 
 const { Title, Text } = Typography;
 
@@ -88,7 +89,7 @@ const ViewPatientsReceipts = () => {
     (state) => state.getPatientReceiptHeader
   );
 
-  const { loading } = useSelector((state) => state.deletePatientCharges);
+  const { loading:deleteLoading } = useSelector((state) => state.deletePatientCharges);
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -154,6 +155,7 @@ const ViewPatientsReceipts = () => {
     setReverseChargeModalVisible(false);
     setViewReceipts(false);
   };
+  
 
   const handlePrintReceipt = () => {
     const invoiceData = {
@@ -397,7 +399,7 @@ const ViewPatientsReceipts = () => {
         </Row>
 
         <Divider />
-
+<LoadingSkeleton loading={chargesLoading || deleteLoading} rows={8} avatar={false}>
         <div className="d-flex  flex-column">
           <div className="d-flex flex-column text-start">
             <Title level={4}>Unposted Charges </Title>
@@ -421,7 +423,7 @@ const ViewPatientsReceipts = () => {
             />
           </div>
         </div>
-
+</LoadingSkeleton>
         <Divider />
 
         <Row gutter={16}>

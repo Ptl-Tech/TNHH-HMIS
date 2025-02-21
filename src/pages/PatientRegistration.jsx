@@ -6,6 +6,7 @@ import {
   Form,
   Input,
   message,
+  notification,
   Select,
   Switch,
 } from "antd";
@@ -24,11 +25,15 @@ import {
 import { useForm } from "antd/es/form/Form";
 import { createPatient, listPatients } from "../actions/patientActions";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import LoadingSkeleton from "../components/LoadingSkeleton";
 
 const PatientRegistration = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const patientNumber = queryParams.get("PatientNo");
+  const { loading: loadingpostPatient } = useSelector(
+    (state) => state.createPatient
+  );
   const {
     loading: countriesLoading,
     error: countriesError,
@@ -311,15 +316,16 @@ const PatientRegistration = () => {
     }
   };
 
-  console.log('visitor data', visitorData);
-  console.log('new patient', newPatient);
-  console.log('patient det', patientDet);
+  console.log("visitor data", visitorData);
+  console.log("new patient", newPatient);
+  console.log("patient det", patientDet);
 
   useEffect(() => {
     if (patientDet) {
       setNewPatient({
         idNumber: patientDet?.IDNumber || "",
-        firstName: patientDet?.FirstName || patientDet?.SearchName.split(" ")[0] || "",
+        firstName:
+          patientDet?.FirstName || patientDet?.SearchName.split(" ")[0] || "",
         middleName: patientDet?.MiddleName || "",
         lastName: patientDet?.LastName || "",
         gender: patientDet?.Gender === "Male" ? "1" : "2" || "",
@@ -426,42 +432,59 @@ const PatientRegistration = () => {
     }
 
     try {
-      // Await the response from dispatch
       const response = await dispatch(createPatient(patientData));
+
+      // Ensure only one notification is shown at a time
+      notification.destroy();
 
       if (response?.patientNo) {
         if (isEditAction) {
-          message.success("Patient details updated successfully.");
+          notification.success({
+            message:(
+              <span style={{ color: "#1E67AB" , fontWeight:"semibold" }}>
+                Patient details updated successfully.
+              </span>
+            ),
+            showProgress: true,
+          });
         } else {
           message.success("New patient saved successfully.");
         }
 
-       //check if the patient number has an active visit
         const isActivated = patientListPayload?.some(
           (existingPatient) =>
-            existingPatient.PatientNo === patientNumber && existingPatient.Activated===true ||
-            existingPatient.PatientNo === response.patientNo && existingPatient.Activated
+            (existingPatient.PatientNo === patientNumber &&
+              existingPatient.Activated === true) ||
+            (existingPatient.PatientNo === response.patientNo &&
+              existingPatient.Activated)
         );
 
-        //
-
-        if (isActivated === true) {
-          message.info("Patient already has an active visit");
+        if (isActivated) {
+          notification.info({
+            message: "Notice",
+            description: "Patient already has an active visit",
+            // style: { backgroundColor: "#007BFF", color: "white" },
+            showProgress: true,
+          });
           return;
         } else {
-          // Navigate to Add Appointment page and pass patientId
-
           const patientId = response.patientNo;
-          navigate(`/reception/Add-Appointment/Patient?PatientNo=${patientId}`, {
-            state: { patientData },
-          });
+          navigate(
+            `/reception/Add-Appointment/Patient?PatientNo=${patientId}`,
+            {
+              state: { patientData },
+            }
+          );
         }
       } else {
         message.error("Failed to save patient data. Please try again.");
       }
     } catch (error) {
       console.error("Error saving patient data:", error);
-      message.error("An unexpected error occurred. Please try again.");
+      // Extract and display the error message from the response
+      if (error.response?.data?.errors) {
+        message.error(error.response.data.errors, 5);
+      }
     }
   };
 
@@ -531,327 +554,254 @@ const PatientRegistration = () => {
         )} */}
       </div>
       <div className="row">
-        <div className="col-12 col-md-8">
-          <Card title="Patient Information" style={{ width: "100%" }}>
-            <Form
-              name="basic"
-              initialValues={{ remember: true }}
-              autoComplete="off"
-              form={form}
-            >
-              <div className="row px-3 py-2  align-items-center justify-content-between">
-                <div className="col-12 col-md-4 ">
-                  <label className="py-1">
-                    ID/Passport/Birth No:
-                    <span className="text-danger px-1 fs-6">*</span>
-                  </label>
+        <LoadingSkeleton loading={loadingpostPatient} avatar={true} rows={6}>
+          <div className="col-12 col-md-8">
+            <Card title="Patient Information" style={{ width: "100%" }}>
+              <Form
+                name="basic"
+                initialValues={{ remember: true }}
+                autoComplete="off"
+                form={form}
+              >
+                <div className="row px-3 py-2  align-items-center justify-content-between">
+                  <div className="col-12 col-md-4 ">
+                    <label className="py-1">
+                      ID/Passport/Birth No:
+                      <span className="text-danger px-1 fs-6">*</span>
+                    </label>
 
-                  <Input
-                    name="idNumber"
-                    placeholder="ID Number"
-                    style={{ width: "100%" }}
-                    value={
-                      newPatient.idNumber ||
-                      visitorData?.IDNumber ||
-                      patientDet?.IDNumber
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                  {errors.idNumber && (
-                    <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.idNumber}
-                    </span>
-                  )}
-                </div>
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    First Name:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    name="firstName"
-                    placeholder="First Name"
-                    style={{ width: "100%" }}
-                    value={
-                      newPatient.firstName ||
-                      visitorData?.VisitorName?.split(" ")[0] ||
-                      patientDet?.SearchName?.split(" ")[0] ||
-                      patientDet?.FirstName?.split(" ")[0]
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                  {errors.firstName && (
-                    <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.firstName}
-                    </span>
-                  )}
-                </div>
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Middle Name:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    name="middleName"
-                    placeholder="Middle Name"
-                    style={{ width: "100%" }}
-                    value={
-                      newPatient.middleName ||
-                      visitorData?.VisitorName?.split(" ")[1] ||
-                      patientDet?.SearchName?.split(" ")[1]
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                  {errors.middleName && (
-                    <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.middleName}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="row px-3 py-2  align-items-center justify-content-between">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Last Name:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    name="lastName"
-                    placeholder="Last Name"
-                    style={{ width: "100%" }}
-                    value={
-                      newPatient.lastName ||
-                      visitorData?.VisitorName?.split(" ")[2] ||
-                      patientDet?.SearchName?.split(" ")[2]
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                </div>
-                <div className="col-12 col-md-4 ">
-                  <label className="py-1">
-                    Gender:
-                    <span className="text-danger px-1 fs-6">*</span>
-                  </label>
-                  <Select
-                    placeholder="--Select Gender--"
-                    className="w-100 text-center fw-bold"
-                    name="gender"
-                    value={
-                      // Convert the incoming gender string to the corresponding value
-                      newPatient.gender === "male" ||
-                      newPatient.gender === "Male"
-                        ? 1
-                        : newPatient.gender === "female" ||
-                          newPatient.gender === "Female"
-                        ? 2
-                        : visitorData?.Gender === "male" ||
-                          visitorData?.Gender === "Male"
-                        ? 1
-                        : visitorData?.Gender === "female" ||
-                          visitorData?.Gender === "Female"
-                        ? 2
-                        : patientDet?.Gender === "male" ||
-                          patientDet?.Gender === "Male"
-                        ? 1
-                        : patientDet?.Gender === "female" ||
-                          patientDet?.Gender === "Female"
-                        ? 2
-                        : newPatient.gender
-                    }
-                    onChange={(value) => handleSelectChange("gender", value)}
-                    showSearch
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">--Select Gender--</Select.Option>
-                    <Select.Option key={1} value={1}>
-                      Male
-                    </Select.Option>
-                    <Select.Option key={2} value={2}>
-                      Female
-                    </Select.Option>
-                  </Select>
-                </div>
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Date of Birth:<span className="text-danger px-1">*</span>
-                  </label>
-                  <DatePicker
-                    // format="YYYY-MM-DD"
-                    style={{ width: "100%" }}
-                    placeholder="Select Date of Birth"
-                    value={
-                      newPatient.dob
-                        ? moment(newPatient.dob) ||
-                          visitorData?.dateOfBirth ||
-                          patientDet?.DateOfBirth
-                        : null
-                    }
-                    onChange={(date, dateString) =>
-                      handleDateChange(date, dateString)
-                    }
-                    className="text-center fw-bold"
-                  />
-                  {dobError && <span style={{ color: "red" }}>{dobError}</span>}
-                  {age !== null && (
-                    <div className="text-success">
-                      Age: {age.years} years {age.months} months
-                    </div>
-                  )}{" "}
-                </div>
-              </div>
-              <div className="row px-3 py-2 align-items-center justify-content-between">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Phone Number:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    placeholder="Enter phone number"
-                    name="phoneNumber"
-                    value={
-                      newPatient.phoneNumber ||
-                      visitorData?.PhoneNumber ||
-                      patientDet?.TelephoneNo1
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                  {errors.phoneNumber && (
-                    <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.phoneNumber}
-                    </span>
-                  )}
-                </div>
-                <div className="col-12 col-md-4 ">
-                  <label className="py-1">
-                    Email:
-                    <span className="text-danger px-1 fs-6">*</span>
-                  </label>
-                  <Input
-                    placeholder="Email"
-                    type="email"
-                    name="email"
-                    style={{ width: "100%" }}
-                    value={newPatient.email || patientDet?.Email}
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                  {errors.email && (
-                    <span style={{ color: "red", fontSize: "0.875rem" }}>
-                      {errors.email}
-                    </span>
-                  )}
-                </div>
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Nationality:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select nationality"
-                    name="nationality"
-                    className="w-100 fw-bold text-center"
-                    value={newPatient.nationality || patientDet?.Nationality}
-                    showSearch
-                    onSearch={handleSearch}
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                    onChange={(value) =>
-                      handleSelectChange("nationality", value)
-                    }
-                  >
-                    <Select.Option value="">
-                      --Select Nationality--
-                    </Select.Option>
-                    {filteredCountries && filteredCountries.length > 0 ? (
-                      filteredCountries.map((country) => (
-                        <Select.Option key={country.Code} value={country.Code}>
-                          {country.Name}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No data available
-                      </Select.Option>
+                    <Input
+                      name="idNumber"
+                      placeholder="ID Number"
+                      style={{ width: "100%" }}
+                      value={
+                        newPatient.idNumber ||
+                        visitorData?.IDNumber ||
+                        patientDet?.IDNumber
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                    {errors.idNumber && (
+                      <span style={{ color: "red", fontSize: "0.875rem" }}>
+                        {errors.idNumber}
+                      </span>
                     )}
-                  </Select>
-                </div>
-              </div>
-              {newPatient.nationality === "KE" && (
-                <div className="row px-3 py-2 align-items-center ">
+                  </div>
                   <div className="col-12 col-md-4">
                     <label className="py-1">
-                      County:<span className="text-danger px-1">*</span>
+                      First Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      name="firstName"
+                      placeholder="First Name"
+                      style={{ width: "100%" }}
+                      value={
+                        newPatient.firstName ||
+                        visitorData?.VisitorName?.split(" ")[0] ||
+                        patientDet?.SearchName?.split(" ")[0] ||
+                        patientDet?.FirstName?.split(" ")[0]
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                    {errors.firstName && (
+                      <span style={{ color: "red", fontSize: "0.875rem" }}>
+                        {errors.firstName}
+                      </span>
+                    )}
+                  </div>
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Middle Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      name="middleName"
+                      placeholder="Middle Name"
+                      style={{ width: "100%" }}
+                      value={
+                        newPatient.middleName ||
+                        visitorData?.VisitorName?.split(" ")[1] ||
+                        patientDet?.SearchName?.split(" ")[1]
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                    {errors.middleName && (
+                      <span style={{ color: "red", fontSize: "0.875rem" }}>
+                        {errors.middleName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="row px-3 py-2  align-items-center justify-content-between">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Last Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      name="lastName"
+                      placeholder="Last Name"
+                      style={{ width: "100%" }}
+                      value={
+                        newPatient.lastName ||
+                        visitorData?.VisitorName?.split(" ")[2] ||
+                        patientDet?.SearchName?.split(" ")[2]
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                  </div>
+                  <div className="col-12 col-md-4 ">
+                    <label className="py-1">
+                      Gender:
+                      <span className="text-danger px-1 fs-6">*</span>
                     </label>
                     <Select
-                      placeholder="Select County"
-                      className="w-100 fw-bold text-center"
-                       name="county"
-                      value={newPatient.county || patientDet?.CountyWardName}
-                      onChange={(value) => handleSelectChange("county", value)}
-                     
+                      placeholder="--Select Gender--"
+                      className="w-100 text-center fw-bold"
+                      name="gender"
+                      value={
+                        // Convert the incoming gender string to the corresponding value
+                        newPatient.gender === "male" ||
+                        newPatient.gender === "Male"
+                          ? 1
+                          : newPatient.gender === "female" ||
+                            newPatient.gender === "Female"
+                          ? 2
+                          : visitorData?.Gender === "male" ||
+                            visitorData?.Gender === "Male"
+                          ? 1
+                          : visitorData?.Gender === "female" ||
+                            visitorData?.Gender === "Female"
+                          ? 2
+                          : patientDet?.Gender === "male" ||
+                            patientDet?.Gender === "Male"
+                          ? 1
+                          : patientDet?.Gender === "female" ||
+                            patientDet?.Gender === "Female"
+                          ? 2
+                          : newPatient.gender
+                      }
+                      onChange={(value) => handleSelectChange("gender", value)}
                       showSearch
-                      // filterOption = {true}
                       filterOption={(input, option) =>
                         option.children
                           .toLowerCase()
                           .indexOf(input.toLowerCase()) >= 0
                       }
-                      // onFocus={handleDisplayDropDown}
                     >
-                      <Select.Option value="">--Select County--</Select.Option>
-                      {countiesPayload && countiesPayload.length > 0 ? (
-                        countiesPayload.map((county) => (
-                          <Select.Option key={county.Code} value={county.Code}>
-                            {county.Description}
-                          </Select.Option>
-                        ))
-                      ) : (
-                        <Select.Option value="" disabled>
-                          No data available
-                        </Select.Option>
-                      )}
+                      <Select.Option value="">--Select Gender--</Select.Option>
+                      <Select.Option key={1} value={1}>
+                        Male
+                      </Select.Option>
+                      <Select.Option key={2} value={2}>
+                        Female
+                      </Select.Option>
                     </Select>
                   </div>
-
                   <div className="col-12 col-md-4">
                     <label className="py-1">
-                      Sub County:<span className="text-danger px-1">*</span>
+                      Date of Birth:<span className="text-danger px-1">*</span>
+                    </label>
+                    <DatePicker
+                      // format="YYYY-MM-DD"
+                      style={{ width: "100%" }}
+                      placeholder="Select Date of Birth"
+                      value={
+                        newPatient.dob
+                          ? moment(newPatient.dob) ||
+                            visitorData?.dateOfBirth ||
+                            patientDet?.DateOfBirth
+                          : null
+                      }
+                      onChange={(date, dateString) =>
+                        handleDateChange(date, dateString)
+                      }
+                      className="text-center fw-bold"
+                    />
+                    {dobError && (
+                      <span style={{ color: "red" }}>{dobError}</span>
+                    )}
+                    {age !== null && (
+                      <div className="text-success">
+                        Age: {age.years} years {age.months} months
+                      </div>
+                    )}{" "}
+                  </div>
+                </div>
+                <div className="row px-3 py-2 align-items-center justify-content-between">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Phone Number:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Enter phone number"
+                      name="phoneNumber"
+                      value={
+                        newPatient.phoneNumber ||
+                        visitorData?.PhoneNumber ||
+                        patientDet?.TelephoneNo1
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                    {errors.phoneNumber && (
+                      <span style={{ color: "red", fontSize: "0.875rem" }}>
+                        {errors.phoneNumber}
+                      </span>
+                    )}
+                  </div>
+                  <div className="col-12 col-md-4 ">
+                    <label className="py-1">
+                      Email:
+                      <span className="text-danger px-1 fs-6">*</span>
+                    </label>
+                    <Input
+                      placeholder="Email"
+                      type="email"
+                      name="email"
+                      style={{ width: "100%" }}
+                      value={newPatient.email || patientDet?.Email}
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                    {errors.email && (
+                      <span style={{ color: "red", fontSize: "0.875rem" }}>
+                        {errors.email}
+                      </span>
+                    )}
+                  </div>
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Nationality:<span className="text-danger px-1">*</span>
                     </label>
                     <Select
-                      placeholder="Select Sub County"
+                      placeholder="Select nationality"
+                      name="nationality"
                       className="w-100 fw-bold text-center"
-                      name="subCounty"
-
-                      value={newPatient.subCounty || patientDet?.SubCountyName}
-                      onChange={(value) =>
-                        handleSelectChange("subCounty", value)
-                      }
-                      onFocus={handleDisplayDropDown}
+                      value={newPatient.nationality || patientDet?.Nationality}
                       showSearch
-                      // filterOption = {true}
+                      onSearch={handleSearch}
                       filterOption={(input, option) =>
                         option.children
                           .toLowerCase()
                           .indexOf(input.toLowerCase()) >= 0
+                      }
+                      onChange={(value) =>
+                        handleSelectChange("nationality", value)
                       }
                     >
                       <Select.Option value="">
-                        --Select Sub County--
+                        --Select Nationality--
                       </Select.Option>
-                      {filteredSubCounties && filteredSubCounties.length > 0 ? (
-                        filteredSubCounties.map((subCounty) => (
+                      {filteredCountries && filteredCountries.length > 0 ? (
+                        filteredCountries.map((country) => (
                           <Select.Option
-                            key={subCounty.SubCountyCode}
-                            value={subCounty.SubCountyCode}
+                            key={country.Code}
+                            value={country.Code}
                           >
-                            {subCounty.Name}
+                            {country.Name}
                           </Select.Option>
                         ))
                       ) : (
@@ -861,263 +811,64 @@ const PatientRegistration = () => {
                       )}
                     </Select>
                   </div>
-
-                  <div className="col-12 col-md-4">
-                    <label className="py-1">
-                      Ward:<span className="text-danger px-1">*</span>
-                    </label>
-                    <Select
-                      placeholder="Select Ward"
-                      className="w-100 fw-bold text-center"
-                      name="countyWard"
-                      value={
-                        newPatient.countyWard || patientDet?.CountyWardName
-                      }
-                      onChange={(value) =>
-                        handleSelectChange("countyWard", value)
-                      }
-                      onFocus={handleDisplayDropDown}
-                      showSearch
-                      // filterOption = {true}
-                      filterOption={(input, option) =>
-                        option.children
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      }
-                    >
-                      <Select.Option value="">--Select Ward--</Select.Option>
-                      {filteredWards && filteredWards.length > 0 ? (
-                        filteredWards.map((ward) => (
-                          <Select.Option key={ward.Code} value={ward.Name}>
-                            {ward.Name}
-                          </Select.Option>
-                        ))
-                      ) : (
-                        <Select.Option value="" disabled>
-                          No wards available
-                        </Select.Option>
-                      )}
-                    </Select>
-                  </div>
                 </div>
-              )}
-              <div className="row px-3 py-2  align-items-center ">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Residence:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    placeholder="Enter residence"
-                    name="residence"
-                    value={newPatient.residence}
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                </div>
-              </div>
-              <div className="row px-3 py-2  align-items-center ">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Kin's Name:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    placeholder="Kin's Name"
-                    name="nextOfKinFullName"
-                    value={
-                      newPatient.nextOfKinFullName ||
-                      patientDet?.NextOfkinFullName
-                    }
-                    onChange={handleInputChange}
-                    className="text-center fw-bold"
-                  />
-                </div>
-                <div className="col-12 col-md-4 ">
-                  <label className="py-1">
-                    Kin's Relationship:
-                    <span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select Relationship"
-                    className="w-100 fw-bold text-center"
-                    value={
-                      newPatient.nextOfKinRelationShip ||
-                      patientDet?.NextofkinRelationship
-                    }
-                    onChange={(value) =>
-                      handleSelectChange("nextOfKinRelationShip", value)
-                    }
-                    // variant="borderless"
-                    name="nextOfKinRelationShip"
-                    onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
-                    showSearch
-                    // filterOption = {true}
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">
-                      --Select Relationship--
-                    </Select.Option>
-                    {relationshipOptionsPayload &&
-                    relationshipOptionsPayload.length > 0 ? (
-                      relationshipOptionsPayload.map((relation) => (
-                        <Select.Option
-                          key={relation.Code}
-                          value={relation.Code}
-                        >
-                          {relation.Description}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No data available
-                      </Select.Option>
-                    )}
-                  </Select>{" "}
-                </div>
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    Kin's Phone Number:
-                    <span className="text-danger px-1">*</span>
-                  </label>
-                  <Input
-                    placeholder="Kin's phone number"
-                    name="nextOfKinPhoneNo"
-                    value={
-                      newPatient.nextOfKinPhoneNo ||
-                      patientDet?.NextOfkinAddress1
-                    }
-                    className="text-center fw-bold"
-                    onChange={handleInputChange}
-                    type="number"
-                  />
-                </div>
-              </div>
-              <div className="row px-3 py-2 mb-4 align-items-center">
-                <div className="col-12 col-md-4">
-                  <label className="py-1">
-                    How did you hear about us:
-                    <span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select An Option"
-                    className="w-100 fw-bold text-center "
-                    value={newPatient.howYouKnewABoutUs}
-                    onChange={(value) =>
-                      handleSelectChange("howYouKnewABoutUs", value)
-                    }
-                    name="howYouKnewABoutUs"
-                    onFocus={handleDisplayDropDown}
-                    showSearch
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    <Select.Option value="">--Select An Option--</Select.Option>
-                    {marketingStrategiesPayload &&
-                    marketingStrategiesPayload.length > 0 ? (
-                      marketingStrategiesPayload.map((list) => (
-                        <Select.Option key={list.Code} value={list.Code}>
-                          {list.Description}
-                        </Select.Option>
-                      ))
-                    ) : (
-                      <Select.Option value="" disabled>
-                        No data Available
-                      </Select.Option>
-                    )}
-                  </Select>{" "}
-                </div>
-              </div>
-            </Form>
-          </Card>
-        </div>
-        <div className="col-12 col-md-4">
-          <Card title="Billing Details" style={{ width: "100%" }}>
-            <Form
-              name="basic"
-              initialValues={{ remember: true }}
-              autoComplete="off"
-            >
-              <div className="row px-3 py-2 g-3 align-items-center">
-                <div className="d-flex my-3 align-items-center justify-content-center">
-                  <Avatar
-                    size={100}
-                    style={{
-                      backgroundColor: "#87d068",
-                      fontSize: "2rem",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {`${
-                      newPatient.firstName?.charAt(0).toUpperCase() ||
-                      visitorData?.VisitorName?.split(" ")[0]
-                        ?.charAt(0)
-                        .toUpperCase() ||
-                      ""
-                    }${
-                      newPatient.lastName?.charAt(0).toUpperCase() ||
-                      visitorData?.VisitorName?.split(" ")[1]
-                        ?.charAt(0)
-                        .toUpperCase() ||
-                      "" ||
-                      visitorData?.VisitorName?.split(" ")[2]
-                        ?.charAt(0)
-                        .toUpperCase() ||
-                      ""
-                    }`}
-                  </Avatar>
-                </div>
-                <div className="col-12">
-                  <label className="py-1">
-                    Patient Type:<span className="text-danger px-1">*</span>
-                  </label>
-                  <Select
-                    placeholder="Select Payment Mode"
-                    className="w-100"
-                    name="paymentMode"
-                    value={
-                      newPatient.paymentMode ||
-                      (patientDet?.PatientType === "Corporate"
-                        ? "1"
-                        : patientDet?.PatientType === "Cash"
-                        ? "2"
-                        : "")
-                    }
-                    
-                    onChange={(value) =>
-                      handleSelectChange("paymentMode", value)
-                    }
-                  >
-                    <Select.Option value="">--Select--</Select.Option>
-                    <Select.Option value="2">Cash</Select.Option>
-                    <Select.Option value="1">Insurance</Select.Option>
-                    {/* <Select.Option value="3">Corporate</Select.Option> */}
-                  </Select>
-                </div>
-
-                {/* Insurance Input Fields */}
-                {newPatient.paymentMode !== "2" && newPatient.paymentMode !== "" && (
-                  <div className="row g-2">
-                    <div className="col-12 ">
+                {newPatient.nationality === "KE" && (
+                  <div className="row px-3 py-2 align-items-center ">
+                    <div className="col-12 col-md-4">
                       <label className="py-1">
-                        Insurance Name:
-                        <span className="text-danger px-1">*</span>
+                        County:<span className="text-danger px-1">*</span>
                       </label>
                       <Select
-                        placeholder="Select Insurance"
-                        className="w-100"
+                        placeholder="Select County"
+                        className="w-100 fw-bold text-center"
+                        name="county"
+                        value={newPatient.county || patientDet?.CountyWardName}
+                        onChange={(value) =>
+                          handleSelectChange("county", value)
+                        }
+                        showSearch
+                        // filterOption = {true}
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                        // onFocus={handleDisplayDropDown}
+                      >
+                        <Select.Option value="">
+                          --Select County--
+                        </Select.Option>
+                        {countiesPayload && countiesPayload.length > 0 ? (
+                          countiesPayload.map((county) => (
+                            <Select.Option
+                              key={county.Code}
+                              value={county.Code}
+                            >
+                              {county.Description}
+                            </Select.Option>
+                          ))
+                        ) : (
+                          <Select.Option value="" disabled>
+                            No data available
+                          </Select.Option>
+                        )}
+                      </Select>
+                    </div>
+
+                    <div className="col-12 col-md-4">
+                      <label className="py-1">
+                        Sub County:<span className="text-danger px-1">*</span>
+                      </label>
+                      <Select
+                        placeholder="Select Sub County"
+                        className="w-100 fw-bold text-center"
+                        name="subCounty"
                         value={
-                          newPatient.insuranceNo || patientDet?.InsuranceNo
+                          newPatient.subCounty || patientDet?.SubCountyName
                         }
                         onChange={(value) =>
-                          handleSelectChange("insuranceNo", value)
+                          handleSelectChange("subCounty", value)
                         }
-                        name="insuranceNo"
                         onFocus={handleDisplayDropDown}
                         showSearch
                         // filterOption = {true}
@@ -1128,15 +879,16 @@ const PatientRegistration = () => {
                         }
                       >
                         <Select.Option value="">
-                          --Select Insurance--
+                          --Select Sub County--
                         </Select.Option>
-                        {insurancePayload && insurancePayload.length > 0 ? (
-                          insurancePayload.map((insurance) => (
+                        {filteredSubCounties &&
+                        filteredSubCounties.length > 0 ? (
+                          filteredSubCounties.map((subCounty) => (
                             <Select.Option
-                              key={insurance.No}
-                              value={insurance.No}
+                              key={subCounty.SubCountyCode}
+                              value={subCounty.SubCountyCode}
                             >
-                              {insurance.Name}
+                              {subCounty.Name}
                             </Select.Option>
                           ))
                         ) : (
@@ -1146,91 +898,374 @@ const PatientRegistration = () => {
                         )}
                       </Select>
                     </div>
-                    <div className="col-12 ">
+
+                    <div className="col-12 col-md-4">
                       <label className="py-1">
-                        Membership No:
-                        <span className="text-danger px-1">*</span>
+                        Ward:<span className="text-danger px-1">*</span>
                       </label>
-                      <Input
-                        placeholder="Enter Membership Number"
-                        name="membershipNo"
+                      <Select
+                        placeholder="Select Ward"
+                        className="w-100 fw-bold text-center"
+                        name="countyWard"
                         value={
-                          newPatient.membershipNo || patientDet?.MembershipNo
+                          newPatient.countyWard || patientDet?.CountyWardName
                         }
-                        onChange={handleInputChange}
-                      />
+                        onChange={(value) =>
+                          handleSelectChange("countyWard", value)
+                        }
+                        onFocus={handleDisplayDropDown}
+                        showSearch
+                        // filterOption = {true}
+                        filterOption={(input, option) =>
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        <Select.Option value="">--Select Ward--</Select.Option>
+                        {filteredWards && filteredWards.length > 0 ? (
+                          filteredWards.map((ward) => (
+                            <Select.Option key={ward.Code} value={ward.Name}>
+                              {ward.Name}
+                            </Select.Option>
+                          ))
+                        ) : (
+                          <Select.Option value="" disabled>
+                            No wards available
+                          </Select.Option>
+                        )}
+                      </Select>
                     </div>
                   </div>
                 )}
+                <div className="row px-3 py-2  align-items-center ">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Residence:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Enter residence"
+                      name="residence"
+                      value={newPatient.residence}
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                  </div>
+                </div>
+                <div className="row px-3 py-2  align-items-center ">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Kin's Name:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Kin's Name"
+                      name="nextOfKinFullName"
+                      value={
+                        newPatient.nextOfKinFullName ||
+                        patientDet?.NextOfkinFullName
+                      }
+                      onChange={handleInputChange}
+                      className="text-center fw-bold"
+                    />
+                  </div>
+                  <div className="col-12 col-md-4 ">
+                    <label className="py-1">
+                      Kin's Relationship:
+                      <span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select Relationship"
+                      className="w-100 fw-bold text-center"
+                      value={
+                        newPatient.nextOfKinRelationShip ||
+                        patientDet?.NextofkinRelationship
+                      }
+                      onChange={(value) =>
+                        handleSelectChange("nextOfKinRelationShip", value)
+                      }
+                      // variant="borderless"
+                      name="nextOfKinRelationShip"
+                      onFocus={handleDisplayDropDown} // Trigger dropdown display when focused
+                      showSearch
+                      // filterOption = {true}
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      <Select.Option value="">
+                        --Select Relationship--
+                      </Select.Option>
+                      {relationshipOptionsPayload &&
+                      relationshipOptionsPayload.length > 0 ? (
+                        relationshipOptionsPayload.map((relation) => (
+                          <Select.Option
+                            key={relation.Code}
+                            value={relation.Code}
+                          >
+                            {relation.Description}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No data available
+                        </Select.Option>
+                      )}
+                    </Select>{" "}
+                  </div>
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      Kin's Phone Number:
+                      <span className="text-danger px-1">*</span>
+                    </label>
+                    <Input
+                      placeholder="Kin's phone number"
+                      name="nextOfKinPhoneNo"
+                      value={
+                        newPatient.nextOfKinPhoneNo ||
+                        patientDet?.NextOfkinAddress1
+                      }
+                      className="text-center fw-bold"
+                      onChange={handleInputChange}
+                      type="number"
+                    />
+                  </div>
+                </div>
+                <div className="row px-3 py-2 mb-4 align-items-center">
+                  <div className="col-12 col-md-4">
+                    <label className="py-1">
+                      How did you hear about us:
+                      <span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select An Option"
+                      className="w-100 fw-bold text-center "
+                      value={newPatient.howYouKnewABoutUs}
+                      onChange={(value) =>
+                        handleSelectChange("howYouKnewABoutUs", value)
+                      }
+                      name="howYouKnewABoutUs"
+                      onFocus={handleDisplayDropDown}
+                      showSearch
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                    >
+                      <Select.Option value="">
+                        --Select An Option--
+                      </Select.Option>
+                      {marketingStrategiesPayload &&
+                      marketingStrategiesPayload.length > 0 ? (
+                        marketingStrategiesPayload.map((list) => (
+                          <Select.Option key={list.Code} value={list.Code}>
+                            {list.Description}
+                          </Select.Option>
+                        ))
+                      ) : (
+                        <Select.Option value="" disabled>
+                          No data Available
+                        </Select.Option>
+                      )}
+                    </Select>{" "}
+                  </div>
+                </div>
+              </Form>
+            </Card>
+          </div>
+          <div className="col-12 col-md-4">
+            <Card title="Billing Details" style={{ width: "100%" }}>
+              <Form
+                name="basic"
+                initialValues={{ remember: true }}
+                autoComplete="off"
+              >
+                <div className="row px-3 py-2 g-3 align-items-center">
+                  <div className="d-flex my-3 align-items-center justify-content-center">
+                    <Avatar
+                      size={100}
+                      style={{
+                        backgroundColor: "#87d068",
+                        fontSize: "2rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {`${
+                        newPatient.firstName?.charAt(0).toUpperCase() ||
+                        visitorData?.VisitorName?.split(" ")[0]
+                          ?.charAt(0)
+                          .toUpperCase() ||
+                        ""
+                      }${
+                        newPatient.lastName?.charAt(0).toUpperCase() ||
+                        visitorData?.VisitorName?.split(" ")[1]
+                          ?.charAt(0)
+                          .toUpperCase() ||
+                        "" ||
+                        visitorData?.VisitorName?.split(" ")[2]
+                          ?.charAt(0)
+                          .toUpperCase() ||
+                        ""
+                      }`}
+                    </Avatar>
+                  </div>
+                  <div className="col-12">
+                    <label className="py-1">
+                      Patient Type:<span className="text-danger px-1">*</span>
+                    </label>
+                    <Select
+                      placeholder="Select Payment Mode"
+                      className="w-100"
+                      name="paymentMode"
+                      value={
+                        newPatient.paymentMode ||
+                        (patientDet?.PatientType === "Corporate"
+                          ? "1"
+                          : patientDet?.PatientType === "Cash"
+                          ? "2"
+                          : "")
+                      }
+                      onChange={(value) =>
+                        handleSelectChange("paymentMode", value)
+                      }
+                    >
+                      <Select.Option value="">--Select--</Select.Option>
+                      <Select.Option value="2">Cash</Select.Option>
+                      <Select.Option value="1">Insurance</Select.Option>
+                      {/* <Select.Option value="3">Corporate</Select.Option> */}
+                    </Select>
+                  </div>
 
-                {/* Additional Fields for Insurance */}
-                {newPatient.paymentMode !== "2" && newPatient.paymentMode !== "" && (
-                  <>
-                    <div className="row g-2 mb-3">
-                      <div className="col-12">
-                        <label className="py-1">
-                          Scheme Name:
-                          <span className="text-danger px-1">*</span>
-                        </label>
-                        <Input
-                          placeholder="Enter Insurance Number"
-                          name="schemeName"
-                          value={
-                            newPatient.schemeName || patientDet?.SchemeName
-                          }
-                          onChange={handleInputChange}
-                        />
+                  {/* Insurance Input Fields */}
+                  {newPatient.paymentMode !== "2" &&
+                    newPatient.paymentMode !== "" && (
+                      <div className="row g-2">
+                        <div className="col-12 ">
+                          <label className="py-1">
+                            Insurance Name:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Select
+                            placeholder="Select Insurance"
+                            className="w-100"
+                            value={
+                              newPatient.insuranceNo || patientDet?.InsuranceNo
+                            }
+                            onChange={(value) =>
+                              handleSelectChange("insuranceNo", value)
+                            }
+                            name="insuranceNo"
+                            onFocus={handleDisplayDropDown}
+                            showSearch
+                            // filterOption = {true}
+                            filterOption={(input, option) =>
+                              option.children
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            }
+                          >
+                            <Select.Option value="">
+                              --Select Insurance--
+                            </Select.Option>
+                            {insurancePayload && insurancePayload.length > 0 ? (
+                              insurancePayload.map((insurance) => (
+                                <Select.Option
+                                  key={insurance.No}
+                                  value={insurance.No}
+                                >
+                                  {insurance.Name}
+                                </Select.Option>
+                              ))
+                            ) : (
+                              <Select.Option value="" disabled>
+                                No data available
+                              </Select.Option>
+                            )}
+                          </Select>
+                        </div>
+                        <div className="col-12 ">
+                          <label className="py-1">
+                            Membership No:
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Input
+                            placeholder="Enter Membership Number"
+                            name="membershipNo"
+                            value={
+                              newPatient.membershipNo ||
+                              patientDet?.MembershipNo
+                            }
+                            onChange={handleInputChange}
+                          />
+                        </div>
                       </div>
-                      <div className="col-12">
-                        <label className="py-1">
-                          Principal Name:
-                          <span className="text-danger px-1">*</span>
-                        </label>
-                        <Input
-                          placeholder="Enter Principal Name"
-                          name="insurancePrincipalMemberName"
-                          value={
-                            newPatient.insurancePrinicipalMemberName ||
-                            patientDet?.InsurancePrincipalMemberName ||
-                            ""
-                          }
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-12 mb-4">
-                      <label className="py-1">
-                        Principle Member ?
-                        <span className="text-danger px-1">*</span>
-                      </label>
-                      <Switch
-                        checked={
-                          newPatient.isPrincipleMember || patientDet?.Principal
-                        }
-                        onChange={(checked) =>
-                          handleSwitchChange("isPrincipleMember", checked)
-                        }
-                        size="large"
-                        style={{ margin: "0 10px" }}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </Form>
-          </Card>
-        </div>
+                    )}
 
+                  {/* Additional Fields for Insurance */}
+                  {newPatient.paymentMode !== "2" &&
+                    newPatient.paymentMode !== "" && (
+                      <>
+                        <div className="row g-2 mb-3">
+                          <div className="col-12">
+                            <label className="py-1">
+                              Scheme Name:
+                              <span className="text-danger px-1">*</span>
+                            </label>
+                            <Input
+                              placeholder="Enter Insurance Number"
+                              name="schemeName"
+                              value={
+                                newPatient.schemeName || patientDet?.SchemeName
+                              }
+                              onChange={handleInputChange}
+                            />
+                          </div>
+                          <div className="col-12">
+                            <label className="py-1">
+                              Principal Name:
+                              <span className="text-danger px-1">*</span>
+                            </label>
+                            <Input
+                              placeholder="Enter Principal Name"
+                              name="insurancePrincipalMemberName"
+                              value={
+                                newPatient.insurancePrinicipalMemberName ||
+                                patientDet?.InsurancePrincipalMemberName ||
+                                ""
+                              }
+                              onChange={handleInputChange}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-12 mb-4">
+                          <label className="py-1">
+                            Principle Member ?
+                            <span className="text-danger px-1">*</span>
+                          </label>
+                          <Switch
+                            checked={
+                              newPatient.isPrincipleMember ||
+                              patientDet?.Principal
+                            }
+                            onChange={(checked) =>
+                              handleSwitchChange("isPrincipleMember", checked)
+                            }
+                            size="large"
+                            style={{ margin: "0 10px" }}
+                          />
+                        </div>
+                      </>
+                    )}
+                </div>
+              </Form>
+            </Card>
+          </div>
+        </LoadingSkeleton>
         <div className="d-flex align-items-center justify-content-end mt-3">
           {/* a btn to naviaget back to patient list if required */}
-          <Button
-            onClick={() =>
-              navigate(-1
-                           )
-            }
-          >
-            Back
-          </Button>
+          <Button onClick={() => navigate(-1)}>Back</Button>
           <Button
             type="primary"
             className="mx-2"

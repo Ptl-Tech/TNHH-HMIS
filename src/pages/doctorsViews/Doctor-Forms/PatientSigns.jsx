@@ -87,7 +87,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           .filter((note) => note.Notes_Type === "Premorbid Personality")
           .at(-1)?.Notes || "",
       20:
-        data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes ||
+        data.filter((note) => note.Notes_Type === "Medical History").at(-1)?.Notes ||
         "",
       23:
         data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||

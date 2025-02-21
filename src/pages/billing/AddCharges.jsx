@@ -73,11 +73,14 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       remarks: values.remarks,
       patientNo: patientNo,
     };
-
-    await dispatch(postPatientCharges(payload));
-    refreshTable();
-      onClose();
-
+  await  dispatch(postPatientCharges(payload));
+  onClose();
+   //simulate delay time to show loading when refreshing table
+    setTimeout(() => {
+      refreshTable();
+      
+    }, 1000);
+    
 
       
     form.resetFields();
