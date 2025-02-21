@@ -232,6 +232,8 @@ import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
 import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
 import { deletePatientChargesReducer } from './ChargesReducers/deletePatientChargesReducer';
 import getPharmacyHistoryListReducer from './pharmacy-reducers/getPharmacyHistoryListReducer';
+import { postsalesInvoiceReducer } from './ChargesReducers/postSalesInvoiceReducer';
+import { reopensalesInvoiceReducer } from './ChargesReducers/postreopenSalesInvoiceReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -417,6 +419,9 @@ export const rootReducer = combineReducers({
   dispatchWalkInLab:dispatchWalkInLabReducer,
   dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
   postPsychologyRequest:postPsychologyRequestReducer,
+  postNursingCarePlan:postNursingCarePlanReducer,
+  getNursingCarePlan:getNursingCarePlanReducer,
+
   getReceiptHeaders:getReceiptPgHeadersReducer,
   getReceiptLines:getReceiptLinesReducer,
   getReceiptHeaderLines:getReceiptHeaderReducer,
@@ -435,9 +440,8 @@ export const rootReducer = combineReducers({
   getUnpostedCharges:getUnpostedChargesReducer,
   getPostedCharges:getpostedChargesReducer,
   deletePatientCharges:deletePatientChargesReducer,
-  postNursingCarePlan:postNursingCarePlanReducer,
-  getNursingCarePlan:getNursingCarePlanReducer,
-
+  postSalesInvoice:postsalesInvoiceReducer,
+  reopenPostedCharges:reopensalesInvoiceReducer,
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,
   getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,

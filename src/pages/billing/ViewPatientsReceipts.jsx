@@ -67,6 +67,7 @@ const ViewPatientsReceipts = () => {
     (state) => state.printInvoice
   );
 
+
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector(
     (state) => state.getReceiptHeaderLines
