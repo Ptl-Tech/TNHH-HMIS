@@ -1,19 +1,10 @@
-import { Badge, Table } from "antd"
-import PropTypes from "prop-types";import { useDispatch, useSelector } from "react-redux";
+import { Table, Tag } from "antd";
+import PropTypes from "prop-types";
 // import { getDoctorsList } from "../../../actions/Doc-actions/DoctorActions"; // Import the action to get the doctor list
 import { useEffect, useState } from "react";
-import { listDoctors } from "../../../../actions/DropdownListActions";
 
-
-const ETCTable = ({ loadingETC, data, treatmentNo,patientNo }) => {
-  const dispatch = useDispatch();
+const ETCTable = ({ loadingETC, data, doctors }) => {
   const [updatedData, setUpdatedData] = useState([]);
-
-  const {  data: doctors  } = useSelector((state) => state.getDoctorsList);
-
-  useEffect(() => {
-    dispatch(listDoctors()); // Fetch the list of doctors
-  }, [dispatch]);
 
   useEffect(() => {
     if (doctors && data) {
@@ -31,86 +22,87 @@ const ETCTable = ({ loadingETC, data, treatmentNo,patientNo }) => {
     }
   }, [doctors, data]);
 
-  const filterData = updatedData?.filter((item) => 
-    treatmentNo ? item?.Link_No === treatmentNo : item?.Patient_No === patientNo
-  );
-    const filterProcedureData = filterData?.filter((item)=>item.Procedure_Type === 'ECT')
+  //
+  const columns = [
+    {
+      title: "#",
+      dataIndex: "key",
+      key: "key",
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "Visit No",
+      dataIndex: "Link_No",
+      key: "Link_No",
+      render: (text, record) => (
+        <span
+          style={{ color: "#0f5689", cursor: "pointer", fontWeight: "bold" }}
+        >
+          {text}
+        </span>
+      ),
+    },
 
-  // 
-const columns = [
-        {
-            title: 'Visit No',
-            dataIndex: 'Link_No',
-            key: 'Link_No',
-        },
-
-        {
-            title: 'Patient No',
-            dataIndex: 'Patient_No',
-            key: 'Patient_No',
-        },
-        {
-            title: 'Procedure Date',
-            dataIndex: 'Procedure_Date',
-            key: 'Procedure_Date',
-        },
-        /* {
+    {
+      title: "Patient No",
+      dataIndex: "Patient_No",
+      key: "Patient_No",
+    },
+    {
+      title: "Procedure Date",
+      dataIndex: "Procedure_Date",
+      key: "Procedure_Date",
+    },
+    /* {
             title: "Procedure Type",
             dataIndex: "Procedure_Type",
             key: "Procedure_Type",
         }, */
-        /* {
+    /* {
             title: 'Requesting Doctor',
             dataIndex: 'Requesting Doctor',
             key: 'Requesting Doctor',
         }, */
-        {
-            title: 'Requested to',
-            dataIndex: 'DoctorName',
-            key: 'DoctorName',
-        },
-        {
-            title: "Status",
-            dataIndex: "Status",
-            key: "Status",
-            render: (text, record) => {
-              if (record.Status === '0') {
-                return (
-                  <Badge 
-                    status="success" 
-                    text="Pending" // or any other label
-                  />
-                );
-              } else {
-                return (
-                  <Badge 
-                    status="error" 
-                    text="Approved" // or any other label
-                  />
-                );
-              }
-            },
-          }
-          
-    ];
+    {
+      title: "Requested to",
+      dataIndex: "DoctorName",
+      key: "DoctorName",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (text, record) => {
+        if (record.Status === "0") {
+          return <Tag color="#87d068">New</Tag>;
+        } else {
+          return <Tag color="#108ee9">Completed</Tag>;
+        }
+      },
+    },
+  ];
   return (
-    <div style={{ }}>
-    <Table 
-       dataSource={filterProcedureData} 
-       loading={loadingETC}
-       columns={columns} 
-       className="admit-patient-table"
-    />
-</div>
-  )
-}
+    <div style={{}}>
+      <Table
+        rowKey="SystemId"
+        bordered
+        size="small"
+        dataSource={updatedData}
+        loading={loadingETC}
+        columns={columns}
+        className="admit-patient-table"
+      />
+    </div>
+  );
+};
 
-export default ETCTable
+export default ETCTable;
 
 //props types validations
 ETCTable.propTypes = {
-    loadingETC: PropTypes.bool.isRequired,
-    data: PropTypes.array.isRequired,
-    treatmentNo: PropTypes.string.isRequired,
-    patientNo: PropTypes.string,
-}
+  loadingETC: PropTypes.bool,
+  data: PropTypes.array,
+  treatmentNo: PropTypes.string,
+  patientNo: PropTypes.string,
+  doctors: PropTypes.array,
+};

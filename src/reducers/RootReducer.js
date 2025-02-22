@@ -57,6 +57,7 @@ import { postTriageListVitalsReducer } from './triage-reducers/postTriageListVit
 import {
   getPatientVitalsLinesReducer,
   getVitalsLinesReducer,
+  getSinglePatientAllVitalsLinesReducer,
 } from './triage-reducers/getVitalsLinesReducer';
 import { postAllergiesMedicationReducer } from './triage-reducers/postAllergiesMedicationReducer';
 import { getAllergiesAndMedicationReducer } from './triage-reducers/getAllergiesAndMedicationReducer';
@@ -202,7 +203,7 @@ import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesRedu
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
-import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
+import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest, getPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
 import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
@@ -276,6 +277,7 @@ export const rootReducer = combineReducers({
   getSpecificInjection: getSpecificInjectionReducer,
   postTriageListVitals: postTriageListVitalsReducer,
   getVitalsLines: getVitalsLinesReducer,
+  getPatientVitals: getSinglePatientAllVitalsLinesReducer,
   getPatientVital: getPatientVitalsLinesReducer,
   postAllergiesMedication: postAllergiesMedicationReducer,
   getAllergiesAndMedications: getAllergiesAndMedicationReducer,
@@ -412,6 +414,7 @@ export const rootReducer = combineReducers({
   getPatientETC:getPatientECTRequest,
   postKetamine:postPatientKetamineReducer,
   getKetamine:getPatientKetamineRequest,
+  getPatientImplant:getPatientImplantRequest,
   postImplant:postPatientImplantRequest,
   checkInConsulation:postCheckInPatientConfirmReducer,
   markAsCompleted:postMarkAsCompletedReducer,

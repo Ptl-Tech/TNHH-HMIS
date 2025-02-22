@@ -5,6 +5,7 @@ import { POST_MENTAL_EXAMINATION_FORM_FAILURE, POST_MENTAL_EXAMINATION_FORM_SUCC
 import { getMentalExaminationFormSlice } from "../../../actions/nurse-actions/getMentalExaminationFormSlice";
 import PropTypes from "prop-types";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMentalStatus }) => {
    const dispatch = useDispatch();
@@ -16,6 +17,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
           const mentalStateExaminationFormData = {
             myAction: "create",
             admissionNo: patientDetails?.Admission_No,
+            date: dayjs().format('YYYY-MM-DD'),
             status,
             comments,
           }
@@ -27,7 +29,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
             .then((result) => {
               if (result.type === POST_MENTAL_EXAMINATION_FORM_SUCCESS) {
                 message.success(`Mental state examination form saved successfully!`);
-                dispatch(getMentalExaminationFormSlice());
+                dispatch(getMentalExaminationFormSlice(patientDetails?.Admission_No));
               } else if (result.type === POST_MENTAL_EXAMINATION_FORM_FAILURE) {
                 message.error(result.payload.message || "Internal server error, please try again later.");
               }

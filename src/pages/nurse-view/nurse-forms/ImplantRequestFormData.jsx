@@ -9,9 +9,9 @@ import { FileTextOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
-import { getPatientKetamineRequest, postPatientImplantRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
+import { getPatientImplantRequest, postPatientImplantRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingInplant, admissionNo }) => {
+const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingImplant, admissionNo }) => {
   const dispatch = useDispatch();
   const handleOnFinish = async (values) => {
     const formData = {
@@ -25,7 +25,7 @@ const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, load
     }
 
     await dispatch(postPatientImplantRequest(formData))
-    dispatch(getPatientKetamineRequest())
+    dispatch(getPatientImplantRequest(treatmentNo ?? admissionNo));
 
     form.resetFields();
   };
@@ -95,6 +95,7 @@ const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, load
               <Select
                 placeholder="Select an Option"
                 className="w-100"
+                size="large"
                 showSearch
                 filterOption={(input, option) =>
                   option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -127,8 +128,8 @@ const ImplantFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, load
             type="primary"
             htmlType="submit"
             icon={<FileTextOutlined />}
-            loading={loadingInplant}
-            disabled={loadingInplant}
+            loading={loadingImplant}
+            disabled={loadingImplant}
           >
             Request Test
           </Button>
@@ -145,6 +146,6 @@ ImplantFormData.propTypes = {
   treatmentNo: PropTypes.string.isRequired,
   doctors: PropTypes.array.isRequired,
   loadingDoctors: PropTypes.bool.isRequired,
-  loadingInplant: PropTypes.bool.isRequired,
+  loadingImplant: PropTypes.bool.isRequired,
   admissionNo: PropTypes.string,
 };
