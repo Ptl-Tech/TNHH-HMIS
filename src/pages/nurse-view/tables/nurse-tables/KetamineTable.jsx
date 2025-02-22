@@ -1,18 +1,9 @@
-import { Badge, Table } from "antd"
+import { Table, Tag } from "antd";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { listDoctors } from "../../../../actions/DropdownListActions";
-import { useDispatch, useSelector } from "react-redux";
 
-const KetamineTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
-  const dispatch = useDispatch();
+const KetamineTable = ({ loadingKetamine, data, doctors }) => {
   const [updatedData, setUpdatedData] = useState([]);
-
-  const { data: doctors } = useSelector((state) => state.getDoctorsList);
-
-  useEffect(() => {
-    dispatch(listDoctors()); // Fetch the list of doctors
-  }, [dispatch]);
 
   useEffect(() => {
     if (doctors && data) {
@@ -30,26 +21,35 @@ const KetamineTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
     }
   }, [doctors, data]);
 
-  const filterData = updatedData?.filter((item) =>
-    treatmentNo ? item?.Link_No === treatmentNo : item?.Patient_No === patientNo
-  );
-  const filterProcedureData = filterData?.filter((item) => item.Procedure_Type === 'Ketamine Infusion')
   const columns = [
     {
-      title: 'Visit No',
-      dataIndex: 'Link_No',
-      key: 'Link_No',
+      title: '#',
+      dataIndex: 'key',
+      key: 'key',
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "Visit No",
+      dataIndex: "Link_No",
+      key: "Link_No",
+      render: (text) => (
+        <span
+          style={{ color: "#0f5689", cursor: "pointer", fontWeight: "bold" }}
+        >
+          {text}
+        </span>
+      ),
     },
 
     {
-      title: 'Patient No',
-      dataIndex: 'Patient_No',
-      key: 'Patient_No',
+      title: "Patient No",
+      dataIndex: "Patient_No",
+      key: "Patient_No",
     },
     {
-      title: 'Procedure Date',
-      dataIndex: 'Procedure_Date',
-      key: 'Procedure_Date',
+      title: "Procedure Date",
+      dataIndex: "Procedure_Date",
+      key: "Procedure_Date",
     },
     /* {
       title: 'Requested Date',
@@ -66,52 +66,45 @@ const KetamineTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
       key: 'Requesting Doctor',
     }, */
     {
-      title: 'Requested to',
-      dataIndex: 'DoctorName',
-      key: 'DoctorName',
+      title: "Requested to",
+      dataIndex: "DoctorName",
+      key: "DoctorName",
     },
     {
       title: "Status",
       dataIndex: "Status",
       key: "Status",
       render: (text, record) => {
-        if (record.Status === '0') {
-          return (
-            <Badge
-              status="success"
-              text="Pending" // or any other label
-            />
-          );
+        if (record.Status === "0") {
+          return <Tag color="#87d068">New</Tag>;
         } else {
-          return (
-            <Badge
-              status="error"
-              text="Approved" // or any other label
-            />
-          );
+          return <Tag color="#108ee9">Completed</Tag>;
         }
       },
-    }
-
+    },
   ];
   return (
     <div style={{}}>
       <Table
-        dataSource={filterProcedureData}
+        size="small"
+        bordered
+        rowKey={'SystemId'}
+        dataSource={updatedData}
         loading={loadingKetamine}
         columns={columns}
         className="admit-patient-table"
       />
     </div>
-  )
-}
+  );
+};
 
-export default KetamineTable
+export default KetamineTable;
 
 //props types validations
 KetamineTable.propTypes = {
-  loadingKetamine: PropTypes.bool.isRequired,
-  data: PropTypes.array.isRequired,
-  treatmentNo: PropTypes.string.isRequired,
+  loadingKetamine: PropTypes.bool,
+  data: PropTypes.array,
+  treatmentNo: PropTypes.string,
   patientNo: PropTypes.string,
-}
+  doctors: PropTypes.array,
+};

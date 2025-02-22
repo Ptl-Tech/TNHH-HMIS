@@ -22,8 +22,6 @@ const MentalStateExaminationForm = () => {
     const { loadingIpGetMentalStatusForm, ipGetMentalStatusForm} = useSelector((state) => state.getMentalStatusExaminationForm);
     const { loadingMentalStatus } = useSelector((state) => state.postMentalStatusExaminationForm);
 
-    const filterMSEFormData = ipGetMentalStatusForm.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
-
     const dispatch = useDispatch();
 
     const handleViewMSEForm = () => {
@@ -45,8 +43,8 @@ const MentalStateExaminationForm = () => {
     }
 
     useEffect(() => {
-        dispatch(getMentalExaminationFormSlice());
-    }, [dispatch]);
+        dispatch(getMentalExaminationFormSlice(patientDetails?.Admission_No));
+    }, [dispatch, patientDetails?.Admission_No]);
     
   return (
     <div>
@@ -89,7 +87,7 @@ const MentalStateExaminationForm = () => {
             <MentalStatusExaminationTable 
             rowSelection={rowSelection}
             loadingIpGetMentalStatusForm={loadingIpGetMentalStatusForm} 
-            filterMSEFormData={filterMSEFormData}
+            filterMSEFormData={ipGetMentalStatusForm}
           />
           )
         }

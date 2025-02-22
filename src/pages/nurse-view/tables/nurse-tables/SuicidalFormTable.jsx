@@ -2,6 +2,7 @@ import { Table } from 'antd'
 import PropTypes from 'prop-types'
 import Loading from '../../../../partials/nurse-partials/Loading'
 import { useState } from 'react'
+import moment from 'moment'
 
 const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection}) => {
     const columns = [
@@ -9,21 +10,45 @@ const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection
           title: 'Date',
           dataIndex: 'Date',
           key: 'Date',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
+              {
+                moment(text).format('DD-MM-YYYY')
+              }
+            </span>
+          )
         },
         {
           title: 'Time',
           dataIndex: 'Time',
           key: 'Time',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
+              {
+                text
+              }
+            </span>
+          )
         },
         {
           title: 'Handing Over',
           dataIndex: 'HandingOver',
           key: 'HandingOver',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+              {text}
+            </span>
+          ) 
         },
         {
             title: 'Taking Over',    
             dataIndex: 'TakingOver',
             key: 'TakingOver',
+            render: (text) => (
+              <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                {text}
+              </span>
+            ) 
         },
     ]
 

@@ -1,44 +1,33 @@
 import {
   Form,
-  Input,
-  DatePicker,
   Row,
   Col,
   Button,
   Typography,
   Select,
-  Checkbox,
   message,
   Modal,
-  Table,
   Tabs,
   Spin,
 } from "antd";
-import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FileTextOutlined,
-  SaveOutlined,
   PlusOutlined,
-  EyeOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getdiagnosisSetup } from "../../../actions/Doc-actions/qyDiagnosisSetup";
 import { postDiagnosisRequest } from "../../../actions/Doc-actions/postDiagnosis";
-import ModalComponent from "../../../components/MessageModal";
 import { getDiagnosisLines } from "../../../actions/Doc-actions/getDiagnosisLines";
 import { getSecondaryDiagnosisSetup } from "../../../actions/Doc-actions/qySecondaryDiagnosisSetup";
 import TabPane from "antd/es/tabs/TabPane";
 import { EditorState } from "draft-js";
-import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import DiagnosisTable from "../tables/Diagnosis/DiagnosisTable";
 import DiagnosisForm from "./DiagnosisForm";
-import DiagnosisFormulationForm from "./DiagnosisFormulationForm";
 import useAuth from "../../../hooks/useAuth";
-const { Option } = Select;
 
 const Diagnosis = () => {
   const location = useLocation();
@@ -46,6 +35,8 @@ const Diagnosis = () => {
   const role = useAuth().userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
+  console.log('treatment number', admissionNo);
   const patientNo = queryParams.get("PatientNo");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -88,8 +79,10 @@ const Diagnosis = () => {
   useEffect(() => {
     if (treatmentNo) {
       dispatch(getDiagnosisLines(treatmentNo));
+    }else if(admissionNo){
+    dispatch(getDiagnosisLines(admissionNo));
     }
-  }, [dispatch, treatmentNo]);
+  }, [dispatch, treatmentNo, admissionNo]);
 
   const handleEditorChange = (state) => {
     setEditorState(state);
@@ -121,11 +114,12 @@ const Diagnosis = () => {
       const payload = {
         myAction: "create",
         recId: "",
-        treatmentNo: treatmentNo,
+        treatmentNo: treatmentNo ? treatmentNo : admissionNo,
         patientNo: patientNo,
         notesType: "11",
         notes: plainTextContent,
       };
+      console.log('payload', payload);
       const success = dispatch(postPatientHistoryNotes(payload));
       if (success) {
         message.success("Notes saved successfully");
@@ -217,7 +211,7 @@ const Diagnosis = () => {
       for (let diagnosis of diagnosisList) {
         const diagnosisData = {
           myAction: "create",
-          treatmentNo: treatmentNo || values.treatmentNo,
+          treatmentNo: treatmentNo ?? admissionNo,
           diagnosisType: activeTab,
           diagnosisNo: diagnosis.diagnosisCode,
           confirmed: diagnosis.confirmed,
@@ -253,7 +247,7 @@ const Diagnosis = () => {
       // Final feedback
       if (success) {
         // message.success("All diagnoses saved successfully!");
-        dispatch(getDiagnosisLines(treatmentNo));
+        dispatch(getDiagnosisLines(treatmentNo ?? admissionNo));
         form.resetFields();
         setModalContent({
           type: "success",
@@ -289,13 +283,12 @@ const Diagnosis = () => {
         style={{
           color: "#0F5689",
           fontSize: "16px",
-          marginBottom: "12px",
           display: "flex",
           alignItems: "center",
         }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
-        Diagnosis
+        Diagnosis Lines
       </Typography.Title>
 
       {(role === "Doctor" || role === "Psychology") &&
@@ -305,7 +298,7 @@ const Diagnosis = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              style={{ marginBottom: "16px", float: "right" }}
+              style={{ marginBottom: "4px", float: "right" }}
               onClick={handleHistoryClick}
             >
               Add New Diagnosis

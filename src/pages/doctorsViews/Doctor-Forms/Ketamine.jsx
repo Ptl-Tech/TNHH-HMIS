@@ -37,8 +37,8 @@ import useAuth from "../../../hooks/useAuth";
     }, [dispatch, doctors?.length]);
 
   useEffect(() => {
-    dispatch(getPatientKetamineRequest())
-  }, [dispatch])
+    dispatch(getPatientKetamineRequest(treatmentNo ?? admissionNo));
+  }, [dispatch, treatmentNo, admissionNo]);
   
     return (
       <>
@@ -75,6 +75,7 @@ import useAuth from "../../../hooks/useAuth";
           <KetamineTable 
           loadingKetamine={loadingKetamine} 
           data={data} 
+          doctors={doctors} 
           treatmentNo={treatmentNo}
           patientNo={patientNo}
           />

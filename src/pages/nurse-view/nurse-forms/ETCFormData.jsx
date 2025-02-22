@@ -11,7 +11,7 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { getPatientECTRequest, postPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingPostEtc, admissionNo }) => {
+const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingPostEtc, admissionNo }) => {
   const dispatch = useDispatch();
   const handleOnFinish = async (values) => {
     const formData = {
@@ -24,10 +24,8 @@ const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingP
       status: 0
     }
 
-    console.log('form data', formData)
-
     await dispatch(postPatientECTRequest(formData))
-    dispatch(getPatientECTRequest())
+    dispatch(getPatientECTRequest(treatmentNo ?? admissionNo))
     // clear tthe form
     form.resetFields();
   };
@@ -97,6 +95,7 @@ const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingP
               <Select
                 placeholder="Select an Option"
                 className="w-100"
+                size="large"
                 showSearch
                 filterOption={(input, option) =>
                   option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -142,10 +141,10 @@ const ECTFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, loadingP
 export default ECTFormData;
 //props validation
 ECTFormData.propTypes = {
-  patientNo: PropTypes.string.isRequired,
-  treatmentNo: PropTypes.string.isRequired,
-  doctors: PropTypes.array.isRequired,
-  loadingDoctors: PropTypes.bool.isRequired,
-  loadingPostEtc: PropTypes.bool.isRequired,
+  patientNo: PropTypes.string,
+  treatmentNo: PropTypes.string,
+  doctors: PropTypes.array,
+  loadingDoctors: PropTypes.bool,
+  loadingPostEtc: PropTypes.bool,
   admissionNo: PropTypes.string,
 };
