@@ -21,7 +21,7 @@ const ECTScan = () => {
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and for
 
-  const { loading: loadingETC, data } = useSelector(
+  const { loading: loadingETC, data: etcData } = useSelector(
     (state) => state.getPatientETC
   );
   const { loading: loadingPostEtc } = useSelector(
@@ -31,17 +31,17 @@ const ECTScan = () => {
     (state) => state.getDoctorsList
   );
 
-  console.log("Etc form data", data);
+  console.log("Etc form data", etcData);
 
   useEffect(() => {
-    dispatch(getPatientECTRequest());
-  }, [dispatch]);
+    dispatch(getPatientECTRequest(treatmentNo ?? admissionNo));
+  }, [dispatch, treatmentNo, admissionNo]);
 
   useEffect(() => {
-    if (!data?.length) {
+    if (!doctors?.length) {
       dispatch(listDoctors());
     }
-  }, [dispatch, data?.length]);
+  }, [dispatch, doctors?.length]);
   return (
     <div style={{ paddingTop: "20px" }}>
       <div
@@ -75,7 +75,8 @@ const ECTScan = () => {
         <ETCTable
           patientNo={patientNo}
           loadingETC={loadingETC}
-          data={data}
+          data={etcData}
+          doctors={doctors}
           admissionNo={admissionNo}
           treatmentNo={treatmentNo}
         />

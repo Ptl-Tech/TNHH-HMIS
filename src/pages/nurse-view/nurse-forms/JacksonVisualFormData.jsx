@@ -5,6 +5,7 @@ import { getJacksonVisualFormSlice } from "../../../actions/nurse-actions/getJac
 import PropTypes from "prop-types";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import jacksonVisualImage from "../../../assets/images/jackson-visual-form.jpg";
+import dayjs from "dayjs";
 
 const JacksonVisualFormData = ({ patientDetails, setIsFormVisible, loadingJackson }) => {
     const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const JacksonVisualFormData = ({ patientDetails, setIsFormVisible, loadingJackso
             myAction:"create",
             admissionNo: patientDetails?.Admission_No,
             score,
+            date: dayjs().format('YYYY-MM-DD'),
             ivLine: iv_line
           };
       
@@ -29,7 +31,7 @@ const JacksonVisualFormData = ({ patientDetails, setIsFormVisible, loadingJackso
               .then((result) => {
                 if (result.type === POST_JACKSON_VISUAL_FORM_SUCCESS) {
                   message.success(`Jackson Visual Form saved successfully!`);
-                  dispatch(getJacksonVisualFormSlice());
+                  dispatch(getJacksonVisualFormSlice(patientDetails?.Admission_No));
                 } else if (result.type === POST_JACKSON_VISUAL_FORM_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");
                 }

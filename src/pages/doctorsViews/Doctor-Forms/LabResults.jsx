@@ -57,6 +57,8 @@ const LabResults = () => {
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
+
+  console.log('patientLabTest', patientLabTest)
   const [labRequest, setLabRequest] = useState({
     myAction: "create",
     treatmentNo: treatmentNo ? treatmentNo : admissionNo,
@@ -66,8 +68,8 @@ const LabResults = () => {
 
   useEffect(() => {
     dispatch(getLabRequestSetup());
-    dispatch(getPatientLabTest());
-  }, [dispatch]);
+    dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
+  }, [dispatch, treatmentNo, admissionNo]);
 
   const handleLabRequest = async () => {
     if (selectedRow && selectedRow.TreatmentNo) {
@@ -79,7 +81,7 @@ const LabResults = () => {
             `Requesting test for ${selectedRow.LaboratoryTestPackageName} with Laboratory No: ${response.laboratoryNo}`
           );
           // Refresh the patient lab test data
-          dispatch(getPatientLabTest());
+          dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
         } else {
           message.error("Failed to request the lab test. Please try again.");
         }
@@ -102,9 +104,10 @@ const LabResults = () => {
   
 
   const handleSave = () => {
+    console.log("Saving lab request:", labRequest);
     dispatch(postLabRequest(labRequest)).then((data) => {
       if (data.status === "success") message.success(data.status);
-      dispatch(getPatientLabTest());
+      dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
       showForm(false);
     });
   };
@@ -194,14 +197,14 @@ const LabResults = () => {
   
   
   // Filter the data based on the selected rows  
-  const dataSource = Array.isArray(patientLabTest)
-  ? patientLabTest
-      .filter((item) => item.TreatmentNo === treatmentNo) // Filter based on TreatmentNo
-      .map((item, index) => ({
-        ...item,
-        key: index, // Ensure unique key
-      }))
-  : [];
+  // const dataSource = Array.isArray(patientLabTest)
+  // ? patientLabTest
+  //     .filter((item) => item.TreatmentNo === treatmentNo) // Filter based on TreatmentNo
+  //     .map((item, index) => ({
+  //       ...item,
+  //       key: index, // Ensure unique key
+  //     }))
+  // : [];
 
   return (
     <div>
@@ -264,7 +267,7 @@ const LabResults = () => {
           <>
            <RowSelectionTable
            columns={columns}
-           dataSource={dataSource}
+           dataSource={patientLabTest}
            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
            tableProps={{ scroll: { x: 600 } }} // Additional Table props
          />

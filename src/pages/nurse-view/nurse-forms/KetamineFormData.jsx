@@ -11,7 +11,7 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { getPatientKetamineRequest, postPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-const KetamineFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, postKetamine, admissionNo }) => {
+const KetamineFormData = ({ patientNo, treatmentNo, doctors, postKetamine, admissionNo }) => {
 
   const dispatch = useDispatch();
   const handleOnFinish = async (values) => {
@@ -25,8 +25,11 @@ const KetamineFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, pos
       status: 0
     }
 
+
+    console.log('formData', formData);
+
     await dispatch(postPatientKetamineRequest(formData))
-    dispatch(getPatientKetamineRequest())
+    dispatch(getPatientKetamineRequest(treatmentNo ?? admissionNo));
 
     form.resetFields();
   };
@@ -95,6 +98,7 @@ const KetamineFormData = ({ patientNo, treatmentNo, doctors, loadingDoctors, pos
                   /> */}
               <Select
                 placeholder="Select an Option"
+                size="large"
                 className="w-100"
                 showSearch
                 filterOption={(input, option) =>

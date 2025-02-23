@@ -47,6 +47,8 @@ const Impatient = () => {
 
   const { loadingAdmittedPatients, admittedPatients } =
     useSelector((state) => state.getPgAdmissionsAdmitted) || {};
+
+  console.log('admitted patients', admittedPatients);
 // get the list of doctors
   const formattedDoctorDetails = useMemo(() => {
     return data?.map((doctor) => ({

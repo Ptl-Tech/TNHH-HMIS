@@ -6,12 +6,21 @@ import {
     GET_PATIENT_VITALS_LINES_SUCCESS,
     GET_PATIENT_VITALS_LINES_FAILURE,
     GET_PATIENT_VITALS_LINES_RESET,
+    GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST,
+    GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS,
+    GET_PATIENT_VITALS_BY_PATIENT_NUMBER_FAILURE
 } from "../../actions/triage-actions/getVitalsLinesSlice";
 
 const initialState = {
     loadingVitalsLines: false,
     vitalsLines: [],
     error: '',
+};
+
+const initialPatientVitalsState = {
+  loading: false,
+  data: [],
+  error: '',
 };
 
 export const getVitalsLinesReducer = (state = initialState, action) => {
@@ -25,6 +34,19 @@ export const getVitalsLinesReducer = (state = initialState, action) => {
         default:
             return state;
     }
+};
+
+export const getSinglePatientAllVitalsLinesReducer = (state = initialPatientVitalsState, action) => {
+  switch (action.type) {
+      case GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST:
+          return { ...state, loading: true };
+      case GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS:
+          return { ...state, loading: false, data: action.payload };
+      case GET_PATIENT_VITALS_BY_PATIENT_NUMBER_FAILURE:
+          return { ...state, loading: false, data: action.payload };
+      default:
+          return state;
+  }
 };
 
 export const getPatientVitalsLinesReducer = (state = { vitals: [] }, action) => {

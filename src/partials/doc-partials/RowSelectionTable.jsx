@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Table, message } from "antd";
+import { useState } from "react";
+import { Table } from "antd";
+import PropTypes from "prop-types";
 
 /**
  * Reusable RowSelection Component
@@ -28,6 +29,8 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
 
   return (
     <Table
+      bordered
+      size="small"
       columns={columns}
       dataSource={dataSource}
       rowSelection={rowSelection}
@@ -44,3 +47,10 @@ const RowSelectionTable = ({ columns, dataSource, onRowSelect, tableProps }) => 
 };
 
 export default RowSelectionTable;
+//props validation
+RowSelectionTable.propTypes = {
+  columns: PropTypes.array,
+  dataSource: PropTypes.array,
+  onRowSelect: PropTypes.func,
+  tableProps: PropTypes.object,
+};

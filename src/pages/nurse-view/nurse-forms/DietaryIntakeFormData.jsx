@@ -27,7 +27,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
                 if (result.type === POST_DIETARY_INTAKE_FORM_LINE_SUCCESS) {
                   message.success(`Dietary Intake Form Line saved successfully!`);
                   setIsFormVisible(false);
-                  dispatch(getQyDietaryFormLinesSlice());
+                  dispatch(getQyDietaryFormLinesSlice(patientDetails?.Admission_No));
                 } else if (result.type === POST_DIETARY_INTAKE_FORM_LINE_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");
                 }

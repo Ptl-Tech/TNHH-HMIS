@@ -1,13 +1,14 @@
 import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FolderViewOutlined, FolderAddOutlined, FileMarkdownOutlined } from "@ant-design/icons";
 import VitalsTable from "../tables/triage-tables/VitalsTable";
 import { useLocation } from "react-router-dom";
-import useFetchVitalsHook from "../../../hooks/useFetchVitalsHook";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData"
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import dayjs from "dayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { getSinglePatientAllVitalsLines } from "../../../actions/triage-actions/getVitalsLinesSlice";
 
 const Vitals = () => {
 
@@ -21,12 +22,8 @@ const Vitals = () => {
         const PatientNo = queryParams.get("PatientNo")
 
         
-        const { loadingInpatientVitals, inpatientVitals } = useFetchVitalsHook();
-        const filterInpatientVitals = inpatientVitals?.filter((vitals) => 
-         
-          vitals.PatientNo === patientDetails?.Patient_No
-        
-      );
+        const { loading:loadingInpatientVitals, data:filterInpatientVitals} = useSelector((state) => state.getPatientVitals);
+        const dispatch = useDispatch();
 
         const handleCancel = () => {
           setIsModalOpen(false);
@@ -55,6 +52,10 @@ const Vitals = () => {
         const handleVitalsButtonVisibility = () => {
           setIsVitalFormVisible(!isVitalFormVisible);
         }
+
+        useEffect(() => {
+          dispatch(getSinglePatientAllVitalsLines(PatientNo))
+        }, [dispatch, PatientNo])
 
   return (
     <div>

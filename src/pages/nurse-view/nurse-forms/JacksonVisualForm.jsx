@@ -20,9 +20,7 @@ const JacksonVisualForm = () => {
     const dispatch = useDispatch();
 
     const { loadingGetJacksonVisual, getJacksonVisual } = useSelector((state) => state.getJacksonVisualForm);
-    const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm);
-
-    const filterJacksonFormData = getJacksonVisual.filter((item) => item.AdmissionNo === patientDetails?.Admission_No);   
+    const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm);  
 
     const handleButtonVisibility = () => {
       setIsFormVisible(!isFormVisible);
@@ -46,8 +44,8 @@ const JacksonVisualForm = () => {
 
     
     useEffect(() => {
-        dispatch(getJacksonVisualFormSlice());
-    }, [dispatch]);
+        dispatch(getJacksonVisualFormSlice(patientDetails?.Admission_No));
+    }, [dispatch, patientDetails?.Admission_No]);
   
     
   return (
@@ -89,7 +87,7 @@ const JacksonVisualForm = () => {
           !isFormVisible && (
             <JacksonVisualFormTable 
             loadingGetJacksonVisual={loadingGetJacksonVisual} 
-            getJacksonVisual={filterJacksonFormData}
+            getJacksonVisual={getJacksonVisual}
             rowSelection={rowSelection}
             />
           )

@@ -8,7 +8,7 @@ import { FileTextOutlined, PlusOutlined } from "@ant-design/icons"
 import ImplantFormData from "../../nurse-view/nurse-forms/ImplantRequestFormData";
 import { useDispatch, useSelector } from "react-redux";
 import { listDoctors } from "../../../actions/DropdownListActions";
-import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
+import { getPatientImplantRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import ImplantTable from "../../nurse-view/tables/nurse-tables/ImplantTable";
 import useAuth from "../../../hooks/useAuth";
   
@@ -24,11 +24,11 @@ import useAuth from "../../../hooks/useAuth";
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 
-    const { loading: loadingKetamine, data } = useSelector(
-      (state) => state.getKetamine
+    const { loading: loadingGetImplant, data } = useSelector(
+      (state) => state.getPatientImplant
     );
 
-    const { loading: loadingInplant } = useSelector(
+    const { loading: loadingPostImplant } = useSelector(
       (state) => state.postImplant
     );
 
@@ -41,8 +41,8 @@ import useAuth from "../../../hooks/useAuth";
     }, [dispatch, doctors?.length]);
 
     useEffect(() => {
-        dispatch(getPatientKetamineRequest())
-      }, [dispatch])
+        dispatch(getPatientImplantRequest(treatmentNo ?? admissionNo));
+      }, [dispatch, treatmentNo, admissionNo]);
 
     return (
       <div>
@@ -77,8 +77,9 @@ import useAuth from "../../../hooks/useAuth";
   
         {!showForm ? (
           <ImplantTable 
-            loadingKetamine={loadingKetamine} 
+            loadingKetamine={loadingGetImplant} 
             data={data} 
+            doctors={doctors} 
             treatmentNo={treatmentNo}
             patientNo={patientNo}
           />
@@ -89,7 +90,7 @@ import useAuth from "../../../hooks/useAuth";
             admissionNo={admissionNo}
             doctors={doctors} 
             loadingDoctors={loadingDoctors}
-            loadingInplant={loadingInplant}
+            loadingImplant={loadingPostImplant}
           />
         )}
       </div>

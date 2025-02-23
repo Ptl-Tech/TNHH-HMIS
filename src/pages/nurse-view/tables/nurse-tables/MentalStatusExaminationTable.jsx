@@ -1,4 +1,4 @@
-import { Badge, Table } from "antd"
+import { Badge, Button, Table } from "antd"
 import PropTypes from "prop-types"
 import Loading from "../../../../partials/nurse-partials/Loading"
 import { useState } from "react"
@@ -9,6 +9,15 @@ const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusFo
           title: 'Date',
           dataIndex: 'Date',
           key: 'Date',
+          render: (_, record) => {
+            const date = new Date(record.Date);
+            const formattedDate = date.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            });
+            return formattedDate;
+          }
         },
         {
           title: 'Status',
@@ -16,11 +25,17 @@ const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusFo
           key: 'Status',
           render: (_, record) => {
             if (record.Status === 'good') {
-              return <Badge status="success" text={record.Status} />
+              return <span>
+                <Button style={{ backgroundColor: '#52c41a', borderColor: '#52c41a', color: 'white' }}>{record.Status}</Button>
+              </span>
             } else if (record.Status === 'average') {
-              return <Badge status="warning" text={record.Status} />
+              return <span>
+                <Button style={{ backgroundColor: 'yellow', borderColor: 'yellow', color: 'black' }}>{record.Status}</Button>
+              </span>
             } else if (record.Status === 'bad') {
-                return <Badge status="error" text={record.Status} />
+              return <span>
+              <Button  style={{ backgroundColor: 'red', borderColor: 'red', color: 'white' }}>{record.Status}</Button>
+            </span>
             }
           }
           
@@ -29,6 +44,7 @@ const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusFo
           title: 'Comments',
           dataIndex: 'Comments',
           key: 'Comments',
+          
         },
     ]
 

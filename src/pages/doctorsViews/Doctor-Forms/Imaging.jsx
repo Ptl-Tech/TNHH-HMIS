@@ -39,6 +39,7 @@ const Imaging = () => {
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName;
 
   const dispatch = useDispatch();
@@ -57,12 +58,16 @@ const Imaging = () => {
     (state) => state.requestRadiologyTest
   );
 
+  const { loading: postRadiology } = useSelector(
+    (state) => state.postRadiologyRequest
+  );
+
   useEffect(() => {
     dispatch(getRadiologySetup());
-    if (treatmentNo) {
-      dispatch(getPatientRadiologyTest(treatmentNo));
+    if (treatmentNo || admissionNo) {
+      dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));
     }
-  }, [dispatch, treatmentNo]);
+  }, [dispatch, treatmentNo, admissionNo]);
 
   const handleSave = async (values) => {
     const { testPackageCode, dueDate, treatmentNo: formTreatmentNo } = values;
@@ -76,16 +81,18 @@ const Imaging = () => {
 
     const radiologyRequest = {
       myAction: "create",
-      treatmentNo: treatmentNo || formTreatmentNo,
+      treatmentNo: treatmentNo ?? admissionNo,
       testPackageCode: testPackageCode,
       dueDate: formattedDueDate,
     };
+
+    console.log("Radiology Request:", radiologyRequest);
 
     try {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
 
       if (response && response.status === "success") {
-        dispatch(getPatientRadiologyTest(formTreatmentNo));
+        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));;
       } else {
         message.error("Failed to submit radiology request");
       }
@@ -97,12 +104,12 @@ const Imaging = () => {
   const handleRadiologyRequest = async () => {
     if (selectedRow && selectedRow.TreatmentNo) {
       const treatmentNo = selectedRow.TreatmentNo;
-      const response = await dispatch(requestRadiologyTest(treatmentNo));
+      const response = await dispatch(requestRadiologyTest(treatmentNo ?? admissionNo));
       if (response && response.status === "success") {
         message.success(
           `Successfully requested radiology test for ${response.radiologyNo}`
         );
-        dispatch(getPatientRadiologyTest(treatmentNo));
+        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));
       }
     } else {
       message.error("No Request selected");
@@ -315,6 +322,8 @@ const Imaging = () => {
             type="primary"
             htmlType="submit"
             style={{ marginTop: "16px" }}
+            loading={postRadiology}
+            disabled={postRadiology}
           >
             Save Radiology Request
           </Button>

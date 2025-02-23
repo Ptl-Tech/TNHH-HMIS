@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Table } from "antd";
-import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { Table } from "antd";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { useDispatch, useSelector } from "react-redux";
 import { getDiagnosisLines } from "../../../../actions/Doc-actions/getDiagnosisLines";
@@ -8,11 +7,11 @@ import { getDiagnosisLines } from "../../../../actions/Doc-actions/getDiagnosisL
 const DiagnosisTable = ({ treatmentNo }) => {
   const dispatch = useDispatch();
 
+  console.log("treatmentNo", treatmentNo);
   const { loading: loadingDiagnosisLines, data: diagnosisLines } = useSelector(
     (state) => state.getDiagnosisLines
   );
 
-  console.log("mydiagnosisLines", diagnosisLines);
 
   useEffect(() => {
     if (treatmentNo) {
@@ -85,8 +84,6 @@ const DiagnosisTable = ({ treatmentNo }) => {
         Remarks: item.Remarks,
       }));
 
-console.log("dataSource", dataSource)
-
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
   };
@@ -95,7 +92,7 @@ console.log("dataSource", dataSource)
     <div style={{ paddingTop: "30px" }}>
       {loadingDiagnosisLines ? (
         <Loading />
-      ) : dataSource && dataSource.length > 0 ? (
+      ) : (
         <Table
   columns={diagnosisLinesColumns}
   dataSource={dataSource.map((item, index) => ({
@@ -113,8 +110,6 @@ console.log("dataSource", dataSource)
   onChange={handleTableChange}
 />
 
-      ) : (
-        <p>No diagnosis lines available.</p>
       )}
     </div>
   );

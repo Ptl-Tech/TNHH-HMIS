@@ -40,13 +40,13 @@ export const postNursingCarePlanSlice = (formData) =>
 };
 
 
-export const getNursingCarePlanSlice = () => 
+export const getNursingCarePlanSlice = (admissionNo) => 
     async (dispatch, getState) => {
       const config = configHelpers(getState);
       try {
           dispatch({ type: GET_NURSING_CARE_PLAN_REQUEST });
   
-          const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgNursingCarePlan&isList=true`, config);
+          const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgNursingCarePlan&isList=true &query=$filter=Admission_No eq '${admissionNo}'`, config);
       
   
           dispatch({ type: GET_NURSING_CARE_PLAN_SUCCESS, payload: data });

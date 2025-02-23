@@ -19,8 +19,6 @@ const SuicidalForm = () => {
     const { ipSuicidalForm, loadingIpSuicidalForm } = useSelector(state => state.getIpSuicidalForm);
     const { loadingSuicidalForm } = useSelector(state => state.postSuicidalForm);
     const [isFormVisible, setIsFormVisible] = useState(false);
-
-    const filterForm = ipSuicidalForm.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
   
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     const staffNo = userInfo?.userData?.no
@@ -61,8 +59,8 @@ const SuicidalForm = () => {
     }
 
     useEffect(() => {
-        dispatch(getSuicidalFormSlice());
-    }, [dispatch]);
+        dispatch(getSuicidalFormSlice(patientDetails?.Admission_No));
+    }, [dispatch, patientDetails?.Admission_No]);
     
   return (
     <div>
@@ -111,7 +109,7 @@ const SuicidalForm = () => {
             <SuicidalFormTable 
             rowSelection={rowSelection}
             showModal={showModal} 
-            ipSuicidalForm={filterForm} 
+            ipSuicidalForm={ipSuicidalForm} 
             loadingIpSuicidalForm={loadingIpSuicidalForm} 
             />
           )

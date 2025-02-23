@@ -24,10 +24,9 @@ const DietaryIntakeForm = () => {
     const { loadingIpLookupValues, ipLookupValues} = useSelector((state) => state.getQyIpLookupValues);
     const { loadingGetIpDietaryForm, ipGetDietaryForm} = useSelector((state) => state.getQyDietaryFormLine);
     const { loadingDietaryIntake } = useSelector((state) => state.postDietaryIntakeFormLine);
-
-    const filterIpLookupValues = ipLookupValues?.filter((item) => item?.Type === "Dietary Intake Form");
-    const filterDietaryIntakeForm = ipGetDietaryForm?.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
     
+
+    console.log('ip forms', ipLookupValues)
       const handleViewForm = () => {
         if(selectedRow[0]) {
           form.resetFields();
@@ -49,13 +48,13 @@ const DietaryIntakeForm = () => {
 
     useEffect(() => {
         if(!ipLookupValues?.length){
-          dispatch(getQyIpLookupValuesSlice());
+          dispatch(getQyIpLookupValuesSlice("Dietary Intake Form"));
         }
       }, [dispatch, ipLookupValues]);
 
       useEffect(() => {   
-          dispatch(getQyDietaryFormLinesSlice()); 
-      }, [dispatch]);
+          dispatch(getQyDietaryFormLinesSlice(patientDetails?.Admission_No)); 
+      }, [dispatch, patientDetails?.Admission_No]);
       
     
   return (
@@ -86,7 +85,7 @@ const DietaryIntakeForm = () => {
         {
           isFormVisible && (
             <DietaryIntakeFormData 
-            filterIpLookupValues={filterIpLookupValues} 
+            filterIpLookupValues={ipLookupValues} 
             form={form} 
             patientDetails={patientDetails}
             setIsFormVisible={setIsFormVisible}
@@ -99,7 +98,7 @@ const DietaryIntakeForm = () => {
         {
           !isFormVisible && (
             <DietaryIntakeTable 
-            filterDietaryIntakeForm={filterDietaryIntakeForm} 
+            filterDietaryIntakeForm={ipGetDietaryForm} 
             loadingGetIpDietaryForm={loadingGetIpDietaryForm}
             rowSelection={rowSelection}
             />
