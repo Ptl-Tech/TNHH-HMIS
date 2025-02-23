@@ -454,7 +454,7 @@ const handleReversePostedInvoice = async () => {
                 style={{ color: "red" }}
                 onClick={() => reopenSalesInvoice()}
               >
-                Reverse Posted Charges
+                Re-open Posted Charges
               </Button>
             </Space>
           </Col>

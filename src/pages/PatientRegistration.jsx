@@ -125,7 +125,7 @@ const PatientRegistration = () => {
     subCounty: "",
     countyWard: "",
     email: "",
-    residence: "",
+    residence:patientDet.PlaceofBirthVillage|| "",
     patientStatus: 0,
   });
   useEffect(() => {
@@ -271,21 +271,22 @@ const PatientRegistration = () => {
   };
   const handleSwitchChange = (name, value) => {
     setNewPatient((prev) => {
-      const updatedPatient = { ...prev, [name]: value };
+        const updatedPatient = { ...prev, [name]: value };
 
-      if (name === "isPrincipleMember" && value) {
-        // Set the insurancePrincipalMemberName in uppercase
-        updatedPatient.insurancePrinicipalMemberName = `${
-          prev.firstName || visitorData?.VisitorName
-        } ${prev.middleName || ""} ${prev.lastName}`
-          .trim()
-          .toUpperCase();
-      } else if (name === "isPrincipleMember" && !value) {
-        updatedPatient.insurancePrinicipalMemberName = ""; // Clear the name if unchecked
-      }
-      return updatedPatient;
+        if (name === "isPrincipleMember" && value) {
+            updatedPatient.insurancePrinicipalMemberName = `${
+                prev.firstName || visitorData?.VisitorName
+            } ${prev.middleName || ""} ${prev.lastName}`
+                .trim()
+                .toUpperCase();
+        } else if (name === "isPrincipleMember" && !value) {
+            updatedPatient.insurancePrinicipalMemberName = "";
+        }
+
+        return updatedPatient;
     });
-  };
+};
+
 
   const handleDisplayDropDown = (e) => {
     const { name, value } = e.target;
@@ -341,8 +342,8 @@ const PatientRegistration = () => {
         nationality: patientDet?.Nationality || "",
         county: patientDet?.CountyWard || "",
         subCounty: patientDet?.SubCountyName || "",
-        countyWard: patientDet?.CountyWardName || "",
-        residence: patientDet?.Residence || "",
+        countyWard: patientDet?.CountyWard || "",
+        residence: patientDet?.PlaceofBirthVillage || "",
         nextOfKinFullName: patientDet?.NextOfkinFullName || "",
         nextOfKinRelationShip: patientDet?.NextofkinRelationship || "",
       });
@@ -393,8 +394,8 @@ const PatientRegistration = () => {
       nationality: newPatient.nationality || patientDet?.Nationality || "",
       county: newPatient.county || patientDet?.County || "",
       subCounty: newPatient.subCounty || patientDet?.SubCountyName || "",
-      countyWard: newPatient.countyWard || patientDet?.CountyWardName || "",
-      residence: newPatient.residence || "",
+      countyWard: newPatient.countyWard || patientDet?.CountyWard || "",
+      residence: newPatient.residence||patientDet.PlaceofBirthVillage || "",
       nextOfKinFullName:
         newPatient.nextOfKinFullName || patientDet?.NextOfkinFullName || "",
       nextOfKinRelationship:
@@ -403,7 +404,7 @@ const PatientRegistration = () => {
         "",
       schemeName: newPatient.schemeName || patientDet?.SchemeName || "",
       nextOfKinPhoneNo:
-        newPatient.nextOfKinPhoneNo || patientDet?.NextofkinPhoneNo || "",
+        newPatient.nextOfKinPhoneNo || patientDet?.NextOfkinAddress1 || "",
       paymentMode: newPatient.paymentMode || patientDet?.PatientType || "",
       insuranceNo: newPatient.insuranceNo || patientDet?.InsuranceNo || "",
       insurancePrincipalMemberName:
@@ -822,7 +823,7 @@ const PatientRegistration = () => {
                         placeholder="Select County"
                         className="w-100 fw-bold text-center"
                         name="county"
-                        value={newPatient.county || patientDet?.CountyWardName}
+                        value={newPatient.county || patientDet?.PlaceofBirthDistrict}
                         onChange={(value) =>
                           handleSelectChange("county", value)
                         }
@@ -908,7 +909,7 @@ const PatientRegistration = () => {
                         className="w-100 fw-bold text-center"
                         name="countyWard"
                         value={
-                          newPatient.countyWard || patientDet?.CountyWardName
+                          newPatient.countyWard || patientDet?.CountyWard
                         }
                         onChange={(value) =>
                           handleSelectChange("countyWard", value)
@@ -946,7 +947,7 @@ const PatientRegistration = () => {
                     <Input
                       placeholder="Enter residence"
                       name="residence"
-                      value={newPatient.residence}
+                      value={newPatient.residence || patientDet?.PlaceofBirthVillage}
                       onChange={handleInputChange}
                       className="text-center fw-bold"
                     />
@@ -1041,7 +1042,7 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select An Option"
                       className="w-100 fw-bold text-center "
-                      value={newPatient.howYouKnewABoutUs}
+                      value={newPatient.howYouKnewABoutUs || patientDet.HowyouKnewAboutUs}
                       onChange={(value) =>
                         handleSelectChange("howYouKnewABoutUs", value)
                       }
@@ -1232,7 +1233,7 @@ const PatientRegistration = () => {
                               name="insurancePrincipalMemberName"
                               value={
                                 newPatient.insurancePrinicipalMemberName ||
-                                patientDet?.InsurancePrincipalMemberName ||
+                                patientDet?.SearchName ||
                                 ""
                               }
                               onChange={handleInputChange}
@@ -1245,10 +1246,8 @@ const PatientRegistration = () => {
                             <span className="text-danger px-1">*</span>
                           </label>
                           <Switch
-                            checked={
-                              newPatient.isPrincipleMember ||
-                              patientDet?.Principal
-                            }
+                          name="isPrincipleMember"
+                          checked={newPatient.isPrincipleMember ?? patientDet?.Principal}
                             onChange={(checked) =>
                               handleSwitchChange("isPrincipleMember", checked)
                             }
