@@ -92,6 +92,7 @@ import LabRoutes from "./Routes/LabRoutes";
 import ViewReceipt from "./pages/billing/ViewReceipt";
 import EncounterSummery from "./pages/doctorsViews/EncounterSummery";
 import ViewPatientsReceipts from "./pages/billing/ViewPatientsReceipts";
+import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 
 function App() {
   return (
@@ -179,6 +180,18 @@ function App() {
           <Route
             path="Discharge-list/Posted-Consumables"
             element={<PostedConsumables />}
+          />
+
+          <Route path="Patient-list" element={<OutpatientList />} />
+
+          <Route
+            path="Patient-Registration/:PatientNo?"
+            element={<PatientRegistration />}
+          />
+
+          <Route
+            path="patient-list/Direct-Admission/:PatientNo?"
+            element={<DirectAdmission />}
           />
 
           <Route path="view-profile" element={<ViewProfile />} />
