@@ -1,5 +1,6 @@
-import { Button, Typography } from "antd";
-import PrescriptionForm from "./PrescriptionForm";
+
+import { Button, message, Typography } from "antd";
+import InpatientPrescriptionForm from "../../doctorsViews/Doctor-Forms/InPatientPrescriptionForm";
 import {
   FileTextOutlined,
   PlusOutlined,
@@ -7,34 +8,43 @@ import {
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
-import PrescriptionTable from "../tables/PrescriptionTable";
-import { sendtoPharmacy } from "../../../actions/Doc-actions/postPrescription";
+import { getInPatientQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
+import InPatientPrescriptionTable from "../../doctorsViews/tables/InPatientPrescriptionTable";
+import { InpatientSendToPharmacy } from "../../../actions/Doc-actions/postPrescription";
 import useAuth from "../../../hooks/useAuth";
 import { useLocation } from "react-router-dom";
 
-const Medication = () => {
+const InpatientMedication = () => {
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false);
   const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
   const getLocation = useLocation();
   const patientDetails = getLocation.state?.patientDetails;
-  const { loadingPrescriptions, prescriptions } = useSelector(
-    (state) => state.getQyPrescriptionLine
+  const { loading:loadingPrescriptions, data:prescriptions } = useSelector(
+    (state) => state.getInPatientPrescriptionLine
   );
+
+  console.log('prescriptions', prescriptions)
   const role = useAuth().userData.departmentName;
 
   const { loading: pharmacyPosting } = useSelector(
-    (state) => state.sendtoPharmacy
+    (state) => state.inpatientSentToPharmacy
   );
-  const handleSendToPharmacy = () => {
-    dispatch(sendtoPharmacy(treatmentNo));
+  const handleSendToPharmacy = async () => {
+    const result = await dispatch(InpatientSendToPharmacy(admissionNo));
+    if(result.status === 'success'){
+        message.success(result.msg || 'Prescription sent to pharmacy successfully');
+        dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
+    }else if(result.status === 'failed'){
+        message.error(result.msg || 'Failed to send prescription to pharmacy');
+    }
+    
   };
 
   useEffect(() => {
-    dispatch(getQyPrescriptionLineSlice(treatmentNo));
-  }, [dispatch, treatmentNo]);
+    dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
+  }, [dispatch, admissionNo]);
   return (
     <div>
       <div
@@ -54,7 +64,9 @@ const Medication = () => {
         {(role === "Doctor" || role === "Psychology") &&
           patientDetails?.Status !== "Completed" && (
             <div style={{ display: "flex", gap: "10px" }}>
-              <Button
+                {
+                    !showForm && (
+                        <Button
                 type="primary"
                 icon={<SendOutlined />}
                 loading={pharmacyPosting}
@@ -63,6 +75,9 @@ const Medication = () => {
               >
                 Send to Pharmacy
               </Button>
+                    )
+                }
+              
 
               <Button
                 type="primary"
@@ -76,23 +91,15 @@ const Medication = () => {
       </div>
 
       {!showForm ? (
-        <PrescriptionTable
-          filteredPrescriptions={prescriptions}
+        <InPatientPrescriptionTable
+          filteredPrescriptions={prescriptions }
           loadingPrescriptions={loadingPrescriptions}
         />
       ) : (
-        <PrescriptionForm setShowForm={setShowForm} />
+        <InpatientPrescriptionForm setShowForm={setShowForm} />
       )}
-
-      {/* {
-        !showForm ? (
-          <PrescriptionTable filteredPrescriptions={filteredPrescriptions} loadingPrescriptions={loadingPrescriptions} />
-        ) : (
-          <PrescriptionForm setShowForm={setShowForm}/>
-        )
-      } */}
     </div>
   );
 };
 
-export default Medication;
+export default InpatientMedication;
