@@ -103,6 +103,8 @@ import {
   saveReferralDetailsReducer,
 } from './doc-reducers/referralRequestReducer';
 import {
+  inpatientSendToPharmacyReducer,
+  saveInPatientPrescriptionDetails,
   savePrescriptionDetailsReducer,
   sendtoPharmacyReducer,
 } from './doc-reducers/prescriptionRequestReducer';
@@ -202,7 +204,7 @@ import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
 import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
-import { getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
+import { getInPatientQyPrescriptionLines, getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
 import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest, getPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
 import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
@@ -314,7 +316,9 @@ export const rootReducer = combineReducers({
   saveRefferalDetails: saveReferralDetailsReducer,
   requestRefferal: requestReferralReducer,
   postPrescription: savePrescriptionDetailsReducer,
+  postInPatientPrescription:saveInPatientPrescriptionDetails,
   sendtoPharmacy: sendtoPharmacyReducer,
+  inpatientSentToPharmacy:inpatientSendToPharmacyReducer,
   saveSigns: saveSignsReducer,
   saveSyptoms: saveSyptomsReducer,
   patientLabTest: viewPatientLabTestReducer,
@@ -410,6 +414,7 @@ export const rootReducer = combineReducers({
   getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
   getQyPrescriptionLine:getQyPrescriptionLinesReducer,
+  getInPatientPrescriptionLine:getInPatientQyPrescriptionLines,
   postPatientETC:postPatientECTRequest,
   getPatientETC:getPatientECTRequest,
   postKetamine:postPatientKetamineReducer,
