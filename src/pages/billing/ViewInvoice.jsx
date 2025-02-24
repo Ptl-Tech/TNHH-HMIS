@@ -117,6 +117,12 @@ const ViewInvoice = () => {
     }
   }, [chargesList]); // Recalculate when chargesList changes
 
+
+
+  const postedCharges = chargesList?.filter((charge) => charge.Posted) || [];
+  const unpostedCharges = chargesList?.filter((charge) => !charge.Posted) || [];
+
+
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -256,17 +262,13 @@ const handleReversePostedInvoice = async () => {
     });
   };
   const handlePrintInvoice = () => {
-    //if charges are unposted then print interim invoice else print invoice show this in error message
-
-  //update the is invoice posted to true with postedCharges[0].Posted
-  
-
-    if (!isInvoicePosted) {
+    // Ensure there are posted charges before allowing printing
+    if (postedCharges.length === 0) {
       return message.error("Please post Final Invoice before printing invoice");
     }
-
+  
     const patientNo = patientData?.PatientNo;
-
+  
     dispatch(postPrintInvoice(patientNo)).then((response) => {
       if (response?.data.base64) {
         setPdfBase64(response.data.base64);
@@ -274,6 +276,7 @@ const handleReversePostedInvoice = async () => {
       }
     });
   };
+  
 
   // When processing (posting) the Invoice, update the state so printing is enabled.
  
@@ -301,9 +304,6 @@ const handleReversePostedInvoice = async () => {
     setSelectedRecId(unpostedCharges[0]?.SystemId);
     setSelectedPatientAmount(patientData?.Balance || balance);
   };
-
-  const postedCharges = chargesList?.filter((charge) => charge.Posted) || [];
-  const unpostedCharges = chargesList?.filter((charge) => !charge.Posted) || [];
 
   // const totalReceived =
   //   patientInvoice?.reduce((acc, line) => acc + line.Amount, 0) || 0;
