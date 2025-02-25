@@ -5,6 +5,7 @@ import Requests from "./Requests";
 import Discharges from "./Discharges";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
+import WardTransfer from "./WardTransfer";
 
 const InpatientCardContent = () => {
   const role = useAuth().userData.departmentName;
@@ -26,6 +27,9 @@ const InpatientCardContent = () => {
           </Tabs.TabPane>
           <Tabs.TabPane tab="Discharge" key="4">
             <Discharges />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Ward Transfer" key="5">
+            <WardTransfer />
           </Tabs.TabPane>
           {/* {
                     role === "Doctor" &&

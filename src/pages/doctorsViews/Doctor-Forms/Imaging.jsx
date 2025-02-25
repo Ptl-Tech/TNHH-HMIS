@@ -31,6 +31,7 @@ import {
 } from "../../../actions/Doc-actions/requestRadiologyTest";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
+import LabResultDrawer from "./LabResultDrawer";
 
 const { Option } = Select;
 
@@ -61,6 +62,22 @@ const Imaging = () => {
   const { loading: postRadiology } = useSelector(
     (state) => state.postRadiologyRequest
   );
+
+
+   // lab test drawer
+   const [open, setOpen] = useState(false);
+   const [size, setSize] = useState();
+   const [record, setRecord] = useState(null);
+ 
+   const showLargeDrawer = (record) => {
+     setSize('large');
+     setOpen(true);
+     setRecord(record);
+   };
+ 
+   const onClose = () => {
+     setOpen(false);
+   };
 
   useEffect(() => {
     dispatch(getRadiologySetup());
@@ -124,6 +141,7 @@ const Imaging = () => {
       setNoResultsMessage(true);
     }
     setModalVisible(true);
+    setOpen(false);
   };
 
   const columns = [
@@ -173,7 +191,7 @@ const Imaging = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleViewResults(record)}
+          onClick={() => showLargeDrawer(record)}
           icon={<FileTextOutlined />}
         >
           View Results
@@ -329,6 +347,8 @@ const Imaging = () => {
           </Button>
         </Form>
       )}
+
+      <LabResultDrawer onClose={onClose} open={open} size={size} record={record} handleViewResults={handleViewResults} procedure="Radiology"/>
     </div>
   );
 };

@@ -85,7 +85,7 @@ const Dashboard = () => {
       icon: <UserOutlined />,
       color: '#fff' ,// You can set the color here
       backgroundColor: '#ac8342 ', // You can set the background color here
-      link: '/Nurse/Consultation'
+      link: '/Nurse/Consultation-List'
     },
     {
       title: "In patients",
