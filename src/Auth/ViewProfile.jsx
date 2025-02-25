@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { Card, Tabs, Button, Input, List, Avatar } from "antd";
-import {
-  UserOutlined,
-  LockOutlined,
-  FileOutlined,
-  ProfileOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, LockOutlined, FileOutlined, ProfileOutlined } from "@ant-design/icons";
+import useAuth from "../hooks/useAuth";
 
 const { TabPane } = Tabs;
 
 const ViewProfile = () => {
+  const { userData } = useAuth(); // Fetch user data from context
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -28,10 +26,7 @@ const ViewProfile = () => {
   ];
 
   return (
-    <div
-     
-      
-    >
+    <div>
       <Card
         className="profile-card"
         style={{
@@ -44,25 +39,23 @@ const ViewProfile = () => {
       >
         <div className="d-flex flex-row">
           {/* Main Profile Section */}
-          <div
-            className="profile-content"
-            style={{ flex: "1", padding: "20px" }}
-          >
+          <div className="profile-content" style={{ flex: "1", padding: "20px" }}>
             {/* Profile Picture and Header */}
             <div className="text-center mb-4">
               <Avatar
                 size={120}
-                icon={<UserOutlined />}
+                src={userData?.profilePic || ""}
+                icon={!userData?.profilePic ? <UserOutlined /> : null}
                 style={{
                   backgroundColor: "#87d068",
                   marginBottom: "10px",
                 }}
               />
               <h4 className="mb-1" style={{ fontWeight: 600 }}>
-                John Doe
+                {userData?.fname} {userData?.lname}
               </h4>
               <p className="text-muted" style={{ fontSize: "14px" }}>
-                Software Engineer
+                {userData?.role || "User Role"}
               </p>
             </div>
 
@@ -80,16 +73,16 @@ const ViewProfile = () => {
               >
                 <div style={{ lineHeight: "1.8", fontSize: "14px" }}>
                   <p>
-                    <strong>Full Name:</strong> John Doe
+                    <strong>Full Name:</strong> {userData?.fname} {userData?.lname}
                   </p>
                   <p>
-                    <strong>Email:</strong> john.doe@example.com
+                    <strong>Email:</strong> {userData?.email}
                   </p>
                   <p>
-                    <strong>Phone:</strong> +123 456 7890
+                    <strong>Phone:</strong> {userData?.phone || "N/A"}
                   </p>
                   <p>
-                    <strong>Address:</strong> 123, Main Street, Cityville
+                    <strong>Address:</strong> {userData?.city || "N/A"}
                   </p>
                 </div>
               </TabPane>
@@ -133,9 +126,7 @@ const ViewProfile = () => {
                   renderItem={(item) => (
                     <List.Item>
                       <List.Item.Meta
-                        avatar={
-                          <FileOutlined style={{ fontSize: "20px", color: "#1890ff" }} />
-                        }
+                        avatar={<FileOutlined style={{ fontSize: "20px", color: "#1890ff" }} />}
                         title={<span style={{ fontWeight: 500 }}>{item.title}</span>}
                       />
                     </List.Item>
