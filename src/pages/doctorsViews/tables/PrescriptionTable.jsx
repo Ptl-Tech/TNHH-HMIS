@@ -1,4 +1,4 @@
-import { Table } from "antd"
+
 import Loading from "../../../partials/nurse-partials/Loading"
 import PropTypes from "prop-types"
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable"

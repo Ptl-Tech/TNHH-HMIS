@@ -23,6 +23,7 @@ import BriefMentalStateExaminationForm from "./nurse-forms/BriefMentalStateExami
 import DietaryIntakeForm from "./nurse-forms/DietaryIntakeForm";
 import JacksonVisualForm from "./nurse-forms/JacksonVisualForm";
 import CarePlanForm from "./nurse-forms/CarePlanForm";
+import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 
 const CarePlan = () => {
   const [activeItem, setActiveItem] = useState("Allergies and Medications");
@@ -45,7 +46,7 @@ const CarePlan = () => {
         setSelectedItem(<Diagnosis />);
         break;
       case "Prescription":
-        setSelectedItem(<Medication />);
+        setSelectedItem(<InpatientMedication />);
         break;
       case "Care Plan":
         setSelectedItem(<CarePlanForm />);
