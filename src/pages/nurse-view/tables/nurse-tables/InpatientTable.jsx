@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
@@ -120,6 +120,29 @@ const InpatientTable = ({
       key: "DoctorsName",
       render: (doctor) => doctor || "Not assigned",
     },
+    {
+      title: "Coding",
+      dataIndex: "Psychiatric_Coding",
+      key: "Psychiatric_Coding",
+      render: (coding) => {
+        let color = null;
+        switch (coding) {
+          case "Red":
+            color = "red";
+            break;
+          case "Amber":
+            color = "orange";
+            break;
+          case "Yellow":
+            color = "yellow";
+            break;
+          case "Green":
+            color = "green";
+            break;
+        }
+        return color ? <Tag color={color}>{coding}</Tag> : null;
+      }
+    }
   ];
   const [pagination, setPagination] = useState({
     current: 1,
