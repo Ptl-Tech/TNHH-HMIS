@@ -186,7 +186,7 @@ import { getQyInpatientProcessProceduresReducer } from './nurse-reducers/getQyIn
 import { postInpatientInjectionReducer } from './nurse-reducers/postInpatientInjectionReducer';
 import { getInpatientInjectionReducer } from './nurse-reducers/getInpatientInjectionReducer';
 import { getQyTreatmentDiagnosisLinesReducer } from './nurse-reducers/getQyTreatmentDiagnosisLinesReducer';
-import { getPgBedsReducer } from './nurse-reducers/getPgBedsReducer';
+import { getPgBedsDetailsReducer, getPgBedsReducer } from './nurse-reducers/getPgBedsReducer';
 import { getPgWardsListReducer } from './nurse-reducers/getPgWardsListReducer';
 import { postAdmissionFormDetailsReducer } from './nurse-reducers/postAdmissionFormDetailsReducer';
 // import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
@@ -369,6 +369,7 @@ export const rootReducer = combineReducers({
   getInpatientInjection: getInpatientInjectionReducer,
   getQyTreatmentDiagnosisLines: getQyTreatmentDiagnosisLinesReducer,
   getPgBeds: getPgBedsReducer,
+  getBedDetails: getPgBedsDetailsReducer,
   getPgWardsList: getPgWardsListReducer,
   postAdmissionFormDetails: postAdmissionFormDetailsReducer,
   // postPatientAdmission:postPatientAdmissionReducer

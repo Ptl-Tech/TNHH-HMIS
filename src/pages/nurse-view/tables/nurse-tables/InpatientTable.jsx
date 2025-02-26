@@ -19,12 +19,6 @@ const InpatientTable = ({
 
   const columns = [
     {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      render: (text, record, index) => index + 1,
-    },
-    {
       title: "Adm No",
       dataIndex: "Admission_No",
       key: "Admission_No",
@@ -69,7 +63,6 @@ const InpatientTable = ({
       sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date),
       defaultSortOrder: "ascend", // Ensure default sorting is newest to oldest
     },
-
     {
       title: "Ward",
       dataIndex: "Ward",
@@ -92,6 +85,11 @@ const InpatientTable = ({
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
         ), // Renders nothing for roles other than Nurse
     },
+    // {
+    //   title: "Room",
+    //   dataIndex: "Ward_Room",
+    //   key: "Ward_Room",
+    // },
     {
       title: "Bed",
       dataIndex: "Bed",
