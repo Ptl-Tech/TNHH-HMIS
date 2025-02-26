@@ -1,293 +1,336 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Select,
-  Table,
-  Form,
-  Input,
-  Popconfirm,
-  message,
-  Typography,
-  Row,
-  Col,
-} from "antd";
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  SaveOutlined,
-  EditOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
+import { useEffect, useState, useMemo } from "react";
+import { Button, Steps, Form, Input, Typography, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { getSignsSetup } from "../../../actions/Doc-actions/qySignsSetup";
-import { postSignsRequest } from "../../../actions/Doc-actions/postSigns";
-import { getPatientSignsLines } from "../../../actions/Doc-actions/getPatientSignsLines";
+import { FileOutlined } from "@ant-design/icons";
+import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
+import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
+import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
+import useAuth from "../../../hooks/useAuth";
+import { useLocation } from "react-router-dom";
 import Loading from "../../../partials/nurse-partials/Loading";
-import { IoListOutline } from "react-icons/io5";
-import { render } from "react-dom";
 
-const PatientSigns = ({ treatmentNo }) => {
-  const [editingRecord, setEditingRecord] = useState(null); // Store the record being edited
-  const [showForm, setShowForm] = useState(false); // Toggle between table and form
-  const [selectedSignSystem, setSelectedSignSystem] = useState(""); // Store the selected sign system
+const { TextArea } = Input;
+const { Step } = Steps;
 
+const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
+  const role = useAuth().userData.departmentName;
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
+  const { loading: saveNotesLoading } = useSelector(
+    (state) => state.postPatientHistory
+  );
+  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+
+  const notesType = [
+    { value: "1", label: "Chief Complaints" },
+    { value: "2", label: "Allegations" },
+    { value: "3", label: "History of Presenting Complaint" },
+    { value: "4", label: "Past Psychiatric and Medical History" },
+    { value: "5", label: "Family History" },
+    { value: "6", label: "Personal History" },
+    { value: "7", label: "Forensic History" },
+    { value: "8", label: "Premorbid Personality" },
+    { value: "9", label: "Medical" },
+    { value: "10", label: "Gynecology" },
+  ];
+
+  const filterCollapseData = data.filter((item) =>
+    notesType.map((note) => note.label).includes(item.Notes_Type)
+  );
+
+  const allNotesPresent = notesType.every((note) =>
+    filterCollapseData.some((item) => item.Notes_Type === note.label)
+  );
+  const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-  const { loading: signsLoading, data: signs = [] } = useSelector(
-    (state) => state.getSignsSetup
-  );
-  const { loading: postsignsLoading, success: postsignsSuccess } = useSelector(
-    (state) => state.saveSigns
-  );
-  const { loading: patientSignsLinesLoading, data: patientSignsLines = [] } =
-    useSelector((state) => state.getPatientsSigns);
-
+  // Fetch patient history notes
   useEffect(() => {
-    dispatch(getSignsSetup());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getPatientSignsLines());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (postsignsSuccess) {
-      form.resetFields();
-      setEditingRecord(null); // Reset editing record after success
-    } else {
-      form.resetFields();
-      setEditingRecord(null);
+    if (treatmentNo) {
+      dispatch(getPatientHistorySlice(treatmentNo));
     }
-  }, [postsignsSuccess, form]);
-  const handleFinish = (values) => {
-    // Find the selected sign's system value from the signs data
-    const selectedSign = signs.find((sign) => sign.SignCode === values.signNo);
+  }, [dispatch, treatmentNo]);
 
-    // Ensure the sign and system are found before proceeding
-    if (!selectedSign) {
-      message.error("Selected sign not found.");
-      return;
-    }
+  // Extract initial values for the form
+  const initialValues = useMemo(
+    () => ({
+      1:
+        data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)
+          ?.Notes || "",
+      2:
+        data.filter((note) => note.Notes_Type === "Allegations").at(-1)
+          ?.Notes || "",
+      3:
+        data
+          .filter(
+            (note) => note.Notes_Type === "History of Presenting Complaint"
+          )
+          .at(-1)?.Notes || "",
+      5:
+        data
+          .filter(
+            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
+          )
+          .at(-1)?.Notes || "",
+      6:
+        data.filter((note) => note.Notes_Type === "Family History").at(-1)
+          ?.Notes || "",
+      7:
+        data.filter((note) => note.Notes_Type === "Personal History").at(-1)
+          ?.Notes || "",
+      8:
+        data.filter((note) => note.Notes_Type === "Forensic History").at(-1)
+          ?.Notes || "",
+      9:
+        data
+          .filter((note) => note.Notes_Type === "Premorbid Personality")
+          .at(-1)?.Notes || "",
+      20:
+        data.filter((note) => note.Notes_Type === "Medical History").at(-1)?.Notes ||
+        "",
+      23:
+        data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
+        "",
+    }),
+    [data]
+  );
 
-    const data = {
-      ...values,
-      system: selectedSign.System, // Add the system value from the selected sign
-      myAction: editingRecord ? "edit" : "create", // Handle create or update
-      treatmentNo: editingRecord ? editingRecord.TreatmentNo : treatmentNo,
-    };
+  //tracking last saved notes
+  const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
 
-    // Dispatch postSignsRequest for both create and update
-    dispatch(postSignsRequest(data)).then((data) => {
-      if (postsignsSuccess) {
-        dispatch(getPatientSignsLines()); // Reload data after successful request
-        form.resetFields(); // Reset the form fields
-        setEditingRecord(null);
-      } else {
-        message.error("An error occurred, please try again");
-      }
-    });
-  };
+  // Initialize form fields with initial values
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [initialValues, form]);
 
-  const handleToggleForm = () => {
-    setShowForm(!showForm);
-  };
-
-  const columnsSigns = [
+  const steps = [
     {
-      title: "Treatment No",
-      dataIndex: "TreatmentNo",
-      key: "TreatmentNo",
-      render: (text) => (
-        <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
+      key: "1",
+      title: "Chief Complaints & Allegations",
+      content: (
+        <>
+          <Form.Item
+            name="1"
+            label="Presentation by Patient "
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter presentation by patient..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+          <Form.Item name="2" label="Presentation by Family" rules={[{ required: true }]}>
+            <TextArea
+              placeholder="Enter presentation by family..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+        </>
       ),
-    },
-    { title: "System", dataIndex: "System", key: "System" },
-    { title: "Sign", dataIndex: "SignCode", key: "SignCode" },
-    {
-      title: "Description",
-      dataIndex: "SignDescription",
-      key: "SignDescription",
+      notesType: ["1", "2"],
     },
     {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="d-block d-md-flex justify-content-center align-items-center gap-3">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            title="Edit"
-            onClick={() => handleEdit(record)} // Trigger edit when clicked
-          >
-            Edit
-          </Button>
-          <Button
-            type="primary"
-            icon={<FileOutlined />}
-            title="View"
-            onClick={() => console.log(`View: ${record.key}`)}
-            ghost
-          >
-            View
-          </Button>
-          <Popconfirm
-            title="Are you sure?"
-            onConfirm={() => console.log(`Delete: ${record.key}`)}
-          >
-            <Button type="primary" icon={<DeleteOutlined />} danger>
-              Delete
-            </Button>
-          </Popconfirm>
-        </div>
+      key: "2",
+      title: "History of Presenting Illness",
+      content: (
+        <Form.Item
+          name="3"
+          label="History of Presenting Illness"
+          rules={[{ required: true }]}
+        >
+          <TextArea
+            placeholder="Describe the illness..."
+            autoSize={{ minRows: 4 }}
+          />
+        </Form.Item>
       ),
+      notesType: ["3"],
+    },
+    {
+      key: "3",
+      title: "Past Psychiatric and Medical History",
+      content: (
+        <>
+          <Form.Item name="20" label="Medical" rules={[{ required: true }]}>
+            <TextArea
+              placeholder="Enter past medical notes..."
+              autoSize={{ minRows: 4 }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="5"
+            label="Past Psychiatric History"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter past psychiatric History..."
+              autoSize={{ minRows: 4 }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="23"
+            label="Obstetric & Gynecology"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter past Obstetric & Gynecology notes..."
+              autoSize={{ minRows: 4 }}
+            />
+          </Form.Item>
+        </>
+      ),
+      notesType: ["5", "20", "23"],
+    },
+    {
+      key: "4",
+      title: "Family & Personal History",
+      content: (
+        <>
+          <Form.Item
+            name="6"
+            label="Family History"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter family history..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="7"
+            label="Personal History"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter personal history..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+        </>
+      ),
+      notesType: ["6", "7"],
+    },
+    {
+      key: "5",
+      title: "Forensic & Premorbid Personality",
+      content: (
+        <>
+          <Form.Item
+            name="8"
+            label="Forensic History"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Enter forensic history..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="9"
+            label="Premorbid Personality"
+            rules={[{ required: true }]}
+          >
+            <TextArea
+              placeholder="Describe premorbid personality..."
+              autoSize={{ minRows: 3 }}
+            />
+          </Form.Item>
+        </>
+      ),
+      notesType: ["8", "9"],
     },
   ];
 
-  const DataSource = Array.isArray(patientSignsLines)
-    ? patientSignsLines.filter((item) => item.TreatmentNo === treatmentNo) // Filter by TreatmentNo
-    : Object.keys(patientSignsLines)
-        .filter((key) => patientSignsLines[key].TreatmentNo === treatmentNo) // Filter based on TreatmentNo
-        .map((key) => ({
-          ...patientSignsLines[key],
-          TreatmentNo: key,
-        }));
+  const handleNext = async () => {
+    try {
+      const values = await form.validateFields();
+      const currentStepData = steps[currentStep];
+      const updatedNotes = currentStepData?.notesType?.map((type) => ({
+        myAction: "create",
+        recId: "",
+        notesType: type,
+        notes: values[type],
+        treatmentNo,
+        patientNo,
+      }));
+      // ?.filter((note) => {
+      //   console.log(`Filtering note:`, note); // Debug
+      //   return note?.notes?.trim() !== "" && !lastSavedNotes[note.notesType];
+      // });
 
-  const handleEdit = (record) => {
-    setEditingRecord(record);
-    form.setFieldsValue({
-      system: record.System,
-      signNo: record.SignCode,
-      description: record.SignDescription,
-    });
-    // Set the system value when editing
-    setSelectedSignSystem(record.System);
-  };
+      if (updatedNotes?.length) {
+        const results = await Promise.all(
+          updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
+        );
+        if (results.every((res) => res === "success")) {
+          message.success("Notes saved successfully!");
+          setLastSavedNotes((prev) => ({
+            ...prev,
+            ...Object.fromEntries(
+              updatedNotes.map((note) => [note.notesType, note.notes])
+            ),
+          }));
+          dispatch(getPatientHistorySlice(treatmentNo));
+        } else {
+          message.error("Failed to save some notes.");
+        }
+      }
 
-  const handleSignChange = (value) => {
-    // Find the sign in signs setup and set the system value
-    const selectedSign = signs.find((sign) => sign.SignCode === value);
-    if (selectedSign) {
-      setSelectedSignSystem(selectedSign.System);
+      if (currentStep === steps.length - 1) {
+        // Trigger the parent callback to move to the next tab if this is the last step
+        moveToNextTab();
+      } else {
+        // Move to the next step
+        setCurrentStep((prev) => prev + 1);
+      }
+    } catch (err) {
+      console.log("some error", err);
     }
   };
 
+  const handlePrev = () => setCurrentStep((prev) => prev - 1);
+  // console.log(currentStep, 'currentStep');
+
+  if (!patientDetails) return <Loading />;
+
   return (
     <div className="mt-4">
-      <Typography.Text
-        style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
-      >
-        <FileOutlined />
-        Patient Signs
+      <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+        <FileOutlined /> Patient History Notes
       </Typography.Text>
-      {patientSignsLinesLoading ? (
-        <Loading />
-      ) : (
-        <>
-          {!showForm ? (
-            <>
-              <div className="d-flex justify-content-end my-2">
-              <Button
-                    onClick={handleToggleForm}
-                    style={{ marginRight: "10px", justifyContent: "end" }}
-                    type="primary"
-                    icon={<PlusOutlined />}
-                  >
-                    Add Sign
-                  </Button>
+      {(role === "Doctor" || role === "Psychology") &&
+        !allNotesPresent &&
+        patientDetails?.Status !== "Completed" && (
+          <>
+            <Steps
+              current={currentStep}
+              size="small"
+              style={{ marginBottom: 24 }}
+            >
+              {steps.map((step) => (
+                <Step key={step.key} title={step.title} />
+              ))}
+            </Steps>
+            <Form form={form} layout="vertical">
+              {steps[currentStep].content}
+              <div className="steps-action">
+                {currentStep > 0 && (
+                  <Button onClick={handlePrev}>Previous</Button>
+                )}
+                <Button
+                  type="primary"
+                  loading={saveNotesLoading}
+                  onClick={handleNext}
+                >
+                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
+                </Button>
               </div>
-              <Table
-                dataSource={DataSource}
-                columns={columnsSigns}
-                pagination={{
-                  position: ["bottom", "right"],
-                  showSizeChanger: true,
-                  pageSize: 10,
-                  showTotal: (total, range) =>
-                    `${range[0]}-${range[1]} of ${total} items`,
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <Form
-                layout="vertical"
-                form={form}
-                onFinish={handleFinish}
-                initialValues={{
-                  system: selectedSignSystem, // Use the selected system value
-                  signNo: "",
-                  description: "",
-                }}
-              >
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label="Sign"
-                      name="signNo"
-                      rules={[
-                        { required: true, message: "Please select a sign" },
-                      ]}
-                    >
-                      <Select
-                        placeholder="Select Sign"
-                        loading={signsLoading}
-                        allowClear
-                        onChange={handleSignChange} // Trigger system value update on sign change
-                      >
-                        {signs.map((sign) => (
-                          <Select.Option
-                            key={sign.SignCode}
-                            value={sign.SignCode}
-                          >
-                            {sign.SignsName}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label="Description"
-                      name="description"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter a description",
-                        },
-                      ]}
-                    >
-                      <Input.TextArea />
-                    </Form.Item>
-                  </Col>
-                </Row>
+            </Form>
+          </>
+        )}
 
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item>
-                      <Button type="primary" htmlType="submit">
-                        <SaveOutlined />
-                        Save
-                      </Button>
-                    </Form.Item>
-                  </Col>
-
-                  <Col span={12}>
-                    <Form.Item>
-                      <Button onClick={handleToggleForm} type="primary">
-                        <IoListOutline />
-                        View Patient Signs
-                      </Button>
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </>
-          )}
-        </>
-      )}
+      <PatientHistoryNotesTable data={data} patientDetails={patientDetails} loadingHistory={loadingHistory}/>
     </div>
   );
 };

@@ -7,7 +7,7 @@ export const GET_SAMPLE_SETUP_SUCCESS = 'GET_SAMPLE_SETUP_SUCCESS';
 export const GET_SAMPLE_SETUP_FAILURE = 'GET_SAMPLE_SETUP_FAILURE';
 export const GET_SAMPLE_SETUP_RESET = 'GET_SAMPLE_SETUP_RESET';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getSpecimenSampleSetupSlice = () => async (dispatch, getState) => {
   const config = configHelpers(getState);

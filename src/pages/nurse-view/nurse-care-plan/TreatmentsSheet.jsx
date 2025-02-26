@@ -1,7 +1,8 @@
-import { Button, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, RotateRightOutlined } from "@ant-design/icons";
+import { Button } from "antd"
+import { PlusOutlined, FileOutlined, RotateRightOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import TreatmentSheetTable from "../tables/nurse-tables/TreatmentSheetTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const TreatmentsSheet = () => {
   const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -37,14 +38,9 @@ const handleStopTreatment = () => {
 
   return (
     <div>
-         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Treatment Sheet
-          </Typography.Text>
-        </Space>
+         <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
           <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleSendToPharmacy()}><PlusOutlined /> Send to Pharmacy</Button>
           <Button color="danger" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleStopTreatment()}><RotateRightOutlined /> Stop Treatment</Button>
         </div>

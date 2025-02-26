@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import configHelpers from '../configHelpers';
 import axios from "axios";
 
@@ -5,7 +6,7 @@ export const POST_CANCEL_ADMISSION_REQUEST = 'POST_CANCEL_ADMISSION_REQUEST';
 export const POST_CANCEL_ADMISSION_SUCCESS = 'POST_CANCEL_ADMISSION_SUCCESS';
 export const POST_CANCEL_ADMISSION_FAILURE = 'POST_CANCEL_ADMISSION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postCancelAdmissionSlice = (cancelAdmissionData) => 
   async (dispatch, getState) => {
@@ -24,13 +25,9 @@ export const postCancelAdmissionSlice = (cancelAdmissionData) =>
     
         dispatch({
             type: POST_CANCEL_ADMISSION_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
-        return { type: POST_CANCEL_ADMISSION_FAILURE, payload: error };
+        message.error(error.message, 5);
     }
 };

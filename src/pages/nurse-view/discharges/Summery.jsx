@@ -1,11 +1,14 @@
-import { Button, DatePicker, Form, Modal, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, DatePicker, Form, Modal } from "antd"
+import { PlusOutlined, FileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import DischargeSummeryTable from "../tables/nurse-tables/DischargeSummeryTable";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
 
 const Summery = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const role = useAuth().userData.departmentName
     const showModal = () => {
       setIsModalOpen(true);
     };
@@ -20,29 +23,30 @@ const Summery = () => {
   return (
     <div>
 
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Discharge Summery
-          </Typography.Text>
-        </Space>
+        <NurseInnerHeader icon={<FileOutlined/>} title="Discharge Summary" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-            <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summery
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Discharge Summery
-          </Button>
-        </div>
+        {
+            role === 'Doctor' ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
+                <Button type="primary" style={{ width: '50%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary
+                </Button>
+                <Button color="default" variant="outlined" style={{ width: '50%' }}><FolderViewOutlined />
+                Preview Discharge Summary
+                </Button>
+                </div>
+            ) : (
+                null
+            )
+        }
 
         <DischargeSummeryTable showModal={showModal}/>
 
 
-        <Modal title="Charge Summery" 
+        <Modal title="Charge Summary" 
           open={isModalOpen} 
           onOk={handleOk} 
           onCancel={handleCancel}
-          okText="Save Discharge Summery"
+          okText="Save Discharge Summary"
         >
             <Form
             

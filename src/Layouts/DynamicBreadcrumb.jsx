@@ -21,10 +21,8 @@ const DynamicBreadcrumb = ({ collapsed }) => {
     Reception: "/reception",
     Doctor: "/Doctor",
     Security: "/Security",
-    //add more roles here
-    
+    //add more roles here    
   };
-
   // Determine the dashboard URL for the current user role
   const dashboardUrl = dashboardUrls[userRole] || "/"; // Fallback to '/' if role not found
 

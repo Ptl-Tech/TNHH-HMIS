@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   PlusOutlined,
   EyeOutlined,
   TeamOutlined,
+  DisconnectOutlined,
 } from "@ant-design/icons";
 import {
   Button,
@@ -16,15 +17,27 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import moment from "moment";
-import dayjs from "dayjs";
-
-const { Search } = Input;
+import { listPatients } from "../actions/patientActions";
+import useAuth from "../hooks/useAuth";
 
 const OutpatientList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { patients } = useSelector((state) => state.patientList);
+  const { loading: loadingPatients, patients } = useSelector((state) => state.patientList);
+  const role = useAuth().userData.departmentName;
+
+  
+
+
+  // get patient whose ActiveVisitNo ="" and CurrentAdmNo = ""
+  const patientsToFilter = useMemo(() => {
+    const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
+  
+    return role === "Nurse"
+      ? patientsArray.filter((patient) => patient?.ActiveVisitNo === "" && patient?.CurrentAdmNo === "")
+      : patientsArray;
+  }, [role, patients]);
+
 
   const [searchParams, setSearchParams] = useState({
     SearchName: "",
@@ -34,36 +47,43 @@ const OutpatientList = () => {
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [showList, setShowList] = useState(false);
 
-  useEffect(() => {
-    // Filter non-inpatient patients when patients data changes
-    if (patients.length > 0) {
-      setFilteredPatients(
-        patients.filter((patient) => !patient.Inpatient)
-      );
-    }
-  }, [patients]);
+useEffect(() => {
+  dispatch(listPatients());
+}, [dispatch]);
 
+  useEffect(() => {
+    // Don't filter by patient type, show all patients
+    setFilteredPatients();
+  }, [patientsToFilter]);
+  
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    setShowList(true);
-    filterPatients({ ...searchParams, [field]: value });
-  };
 
-  const filterPatients = (params) => {
-    const { SearchName, patientId, patientNo } = params;
-    const filtered = patients.filter((patient) => {
-      return (
-        patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
-        patient.IDNumber.includes(patientId) &&
-        patient.PatientNo.toString().includes(patientNo)
-      );
+    setSearchParams((prevState) => {
+      const updatedParams = { ...prevState, [field]: value };
+      // If all search fields are empty, hide the list
+      if (!updatedParams.SearchName && !updatedParams.patientId && !updatedParams.patientNo) {
+        setShowList(false);
+      } else {
+        // Otherwise, show the list and filter
+        setShowList(true);
+        filterPatients(updatedParams);
+      }
+      return updatedParams;
     });
-    setFilteredPatients(filtered);
-  };
+};
+
+const filterPatients = (params) => {
+  const { SearchName, patientId, patientNo } = params;
+  const filtered = patientsToFilter.filter((patient) => {
+    return (
+      (!SearchName || patient.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
+      (!patientId || patient.IDNumber.includes(patientId)) &&
+      (!patientNo || patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase()))
+    );
+  });
+  setFilteredPatients(filtered);
+};
 
   const columns = [
     {
@@ -71,12 +91,24 @@ const OutpatientList = () => {
       dataIndex: "PatientNo",
       key: "PatientNo",
       sorter: (a, b) => a.PatientNo - b.PatientNo,
+      render: (text) => (
+        <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
+          {text}
+        </Typography.Text>
+      )
     },
     {
       title: "Patient Name",
       dataIndex: "SearchName",
       key: "SearchName",
       sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
+      render: (text) => (
+        <Tooltip title={text}>
+          <Typography.Text ellipsis style={{ maxWidth: "200px", color: "#0f5689", fontWeight: "bold" }}>
+            {text}
+          </Typography.Text>
+        </Tooltip>
+      )
     },
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
@@ -93,36 +125,54 @@ const OutpatientList = () => {
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          {record.Activated ? (
-            <Tooltip title="View Details">
+          {role === "Reception" ? (
+            record.Activated ? (
+              <Tooltip title="View Details">
+                <Button
+                  type="primary"
+                  icon={<EyeOutlined />}
+                  onClick={() =>
+                    navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
+                      state: { patientDet: record },
+                    })
+                  }
+                >
+                  View Details
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Create Visit">
+                <Button
+                  icon={<PlusOutlined />}
+                  type="primary"
+                  onClick={() =>
+                    navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
+                      state: { existingPatient: record, previousPath: location.pathname },
+                    })
+                  }
+                >
+                  Create Visit
+                </Button>
+              </Tooltip>
+            )
+          ) : role === "Nurse" ? (
+            <Tooltip title="Admit Patient">
               <Button
-                icon={<EyeOutlined />}
+                icon={<DisconnectOutlined />}
+                type="primary"
                 onClick={() =>
-                  navigate("/reception/Patient-Registration", {
-                    state: { patientDet: record },
+                  navigate(`/Nurse/patient-list/Direct-Admission?PatientNo=${record.PatientNo}`, {
+                    state: { patientDetails: record },
                   })
                 }
               >
-                View Details
+                Admit Patient
               </Button>
             </Tooltip>
-          ) : (
-            <Tooltip title="Create Visit">
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() =>
-                  navigate(`/reception/Add-Appointment/${record.PatientNo}`, {
-                    state: { existingPatient: record },
-                  })
-                }
-              >
-                Create Visit
-              </Button>
-            </Tooltip>
-          )}
+          ) : null}
         </div>
       ),
-    },
+    }
   ];
 
   return (
@@ -134,7 +184,13 @@ const OutpatientList = () => {
       <div className="d-flex justify-content-between">
         <Button
           type="primary"
-          onClick={() => navigate("/reception/Patient-Registration")}
+          onClick={() => {
+            if (role === "Reception") {
+              navigate("/reception/Patient-Registration");
+            } else if (role === "Nurse") {
+              navigate("/Nurse/Patient-Registration");
+            }
+          }}
           style={{ marginBottom: "20px" }}
         >
           Register New Patient
@@ -150,17 +206,19 @@ const OutpatientList = () => {
         >
           Find Patient Details by:
         </Typography.Text>
-        <Row gutter={16} className="mt-2">
-          <Col span={6}>
+        <Row gutter={[16, 16]} className="mt-2">
+          <Col xl={8} md={12} xs={24}>
             <Input
+              size="large"
               placeholder="Patient Name"
               value={searchParams.SearchName}
               onChange={(e) => handleSearchChange(e, "SearchName")}
               allowClear
             />
           </Col>
-          <Col span={6}>
+          <Col xl={8} md={12} xs={24}>
             <Input
+              size="large"
               placeholder="Patient ID"
               value={searchParams.patientId}
               onChange={(e) => handleSearchChange(e, "patientId")}
@@ -168,8 +226,9 @@ const OutpatientList = () => {
               onSearch={() => filterPatients(searchParams)}
             />
           </Col>
-          <Col span={6}>
+          <Col xl={8} md={12} xs={24}>
             <Input
+              size="large"
               placeholder="Patient No"
               value={searchParams.patientNo}
               onChange={(e) => handleSearchChange(e, "patientNo")}
@@ -181,6 +240,10 @@ const OutpatientList = () => {
       {showList && (
   <div className="mt-4">
     <Table
+      rowKey="SystemCreatedAt"
+      bordered
+      size="small"
+      loading={loadingPatients}
       columns={columns}
       dataSource={filteredPatients}
       pagination={{ pageSize: 10 }}

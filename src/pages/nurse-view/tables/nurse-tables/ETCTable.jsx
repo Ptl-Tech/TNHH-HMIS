@@ -1,83 +1,108 @@
-import { Button, Space, Table } from "antd"
+import { Table, Tag } from "antd";
 import PropTypes from "prop-types";
+// import { getDoctorsList } from "../../../actions/Doc-actions/DoctorActions"; // Import the action to get the doctor list
+import { useEffect, useState } from "react";
 
-const ETCTable = ({ showModal }) => {
-const columns = [
-        {
-            title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
-        },
-        {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
-        },
-        {
-            title: 'Operation',
-            dataIndex: 'operation',
-            key: 'operation',
-        },
-        {
-            title: 'Doctor Name',
-            dataIndex: 'doctorName',
-            key: 'doctorName',
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
-        {
-            title: 'Actions',
-            dataIndex: 'actions',
-            key: 'actions',
-            render: (_, record) => (
-                <Space>
-                    <Button type="primary"
-                    onClick={() => handleEdit(record)}
-                    >Edit</Button>
-                    <Button color="danger" variant="outlined"
-                    onClick={() => handleDelete(record)}
-                    >Cancel</Button>
-                </Space>
-            ),
+const ETCTable = ({ loadingETC, data, doctors }) => {
+  const [updatedData, setUpdatedData] = useState([]);
+
+  useEffect(() => {
+    if (doctors && data) {
+      const doctorsMap = doctors.reduce((acc, doctor) => {
+        acc[doctor.DoctorID] = doctor.DoctorsName;
+        return acc;
+      }, {});
+
+      const newData = data.map((item) => ({
+        ...item,
+        DoctorName: doctorsMap[item.Doctor_ID] || "",
+      }));
+
+      setUpdatedData(newData); // Update the data object with doctor names
+    }
+  }, [doctors, data]);
+
+  //
+  const columns = [
+    {
+      title: "#",
+      dataIndex: "key",
+      key: "key",
+      render: (text, record, index) => index + 1,
+    },
+    {
+      title: "Visit No",
+      dataIndex: "Link_No",
+      key: "Link_No",
+      render: (text, record) => (
+        <span
+          style={{ color: "#0f5689", cursor: "pointer", fontWeight: "bold" }}
+        >
+          {text}
+        </span>
+      ),
+    },
+
+    {
+      title: "Patient No",
+      dataIndex: "Patient_No",
+      key: "Patient_No",
+    },
+    {
+      title: "Procedure Date",
+      dataIndex: "Procedure_Date",
+      key: "Procedure_Date",
+    },
+    /* {
+            title: "Procedure Type",
+            dataIndex: "Procedure_Type",
+            key: "Procedure_Type",
+        }, */
+    /* {
+            title: 'Requesting Doctor',
+            dataIndex: 'Requesting Doctor',
+            key: 'Requesting Doctor',
+        }, */
+    {
+      title: "Requested to",
+      dataIndex: "DoctorName",
+      key: "DoctorName",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (text, record) => {
+        if (record.Status === "0") {
+          return <Tag color="#87d068">New</Tag>;
+        } else {
+          return <Tag color="#108ee9">Completed</Tag>;
         }
-    ];
-
-    const data = [
-        {
-            key: '1',
-            date: '2023-04-20',
-            time: '10:00 AM',
-            operation: 'ECT',
-            doctorName: 'Dr. John Doe',
-            description: 'This is a description',
-        },
-    ];
-
-    const handleEdit = (record) => {
-        showModal();
-        console.log(record);
-    };
-    const handleDelete = (record) => {
-        console.log(record);
-    };
+      },
+    },
+  ];
   return (
-    <div style={{ paddingTop: '30px' }}>
-    <Table 
-    
-       columns={columns} 
-       dataSource={data} 
-       className="admit-patient-table"
-    />
-</div>
-  )
-}
+    <div style={{}}>
+      <Table
+        rowKey="SystemId"
+        bordered
+        size="small"
+        dataSource={updatedData}
+        loading={loadingETC}
+        columns={columns}
+        className="admit-patient-table"
+      />
+    </div>
+  );
+};
 
-export default ETCTable
+export default ETCTable;
 
 //props types validations
 ETCTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
-}
+  loadingETC: PropTypes.bool,
+  data: PropTypes.array,
+  treatmentNo: PropTypes.string,
+  patientNo: PropTypes.string,
+  doctors: PropTypes.array,
+};

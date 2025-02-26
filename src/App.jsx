@@ -19,7 +19,7 @@ import HistoryVisitorList from "./pages/HistoryVisitorList";
 import ActiveAppmnts from "./pages/ActiveAppmnts";
 import CashPatients from "./pages/CashPatients";
 import InsurancePatients from "./pages/InsurancePatients";
-import AdmitPatient from "./pages/nurse-view/AdmitPatient";
+import AdmitPatient from "./pages/nurse-view/forms/nurse-forms/AdmitPatient";
 import PatientCharges from "./pages/nurse-view/PatientCharges";
 import ReleaseBed from "./pages/nurse-view/ReleaseBed";
 import TransferBed from "./pages/nurse-view/TransferBed ";
@@ -61,6 +61,7 @@ import AdmissionRequest from "./pages/nurse-view/AdmissionRequest";
 import DischargeList from "./pages/nurse-view/DischargeList";
 import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
 import RadiologyOutPatient from "./pages/doctorsViews/tables/Radiology/RadiologyOutPatient";
+import RadiologyOutPatients from "./pages/doctorsViews/tables/Radiology/RadiologyOutPatients";
 
 import ViewDoctorNotes from "./pages/nurse-view/nurse-patient-file/ViewDoctorNotes";
 import PostedConsumables from "./pages/nurse-view/PostedConsumables";
@@ -69,11 +70,29 @@ import LaboratoryEvaluationCard from "./pages/doctorsViews/tables/lab/Laboratory
 import DoctorAdmissions from "./pages/doctorsViews/DocAdmission-views/DoctorAdmissions";
 import VerifiedAdmission from "./pages/doctorsViews/DocAdmission-views/VerifiedAdmission";
 import AdmittedPatients from "./pages/doctorsViews/DocAdmission-views/AdmittedPatients";
+import PhamarcyDashboard from "./pages/pharmacy-views/PhamarcyDashboard";
 import PhamarcyOutpatient from "./pages/pharmacy-views/PhamarcyOutpatient";
 import PharmacyCard from "./pages/pharmacy-views/PharmacyCard";
 import PharmacyInpatient from "./pages/pharmacy-views/PharmacyInpatient";
 import PharmacyListReturnLines from "./pages/pharmacy-views/PharmacyListReturnLines";
 import PharmacyHistoryList from "./pages/pharmacy-views/PharmacyHistoryList";
+import ReadNurseNotes from "./pages/nurse-view/ReadNurseNotes";
+import ConsultationCard from "./pages/nurse-view/ConsultationCard";
+import BedOccupancy from "./pages/nurse-view/BedOccupancy";
+import CloseList from "./pages/doctorsViews/tables/ClosedDocctorVisits";
+import ReadDoctorNotes from "./pages/ReadDoctorNotes";
+import ConsultationRoomPatients from "./pages/doctorsViews/tables/ConsultationRoomPatients";
+import WalkInPatientList from "./pages/WalkInPatientList";
+import WalkinRegistration from "./pages/WalkinRegistration";
+import RadiologyDashboard from "./Dashboards/RadiologyDashboard";
+import ViewInvoice from "./pages/billing/ViewInvoice";
+import ActiveOutPatients from "./pages/billing/ActiveOutPatients";
+import ActiveInpatient from "./pages/billing/ActiveInpatient";
+import LabRoutes from "./Routes/LabRoutes";
+import ViewReceipt from "./pages/billing/ViewReceipt";
+import EncounterSummery from "./pages/doctorsViews/EncounterSummery";
+import ViewPatientsReceipts from "./pages/billing/ViewPatientsReceipts";
+import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 
 function App() {
   return (
@@ -115,7 +134,18 @@ function App() {
           />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
 
-          <Route path="Admissions" element={<Admissions />} />
+          <Route path="PendingConsultationList" element={<ConsultationRoomPatients />} />
+          <Route path="ClosedConsultationList" element={<CloseList />} />
+
+          <Route path="OutPatients" element={<DoctorVisits />} />
+          <Route path="Consultation-List/Patient" element={<ConsultationRoomEvalutionCard />} /> 
+          <Route
+            path="Consultation-List/Read-Doctor-Dotes"
+            element={<ReadDoctorNotes />}
+          />
+
+          <Route path="Consultation-List" element={<DoctorVisits />} />
+
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
 
@@ -127,7 +157,19 @@ function App() {
             path="Ward-management/Transfer-bed"
             element={<TransferBed />}
           />
+          <Route
+            path="Ward-management/Bed-occupancy"
+            element={<BedOccupancy />}
+          />
           <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
+          <Route
+            path="Inpatient/Read-nurse-notes"
+            element={<ReadNurseNotes />}
+          />
+          <Route
+            path="Consultation-List/Encounter"
+            element={<EncounterSummery />}
+          />
 
           <Route path="Observation-Room/:id" element={<NurseObservation />} />
           <Route path="Outpatient-list" element={<NurseOutpatientList />} />
@@ -135,18 +177,32 @@ function App() {
           <Route path="BedManagement" element={<BedManager />} />
 
           <Route path="Discharge-list" element={<DischargeList />} />
-          <Route path="Discharge-list/Posted-Consumables" element={<PostedConsumables />} />
+          <Route
+            path="Discharge-list/Posted-Consumables"
+            element={<PostedConsumables />}
+          />
+
+          <Route path="Patient-list" element={<OutpatientList />} />
+
+          <Route
+            path="Patient-Registration/:PatientNo?"
+            element={<PatientRegistration />}
+          />
+
+          <Route
+            path="patient-list/Direct-Admission/:PatientNo?"
+            element={<DirectAdmission />}
+          />
 
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
-
       <Route element={<PrivateRoute allowedDepartments={["Reception"]} />}>
         <Route path="/reception" element={<MainLayout />}>
           <Route index element={<ReceptionDashboard />} />
 
           <Route
-            path="/reception/Patient-Registration"
+            path="/reception/Patient-Registration/:PatientNo?"
             element={<PatientRegistration />}
           />
           <Route
@@ -155,6 +211,14 @@ function App() {
           />
 
           <Route path="/reception/Patient-list" element={<OutpatientList />} />
+          <Route
+            path="/reception/Walkin-patient-list"
+            element={<WalkInPatientList />}
+          />
+          <Route
+            path="/reception/Register-walkin"
+            element={<WalkinRegistration />}
+          />
           <Route path="/reception/view-profile" element={<ViewProfile />} />
           <Route
             path="/reception/appointments/list"
@@ -169,19 +233,42 @@ function App() {
             element={<DispatchedAppmnts />}
           />
 
-          <Route path="/reception/cash-List" element={<CashPatients />} />
           <Route
+            path="/reception/Billing/Outpatients"
+            element={<ActiveOutPatients />}
+          />
+          <Route
+            path="/reception/Billing/Inpatients"
+            element={<ActiveInpatient />}
+          />
+
+          {/* <Route
             path="/reception/insurance-List"
             element={<InsurancePatients />}
           />
 
-          <Route path="/reception/InPatient-list" element={<InpatientList />} />
+          <Route
+            path="/reception/InPatient-list"
+            element={<InpatientList />}
+          /> */}
 
           <Route path="/reception/visitors-list" element={<VisitorList />} />
 
           <Route
             path="/reception/create-visit/:patientNo"
             element={<CreateVisitForm />}
+          />
+          <Route
+            path="/reception/invoice/:patientNo"
+            element={<ViewInvoice />}
+          />
+          <Route
+            path="/reception/Receipt/:patientNo"
+            element={<ViewReceipt />}
+          />
+          <Route
+            path="/reception/Patient-Charges/:patientNo"
+            element={<ViewPatientsReceipts />}
           />
         </Route>
       </Route>
@@ -191,12 +278,16 @@ function App() {
           <Route index element={<DoctorDashboard />} />
           <Route path="/Doctor/Consultation-List" element={<DoctorVisits />} />
           <Route
-            path="/Doctor/PendingTreatmentList"
-            element={<TreamentListPending />}
+            path="/Doctor/ClosedConsultationList"
+            element={<CloseList />}
+          />
+          <Route
+            path="/Doctor/PendingConsultationList"
+            element={<ConsultationRoomPatients />}
           />
 
           <Route
-            path="/Doctor/Consultation/Patient"
+            path="/Doctor/Consultation-List/Patient"
             element={<ConsultationRoomEvalutionCard />}
           />
           <Route path="/Doctor/Inpatient" element={<Inpatient />} />
@@ -217,6 +308,10 @@ function App() {
           <Route
             path="/Doctor/Past-doctor-visit/Patient"
             element={<TreatmentCard />}
+          />
+          <Route
+            path="/Doctor/Inpatient/Read-nurse-notes"
+            element={<ReadNurseNotes />}
           />
           <Route
             path="/Doctor/Past-doctor-visit/Patient"
@@ -242,16 +337,149 @@ function App() {
             element={<AdmittedPatients />}
           />
           <Route
+            path="/Doctor/Pharmacy-Dashboard"
+            element={<PhamarcyDashboard />}
+          />
+          <Route
             path="/Doctor/Pharmacy-OutPatient"
             element={<PhamarcyOutpatient />}
           />
-          <Route path="/Doctor/Pharmacy-Inpatient" element={<PharmacyInpatient />} />
+          <Route
+            path="/Doctor/Pharmacy-Inpatient"
+            element={<PharmacyInpatient />}
+          />
           <Route path="/Doctor/Pharmacy-Card" element={<PharmacyCard />} />
-<Route path="/Doctor/Pharmacy-Returns" element={<PharmacyListReturnLines />} />
-<Route path="/Doctor/Pharmacy-History" element={<PharmacyHistoryList />} />
+          <Route
+            path="/Doctor/Pharmacy-Returns"
+            element={<PharmacyListReturnLines />}
+          />
+          <Route
+            path="/Doctor/Pharmacy-History"
+            element={<PharmacyHistoryList />}
+          />
+          <Route
+            path="/Doctor/Consultation/Read-Doctor-Dotes"
+            element={<ReadDoctorNotes />}
+          />
+          <Route 
+            path="/Doctor/Consultation-List/Encounter"
+            element={<EncounterSummery />}
+          />
           <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
+
+      <Route element={<PrivateRoute allowedDepartments={["Psychology"]} />}>
+        <Route path="/Psychology" element={<MainLayout />}>
+          <Route index element={<DoctorDashboard />} />
+          <Route
+            path="/Psychology/Consultation-List"
+            element={<DoctorVisits />}
+          />
+          <Route
+            path="/Psychology/ClosedConsultationList"
+            element={<CloseList />}
+          />
+          <Route
+            path="/Psychology/PendingConsultationList"
+            element={<ConsultationRoomPatients />}
+          />
+
+          <Route
+            path="/Psychology/Consultation-List/Patient"
+            element={<ConsultationRoomEvalutionCard />}
+          />
+          <Route path="/Psychology/Inpatient" element={<Inpatient />} />
+          <Route
+            path="/Psychology/Inpatient/Patient-card"
+            element={<InpatientCard />}
+          />
+          <Route path="/Psychology/Admissions" element={<DoctorAdmissions />} />
+          <Route
+            path="/Psychology/Discharge-list"
+            element={<DischargeList />}
+          />
+          <Route
+            path="/Psychology/Discharge-requests"
+            element={<DischargeRequests />}
+          />
+          <Route
+            path="/Psychology/Past-doctor-visit"
+            element={<PastDoctorVisit />}
+          />
+          <Route path="/Psychology/Consultation-List/Encounter" 
+          element={<EncounterSummery />} 
+          />
+          <Route
+            path="/Psychology/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
+          <Route
+            path="/Psychology/Inpatient/Read-nurse-notes"
+            element={<ReadNurseNotes />}
+          />
+          <Route
+            path="/Psychology/Past-doctor-visit/Patient"
+            element={<TreatmentCard />}
+          />
+          <Route path="/Psychology/Lab-Patients" element={<LabOutPatient />} />
+          <Route
+            path="/Psychology/Radiology-Patients"
+            element={<RadiologyOutPatient />}
+          />
+          {/* Laboratory Routes */}
+          <Route
+            path="/Psychology/Lab/Patient"
+            element={<LaboratoryEvaluationCard />}
+          />
+
+          <Route
+            path="/Psychology/Approved-Admissions"
+            element={<VerifiedAdmission />}
+          />
+          <Route
+            path="/Psychology/Admitted-Patients"
+            element={<AdmittedPatients />}
+          />
+          <Route
+            path="/Psychology/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route
+            path="/Psychology/Pharmacy-Inpatient"
+            element={<PharmacyInpatient />}
+          />
+          <Route path="/Psychology/Pharmacy-Card" element={<PharmacyCard />} />
+          <Route
+            path="/Psychology/Pharmacy-Returns"
+            element={<PharmacyListReturnLines />}
+          />
+          <Route
+            path="/Psychology/Pharmacy-History"
+            element={<PharmacyHistoryList />}
+          />
+          <Route
+            path="/Psychology/Consultation/Read-Doctor-Dotes"
+            element={<ReadDoctorNotes />}
+          />
+          <Route path="view-profile" element={<ViewProfile />} />
+        </Route>
+      </Route>
+      <Route element={<PrivateRoute allowedDepartments={["Radiology"]} />}>
+        <Route path="/Radiology" element={<MainLayout />}>
+          <Route index element={<RadiologyDashboard />} />
+          <Route
+            path="/Radiology/Radiology-Patients"
+            element={<RadiologyOutPatients />}
+          />
+          <Route
+            path="/Radiology/Radiology-Patient/:radiologyNo?"
+            element={<RadiologyOutPatient />}
+          />
+        </Route>
+      </Route>
+      {/* Lab routes */}
+      {LabRoutes()}
 
       <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
         <Route path="/Security" element={<MainLayout />}>
@@ -261,6 +489,31 @@ function App() {
             path="/Security/History-list"
             element={<HistoryVisitorList />}
           />
+        </Route>
+      </Route>
+
+      <Route element={<PrivateRoute allowedDepartments={["Pharmacy"]} />}>
+        <Route path="/Pharmacy" element={<MainLayout />}>
+          <Route index element={<PhamarcyDashboard />} />
+          <Route
+            path="/Pharmacy/Pharmacy-OutPatient"
+            element={<PhamarcyOutpatient />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-Inpatient"
+            element={<PharmacyInpatient />}
+          />
+          <Route path="/Pharmacy/Pharmacy-Card" element={<PharmacyCard />} />
+          <Route
+            path="/Pharmacy/Pharmacy-Returns"
+            element={<PharmacyListReturnLines />}
+          />
+          <Route
+            path="/Pharmacy/Pharmacy-History"
+            element={<PharmacyHistoryList />}
+          />
+          {/* <Route path="/Pharmacy/Consultation/Read-Doctor-Dotes" element={<ReadDoctorNotes />} /> */}
+          <Route path="view-profile" element={<ViewProfile />} />
         </Route>
       </Route>
 

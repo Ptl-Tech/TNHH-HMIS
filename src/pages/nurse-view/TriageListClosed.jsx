@@ -1,26 +1,29 @@
-import { Button, Card, Table } from 'antd'
+import { Button, Table } from 'antd'
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TriageSummeryCard from './TriageSummeryCard';
 import Loading from '../../partials/nurse-partials/Loading'
 import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
-import { useLocation } from 'react-router-dom';
-import Search from 'antd/es/transfer/search';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
-import { SearchOutlined } from '@ant-design/icons';
+import { useLocation } from 'react-router-dom';
+import FilterTriageList from '../../partials/nurse-partials/FilterTriageList';
 
 const TriageListClosed = () => {
-  const [searchParams, setSearchParams] = useState({
-    name: "",
-    patientNo: "",
-    observationNo: "",
-  });
+
   const dispatch = useDispatch();
   const location = useLocation();
+  const currentPath = location.pathname;
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchObservationNumber, setSearchObservationNumber] = useState('')
 
   const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
-  const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
-  const closedTriageList = triageList.filter((item)=>item.Status==='Closed') || {};
+  // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
+
+  const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+  
+  
+  const openTriageList = triageList.filter((item) => item.Status === 'Closed');
 
   const formattedTriageWaitingList = triageWaitingList.map(patient => {
     return {
@@ -29,142 +32,79 @@ const TriageListClosed = () => {
     }
   });
 
-  const combinedList = closedTriageList.map(room => {
-    // Find the matching patient in the formattedTriageWaitingList
+    const combinedList = openTriageList.map(room => {
     const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
 
-    // Combine room data with the matching patient's data
     return {
-        ...room, // Include all fields from the room object
+        ...room, 
         PatientNo: room.PatientNo,
         SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
     };
   });
 
-  //get the current location path
-  const currentPath = location.pathname;
 
-//extracting values from combinedTriageWaitingListAndTriageList
-  const waitingListTableDataSource = combinedList.map((item, index) => ({
-    key: index + 1,
-    // name: item?.Names || `Patient name here`,
-    regDate: item.ObservationDate,
-    name: item?.SearchName || ``,
-    
-    // age: item?.AgeinYears,
-    // sex: item?.Gender,
-    number: item?.PatientNo || ``,
-    idNumber: item?.IDNumber  || ``,
-    observationNo: item?.ObservationNo  || ``,
-  })).sort((a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered));
-
-  const [filteredPatients, setFilteredPatients] = useState(waitingListTableDataSource);
-
-const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
-    total: filteredPatients.length,
+    total: combinedList.length,
 });
 
 const handleTableChange = (newPagination) => {
     setPagination(newPagination); // Update pagination settings
 };
 
-const paginatedData = filteredPatients.slice(
-    (pagination.current - 1) * pagination.pageSize,
-    pagination.current * pagination.pageSize
-);
-
-
-  //filtering waitingListTableDataSource
-
-  const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    handleFilterPatients({ ...searchParams, [field]: value });
-  };
-
-  const handleFilterPatients = () => {
-    // Check if any search input has a value
-    const isSearching = Object.values(searchParams).some((value) => value.trim() !== "");
-  
-    if (isSearching) {
-      // Filter only when there's input
-      const filtered = waitingListTableDataSource.filter((patient) => {
-        const name = patient.name?.toLowerCase() || ""; // Handle undefined values
-        const observationNo = patient.observationNo?.toLowerCase() || "";
-        const number = patient.number?.toString() || "";
-  
-        return (
-          name.includes(searchParams.name.toLowerCase()) &&
-          observationNo.includes(searchParams.observationNo.toLowerCase()) &&
-          number.includes(searchParams.patientNo.toLowerCase())
-        );
-      });
-  
-      setFilteredPatients(filtered);
-    } else {
-      // Show all records when no search criteria are provided
-      setFilteredPatients(waitingListTableDataSource);
-    }
-  };
-  
-
   useEffect(() => {
-    if (!triageList?.length) {
         dispatch(getTriageList());
-    }
-}, [triageList, dispatch]);
+}, [dispatch]);
 
 
   useEffect(() => {
-          
-      if(!triageWaitingList?.length) {
-          dispatch(getTriageWaitingList());
-      }
-  }, [dispatch, triageWaitingList.length]);
+      dispatch(getTriageWaitingList());
+  }, [dispatch]);
 
   const waitingListColumns = [
     {
-      title: 'Index',
-      dataIndex: 'key',
-      rowScope: 'row',
-    },
-    {
       title: 'Observation No',
-      dataIndex: 'observationNo',
-      rowScope: 'row',
+      dataIndex: 'ObservationNo',
+      key: 'ObservationNo',
+      filteredValue: searchObservationNumber ? [searchObservationNumber] : null,
+      onFilter: (value, record) =>
+        record?.ObservationNo ?
+        record.ObservationNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
     {
       title: 'Patient Number',
-      dataIndex: 'number',
-      rowScope: 'row',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
+      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
+      onFilter: (value, record) =>
+        record?.PatientNo ?
+        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
     },
-   {
-      title: 'Patient Name',
-      dataIndex: 'name',
-      rowScope: 'row',
-      filterSearch: true, // Enable search
-      filters: [
-        ...new Set(waitingListTableDataSource.map((item) => ({ text: item.name, value: item.name }))),
-      ],
-      onFilter: (value, record) => record.name.includes(value),
-      filterIcon: <SearchOutlined style={{ color: "rgba(0, 0, 0, 0.85)" }} />,
-    }, 
-   
     {
-      title: 'Observation Date',
-      dataIndex: 'regDate',
-      rowScope: 'row',
+      title: 'Patient Name',
+      dataIndex: 'SearchName',
+      key: 'SearchName',
+      filteredValue: searchName ? [searchName] : null,
+      onFilter: (value, record) =>
+        record?.SearchName ?
+        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
+      render: (name) => (
+        <div style={{ color: '#0f5689' }}>
+          {name}
+        </div>
+      )
     },
     
     {
+      title: 'Observation Date',
+      dataIndex: 'ObservationDate',
+      key: 'ObservationDate',
+    },  
+    {
       title: 'Status',
-      dataIndex: 'checkIn',
-      rowScope: 'row',
+      dataIndex: 'Status',
+      key: 'Status',
       width: 200,
       render: () => <Button color="danger" variant="outlined">Closed</Button>
     },
@@ -172,42 +112,20 @@ const paginatedData = filteredPatients.slice(
  
   return (
       <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={waitingListTableDataSource} currentPath={currentPath} closedTriageList={closedTriageList}/>
+          <TriageSummeryCard waitingPatient={combinedList} currentPath={currentPath} openTriageList={openTriageList}/>
+
+          <FilterTriageList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchObservationNumber={setSearchObservationNumber}/>
           
-          <Card style={{ padding: '10px 16px', marginBottom: '10px', backgroundColor: '#fcfafa' }}>
-          <div className='admit-patient-filter-container'>
-                  <Search placeholder="search by name" 
-                      allowClear
-                      value={searchParams.name}
-                      onChange={(e) => handleSearchChange(e, "name")}
-                      onSearch={handleFilterPatients}
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Search placeholder="search by observation no" 
-                      allowClear
-                      value={searchParams.idNumber}
-                      onChange={(e) => handleSearchChange(e, "observationNo")}
-                      onSearch={handleFilterPatients}
-                  />
-                  <span style={{ color: 'gray', fontSize: '14px', fontWeight: 'bold'}}>or</span>
-                  <Search placeholder="search by patient no" 
-                      allowClear
-                      value={searchParams.patientNo}
-                      onChange={(e) => handleSearchChange(e, "patientNo")}
-                      onSearch={handleFilterPatients}
-                  />
-              </div>
-          </Card>
 
           {
-            loadingTriageList ? 
+            loadingTriageList || loadingWaitingList ? 
             (
               <Loading />
             )
             :
             (
                 <Table columns={waitingListColumns} 
-                dataSource={filteredPatients} 
+                dataSource={combinedList} 
                 bordered size='middle' 
                 pagination={{
                   ...pagination,
@@ -220,7 +138,7 @@ const paginatedData = filteredPatients.slice(
                   style: {
                       marginTop: '30px',
                   }
-              }} 
+              }}
                 />
             )
           }

@@ -1,20 +1,17 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types';
 import useSetTablePagination from '../../../../hooks/useSetTablePagination';
 import Loading from '../../../../partials/nurse-partials/Loading';
-import { FolderViewOutlined } from '@ant-design/icons';
 
-const GeneralObservationsTable = ({ showModal, ipGetProcedure, loadingGetIpProcedure }) => {
+const GeneralObservationsTable = ({ ipGetProcedure, loadingGetIpProcedure }) => {
     const columns = [
         {
-          title: 'Process Code',
-          dataIndex: 'ProcessCode',
-          key: 'ProcessCode',
-          fixed: 'left',
-          width: 100,
+          title: 'Patient Admission No',
+          dataIndex: 'AdmissionNo',
+          key: 'AdmissionNo',
         },
         {
-          title: 'Process Description',
+          title: 'Title',
           dataIndex: 'Process',
           key: 'Process',
         },
@@ -24,22 +21,12 @@ const GeneralObservationsTable = ({ showModal, ipGetProcedure, loadingGetIpProce
             key: 'ProcessDate',
             render: (text) => <span>{text ? new Date(text).toLocaleDateString() : ''}</span>
         },
-        {
-          title: 'Remarks',
-          dataIndex: 'Remarks',
-          key: 'Remarks',
-        },
-        {
-          title: 'Action',
-          key: 'action',
-          fixed: 'right',
-          width: 100,
-          render: (_, record) => (
-            <Space size="middle">
-              <Button type="primary" onClick={() => showModal(record)}><FolderViewOutlined /> View</Button>
-            </Space>
-          ),
-        },
+        // {
+        //     title: 'Time',
+        //     dataIndex: 'ProcessTime',
+        //     key: 'ProcessTime',
+        //     // render: (text) => <span>{text ? new Date(text).toLocaleTimeString() : ''}</span>
+        // },
       ];
       
       const { pagination, handleTableChange } = useSetTablePagination(ipGetProcedure);

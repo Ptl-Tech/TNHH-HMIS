@@ -1,99 +1,97 @@
-import { Button, DatePicker, Form, Modal, Select, Space, TimePicker, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons";
-import { useState } from "react";
-import TextArea from "antd/es/input/TextArea";
+import { Button, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { FileTextOutlined, PlusOutlined } from "@ant-design/icons";
+import ECTFormData from "../nurse-forms/ETCFormData";
 import ETCTable from "../tables/nurse-tables/ETCTable";
-
+import { getPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
+import { listDoctors } from "../../../actions/DropdownListActions";
+import useAuth from "../../../hooks/useAuth";
 
 const ECTScan = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-      const showModal = () => {
-        setIsModalOpen(true);
-      };
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
+  const queryParams = new URLSearchParams(location.search);
+  const treatmentNo = queryParams.get("TreatmentNo");
+  const patientNo = queryParams.get("PatientNo");
+  const admissionNo = queryParams.get("AdmNo");
+  const role = useAuth().userData.departmentName;
 
-      const handleOk = () => {
-        setIsModalOpen(false);
-      };
-      const handleCancel = () => {
-        setIsModalOpen(false);
-      };
-  
-  const [ form ] = Form.useForm();
+  const dispatch = useDispatch();
+  const [showForm, setShowForm] = useState(false); // Toggle between table and for
+
+  const { loading: loadingETC, data: etcData } = useSelector(
+    (state) => state.getPatientETC
+  );
+  const { loading: loadingPostEtc } = useSelector(
+    (state) => state.postPatientETC
+  );
+  const { loading: loadingDoctors, data: doctors } = useSelector(
+    (state) => state.getDoctorsList
+  );
+
+  console.log("Etc form data", etcData);
+
+  useEffect(() => {
+    dispatch(getPatientECTRequest(treatmentNo ?? admissionNo));
+  }, [dispatch, treatmentNo, admissionNo]);
+
+  useEffect(() => {
+    if (!doctors?.length) {
+      dispatch(listDoctors());
+    }
+  }, [dispatch, doctors?.length]);
   return (
-    <div>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              ECT Scan
-          </Typography.Text>
-        </Space>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add ECT</Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined /> Preview ECT</Button>
+    <div style={{ paddingTop: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <Typography.Title level={5} style={{ color: "#0F5689" }}>
+            <FileTextOutlined style={{ marginRight: "8px" }} />
+            ECT Request
+          </Typography.Title>
         </div>
-
-
-
-        <ETCTable showModal={showModal} />
-
-
-        <Modal title="ECT Scan" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <Form
-            layout="vertical" 
-            style={{ paddingTop: '10px'}} 
-            form={form}
-            autoComplete="off"
+        {role === "Doctor" && patientDetails?.Status !== "Completed" && (
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              type="primary"
+              onClick={() => setShowForm(!showForm)}
+              icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
             >
+              {!showForm ? " New ECT Request" : "View ECT Requests"}
+            </Button>
+          </div>
+        )}
+      </div>
 
-            <Form.Item label="Operation" 
-                name="operation"
-                rules={[{ required: true, message: 'Please select a operation!' }]}
-                hasFeedback
-                >
-                <Select placeholder="Select a operation">
-                    <Select.Option value="General">ECT</Select.Option> 
-                </Select>
-            </Form.Item>
-            <Form.Item label="Doctor Name" 
-                name="doctorName"
-                rules={[{ required: true, message: 'Please select a doctor name!' }]}
-                hasFeedback
-                >
-                <Select placeholder="Select a doctor name">
-                    <Select.Option value="General">Dr. John</Select.Option>
-                    <Select.Option value="Allergy">Dr. Jane</Select.Option>
-                </Select>
-            </Form.Item>
-            <Form.Item label="Operation Date" 
-                rules={[{ required: true, message: 'Please select a date!' }]}
-                name="date"
-                hasFeedback
-                >
-                <DatePicker type='text' placeholder="Enter date" style={{ width: '100%' }}/>
-                  
-            </Form.Item> 
-            <Form.Item label="Operation Time" 
-                rules={[{ required: true, message: 'Please select a time!' }]}
-                name="time"
-                hasFeedback
-                >
-                <TimePicker type='text' placeholder="Enter time" style={{ width: '100%' }}/>
-                  
-            </Form.Item>  
-            <Form.Item label="Description" name="description"
-              rules={[{ required: true, message: 'Please enter a description!' }]}
-              hasFeedback
-            >
-            <TextArea type='text' placeholder="Enter description" 
-             
-            />
-        </Form.Item>
-        </Form>
-        </Modal>
-
+      {!showForm ? (
+        <ETCTable
+          patientNo={patientNo}
+          loadingETC={loadingETC}
+          data={etcData}
+          doctors={doctors}
+          admissionNo={admissionNo}
+          treatmentNo={treatmentNo}
+        />
+      ) : (
+        <ECTFormData
+          patientNo={patientNo}
+          treatmentNo={treatmentNo}
+          loadingDoctors={loadingDoctors}
+          doctors={doctors}
+          admissionNo={admissionNo}
+          loadingPostEtc={loadingPostEtc}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default ECTScan
+export default ECTScan;

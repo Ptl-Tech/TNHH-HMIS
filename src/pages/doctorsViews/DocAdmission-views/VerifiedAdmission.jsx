@@ -4,15 +4,14 @@ import {
   DatePicker,
   Form,
   Input,
+  Modal,
   Popconfirm,
   Space,
   Table,
   Typography,
 } from "antd";
-import { ProfileOutlined,CloseCircleOutlined } from "@ant-design/icons";
-import Modal from "antd/es/modal/Modal";
+import { ProfileOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import TextArea from "antd/es/input/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import { saveAdmissionDetails } from "../../../actions/Doc-actions/postAdmissionRequest";
@@ -26,17 +25,16 @@ import { cancelPatientAdmission } from "../../../actions/Doc-actions/Admission/c
 import { getVerifiedAdmissions } from "../../../actions/Doc-actions/Admission/getVerifiedAdmissions";
 import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../../../actions/Doc-actions/OutPatientAction";
+
 const VerifiedAdmission = () => {
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.saveAdmissionDetails);
   const { loading: postPatientAdmissionLoading } = useSelector(
     (state) => state.postAdmitPatient
   );
-
   const { loading: postAdmissionVerificationLoading } = useSelector(
     (state) => state.postAdmissionVerification
   );
-
   const { loading: postAdmissionCancellingLoading } = useSelector(
     (state) => state.cancelPatientAdmission
   );
@@ -48,7 +46,6 @@ const VerifiedAdmission = () => {
   );
 
   const [selectedRecord, setSelectedRecord] = useState(null);
-
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -58,8 +55,8 @@ const VerifiedAdmission = () => {
   }, [dispatch, admissions.length]);
 
   useEffect(() => {
-    if (!loadingPatientDetails) {
-      dispatch(getPatientDetails(selectedRecord?.PatientNo));
+    if (selectedRecord && !loadingPatientDetails) {
+      dispatch(getPatientDetails(selectedRecord.PatientNo));
     }
   }, [dispatch, loadingPatientDetails, selectedRecord?.PatientNo]);
 
@@ -100,49 +97,10 @@ const VerifiedAdmission = () => {
       dataIndex: "Date",
       key: "Date",
     },
-    
     {
       title: "Doctor",
       dataIndex: "LinkType",
       key: "LinkType",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      render: (_, record) => {
-        return (
-          <div className="d-flex justify-content-between align-items-start gap-2">
-            <Button
-              type="primary"
-              onClick={() =>
-                navigate(
-                  `/Doctor/Inpatient/Patient-card?treatmentNo=${record.No}`,
-                  { state: { patientDetails: patientDetails } }
-                )
-              }
-            >
-                <ProfileOutlined />
-              View Details
-            </Button>
-<Popconfirm
-  title="Are you sure you want to cancel this admission?"
-    onConfirm={() => {
-      setSelectedRecord(record);
-      dispatch(cancelPatientAdmission(record.No));
-    }}
-    okText="Yes"
-    cancelText="No"
-  >  <Button type="primary" danger>
-  <CloseCircleOutlined />
-  Cancel Admission
-</Button>
-</Popconfirm>
-
-           
-          </div>
-        );
-      },
     },
   ];
 
@@ -151,6 +109,13 @@ const VerifiedAdmission = () => {
     pageSize: 10,
     total: admissions.length,
   });
+
+  const rowSelection = {
+    type: "radio", // Only allow single selection for deletion or navigation
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRecord(selectedRows[0]); // Assuming single row selection
+    },
+  };
 
   const handleTableChange = (newPagination) => {
     setPagination(newPagination);
@@ -161,6 +126,21 @@ const VerifiedAdmission = () => {
     pagination.current * pagination.pageSize
   );
 
+  const handleCancelAdmission = () => {
+    if (selectedRecord) {
+      Modal.confirm({
+        title: "Are you sure you want to cancel this admission?",
+        onOk: () => {
+          if (selectedRecord) {
+            dispatch(cancelPatientAdmission(selectedRecord.No)); // Dispatch action to cancel the admission
+          }
+        },
+        okText: "Yes",
+        cancelText: "No",
+      });
+    }
+  };
+  
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       <Space
@@ -208,39 +188,68 @@ const VerifiedAdmission = () => {
       {getVerifiedAdmissionLoading ? (
         <Loading />
       ) : (
-        <Table
-          columns={columns}
-          dataSource={admissions}
-          className="admit-patient-table"
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            position: ["bottom", "right"],
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (page, pageSize) =>
-              handleTableChange({
-                current: page,
-                pageSize,
-                total: pagination.total,
-              }),
-            onShowSizeChange: (current, size) =>
-              handleTableChange({
-                current,
-                pageSize: size,
-                total: pagination.total,
-              }),
-            style: {
-              marginTop: "30px",
-            },
-          }}
-        />
-      )}
+        <>
+          <div className="d-flex justify-content-start align-items-start gap-2">
+            <Button
+              type="primary"
+              onClick={() => {
+                if (selectedRecord) {
+                  navigate(
+                    `/Doctor/Inpatient/Patient-card?treatmentNo=${selectedRecord.No}`,
+                    { state: { patientDetails: patientDetails } }
+                  );
+                }
+              }}
+              disabled={!selectedRecord}
+            >
+              <ProfileOutlined />
+              View Details
+            </Button>
+            <Button
+                type="primary"
+                danger
+                disabled={!selectedRecord}
+                onClick={handleCancelAdmission}
+              >
+                <CloseCircleOutlined />
+                Cancel Admission
+              </Button>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={paginatedData}
+            rowSelection={rowSelection}
+            className="admit-patient-table"
+            rowKey="SystemId"
 
-     
+            bordered
+            size="middle"
+            pagination={{
+              ...pagination,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              position: ["bottom", "right"],
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+              onChange: (page, pageSize) =>
+                handleTableChange({
+                  current: page,
+                  pageSize,
+                  total: pagination.total,
+                }),
+              onShowSizeChange: (current, size) =>
+                handleTableChange({
+                  current,
+                  pageSize: size,
+                  total: pagination.total,
+                }),
+              style: {
+                marginTop: "30px",
+              },
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };

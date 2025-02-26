@@ -2,7 +2,7 @@ import axios from "axios";
 import { ADMIT_VISITOR_FAIL, ADMIT_VISITOR_REQUEST, ADMIT_VISITOR_SUCCESS, REGISTER_VISITOR_FAIL, REGISTER_VISITOR_REQUEST, REGISTER_VISITOR_SUCCESS, VISITORS_LIST_FAIL, VISITORS_LIST_REQUEST, VISITORS_LIST_SUCCESS } from "../constants/visitorsConstants";
 import { message } from "antd";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 export const createVisitor = (visitor) => async (dispatch, getState) => {
     try {
       dispatch({ type: REGISTER_VISITOR_REQUEST });

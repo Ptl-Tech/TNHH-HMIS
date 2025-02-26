@@ -5,7 +5,7 @@ export const GET_VISITORS_LIST_REQUEST = 'GET_VISITORS_LIST_REQUEST';
 export const GET_VISITORS_LIST_SUCCESS = 'GET_VISITORS_LIST_SUCCESS';
 export const GET_VISITORS_LIST_FAILURE = 'GET_VISITORS_LIST_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getVisitorsListSlice = (admissionNo) => 
   async (dispatch, getState) => {
@@ -13,7 +13,7 @@ export const getVisitorsListSlice = (admissionNo) =>
     try {
         dispatch({ type: GET_VISITORS_LIST_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPVisitors&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPVisitors&isList=true &query=$filter=AdmissionNo eq '${admissionNo}' `, config);
     
 
         dispatch({ type: GET_VISITORS_LIST_SUCCESS, payload: data });

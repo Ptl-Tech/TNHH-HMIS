@@ -1,40 +1,55 @@
-import { Button, Space, Table } from 'antd'
+import { Table } from 'antd'
 import PropTypes from 'prop-types'
-import { EditOutlined } from '@ant-design/icons'
 import Loading from '../../../../partials/nurse-partials/Loading'
 import { useState } from 'react'
+import moment from 'moment'
 
-const SuicidalFormTable = ({ showModal, loadingIpSuicidalForm, ipSuicidalForm }) => {
+const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection}) => {
     const columns = [
         {
           title: 'Date',
           dataIndex: 'Date',
           key: 'Date',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
+              {
+                moment(text).format('DD-MM-YYYY')
+              }
+            </span>
+          )
         },
         {
           title: 'Time',
           dataIndex: 'Time',
           key: 'Time',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
+              {
+                text
+              }
+            </span>
+          )
         },
         {
           title: 'Handing Over',
           dataIndex: 'HandingOver',
           key: 'HandingOver',
+          render: (text) => (
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+              {text}
+            </span>
+          ) 
         },
         {
             title: 'Taking Over',    
             dataIndex: 'TakingOver',
             key: 'TakingOver',
+            render: (text) => (
+              <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                {text}
+              </span>
+            ) 
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined /> Edit</Button>
-                </Space>
-            ),
-        }
     ]
 
      const [pagination, setPagination] = useState({
@@ -55,6 +70,8 @@ const SuicidalFormTable = ({ showModal, loadingIpSuicidalForm, ipSuicidalForm })
           <div style={{ paddingTop: '30px' }}>
               <Table columns={columns} dataSource={ipSuicidalForm} 
                bordered size='middle' 
+               rowKey={(record, index) => record.Time + index}
+               rowSelection={rowSelection}
                pagination={{
                  ...pagination,
                  total: ipSuicidalForm?.length,
@@ -82,5 +99,7 @@ export default SuicidalFormTable
 SuicidalFormTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingIpSuicidalForm: PropTypes.bool.isRequired,
-    ipSuicidalForm: PropTypes.array.isRequired
+    ipSuicidalForm: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
+
 }

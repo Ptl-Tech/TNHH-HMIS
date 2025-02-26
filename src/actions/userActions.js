@@ -4,7 +4,7 @@ import { message } from "antd";
 
 
 
-const API = "http://217.21.122.62:8085/"
+const API = "https://chiromo.potestastechnologies.net:8085/"
 
 export const login = (staffNo, password) => async (dispatch) => {
   try {
@@ -119,6 +119,8 @@ export const forgotPassword = (staffNo) => async (dispatch) => {
       { staffNo },
       config
     );
+
+    console.log('response from the server', data)
 
     dispatch({ type: FORGOT_PWD_SUCCESS, payload: data });
   } catch (errors) {

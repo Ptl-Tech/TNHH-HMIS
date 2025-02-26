@@ -5,7 +5,7 @@ export const POST_ADMISSION_FORM_DETAILS_REQUEST = 'POST_ADMISSION_FORM_DETAILS_
 export const POST_ADMISSION_FORM_DETAILS_SUCCESS = 'POST_ADMISSION_FORM_DETAILS_SUCCESS';
 export const POST_ADMISSION_FORM_DETAILS_FAILURE = 'POST_ADMISSION_FORM_DETAILS_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postAdmissionFormDetailsSlice = (admissionFormData) => 
   async (dispatch, getState) => {
@@ -24,11 +24,7 @@ export const postAdmissionFormDetailsSlice = (admissionFormData) =>
     
         dispatch({
             type: POST_ADMISSION_FORM_DETAILS_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_ADMISSION_FORM_DETAILS_FAILURE, payload: error };

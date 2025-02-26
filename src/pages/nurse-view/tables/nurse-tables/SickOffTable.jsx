@@ -35,25 +35,14 @@ const SickOffTable = ({ rowSelection }) => {
             key: 'remarks',
         },
     ]
-    const data = [
-        {
-            key: '1',
-            offDays: '2',
-            lightDutyDays: '3',
-            sickOffStartDay: '12//12/2023',
-            sickOffEndDay: '12//12/2023',
-            nextAppointmentDate: '12//12/2023',
-            remarks: 'Some comments goes here',
-        },
-     
-    ]
+   
     
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div style={{ paddingTop: '10px' }}>
     <Table
     
        columns={columns} 
-       dataSource={data} 
+   
        className="admit-patient-table"
        rowSelection={rowSelection}
     />

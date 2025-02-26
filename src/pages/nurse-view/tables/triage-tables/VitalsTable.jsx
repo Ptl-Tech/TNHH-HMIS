@@ -1,9 +1,8 @@
 import { Badge, Table } from "antd"
 import PropTypes from "prop-types"
 import useSetTablePagination from "../../../../hooks/useSetTablePagination"
-import Loading from "../../../../partials/nurse-partials/Loading"
 
-const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadingTriageList }) => {
+const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals }) => {
   const columns = [
     {
       title: 'Patient No',
@@ -13,7 +12,7 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadi
       width: 100,
     },
     {
-      title: 'Observation No',
+      title: 'Admission No',
       dataIndex: 'ObservationNo',
       key: 'ObservationNo',
     },
@@ -136,6 +135,8 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadi
       key: 'DateTaken',
       fixed: 'right',
       width: 100,
+      //sort with date from the newest to the oldest
+      sorter: (a, b) => new Date(b.DateTaken) - new Date(a.DateTaken),
     },
 
   ]
@@ -144,11 +145,9 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadi
  
   return (
     <div style={{ paddingTop: '30px' }}>
-        {
-            loadingInpatientVitals || loadingTriageList ? (
-              <Loading />
-            ) : (
+        
               <Table columns={columns} 
+                loading={loadingInpatientVitals}
                 rowKey={(record, index) => (record.BMI || 0) + '-' + index}
                 scroll={{ x: 'max-content' }}
                 dataSource={filterVitals} 
@@ -168,8 +167,7 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals, loadi
                     }
                 }}
                 />
-            ) 
-        }
+
     </div>
   )
 }

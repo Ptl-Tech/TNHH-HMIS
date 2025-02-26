@@ -34,17 +34,6 @@ const DiagnosisTable = ({ showModal, loadingGetInpatientInjection, injections })
           fixed: 'right',
           width: 150,
         },
-        {
-          title: 'Action',
-          key: 'action',
-          fixed: 'right',
-          width: 100,
-          render: (_, record) => (
-            <Space>
-                <Button type="primary" variant="outlined" onClick={() => showModal(record)}><FolderViewOutlined />View</Button>
-            </Space>
-          ),
-        },
       ];
 
       const { pagination, handleTableChange } = useSetTablePagination(injections);

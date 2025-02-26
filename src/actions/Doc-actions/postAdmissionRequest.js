@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure message is imported
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action Types
 export const SAVE_ADMISSION_DETAILS_REQUEST = "SAVE_ADMISSION_DETAILS_REQUEST";
@@ -15,64 +15,57 @@ export const REQUEST_PATIENT_ADMISSION_SUCCESS = "REQUEST_PATIENT_ADMISSION_SUCC
 export const REQUEST_PATIENT_ADMISSION_FAIL = "REQUEST_PATIENT_ADMISSION_FAIL";
 
 
-// Action to save admission details
 export const saveAdmissionDetails = (Admission) => async (dispatch, getState) => {
   try {
     dispatch({ type: SAVE_ADMISSION_DETAILS_REQUEST });
-    console.log("Admission Details:", Admission); // Corrected from Diagnosis
-    // Get user info from state
+
     const {
       otpVerify: { userInfo },
     } = getState();
 
-    // Get branch code from localStorage
     const branchCode = localStorage.getItem("branchCode");
 
-    // Set headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Custom header: staffNo
-        sessionToken: userInfo.userData.portalSessionToken, // Custom header: sessionToken
-        branchCode: branchCode, // Custom header: branchCode
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
       },
     };
 
-
-    // Make API POST request
-    const response = await axios.post(`${API}Doctor/PatientAdmission`, Admission, config);
-
-    // Extract relevant data from response
-    const responseData = {
-      status: response.data.status,
-      data: response.data, // Assuming the data contains the necessary response
+    const admissionData = {
+      ...Admission,
+      staffNo: userInfo.userData.no,
     };
 
-    // Simulate a delay for UI feedback
+    const response = await axios.post(`${API}Doctor/PatientAdmission`, admissionData, config);
+
+    const responseData = {
+      status: response.data.status,
+      data: response.data,
+    };
+
     setTimeout(() => {
       dispatch({ type: SAVE_ADMISSION_DETAILS_SUCCESS, payload: responseData });
-      message.success("Admission details saved successfully");
-
+      message.success(`Admission details saved ${responseData.data.status}fully!`, 5);
     }, 1200);
-    
 
-    // Return patient ID for further use
-    return responseData.data; // Assuming `msg` contains the patient ID
+    return responseData.data;
 
   } catch (error) {
-    // Dispatch failure action with error message
+    // Extract the specific part of the error message starting from "An admission for this patient ..."
+    const errorMessage = error.response?.data?.errors?.match(/An admission for this patient.*/)?.[0] || "An error occurred.";
+
+    // Dispatch failure action with trimmed message
     dispatch({
       type: SAVE_ADMISSION_DETAILS_FAIL,
-      payload: error.response?.data?.message || error.message || error.errors,
+      payload: errorMessage,
     });
 
-    // Show error message
-    message.error(
-      error.response?.data?.message || error.message || error.errors,
-      5
-    );
+    // Show the trimmed error message
+    message.error(errorMessage);
 
-    // Rethrow error for further handling
     throw error;
   }
 };
@@ -123,6 +116,9 @@ export const requestPatientAdmission = (treatmentId) => async (dispatch, getStat
         type: REQUEST_PATIENT_ADMISSION_SUCCESS,
         payload: responseData,
       });
+
+      message.success(`Admission No ${responseData.data.admissionNo} requested ${responseData.data.status}fully!`, 5);
+
     }, 2000);
 
     // Return the patient ID for further use

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const GET_CHARGES_SETUP_REQUEST = "GET_CHARGES_SETUP_REQUEST";
 export const GET_CHARGES_SETUP_SUCCESS = "GET_CHARGES_SETUP_SUCCESS";
@@ -33,7 +33,6 @@ export const getChargesSetup = () => async (dispatch, getState) => {
 
     dispatch({ type: GET_CHARGES_SETUP_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     // Check if it's an axios error
     const errorMessage = error.response

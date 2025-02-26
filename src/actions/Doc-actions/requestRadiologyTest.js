@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const REQUEST_RADIOLOGY_TEST = "REQUEST_RADIOLOGY_TEST";
 export const REQUEST_RADIOLOGY_TEST_SUCCESS = "REQUEST_RADIOLOGY_TEST_SUCCESS";
@@ -44,7 +44,7 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
 
     setTimeout(() => {
       dispatch({ type: REQUEST_RADIOLOGY_TEST_SUCCESS, payload: responseData });
-      message.success("Radiology Test posted Successfully", 2);
+      // message.success("Radiology Test posted Successfully", 2);
     }, 2000);
 
     return responseData.data;
@@ -81,7 +81,7 @@ export const getPatientRadiologyTest = (treatmentId) => async (dispatch, getStat
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentRadiologyLines&isList=false&query=$filter=TreatmentNo eq '${treatmentId}'`,
+      `${API}data/odatafilter?webservice=QyTreatmentRadiologyLines&isList=true&query=$filter=TreatmentNo eq '${treatmentId}'`,
       config
     );
 

@@ -5,7 +5,7 @@ export const GET_PG_ADMISSIONS_PENDING_VERIFICATION_REQUEST = 'GET_PG_ADMISSIONS
 export const GET_PG_ADMISSIONS_PENDING_VERIFICATION_SUCCESS = 'GET_PG_ADMISSIONS_PENDING_VERIFICATION_SUCCESS';
 export const GET_PG_ADMISSIONS_PENDING_VERIFICATION_FAILURE = 'GET_PG_ADMISSIONS_PENDING_VERIFICATION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPgAdmissionsPendingVerificationSlice = () => 
   async (dispatch, getState) => {

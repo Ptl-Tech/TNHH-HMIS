@@ -1,0 +1,145 @@
+import { Button, Col, Form, message, Row, Select, Space } from "antd"
+import TextArea from "antd/es/input/TextArea";
+import { useDispatch, useSelector } from "react-redux";
+import PropTypes from "prop-types";
+import { POST_DISPATCH_TO_DOCTOR_FAIL, POST_DISPATCH_TO_DOCTOR_SUCCESS, postDispatchToDoctorSlice } from "../../../actions/triage-actions/postDispatchToDoctorSlice";
+import { useEffect } from "react";
+import { getQyUrgencyColorCodingSetupSetupSlice } from "../../../actions/nurse-actions/getQyUrgencyColorCodingSetupSlice";
+import { getUrgencyColorcode } from "../../../utils/helpers";
+import { SendOutlined, CloseOutlined } from "@ant-design/icons";
+
+const TriageDispatchToDoctorFormData = ({ staffNo, observationNo, setIsDispatchFormVisible }) => {
+    const { form } = Form.useForm();
+    const dispatch = useDispatch();
+    const { loadingColorCode, colorCode } = useSelector((state) => state.getQyUrgencyColorCodingSetup);
+    const { loadingDispatchToDoctor } = useSelector((state)=> state.dispatchToDoctor);
+   
+    const handleOnFinish = async (values) => {
+        const dispatchData = {
+            observationNo,
+            staffNo,
+            urgencyStatus: values.status,
+            tcaStatusRemarks: values.urgencyStatus,
+            ObservationRemarks: values.remarks,
+        }
+        
+        try{
+            const result = await dispatch(postDispatchToDoctorSlice(dispatchData))
+            if(result.type === POST_DISPATCH_TO_DOCTOR_SUCCESS){
+                message.success(result?.payload?.status || 'Dispatch to doctor successful');
+                setIsDispatchFormVisible(false);
+            }else if(result.type === POST_DISPATCH_TO_DOCTOR_FAIL){
+                message.error(result?.payload?.status || 'Dispatch to doctor failed');
+                setIsDispatchFormVisible(false);
+            }
+        }catch(error){
+           message.error(error?.message || 'Dispatch to doctor failed');
+        }
+        
+        
+    }
+
+    useEffect(() => {
+        if(!colorCode.length){
+            dispatch(getQyUrgencyColorCodingSetupSetupSlice())
+        }
+    }, [dispatch, colorCode?.length]);
+
+    const urgency = colorCode.map((item) => ({
+        label: getUrgencyColorcode(item.UrgencyStatus),
+        value: item.LineNo,
+    }));
+  return (
+    <>
+        <Form
+            layout="vertical"
+            form={form}
+            onFinish={handleOnFinish}
+            initialValues={{
+                status: undefined,
+                urgencyStatus: '',
+                observationRemarks: '',
+            }}
+        >
+        <Row gutter={16}>
+            <Col span={24}>
+                <Form.Item label="Urgency Status" name="status"
+                    hasFeedback
+                    rules={[{ required: true, message: 'Please select status!' }]}
+                    
+                >
+                    <Select 
+                        loading={loadingColorCode}
+                        placeholder="Select urgency status"
+                        options={colorCode.map((item) => ({
+                            label: getUrgencyColorcode(item.UrgencyStatus).text,
+                            value: item.LineNo,
+                        }))}
+                    />
+
+                </Form.Item>
+            </Col>
+            </Row>
+            <Row gutter={16}>
+                <Col span={24}>
+                    <Form.Item label="Urgency Status Remarks" name="urgencyStatus"
+                        hasFeedback
+                        rules={[
+                            { max: 30, message: 'Remarks must be less than 30 characters!' },
+                        ]}
+                        
+                    >
+                        <TextArea 
+                        autoSize={{ minRows: 3, maxRows: 5 }}
+                        placeholder="Enter Remarks"
+                        />
+                    </Form.Item>
+                </Col>
+            </Row>
+            <Row gutter={16}>
+            <Col span={24}>
+                <Form.Item label="Observation Remarks" name="remarks"
+                    hasFeedback
+                    rules={[
+                        { max: 50, message: 'Remarks must be less than 50 characters!' },
+                    ]}
+                    
+                >
+                    <TextArea 
+                    autoSize={{ minRows: 3, maxRows: 5 }}
+                    placeholder="Enter Remarks"
+                    />
+                </Form.Item>
+            </Col>
+        </Row>
+        <Form.Item>
+            <Space>
+                <Button htmlType="submit" type="primary"
+             
+                icon={<SendOutlined />}
+                loading={loadingDispatchToDoctor}
+                disabled={loadingDispatchToDoctor}
+                >
+                    Dispatch to Doctor
+                </Button>
+                <Button htmlType="button" variant="outlined" color="danger" onClick={() => setIsDispatchFormVisible(false)}
+                    icon={<CloseOutlined />}
+                >
+                    Cancel
+                </Button>
+            </Space>
+        </Form.Item>
+
+        </Form>
+    </>
+  )
+}
+
+export default TriageDispatchToDoctorFormData
+
+// props validation 
+TriageDispatchToDoctorFormData.propTypes = {
+    staffNo: PropTypes.string.isRequired,
+    observationNo: PropTypes.string.isRequired,
+    setIsDispatchFormVisible: PropTypes.bool.isRequired,
+}

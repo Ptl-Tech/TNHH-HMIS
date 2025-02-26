@@ -2,7 +2,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 
 export const POST_LAB_REQUEST = "POST_LAB_REQUEST";
@@ -40,11 +40,8 @@ export const postLabRequest  = (labRequest) => async (dispatch, getState) => {
         data: response.data, // Assuming `msg` contains the patient ID
       };
   
-      setTimeout(() => {
-        dispatch({ type: POST_LAB_SUCCESS, payload: responseData });
-        message.success("Saved Successfully", 2);
-      }, 2000);
-  
+      dispatch({ type: POST_LAB_SUCCESS, payload: responseData });
+
       // Return patient ID for further use
       return responseData.data; // `msg` contains the patient ID
     } catch (error) {

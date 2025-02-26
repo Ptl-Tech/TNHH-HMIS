@@ -1,11 +1,11 @@
-import { Button, Col, Divider, Form, Input, message, Row, Table } from 'antd'
+import { Button, Col, Form, Input, message, Row, Space, Table } from 'antd'
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
 import { getVitalsLinesSlice } from '../../../../actions/triage-actions/getVitalsLinesSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Loading from '../../../../partials/nurse-partials/Loading';
-import { SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined, EditOutlined } from '@ant-design/icons';
 import { updateTriageListVitalsSlice } from '../../../../actions/triage-actions/updateTriageListVitalsSlice';
 
 const FormVitals = ({ observationNumber, patientNumber}) => {
@@ -15,39 +15,37 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
   const dispatch = useDispatch();
   const {loadingVitalsLines, vitalsLines} = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
-  
-  const { PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, ObservationNo, BMI, LineNo} = vitalsLines;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingLine, setEditingLine] = useState([]);
   
   useEffect(() => {
-    if (!vitalsLines.length) {
       dispatch(getVitalsLinesSlice(observationNumber));
-    }
-  }, [dispatch, observationNumber, vitalsLines.length]);
+  }, [dispatch, observationNumber]);
 
-  useEffect(() => {
-    if (vitalsLines) {
-      form.setFieldsValue({
-        vitals: {
-          pulseRate: PulseRate || '',
-          pain: Pain || '',
-          height: Height || '',
-          weight: Weight || '',
-          temperature: Temperature || '',
-          bloodPreasure: BloodPressure || '',
-          sP02: SP02,
-          respirationRate: RespirationRate || '',
-          bmi: BMI ? BMI.toFixed(2) : "0.0",
-        },
-      });
-    }
-    }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
+  // useEffect(() => {
+  //   if (vitalsLines) {
+  //     form.setFieldsValue({
+  //       vitals: {
+  //         pulseRate: PulseRate || '',
+  //         height: Height || '',
+  //         weight: Weight || '',
+  //         temperature: Temperature || '',
+  //         bloodPreasure: BloodPressure || '',
+  //         sP02: SP02,
+  //         respirationRate: RespirationRate || '',
+  //         bmi: BMI ? BMI.toFixed(2) : "0.0",
+  //       },
+  //     });
+  //   }else{
+  //     form.resetFields();
+  //   }
+  //   }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
   
 
     const onFinish = async (values) => {
       try {
         const {
           pulseRate,
-          pain,
           height,
           weight,
           temperature,
@@ -59,7 +57,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
         // Transform values
         const transformedValues = {
           pulseRate,
-          pain: parseInt(cleanValue(pain)),
           height: parseFloat(cleanValue(height)),
           weight: parseFloat(cleanValue(weight)),
           temperature: parseFloat(cleanValue(temperature)),
@@ -75,19 +72,23 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           patientNo: patientNumber,
           observationNo: observationNumber,
         };
+
+        setIsEditing(false);
     
         // Create or update logic
-        if (vitalsLines && Object.keys(vitalsLines).length > 0) {
+        if (isEditing) {
           // Update vitals
           const updateVitals = {
             ...baseVitals,
-            lineNo: LineNo,
+            lineNo: editingLine?.LineNo,
             type: 1,
             myAction: "edit",
           };
     
           await dispatch(updateTriageListVitalsSlice(updateVitals));
           message.success("Successfully updated vitals");
+          dispatch(getVitalsLinesSlice(observationNumber));
+          form.resetFields(); 
         } else {
           // Create vitals
           const createVitals = {
@@ -96,20 +97,20 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
             myAction: "create",
           };
     
-          const response = await dispatch(postTriageListVitalsSlice(createVitals));
-          if (response?.status === "success") {
-            message.success("Vitals successfully created");
-          } else {
-            message.error("Error saving vitals data");
-          }
+          await dispatch(postTriageListVitalsSlice(createVitals)).then((data)=>{
+                if(data){
+                  message.success("Vitals successfully created");
+                  dispatch(getVitalsLinesSlice(observationNumber));
+                  form.resetFields();
+                }else{
+                  message.error(data?.status || "Error saving vitals data");
+                }
+            })
         }
-    
-        // Reload vitals list after successful operation
-        dispatch(getVitalsLinesSlice(observationNumber));
+       
       } catch (error) {
         // Generic error handling
-        message.error("An error occurred while saving vitals data.");
-        console.error("Error saving vitals:", error);
+        message.error(error.message || "An error occurred while saving vitals data.");
       }
     };
     
@@ -143,47 +144,92 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
   const columns = [
     {
-      title: 'Pulse Rate',
-      dataIndex: 'pulseRate',
-      key: 'pulseRate',
+      title: 'Observation No',
+      dataIndex: 'ObservationNo',
+      key: 'ObservationNo',
+      fixed: 'left',
+      width: 150,
     },
     {
-      title: 'Pain',
-      dataIndex: 'pain',
-      key: 'pain',
+      title: 'Pulse Rate',
+      dataIndex: 'PulseRate',
+      key: 'PulseRate',
     },
     {
       title: 'Height',
-      dataIndex: 'height',
-      key: 'height',
+      dataIndex: 'Height',
+      key: 'Height',
     },
     {
       title: 'Weight',
-      dataIndex: 'weight',
-      key: 'weight',
+      dataIndex: 'Weight',
+      key: 'Weight',
     },
     {
       title: 'Temperature',
-      dataIndex: 'temperature',
-      key: 'temperature',
+      dataIndex: 'Temperature',
+      key: 'Temperature',
     },
-
-  ]
-
-  const dataSource = [
     {
-      key: ObservationNo,
-      pulseRate: PulseRate,
-      pain: Pain,
-      height: Height,
-      weight: Weight,
-      temperature: Temperature,
-      bloodPreasure: BloodPressure,
-      sP02: SP02,
-      respirationRate: RespirationRate,
-      bmi: BMI,
+      title: 'Blood BloodPressure',
+      dataIndex: 'BloodPressure',
+      key: 'BloodPressure',
+    },
+    {
+      title: 'SP02',
+      dataIndex: 'SP02',
+      key: 'SP02',
+    },
+    {
+      title: 'Respiratory Rate',
+      dataIndex: 'RespirationRate',
+      key: 'RespirationRate',
+    },
+    {
+      title: 'BMI',
+      dataIndex: 'BMI',
+      key: 'BMI',
+      //render BMI in two decimal places
+      render: (text) => <span>{text ? text.toFixed(2) : "0.0"}</span>,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      fixed: 'right',
+      width: 150,
+      render(_, record) {
+        return (
+          <Space size="middle">
+            <Button type="primary" onClick={() => handleEdit(record)} icon={<EditOutlined />}>
+              Update
+            </Button>
+            {/* <Button type="primary" danger onClick={() => handleDelete(record)} icon={<DeleteOutlined />}> 
+              Delete
+            </Button> */}
+          </Space>
+        );
+      }
     }
+
   ]
+
+  const handleEdit = (record) => {
+    setIsEditing(true);
+    setEditingLine(record);
+    form.setFieldsValue({
+      vitals: {
+        pulseRate: record.PulseRate || '',
+        height: record.Height || '',
+        weight: record.Weight || '',
+        temperature: record.Temperature || '',
+        bloodPreasure: record.BloodPressure || '',
+        sP02: record.SP02,
+        respirationRate: record.RespirationRate || '',
+        bmi: record.BMI ? record.BMI.toFixed(2) : "0.0",
+      },
+    });
+
+  }
 
   return (
    <div>
@@ -206,7 +252,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
               height: '',
               weight: '',
               respirationRate: '',
-              pain: 0,
               bmi: "0.0"
             },
             
@@ -266,19 +311,19 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                           );
                         }
           
-                        const [systolic, diastolic] = value.split('/').map(Number);
-                        if (
-                          systolic < 90 ||
-                          systolic > 200 ||
-                          diastolic < 60 ||
-                          diastolic > 120
-                        ) {
-                          return Promise.reject(
-                            new Error(
-                              'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
-                            )
-                          );
-                        }
+                        // const [systolic, diastolic] = value.split('/').map(Number);
+                        // if (
+                        //   systolic < 90 ||
+                        //   systolic > 200 ||
+                        //   diastolic < 60 ||
+                        //   diastolic > 120
+                        // ) {
+                        //   return Promise.reject(
+                        //     new Error(
+                        //       'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
+                        //     )
+                        //   );
+                        // }
           
                         return Promise.resolve();
                       },
@@ -342,7 +387,7 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                           }
                   
                           // Ensure value is a valid percentage
-                          const percentageMatch = value.match(/^(\d{1,2}|100)%$/);
+                          const percentageMatch = value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error('SPO2 must be a valid percentage (e.g., 98%).')
@@ -451,33 +496,6 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Pain (Scale 0-10)" name={['vitals', 'pain']}
-                validationTrigger={['onBlur', 'onChange']}
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Please input pain level!' },
-                  {
-                    validator(_, value) {
-                      if (value >= 0 && value <= 10) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(new Error('Pain level must be a scale of 0-10 !'));
-                    },
-                  },
-                ]}
-
-                >
-                
-                  <Input type='text' 
-                   
-                    placeholder='eg 1'
-              
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={24}>
               <Form.Item label="BMI" name={['vitals', 'bmi']}
               >
                 <Input type='text' 
@@ -489,18 +507,18 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
 
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> 
+            <Form.Item >
+                <Button type="primary" loading={loading} htmlType="submit">
+                  <SaveOutlined />
 
-            <Col span={12}>
-                <Form.Item >
-                    <Button type="primary" loading={loading} htmlType="submit">
-                      <SaveOutlined />
-                      {
-                        vitalsLines && Object.keys(vitalsLines).length > 0 ? 'Update vitals' : 'Save vitals'
-                      }
-                    </Button>
-                </Form.Item>
-            </Col>
+                  {
+                    isEditing ? "Update vitals" : "Save vitals"
+                  }
+                   
+                </Button>
+            </Form.Item>
+         
         </Form>
         
 
@@ -508,22 +526,9 @@ const FormVitals = ({ observationNumber, patientNumber}) => {
           vitalsLines && Object.keys(vitalsLines).length > 0 && 
           (
             <div style={{ marginTop: '10px' }}>
-            <Divider />
             <Table columns={columns} 
-            dataSource={dataSource} 
+            dataSource={Array.isArray(vitalsLines) ? vitalsLines : [vitalsLines]}
             pagination={false}
-            expandable={{
-              expandedRowRender: (record) => (
-                <p style={{ margin: 0 }}>
-
-                  Blood Preasure : {record.bloodPreasure}, 
-                  SP02 : {record.sP02}, 
-                  Respiration Rate : {record.respirationRate}, 
-                  BMI : {record.bmi.toFixed(2)}
-                </p>
-              ),
-              rowExpandable: (record) => record.name !== 'Not Expandable',
-            }}
             />
             </div>
           )

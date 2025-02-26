@@ -1,58 +1,83 @@
 import { Card, Tabs } from "antd";
-import React from "react";
 import ObservationRoom from "./ObservationRoom";
 import PatientCarePlan from "./PatientCarePlan";
 import PatientRequests from "./PatientRequests";
-import DocForms from "./DocForms";
 import PatientFile from "../../nurse-view/PatientFile";
 import ConsultationroomDetails from "./ConsultationroomDetails";
 import AdmissionTab from "./AdmissionTab";
+import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 
 const EvaluationCardContent = ({
   treatmentNo,
   observationNo,
   patientNo,
   patientDetails,
+  role,
 }) => {
+  const location = useLocation();
+  const patientDetail = location.state?.patientDetails;
+
   return (
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>
         <Tabs defaultActiveKey="1">
-       
-          <Tabs.TabPane tab="Triage Room Details" key="2">
-            <ObservationRoom
-              treatmentNo={treatmentNo}
-              observationNo={observationNo}
-              patientNo={patientNo}
-            />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Consultation Room Details" key="3">
+          {(role === "Doctor" || role === "Psychology" || role === "Nurse") && (
+            <Tabs.TabPane tab="Triage Room" key="2">
+              <ObservationRoom
+                treatmentNo={treatmentNo}
+                observationNo={observationNo}
+                patientNo={patientNo}
+              />
+            </Tabs.TabPane>
+          )}
+
+          <Tabs.TabPane tab="Consultation Room " key="3">
             <ConsultationroomDetails
               treatmentNo={treatmentNo}
               observationNo={observationNo}
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Procedures" key="4">
-            <PatientRequests />
-          </Tabs.TabPane>{" "}
-          <Tabs.TabPane tab="Medication" key="5">
-            <PatientCarePlan
-              treatmentNo={treatmentNo}
-              observationNo={observationNo}
-              patientNo={patientNo}
-            />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Doctor Forms" key="6">
+          {(role === "Doctor" || role === "Nurse") && (
+            <>
+              <Tabs.TabPane tab="Medication" key="5">
+                <PatientCarePlan
+                  treatmentNo={treatmentNo}
+                  observationNo={observationNo}
+                  patientNo={patientNo}
+                />
+              </Tabs.TabPane>
+            </>
+          )}
+
+          {(role === "Doctor" || role === "Nurse") && (
+            <>
+              <Tabs.TabPane tab="Procedures" key="4">
+                <PatientRequests />
+              </Tabs.TabPane>{" "}
+            </>
+          )}
+
+          {/* <Tabs.TabPane tab="Doctor Forms" key="6">
             <DocForms />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Patient Admission & Referral" key="7">
-            <AdmissionTab />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Patient File" key="8">
-            <PatientFile patientDetails={patientDetails} />
-          </Tabs.TabPane>
-         
+          </Tabs.TabPane> */}
+
+          {role === "Doctor" && patientDetail?.Status !== "Completed" && (
+            <>
+              <Tabs.TabPane tab="Admission & Referral" key="7">
+                <AdmissionTab />
+              </Tabs.TabPane>
+            </>
+          )}
+          {(role === "Nurse" || role === "Doctor" || role === "Psychology") &&
+            patientDetail?.Status !== "Completed" && (
+              <>
+                <Tabs.TabPane tab="Patient File" key="8">
+                  <PatientFile patientDetails={patientDetails} />
+                </Tabs.TabPane>
+              </>
+            )}
         </Tabs>
       </Card>
     </div>
@@ -60,3 +85,11 @@ const EvaluationCardContent = ({
 };
 
 export default EvaluationCardContent;
+// props validation
+EvaluationCardContent.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+  patientDetails: PropTypes.object,
+  role: PropTypes.string,
+};

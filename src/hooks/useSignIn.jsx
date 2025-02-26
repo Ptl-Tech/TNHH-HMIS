@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { forgotPassword, login, verifyOtp } from '../actions/userActions';
-import { message } from 'antd';
 
 const useSignIn = () => {
   const [staffNo, setStaffNo] = useState('');
@@ -19,7 +18,11 @@ const useSignIn = () => {
   const { userInfo, loading, error } = loginHandler;
 
   const verifyOtpHandler = useSelector((state) => state.otpVerify);
-  const { userInfo: verifyOtpUserInfo, success: verifyOtpSuccess, error: verifyOtpError } = verifyOtpHandler;
+  const {
+    userInfo: verifyOtpUserInfo,
+    success: verifyOtpSuccess,
+    error: verifyOtpError,
+  } = verifyOtpHandler;
 
   const forgotPwdHandler = useSelector((state) => state.forgotPwd);
   const { success: forgotPwdSuccess, error: forgotPwdError } = forgotPwdHandler;
@@ -37,12 +40,11 @@ const useSignIn = () => {
     console.log('verifyOtpUserSuccess:', verifyOtpSuccess);
   };
 
-
   // Handle forgot password action
   const handleForgotPassword = async () => {
     await dispatch(forgotPassword(staffNo));
     if (forgotPwdSuccess) {
-      navigate("/reset-password");
+      navigate('/reset-password');
     }
   };
 
@@ -66,10 +68,16 @@ const useSignIn = () => {
         navigate('/reception');
       } else if (role === 'Doctor') {
         navigate('/Doctor');
+      } else if (role === 'LABORATORY') {
+        navigate('/Lab');
       } else if (role === 'Security') {
         navigate('/Security');
       } else if (role === 'Nurse') {
-        navigate('/Nurse')
+        navigate('/Nurse');
+      } else if (role === 'Psychology') {
+        navigate('/Psychology');
+      } else if (role === 'Radiology') {
+        navigate('/Radiology');
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);
@@ -85,12 +93,13 @@ const useSignIn = () => {
     otp,
     setOtp,
     isOtpRequired,
+    setIsOtpRequired,
     handleLogin,
     handleVerifyOtp,
     loading,
     error,
     forgotPwdError,
-    setIsOtpRequired
+    setIsOtpRequired,
   };
 };
 

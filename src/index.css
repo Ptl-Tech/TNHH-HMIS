@@ -8,14 +8,46 @@
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
 .ant-layout-sider {
   flex: 0 0 230px !important;
   max-width: 230px !important;
   min-width: 230px !important;
   width: 230px !important;
 }
+.admit-patient-table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admit-patient-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+
+.admit-patient-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.ant-menu-light.ant-menu-light {
+  color: #ffffff;
+  background: #0f5689 !important;
+}
+
+.ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+  background: #0f5689 !important;
+}
+
+:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper .ant-table-thead th.ant-table-column-sort{
+  background: #0f5689 !important;
+}
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper .ant-table-tbody > tr > th{
+  background-color:  #fff !important;
+  color: #000 !important;
+  font-weight: normal !important;
+}
+
 /* Override submenu background to make it transparent */
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light, :where(.css-dev-only-do-not-override-1gx1iy6).ant-menu-light>.ant-menu {
+:where(.css-dev-only-do-not-override-191squa).ant-menu-light, :where(.css-dev-only-do-not-override-191squa).ant-menu-light>.ant-menu {
   color: #ffffff;
   background: #0f5689 !important;
 }
@@ -23,8 +55,7 @@
   color: #ffffff;
 }
 
-:where(.css-1gx1iy6).ant-menu-light, 
-:where(.css-1gx1iy6).ant-menu-light > .ant-menu {
+:where(.css-191squa).ant-menu-light, :where(.css-191squa).ant-menu-light>.ant-menu  {
     color: #ffffff;
     background: #0f5689 !important;
 }
@@ -109,6 +140,28 @@
   outline: none;
   box-shadow: none;
 }
+.steps-action {
+  display: flex;
+  justify-content: flex-end;
+  gap: 28px; /* Adjust spacing as needed */
+  margin-top: 16px;
+}
+.iframe-scrollbar {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent; /* For Firefox */
+}
+
+.iframe-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.iframe-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 .st{
   color: rgb(177, 211, 177);
@@ -145,7 +198,7 @@
 .modal-title-content {
   background-color: #f5f5dc; /* Light greyish cream */
   padding: 20px;
-  //text-align: center; /* Center the title and logo */
+  
 }
 
 .modal-logo-container {
@@ -190,6 +243,9 @@
   background-color: #ffd6d6; /* Light red */
 }
 
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert .ant-alert-close-icon .anticon-close {
+  color: #0f5689 !important;
+}
 
 
 main {
@@ -278,6 +334,10 @@ main {
   .admit-patient-filter-container {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .filtersOr {
+    display: none !important;
   }
   
 }
@@ -439,3 +499,29 @@ main {
 }
 
 /* END OF NURSE MODULE STYLES */
+
+.ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: black !important;
+}
+
+.ant-tabs-tab-btn {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab, .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
+  background-color: #0f5689 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active, .ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab-active {
+  background-color: #dddada !important;
+}
+
+.active-button{
+  background-color: #cac6c6 !important;
+  color: black !important;
+  border: none !important;
+}
+
+

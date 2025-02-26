@@ -1,15 +1,23 @@
-import { Badge, Button, Space, Table } from "antd"
+import { Badge, Button, Table } from "antd"
 import PropTypes from "prop-types"
 import Loading from "../../../../partials/nurse-partials/Loading"
 import { useState } from "react"
-import { EditOutlined } from '@ant-design/icons'
 
-const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm, ipGetMentalStatusForm }) => {
+const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusForm, filterMSEFormData }) => {
     const columns = [
         {
           title: 'Date',
           dataIndex: 'Date',
           key: 'Date',
+          render: (_, record) => {
+            const date = new Date(record.Date);
+            const formattedDate = date.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            });
+            return formattedDate;
+          }
         },
         {
           title: 'Status',
@@ -17,11 +25,17 @@ const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm,
           key: 'Status',
           render: (_, record) => {
             if (record.Status === 'good') {
-              return <Badge status="success" text={record.Status} />
+              return <span>
+                <Button style={{ backgroundColor: '#52c41a', borderColor: '#52c41a', color: 'white' }}>{record.Status}</Button>
+              </span>
             } else if (record.Status === 'average') {
-              return <Badge status="warning" text={record.Status} />
+              return <span>
+                <Button style={{ backgroundColor: 'yellow', borderColor: 'yellow', color: 'black' }}>{record.Status}</Button>
+              </span>
             } else if (record.Status === 'bad') {
-                return <Badge status="error" text={record.Status} />
+              return <span>
+              <Button  style={{ backgroundColor: 'red', borderColor: 'red', color: 'white' }}>{record.Status}</Button>
+            </span>
             }
           }
           
@@ -30,22 +44,14 @@ const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm,
           title: 'Comments',
           dataIndex: 'Comments',
           key: 'Comments',
+          
         },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Button type="primary" onClick={() => showModal(record)}><EditOutlined />Edit</Button>
-                </Space>
-            ),
-        }
     ]
 
     const [pagination, setPagination] = useState({
             current: 1,
             pageSize: 10,
-            total: ipGetMentalStatusForm?.length,
+            total: filterMSEFormData?.length,
         });
               
         const handleTableChange = (newPagination) => {
@@ -59,11 +65,14 @@ const MentalStatusExaminationTable = ({ showModal, loadingIpGetMentalStatusForm,
           <Loading />
         ) : (
           <div style={{ paddingTop: '30px' }}>
-           <Table columns={columns} dataSource={ipGetMentalStatusForm} 
+           <Table columns={columns} 
+           rowKey={(record, index) => record.Date + index}
+           dataSource={filterMSEFormData} 
            bordered size='middle' 
+           rowSelection={rowSelection}
            pagination={{
              ...pagination,
-             total: ipGetMentalStatusForm?.length,
+             total: filterMSEFormData?.length,
              showSizeChanger: true,
              showQuickJumper: true,
              position: ['bottom', 'right'],
@@ -88,5 +97,6 @@ export default MentalStatusExaminationTable
 MentalStatusExaminationTable.propTypes = {
     showModal: PropTypes.func.isRequired,
     loadingIpGetMentalStatusForm: PropTypes.bool.isRequired,
-    ipGetMentalStatusForm: PropTypes.array.isRequired
+    filterMSEFormData: PropTypes.array.isRequired,
+    rowSelection: PropTypes.array.isRequired
 }

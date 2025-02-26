@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Divider, Form, Input, message, Row, Table } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Col, Divider, Form, Input, message, Row, Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getPatientVitalsLinesSlice,
-  getVitalsLinesSlice,
 } from "../../actions/triage-actions/getVitalsLinesSlice";
 import Loading from "../../partials/nurse-partials/Loading";
 import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
-import { updateTriageListVitalsSlice } from "../../actions/triage-actions/updateTriageListVitalsSlice";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
+import useAuth from "../../hooks/useAuth";
+import {FileTextOutlined} from "@ant-design/icons";
+import { useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const FormVitals = ({ observationNo, patientNo }) => {
   const [form] = Form.useForm();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
   const dispatch = useDispatch();
+  const role = useAuth().userData.departmentName;
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
 
   const { loading: loadingVitalsLines, vitals: vitalsLines } = useSelector(
     (state) => state.getPatientVital
@@ -25,6 +30,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
       title: "Observation No",
       dataIndex: "ObservationNo",
       key: "ObservationNo",
+      fixed: "left",
+      width: 150,
       render: (text) => (
         <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
       ),
@@ -42,13 +49,15 @@ const FormVitals = ({ observationNo, patientNo }) => {
       key: "bloodPreasure",
     },
     { title: "SpO₂", dataIndex: "sP02", key: "sP02" },
-    { title: "Pain", dataIndex: "pain", key: "pain" },
+    // { title: "Pain", dataIndex: "pain", key: "pain" },
     { title: "Height (cm)", dataIndex: "height", key: "height" },
     { title: "Weight (kg)", dataIndex: "weight", key: "weight" },
     {
       title: "BMI",
       dataIndex: "BMI",
       key: "BMI",
+      fixed: "right",
+      width: 150,
       render: (text) => (text !== "-" ? parseFloat(text).toFixed(2) : "-"),
     },
   ];
@@ -73,11 +82,26 @@ const FormVitals = ({ observationNo, patientNo }) => {
       height: item.Height,
       weight: item.Weight,
       BMI: item.BMI,
-    }));
+      DateCreated: item.DateCreated, // Assuming CreatedAt exists in your data
+    }))
+    .sort((a, b) => new Date(b.DateCreated) - new Date(a.DateCreated)); // Sort by createdAt in descending order
 
   useEffect(() => {
     dispatch(getPatientVitalsLinesSlice());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (showForm && dataSource.length > 0) {
+      const latestEntry = dataSource[0];
+      form.setFieldsValue({
+        vitals: {
+          height: latestEntry.height || "",
+          weight: latestEntry.weight || "",
+          bmi: latestEntry.BMI || "",
+        },
+      });
+    }
+  }, [showForm, dataSource, form]);
 
   const handleToggleForm = () => {
     setShowForm(!showForm);
@@ -87,9 +111,6 @@ const FormVitals = ({ observationNo, patientNo }) => {
     try {
       const {
         pulseRate,
-        pain,
-        height,
-        weight,
         temperature,
         bloodPreasure,
         sP02,
@@ -99,14 +120,14 @@ const FormVitals = ({ observationNo, patientNo }) => {
       // Transform values
       const transformedValues = {
         pulseRate,
-        pain: parseInt(cleanValue(pain)),
-        height: parseFloat(cleanValue(height)),
-        weight: parseFloat(cleanValue(weight)),
+        // pain: parseInt(cleanValue(pain)),
+        // height: parseFloat(cleanValue(height)),
+        // weight: parseFloat(cleanValue(weight)),
         temperature: parseFloat(cleanValue(temperature)),
         bloodPreasure,
         sP02,
         respirationRate,
-        BMI: calculateBMI(height, weight),
+        // BMI: calculateBMI(height, weight),
       };
 
       // Common payload properties
@@ -123,18 +144,16 @@ const FormVitals = ({ observationNo, patientNo }) => {
         myAction: "create",
       };
 
-      const response = await dispatch(postTriageListVitalsSlice(createVitals));
-      if (response?.status === "success") {
-        message.success("Vitals successfully created");
-        await dispatch(getPatientVitalsLinesSlice());
-        //show the table and hide the form
-        await setShowForm(true);
-      } else {
-        message.error("Error saving vitals data");
-      }
-
-      // Reload vitals list after successful operation
-      dispatch(getPatientVitalsLinesSlice());
+      await dispatch(postTriageListVitalsSlice(createVitals)).then((data) => {
+        if (data) {
+          message.success("Vitals successfully saved");
+          dispatch(getPatientVitalsLinesSlice());
+          //show the table and hide the form
+          setShowForm(false);
+        } else {
+          message.error("Error saving vitals data");
+        }
+      });
     } catch (error) {
       // Generic error handling
       message.error("An error occurred while saving vitals data.");
@@ -175,19 +194,27 @@ const FormVitals = ({ observationNo, patientNo }) => {
         <div>
           {!showForm ? (
             <>
-            <div className="d-flex justify-content-end ">
-           
-              <Button
-                type="primary"
-                onClick={handleToggleForm}
-                icon={<PlusOutlined />}
-              >
-                Add Vitals
-              </Button>
-            
-            </div>
-            <Divider />
+              <Divider />
+              <Typography.Title level={5} style={{ marginBottom: "12px", color: "#0F5689" }}>
+                <FileTextOutlined style={{ marginRight: "8px" }} />
+                Patient Vitals
+              </Typography.Title>
+              <div className="d-flex" style={{ paddingTop: '20px'}}>
+                {role === "Doctor" &&
+                  patientDetails?.Status !== "Completed" && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={handleToggleForm}
+                      style={{ marginBottom: "16px" }}
+                    >
+                      Add Vitals
+                    </Button>
+                  )}
+              </div>
+
               <Table
+                scroll={{ x: "max-content" }}
                 columns={columns}
                 dataSource={dataSource}
                 pagination={{
@@ -198,7 +225,6 @@ const FormVitals = ({ observationNo, patientNo }) => {
                     `${range[0]}-${range[1]} of ${total} items`,
                 }}
               />
-              
             </>
           ) : (
             <Form
@@ -367,7 +393,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
 
                           // Ensure value is a valid percentage
                           const percentageMatch =
-                            value.match(/^(\d{1,2}|100)%$/);
+                            value.match(/^(\d{1,2}|100)$/);
                           if (!percentageMatch) {
                             return Promise.reject(
                               new Error(
@@ -394,6 +420,41 @@ const FormVitals = ({ observationNo, patientNo }) => {
               </Row>
               <Row gutter={16}>
                 <Col span={12}>
+                  <Form.Item
+                    label="Respiration Rate (bpm)"
+                    name={["vitals", "respirationRate"]}
+                    hasFeedback
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input respiration rate!",
+                      },
+                      {
+                        pattern: /^[0-9]+$/,
+                        message: "Respiration rate must be a valid number!",
+                      },
+                      {
+                        validator(_, value) {
+                          if (!value || (value >= 12 && value <= 25)) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error(
+                              "Respiration rate must be between 12 and 25 bpm!"
+                            )
+                          );
+                        },
+                      },
+                    ]}
+                  >
+                    <Input
+                      type="text"
+                      name="respirationRate"
+                      placeholder="eg 18"
+                    />
+                  </Form.Item>
+                </Col>
+                {/* <Col span={12}>
                   <Form.Item
                     label="Height (cm)"
                     name={["vitals", "height"]}
@@ -436,44 +497,10 @@ const FormVitals = ({ observationNo, patientNo }) => {
                   >
                     <Input type="number" placeholder="eg 70" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Respiration Rate (bpm)"
-                    name={["vitals", "respirationRate"]}
-                    hasFeedback
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input respiration rate!",
-                      },
-                      {
-                        pattern: /^[0-9]+$/,
-                        message: "Respiration rate must be a valid number!",
-                      },
-                      {
-                        validator(_, value) {
-                          if (!value || (value >= 12 && value <= 25)) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error(
-                              "Respiration rate must be between 12 and 25 bpm!"
-                            )
-                          );
-                        },
-                      },
-                    ]}
-                  >
-                    <Input
-                      type="text"
-                      name="respirationRate"
-                      placeholder="eg 18"
-                    />
-                  </Form.Item>
-                </Col>
+                {/*                 
                 <Col span={12}>
                   <Form.Item
                     label="Pain (Scale 0-10)"
@@ -496,10 +523,10 @@ const FormVitals = ({ observationNo, patientNo }) => {
                   >
                     <Input type="text" placeholder="eg 1" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row gutter={16}>
-                <Col span={12}>
+                {/* <Col span={12}>
                   <Form.Item label="BMI" name={["vitals", "bmi"]}>
                     <Input
                       type="text"
@@ -507,7 +534,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
                       style={{ color: "#0f5689", fontWeight: "bold" }}
                     />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Row>
                 <Col span={24}>
@@ -537,3 +564,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
 };
 
 export default FormVitals;
+// props validation
+FormVitals.propTypes = {
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+};

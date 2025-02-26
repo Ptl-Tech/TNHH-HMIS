@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message, Modal } from "antd";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const POST_DIAGNOSIS_REQUEST = "POST_DIAGNOSIS_REQUEST";
 export const POST_DIAGNOSIS_SUCCESS = "POST_DIAGNOSIS_SUCCESS";

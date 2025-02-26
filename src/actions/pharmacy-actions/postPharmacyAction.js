@@ -1,7 +1,8 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure message is imported
+import apiHeaderConfig from "../configHelpers";
 
-const API = "http://217.21.122.62:8085/";
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action Types
 export const POST_PHARMACY_DRUG_ISSUANCE_REQUEST =
@@ -21,6 +22,63 @@ export const POST_ARCHIVE_PRESCRIPTION_FAILURE =
   "POST_ARCHIVE_PRESCRIPTION_FAILURE";
 export const POST_ARCHIVE_PRESCRIPTION_RESET =
   "POST_ARCHIVE_PRESCRIPTION_RESET";
+
+export const POST_EDIT_PRESCRIPTION_REQUEST =
+  "POST_EDIT_PRESCRIPTION_REQUEST";
+export const POST_EDIT_PRESCRIPTION_SUCCESS =
+  "POST_EDIT_PRESCRIPTION_SUCCESS";
+export const POST_EDIT_PRESCRIPTION_FAILURE =
+  "POST_EDIT_PRESCRIPTION_FAILURE";
+export const POST_EDIT_PRESCRIPTION_RESET =
+  "POST_EDIT_PRESCRIPTION_RESET";
+
+
+export const postPrescriptionQuantity = (pharmacyData) => async (dispatch, getState) => {
+  
+  const config = apiHeaderConfig(getState);
+  try {
+    // Dispatch the POST start action
+    dispatch({ type: POST_EDIT_PRESCRIPTION_REQUEST });
+
+    // Corrected POST body structure
+    const response = await axios.post(
+      `${API}Pharmacy/PharmacyLine`, // Endpoint for POSTing drug issuance
+      pharmacyData, 
+      config
+    );
+
+    // Extract response details
+    const responseData = {
+      status: response.data.status,
+      data: response.data, // Assuming `data` contains the response data
+    };
+
+    console.log(responseData);
+
+    // Dispatch success after a small delay
+    setTimeout(() => {
+      dispatch({
+        type: POST_EDIT_PRESCRIPTION_SUCCESS,
+        payload: responseData,
+      });
+    }, 2000);
+
+    // Return the data for further use
+    return responseData.data;
+  } catch (error) {
+    setTimeout(() => {
+      dispatch({
+        type: POST_EDIT_PRESCRIPTION_FAILURE,
+        payload: error.response?.data?.message || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }, 1200);
+
+    // Rethrow error for any additional handling
+    throw error;
+  }
+}
+
 
 // Action to POST drug issuance
 export const postDrugIssuance = (pharmacyNo) => async (dispatch, getState) => {

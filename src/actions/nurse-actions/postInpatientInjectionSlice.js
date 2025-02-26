@@ -5,7 +5,7 @@ export const POST_INPATIENT_INJECTION_REQUEST = 'POST_INPATIENT_INJECTION_REQUES
 export const POST_INPATIENT_INJECTION_SUCCESS = 'POST_INPATIENT_INJECTION_SUCCESS';
 export const POST_INPATIENT_INJECTION_FAILURE = 'POST_INPATIENT_INJECTION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postInpatientInjectionSlice = (endpoint = '/Inpatient/Injection', injectionsData) => 
   async (dispatch, getState) => {
@@ -24,11 +24,7 @@ export const postInpatientInjectionSlice = (endpoint = '/Inpatient/Injection', i
     
         dispatch({
             type: POST_INPATIENT_INJECTION_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_INPATIENT_INJECTION_FAILURE, payload: error };

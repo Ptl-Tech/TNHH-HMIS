@@ -1,41 +1,35 @@
-import React from "react";
+
 import { Card, Typography } from "antd";
-import { HourglassOutlined, ClockCircleOutlined, StopOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import useAuth from "../../hooks/useAuth";
 
-const ConsultationRoomSummeryCard = ({ currentPath}) => {
-  const { patients: treatmentList = [] } =
-    useSelector((state) => state.docTreatmentList) || {};
-
-    
-  const openConsultationList = treatmentList.filter((item) => item.Status === "New");
-  const pendingConsultationList = treatmentList.filter((item) => item.Status === "Pending");
-  const closedConsultationList = treatmentList.filter((item) => item.Status === "Closed");
-
+const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeConsultationList, closedConsultationList }) => {
+  
+  const role = useAuth().userData.departmentName
   const cardData = [
     {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
-      title: "Waiting List",
-      link: "/Doctor/Consultation-List",
-      count: openConsultationList.length,
+      title: "OP Waiting List",
+      ...(role === "Doctor" ? { link: "/Doctor/Consultation-List" } : role === "Nurse" ? { link: "/Nurse/Consultation-List" } : { link: "/Psychology/Consultation-List" }),
+      count: openDoctorVisitList?.length,
     },
-    // {
-    //   backgroundColor: "gray",
-    //   icon: <ClockCircleOutlined />,
-    //   title: "In Consultation Room",
-    // //  link: "/Doctor/PendingConsultationList",
-    //   count: pendingConsultationList.length,
-    // },
+    {
+      backgroundColor: "orange",
+      icon: <ClockCircleOutlined />,
+      title: "In Consultation",
+      ...(role === "Doctor" ? { link: "/Doctor/PendingConsultationList" } : role === "Nurse" ? { link: "/Nurse/PendingConsultationList" } : { link: "/Psychology/PendingConsultationList" }),
+      count: activeConsultationList?.length,
+    },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,
       title: "Closed",
-      link: "/Doctor/ClosedConsultationList",
-      count: closedConsultationList.length,
+      ...(role === "Doctor" ? { link: "/Doctor/ClosedConsultationList" } : role === "Nurse" ? { link: "/Nurse/ClosedConsultationList" } : { link: "/Psychology/ClosedConsultationList" }),
+      count: closedConsultationList?.length,
     },
   ];
 
@@ -89,6 +83,8 @@ const ConsultationRoomSummeryCard = ({ currentPath}) => {
 ConsultationRoomSummeryCard.propTypes = {
   currentPath: PropTypes.string.isRequired,
   closedConsultationList: PropTypes.array.isRequired,
+  openDoctorVisitList: PropTypes.array.isRequired,
+  activeConsultationList: PropTypes.array.isRequired,
 };
 
 export default ConsultationRoomSummeryCard;

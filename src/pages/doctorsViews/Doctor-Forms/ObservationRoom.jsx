@@ -1,36 +1,28 @@
-import React, { useState } from "react";
-import Vitals from "../Vitals";
-import AddAllergies from "../AddAllergies";
+import { useState } from "react";
 import AllergyAndMedication from "../../nurse-view/forms/triage-forms/AllergyAndMedication";
-import Injections from "../../nurse-view/forms/triage-forms/Injections";
-import { Button, Typography } from "antd";
+import { Button } from "antd";
 import {
   HeartOutlined,
-  SolutionOutlined,
   MedicineBoxOutlined,
-  CalendarOutlined,
 } from "@ant-design/icons"; // Import icons
-import Diagnosis from "./Diagnosis";
 import FormVitals from "../Vitals";
-import PatientSigns from "./PatientSigns";
-import PatientSymptoms from "./PatientSyptoms";
-import DoctorNotes from "../../nurse-view/nurse-patient-file/DoctorNotes";
+import PropTypes from "prop-types";
+import ObservationNotes from "../ConsultationCard/ObservationNotes";
 
-import { FaNotesMedical } from "react-icons/fa6";
-import SickOff from "../../nurse-view/discharges/SickOff";
-
-const { Title } = Typography;
-
-const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
+const ObservationRoom = ({ treatmentNo, observationNo, patientNo }) => {
+  const [activeItem, setActiveItem] = useState('Vitals');
   const handleOnClick = (item) => {
-    switch (item) {
+    setActiveItem(item.label);
+    switch (item.label) {
       case "Vitals":
         setSelectedItem(<FormVitals treatmentNo={treatmentNo} observationNo={observationNo} patientNo={patientNo} />);
         break;
-     case'Allergies and Medications':
-     setSelectedItem(<AllergyAndMedication />);
-     break;
-
+      case 'Allergies and Medications':
+        setSelectedItem(<AllergyAndMedication treatmentNo={treatmentNo} observationNumber={observationNo} patientNumber={patientNo} setIsFormVisible={false} />);
+        break;
+      case 'Nurse Notes':
+        setSelectedItem(<ObservationNotes treatmentNo={treatmentNo} patientNo={patientNo} />);
+        break;
       default:
 
         setSelectedItem(<FormVitals />);
@@ -42,7 +34,8 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
   const buttonItems = [
     { label: "Vitals", icon: <HeartOutlined /> },
     { label: "Allergies and Medications", icon: <MedicineBoxOutlined /> },
-   
+    { label: "Nurse Notes", icon: <MedicineBoxOutlined /> },
+
   ];
 
   return (
@@ -57,16 +50,16 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
         }}
       >
         {buttonItems.map((item, index) => (
-          <Button
-            key={index}
-            type="primary"
-            style={{ backgroundColor: "#0f5689", display: "flex", alignItems: "center", gap: "5px" }}
-            onClick={() => handleOnClick(item.label)}
-          >
-            {item.icon}
-            {item.label}
-          </Button>
-        ))}
+                  <Button
+                    key={index}
+                    style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+                    className={activeItem === item.label ? "active-button" : ""}
+                    onClick={() => handleOnClick(item)}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Button>
+                ))}
       </div>
       <div>{selectedItem}</div>
     </>
@@ -74,3 +67,9 @@ const ObservationRoom = ({ treatmentNo, observationNo,patientNo }) => {
 };
 
 export default ObservationRoom;
+
+ObservationRoom.propTypes = {
+  treatmentNo: PropTypes.string,
+  observationNo: PropTypes.string,
+  patientNo: PropTypes.string,
+}

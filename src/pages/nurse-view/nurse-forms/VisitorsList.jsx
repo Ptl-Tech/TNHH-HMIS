@@ -1,171 +1,128 @@
-import { Button, Form, Input, message, Modal, Space, Typography } from "antd"
-import { PlusOutlined, ProfileOutlined, FolderViewOutlined } from "@ant-design/icons"
+import { Button, Form, Input, Modal } from "antd"
+import { PlusOutlined, FileOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useEffect, useState } from "react"
 import VisitorFormTable from "../tables/nurse-tables/VisitorFormTable";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { POST_VISITOR_LIST_FAILURE, POST_VISITOR_LIST_SUCCESS, postVisitorListSlice } from "../../../actions/nurse-actions/postVisitorListSlice";
 import { getVisitorsListSlice } from "../../../actions/nurse-actions/getVisitorsListSlice";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
+import VisitorsListFormData from "../forms/nurse-forms/VisitorsListFormData";
+import { useLocation } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 const VisitorsList = () => {
 
+    const role = useAuth().userData.departmentName;
     const { patientDetails } = useLocation().state;
+    const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
     const [ form ] = Form.useForm();
     const dispatch = useDispatch();
-    const [isEditMode, setIsEditMode] = useState(false);
+    const [isFormVisible, setIsFormVisible] = useState(false);
 
     const { loadingIpVisitors, ipVisitors} = useSelector((state) => state.getIPVisitors);
+    const { loadingVisitor } = useSelector((state) => state.postVisitorList);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const showModal = (record) => {
-      form.resetFields();
-      if (record) {
-          setIsEditMode(true);
-          form.setFieldsValue({
-              admissionNo: record?.AdmissionNo || '',
-              visitorName: record?.VisitorName || '',
-              idNumber: record?.IdNumber || '',
-              phoneNumber: record?.PhoneNumber || '',
-          });
-      } else {
-          setIsEditMode(false);
-      }
-      setIsModalOpen(true);
-    };
-  
-    const handleOk = () => {
-      form.submit();
-    };
+
+
     const handleCancel = () => {
       setIsModalOpen(false);
+      form.resetFields();
     };
 
-    const handleOnFinish = async (values) => {
-      try {
-        const { admissionNo, visitorName, idNumber, phoneNumber } = values;
-    
-        // Construct the visitor data
-        const visitorData = {
-          myAction: isEditMode ? "edit" : "create",
-          admissionNo,
-          visitorName,
-          idNumber,
-          phoneNumber,
-        };
-    
-        // Dispatch function to handle API call and feedback
-        const dispatchVisitorData = async (data) => {
-          await dispatch(postVisitorListSlice('/InpatientForms/VisitorsListForm', data))
-            .then((result) => {
-              if (result.type === POST_VISITOR_LIST_SUCCESS) {
-                const actionWord = isEditMode ? 'updated' : 'added';
-                message.success(`Visitor ${result.payload.visitorName} ${actionWord} successfully!`);
-                dispatch(getVisitorsListSlice(patientDetails?.CurrentAdmNo));
-              } else if (result.type === POST_VISITOR_LIST_FAILURE) {
-                message.error(result.payload.message || "Internal server error, please try again later.");
-              }
-            })
-            .then(() => {
-              setIsModalOpen(false);
-              form.resetFields();
-            })
-            .catch((err) => {
-              message.error(err.message || "Internal server error, please try again later.");
-            });
-        };
-    
-        // Call the function
-        await dispatchVisitorData(visitorData);
-    
-      } catch (error) {
-        message.error(error.message || "An unexpected error occurred.");
-      }
-    };
-    
+    const handleViewVisitor = () => {
+      if(selectedRow[0]) {
+        form.resetFields();
+        form.setFieldsValue({
+          visitorName: selectedRow[0]?.VisitorName || '',
+          idNumber: selectedRow[0]?.IdNumber || '',
+          phoneNumber: selectedRow[0]?.PhoneNumber || '',
+        })
+        setIsModalOpen(true);
+      };
+    }
+
+    const handleButtonVisibility = () => {
+      setIsFormVisible(!isFormVisible);
+    }
 
     useEffect(() => {
-      if(!ipVisitors?.length){
-        dispatch(getVisitorsListSlice(patientDetails?.CurrentAdmNo));
-      }
-    }, [dispatch, patientDetails?.CurrentAdmNo, ipVisitors?.length]);
+        dispatch(getVisitorsListSlice(patientDetails?.Admission_No));
+    }, [dispatch, patientDetails?.Admission_No]);
 
 
   return (
     <div>
-         <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
-          <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
-              Visitor List
-          </Typography.Text>
-        </Space>
+         
+         <NurseInnerHeader icon={<FileOutlined />} title="Visitors List"  />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} onClick={()=>showModal()}><PlusOutlined /> Add Visitor
-          </Button>
-          <Button color="default" variant="outlined" style={{ width: '100%' }}><FolderViewOutlined />
-            Preview Visitor List
-          </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          
+          {
+            !isFormVisible && (
+              
+                role === 'Nurse' ? (
+                  <>
+                    <Button type="primary"  onClick={handleButtonVisibility}><PlusOutlined /> New Visitor
+                    </Button>
+                    <Button type="primary" disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
+                    View Visitor Details
+                    </Button>
+                  </>
+                ) : (
+                  <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={handleViewVisitor}><FolderViewOutlined />
+                      View Visitor Details
+                  </Button>
+                )
+            )
+          }
+          
+
         </div>
 
-        <VisitorFormTable showModal={showModal} loadingIpVisitors={loadingIpVisitors} ipVisitors={ipVisitors} />
+        {
+          isFormVisible && (
+            <VisitorsListFormData 
+            setIsFormVisible={setIsFormVisible} 
+            loadingIpVisitors={loadingIpVisitors} 
+            loadingVisitor={loadingVisitor}
+            patientDetails={patientDetails}
+            />
+          )
+        }
 
-        <Modal title="Visitor Form" 
+        {
+          !isFormVisible && (
+            <VisitorFormTable 
+            rowSelection={rowSelection} 
+            loadingIpVisitors={loadingIpVisitors} 
+            filterVisitorList={ipVisitors}
+            />
+          )
+        }
+
+        <Modal title="View Visitor Details" 
           open={isModalOpen} 
-          onOk={handleOk} 
-          onCancel={handleCancel}
-          okText= {isEditMode ? 'Update Visitor' : 'Save Visitor'}
+          footer={[
+            <Button key="cancel" color="danger" onClick={handleCancel}>
+              Cancel
+            </Button>
+          ]}
         >
             <Form
             
                 layout="vertical" 
                 style={{ paddingTop: '10px'}} 
                 form={form}
-                onFinish={handleOnFinish}
                 initialValues={{
-                  admissionNo: patientDetails?.CurrentAdmNo,
                   visitorName: '',
                   idNumber: '',
                   phoneNumber: ''
                 }}
             >
-          
-            <Form.Item 
-                label="Admission No" 
-                name="admissionNo"
-                hasFeedback
-                >
-                <Input placeholder="Admission No"
-                    type='text'
-                    disabled
-                />
-            </Form.Item>
-
             <Form.Item 
                 label="Visitor Name" 
                 name="visitorName"
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Visitor Name is required' },
-                  {
-                    validator: (_, value) => {
-                      const regex = /^[A-Za-z\s]+$/;
-                      if (!value || regex.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject('Name should only contain letters and spaces');
-                    },
-                  },
-                  {
-                    validator: (_, value) => {
-                      const name = value.length;
-                      if (name < 3) {
-                        return Promise.reject('Name should be at least 3 characters');
-                      }
-                      return Promise.resolve();
-                    },
-                  }
-                
-                ]}
                 >
                 <Input placeholder="Visitor Name"
                     type='text'
@@ -175,19 +132,6 @@ const VisitorsList = () => {
             <Form.Item 
                 label="ID Number" 
                 name="idNumber"
-                hasFeedback
-                rules={[
-                  { required: true, message: 'ID Number is required' },
-                  {
-                    validator: (_, value) => {
-                      const regex = /^\d{8}$/;
-                      if (!value || regex.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject('ID Number should contains digits and 8 digits long');
-                    },
-                  },
-                ]}
                 >
                 <Input placeholder="ID Number"
                     type="text"
@@ -198,19 +142,6 @@ const VisitorsList = () => {
                 label="Phone Number" 
                 name="phoneNumber"
                 placeholder="e.g 0712345678"
-                hasFeedback
-                rules={[
-                  { required: true, message: 'Phone Number is required' },
-                  {
-                    validator: (_, value) => {
-                      const regex = /^07\d{8}$/;
-                      if (!value || regex.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject('Phone Number must start with 07 and be 10 digits long');
-                    },
-                  },
-                ]}
                 >
                 <Input placeholder="Phone Number"
                     type="text"

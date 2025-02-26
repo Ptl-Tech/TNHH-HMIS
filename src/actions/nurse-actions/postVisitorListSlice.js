@@ -5,7 +5,7 @@ export const POST_VISITOR_LIST_REQUEST = 'POST_VISITOR_LIST_REQUEST';
 export const POST_VISITOR_LIST_SUCCESS = 'POST_VISITOR_LIST_SUCCESS';
 export const POST_VISITOR_LIST_FAILURE = 'POST_VISITOR_LIST_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const postVisitorListSlice = (endpoint = '/InpatientForms/VisitorsListForm', visitorData) => 
   async (dispatch, getState) => {
@@ -24,11 +24,7 @@ export const postVisitorListSlice = (endpoint = '/InpatientForms/VisitorsListFor
     
         dispatch({
             type: POST_VISITOR_LIST_FAILURE,
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            },
+            payload: error.response?.data?.message || error.message,
         });
 
         return { type: POST_VISITOR_LIST_FAILURE, payload: error };

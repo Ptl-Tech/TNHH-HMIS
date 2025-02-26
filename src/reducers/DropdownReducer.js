@@ -37,6 +37,10 @@ import {
   SUB_COUNTIES_LIST_FAIL,
   SUB_COUNTIES_LIST_REQUEST,
   SUB_COUNTIES_LIST_SUCCESS,
+  SUB_COUNTY_WARDS_LIST_RESET,
+  SUB_COUNTY_WARDS_LIST_FAIL,
+  SUB_COUNTY_WARDS_LIST_REQUEST,
+  SUB_COUNTY_WARDS_LIST_SUCCESS,
   CLINICS_LIST_REQUEST,
   CLINICS_LIST_SUCCESS,
   CLINICS_LIST_FAIL,
@@ -215,6 +219,21 @@ export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
       return { loading: false, error: action.payload };
     case SUB_COUNTIES_LIST_RESET:
       return { subCounties: [] };
+    default:
+      return state;
+  }
+};
+
+export const subCountWardsListReducer = (state = { subCounties: [] }, action) => {
+  switch (action.type) {
+    case SUB_COUNTY_WARDS_LIST_REQUEST:
+      return { loading: true, subCountyWards: [] };
+    case SUB_COUNTY_WARDS_LIST_SUCCESS:
+      return { loading: false, subCountyWards: action.payload };
+    case SUB_COUNTY_WARDS_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case SUB_COUNTY_WARDS_LIST_RESET:
+      return { subCountyWards: [] };
     default:
       return state;
   }

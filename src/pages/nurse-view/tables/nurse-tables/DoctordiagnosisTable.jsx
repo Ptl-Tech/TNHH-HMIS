@@ -12,16 +12,7 @@ const columns = [
             fixed: 'left',
             width: 100
         },
-        {
-          title: 'Treatment No',
-          dataIndex: 'TreatmentNo',
-          key: 'TreatmentNo',
-        },
-        {
-          title: 'Diagnosis No',
-          dataIndex: 'DiagnosisNo',
-          key: 'DiagnosisNo',
-        },
+        
         {
             title: 'Diagnosis Code',
             dataIndex: 'DiagnosisCode',
@@ -35,6 +26,12 @@ const columns = [
          
         },
         {
+          title: 'Diagnosis Type',
+          dataIndex: 'DiagnosisType',
+          key: 'DiagnosisType',
+         
+        },
+        {
           title: 'Doctor',
           dataIndex: 'DoctorName',
           key: 'DoctorName',
@@ -45,20 +42,20 @@ const columns = [
           dataIndex: 'DiagnosisName',
           key: 'DiagnosisName',
           fixed: 'right',
-          width: 200
+          width: 300
         },
         {
           title: 'Remarks',
           dataIndex: 'Remarks',
           key: 'Remarks',
           fixed: 'right',
-          width: 200
+          width: 300
         },
         
       ];
       const { pagination, handleTableChange } = useSetTablePagination(filterFormattedList);
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div>
         {
             loadingGetDoctorDiagnosis || loading ? (
               <Loading />

@@ -1,0 +1,59 @@
+import { message } from "antd";
+import axios from "axios";
+
+const API = "https://chiromo.potestastechnologies.net:8085/";
+
+export const REOPEN_SALES_INVOICE_REQUEST = "REOPEN_SALES_INVOICE_REQUEST";
+export const REOPEN_SALES_INVOICE_SUCCESS = "REOPEN_SALES_INVOICE_SUCCESS";
+export const REOPEN_SALES_INVOICE_FAIL = "REOPEN_SALES_INVOICE_FAIL";
+export const REOPEN_SALES_INVOICE_RESET = "REOPEN_SALES_INVOICE_RESET";
+
+export const reopensalesInvoice = (invoice) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: REOPEN_SALES_INVOICE_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}GeneralProcesses/ChargesReopenPostedCharges`,
+      invoice,
+      config
+    );
+
+    // Extract response details
+    const responseData = {
+      status: response.data.status,
+    };
+
+    
+
+    dispatch({ type: REOPEN_SALES_INVOICE_SUCCESS, payload: response });
+    return responseData.status;
+  } catch (error) {
+    // Extract error message from different possible sources
+    const errorMessage =
+      error.response?.data?.errors || 
+      "Failed to dispatch patient!";
+
+    // message.error(errorMessage, 5);
+
+    dispatch({
+      type: REOPEN_SALES_INVOICE_FAIL,
+      payload: errorMessage,
+    });
+
+    throw error;
+  }
+};

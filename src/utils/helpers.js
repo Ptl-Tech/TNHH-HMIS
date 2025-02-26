@@ -3,13 +3,11 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 
 export const getColorByWaitingTime = (observationDateTime) => {
-    const currentTime = dayjs(); // Current date-time
-    const observationTimeParsed = dayjs(observationDateTime); // Parse the observation date-time
-    const waitingTimeMinutes = currentTime.diff(observationTimeParsed, 'minute'); // Calculate the difference in minutes
+   
   
-    if (waitingTimeMinutes <= 60) {
+    if (observationDateTime <= 60) {
       return 'green';
-    } else if (waitingTimeMinutes <= 120) {
+    } else if (observationDateTime <= 120) {
       return 'orange';
     } else {
       return 'red';
@@ -30,21 +28,29 @@ export const getColorByWaitingTime = (observationDateTime) => {
   };
 
 
-  export const rowClassName = (record) => {
-    const treatmentDateTime = `${record.treatmentDate}T${record.treatmentTime}`;
-    const color = getColorByWaitingTreatmentTime(treatmentDateTime);
-
-    switch (color) {
-      case "green":
-        return "row-green";
-      case "orange":
-        return "row-orange";
-      case "red":
-        return "row-red";
+  export const getUrgencyColorcode = (urgency) => {
+    switch (urgency) {
+      case "Normal":
+        return { color: "#35AB22", text: "Green" }; // Green for low urgency
+      case "Urgent":
+        return { color: "#9F9700", text: "Yellow" }; // Yellow for medium urgency
+      case "Emergency":
+        return { color: "#EB6965", text: "Red" }; // Red for high urgency
       default:
-        return "";
+        return { color: "#35AB22", text: "Green" }; // Default is low urgency
     }
   };
+
+  export const rowClassName = (record) => {
+    const urgency = record.urgency;
+    const { color } = getUrgencyColorcode(urgency);
+  
+    return {
+      backgroundColor: color, // Set background color based on urgency
+    };
+  };
+  
+  
 
 export const formatElapsedTime = (minutes) => {
     if (minutes < 60) {
@@ -62,6 +68,62 @@ export const formatElapsedTime = (minutes) => {
     XLSX.utils.book_append_sheet(workBook, workSheet, tableName);
     XLSX.writeFile(workBook, fileName);
   }
+
+  export const convertTime = (time) => {
+    if (!time) return '-';
+
+    // Convert `HH:mm:ss` to a Date object
+    const today = new Date(); // Get today's date
+    const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Time';
+
+    // Format time to "hh:mm AM/PM"
+    const formattedTime = date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    return formattedTime;
+}
+
+
+export const calculateAge =(dob) => {
+  const today = new Date();
+  const birthDate = new Date(dob);
+
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDate() - birthDate.getDate();
+
+  // Adjust months and years if needed
+  if (days < 0) {
+    months -= 1;
+    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); 
+    days += lastMonth.getDate();
+  }
+
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+
+  return `${years} years ${months} months ${days} days`;
+}
+
+export const calculateDailyBedOccupancy = (totalBeds, occupiedBeds) =>{
+  if (totalBeds <= 0) {
+      return;
+  }
+  if (occupiedBeds < 0 || occupiedBeds > totalBeds) {
+      return;
+  }
+  
+  const occupancyRate = (occupiedBeds / totalBeds) * 100;
+  return `${occupancyRate.toFixed(0)}%`;
+}
 
    // Print PDF
    export const printToPDF = (dataSource, tableTitle) => {

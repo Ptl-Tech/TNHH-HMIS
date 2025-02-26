@@ -1,36 +1,39 @@
-
-import configHelpers  from '../../actions/configHelpers'
+import configHelpers from "../../actions/configHelpers";
 import axios from "axios";
 
-export const GET_ALLERGIES_AND_MEDICATIONS_REQUEST = 'GET_ALLERGIES_AND_MEDICATIONS_REQUEST';
-export const GET_ALLERGIES_AND_MEDICATIONS_SUCCESS = 'GET_ALLERGIES_AND_MEDICATIONS_SUCCESS';
-export const GET_ALLERGIES_AND_MEDICATIONS_FAILURE = 'GET_ALLERGIES_AND_MEDICATIONS_FAILURE';
+export const GET_ALLERGIES_AND_MEDICATIONS_REQUEST =
+  "GET_ALLERGIES_AND_MEDICATIONS_REQUEST";
+export const GET_ALLERGIES_AND_MEDICATIONS_SUCCESS =
+  "GET_ALLERGIES_AND_MEDICATIONS_SUCCESS";
+export const GET_ALLERGIES_AND_MEDICATIONS_FAILURE =
+  "GET_ALLERGIES_AND_MEDICATIONS_FAILURE";
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL =
+  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8085";
 
-export const getAllergiesAndMedicationsSlice = (observationNo) => async (dispatch, getState) => {
-   
+export const getAllergiesAndMedicationsSlice =
+  (observationNo) => async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
-        dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_REQUEST });
+      dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&isList=false&query=$filter=ObservationNo eq '${observationNo}'`, config);
-      
-        dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data })
+      const { data } = await axios.get(
+        `${API_URL}/data/odatafilter?webservice=QyAllergiesAndMedications&isList=true&query=$filter=ObservationNo eq '${observationNo}'`,
+        config
+      );
+      dispatch({ type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data });
 
-        return {  type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data };
-           
-
+      return { type: GET_ALLERGIES_AND_MEDICATIONS_SUCCESS, payload: data };
     } catch (error) {
-        dispatch({ 
-            type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, 
-            payload: {
-                message: error.message,
-                status: error.response?.status || 'Network Error',
-                data: error.response?.data || null,
-            } 
-        });
+      dispatch({
+        type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE,
+        payload: {
+          message: error.message,
+          status: error.response?.status || "Network Error",
+          data: error.response?.data || null,
+        },
+      });
 
-        return { type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error };
+      return { type: GET_ALLERGIES_AND_MEDICATIONS_FAILURE, payload: error };
     }
-}
+  };

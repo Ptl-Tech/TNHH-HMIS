@@ -8,21 +8,46 @@ import {
   Row,
   Table,
   Typography,
-  Pagination,
   Tooltip,
+  Modal,
+  
+  Tabs,
 } from "antd";
 import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
-import { listPatients } from "../actions/patientActions";
+import { appmntList, listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
+import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
+import useAuth from "../hooks/useAuth";
+import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoice";
+import TabPane from "antd/es/tabs/TabPane";
+import { getBillingList } from "../actions/Charges-Actions/getBillingList";
+import { saveAs } from "file-saver";
+import Page from "react-pdf/dist/cjs/Page.js";
+import { Document, pdfjs } from "react-pdf";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const CashPatients = () => {
+  
+  const { loading, patients: visitData } = useSelector(
+    (state) => state.appmntList
+  );
+  const { loading: billingLoading, patients: billingData } = useSelector(
+    (state) => state.getBillingList
+  );
   const {
-    loading: patientsLoading,
-    error: patientsError,
-    patients,
-  } = useSelector((state) => state.patientList);
+    loading: patientDetailsLoading,
+    error: patientDetailsError,
+    patientDetails,
+  } = useSelector((state) => state.getPatientDetails);
+  const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
+    useSelector((state) => state.postInterimInvoice);
 
   const [filteredPatients, setFilteredPatients] = useState([]);
+  const [filteredOutpatients, setFilteredOutpatients] = useState([]);
+  const [filteredInpatients, setFilteredInpatients] = useState([]);
+  const [formattedBillingTable, setFormattedBillingTable] = useState([]);
+
   const [searchParams, setSearchParams] = useState({
     SearchNames: "",
     AppointmentNo: "",
@@ -32,74 +57,289 @@ const CashPatients = () => {
     current: 1,
     pageSize: 20,
   });
-
+  const [billingModalVisible, setBillingModalVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
+  const [pdfBlob, setPdfBlob] = useState(null);
+  const staffNo = useAuth().userData.No;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    dispatch(listPatients());
+    dispatch(appmntList());
+    dispatch(getBillingList());
   }, [dispatch]);
 
+
+  const formattedBillingList= visitData.map((patient) =>{
+    const matchingPatient=billingData.find((p) => p.PatientNo === patient.PatientNo);
+    return {
+      ...patient,
+      PatientNo: patient.PatientNo,
+      Balance: matchingPatient?.Balance,      
+      OpenInsuranceBalance:matchingPatient?.Open_Insurance_Amount,
+      Inpatient:matchingPatient?.Inpatient
+    };
+
+  });
+
+ 
   useEffect(() => {
-    // Filter only "Cash" patients and those with isActivated: true
-    const cashPatients = patients.filter(
-      (patient) => patient.PatientType === "Cash" && patient.Activated === true
-    );
-    setFilteredPatients(cashPatients);
-  }, [patients]);
+    if (selectedPatient) {
+      dispatch(getPatientDetails(selectedPatient.PatientNo));
+    }
+  }, [selectedPatient]);
+
+  // Update patientBalanceDetails when patientDetails changes
+  useEffect(() => {
+    if (
+      patientDetails &&
+      selectedPatient?.PatientNo === patientDetails.PatientNo
+    ) {
+      setPatientBalanceDetails(patientDetails);
+    }
+  }, [patientDetails, selectedPatient]);
+
+ 
+  useEffect(() => {
+    if (formattedBillingList) {
+      // Sort the list based on the AppointmentDate (latest first)
+      const sortedList = [...formattedBillingList].sort((a, b) => {
+        const dateA = new Date(a.AppointmentDate);
+        const dateB = new Date(b.AppointmentDate);
+        return dateB - dateA; // For descending order
+      });
+  
+      setFilteredOutpatients(
+        sortedList.filter(
+          (patient) =>
+            patient.PatientType === "Cash" && !patient.Inpatient
+        )
+      );
+      setFilteredInpatients(
+        sortedList.filter(
+          (patient) =>
+            patient.PatientType === "Cash" && patient.Inpatient
+        )
+      );
+    }
+  }, [formattedBillingList]);
+  
+
   
   const handleSearchChange = (e, key) => {
-    const value = e.target.value;
+    const value = e.target.value.toLowerCase();
     setSearchParams((prev) => ({ ...prev, [key]: value }));
-  
-    const filtered = patients.filter((patient) => {
-      const matchesName = patient.Names.toLowerCase().includes(searchParams.SearchNames.toLowerCase());
-      const matchesAppointmentNo = patient.AppointmentNo.toLowerCase().includes(searchParams.AppointmentNo.toLowerCase());
-  
-      // Ensure the patient is both 'Cash' and 'isActivated: true'
-      return (
-        matchesName &&
-        matchesAppointmentNo &&
-        patient.PatientType === "Cash" &&
-        patient.isActivated === true
+
+    const filtered = formattedBillingTable.filter((patient) => {
+      const matchesName = patient.Names?.toLowerCase().includes(
+        searchParams.SearchNames.toLowerCase()
       );
+      const matchesAppointmentNo = patient.AppointmentNo?.toLowerCase().includes(
+        searchParams.AppointmentNo.toLowerCase()
+      );
+
+      return matchesName && matchesAppointmentNo;
     });
-  
-    setFilteredPatients(filtered);
+
+    setFormattedBillingTable(filtered);
   };
-  
   const handlePaginationChange = (page, pageSize) => {
     setPagination({ current: page, pageSize });
   };
 
-  useEffect(() => {
-    const startIndex = (pagination.current - 1) * pagination.pageSize;
-    const endIndex = startIndex + pagination.pageSize;
-    setFilteredPatients((prevPatients) => prevPatients.slice(startIndex, endIndex));
-  }, [pagination]);
+  // const showModal = (patient) => {
+  //   setSelectedPatient(patient);
+  //   setBillingModalVisible(true);
+  // };
 
-  const columns = [
+  const handleBillingSubmit = (patient) => {
+    const invoiceData = {
+      PatientNo: patient.PatientNo,
+      visitNo: patient.AppointmentNo,
+      staffNo,
+    };
+
+    dispatch(postInterimInvoice(invoiceData)).then((response) => {
+      if (response?.base64) {
+        const byteCharacters = atob(response.base64);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+          const slice = byteCharacters.slice(offset, offset + 512);
+          const byteNumbers = Array.from(slice).map((char) => char.charCodeAt(0));
+          byteArrays.push(new Uint8Array(byteNumbers));
+        }
+        const blob = new Blob(byteArrays, { type: "application/pdf" });
+        const blobUrl = URL.createObjectURL(blob);
+        setPdfBlob(blobUrl);
+        setSelectedPatient(patient);
+        setBillingModalVisible(true);
+      }
+    });
+  };
+    const handleDownload = () => {
+      if (pdfBlob && selectedPatient) {
+        // Use the patient's name or fallback to a default name if unavailable
+        const patientName = selectedPatient?.Names || "Unknown_Patient";
+        const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, '_');  // Replace spaces with underscores for a valid filename
+    
+        // Trigger the download
+        saveAs(pdfBlob, fileName);
+      }
+    };
+
+  const handlePrint = () => {
+    if (pdfBlob) {
+      const printWindow = window.open("", "_blank");  // Open a blank window
+      const htmlContent = `
+        <html>
+          <head><title>Invoice</title></head>
+          <body>
+            <embed src="${pdfBlob}" width="100%" height="100%" />
+          </body>
+        </html>`;
+      printWindow.document.write(htmlContent);  // Write the content
+      printWindow.document.close();  // Close the document to ensure it renders
+      printWindow.print();  // Trigger the print
+    }
+  };
+  
+  const outpatientColumns = [
     {
       title: "Patient No",
       dataIndex: "PatientNo",
       key: "PatientNo",
-      sorter: (a, b) => a.PatientNo - b.PatientNo,
     },
     {
       title: "Patient Name",
-      dataIndex: "SearchName",
-      key: "SearchName",
-      sorter: (a, b) => a.Names.localeCompare(b.SearchName),
+      dataIndex: "Names", // Corrected key to match patient object
+      key: "Names",
     },
-    { title: "Gender", dataIndex: "Gender", key: "Gender" },
-    { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    {
+      title: "Appointment No",
+      dataIndex: "AppointmentNo",
+      key: "AppointmentNo",
+    },
     {
       title: "Appointment Date",
-      dataIndex: "ActiveAppointmentdate",
-      key: "ActiveAppointmentdate",
-      render: (text) => new Date(text).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.ActiveAppointmentdate) - new Date(b.ActiveAppointmentdate),
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      },
+    },
+    {
+      title: "Appointment Time",
+      dataIndex: "AppointmentTime",
+      key: "AppointmentTime",
+      render: (text, record) => {
+        const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
+        const dateTime = new Date(dateTimeString);
+        return dateTime.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
+    },
+    {
+      title: "Gender",
+      dataIndex: "Gender",
+      key: "Gender",
+    },
+    {
+      title: "Patient Type",
+      dataIndex: "PatientType",
+      key: "PatientType",
+    },
+    {
+      title: "Balance",
+      dataIndex: "Balance",
+      key: "Balance",
+      // render: (text) => `KSh ${text.toFixed(2)}`,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div style={{ display: "flex", gap: "8px" }}>
+          {/* <Tooltip title="View Details">
+            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
+              View Details
+            </Button>
+          </Tooltip> */}
+          <Tooltip title="Bill and Clear">
+            <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
+            Print Invoice
+            </Button>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+  const inpatientColumns = [
+    {
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
+    },
+    {
+      title: "Patient Name",
+      dataIndex: "Names", // Corrected key to match patient object
+      key: "Names",
+    },
+    {
+      title: "Appointment No",
+      dataIndex: "AppointmentNo",
+      key: "AppointmentNo",
+    },
+    {
+      title: "Appointment Date",
+      dataIndex: "AppointmentDate",
+      key: "AppointmentDate",
+      render: (text) => {
+        const date = new Date(text);
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+      },
+    },
+    {
+      title: "Appointment Time",
+      dataIndex: "AppointmentTime",
+      key: "AppointmentTime",
+      render: (text, record) => {
+        const dateTimeString = `${record.AppointmentDate}T${record.AppointmentTime}`;
+        const dateTime = new Date(dateTimeString);
+        return dateTime.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      },
+    },
+    {
+      title: "Gender",
+      dataIndex: "Gender",
+      key: "Gender",
+    },
+    {
+      title: "Patient Type",
+      dataIndex: "PatientType",
+      key: "PatientType",
+    },
+    {
+      title: "Balance",
+      dataIndex: "Balance",
+      key: "Balance",
+      render: (text) => `KSh ${text.toFixed(2)}`,
     },
     {
       title: "Actions",
@@ -107,23 +347,23 @@ const CashPatients = () => {
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
           <Tooltip title="View Details">
-            <Button icon={<EyeOutlined />} onClick={() => showModal(record)}>
-              View Details
-            </Button>
+            
           </Tooltip>
-          {/* Action Button to redirect to billing page */}
           <Tooltip title="Bill and Clear">
-            <Button
-              type="primary"
-              onClick={() => navigate(`/billing/${record.AppointmentNo}`)} // Updated to use navigate
-            >
-              Bill & Clear
+          <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
+          Print Invoice
             </Button>
           </Tooltip>
         </div>
       ),
     },
   ];
+  /* const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+  }; */
 
   const startIdx = (pagination.current - 1) * pagination.pageSize;
   const endIdx = startIdx + pagination.pageSize;
@@ -165,43 +405,93 @@ const CashPatients = () => {
       </Card>
 
       <div className="mt-4">
-        <Table
-          columns={columns}
-          loading={patientsLoading}
-          dataSource={paginatedData.map((patient) => ({
-            ...patient,
-            key: patient.AppointmentNo,
-          }))}
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys),
-          }}
-          rowClassName={(record) =>
-            record.Status === "New" ? "row-warning" : ""
-          }
-          pagination={false}
-          bordered
-          size="small"
-        />
-        <Pagination
-          total={filteredPatients.length}
-          showTotal={(total, range) =>
-            `${range[0]}-${range[1]} of ${total} items`
-          }
-          defaultPageSize={20}
-          current={pagination.current}
-          onChange={handlePaginationChange}
-          style={{ float: "right", margin: "16px" }}
-        />
+      <Tabs defaultActiveKey="1" size="large" type="card">
+        <TabPane tab="Outpatients list" key="1">
+          <Table
+          //  rowSelection={rowSelection}
+            columns={outpatientColumns}
+            dataSource={filteredOutpatients.map((patient) => ({
+              ...patient,
+              key: patient.AppointmentNo,
+            }))}
+            pagination={{
+              total: filteredOutpatients.length,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              onChange: handlePaginationChange,
+            }}
+            bordered
+            size="small"
+          />
+        </TabPane>
+        <TabPane tab="Inpatients list" key="2">
+          <Table
+          //  rowSelection={rowSelection}
+            columns={inpatientColumns}
+            dataSource={filteredInpatients.map((patient) => ({
+              ...patient,
+              key: patient.AppointmentNo,
+            }))}
+            pagination={{
+              total: filteredInpatients.length,
+              current: pagination.current,
+              pageSize: pagination.pageSize,
+              onChange: handlePaginationChange,
+            }}
+            bordered
+            size="small"
+          />
+        </TabPane>
+      </Tabs>
       </div>
 
+     
       <style jsx>{`
         .row-warning {
           background-color: #faad14 !important;
         }
       `}</style>
+
+        {/* Modal for previewing and printing/downloading the PDF */}
+        <Modal
+  title={`Invoice for ${selectedPatient?.Names}`}
+  visible={billingModalVisible}
+  onCancel={() => setBillingModalVisible(false)}
+  footer={[
+    <Button type="primary" key="download" onClick={handleDownload}>Download</Button>,
+    <Button type="default" key="print" onClick={handlePrint}>Print</Button>,
+    <Button type="primary" key="close" onClick={() => setBillingModalVisible(false)}>Close</Button>,
+  ]}
+  width={800}
+  style={{ top: 20 }}
+>
+  <iframe 
+    src={pdfBlob} 
+    width="100%" 
+    height="600px" 
+    style={{ border: "none" }} 
+    className="iframe-scrollbar"
+  ></iframe>
+</Modal>
+
     </div>
   );
 };
-
+{
+  /* <style jsx>{`
+  .patient-info-card {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  .card-header {
+    background-color: #f0f2f5;
+    border-radius: 8px;
+  }
+  .ant-card-body {
+    padding: 16px;
+  }
+`}</style>; */
+}
 export default CashPatients;

@@ -20,6 +20,7 @@ const Login = () => {
     // branchCode,
     // setBranchCode,
     isOtpRequired,
+    setIsOtpRequired,
     handleLogin,
     handleVerifyOtp,
     loading,
@@ -214,9 +215,11 @@ const Login = () => {
       <Modal
         title="Enter OTP"
         visible={isOtpRequired}
-        onCancel={() => {}}
+        onCancel={() => setIsOtpRequired(false)}
         footer={null}
         width={400}
+        maskClosable={false}
+        centered
       >
         <div
           style={{
@@ -239,6 +242,7 @@ const Login = () => {
             onChange={(e) => setOtp(e.target.value)} // Ensure this correctly updates the OTP state
             placeholder="Enter OTP"
             maxLength={6}
+            onPressEnter={handleVerifyOtp}
             style={{
               textAlign: "center",
               width: "100%",
@@ -246,8 +250,8 @@ const Login = () => {
               marginBottom: "20px",
             }}
           />
-
-          <Button type="primary" block onClick={handleVerifyOtp}>
+{/* onenter key down handleverify otp */}
+          <Button type="primary" block  onClick={handleVerifyOtp}>
             Submit
           </Button>
         </div>

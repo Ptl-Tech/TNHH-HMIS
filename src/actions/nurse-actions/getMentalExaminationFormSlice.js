@@ -5,7 +5,7 @@ export const GET_MENTAL_EXAMINATION_FORM_REQUEST = 'GET_MENTAL_EXAMINATION_FORM_
 export const GET_MENTAL_EXAMINATION_FORM_SUCCESS = 'GET_MENTAL_EXAMINATION_FORM_SUCCESS';
 export const GET_MENTAL_EXAMINATION_FORM_FAILURE = 'GET_MENTAL_EXAMINATION_FORM_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'http://217.21.122.62:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getMentalExaminationFormSlice = (admissionNo) => 
   async (dispatch, getState) => {
@@ -13,7 +13,7 @@ export const getMentalExaminationFormSlice = (admissionNo) =>
     try {
         dispatch({ type: GET_MENTAL_EXAMINATION_FORM_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPMentalStatusChecks&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPMentalStatusChecks&isList=true &query=$filter=AdmissionNo eq '${admissionNo}'`, config);
     
 
         dispatch({ type: GET_MENTAL_EXAMINATION_FORM_SUCCESS, payload: data });

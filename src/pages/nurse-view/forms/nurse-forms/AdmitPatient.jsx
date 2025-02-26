@@ -1,213 +1,267 @@
-import { Button, Card, Col, Form, message, Modal, Row, Select, Space, Typography } from "antd"
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getPgBedsSlice } from "../../../../actions/nurse-actions/getPgBedsSlice";
-import { getPgWardsListSlice } from "../../../../actions/nurse-actions/getPgWardsListSlice";
-import { POST_ADMISSION_FORM_DETAILS_SUCCESS, postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
-import { POST_CANCEL_ADMISSION_FAILURE } from "../../../../actions/nurse-actions/postCancelAdmissionSlice";
-import { POST_PATIENT_ADMISSION_FAIL, POST_PATIENT_ADMISSION_SUCCESS, postPatientAdmission } from "../../../../actions/Doc-actions/Admission/postAdmitPatient";
+import { useLocation, useNavigate } from "react-router-dom";
+import useSetTableCheckBoxHook from "../../../../hooks/useSetTableCheckBoxHook";
+import { useGetWardManagementHook } from "../../../../hooks/useGetWardManagementHook";
+import { useEffect, useState } from "react";
+import NurseInnerHeader from "../../../../partials/nurse-partials/NurseInnerHeader";
+import {
+  Button,
+  Card,
+  Space,
+  Typography,
+  Row,
+  Col,
+  List,
+  message,
+  Form,
+} from "antd";
+import Loading from "../../../../partials/nurse-partials/Loading";
+import FilterWardManagement from "../../../../partials/nurse-partials/FilterWardManagement";
+import DisplayAlert from "../../../../partials/nurse-partials/DisplayAlert";
+import WardManagementTable from "../../tables/nurse-tables/WardManagementTable";
+import { BankOutlined, InsertRowLeftOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { postAdmissionFormDetailsSlice } from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
+import {
+  POST_ADMISSION_FORM_DETAILS_SUCCESS,
+  POST_ADMISSION_FORM_DETAILS_FAILURE,
+} from "../../../../actions/nurse-actions/postAdmissionFormDetailsSlice";
 
 const AdmitPatientForm = () => {
-
-  const { patientDetails } = useLocation().state;
+  const location = useLocation();
   const dispatch = useDispatch();
-  const {loadingBeds, getBeds} = useSelector(state => state.getPgBeds);
-  const { loadingWards, getWards } = useSelector(state => state.getPgWardsList);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const { patientDetails } = location.state || {};
+  const { selectedRow, selectedRowKey, rowSelection } =
+    useSetTableCheckBoxHook();
+  const { getBeds, loadingWards, getWards, wardRooms } =
+    useGetWardManagementHook();
+    const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
-  const patientInfo = [
-    { title: 'Patient Name', value: patientDetails?.Names },
-    { title: 'Patient Number', value: patientDetails?.PatientNo },
-    { title: 'Visit Number', value: patientDetails?.LinkNo },
-    { title: "Doctor's Name", value: patientDetails?.DoctorName }
+
+  const [selectedWard, setSelectedWard] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [filteredRooms, setFilteredRooms] = useState([]);
+  const [loadingRooms, setLoadingRooms] = useState(false);
+  const [filteredBeds, setFilteredBeds] = useState([]);
+  const [loadingBeds, setLoadingBeds] = useState(false);
+  const [alertType, setAlertType] = useState("info");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [psychiatricCoding, setPsychiatricCoding] = useState(null);
+  const [codingReason, setCodingReason] = useState(null);
+
+  const psychiatricCodingOptions = [
+    { label: "Red", value: 0 },
+    { label: "Amber", value: 1 },
+    { label: "Yellow", value: 2 },
+    { label: "Green", value: 3 },
   ];
 
-  const [form] = Form.useForm();
-  const { confirm } = Modal;
+  useEffect(() => {
+    if (selectedWard) {
+      setLoadingRooms(true);
+      setFilteredBeds([]);
+      const timeout = setTimeout(() => {
+        setFilteredRooms(
+          wardRooms.filter((room) => room.Ward_No === selectedWard)
+        );
+        setLoadingRooms(false);
+      }, 200);
+      return () => clearTimeout(timeout); // Cleanup timeout on ward change
+    } else {
+      setFilteredRooms([]); // Clear rooms if no ward selected
+    }
+  }, [selectedWard, wardRooms]);
 
-  const filterBeds = Array.isArray(getBeds) ? getBeds.filter(bed => bed.Occupied === false) : [];
-  
-  const onFinish = async (values) => {
-    const { bed, ward, type } = values;
+  useEffect(() => {
+    if (selectedRoom) {
+      setLoadingBeds(true);
+      const timeout = setTimeout(() => {
+        setFilteredBeds(getBeds.filter((bed) => bed.Room_No === selectedRoom));
+        setLoadingBeds(false);
+      }, 200);
+      return () => clearTimeout(timeout); // Cleanup timeout on ward change
+    } else {
+      setFilteredBeds([]); // Clear rooms if no ward selected
+    }
+  }, [selectedRoom, getBeds]);
+
+  function handleWardChange(value) {
+    setSelectedWard(value);
+  }
+
+  const handleOnFinish = async () => {
+    //validate form fields
+    form
+      .validateFields()
+      .then(() => {
+        handleAssignBed();
+      })
+      .catch(() => {
+        message.error("Please fill in all required fields");
+      });
+  };
+  const handleAssignBed = async () => {
+    if (!selectedRow[0]) {
+      return message.warning("Please select bed to assign patient");
+    }
+
+    if (selectedRow[0]?.Occupied === true) {
+      return message.warning(
+        "Bed is already occupied, please select another bed"
+      );
+    }
+
     const formData = {
-      myAction: 'edit',
-      recId: "",
-      admissionNo: patientDetails?.AdmissionNo,
-      admissionType:  type,
-      ward,
-      bed,
+      myAction: "edit",
+      recId: patientDetails?.SystemId,
+      admissionNo: patientDetails?.Admission_No,
+      wardRoom: selectedRow[0]?.Room_No,
+      ward: selectedRow[0]?.WardNo,
+      bed: selectedRow[0]?.BedNo,
+      psychiatricCoding,
+      codingReason,
+      admissionType: "0",
+    };
+
+    try {
+      const result = await dispatch(postAdmissionFormDetailsSlice(formData));
+      if (result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS) {
+        message.success(
+          result.payload.message ||
+            "Ward, Room and Bed assigned successfully to patient"
+        );
+        navigate(`/Nurse/Inpatient`);
+      } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
+        message.error(
+          result.payload.message ||
+            "Failed to assign ward, bed and room to patient"
+        );
+      }
+    } catch (error) {
+      message.error(
+        error.message || "An internal error occurred, please try again"
+      );
     }
+  };
 
-    try{
-      const result = await dispatch(postAdmissionFormDetailsSlice((formData)));
-
-      if(result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS){
-        message.success(result.payload.message || 'Admission Form Details Submitted Successfully');
-        form.resetFields();
-      }else if(result.type === POST_CANCEL_ADMISSION_FAILURE){
-        message.error(result.payload.message || 'Admission Form Details Failed to Submit');
-      }
-    }catch(error){
-        message.error(error.message || 'An error occurred');
-    }
-  }
-
-  const handleAdmitPatient = async () => {
-    confirm({
-      title: 'Confirm Patient Admission',
-      content: `Are you sure you want to admit ${patientDetails?.Names} ?`,
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk(){
-          return new Promise((resolve, reject) => {
-              handleAdmitPatientAction()
-              .then(resolve) // Resolve the modal when successful
-              .catch(reject); // Reject on failure
-          });
-      },
-  })
-  }
-
-  const handleAdmitPatientAction = async () => {
-    try{
-      const result = await dispatch(postPatientAdmission({admissionNo: patientDetails?.AdmissionNo}));
-      if(result.type === POST_PATIENT_ADMISSION_SUCCESS){
-        message.success(result.payload.message || 'Patient Admitted Successfully');
-        form.resetFields();
-      }else if(result.type === POST_PATIENT_ADMISSION_FAIL){
-        message.error(result.payload.message || 'Patient Admission Failed');
-      }
-    }catch(error){
-      message.error(error.message || 'Unexpected error occurred');
-    }
-  }
-
-  useEffect(()=>{
-      if(!getBeds?.length){
-        dispatch(getPgBedsSlice())
-      }
-  }, [dispatch, getBeds?.length]);
-
-  useEffect(()=>{
-      if(!getWards?.length){
-        dispatch(getPgWardsListSlice())
-      }
-  }, [dispatch, getWards])
+  const handleRoom = (room) => {
+    setSelectedRoom(room);
+  };
 
   return (
-    <>
-     
-    <Row gutter={16}>
-    {patientInfo.map((info, index) => (
-    <Col key={index} xs={24} sm={24} md={12} lg={6} xl={6}>
-    <Card className="admit-patient-card-container">
-      <Typography.Title level={5}>
-        {info.title}
-      </Typography.Title>
-      <Typography.Text>
-        {info.value}
-      </Typography.Text>
-    </Card>
-    </Col>
-    ))}
-    </Row>
+    <div>
+      {alertMessage && (
+        <DisplayAlert
+          alertMessage={alertMessage}
+          alertType={alertType}
+          setAlertMessage={setAlertMessage}
+        />
+      )}
 
-    <Card style={{ margin: '20px 10px 10px 10px' }}>
-        <Form layout="vertical" 
-        className="admit-patient-card-container"
-        form={form}
-        onFinish={onFinish}
-        >
-        
-        <Row gutter={16}>
-        <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-                <Form.Item 
-                  label="Select Ward"
-                  name='ward'
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Ward field is required!',
-                    }
-                  ]} 
-                 
-                >
-                <Select 
-                  optionFilterProp="label"
-                  loading={loadingWards}
-                  options={getWards?.map((ward) => ({
-                    value: ward.Ward_Code,
-                    label: ward.Ward_Name,
-                  }))
-                  }
-                  placeholder="Select ward"
-                  showSearch
-                
-                />
-               
-                </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item 
-              label="Select Bed" 
-              name='bed'
-              rules={[
-                {
-                  required: true,
-                  message: 'Bed field is required!',
-                }
-              ]}
-               >
-                <Select
-                  placeholder="Select Bed"
-                  showSearch
-                  loading={loadingBeds}
-                  options={filterBeds?.map((bed) => ({
-                    value: bed.BedNo,
-                    label: bed.BedName,
-                  }))
-                }
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={8} xl={8}>
-              <Form.Item 
-              label="Admission Type" 
-              name='type'
-              rules={[
-                {
-                  required: true,
-                  message: 'Admission type field is required!',
-                }
-              ]}
-              >
-                  <Select 
-                    options={
-                      [
-                        {
-                          value: 'inpatient',
-                          label: 'inpatient',
-                        },
-                      ]
-                    }
-                  />
-              </Form.Item>
-            </Col>
-        </Row>
+      <NurseInnerHeader
+        title="Assign Ward, Room and Bed to Patient"
+        icon={<BankOutlined />}
+      />
+
+      <Card className="admit-patient-card-container">
         <Space>
-            <Form.Item >
-                <Button type="primary" htmlType="submit">Save Admission</Button>
-            </Form.Item>
-            <Form.Item >
-                <Button type="primary" onClick={handleAdmitPatient} htmlType="submit">Admit Patient</Button>
-            </Form.Item>
+          <Button
+            size="large"
+            type="primary"
+            disabled={!selectedRowKey}
+            onClick={handleOnFinish}
+          >
+            <BankOutlined />
+            Assign Bed
+          </Button>
         </Space>
-        </Form>
-        </Card>
-    </>
-    
-  )
-}
+      </Card>
 
-export default AdmitPatientForm
+      <div
+        style={{
+          marginTop: "10px",
+          paddingBottom: "10px",
+          display: "flex",
+          gap: "20px",
+          alignItems: "center",
+        }}
+      >
+        {selectedRoom && (
+          <Typography.Text
+            style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+          >
+            Room Selected {selectedRoom ? `: ${selectedRoom}` : ""}
+          </Typography.Text>
+        )}
+      </div>
+
+      <FilterWardManagement
+        setPsychiatricCoding={setPsychiatricCoding}
+        setCodingReason={setCodingReason}
+        psychiatricCodingOptions={psychiatricCodingOptions}
+        getWards={getWards}
+        handleWardChange={handleWardChange}
+        loadingWards={loadingWards}
+        form={form}
+        handleOnFinish={handleOnFinish}
+        patientNo={patientNo}
+      />
+
+      <Row gutter={[16, 16]} style={{ marginTop: "20px", overflowX: "hidden" }}>
+        <Col xs={24} md={24} lg={8}>
+          {loadingRooms ? (
+            <Loading />
+          ) : (
+            <List
+              style={{ cursor: "pointer" }}
+              dataSource={filteredRooms.map((room) => ({
+                value: room.Room_No, // The unique identifier for the room
+                label: room.Room_Name, // The display name for the room
+              }))}
+              locale={{
+                emptyText: (
+                  <Space
+                    direction="vertical"
+                    size={2} // Adjust vertical spacing between items
+                    style={{ textAlign: "center", marginTop: "20px", marginBottom: "20px" }}
+                  >
+                    <InsertRowLeftOutlined
+                      style={{
+                        fontSize: 48,
+                        color: "#0f5689",
+                        marginBottom: 20,
+                        fontWeight: "normal",
+                      }}
+                    />
+                    <Typography.Text type="secondary" style={{ fontSize: 16 }}>
+                      Please select ward.
+                    </Typography.Text>
+                  </Space>
+                ),
+              }}
+              renderItem={(item) => (
+                <List.Item
+                  onClick={() => handleRoom(item.value)}
+                  style={{ color: "#0f5689" }}
+                >
+                  {item.label}
+                </List.Item>
+              )}
+              bordered
+            />
+          )}
+        </Col>
+        <Col xs={24} md={24} lg={16} style={{ overflowX: "hidden" }}>
+          <WardManagementTable
+            rowSelection={rowSelection}
+            filteredBeds={filteredBeds}
+            loadingBeds={loadingBeds}
+          />
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default AdmitPatientForm;
