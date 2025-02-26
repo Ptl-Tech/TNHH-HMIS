@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import {
-  PlusOutlined,
-  EyeOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { PlusOutlined, EyeOutlined, TeamOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
@@ -15,10 +11,8 @@ import {
   Table,
   Tooltip,
   Typography,
-} from "antd";
-import moment from "moment";
-import dayjs from "dayjs";
-import { listPatients } from "../actions/patientActions";
+} from 'antd';
+import { listPatients } from '../actions/patientActions';
 
 const { Search } = Input;
 
@@ -28,29 +22,33 @@ const OutpatientList = () => {
   const { patients } = useSelector((state) => state.patientList);
 
   const [searchParams, setSearchParams] = useState({
-    SearchName: "",
-    patientId: "",
-    patientNo: "",
+    SearchName: '',
+    patientId: '',
+    patientNo: '',
   });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [showList, setShowList] = useState(false);
 
-useEffect(() => {
-  dispatch(listPatients());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
 
   useEffect(() => {
     // Don't filter by patient type, show all patients
     setFilteredPatients(patients);
   }, [patients]);
-  
+
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
 
     setSearchParams((prevState) => {
       const updatedParams = { ...prevState, [field]: value };
       // If all search fields are empty, hide the list
-      if (!updatedParams.SearchName && !updatedParams.patientId && !updatedParams.patientNo) {
+      if (
+        !updatedParams.SearchName &&
+        !updatedParams.patientId &&
+        !updatedParams.patientNo
+      ) {
         setShowList(false);
       } else {
         // Otherwise, show the list and filter
@@ -59,57 +57,63 @@ useEffect(() => {
       }
       return updatedParams;
     });
-};
+  };
 
-const filterPatients = (params) => {
-  const { SearchName, patientId, patientNo } = params;
-  const filtered = patients.filter((patient) => {
-    return (
-      (!SearchName || patient.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
-      (!patientId || patient.IDNumber.includes(patientId)) &&
-      (!patientNo || patient.PatientNo.toString().includes(patientNo))
-    );
-  });
-  setFilteredPatients(filtered);
-};
+  const filterPatients = (params) => {
+    const { SearchName, patientId, patientNo } = params;
+    const filtered = patients?.filter((patient) => {
+      return (
+        (!SearchName ||
+          patient.SearchName.toLowerCase().includes(
+            SearchName.toLowerCase(),
+          )) &&
+        (!patientId || patient.IDNumber.includes(patientId)) &&
+        (!patientNo || patient.PatientNo.toString().includes(patientNo))
+      );
+    });
+    setFilteredPatients(filtered);
+  };
 
   const columns = [
     {
-      title: "Patient No",
-      dataIndex: "PatientNo",
-      key: "PatientNo",
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
       sorter: (a, b) => a.PatientNo - b.PatientNo,
     },
     {
-      title: "Patient Name",
-      dataIndex: "SearchName",
-      key: "SearchName",
+      title: 'Patient Name',
+      dataIndex: 'SearchName',
+      key: 'SearchName',
       sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
     },
-    { title: "Gender", dataIndex: "Gender", key: "Gender" },
-    { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    { title: 'Gender', dataIndex: 'Gender', key: 'Gender' },
+    { title: 'Patient Type', dataIndex: 'PatientType', key: 'PatientType' },
+    { title: 'ID Number', dataIndex: 'IDNumber', key: 'IDNumber' },
     {
-      title: "Date Registered",
-      dataIndex: "DateRegistered",
-      key: "DateRegistered",
+      title: 'Date Registered',
+      dataIndex: 'DateRegistered',
+      key: 'DateRegistered',
       render: (text) => new Date(text).toLocaleDateString(),
       sorter: (a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered),
     },
     {
-      title: "Actions",
-      key: "actions",
+      title: 'Actions',
+      key: 'actions',
       render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           {record.Activated ? (
             <Tooltip title="View Details">
               <Button
-               type="primary"
+                type="primary"
                 icon={<EyeOutlined />}
                 onClick={() =>
-                  navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
-                    state: { patientDet: record },
-                  })
+                  navigate(
+                    `/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`,
+                    {
+                      state: { patientDet: record },
+                    },
+                  )
                 }
               >
                 View Details
@@ -121,11 +125,15 @@ const filterPatients = (params) => {
                 icon={<PlusOutlined />}
                 type="primary"
                 onClick={() =>
-                  navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
-                    state: { existingPatient: record, previousPath: location.pathname  },
-                   
-                    
-                  })
+                  navigate(
+                    `/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`,
+                    {
+                      state: {
+                        existingPatient: record,
+                        previousPath: location.pathname,
+                      },
+                    },
+                  )
                 }
               >
                 Create Visit
@@ -140,14 +148,14 @@ const filterPatients = (params) => {
   return (
     <div>
       <h4 className="text-center p-3 text-dark">
-        <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
+        <TeamOutlined style={{ marginRight: '8px', fontSize: '24px' }} />
         Patient List
       </h4>
       <div className="d-flex justify-content-between">
         <Button
           type="primary"
-          onClick={() => navigate("/reception/Patient-Registration")}
-          style={{ marginBottom: "20px" }}
+          onClick={() => navigate('/reception/Patient-Registration')}
+          style={{ marginBottom: '20px' }}
         >
           Register New Patient
         </Button>
@@ -155,19 +163,22 @@ const filterPatients = (params) => {
       <Card className="card-header mb-4 mt-4 p-4">
         <Typography.Text
           style={{
-            color: "#003F6D",
-            fontWeight: "bold",
-            marginBottom: "16px",
+            color: '#003F6D',
+            fontWeight: 'bold',
+            marginBottom: '16px',
           }}
         >
           Find Patient Details by:
         </Typography.Text>
-        <Row gutter={16} className="mt-2">
+        <Row
+          gutter={16}
+          className="mt-2"
+        >
           <Col span={6}>
             <Input
               placeholder="Patient Name"
               value={searchParams.SearchName}
-              onChange={(e) => handleSearchChange(e, "SearchName")}
+              onChange={(e) => handleSearchChange(e, 'SearchName')}
               allowClear
             />
           </Col>
@@ -175,7 +186,7 @@ const filterPatients = (params) => {
             <Input
               placeholder="Patient ID"
               value={searchParams.patientId}
-              onChange={(e) => handleSearchChange(e, "patientId")}
+              onChange={(e) => handleSearchChange(e, 'patientId')}
               allowClear
               onSearch={() => filterPatients(searchParams)}
             />
@@ -184,22 +195,21 @@ const filterPatients = (params) => {
             <Input
               placeholder="Patient No"
               value={searchParams.patientNo}
-              onChange={(e) => handleSearchChange(e, "patientNo")}
+              onChange={(e) => handleSearchChange(e, 'patientNo')}
               allowClear
             />
           </Col>
         </Row>
       </Card>
       {showList && (
-  <div className="mt-4">
-    <Table
-      columns={columns}
-      dataSource={filteredPatients}
-      pagination={{ pageSize: 10 }}
-    />
-  </div>
-)}
-
+        <div className="mt-4">
+          <Table
+            columns={columns}
+            dataSource={filteredPatients}
+            pagination={{ pageSize: 10 }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -49,9 +49,11 @@ const LabRequests = ({ status, requestType }) => {
     setSearchedColumn(dataIndex);
   };
 
-  const handleReset = (clearFilters) => {
+  const handleReset = (clearFilters, confirm) => {
     clearFilters();
     setSearchText('');
+    setSearchedColumn('');
+    confirm();
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -94,7 +96,7 @@ const LabRequests = ({ status, requestType }) => {
             Search
           </Button>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
             size="small"
             style={{
               width: 90,

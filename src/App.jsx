@@ -91,6 +91,7 @@ import LabRoutes from './Routes/LabRoutes';
 import ViewReceipt from './pages/billing/ViewReceipt';
 import EncounterSummery from './pages/doctorsViews/EncounterSummery';
 import ViewPatientsReceipts from './pages/billing/ViewPatientsReceipts';
+import ReceptionRoutes from './Routes/ReceptionRoutes';
 
 function App() {
   return (
@@ -111,7 +112,7 @@ function App() {
         path="/reset-password"
         element={<ResetPwd />}
       />
-
+      {ReceptionRoutes()}
       <Route element={<PrivateRoute allowedDepartments={['Nurse']} />}>
         <Route
           path="/Nurse"
@@ -288,96 +289,6 @@ function App() {
           <Route
             path="view-profile"
             element={<ViewProfile />}
-          />
-        </Route>
-      </Route>
-      <Route element={<PrivateRoute allowedDepartments={['Reception']} />}>
-        <Route
-          path="/reception"
-          element={<MainLayout />}
-        >
-          <Route
-            index
-            element={<ReceptionDashboard />}
-          />
-
-          <Route
-            path="/reception/Patient-Registration/:PatientNo?"
-            element={<PatientRegistration />}
-          />
-          <Route
-            path="/reception/Add-Appointment/:patientNo?"
-            element={<CreateVisitForm />}
-          />
-
-          <Route
-            path="/reception/Patient-list"
-            element={<OutpatientList />}
-          />
-          <Route
-            path="/reception/Walkin-patient-list"
-            element={<WalkInPatientList />}
-          />
-          <Route
-            path="/reception/Register-walkin"
-            element={<WalkinRegistration />}
-          />
-          <Route
-            path="/reception/view-profile"
-            element={<ViewProfile />}
-          />
-          <Route
-            path="/reception/appointments/list"
-            element={<ActiveAppmnts />}
-          />
-          <Route
-            path="/reception/converted-patients"
-            element={<ConvertedPatients />}
-          />
-          <Route
-            path="/reception/appointments/Dispatched"
-            element={<DispatchedAppmnts />}
-          />
-
-          <Route
-            path="/reception/Billing/Outpatients"
-            element={<ActiveOutPatients />}
-          />
-          <Route
-            path="/reception/Billing/Inpatients"
-            element={<ActiveInpatient />}
-          />
-
-          {/* <Route
-            path="/reception/insurance-List"
-            element={<InsurancePatients />}
-          />
-
-          <Route
-            path="/reception/InPatient-list"
-            element={<InpatientList />}
-          /> */}
-
-          <Route
-            path="/reception/visitors-list"
-            element={<VisitorList />}
-          />
-
-          <Route
-            path="/reception/create-visit/:patientNo"
-            element={<CreateVisitForm />}
-          />
-          <Route
-            path="/reception/invoice/:patientNo"
-            element={<ViewInvoice />}
-          />
-          <Route
-            path="/reception/Receipt/:patientNo"
-            element={<ViewReceipt />}
-          />
-          <Route
-            path="/reception/Patient-Charges/:patientNo"
-            element={<ViewPatientsReceipts />}
           />
         </Route>
       </Route>

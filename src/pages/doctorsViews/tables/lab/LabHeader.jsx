@@ -15,7 +15,7 @@ import {
   generateLabResultsReport,
 } from '../../../../actions/lab-actions/generateLabResultsReport';
 
-const LabHeader = ({ walkIn, patientData, patientLabRecord }) => {
+const LabHeader = ({ patientData, patientLabRecord }) => {
   const dispatch = useDispatch();
 
   console.log({ patientLabRecord });

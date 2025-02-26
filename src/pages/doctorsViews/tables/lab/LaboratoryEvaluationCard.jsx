@@ -41,7 +41,7 @@ const LaboratoryEvaluationCard = () => {
       labObservationNo !== labRequestData?.LaboratoryNo ||
       postLabRequestToDoctor?.status === 'success'
     ) {
-      dispatch(getLabRequest(labObservationNo));
+      dispatch(getLabRequest('LaboratoryNo', labObservationNo));
     }
   }, [labRequestData, postLabRequestToDoctor, labObservationNo]);
 

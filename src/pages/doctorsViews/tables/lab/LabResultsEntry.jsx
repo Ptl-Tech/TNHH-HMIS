@@ -252,7 +252,17 @@ const RemarkForm = ({ record, handleCancel }) => {
   // handling pushing code
   const onFinish = async (data) => {
     const { remarks } = data;
-    const { SystemId, Laboratory_No, Positive } = record;
+    console.log({ record });
+
+    const {
+      SystemId,
+      Laboratory_No,
+      Positive,
+      LaboratoryTestCode,
+      SpecimenCode,
+      MeasuringUnitCode,
+      CountValue,
+    } = record;
 
     console.log({ remarks });
 
@@ -262,6 +272,10 @@ const RemarkForm = ({ record, handleCancel }) => {
       myAction: 'edit',
       positive: Positive,
       laboratoryNo: Laboratory_No,
+      labTestCode: LaboratoryTestCode,
+      specimenCode: SpecimenCode,
+      unitOfMeasure: MeasuringUnitCode,
+      countValue: CountValue,
     };
 
     await dispatch(postTestRemarks(finalData));

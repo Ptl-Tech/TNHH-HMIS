@@ -20,20 +20,19 @@ import {
   RetweetOutlined,
   LayoutOutlined,
   UserAddOutlined,
-  UsergroupAddOutlined
+  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
-import { FaUserGroup } from 'react-icons/fa6';
 import logo from '../assets/images/logo.png';
 import smallLogo from '../assets/images/smallLogo.png';
 import Signout from '../Auth/Signout';
-import { BiCoinStack } from 'react-icons/bi';
 import { FaUserFriends } from 'react-icons/fa';
 import DynamicBreadcrumb from './DynamicBreadcrumb';
 import useAuth from '../hooks/useAuth';
 
 // routes
 import { labRoutes } from '../Routes/LabRoutes';
+import { receptionRoutes } from '../Routes/ReceptionRoutes';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -49,75 +48,6 @@ const MainLayout = () => {
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const department = userInfo?.userData?.departmentName;
-
-    const receptionRoutes = [
-      {
-        key: '/reception',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Dashboard',
-      },
-      {
-        key: '/reception/visitors-list',
-        icon: <UserOutlined style={{ color: '#fff' }} />,
-        label: 'Visitors',
-      },
-      {
-        key: '/reception/patient-list',
-        icon: <FaUserGroup style={{ color: '#fff' }} />,
-        label: 'Patient List',
-        children: [
-          {
-            key: '/reception/Patient-list',
-            label: 'Patient List',
-            icon: <FileTextOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: '/reception/Walkin-patient-list',
-            label: 'Walk-in Patient List',
-            icon: <UserAddOutlined style={{ color: '#fff' }} />,
-          },
-          // {
-          //   key: '/reception/converted-patients',
-          //   label: 'Converted Patients',
-          //   icon: <UserOutlined style={{ color: '#fff' }} />,
-          // },
-        ],
-      },
-      {
-        key: '/reception/appointments',
-        icon: <CalendarOutlined style={{ color: '#fff' }} />,
-        label: 'Appointments',
-        children: [
-          {
-            key: '/reception/appointments/list',
-            label: ' New Appointments',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: '/reception/appointments/Dispatched',
-            label: 'Dispatched List',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        key: '/reception/billing',
-        icon: <BiCoinStack style={{ color: '#fff' }} />,
-        label: 'Billing',
-        children: [
-          {
-            key: '/reception/Billing/Outpatients',
-            label: 'OutPatient',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: '/reception/Billing/Inpatients',
-            label: 'InPatient',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-    ];
 
     const nurseRoutes = [
       {

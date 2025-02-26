@@ -1,96 +1,92 @@
-import dayjs from "dayjs";
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
+import dayjs from 'dayjs';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
 
 export const getColorByWaitingTime = (observationDateTime) => {
-   
-  
-    if (observationDateTime <= 60) {
-      return 'green';
-    } else if (observationDateTime <= 120) {
-      return 'orange';
-    } else {
-      return 'red';
-    }
-  };
-  export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {
-    const currentTime = dayjs(); // Current date-time
-    const treatmentTimeParsed = dayjs(treatmentDateTime); // Parse the observation date-time
-    const waitingTimeMinutes = currentTime.diff(treatmentTimeParsed, 'minute'); // Calculate the difference in minutes
-  
-    if (waitingTimeMinutes <= 60) {
-      return 'green';
-    } else if (waitingTimeMinutes <= 120) {
-      return 'orange';
-    } else {
-      return 'red';
-    }
-  };
+  if (observationDateTime <= 60) {
+    return 'green';
+  } else if (observationDateTime <= 120) {
+    return 'orange';
+  } else {
+    return 'red';
+  }
+};
+export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {
+  const currentTime = dayjs(); // Current date-time
+  const treatmentTimeParsed = dayjs(treatmentDateTime); // Parse the observation date-time
+  const waitingTimeMinutes = currentTime.diff(treatmentTimeParsed, 'minute'); // Calculate the difference in minutes
 
+  if (waitingTimeMinutes <= 60) {
+    return 'green';
+  } else if (waitingTimeMinutes <= 120) {
+    return 'orange';
+  } else {
+    return 'red';
+  }
+};
 
-  export const getUrgencyColorcode = (urgency) => {
-    switch (urgency) {
-      case "Normal":
-        return { color: "#35AB22", text: "Green" }; // Green for low urgency
-      case "Urgent":
-        return { color: "#9F9700", text: "Yellow" }; // Yellow for medium urgency
-      case "Emergency":
-        return { color: "#EB6965", text: "Red" }; // Red for high urgency
-      default:
-        return { color: "#35AB22", text: "Green" }; // Default is low urgency
-    }
-  };
+export const getUrgencyColorcode = (urgency) => {
+  switch (urgency) {
+    case 'Normal':
+      return { color: '#35AB22', text: 'Green' }; // Green for low urgency
+    case 'Urgent':
+      return { color: '#9F9700', text: 'Yellow' }; // Yellow for medium urgency
+    case 'Emergency':
+      return { color: '#EB6965', text: 'Red' }; // Red for high urgency
+    default:
+      return { color: '#35AB22', text: 'Green' }; // Default is low urgency
+  }
+};
 
-  export const rowClassName = (record) => {
-    const urgency = record.urgency;
-    const { color } = getUrgencyColorcode(urgency);
-  
-    return {
-      backgroundColor: color, // Set background color based on urgency
-    };
+export const rowClassName = (record) => {
+  const urgency = record.urgency;
+  const { color } = getUrgencyColorcode(urgency);
+
+  return {
+    backgroundColor: color, // Set background color based on urgency
   };
-  
-  
+};
 
 export const formatElapsedTime = (minutes) => {
-    if (minutes < 60) {
-      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    } else {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return `${hours} hour${hours > 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes > 1 ? 's' : ''} ago`;
-    }
-  };
-
-  export const exportToExcel = (dataSource, tableName, fileName) => {
-    const workSheet = XLSX.utils.json_to_sheet(dataSource);
-    const workBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workBook, workSheet, tableName);
-    XLSX.writeFile(workBook, fileName);
+  if (minutes < 60) {
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours} hour${hours > 1 ? 's' : ''} ${remainingMinutes} minute${
+      remainingMinutes > 1 ? 's' : ''
+    } ago`;
   }
+};
 
-  export const convertTime = (time) => {
-    if (!time) return '-';
+export const exportToExcel = (dataSource, tableName, fileName) => {
+  const workSheet = XLSX.utils.json_to_sheet(dataSource);
+  const workBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workBook, workSheet, tableName);
+  XLSX.writeFile(workBook, fileName);
+};
 
-    // Convert `HH:mm:ss` to a Date object
-    const today = new Date(); // Get today's date
-    const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
+export const convertTime = (time) => {
+  if (!time) return '-';
 
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Invalid Time';
+  // Convert `HH:mm:ss` to a Date object
+  const today = new Date(); // Get today's date
+  const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
 
-    // Format time to "hh:mm AM/PM"
-    const formattedTime = date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Time';
 
-    return formattedTime;
-}
+  // Format time to "hh:mm AM/PM"
+  const formattedTime = date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 
+  return formattedTime;
+};
 
-export const calculateAge =(dob) => {
+export const calculateAge = (dob) => {
   const today = new Date();
   const birthDate = new Date(dob);
 
@@ -101,7 +97,7 @@ export const calculateAge =(dob) => {
   // Adjust months and years if needed
   if (days < 0) {
     months -= 1;
-    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); 
+    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
     days += lastMonth.getDate();
   }
 
@@ -111,26 +107,27 @@ export const calculateAge =(dob) => {
   }
 
   return `${years} years ${months} months ${days} days`;
-}
+};
 
-export const calculateDailyBedOccupancy = (totalBeds, occupiedBeds) =>{
+export const calculateDailyBedOccupancy = (totalBeds, occupiedBeds) => {
   if (totalBeds <= 0) {
-      return;
+    return;
   }
   if (occupiedBeds < 0 || occupiedBeds > totalBeds) {
-      return;
+    return;
   }
-  
+
   const occupancyRate = (occupiedBeds / totalBeds) * 100;
   return `${occupancyRate.toFixed(0)}%`;
-}
+};
 
-   // Print PDF
-   export const printToPDF = (dataSource, tableTitle) => {
-    const doc = new jsPDF();
+// Print PDF
+export const printToPDF = (dataSource, tableTitle) => {
+  const doc = new jsPDF();
 
-    // Add a logo
-  const logo = 'https://s3-us-west-2.amazonaws.com/cbi-image-service-prd/modified/27ed644d-f415-4f51-a5d8-e70aabc8ebac.png?w=128';
+  // Add a logo
+  const logo =
+    'https://s3-us-west-2.amazonaws.com/cbi-image-service-prd/modified/27ed644d-f415-4f51-a5d8-e70aabc8ebac.png?w=128';
   const logoWidth = 30; // Adjust logo width
   const logoHeight = 30; // Adjust logo height
   const logoX = 10; // X position
@@ -143,19 +140,59 @@ export const calculateDailyBedOccupancy = (totalBeds, occupiedBeds) =>{
 
   // Adjusting the Y position of the table to avoid overlapping the logo
   const tableStartY = logoY + logoHeight + 10;
- 
 
-    // Add table dynamically from dataSource
-    const tableColumn = ['Key', 'Adm No', 'Patient No', 'Patient Names', 'Adm Date', 'Ward', 'Bed', 'Doctor'];
-    const tableRows = dataSource.map((row) => [row.key, row.admNo, row.patientNo, row.names, row.admDate, row.ward, row.bed, row.doctor]);
+  // Add table dynamically from dataSource
+  const tableColumn = [
+    'Key',
+    'Adm No',
+    'Patient No',
+    'Patient Names',
+    'Adm Date',
+    'Ward',
+    'Bed',
+    'Doctor',
+  ];
+  const tableRows = dataSource.map((row) => [
+    row.key,
+    row.admNo,
+    row.patientNo,
+    row.names,
+    row.admDate,
+    row.ward,
+    row.bed,
+    row.doctor,
+  ]);
 
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: tableStartY,
-    });
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableRows,
+    startY: tableStartY,
+  });
 
-    // Open the print dialog directly
-    doc.autoPrint();
-    window.open(doc.output("bloburl"), "_blank");
-  };
+  // Open the print dialog directly
+  doc.autoPrint();
+  window.open(doc.output('bloburl'), '_blank');
+};
+
+function pascalToCamelCase(str) {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+export const convertKeysToCamelCase = (obj) => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj; // Return the value if it's not an object
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(convertKeysToCamelCase); // Handle arrays
+  }
+
+  const newObj = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const camelCaseKey = pascalToCamelCase(key);
+      newObj[camelCaseKey] = convertKeysToCamelCase(obj[key]); // Recursively convert nested objects
+    }
+  }
+  return newObj;
+};

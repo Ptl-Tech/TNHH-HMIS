@@ -30,11 +30,11 @@ const ReceptionDashboard = () => {
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
-    const filteredAppointments = appointments.filter((appointment) => {
+    const filteredAppointments = appointments?.filter((appointment) => {
       const appointmentDate = new Date(appointment.AppointmentDate).toISOString().split("T")[0];
       return appointmentDate === today && appointment.Status === "New"; // Filter by today's date and status "new"
     });
-    setActiveAppmnts(filteredAppointments.length); // Set the count of active appointments
+    setActiveAppmnts(filteredAppointments?.length); // Set the count of active appointments
   }, [appointments]);
 
   useEffect(() => {

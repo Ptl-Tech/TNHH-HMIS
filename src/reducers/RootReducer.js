@@ -239,7 +239,10 @@ import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsRedu
 import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
 import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
 import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
-import { getPatientReceiptsHeadersReducer, getPatientReceiptsReducer } from './ChargesReducers/getPatientReceiptsReducer';
+import {
+  getPatientReceiptsHeadersReducer,
+  getPatientReceiptsReducer,
+} from './ChargesReducers/getPatientReceiptsReducer';
 import { getPatientEncounterListReducer } from './doc-reducers/pastDoctorNotesEncounterReducers';
 import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
 import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
@@ -251,6 +254,9 @@ import { getLabRequestReducer } from './lab-reducers/getLabRequestReducer';
 import { getLabTestCodesReducer } from './lab-reducers/getLabtestCodesReducer';
 import { postLabTestReducer } from './lab-reducers/postLabTestReducer';
 import { generateLabResultsReportReducer } from './lab-reducers/generateLabResultsReportReducer';
+import { getSinglePatientReducer } from './reception-reducers/getSinglePatientReducer';
+import { createLabTestHeaderReducer } from './lab-reducers/createLabTestHeader';
+import { postLabTestLinesReducer } from './lab-reducers/postLabTestLinesReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -309,7 +315,7 @@ export const rootReducer = combineReducers({
   docTreatmentList: treatmentListReducer,
   getPatientList: getPatientListReducer,
   // past encounters
-  getPatientEncounters:getPatientEncounterListReducer,
+  getPatientEncounters: getPatientEncounterListReducer,
   // end
   getConsultationRoom: getConsultationRoomListReducer,
   getPatient: PatientDeetsReducer,
@@ -344,11 +350,14 @@ export const rootReducer = combineReducers({
   postLabSample: postLabSampleReducer,
   postLabTest: postLabTestReducer,
   postTestRemarks: postTestRemarksReducer,
+  postLabTestLines: postLabTestLinesReducer,
   postLabTestResults: postLabTestResultsReducer,
+  createLabTestHeader: createLabTestHeaderReducer,
   postLabRequestToDoctor: postLabRequestToDoctorReducer,
   generateLabResultsReport: generateLabResultsReportReducer,
   // ************************************* /
 
+  getSinglePatient: getSinglePatientReducer,
   getIPVisitors: getVisitorsListReducer,
   postSuicidalForm: postSuicidalFormReducer,
   getIpSuicidalForm: getSuicidalFormReducer,
@@ -421,47 +430,47 @@ export const rootReducer = combineReducers({
   getPatientVisit: getPatientVisitReducer,
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
-  postDoctorNotes:postDoctorNotesReducer,
-  getBillingList:getBillingListReducer,
-  postVisitorList:postVisitorListReducer,
-  postPatientHistory:postPatientHistoryNotesReducer,
-  getPatientHistoryNotesReducer:getPatientHistoryNotes,
-  postMSEForm:postMSENotesReducer,
-  getPatientMSE:getPatientMSENotesReducer,
-  getTreatmentDiagnosisLines:getPatientTreamentDiagnosisLinesReducer,
-  getPgAdmissionsAdmitted:getAdmissionsAdmittedReducer,
-  getQyPrescriptionLine:getQyPrescriptionLinesReducer,
-  postPatientETC:postPatientECTRequest,
-  getPatientETC:getPatientECTRequest,
-  postKetamine:postPatientKetamineReducer,
-  getKetamine:getPatientKetamineRequest,
-  postImplant:postPatientImplantRequest,
-  checkInConsulation:postCheckInPatientConfirmReducer,
-  markAsCompleted:postMarkAsCompletedReducer,
-  createWalkInPatient:createWalkInPatientReducer,
-  dispatchWalkInLab:dispatchWalkInLabReducer,
-  dispatchWalkInPharmacy:dispatchWalkInPharmacyReducer,
-  postPsychologyRequest:postPsychologyRequestReducer,
-  getReceiptHeaders:getReceiptPgHeadersReducer,
-  getReceiptLines:getReceiptLinesReducer,
-  getReceiptHeaderLines:getReceiptHeaderReducer,
-  postReceipt:postReceiptHeaderReducer,
-  processReceipt:postReceiptReducer,
-  printInvoice:postPrintInvoiceReducer,
-  printReceipt:printReceiptReducer  ,
-  getTransactionList:getTransactionListReducer,
-  getChargesSetup:getChargesSetupReducer,
-  getChargesLines:getChargesLinesReducer,
-  postPatientCharges:postPatientChargesReducer,
-  generateInvoice:postGenerateInvoiceReducer,
-  postReverseCharges:postReverseChargeReducer,
-  getPatientReceipt:getPatientReceiptsReducer,
-  getPatientReceiptHeader:getPatientReceiptsHeadersReducer,
-  getUnpostedCharges:getUnpostedChargesReducer,
-  getPostedCharges:getpostedChargesReducer,
-  deletePatientCharges:deletePatientChargesReducer,
-  postNursingCarePlan:postNursingCarePlanReducer,
-  getNursingCarePlan:getNursingCarePlanReducer,
+  postDoctorNotes: postDoctorNotesReducer,
+  getBillingList: getBillingListReducer,
+  postVisitorList: postVisitorListReducer,
+  postPatientHistory: postPatientHistoryNotesReducer,
+  getPatientHistoryNotesReducer: getPatientHistoryNotes,
+  postMSEForm: postMSENotesReducer,
+  getPatientMSE: getPatientMSENotesReducer,
+  getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
+  getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
+  getQyPrescriptionLine: getQyPrescriptionLinesReducer,
+  postPatientETC: postPatientECTRequest,
+  getPatientETC: getPatientECTRequest,
+  postKetamine: postPatientKetamineReducer,
+  getKetamine: getPatientKetamineRequest,
+  postImplant: postPatientImplantRequest,
+  checkInConsulation: postCheckInPatientConfirmReducer,
+  markAsCompleted: postMarkAsCompletedReducer,
+  createWalkInPatient: createWalkInPatientReducer,
+  dispatchWalkInLab: dispatchWalkInLabReducer,
+  dispatchWalkInPharmacy: dispatchWalkInPharmacyReducer,
+  postPsychologyRequest: postPsychologyRequestReducer,
+  getReceiptHeaders: getReceiptPgHeadersReducer,
+  getReceiptLines: getReceiptLinesReducer,
+  getReceiptHeaderLines: getReceiptHeaderReducer,
+  postReceipt: postReceiptHeaderReducer,
+  processReceipt: postReceiptReducer,
+  printInvoice: postPrintInvoiceReducer,
+  printReceipt: printReceiptReducer,
+  getTransactionList: getTransactionListReducer,
+  getChargesSetup: getChargesSetupReducer,
+  getChargesLines: getChargesLinesReducer,
+  postPatientCharges: postPatientChargesReducer,
+  generateInvoice: postGenerateInvoiceReducer,
+  postReverseCharges: postReverseChargeReducer,
+  getPatientReceipt: getPatientReceiptsReducer,
+  getPatientReceiptHeader: getPatientReceiptsHeadersReducer,
+  getUnpostedCharges: getUnpostedChargesReducer,
+  getPostedCharges: getpostedChargesReducer,
+  deletePatientCharges: deletePatientChargesReducer,
+  postNursingCarePlan: postNursingCarePlanReducer,
+  getNursingCarePlan: getNursingCarePlanReducer,
 
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,
