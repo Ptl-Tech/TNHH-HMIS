@@ -126,6 +126,11 @@ const MainLayout = () => {
         label: 'Dashboard',
       },
       {
+        key: 'patient-list',
+        icon: <FileTextOutlined style={{ color: '#fff' }} />,
+        label: 'Patient List',
+      },
+      {
         icon: <FileTextOutlined style={{ color: '#fff' }} />,
         label: 'Triage',
         children: [

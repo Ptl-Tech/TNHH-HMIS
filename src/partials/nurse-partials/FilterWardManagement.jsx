@@ -12,6 +12,7 @@ const FilterWardManagement = ({
   handleOnFinish,
   patientNo,
 }) => {
+
   return (
     <>
       <Card
@@ -56,6 +57,7 @@ const FilterWardManagement = ({
                       .toLowerCase()
                       .localeCompare((optionB?.label ?? "").toLowerCase())
                   }
+                  // defaultValue={getWards?.length > 0 ? getWards[0].Ward_Code : undefined} // Set first option as default
                 />
               </Form.Item>
             </Col>

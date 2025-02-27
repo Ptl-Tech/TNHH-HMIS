@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
@@ -18,12 +18,6 @@ const InpatientTable = ({
   const role = useAuth().userData.departmentName;
 
   const columns = [
-    {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
-      render: (text, record, index) => index + 1,
-    },
     {
       title: "Adm No",
       dataIndex: "Admission_No",
@@ -69,7 +63,6 @@ const InpatientTable = ({
       sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date),
       defaultSortOrder: "ascend", // Ensure default sorting is newest to oldest
     },
-
     {
       title: "Ward",
       dataIndex: "Ward",
@@ -92,6 +85,11 @@ const InpatientTable = ({
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
         ), // Renders nothing for roles other than Nurse
     },
+    // {
+    //   title: "Room",
+    //   dataIndex: "Ward_Room",
+    //   key: "Ward_Room",
+    // },
     {
       title: "Bed",
       dataIndex: "Bed",
@@ -120,6 +118,29 @@ const InpatientTable = ({
       key: "DoctorsName",
       render: (doctor) => doctor || "Not assigned",
     },
+    {
+      title: "Coding",
+      dataIndex: "Psychiatric_Coding",
+      key: "Psychiatric_Coding",
+      render: (coding) => {
+        let color = null;
+        switch (coding) {
+          case "Red":
+            color = "red";
+            break;
+          case "Amber":
+            color = "orange";
+            break;
+          case "Yellow":
+            color = "yellow";
+            break;
+          case "Green":
+            color = "green";
+            break;
+        }
+        return color ? <Tag color={color}>{coding}</Tag> : null;
+      }
+    }
   ];
   const [pagination, setPagination] = useState({
     current: 1,

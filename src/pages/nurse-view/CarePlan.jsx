@@ -6,7 +6,7 @@ import TreatmentsSheet from "./nurse-care-plan/TreatmentsSheet";
 import ECTScan from "./nurse-care-plan/ECTScan";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 import DailyProcess from "./nurse-care-plan/DailyProcess";
-import Diagnosis from "./nurse-care-plan/Diagnosis";
+import Diagnosis from "../../pages/doctorsViews/Doctor-Forms/Diagnosis";
 import useAuth from "../../hooks/useAuth";
 import Medication from "../doctorsViews/Doctor-Forms/Medication";
 import {
@@ -23,6 +23,7 @@ import BriefMentalStateExaminationForm from "./nurse-forms/BriefMentalStateExami
 import DietaryIntakeForm from "./nurse-forms/DietaryIntakeForm";
 import JacksonVisualForm from "./nurse-forms/JacksonVisualForm";
 import CarePlanForm from "./nurse-forms/CarePlanForm";
+import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 
 const CarePlan = () => {
   const [activeItem, setActiveItem] = useState("Allergies and Medications");
@@ -45,7 +46,7 @@ const CarePlan = () => {
         setSelectedItem(<Diagnosis />);
         break;
       case "Prescription":
-        setSelectedItem(<Medication />);
+        setSelectedItem(<InpatientMedication />);
         break;
       case "Care Plan":
         setSelectedItem(<CarePlanForm />);

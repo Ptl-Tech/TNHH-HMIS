@@ -59,7 +59,7 @@ export default NurseInnerHeader;
 
 // props validation
 NurseInnerHeader.propTypes = {
-  filterInPatients: PropTypes.array,
-  title: PropTypes.string.isRequired,
-  icon: PropTypes.string,
+  filterInPatients: PropTypes.object,
+  title: PropTypes.string,
+  icon: PropTypes.object,
 };

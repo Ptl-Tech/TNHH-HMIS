@@ -1,0 +1,96 @@
+import Loading from "../../../partials/nurse-partials/Loading";
+import PropTypes from "prop-types";
+import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
+import { Tag, Typography } from "antd";
+
+const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
+  const handleEdit = (record) => {
+    console.log("Edit clicked for record:", record);
+  };
+
+  const columns = [
+    {
+        title: "#",
+        dataIndex: "key",
+        key: "key",
+        render: (text, record, index) => index + 1,
+        fixed: "left",
+        width: 50,
+
+    },
+    {
+      title: "Admission No",
+      dataIndex: "Admission_No",
+      key: "Admission_No",
+      fixed: "left",
+      width: 150,
+      render: (text) => (
+        <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
+          {text}
+        </Typography.Text>
+      ),
+    },
+    {
+      title: "Drug No",
+      dataIndex: "Drug_No",
+      key: "Drug_No",
+    },
+    {
+      title: "Drug Name",
+      dataIndex: "Drug_Name",
+      key: "Drug_Name",
+    },
+    {
+      title: "Dosage",
+      dataIndex: "Dosage",
+      key: "Dosage",
+    },
+    {
+      title: "Route",
+      dataIndex: "Route",
+      key: "Route",
+    },
+    {
+      title: "Remarks",
+      dataIndex: "Remarks",
+      key: "Remarks",
+      fixed: "right",
+      width: 100,
+    },
+    {
+      title: "Status",
+      dataIndex: "Posted",
+      key: "Posted",
+      fixed: "right",
+      width: 100,
+      render: (_, record) => {
+        if(record.Posted === false){
+            return <Tag color="red">New</Tag>
+        }else{
+            return <Tag color="green">Posted</Tag>
+        }
+      }
+    },
+  ];
+  return (
+    <div>
+      {loadingPrescriptions ? (
+        <Loading />
+      ) : (
+        <RowSelectionTable
+          columns={columns}
+          dataSource={filteredPrescriptions}
+          onRowSelect={handleEdit}
+        />
+      )}
+    </div>
+  );
+};
+
+export default PrescriptionTable;
+
+//props types validations
+PrescriptionTable.propTypes = {
+  loadingPrescriptions: PropTypes.bool.isRequired,
+  filteredPrescriptions: PropTypes.array.isRequired,
+};

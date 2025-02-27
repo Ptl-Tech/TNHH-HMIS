@@ -7,13 +7,9 @@ const CarePlanFormTable = ({
   loadingGetCarePlan,
   setIsFormVisible,
   form,
-  patientDetails,
   setIsViewing
 }) => {
-  const filterPatient = getCarePlan.filter(
-    (patient) => patient.Admission_No === patientDetails?.Admission_No
-  );
-
+  
   const handleShowRecord = (record) => {
     // Filter out undefined/null fields before setting values
     const sanitizedRecord = Object.keys(record).reduce((acc, key) => {
@@ -29,8 +25,10 @@ const CarePlanFormTable = ({
   };
   return (
     <Table
+      bordered
+      rowKey={"SystemId"}
       style={{ paddingTop: "20px" }}
-      dataSource={filterPatient}
+      dataSource={getCarePlan}
       loading={loadingGetCarePlan}
       scroll={{ x: 1500 }}
       columns={[
@@ -40,11 +38,25 @@ const CarePlanFormTable = ({
           key: "Date",
           fixed: "left",
           width: 150,
+          render: (text, record) => (
+            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}>
+              {new Date(record.Date).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
+          )
         },
         {
           title: "Admission Number",
           dataIndex: "Admission_No",
           key: "Admission_No",
+          render: (text, record) => (
+            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}>
+              {record.Admission_No}
+            </span>
+          )
         },
         {
           title: "Physical Exam",
@@ -71,14 +83,15 @@ const CarePlanFormTable = ({
           dataIndex: "action",
           key: "action",
           fixed: "right",
-          width: 150,
+          width: 180,
           render: (_, record) => (
             <Button
-              style={{ color: "#0f5689" }}
+            type="primary"
+              style={{ color: "white" }}
               onClick={() => handleShowRecord(record)}
               icon={<FolderViewOutlined />}
             >
-              View
+              View Care Plan
             </Button>
           ),
         },
@@ -94,6 +107,5 @@ CarePlanFormTable.propTypes = {
   loadingGetCarePlan: PropTypes.bool.isRequired,
   setIsFormVisible: PropTypes.bool.isRequired,
   form: PropTypes.array.isRequired,
-  patientDetails: PropTypes.array.isRequired,
   setIsViewing: PropTypes.bool
 };

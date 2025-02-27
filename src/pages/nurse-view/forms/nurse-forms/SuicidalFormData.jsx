@@ -5,6 +5,7 @@ import { POST_SUICIDAL_FORM_FAILURE, POST_SUICIDAL_FORM_SUCCESS, postSuicidalFor
 import { getSuicidalFormSlice } from "../../../../actions/nurse-actions/getSuicidalFormSlice";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import moment from "moment";
 
 const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalForm, formattedSffNo, form }) => {
     const dispatch = useDispatch();
@@ -18,11 +19,10 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
             admissionNo: patientDetails?.Admission_No,
             handingOver,
             takingOver: formattedSffNo,
-            remarks   
+            remarks,
+            date: moment().format('YYYY-MM-DD'),
+            time: moment().format('HH:mm:ss')   
           }
-
-          console.log('form data', suicidalFormData)
-  
            // Dispatch function to handle API call and feedback
           const dispatchSuicidalFormData = async (data) => {
             await dispatch(postSuicidalFormSlice('/InpatientForms/SuicidalPrecautionForm', data))
@@ -30,7 +30,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                 if (result.type === POST_SUICIDAL_FORM_SUCCESS) {
                   message.success(`suicidal precaution form has been saved successfully!`);
                   setIsFormVisible(false);
-                  dispatch(getSuicidalFormSlice());
+                  dispatch(getSuicidalFormSlice(patientDetails?.Admission_No));
                 } else if (result.type === POST_SUICIDAL_FORM_FAILURE) {
                   message.error(result.payload.message || "Internal server error, please try again later.");
                 }
