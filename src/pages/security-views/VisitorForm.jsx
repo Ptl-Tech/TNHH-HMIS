@@ -155,19 +155,23 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (newVisitor.visitorCategory === "0") {
-      newVisitor.personToVisit = "";
+   
+    // Replace empty purposeOfVisit with "Reception"
+    if (!newVisitor.purposeOfVisit || newVisitor.purposeOfVisit.trim() === "") {
+      newVisitor.purposeOfVisit = "Reception";
     }
+  
     const { visitorName, ...restVisitorData } = newVisitor; // Exclude visitorName
-
+  
     const visitorData = {
       myAction: "create",
       visitorNo: "",
       ...restVisitorData,
     };
-
+  
     const visitorId = await dispatch(createVisitor(visitorData));
     console.log("Visitor created with ID:", visitorId);
+  
     if (visitorId) {
       message.success("Visitor created successfully!");
       dispatch(admitVisitor(visitorId));
@@ -183,18 +187,19 @@ const VisitorForm = () => {
         department: "Reception",
         visitorName: "",
         visitorPassNo: "",
-        purposeOfVisit: "",
+        purposeOfVisit: "", // Reset after submission
         reasonForVisit: "",
         FirstName: "",
         MiddleName: "",
         LastName: "",
       });
-//set loading to false
+  
+      // Set loading to false
       setLoadingVisitorCheck(false);
       setVisitorExistsError("");
     }
   };
-
+  
   useEffect(() => {
     dispatch(getEmployeesList());
     dispatch(getVisitorsList());

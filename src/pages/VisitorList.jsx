@@ -167,6 +167,8 @@ const VisitorList = () => {
 
     try {
       const patientNo = await dispatch(convertPatient(selectedVisitor.No));
+      console.log("PatientNo", patientNo);
+
       if (patientNo) {
         const existingPatient = patients.find(
           (patient) => patient.PatientNo === patientNo
@@ -177,8 +179,8 @@ const VisitorList = () => {
             state: { existingPatient },
           });
         } else {
-          message.success("Register Patient First.", 5);
-          navigate("/reception/Patient-Registration", {
+          message.success(`Patient Number: ${patientNo}`, 5);
+          navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
             state: { visitorData: selectedVisitor, patientNumber: patientNo },
           });
         }
