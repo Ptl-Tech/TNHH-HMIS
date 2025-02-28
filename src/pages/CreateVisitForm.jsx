@@ -465,11 +465,7 @@ const CreateVisitForm = () => {
                         placeholder="Select Insurance"
                         className="w-100"
                         value={
-                          newVisit.insuranceNo ||
-                          insurancePayload?.find(
-                            (insurance) =>
-                              insurance.No === existingPatient?.InsuranceNo
-                          )?.No ||
+                          newVisit.insuranceNo || existingPatient?.InsuranceNo ||
                           ""
                         }
                         onChange={(value) =>

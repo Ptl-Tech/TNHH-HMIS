@@ -8,7 +8,8 @@ import {
   Spin,
   Typography,
   Row,
-  Col
+  Col,
+  notification,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +21,7 @@ import {
 } from "../../actions/visitorsActions";
 import LoadingSkeleton from "../../components/LoadingSkeleton";
 import { read } from "xlsx";
+import { checkExistingValue } from "../../actions/Common-Actions/HelperActions";
 
 const VisitorForm = () => {
   const { loading, success, error, data } = useSelector(
@@ -120,34 +122,6 @@ const VisitorForm = () => {
       }
     }
 
-    // if (name === "visitorName") {
-    //   // Only generate if category is 'Employee'
-    //   setNewVisitor((prevState) => ({
-    //     ...prevState,
-    //     visitorPassNo: generateVisitorPassNo(), // Generate a new visitor pass number
-    //   }));
-    //   form.setFieldsValue({ visitorPassNo: generateVisitorPassNo() });
-    // }
-
-    // // Additional logic for autopopulating fields
-    // if (name === "reasonForVisit") {
-    //   if (value === "1") {
-    //     // Medication
-    //     setNewVisitor((prevState) => ({
-    //       ...prevState,
-    //       purposeOfVisit: "Medication",
-    //       // : "",
-    //       personToVisit: "",
-    //     }));
-
-    //     form.setFieldsValue({
-    //       purposeOfVisit: "Medication",
-    //       personToVisit: "",
-    //     });
-    //     message.info("Purpose of visit set to Medication.");
-    //   }
-    // }
-
     setNewVisitor((prevState) => ({
       ...prevState,
       [name]: value,
@@ -155,55 +129,122 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = async () => {
-   
-    // Replace empty purposeOfVisit with "Reception"
-    if (!newVisitor.purposeOfVisit || newVisitor.purposeOfVisit.trim() === "") {
-      newVisitor.purposeOfVisit = "Reception";
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+    if (!newVisitor.idNumber) {
+      message.error("Please enter an ID number.");
+      return;
     }
-  
-    const { visitorName, ...restVisitorData } = newVisitor; // Exclude visitorName
-  
+ // Default purpose of visit
+ if (!newVisitor.purposeOfVisit || newVisitor.purposeOfVisit.trim() === "") {
+  newVisitor.purposeOfVisit = "Reception";
+}
+
+    const existingVisitor = visitors?.find(
+      (visitor) =>
+        visitor.IDNumber === newVisitor.idNumber &&
+        visitor.InitiatedDate.split("T")[0] === today
+    );
+
+    if (existingVisitor) {
+      if (existingVisitor.Status !== "Cleared") {
+        notification.warning({
+          message: `Visitor ${existingVisitor.VisitorName} is already checked in.`,
+        });
+        return;
+      }
+
+      // If visitor exists, update their details before admitting
+      const updatedVisitorData = {
+        myAction: "edit",
+        visitorNo: existingVisitor.No, // Keep the existing visitor number
+        ...newVisitor,
+      };
+
+      try {
+        await dispatch(createVisitor(updatedVisitorData)); // Update visitor details
+        // message.success("Visitor details updated successfully!");
+
+        // Now admit the visitor (change status)
+        await dispatch(admitVisitor(existingVisitor.No));
+ // Show success notification
+ notification.success({
+  message: "Visitor Checked In",
+  description: `Visitor checked in successfully! Visitor No: ${existingVisitor.No}`,
+})
+        form.resetFields();
+        setNewVisitor({
+          visitorCategory: null,
+          personToVisit: "",
+          personToVisitNo: "",
+          idNumber: "",
+          phoneNumber: "",
+          carRegistrationNo: "",
+          department: "Reception",
+          visitorName: "",
+          visitorPassNo: "",
+          purposeOfVisit: "",
+          reasonForVisit: "",
+          firstName: "",
+          middleName: "",
+          lastName: "",
+        });
+
+        setLoadingVisitorCheck(false);
+        setVisitorExistsError("");
+      } catch (error) {
+        console.error("Error updating visitor details:", error);
+        message.error("Failed to update visitor details.");
+      }
+      return;
+    }
+
+    //if purpose of visit is not selected set it to other
+   
+    // If visitor does not exist, create a new record
     const visitorData = {
       myAction: "create",
       visitorNo: "",
-      ...restVisitorData,
+      ...newVisitor,
     };
-  
-    const visitorId = await dispatch(createVisitor(visitorData));
-    console.log("Visitor created with ID:", visitorId);
-  
-    if (visitorId) {
-      message.success("Visitor created successfully!");
-      dispatch(admitVisitor(visitorId));
-      setVisitorPassCounter((prev) => prev + 1); // Increment counter
-      form.resetFields(); // Reset form fields
-      setNewVisitor({
-        visitorCategory: null,
-        personToVisit: "",
-        personToVisitNo: "",
-        idNumber: "",
-        phoneNumber: "",
-        carRegistrationNo: "",
-        department: "Reception",
-        visitorName: "",
-        visitorPassNo: "",
-        purposeOfVisit: "", // Reset after submission
-        reasonForVisit: "",
-        FirstName: "",
-        MiddleName: "",
-        LastName: "",
-      });
-  
-      // Set loading to false
-      setLoadingVisitorCheck(false);
-      setVisitorExistsError("");
+
+    try {
+      const visitorId = await dispatch(createVisitor(visitorData));
+      if (visitorId) {
+        message.success("Visitor created successfully!");
+     const admitVisitorResponse =   await dispatch(admitVisitor(visitorId)); // Admit the newly created visitor
+        notification.success(`Visitor Number: ${admitVisitorResponse} checked iin successfully!`);
+
+        setVisitorPassCounter((prev) => prev + 1);
+        form.resetFields();
+        setNewVisitor({
+          visitorCategory: null,
+          personToVisit: "",
+          personToVisitNo: "",
+          idNumber: "",
+          phoneNumber: "",
+          carRegistrationNo: "",
+          department: "Reception",
+          visitorName: "",
+          visitorPassNo: "",
+          purposeOfVisit: "",
+          reasonForVisit: "",
+          firstName: "",
+          middleName: "",
+          lastName: "",
+        });
+        setLoadingVisitorCheck(false);
+        setVisitorExistsError("");
+      }
+    } catch (error) {
+      // console.error("Error creating visitor:", error);
+      message.error("Failed to create visitor. Please try again.");
     }
   };
-  
+
   useEffect(() => {
     dispatch(getEmployeesList());
     dispatch(getVisitorsList());
-    console.log(visitors);
   }, [dispatch]);
 
   const handleIdNumberChange = (e) => {
@@ -223,34 +264,36 @@ const VisitorForm = () => {
           (visitor) => visitor.IDNumber === value
         );
         if (existingVisitor) {
-          // Fill in the details if the visitor exists
-          setExistingVisitor(existingVisitor);
           message.success("Visitor Information already exists", 5);
+          
+          // Extract names from visitorName field
+          const nameParts = existingVisitor?.VisitorName?.trim().split(/\s+/) || [];
+          const firstName = nameParts[0] || "";
+          const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
+          const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+        
           setNewVisitor((prevState) => ({
             ...prevState,
             visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            // personToVisit: existingVisitor.PersonToSee,
-            // personToVisitNo: existingVisitor.PersonToVisitNo,
-            // purposeOfVisit: existingVisitor.PurposeOfVisit,
-            // visitorCategory: existingVisitor.VisitorCategory,
-            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
+            firstName,
+            middleName,
+            lastName,
           }));
+        
           form.setFieldsValue({
             visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
             carRegistrationNo: existingVisitor.CarRegNumber,
-            // personToVisit: existingVisitor.PersonToSee,
-            // personToVisitNo: existingVisitor.PersonToVisitNo,
-            // purposeOfVisit: existingVisitor.PurposeOfVisit,
-            // visitorCategory: existingVisitor.VisitorCategory,
-            // reasonForVisit: existingVisitor.ReasonForVisit,
             visitorPassNo: generateVisitorPassNo(),
+            firstName,
+            middleName,
+            lastName,
           });
-          setVisitorExistsError("Patient already exists"); // Clear any previous error
-        } else {
+        }
+        else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
           setNewVisitor((prevState) => ({
             ...prevState,
@@ -282,234 +325,280 @@ const VisitorForm = () => {
   };
   return (
     <div>
-    <div className="row p-md-2 gap-4 gap-md-0">
-      <Typography.Title level={3} style={{ color: "#003F6D" }}>
-        Visitor Card
-      </Typography.Title>
-      <div className="col-12">
-        <Card className="card-header" style={{ height: "auto", overflow: "auto" }}>
-          <Typography.Title level={5} style={{ color: "#ac8342" }}>
-            Visitor Details
-          </Typography.Title>
-         <LoadingSkeleton loading={admitVisitorLoading} rows={3} avatar={true}>
-         <Form form={form} layout="vertical">
-            <Row gutter={[16, 16]}>
-              {/* First Row */}
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="Reason for Visit:"
-                  name="reasonForVisit"
-                  rules={[
-                    { required: true, message: "Please select a reason for visit!" },
-                  ]}
-                >
-                  <Select
-                    placeholder="Select category"
-                    value={newVisitor.reasonForVisit}
-                    onChange={(value) => handleInputChange("reasonForVisit", value)}
-                  >
-                    <Select.Option value="1">Medication</Select.Option>
-                    <Select.Option value="2">Official</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="ID Number:"
-                  name="idNumber"
-                  rules={[
-                    { required: true, message: "Please enter the ID number!" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter ID number"
-                    value={newVisitor.idNumber || existingVisitor?.IDNumber}
-                    onChange={handleIdNumberChange}
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="Visitor Name:"
-                  name="visitorName"
-                  rules={[
-                    { required: true, message: "Please enter the visitor name!" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter visitor name"
-                    value={newVisitor.visitorName || existingVisitor?.VisitorName}
-                    onChange={(e) => handleInputChange("visitorName", e.target.value)}
-                  />
-                </Form.Item>
-              </Col>
-  
-              {/* Second Row */}
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="Phone Number:"
-                  name="phoneNumber"
-                  rules={[
-                    { required: true, message: "Please enter the phone number!" },
-                  ]}
-                >
-                  <Input
-                    placeholder="Enter phone number"
-                    value={newVisitor.phoneNumber || existingVisitor?.PhoneNumber}
-                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="Car Registration:"
-                  name="carRegistrationNo"
-                >
-                  <Input
-                    placeholder="Enter car registration"
-                    value={
-                      newVisitor.carRegistrationNo ||
-                      existingVisitor?.CarRegNumber
-                    }
-                    onChange={(e) => handleInputChange("carRegistrationNo", e.target.value)}
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label="Person to See:"
-                  name="visitorCategory"
-                  rules={[
-                    { required: true, message: "Please select a category!" },
-                  ]}
-                >
-                  <Select
-                    placeholder="Select Visitor Category"
-                    value={newVisitor.visitorCategory}
-                    onChange={(value) => handleInputChange("visitorCategory", value)}
-                  >
-                    <Select.Option value="2">Employee</Select.Option>
-                    <Select.Option value="1">Patient</Select.Option>
-                    <Select.Option value="0">Other</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-  
-              {/* Conditional Fields */}
-              {newVisitor.visitorCategory === "1" && (
-                <Col xs={24} sm={12} md={8}>
-                  <Form.Item
-                    label="Patient Name:"
-                    name="patientName"
-                    rules={[
-                      { required: true, message: "Please enter the patient name!" },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Enter patient name"
-                      value={newVisitor.patientName}
-                      onChange={(e) =>
-                        handleInputChange("patientName", e.target.value)
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              )}
-  
-              {newVisitor.visitorCategory === "2" && (
-                <>
+      <div className="row p-md-2 gap-4 gap-md-0">
+        <Typography.Title level={3} style={{ color: "#003F6D" }}>
+          Visitor Card
+        </Typography.Title>
+        <div className="col-12">
+          <Card
+            className="card-header"
+            style={{ height: "auto", overflow: "auto" }}
+          >
+            <Typography.Title level={5} style={{ color: "#ac8342" }}>
+              Visitor Details
+            </Typography.Title>
+            <LoadingSkeleton
+              loading={admitVisitorLoading}
+              rows={3}
+              avatar={true}
+            >
+              <Form form={form} layout="vertical">
+                <Row gutter={[16, 16]}>
+                  {/* First Row */}
                   <Col xs={24} sm={12} md={8}>
                     <Form.Item
-                      label="Person to Visit Name:"
-                      name="personToVisit"
+                      label="Reason for Visit:"
+                      name="reasonForVisit"
                       rules={[
-                        { required: true, message: "Please select a person!" },
+                        {
+                          required: true,
+                          message: "Please select a reason for visit!",
+                        },
                       ]}
                     >
                       <Select
-                        placeholder="Select Name"
-                        value={newVisitor.personToVisit}
+                        placeholder="Select category"
+                        value={newVisitor.reasonForVisit}
                         onChange={(value) =>
-                          handleInputChange("personToVisit", value)
+                          handleInputChange("reasonForVisit", value)
                         }
-                        onFocus={() => dispatch(getEmployeesList())}
                       >
-                        {data.map((employee, index) => (
-                          <Select.Option key={index} value={employee?.No}>
-                            {`${employee.FirstName || ""} ${employee.MiddleName || ""} ${employee.LastName || ""}`.trim()}
-                          </Select.Option>
-                        ))}
+                        <Select.Option value="1">Medication</Select.Option>
+                        <Select.Option value="2">Official</Select.Option>
                       </Select>
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12} md={8}>
                     <Form.Item
-                      label="Person to Visit No:"
-                      name="personToVisitNo"
+                      label="ID Number:"
+                      name="idNumber"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter the ID number!",
+                        },
+                      ]}
                     >
                       <Input
-                        placeholder="Enter visitor number"
-                        value={newVisitor.personToVisitNo}
+                        placeholder="Enter ID number"
+                        value={newVisitor.idNumber || existingVisitor?.IDNumber}
+                        onChange={handleIdNumberChange}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={12} md={8}>
+                    <Form.Item
+                      label="Visitor Name:"
+                      name="visitorName"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter the visitor name!",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Enter visitor name"
+                        value={
+                          newVisitor.visitorName || existingVisitor?.VisitorName
+                        }
                         onChange={(e) =>
-                          handleInputChange("personToVisitNo", e.target.value)
+                          handleInputChange("visitorName", e.target.value)
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  {/* Second Row */}
+                  <Col xs={24} sm={12} md={8}>
+                    <Form.Item
+                      label="Phone Number:"
+                      name="phoneNumber"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter the phone number!",
+                        },
+                      ]}
+                    >
+                      <Input
+                        placeholder="Enter phone number"
+                        value={
+                          newVisitor.phoneNumber || existingVisitor?.PhoneNumber
+                        }
+                        onChange={(e) =>
+                          handleInputChange("phoneNumber", e.target.value)
                         }
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={12} md={8}>
-                    <Form.Item label="Department:" name="department">
+                    <Form.Item
+                      label="Car Registration:"
+                      name="carRegistrationNo"
+                    >
                       <Input
-                        placeholder="Auto-populated department"
-                        value={newVisitor.department || "Reception"}
-                        readOnly
+                        placeholder="Enter car registration"
+                        value={
+                          newVisitor.carRegistrationNo ||
+                          existingVisitor?.CarRegNumber
+                        }
+                        onChange={(e) =>
+                          handleInputChange("carRegistrationNo", e.target.value)
+                        }
                       />
                     </Form.Item>
                   </Col>
-                </>
-              )}
-  
-              {newVisitor.visitorCategory === "0" && (
-                <Col xs={24} sm={12} md={8}>
-                  <Form.Item
-                    label="Purpose of Visit:"
-                    name="purposeOfVisit"
-                  >
-                    <Input
-                      placeholder="Enter purpose of visit"
-                      value={newVisitor.purposeOfVisit}
-                      onChange={(e) =>
-                        handleInputChange("purposeOfVisit", e.target.value)
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              )}
-            </Row>
-          </Form>
-          </LoadingSkeleton>
-        </Card>
-      </div>
-      <div className="col-12 my-3">
-        <Button
-          type="primary"
-          htmlType="submit"
-          onClick={handleSubmit}
-          block
-          style={{
-            float: "right",
-            marginTop: "16px",
-            borderRadius: "15px",
-            backgroundColor: "#E89641",
-            color: "#fff",
-            fontSize: "16px",
-          }}
-        >
-          Check In
-        </Button>
+                  <Col xs={24} sm={12} md={8}>
+                    <Form.Item
+                      label="Person to See:"
+                      name="visitorCategory"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a category!",
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select Visitor Category"
+                        value={newVisitor.visitorCategory}
+                        onChange={(value) =>
+                          handleInputChange("visitorCategory", value)
+                        }
+                      >
+                        <Select.Option value="2">Employee</Select.Option>
+                        <Select.Option value="1">Patient</Select.Option>
+                        <Select.Option value="0">Other</Select.Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  {/* Conditional Fields */}
+                  {newVisitor.visitorCategory === "1" && (
+                    <Col xs={24} sm={12} md={8}>
+                      <Form.Item
+                        label="Patient Name:"
+                        name="patientName"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter the patient name!",
+                          },
+                        ]}
+                      >
+                        <Input
+                          placeholder="Enter patient name"
+                          value={newVisitor.patientName}
+                          onChange={(e) =>
+                            handleInputChange("patientName", e.target.value)
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
+                  )}
+
+                  {newVisitor.visitorCategory === "2" && (
+                    <>
+                      <Col xs={24} sm={12} md={8}>
+                        <Form.Item
+                          label="Person to Visit Name:"
+                          name="personToVisit"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select a person!",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select Name"
+                            value={newVisitor.personToVisit}
+                            onChange={(value) =>
+                              handleInputChange("personToVisit", value)
+                            }
+                            onFocus={() => dispatch(getEmployeesList())}
+                          >
+                            {data.map((employee, index) => (
+                              <Select.Option key={index} value={employee?.No}>
+                                {`${employee.FirstName || ""} ${
+                                  employee.MiddleName || ""
+                                } ${employee.LastName || ""}`.trim()}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={12} md={8}>
+                        <Form.Item
+                          label="Person to Visit No:"
+                          name="personToVisitNo"
+                        >
+                          <Input
+                            placeholder="Enter visitor number"
+                            value={newVisitor.personToVisitNo}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "personToVisitNo",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={12} md={8}>
+                        <Form.Item label="Department:" name="department">
+                          <Input
+                            placeholder="Auto-populated department"
+                            value={newVisitor.department || "Reception"}
+                            readOnly
+                          />
+                        </Form.Item>
+                      </Col>
+                    </>
+                  )}
+
+                  {newVisitor.visitorCategory === "0" && (
+                    <Col xs={24} sm={12} md={8}>
+                      <Form.Item
+                        label="Purpose of Visit:"
+                        name="purposeOfVisit"
+                      >
+                        <Input
+                          placeholder="Enter purpose of visit"
+                          value={newVisitor.purposeOfVisit || "Other"}
+                          onChange={(e) =>
+                            handleInputChange("purposeOfVisit", e.target.value)
+                          }
+                        />
+                      </Form.Item>
+                    </Col>
+                  )}
+                </Row>
+              </Form>
+            </LoadingSkeleton>
+          </Card>
+        </div>
+        <div className="col-12 my-3">
+          <Button
+            type="primary"
+            htmlType="submit"
+            onClick={handleSubmit}
+            block
+            style={{
+              float: "right",
+              marginTop: "16px",
+              borderRadius: "15px",
+              backgroundColor: "#E89641",
+              color: "#fff",
+              fontSize: "16px",
+            }}
+          >
+            Check In
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
-  
   );
 };
 
