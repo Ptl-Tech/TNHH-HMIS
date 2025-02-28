@@ -1,9 +1,9 @@
 import {
-  POST_LAB_TEST_RESULTS_FAIL,
-  POST_LAB_TEST_RESULTS_RESET,
-  POST_LAB_TEST_RESULTS_REQUEST,
-  POST_LAB_TEST_RESULTS_SUCCESS,
-} from '../../actions/lab-actions/postLabTestResults';
+  GET_LAB_REQUEST_FAIL,
+  GET_LAB_REQUEST_REQUEST,
+  GET_LAB_REQUEST_RESET,
+  GET_LAB_REQUEST_SUCCESS,
+} from '../../actions/lab-actions/getLabRequest';
 
 const initialState = {
   data: null,
@@ -11,22 +11,22 @@ const initialState = {
   loading: false,
 };
 
-export const postLabTestResultsReducer = (state = initialState, action) => {
+export const getLabRequestReducer = (state = initialState, action) => {
   switch (action.type) {
-    case POST_LAB_TEST_RESULTS_REQUEST:
+    case GET_LAB_REQUEST_REQUEST:
       return {
         ...state,
         loading: true,
       };
-    case POST_LAB_TEST_RESULTS_SUCCESS:
+    case GET_LAB_REQUEST_SUCCESS:
       return {
         ...state,
         loading: false,
         data: action.payload,
       };
-    case POST_LAB_TEST_RESULTS_RESET:
+    case GET_LAB_REQUEST_RESET:
       return initialState;
-    case POST_LAB_TEST_RESULTS_FAIL:
+    case GET_LAB_REQUEST_FAIL:
       return {
         ...state,
         loading: false,

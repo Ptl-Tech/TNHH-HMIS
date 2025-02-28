@@ -77,3 +77,29 @@ export const labResultsColumns = [
     editable: true,
   },
 ];
+
+export const filterByCategory = (labRequest, variant) => {
+  var returnValue;
+  switch (variant) {
+    case 'All':
+      returnValue = true;
+      break;
+    case 'Walk-In':
+      returnValue = labRequest.Walk_In;
+      break;
+    case 'Inpatient':
+      returnValue = labRequest.Inpatient;
+      break;
+    case 'Outpatient':
+      returnValue = !labRequest.Inpatient && !labRequest.Walk_In;
+      break;
+    default:
+      returnValue = true;
+      break;
+  }
+
+  return returnValue;
+};
+
+export const filterByStatus = (labRequest, status) =>
+  status ? labRequest.Status === status : true;
