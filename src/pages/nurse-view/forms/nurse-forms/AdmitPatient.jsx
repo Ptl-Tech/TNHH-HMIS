@@ -36,6 +36,8 @@ const AdmitPatientForm = () => {
     useSetTableCheckBoxHook();
   const { getBeds, loadingWards, getWards, wardRooms } =
     useGetWardManagementHook();
+    const patientNo = new URLSearchParams(location.search).get("PatientNo");
+
 
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -203,6 +205,7 @@ const AdmitPatientForm = () => {
         loadingWards={loadingWards}
         form={form}
         handleOnFinish={handleOnFinish}
+        patientNo={patientNo}
       />
 
       <Row gutter={[16, 16]} style={{ marginTop: "20px", overflowX: "hidden" }}>

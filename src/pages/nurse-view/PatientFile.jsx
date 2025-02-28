@@ -29,7 +29,7 @@ const PatientFile = ({ patientDetails }) => {
     {label: "Patient Info", icon: <UserOutlined />},
     // "Medical Info",
     {label: "Next of Kin", icon: <UserAddOutlined />},
-    ...(userRole.userData.departmentName === "Doctor" &&
+    ...(userRole.userData.departmentName === "Doctor" || userRole.userData.departmentName === "Psychology" &&
       patientDetail?.Status !== "Completed" ? [{ label: 'Past Doctor Notes', icon: <FileMarkdownOutlined /> }] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Nursing Notes", icon: <FileProtectOutlined />}] : []),
     ...(userRole.userData.departmentName === "Nurse" ? [{label: "Past Encounters Notes", icon: <ExperimentOutlined />}] : []),
@@ -47,7 +47,7 @@ const PatientFile = ({ patientDetails }) => {
     setActiveItem(item.label);
     switch (item.label) {
       case "Patient Info":
-        setSelectedItem(<PatientInfo patientDetails={patientDetails} />);
+        setSelectedItem(<PatientInfo />);
         break;
       // case "Medical Info":
       //   setSelectedItem(<MedicalInfo />);
@@ -67,9 +67,9 @@ const PatientFile = ({ patientDetails }) => {
       case "Order Sheet":
         setSelectedItem(<Consumables />);
         break;
-      case "Charges":
-        setSelectedItem(<Charges/>);
-        break;
+      // case "Charges":
+      //   setSelectedItem(<Charges/>);
+      //   break;
         case "TCA":
         setSelectedItem(<TCAAppointments/>);
         break;

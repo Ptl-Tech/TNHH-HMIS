@@ -27,7 +27,7 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
               .then((result) => {
                 if (result.type === POST_VISITOR_LIST_SUCCESS) {
                   message.success( result.payload.msg || `Visitor has been saved successfully!`);
-                  dispatch(getVisitorsListSlice());
+                  dispatch(getVisitorsListSlice(patientDetails?.Admission_No));
                   setIsFormVisible(false);
                 } else if (result.type === POST_VISITOR_LIST_FAILURE) {
                   message.error(result.payload.msg || "Internal server error, please try again later.");

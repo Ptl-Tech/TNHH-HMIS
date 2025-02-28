@@ -100,9 +100,9 @@ export const createPatient = (patient) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PATIENT_REGISTER_FAIL,
-      payload: error.response?.data?.message || error.message,
+      payload: error.response?.data?.errors || error.message,
     });
-    message.error(error.message, 5);
+    // message.error(error.message, 5);
     throw error; // Rethrow error for `handleSubmit` to handle
   }
 };
@@ -375,17 +375,13 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
       msg: response.data.observationNo,
     };
 
-    // Display success message with observation number
     message.success(
       `Patient dispatched successfully! Observation No: ${responseData.msg}`,
       5,
     );
 
-    setTimeout(() => {
-      console.log('Dispatched Payload:', responseData);
-    }, 2000);
-
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
+    return responseData.msg;
   } catch (error) {
     // Extract error message from different possible sources
     const errorMessage =
@@ -555,24 +551,23 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
     const {
       otpVerify: { userInfo },
     } = getState();
+    const branchCode = localStorage.getItem("branchCode");
 
     const config = {
       headers: {
         'Content-Type': 'application/json',
         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
       },
     };
 
     // Fetch patient details by patientNo
-    const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyPatients&$filter=patientNo eq '${patientNo}'&isList=false`,
-      config,
-    );
+    const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
 
     // Check if a patient was found
-    if (data.length > 0) {
-      dispatch({ type: PATIENT_LIST_SUCCESS, payload: data[0] });
+    if (data && Object.keys(data).length > 0) {
+      dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } else {
       dispatch({ type: PATIENT_LIST_FAIL, payload: 'Patient not found' });
       message.warning('No patient found with the provided patient number.', 5);

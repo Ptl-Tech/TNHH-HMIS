@@ -7,13 +7,13 @@ export const GET_VISITORS_LIST_FAILURE = 'GET_VISITORS_LIST_FAILURE';
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
-export const getVisitorsListSlice = () => 
+export const getVisitorsListSlice = (admissionNo) => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_VISITORS_LIST_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPVisitors&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPVisitors&isList=true &query=$filter=AdmissionNo eq '${admissionNo}' `, config);
     
 
         dispatch({ type: GET_VISITORS_LIST_SUCCESS, payload: data });

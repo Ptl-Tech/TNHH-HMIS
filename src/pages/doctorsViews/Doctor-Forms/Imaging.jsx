@@ -31,6 +31,7 @@ import {
 } from "../../../actions/Doc-actions/requestRadiologyTest";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
+import LabResultDrawer from "./LabResultDrawer";
 
 const { Option } = Select;
 
@@ -39,6 +40,7 @@ const Imaging = () => {
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
+  const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName;
 
   const dispatch = useDispatch();
@@ -57,12 +59,32 @@ const Imaging = () => {
     (state) => state.requestRadiologyTest
   );
 
+  const { loading: postRadiology } = useSelector(
+    (state) => state.postRadiologyRequest
+  );
+
+
+   // lab test drawer
+   const [open, setOpen] = useState(false);
+   const [size, setSize] = useState();
+   const [record, setRecord] = useState(null);
+ 
+   const showLargeDrawer = (record) => {
+     setSize('large');
+     setOpen(true);
+     setRecord(record);
+   };
+ 
+   const onClose = () => {
+     setOpen(false);
+   };
+
   useEffect(() => {
     dispatch(getRadiologySetup());
-    if (treatmentNo) {
-      dispatch(getPatientRadiologyTest(treatmentNo));
+    if (treatmentNo || admissionNo) {
+      dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));
     }
-  }, [dispatch, treatmentNo]);
+  }, [dispatch, treatmentNo, admissionNo]);
 
   const handleSave = async (values) => {
     const { testPackageCode, dueDate, treatmentNo: formTreatmentNo } = values;
@@ -76,16 +98,18 @@ const Imaging = () => {
 
     const radiologyRequest = {
       myAction: "create",
-      treatmentNo: treatmentNo || formTreatmentNo,
+      treatmentNo: treatmentNo ?? admissionNo,
       testPackageCode: testPackageCode,
       dueDate: formattedDueDate,
     };
+
+    console.log("Radiology Request:", radiologyRequest);
 
     try {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
 
       if (response && response.status === "success") {
-        dispatch(getPatientRadiologyTest(formTreatmentNo));
+        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));;
       } else {
         message.error("Failed to submit radiology request");
       }
@@ -97,12 +121,12 @@ const Imaging = () => {
   const handleRadiologyRequest = async () => {
     if (selectedRow && selectedRow.TreatmentNo) {
       const treatmentNo = selectedRow.TreatmentNo;
-      const response = await dispatch(requestRadiologyTest(treatmentNo));
+      const response = await dispatch(requestRadiologyTest(treatmentNo ?? admissionNo));
       if (response && response.status === "success") {
         message.success(
           `Successfully requested radiology test for ${response.radiologyNo}`
         );
-        dispatch(getPatientRadiologyTest(treatmentNo));
+        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));
       }
     } else {
       message.error("No Request selected");
@@ -117,6 +141,7 @@ const Imaging = () => {
       setNoResultsMessage(true);
     }
     setModalVisible(true);
+    setOpen(false);
   };
 
   const columns = [
@@ -166,7 +191,7 @@ const Imaging = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleViewResults(record)}
+          onClick={() => showLargeDrawer(record)}
           icon={<FileTextOutlined />}
         >
           View Results
@@ -315,11 +340,15 @@ const Imaging = () => {
             type="primary"
             htmlType="submit"
             style={{ marginTop: "16px" }}
+            loading={postRadiology}
+            disabled={postRadiology}
           >
             Save Radiology Request
           </Button>
         </Form>
       )}
+
+      <LabResultDrawer onClose={onClose} open={open} size={size} record={record} handleViewResults={handleViewResults} procedure="Radiology"/>
     </div>
   );
 };

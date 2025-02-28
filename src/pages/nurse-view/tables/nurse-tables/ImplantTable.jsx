@@ -1,18 +1,9 @@
-import { Badge, Table } from "antd"
+import { Badge, Table, Tag } from "antd"
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { listDoctors } from "../../../../actions/DropdownListActions";
-import { useDispatch, useSelector } from "react-redux";
 
-const ImplantTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
-  const dispatch = useDispatch();
+const ImplantTable = ({ loadingKetamine, data, doctors }) => {
   const [updatedData, setUpdatedData] = useState([]);
-
-  const { data: doctors } = useSelector((state) => state.getDoctorsList);
-
-  useEffect(() => {
-    dispatch(listDoctors()); // Fetch the list of doctors
-  }, [dispatch]);
 
   useEffect(() => {
     if (doctors && data) {
@@ -30,17 +21,24 @@ const ImplantTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
     }
   }, [doctors, data]);
 
-  console.log('doctorMap', updatedData);
-
-  const filterData = updatedData?.filter((item) =>
-    treatmentNo ? item?.Link_No === treatmentNo : item?.Patient_No === patientNo
-  );
-  const filterProcedureData = filterData?.filter((item) => item.Procedure_Type === 'Implant')
   const columns = [
+    {
+      title: '#',
+      dataIndex: 'key',
+      key: 'key',
+      render: (text, record, index) => index + 1,
+    },
     {
       title: 'Visit No',
       dataIndex: 'Link_No',
       key: 'Link_No',
+      render: (text) => (
+        <span
+          style={{ color: "#0f5689", cursor: "pointer", fontWeight: "bold" }}
+        >
+          {text}
+        </span>
+      ),
     },
 
     {
@@ -79,19 +77,11 @@ const ImplantTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
       key: "Status",
       render: (text, record) => {
         if (record.Status === '0') {
-          return (
-            <Badge
-              status="success"
-              text="Pending" // or any other label
-            />
-          );
+          return <Tag color="#87d068">New</Tag>
+          
         } else {
-          return (
-            <Badge
-              status="error"
-              text="Approved" // or any other label
-            />
-          );
+          return <Tag color="#87d068">New</Tag>
+          
         }
       },
     }
@@ -100,7 +90,10 @@ const ImplantTable = ({ loadingKetamine, data, treatmentNo, patientNo }) => {
   return (
     <div style={{}}>
       <Table
-        dataSource={filterProcedureData}
+        bordered
+        size="small"
+        rowKey={'SystemId'}
+        dataSource={updatedData}
         loading={loadingKetamine}
         columns={columns}
         className="admit-patient-table"
@@ -113,8 +106,7 @@ export default ImplantTable
 
 //props types validations
 ImplantTable.propTypes = {
-  loadingKetamine: PropTypes.bool.isRequired,
-  data: PropTypes.array.isRequired,
-  treatmentNo: PropTypes.string.isRequired,
-  patientNo: PropTypes.string,
+  loadingKetamine: PropTypes.bool,
+  data: PropTypes.array,
+  doctors: PropTypes.array,
 }

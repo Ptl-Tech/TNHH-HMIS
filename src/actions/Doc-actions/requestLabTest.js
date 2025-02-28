@@ -56,7 +56,7 @@ export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
   }
 };
 
-export const getPatientLabTest = () => async (dispatch, getState) => {
+export const getPatientLabTest = (treatmentNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: VIEW_PATIENT_LAB_TEST });
 
@@ -76,7 +76,7 @@ export const getPatientLabTest = () => async (dispatch, getState) => {
     };
 
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=true`,
+      `${API}data/odatafilter?webservice=QyTreatmentLaboratoryLines&isList=true &query=$filter=TreatmentNo eq '${treatmentNo}'`,
       config,
     );
 

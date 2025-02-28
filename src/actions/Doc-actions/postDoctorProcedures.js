@@ -29,6 +29,11 @@ export const GET_PATIENT_KETAMINE_REQUEST_SUCCESS = "GET_PATIENT_KETAMINE_REQUES
 export const GET_PATIENT_KETAMINE_REQUEST_FAIL = "GET_PATIENT_KETAMINE_REQUEST_FAIL";
 export const GET_PATIENT_KETAMINE_REQUEST_RESET = "GET_PATIENT_KETAMINE_REQUEST_RESET";
 
+export const GET_PATIENT_IMPLANT_REQUEST_REQUEST = "GET_PATIENT_IMPLANT_REQUEST_REQUEST";
+export const GET_PATIENT_IMPLANT_REQUEST_SUCCESS = "GET_PATIENT_IMPLANT_REQUEST_SUCCESS";
+export const GET_PATIENT_IMPLANT_REQUEST_FAIL = "GET_PATIENT_IMPLANT_REQUEST_FAIL";
+export const GET_PATIENT_IMPLANT_REQUEST_RESET = "GET_PATIENT_IMPLANT_REQUEST_RESET";
+
 // Post Prescription Action
 export const postPatientECTRequest = (prescription) => async (dispatch, getState) => {
   try {
@@ -196,7 +201,7 @@ export const postPatientKetamineRequest = (prescription) => async (dispatch, get
   };
 
 
-export const getPatientECTRequest = () => async (dispatch, getState) => {
+export const getPatientECTRequest = (treatmentNo) => async (dispatch, getState) => {
     try {
       dispatch({ type: GET_PATIENT_ETC_REQUEST_REQUEST });
   
@@ -215,7 +220,7 @@ export const getPatientECTRequest = () => async (dispatch, getState) => {
       };
   
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgProcedureRequestList&isList=true`,
+        `${API}data/odatafilter?webservice=PgProcedureRequestList&isList=true &query=$filter=Link_No eq '${treatmentNo}' and Procedure_Type eq 'ECT'`,
         config
       );
   
@@ -231,7 +236,7 @@ export const getPatientECTRequest = () => async (dispatch, getState) => {
     }
   };
 
-  export const getPatientKetamineRequest = () => async (dispatch, getState) => {
+  export const getPatientKetamineRequest = (treatmentNo) => async (dispatch, getState) => {
     try {
       dispatch({ type: GET_PATIENT_KETAMINE_REQUEST_REQUEST });
   
@@ -250,7 +255,7 @@ export const getPatientECTRequest = () => async (dispatch, getState) => {
       };
   
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgProcedureRequestList&isList=true`,
+        `${API}data/odatafilter?webservice=PgProcedureRequestList&isList=true &query=$filter=Link_No eq '${treatmentNo}' and Procedure_Type eq 'Ketamine Infusion'`,
         config
       );
   
@@ -263,6 +268,41 @@ export const getPatientECTRequest = () => async (dispatch, getState) => {
       message.error(errorMessage);
   
       dispatch({ type: GET_PATIENT_KETAMINE_REQUEST_FAIL, payload: errorMessage });
+    }
+  };
+
+  export const getPatientImplantRequest = (treatmentNo) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: GET_PATIENT_IMPLANT_REQUEST_REQUEST });
+  
+      const {
+        otpVerify: { userInfo },
+      } = getState();
+      const branchCode = localStorage.getItem("branchCode");
+  
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: userInfo?.userData?.no,
+          sessionToken: userInfo?.userData?.portalSessionToken,
+          branchCode: branchCode,
+        },
+      };
+  
+      const response = await axios.get(
+        `${API}data/odatafilter?webservice=PgProcedureRequestList&isList=true &query=$filter=Link_No eq '${treatmentNo}' and Procedure_Type eq 'Implant'`,
+        config
+      );
+  
+      dispatch({ type: GET_PATIENT_IMPLANT_REQUEST_SUCCESS, payload: response.data });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to fetch diagnosis lines";
+      
+      // Display error message using Ant Design's message component
+      message.error(errorMessage);
+  
+      dispatch({ type: GET_PATIENT_IMPLANT_REQUEST_FAIL, payload: errorMessage });
     }
   };
 

@@ -45,7 +45,7 @@ const CarePlanFormData = ({
               message.success(
                 result.payload.msg || `Care plan saved successfully!`
               );
-              dispatch(getNursingCarePlanSlice());
+              dispatch(getNursingCarePlanSlice(patientDetails?.Admission_No));
               setIsFormVisible(false);
             } else if (result.type === POST_NURSING_CARE_PLAN_FAILURE) {
               message.error(

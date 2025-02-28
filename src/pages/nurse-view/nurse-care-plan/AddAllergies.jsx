@@ -14,7 +14,7 @@ const AddAllergies = () => {
         const [isModalOpen, setIsModalOpen] = useState(false);
         const { patientDetails } = useLocation().state;
         const [isFormVisible, setIsFormVisible] = useState(false);
-
+const observationNumber = new URLSearchParams(window.location.search).get("AdmNo");
         const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
         const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
         const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.Patient_No);
@@ -62,7 +62,7 @@ const AddAllergies = () => {
 
         {
           isFormVisible && (
-            <AllergyAndMedication setIsFormVisible={setIsFormVisible} />
+            <AllergyAndMedication setIsFormVisible={setIsFormVisible} observationNumber={observationNumber} />
           )
         }
 

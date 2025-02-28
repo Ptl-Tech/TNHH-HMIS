@@ -5,6 +5,11 @@ export const GET_PG_BEDS_REQUEST = 'GET_PG_BEDS_REQUEST';
 export const GET_PG_BEDS_SUCCESS = 'GET_PG_BEDS_SUCCESS';
 export const GET_PG_BEDS_FAILURE = 'GET_PG_BEDS_FAILURE';
 
+export const GET_PG_BED_DETAILS_REQUEST = 'GET_PG_BED_DETAILS_REQUEST';
+export const GET_PG_BED_DETAILS_SUCCESS = 'GET_PG_BED_DETAILS_SUCCESS';
+export const GET_PG_BED_DETAILS_FAILURE = 'GET_PG_BED_DETAILS_FAILURE';
+
+
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
 export const getPgBedsSlice = () => 
@@ -34,3 +39,31 @@ export const getPgBedsSlice = () =>
         return { type: GET_PG_BEDS_FAILURE, payload: error };
     }
 };
+
+export const getPgBedsDetailsSlice = (bedNo) => 
+    async (dispatch, getState) => {
+      const config = configHelpers(getState);
+      try {
+          dispatch({ type: GET_PG_BED_DETAILS_REQUEST });
+  
+          const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgBeds&isList=true&query=$filter=WardNo eq '${bedNo}'`, config);
+      
+  
+          dispatch({ type: GET_PG_BED_DETAILS_SUCCESS, payload: data });
+  
+          return { type: GET_PG_BED_DETAILS_SUCCESS, payload: data };
+  
+      } catch (error) {
+      
+          dispatch({
+              type: GET_PG_BED_DETAILS_FAILURE,
+              payload: {
+                  message: error.message,
+                  status: error.response?.status || 'Network Error',
+                  data: error.response?.data || null,
+              },
+          });
+  
+          return { type: GET_PG_BED_DETAILS_FAILURE, payload: error };
+      }
+  };

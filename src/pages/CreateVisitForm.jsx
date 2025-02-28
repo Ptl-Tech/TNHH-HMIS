@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   message,
+  notification,
   Select,
   Switch,
 } from 'antd';
@@ -21,8 +22,10 @@ import {
   createTriageVisit,
   listPatients,
   postTriageVisit,
-} from '../actions/patientActions';
-import { IoCaretBack, IoCloseOutline } from 'react-icons/io5';
+
+} from "../actions/patientActions";
+import { IoCaretBack, IoCloseOutline } from "react-icons/io5";
+import LoadingSkeleton from "../components/LoadingSkeleton";
 
 const CreateVisitForm = () => {
   const dispatch = useDispatch();
@@ -32,8 +35,9 @@ const CreateVisitForm = () => {
   const patientNo = queryParams.get('PatientNo');
   const { state } = location; // Access the state passed via navigate
   const { patientData, existingPatient, visitData } = state || {}; // Destructure patient data if available
-  const { loading, patients: visitPatients } = useSelector(
-    (state) => state.appmntList,
+  const { loading: appmntListLoading, patients: visitPatients } = useSelector(
+    (state) => state.appmntList
+
   );
   const {
     loading: patientListLoading,
@@ -81,6 +85,9 @@ const CreateVisitForm = () => {
     error: editPatientError,
     data: editPatientPayload,
   } = useSelector((state) => state.createPatient);
+
+  const loading=   visitLoading ||  postTriageVisitLoading;
+
   const [newVisit, setNewVisit] = useState({
     clinic: '',
     doctor: '',
@@ -171,10 +178,23 @@ const CreateVisitForm = () => {
 
       if (response) {
         const newAppointmentId = response;
-        console.log('Visit created with ID:', newAppointmentId);
-        message.success('Visit created successfully!');
 
+        console.log("Visit created with ID:", newAppointmentId);
+        // message.success("Visit created successfully!");
+        notification.success({
+          message: (
+            <span style={{ color: "#1E67AB" , fontWeight:"semibold" }}>
+              Patient visit has been created successfully!{" "}
+              <span style={{ color: "red", fontWeight: "bold" }}>Appointment No: {newAppointmentId}</span>
+            </span>
+          ),
+          style: {
+            border:"2px solid #1E67AB",
+            color: "white", // White text
+          },
+        });
         setAppointmentId(newAppointmentId);
+
 
         // Call dispatchPatient after successfully setting the appointment ID
         // dispatchPatient(newAppointmentId);
@@ -203,7 +223,20 @@ const CreateVisitForm = () => {
     try {
       console.log('Dispatching patient with appointment ID:', appointmentId);
 
-      await dispatch(postTriageVisit({ appointmentNo: appointmentId }));
+    const OBNo=  await dispatch(postTriageVisit({ appointmentNo: appointmentId }));
+    if (OBNo) {
+      notification.success({
+        message: (
+          <span style={{ color: "#1E67AB" , fontWeight:"semibold" }}>
+            Patient has been dispatched successfully!{" "}
+            <span style={{ color: "red", fontWeight: "bold" }}>OB No: {OBNo}</span>
+          </span>
+        ),
+        showProgress: true,
+      });
+    
+      navigate(-1 || "/reception/visitors-list");
+    }
     } catch (postTriageVisitError) {
       console.error('Error dispatching patient:', error);
       //display error message from postTriageVisitError
@@ -312,10 +345,8 @@ const CreateVisitForm = () => {
 
         <div className="row">
           <div className="col-12 col-md-8">
-            <Card
-              title="Patient Information"
-              style={{ width: '100%' }}
-            >
+            <Card title="Patient Information" style={{ width: "100%" }}>
+              <LoadingSkeleton loading={loading} avatar={true} rows={3}>
               <Form>
                 <div className="row px-3 py-2 align-items-center justify-content-between">
                   <div className="col-12 col-md-6">
@@ -588,6 +619,7 @@ const CreateVisitForm = () => {
                   </>
                 )}
               </Form>
+                </LoadingSkeleton>
             </Card>
           </div>
           <div className="col-12 col-md-4">

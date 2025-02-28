@@ -48,10 +48,10 @@ export const postPatientCharges = (charges) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: POST_CHARGES_FAIL,
-      payload: error.response?.data?.message || error.errors || error.message,
+      payload: error.response?.data?.errors ,
     });
 
-    message.error(error.response?.data?.message || error.errors || "Failed to post charges.");
+    message.error(error.response?.data?.errors || "Failed to post charges.");
     throw error;
   }
 };

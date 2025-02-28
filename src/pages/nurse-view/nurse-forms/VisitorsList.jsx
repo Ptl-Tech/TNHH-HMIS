@@ -24,7 +24,6 @@ const VisitorsList = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const filterVisitorList = ipVisitors.filter((item) => item?.AdmissionNo === patientDetails?.Admission_No);
 
     const handleCancel = () => {
       setIsModalOpen(false);
@@ -48,8 +47,8 @@ const VisitorsList = () => {
     }
 
     useEffect(() => {
-        dispatch(getVisitorsListSlice());
-    }, [dispatch]);
+        dispatch(getVisitorsListSlice(patientDetails?.Admission_No));
+    }, [dispatch, patientDetails?.Admission_No]);
 
 
   return (
@@ -97,7 +96,7 @@ const VisitorsList = () => {
             <VisitorFormTable 
             rowSelection={rowSelection} 
             loadingIpVisitors={loadingIpVisitors} 
-            filterVisitorList={filterVisitorList}
+            filterVisitorList={ipVisitors}
             />
           )
         }

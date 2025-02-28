@@ -28,8 +28,8 @@ const CarePlanForm = () => {
   };
 
   useEffect(() => {
-    dispatch(getNursingCarePlanSlice());
-  }, [dispatch]);
+    dispatch(getNursingCarePlanSlice(patientDetails?.Admission_No));
+  }, [dispatch, patientDetails?.Admission_No]);
 
   return (
     <>

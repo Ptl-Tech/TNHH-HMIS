@@ -251,9 +251,9 @@ const ConsultationRoomPatients = () => {
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === "Doctor"
-        ? `/Doctor/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
+        ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
         : role === "Psychology" 
-        ? `/Psychology/Consultation/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
+        ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`
         : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${record.TreatmentNo}`,
       {
         state: {

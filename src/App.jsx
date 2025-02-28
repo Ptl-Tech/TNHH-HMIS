@@ -39,6 +39,7 @@ import Inpatient from './pages/nurse-view/Inpatient';
 import WaitingList from './pages/WaitingList';
 // import Patientlist from "./pages/Patientlist";
 // import NewPatients from "./pages/NewPatients";
+
 import NurseObservation from './pages/NurseObservation';
 import NurseOutpatientList from './pages/NurseOutpatientList';
 import BedManager from './pages/BedManager';
@@ -59,6 +60,7 @@ import Admissions from './pages/nurse-view/Admissions';
 import AdmissionRequests from './pages/nurse-view/AdmissionRequests';
 import AdmissionRequest from './pages/nurse-view/AdmissionRequest';
 import DischargeList from './pages/nurse-view/DischargeList';
+import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
 import RadiologyOutPatient from './pages/doctorsViews/tables/Radiology/RadiologyOutPatient';
 import RadiologyOutPatients from './pages/doctorsViews/tables/Radiology/RadiologyOutPatients';
 
@@ -91,6 +93,7 @@ import LabRoutes from './Routes/LabRoutes';
 import ViewReceipt from './pages/billing/ViewReceipt';
 import EncounterSummery from './pages/doctorsViews/EncounterSummery';
 import ViewPatientsReceipts from './pages/billing/ViewPatientsReceipts';
+import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 import ReceptionRoutes from './Routes/ReceptionRoutes';
 
 function App() {
@@ -214,12 +217,25 @@ function App() {
             path="Consultation-List/Read-Doctor-Dotes"
             element={<ReadDoctorNotes />}
           />
-
+          <Route path="Patient-list" element={<OutpatientList />} />
+          <Route
+            path="Patient-Registration/:PatientNo?"
+            element={<PatientRegistration />}
+          />
+          <Route
+            path="patient-list/Direct-Admission/:PatientNo?"
+            element={<DirectAdmission />}
+          />
+          <Route path="view-profile" element={<ViewProfile />} />
+        </Route>
+      </Route>
+      <Route element={<PrivateRoute allowedDepartments={["Reception"]} />}>
+        <Route path="/reception" element={<MainLayout />}>
+          <Route index element={<ReceptionDashboard />} />
           <Route
             path="Consultation-List"
             element={<DoctorVisits />}
           />
-
           <Route
             path="Admission-requests"
             element={<AdmissionRequests />}

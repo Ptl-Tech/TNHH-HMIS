@@ -28,6 +28,7 @@ import {
 } from "@ant-design/icons";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
+import LabResultDrawer from "./LabResultDrawer";
 
 const { Option } = Select;
 
@@ -57,6 +58,7 @@ const LabResults = () => {
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
+
   const [labRequest, setLabRequest] = useState({
     myAction: "create",
     treatmentNo: treatmentNo ? treatmentNo : admissionNo,
@@ -64,22 +66,36 @@ const LabResults = () => {
     dueDate: "",
   });
 
+  // lab test drawer
+  const [open, setOpen] = useState(false);
+  const [size, setSize] = useState();
+  const [record, setRecord] = useState(null);
+
+  const showLargeDrawer = (record) => {
+    setSize('large');
+    setOpen(true);
+    setRecord(record);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
   useEffect(() => {
     dispatch(getLabRequestSetup());
-    dispatch(getPatientLabTest());
-  }, [dispatch]);
+    dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
+  }, [dispatch, treatmentNo, admissionNo]);
 
   const handleLabRequest = async () => {
     if (selectedRow && selectedRow.TreatmentNo) {
       try {
         const response = await dispatch(requestLabTest(selectedRow.TreatmentNo));
-        console.log("Response from requestLabTest:", response);
         if (response) {
           message.success(
             `Requesting test for ${selectedRow.LaboratoryTestPackageName} with Laboratory No: ${response.laboratoryNo}`
           );
           // Refresh the patient lab test data
-          dispatch(getPatientLabTest());
+          dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
         } else {
           message.error("Failed to request the lab test. Please try again.");
         }
@@ -104,7 +120,7 @@ const LabResults = () => {
   const handleSave = () => {
     dispatch(postLabRequest(labRequest)).then((data) => {
       if (data.status === "success") message.success(data.status);
-      dispatch(getPatientLabTest());
+      dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
       showForm(false);
     });
   };
@@ -116,6 +132,7 @@ const LabResults = () => {
       setNoResultsMessage(true);
     }
     setModalVisible(true);
+    setOpen(false);
   };
 
   const columns = [
@@ -164,18 +181,18 @@ const LabResults = () => {
         return <Tag color={color}>{status}</Tag>;
       },
     },
-    {
-      title: "Results",
-      dataIndex: "Results",
-      key: "Results",
-    },
+    // {
+    //   title: "Results",
+    //   dataIndex: "Results",
+    //   key: "Results",
+    // },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => handleViewResults(record)}
+          onClick={() => showLargeDrawer(record)}
           icon={<FileTextOutlined />}
         >
           View Results
@@ -183,25 +200,6 @@ const LabResults = () => {
       ),
     },
   ];
-  
-  // const rowSelection = {
-  //   type: "radio", // This ensures only one row can be selected
-  //   selectedRowKeys: selectedRow.length ? [selectedRow[0].key] : [], // Ensure only a single row is selected
-  //   onChange: (selectedRowKeys, selectedRow) => {
-  //     setSelectedRow(selectedRow);
-  //   },
-  // };
-  
-  
-  // Filter the data based on the selected rows  
-  const dataSource = Array.isArray(patientLabTest)
-  ? patientLabTest
-      .filter((item) => item.TreatmentNo === treatmentNo) // Filter based on TreatmentNo
-      .map((item, index) => ({
-        ...item,
-        key: index, // Ensure unique key
-      }))
-  : [];
 
   return (
     <div>
@@ -264,7 +262,7 @@ const LabResults = () => {
           <>
            <RowSelectionTable
            columns={columns}
-           dataSource={dataSource}
+           dataSource={patientLabTest}
            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
            tableProps={{ scroll: { x: 600 } }} // Additional Table props
          />
@@ -356,6 +354,8 @@ const LabResults = () => {
           </div>
         </Form>
       )}
+
+      <LabResultDrawer onClose={onClose} open={open} size={size} record={record} handleViewResults={handleViewResults} procedure="Laboratory"/>
     </div>
   );
 };

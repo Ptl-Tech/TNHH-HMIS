@@ -64,12 +64,8 @@ const PrescriptionForm = ({ setShowForm }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getQyPrescriptionLineSlice());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getQyPrescriptionLineSlice());
-  }, [dispatch]);
+    dispatch(getQyPrescriptionLineSlice(treatmentNo));
+  }, [dispatch, treatmentNo]);
 
   const [prescriptionCardData, setPrescriptionCardData] = useState({
     DrugNo: "N/A",

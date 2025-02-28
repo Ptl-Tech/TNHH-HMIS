@@ -93,7 +93,7 @@ const ProcessPayment = ({
           />
         </div>
       }
-      visible={visible}
+      open={visible}
       onCancel={onClose}
       style={{ top: 20 }}
       width={600}

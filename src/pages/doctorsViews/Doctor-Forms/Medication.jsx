@@ -25,9 +25,6 @@ const Medication = () => {
   );
   const role = useAuth().userData.departmentName;
 
-  const filteredPrescriptions = prescriptions.filter(
-    (prescription) => prescription.TreatmentNo === treatmentNo
-  );
   const { loading: pharmacyPosting } = useSelector(
     (state) => state.sendtoPharmacy
   );
@@ -36,8 +33,8 @@ const Medication = () => {
   };
 
   useEffect(() => {
-    dispatch(getQyPrescriptionLineSlice());
-  }, [dispatch]);
+    dispatch(getQyPrescriptionLineSlice(treatmentNo));
+  }, [dispatch, treatmentNo]);
   return (
     <div>
       <div
@@ -80,7 +77,7 @@ const Medication = () => {
 
       {!showForm ? (
         <PrescriptionTable
-          filteredPrescriptions={filteredPrescriptions}
+          filteredPrescriptions={prescriptions}
           loadingPrescriptions={loadingPrescriptions}
         />
       ) : (

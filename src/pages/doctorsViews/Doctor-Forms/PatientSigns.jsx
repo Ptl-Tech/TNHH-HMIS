@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Button, Steps, Form, Input, Typography, message, Spin } from "antd";
+import { Button, Steps, Form, Input, Typography, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { FileOutlined } from "@ant-design/icons";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
@@ -7,6 +7,7 @@ import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientH
 import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
 import useAuth from "../../../hooks/useAuth";
 import { useLocation } from "react-router-dom";
+import Loading from "../../../partials/nurse-partials/Loading";
 
 const { TextArea } = Input;
 const { Step } = Steps;
@@ -86,7 +87,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           .filter((note) => note.Notes_Type === "Premorbid Personality")
           .at(-1)?.Notes || "",
       20:
-        data.filter((note) => note.Notes_Type === "Medical").at(-1)?.Notes ||
+        data.filter((note) => note.Notes_Type === "Medical History").at(-1)?.Notes ||
         "",
       23:
         data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
@@ -291,7 +292,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
   // console.log(currentStep, 'currentStep');
 
-  if (!patientDetails) return <Spin />;
+  if (!patientDetails) return <Loading />;
 
   return (
     <div className="mt-4">

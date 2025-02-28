@@ -39,8 +39,6 @@ const VisitorList = () => {
   const [searchPhone, setSearchPhone] = useState('');
   const [searchIdNumber, setSearchIdNumber] = useState('');
 
-  console.log('search name', searchName);
-
   const currentDate = dayjs().format('YYYY-MM-DD');
 
   const { loading: visitorsLoading, visitors } = useSelector(
@@ -49,7 +47,10 @@ const VisitorList = () => {
   const { loading: patientsLoading, patients } = useSelector(
     (state) => state.patientList,
   );
-
+  const { loading: convertPatientLoading } = useSelector(
+    (state) => state.convertPatient
+  );
+  
   const loading = visitorsLoading || patientsLoading || filterLoading;
 
   useEffect(() => {
@@ -66,7 +67,6 @@ const VisitorList = () => {
     console.log('visitors are existing patients', visitors);
   }
 
-  console.log('visitors', filteredVisitors);
   //filter the visitors based on date and status only
   useEffect(() => {
     const filtered = visitors?.filter((visitor) => {
@@ -103,8 +103,10 @@ const VisitorList = () => {
       (patient) => patient.IDNumber === visitor.IDNumber,
     );
 
-    if (isPatient) {
-      return 'Dispatch Patient'; // Show 'Create Visit' if the visitor is a patient
+    if (isPatient && isPatient.Walkin) {
+      return "Create Walk In visit"; // Show 'Create Visit' if the visitor is a patient
+    }else if (isPatient && !isPatient.Walkin) {
+      return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
     } else {
       return 'Register Walk In '; // Show 'Convert to Patient' if the visitor is not yet a patient
     }
@@ -162,6 +164,8 @@ const VisitorList = () => {
 
     try {
       const patientNo = await dispatch(convertPatient(selectedVisitor.No));
+      console.log("PatientNo", patientNo);
+
       if (patientNo) {
         const existingPatient = patients.find(
           (patient) => patient.PatientNo === patientNo,
@@ -172,8 +176,8 @@ const VisitorList = () => {
             state: { existingPatient },
           });
         } else {
-          message.success('Register Patient First.', 5);
-          navigate('/reception/Patient-Registration', {
+          message.success(`Patient Number: ${patientNo}`, 5);
+          navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
             state: { visitorData: selectedVisitor, patientNumber: patientNo },
           });
         }
@@ -278,22 +282,24 @@ const VisitorList = () => {
         style={{ padding: '30px 10px' }}
       >
         <Row gutter={[16, 16]}>
+        <Col span={8}>
+            <Input.Search
+              placeholder="Visitor Name"
+              // value={searchParams.VisitorName}
+              allowClear
+              onChange={(value)=>setSearchName(value.target.value)}
+
+            />
+          </Col>
           <Col span={8}>
             <Input.Search
               placeholder="ID Number"
               // value={searchParams.IdNumber}
               allowClear
-              onChange={(value) => setSearchIdNumber(value.target.value)}
+              onChange={(value)=>setSearchIdNumber(value.target.value)}
             />
           </Col>
-          <Col span={8}>
-            <Input.Search
-              placeholder="Visitor Name"
-              // value={searchParams.VisitorName}
-              allowClear
-              onChange={(value) => setSearchName(value.target.value)}
-            />
-          </Col>
+         
           <Col span={8}>
             <Input.Search
               placeholder="Visitor Phone"
@@ -329,8 +335,8 @@ const VisitorList = () => {
           <Button
             key="convert"
             type="primary"
-            disabled={!selectedVisitor}
-            loading={loading}
+            disabled={!selectedVisitor || convertPatientLoading}
+            loading={convertPatientLoading}
             onClick={handleConvertToPatient}
           >
             Convert to Patient
