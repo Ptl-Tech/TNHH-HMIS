@@ -34,7 +34,7 @@ const DispatchedAppmnts = () => {
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const todayPatients = patients.filter(
+    const todayPatients = patients?.filter(
       (patient) => patient.AppointmentDate === today
     );
     setFilteredPatients(todayPatients);
@@ -160,7 +160,7 @@ const DispatchedAppmnts = () => {
 
   const startIdx = (pagination.current - 1) * pagination.pageSize;
   const endIdx = startIdx + pagination.pageSize;
-  const paginatedData = filteredPatients.slice(startIdx, endIdx);
+  const paginatedData = filteredPatients?.slice(startIdx, endIdx);
 
   return (
     <div>
@@ -209,7 +209,7 @@ const DispatchedAppmnts = () => {
       <Table
         columns={columns}
         loading={loading}
-        dataSource={paginatedData.map((patient) => ({
+        dataSource={paginatedData?.map((patient) => ({
           ...patient,
           key: patient.AppointmentNo,
         }))}
@@ -218,7 +218,7 @@ const DispatchedAppmnts = () => {
         size="medium"
       />
       <Pagination
-        total={filteredPatients.length}
+        total={filteredPatients?.length}
         showTotal={(total, range) =>
           `${range[0]}-${range[1]} of ${total} items`
         }

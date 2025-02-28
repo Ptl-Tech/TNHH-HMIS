@@ -69,7 +69,7 @@ const useSignIn = () => {
         navigate('/reception');
       } else if (role === 'Doctor') {
         navigate('/Doctor');
-      } else if (role === 'LABORATORY') {
+      } else if (role === 'Laboratory') {
         navigate('/Lab');
       } else if (role === 'Security') {
         navigate('/Security');

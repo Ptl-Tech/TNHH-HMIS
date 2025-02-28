@@ -8,8 +8,9 @@ import { ProfileOutlined, SearchOutlined } from '@ant-design/icons';
 
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { getLabList } from '../../../../actions/Doc-actions/getLabList';
+import { filterByCategory, filterByStatus } from './utils';
 
-const LabOutPatient = () => {
+const LabRequests = ({ status, requestType }) => {
   // hooks
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -21,10 +22,18 @@ const LabOutPatient = () => {
   const { loadinglabTreatmentHeaders, data: labTreatmentHeaders } = useSelector(
     (state) => state.labList,
   );
+
+  const labTreatmentHeadersData = labTreatmentHeaders.filter(
+    (item) =>
+      filterByCategory(item, requestType) && filterByStatus(item, status),
+  );
+
+  console.log({ labTreatmentHeadersData });
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
-    total: labTreatmentHeaders.length,
+    total: labTreatmentHeadersData.length,
   });
 
   useEffect(() => {
@@ -39,10 +48,14 @@ const LabOutPatient = () => {
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
-  const handleReset = (clearFilters) => {
+
+  const handleReset = (clearFilters, confirm) => {
     clearFilters();
     setSearchText('');
+    setSearchedColumn('');
+    confirm();
   };
+
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -83,7 +96,7 @@ const LabOutPatient = () => {
             Search
           </Button>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters, confirm)}
             size="small"
             style={{
               width: 90,
@@ -134,6 +147,7 @@ const LabOutPatient = () => {
     },
     render: (text) => text,
   });
+
   const columns = [
     {
       title: 'Doctor Name',
@@ -176,7 +190,7 @@ const LabOutPatient = () => {
           case 'Forwarded':
             statusColor = 'blue';
             break;
-          case 'Cancelled':
+          case 'Voided':
             statusColor = 'red';
             break;
           default:
@@ -208,7 +222,11 @@ const LabOutPatient = () => {
             type="primary"
             onClick={() => handleNavigate(record, record.LaboratoryNo)}
           >
-            View Requests
+            {record.Status === 'Completed'
+              ? 'View Results'
+              : record.Status === 'Recalled'
+              ? 'Review Results'
+              : 'View Requests'}
           </Button>
         );
       },
@@ -220,11 +238,10 @@ const LabOutPatient = () => {
   };
 
   const handleNavigate = (record, LaboratoryNo) => {
-    navigate(`/Lab/Patient?LaboratoryNo=${LaboratoryNo}`, {
+    navigate(`/Lab/Outpatient/Lab-Request?LaboratoryNo=${LaboratoryNo}`, {
       state: {
         patientNo: record.PatientNo,
         labObservationNo: record.LaboratoryNo,
-        patientLabRecord: record,
       },
     });
   };
@@ -255,7 +272,7 @@ const LabOutPatient = () => {
           bordered
           size="middle"
           columns={columns}
-          dataSource={labTreatmentHeaders}
+          dataSource={labTreatmentHeadersData}
           className="admit-patient-table"
           pagination={{
             ...pagination,
@@ -286,4 +303,4 @@ const LabOutPatient = () => {
   );
 };
 
-export default LabOutPatient;
+export default LabRequests;

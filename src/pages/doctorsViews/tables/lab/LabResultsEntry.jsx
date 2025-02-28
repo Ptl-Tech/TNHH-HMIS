@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -12,34 +12,56 @@ import {
   Typography,
   InputNumber,
   Flex,
+  Dropdown,
+  Modal,
+  Space,
 } from 'antd';
 
 import { labLinesColumns, labResultsColumns } from './utils';
 
+import { AiOutlineMore } from 'react-icons/ai';
 import Loading from '../../../../partials/nurse-partials/Loading';
 import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
 
+import {
+  POST_LAB_TEST_REMARKS_RESET,
+  postTestRemarks,
+} from '../../../../actions/lab-actions/postTestRemarks';
 import { getLabTestResults } from '../../../../actions/lab-actions/getLabTestResults';
-import { postLabTestResults } from '../../../../actions/lab-actions/postLabTestResults';
+import {
+  POST_LAB_TEST_RESULTS_RESET,
+  postLabTestResults,
+} from '../../../../actions/lab-actions/postLabTestResults';
 
 const LabResultsEntry = ({ data, loading }) => {
   // state
-  const [open, setOpen] = useState(false);
+  const [openResults, setOpenResults] = useState(false);
+  const [openRemarks, setOpenRemarks] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
 
-  const showDrawer = (record) => {
+  const showResultsDrawer = (record) => {
     setCurrentRecord(record);
-    setOpen(true);
+    setOpenResults(true);
   };
 
-  const handleOk = () => {
+  const handleResultsOk = () => {
     setCurrentRecord(null);
-    setOpen(false);
+    setOpenResults(false);
   };
 
-  const handleCancel = () => {
+  const handleResultsCancel = () => {
     setCurrentRecord(null);
-    setOpen(false);
+    setOpenResults(false);
+  };
+
+  const showRemarksDrawer = (record) => {
+    setCurrentRecord(record);
+    setOpenRemarks(true);
+  };
+
+  const handleRemarksCancel = () => {
+    setCurrentRecord(null);
+    setOpenRemarks(false);
   };
 
   const { Title } = Typography;
@@ -47,15 +69,15 @@ const LabResultsEntry = ({ data, loading }) => {
   const columns = [
     ...labLinesColumns,
     {
+      align: 'right',
       title: 'Add results',
       render: (_, record) => {
         return (
-          <Button
-            type="primary"
-            onClick={() => showDrawer(record)}
-          >
-            Add Test Results
-          </Button>
+          <TestMenu
+            record={record}
+            handleOpenResults={showResultsDrawer}
+            handleOpenRemarks={showRemarksDrawer}
+          />
         );
       },
     },
@@ -74,15 +96,23 @@ const LabResultsEntry = ({ data, loading }) => {
       ) : (
         <>
           <Table
+            rowClassName={(record) =>
+              !record.Sample_Collected ? 'disabled-row' : 'editable-row'
+            }
             columns={columns}
             dataSource={data}
             pagination={false}
           />
           <ResultsDrawer
-            open={open}
+            open={openResults}
             record={currentRecord}
-            handleOk={handleOk}
-            handleCancel={handleCancel}
+            handleOk={handleResultsOk}
+            handleCancel={handleResultsCancel}
+          />
+          <RemarksModal
+            open={openRemarks}
+            record={currentRecord}
+            handleCancel={handleRemarksCancel}
           />
         </>
       )}
@@ -90,9 +120,44 @@ const LabResultsEntry = ({ data, loading }) => {
   );
 };
 
+const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
+  console.log({ record });
+
+  const items = [
+    {
+      key: '1',
+      label: (
+        <div onClick={() => handleOpenResults(record)}>Add Test Results</div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div onClick={() => handleOpenRemarks(record)}>
+          {record.Remarks ? 'View Final Remarks' : 'Add Final Remarks'}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <Dropdown
+      menu={{ items }}
+      placement="bottomRight"
+      arrow={{ pointAtCenter: true }}
+    >
+      <AiOutlineMore size={28} />
+    </Dropdown>
+  );
+};
+
 const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
+  console.log({ record });
+
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state) => state.getLabTestResults);
+  const { data, loading, error } = useSelector(
+    (state) => state.getLabTestResults,
+  );
   const { LaboratoryTestName } = record || {};
 
   useEffect(() => {
@@ -127,6 +192,153 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
   );
 };
 
+const RemarksModal = ({ record, open, handleCancel }) => {
+  const dispatch = useDispatch();
+
+  const { data, loading, error } = useSelector(
+    (state) => state.postTestRemarks,
+  );
+
+  useEffect(() => {
+    if (data) {
+      const { status } = data;
+      status === 'success'
+        ? message.success('Remarks posted successfully')
+        : message.error('Something went wrong');
+
+      dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
+    }
+
+    if (error) {
+      message.info('Something went wrong');
+      dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
+    }
+
+    if (loading) message.info('Submitting remarks');
+  }, [data, loading]);
+
+  return (
+    <Modal
+      open={open}
+      size="large"
+      title={`Final Test Remarks`}
+      footer={null}
+    >
+      {loading ? (
+        <SkeletonLoading />
+      ) : (
+        <RemarkForm
+          record={record}
+          handleCancel={handleCancel}
+        />
+      )}
+    </Modal>
+  );
+};
+
+const RemarkForm = ({ record, handleCancel }) => {
+  // destructor
+  const { TextArea } = Input;
+  const { Item, useForm } = Form;
+
+  // hooks
+  const [form] = useForm();
+  const dispatch = useDispatch();
+
+  const { data, error, loading } = useSelector(
+    (state) => state.postTestRemarks,
+  );
+
+  // handling pushing code
+  const onFinish = async (data) => {
+    const { remarks } = data;
+    console.log({ record });
+
+    const {
+      SystemId,
+      Laboratory_No,
+      Positive,
+      LaboratoryTestCode,
+      SpecimenCode,
+      MeasuringUnitCode,
+      CountValue,
+    } = record;
+
+    console.log({ remarks });
+
+    const finalData = {
+      remarks,
+      recId: SystemId,
+      myAction: 'edit',
+      positive: Positive,
+      laboratoryNo: Laboratory_No,
+      labTestCode: LaboratoryTestCode,
+      specimenCode: SpecimenCode,
+      unitOfMeasure: MeasuringUnitCode,
+      countValue: CountValue,
+    };
+
+    await dispatch(postTestRemarks(finalData));
+    form.resetFields();
+    handleCancel();
+  };
+
+  return (
+    <>
+      {loading ? (
+        <SkeletonLoading />
+      ) : (
+        <Form
+          form={form}
+          name="sampleForm"
+          layout="vertical"
+          autoComplete="off"
+          onFinish={onFinish}
+        >
+          <Item
+            name="remarks"
+            label="Sample Description"
+            rules={[
+              {
+                required: true,
+                message: 'Please add a description for your sample',
+              },
+            ]}
+          >
+            <TextArea />
+          </Item>
+          <Space
+            style={{
+              justifyContent: 'flex-end',
+              display: 'flex',
+              width: '100%',
+            }}
+          >
+            <Item label={null}>
+              <Button
+                onClick={handleCancel}
+                htmlType="button"
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+            </Item>
+            <Item label={null}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : 'Submit Remark'}
+              </Button>
+            </Item>
+          </Space>
+        </Form>
+      )}
+    </>
+  );
+};
+
 const EditableCell = ({
   dataIndex,
   inputType,
@@ -138,7 +350,7 @@ const EditableCell = ({
 }) => {
   const { Item } = Form;
   const [value, setValue] = useState(
-    inputType === 'number' ? parseFloat(children) || 0 : children || ''
+    inputType === 'number' ? parseFloat(children) || 0 : children || '',
   );
 
   const handleChange = (newValue) => {
@@ -181,8 +393,11 @@ const ResultsTable = ({ initialData, error, loading }) => {
   const dispatch = useDispatch();
 
   const [editingKey, setEditingKey] = useState(null);
-  const [results, setResults] = useState([...initialData].map(item => ({...item})));
-  
+
+  const [results, setResults] = useState(
+    [...initialData].map((item) => ({ ...item })),
+  );
+
   const {
     data: labResultsData,
     loading: labResultsLoading,
@@ -195,18 +410,25 @@ const ResultsTable = ({ initialData, error, loading }) => {
       status === 'success'
         ? message.success('Results submitted successfully!')
         : message.error('Something went wrong!');
+
+      dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
     }
-  }, [labResultsData, labResultsError]);
+
+    if (labResultsError) {
+      message.error('Something went wrong');
+      dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
+    }
+
+    if (labResultsLoading) message.info('Submitting the results');
+  }, [labResultsData, labResultsLoading, labResultsError]);
 
   const isEditing = (record) => record.Specimen_Code === editingKey;
-  
+
   const handleSave = (key, dataIndex, value) => {
-    setResults(prevResults => 
-      prevResults.map(item => 
-        item.Specimen_Code === key 
-          ? { ...item, [dataIndex]: value }
-          : item
-      )
+    setResults((prevResults) =>
+      prevResults.map((item) =>
+        item.Specimen_Code === key ? { ...item, [dataIndex]: value } : item,
+      ),
     );
   };
 
@@ -241,38 +463,44 @@ const ResultsTable = ({ initialData, error, loading }) => {
   };
 
   return (
-    <Form
-      form={form}
-      component={false}
-    >
-      <Table
-        onRow={(record) => ({
-          onClick: () => edit(record),
-        })}
-        footer={() => (
-          <Flex
-            justify="end"
-            onClick={handleSubmit}
-          >
-            <Button
-              type="primary"
-              disabled={labResultsLoading}
-            >
-              {labResultsLoading
-                ? 'Loading...'
-                : editingKey
-                ? 'Preview'
-                : 'Submit'}
-            </Button>
-          </Flex>
-        )}
-        columns={columns}
-        components={{ body: { cell: EditableCell } }}
-        dataSource={results}
-        pagination={false}
-        rowClassName="editable-row"
-      />
-    </Form>
+    <>
+      {loading ? (
+        <SkeletonLoading />
+      ) : (
+        <Form
+          form={form}
+          component={false}
+        >
+          <Table
+            rowClassName={'editable-row'}
+            onRow={(record) => ({
+              onClick: () => edit(record),
+            })}
+            footer={() => (
+              <Flex
+                justify="end"
+                onClick={handleSubmit}
+              >
+                <Button
+                  type="primary"
+                  disabled={labResultsLoading}
+                >
+                  {labResultsLoading
+                    ? 'Loading...'
+                    : editingKey
+                    ? 'Preview'
+                    : 'Submit'}
+                </Button>
+              </Flex>
+            )}
+            columns={columns}
+            components={{ body: { cell: EditableCell } }}
+            dataSource={results}
+            pagination={false}
+          />
+        </Form>
+      )}
+    </>
   );
 };
 
