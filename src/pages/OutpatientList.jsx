@@ -7,6 +7,7 @@ import {
   TeamOutlined,
   DisconnectOutlined,
 } from "@ant-design/icons";
+
 import {
   Button,
   Card,
@@ -16,9 +17,11 @@ import {
   Table,
   Tooltip,
   Typography,
+
 } from "antd";
 import { listPatients } from "../actions/patientActions";
 import useAuth from "../hooks/useAuth";
+const { Search } = Input;
 
 const OutpatientList = () => {
   const dispatch = useDispatch();
@@ -40,29 +43,35 @@ const OutpatientList = () => {
 
 
   const [searchParams, setSearchParams] = useState({
-    SearchName: "",
-    patientId: "",
-    patientNo: "",
+    SearchName: '',
+    patientId: '',
+    patientNo: '',
   });
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [showList, setShowList] = useState(false);
 
-useEffect(() => {
-  dispatch(listPatients());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(listPatients());
+  }, [dispatch]);
 
   useEffect(() => {
     // Don't filter by patient type, show all patients
+
     setFilteredPatients();
   }, [patientsToFilter]);
-  
+
+
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
 
     setSearchParams((prevState) => {
       const updatedParams = { ...prevState, [field]: value };
       // If all search fields are empty, hide the list
-      if (!updatedParams.SearchName && !updatedParams.patientId && !updatedParams.patientNo) {
+      if (
+        !updatedParams.SearchName &&
+        !updatedParams.patientId &&
+        !updatedParams.patientNo
+      ) {
         setShowList(false);
       } else {
         // Otherwise, show the list and filter
@@ -71,7 +80,7 @@ useEffect(() => {
       }
       return updatedParams;
     });
-};
+  };
 
 const filterPatients = (params) => {
   const { SearchName, patientId, patientNo } = params;
@@ -87,9 +96,9 @@ const filterPatients = (params) => {
 
   const columns = [
     {
-      title: "Patient No",
-      dataIndex: "PatientNo",
-      key: "PatientNo",
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
       sorter: (a, b) => a.PatientNo - b.PatientNo,
       render: (text) => (
         <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
@@ -98,9 +107,9 @@ const filterPatients = (params) => {
       )
     },
     {
-      title: "Patient Name",
-      dataIndex: "SearchName",
-      key: "SearchName",
+      title: 'Patient Name',
+      dataIndex: 'SearchName',
+      key: 'SearchName',
       sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
       render: (text) => (
         <Tooltip title={text}>
@@ -110,19 +119,19 @@ const filterPatients = (params) => {
         </Tooltip>
       )
     },
-    { title: "Gender", dataIndex: "Gender", key: "Gender" },
-    { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
-    { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    { title: 'Gender', dataIndex: 'Gender', key: 'Gender' },
+    { title: 'Patient Type', dataIndex: 'PatientType', key: 'PatientType' },
+    { title: 'ID Number', dataIndex: 'IDNumber', key: 'IDNumber' },
     {
-      title: "Date Registered",
-      dataIndex: "DateRegistered",
-      key: "DateRegistered",
+      title: 'Date Registered',
+      dataIndex: 'DateRegistered',
+      key: 'DateRegistered',
       render: (text) => new Date(text).toLocaleDateString(),
       sorter: (a, b) => new Date(a.DateRegistered) - new Date(b.DateRegistered),
     },
     {
-      title: "Actions",
-      key: "actions",
+      title: 'Actions',
+      key: 'actions',
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
           {role === "Reception" ? (
@@ -178,7 +187,7 @@ const filterPatients = (params) => {
   return (
     <div>
       <h4 className="text-center p-3 text-dark">
-        <TeamOutlined style={{ marginRight: "8px", fontSize: "24px" }} />
+        <TeamOutlined style={{ marginRight: '8px', fontSize: '24px' }} />
         Patient List
       </h4>
       <div className="d-flex justify-content-between">
@@ -192,6 +201,7 @@ const filterPatients = (params) => {
             }
           }}
           style={{ marginBottom: "20px" }}
+
         >
           Register New Patient
         </Button>
@@ -199,20 +209,21 @@ const filterPatients = (params) => {
       <Card className="card-header mb-4 mt-4 p-4">
         <Typography.Text
           style={{
-            color: "#003F6D",
-            fontWeight: "bold",
-            marginBottom: "16px",
+            color: '#003F6D',
+            fontWeight: 'bold',
+            marginBottom: '16px',
           }}
         >
           Find Patient Details by:
         </Typography.Text>
         <Row gutter={[16, 16]} className="mt-2">
           <Col xl={8} md={12} xs={24}>
+
             <Input
               size="large"
               placeholder="Patient Name"
               value={searchParams.SearchName}
-              onChange={(e) => handleSearchChange(e, "SearchName")}
+              onChange={(e) => handleSearchChange(e, 'SearchName')}
               allowClear
             />
           </Col>
@@ -221,7 +232,7 @@ const filterPatients = (params) => {
               size="large"
               placeholder="Patient ID"
               value={searchParams.patientId}
-              onChange={(e) => handleSearchChange(e, "patientId")}
+              onChange={(e) => handleSearchChange(e, 'patientId')}
               allowClear
               onSearch={() => filterPatients(searchParams)}
             />
@@ -231,26 +242,25 @@ const filterPatients = (params) => {
               size="large"
               placeholder="Patient No"
               value={searchParams.patientNo}
-              onChange={(e) => handleSearchChange(e, "patientNo")}
+              onChange={(e) => handleSearchChange(e, 'patientNo')}
               allowClear
             />
           </Col>
         </Row>
       </Card>
       {showList && (
-  <div className="mt-4">
-    <Table
-      rowKey="SystemCreatedAt"
-      bordered
-      size="small"
-      loading={loadingPatients}
-      columns={columns}
-      dataSource={filteredPatients}
-      pagination={{ pageSize: 10 }}
-    />
-  </div>
-)}
-
+      <div className="mt-4">
+        <Table
+          rowKey="SystemCreatedAt"
+          bordered
+          size="small"
+          loading={loadingPatients}
+          columns={columns}
+          dataSource={filteredPatients}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
+     )}
     </div>
   );
 };

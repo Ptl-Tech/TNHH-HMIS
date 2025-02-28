@@ -18,8 +18,18 @@ const ReceptionDashboard = () => {
   const userDetails = useAuth();
   const today = moment().format("YYYY-MM-DD");
 
+
   const { visitors } = useSelector((state) => state.visitorsList);
   const { patients } = useSelector((state) => state.patientList);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+    const filteredAppointments = appointments?.filter((appointment) => {
+      const appointmentDate = new Date(appointment.AppointmentDate).toISOString().split("T")[0];
+      return appointmentDate === today && appointment.Status === "New"; // Filter by today's date and status "new"
+    });
+    setActiveAppmnts(filteredAppointments?.length); // Set the count of active appointments
+  }, [appointments]);
 
   useEffect(() => {
     dispatch(listPatients());

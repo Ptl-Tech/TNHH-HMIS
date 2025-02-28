@@ -125,7 +125,7 @@ const PatientRegistration = () => {
     subCounty: "",
     countyWard: "",
     email: "",
-    residence:patientDet.PlaceofBirthVillage|| "",
+    residence: "",
     patientStatus: 0,
   });
   useEffect(() => {
@@ -407,11 +407,11 @@ const PatientRegistration = () => {
         newPatient.nextOfKinPhoneNo || patientDet?.NextOfkinAddress1 || "",
       paymentMode: newPatient.paymentMode || patientDet?.PatientType || "",
       insuranceNo: newPatient.insuranceNo || patientDet?.InsuranceNo || "",
-      insurancePrincipalMemberName:
+      insurancePrinicipalMemberName:
         newPatient.insurancePrinicipalMemberName ||
         patientDet?.SearchName ||
         "",
-      isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal,
+      isPrincipleMember: newPatient.isPrincipleMember || patientDet?.Principal || false,
       membershipNo: newPatient.membershipNo || patientDet?.MembershipNo || "",
       insuranceName:
         newPatient.insuranceName || patientDet?.InsuranceName || "",
@@ -1042,7 +1042,7 @@ const PatientRegistration = () => {
                     <Select
                       placeholder="Select An Option"
                       className="w-100 fw-bold text-center "
-                      value={newPatient.howYouKnewABoutUs || patientDet.HowyouKnewAboutUs}
+                      value={newPatient.howYouKnewABoutUs || patientDet?.HowyouKnewAboutUs}
                       onChange={(value) =>
                         handleSelectChange("howYouKnewABoutUs", value)
                       }
@@ -1230,11 +1230,12 @@ const PatientRegistration = () => {
                             </label>
                             <Input
                               placeholder="Enter Principal Name"
-                              name="insurancePrincipalMemberName"
+                              name="insurancePrinicipalMemberName"
                               value={
-                                newPatient.insurancePrinicipalMemberName ||
-                                patientDet?.SearchName ||
-                                ""
+                                newPatient.insurancePrinicipalMemberName !== undefined &&
+                                newPatient.insurancePrinicipalMemberName !== ""
+                                  ? newPatient.insurancePrinicipalMemberName
+                                  : patientDet?.SearchName || ""
                               }
                               onChange={handleInputChange}
                             />

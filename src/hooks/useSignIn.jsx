@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { forgotPassword, login, verifyOtp } from '../actions/userActions';
+const SESSION_TIMEOUT = 100 * 1000; // 10 seconds for testing (Change to 90 * 60 * 1000 for production)
 
 const useSignIn = () => {
   const [staffNo, setStaffNo] = useState('');
@@ -68,7 +69,7 @@ const useSignIn = () => {
         navigate('/reception');
       } else if (role === 'Doctor') {
         navigate('/Doctor');
-      } else if (role === 'LABORATORY') {
+      } else if (role === 'Laboratory') {
         navigate('/Lab');
       } else if (role === 'Security') {
         navigate('/Security');
@@ -81,7 +82,47 @@ const useSignIn = () => {
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);
+// Store session start time in localStorage and set timeout
+useEffect(() => {
+  if (userInfo?.sessionToken) {
+    const sessionStart = Date.now();
+    localStorage.setItem('sessionStart', sessionStart);
 
+    console.log('Session started. Redirecting in 10 seconds...');
+    const timeout = setTimeout(() => {
+      console.log('Session expired. Logging out...');
+      localStorage.removeItem('sessionStart'); // Clear session from localStorage
+      navigate('/'); // Redirect to login
+    }, SESSION_TIMEOUT);
+
+    return () => clearTimeout(timeout); // Cleanup on unmount or logout
+  }
+}, [userInfo, navigate]);
+
+// Check if session expired on page reload
+useEffect(() => {
+  const storedSessionStart = localStorage.getItem('sessionStart');
+
+  if (storedSessionStart) {
+    const elapsedTime = Date.now() - parseInt(storedSessionStart, 10);
+    if (elapsedTime >= SESSION_TIMEOUT) {
+      console.log('Session expired on reload. Redirecting to login...');
+      localStorage.removeItem('sessionStart'); // Clear storage
+      navigate('/');
+    } else {
+      const remainingTime = SESSION_TIMEOUT - elapsedTime;
+      console.log(`Session resuming. Redirecting in ${remainingTime / 1000} seconds...`);
+      
+      const timeout = setTimeout(() => {
+        console.log('Session expired. Logging out...');
+        localStorage.removeItem('sessionStart');
+        navigate('/');
+      }, remainingTime);
+
+      return () => clearTimeout(timeout);
+    }
+  }
+}, [navigate]);
   return {
     staffNo,
     setStaffNo,

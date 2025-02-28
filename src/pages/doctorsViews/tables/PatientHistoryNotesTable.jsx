@@ -57,8 +57,10 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
       };
     });
 
+    console.log('filtered data', filterCollapseData);
+
   const groupedData = filterCollapseData?.reduce((acc, item) => {
-    acc[item.Notes_Type] = {
+    acc[item.Notes] = {
       Line_No: item.Line_No,
       SystemId: item.SystemId,
       Notes_Type: item.Notes_Type,

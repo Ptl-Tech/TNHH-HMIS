@@ -8,7 +8,6 @@ import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 import DailyProcess from "./nurse-care-plan/DailyProcess";
 import Diagnosis from "../../pages/doctorsViews/Doctor-Forms/Diagnosis";
 import useAuth from "../../hooks/useAuth";
-import Medication from "../doctorsViews/Doctor-Forms/Medication";
 import {
   FileOutlined,
   FileMarkdownOutlined,

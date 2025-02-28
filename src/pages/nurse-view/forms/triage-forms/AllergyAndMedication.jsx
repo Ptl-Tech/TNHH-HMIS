@@ -5,6 +5,7 @@ import {
   Input,
   message,
   Row,
+  Select,
   Space,
 } from "antd";
 import PropTypes from "prop-types";
@@ -26,7 +27,7 @@ const AllergyAndMedication = ({
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-
+console.log(observationNumber);
   const config = useAuth().userData;
 
   const { postAllergyMedicationLoading } = useSelector(
@@ -44,7 +45,8 @@ const AllergyAndMedication = ({
       complaints: complains,
       foodAllergy,
       drugAllergy,
-      patientNo: patientNumber,
+    reasonForVisit: values.reasonForVisit,
+      // patientNo: patientNumber,
       staffNo: config.no,
       observationNo: observationNumber,
       assessedBy: config.no,
@@ -85,7 +87,7 @@ const AllergyAndMedication = ({
               autoComplete="off"
             >
               <Row gutter={16}>
-                <Col span={12}>
+                <Col span={8}>
                   <Form.Item
                     label="Food Allergy"
                     name={["allergy", "foodAllergy"]}
@@ -94,7 +96,35 @@ const AllergyAndMedication = ({
                     <Input type="text" name="foodAllergy" placeholder="Food Allergy" />
                   </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={8}>
+                  <Form.Item
+                    label="Reason for Visit"
+                    name="reasonForVisit"
+                    hasFeedback
+                  >
+                   <Select
+                      showSearch
+                      style={{ width: "100%" }}
+                      placeholder="Reason for visit"
+                      optionFilterProp="children"
+                      name="reasonForVisit"
+                      filterOption={(input, option) =>
+                        option.children.toLowerCase().includes(input.toLowerCase())
+                      }
+                      filterSort={(optionA, optionB) =>
+                        optionA.children
+                          .toLowerCase()
+                          .localeCompare(optionB.children.toLowerCase())
+                      }
+                    >
+                      <Select.Option value="1">-Patient not improving</Select.Option>
+                      <Select.Option value="2">-Patient Deteriorated</Select.Option>
+                      <Select.Option value="3">-New Presentation</Select.Option>
+                      <Select.Option value="4">-Follow up</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
                   <Form.Item
                     label="Drug Allergy"
                     name={["allergy", "drugAllergy"]}
