@@ -3,8 +3,11 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import { FileOutlined, PlusOutlined, FolderViewOutlined } from "@ant-design/icons"
 import { useState } from "react";
 import BriefMentalStateExamFormData from "./BriefMentalStateExamFormData";
+import { useLocation } from "react-router-dom";
 
 const BriefMentalStateExaminationForm = () => {
+    const location = useLocation();
+    const patientNo = new URLSearchParams(location.search).get("PatientNo");
      const [isFormVisible, setIsFormVisible] = useState(false);
     const handleButtonVisibility = () => {
         setIsFormVisible(!isFormVisible);
@@ -31,7 +34,7 @@ const BriefMentalStateExaminationForm = () => {
 
         {
             isFormVisible && (
-                <BriefMentalStateExamFormData setIsFormVisible={setIsFormVisible}/>
+                <BriefMentalStateExamFormData setIsFormVisible={setIsFormVisible} patientNo={patientNo}/>
             )
         }
     </>
