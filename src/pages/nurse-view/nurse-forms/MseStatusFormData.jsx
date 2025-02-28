@@ -30,6 +30,7 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
               if (result.type === POST_MENTAL_EXAMINATION_FORM_SUCCESS) {
                 message.success(`Mental state examination form saved successfully!`);
                 dispatch(getMentalExaminationFormSlice(patientDetails?.Admission_No));
+                setIsFormVisible(false);
               } else if (result.type === POST_MENTAL_EXAMINATION_FORM_FAILURE) {
                 message.error(result.payload.message || "Internal server error, please try again later.");
               }
@@ -68,7 +69,6 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
         <Form.Item
         label="Status"    
         name="status"
-        placeholder="Select status"
         hasFeedback
         rules={[
             {
@@ -77,11 +77,15 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
             },
           ]}
         >
-            <Select>
-                <Select.Option value="good">Good</Select.Option>
-                <Select.Option value="average">Average</Select.Option>
-                <Select.Option value="bad">Bad</Select.Option>
-            </Select>
+            <Select
+            placeholder="Select status"
+                  options={[
+                    { value: '0', label: '0 - Severe' },
+                    { value: '1', label: '1 - Moderate' },
+                    { value: '2', label: '2 - Mild' },
+                    { value: '3', label: '3 - Normal' },
+                  ]}
+                />
         </Form.Item>
 
         <Form.Item 
@@ -127,8 +131,8 @@ const MseStatusFormData = ({ patientDetails, form, setIsFormVisible, loadingMent
 export default MseStatusFormData
 // props validations
 MseStatusFormData.propTypes = {
-    patientDetails: PropTypes.object.isRequired,
-    form: PropTypes.object.isRequired,
-    setIsFormVisible: PropTypes.bool.isRequired,
-    loadingMentalStatus: PropTypes.bool.isRequired
+    patientDetails: PropTypes.array,
+    form: PropTypes.object,
+    setIsFormVisible: PropTypes.func,
+    loadingMentalStatus: PropTypes.func
 }

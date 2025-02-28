@@ -29,7 +29,7 @@ const EncounterSummery = () => {
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       
-      <NurseInnerHeader title="Encounter Summery" />
+      <NurseInnerHeader title="Encounter Summary" />
 
       <Row gutter={8}>
         <Col

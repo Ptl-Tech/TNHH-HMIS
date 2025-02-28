@@ -52,7 +52,7 @@ const PastDoctorNotesTable = ({ role, combinedPatients, loadingDoctors, loadingE
           key: 'action',
           fixed: 'right',
           width: 200,
-          render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleNavigate(record)}>Encounter Summery</Button>
+          render: (_, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleNavigate(record)}>Encounter Summary</Button>
         }
       ]
   
