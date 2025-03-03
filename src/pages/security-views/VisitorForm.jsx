@@ -80,7 +80,7 @@ const VisitorForm = () => {
 
   const handleInputChange = (name, value) => {
     if (name === "visitorName") {
-      const nameParts = value.split(" ").filter(Boolean); // Split and remove extra spaces
+      const nameParts = value.split(" ").filter(Boolean); // Remove empty strings
       const [firstName, middleName, lastName] = [
         nameParts[0] || "",
         nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "",
@@ -129,16 +129,29 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = async () => {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    if (
+      !newVisitor.firstName ||
+      newVisitor.firstName.trim() === "" ||
+      !newVisitor.lastName ||
+      newVisitor.lastName.trim() === ""
+    ) {
+      notification.error({
+        // message: "Please enter a valid name",
+        description: "First name and Last name are required",
+      });
 
-    if (!newVisitor.idNumber) {
-      message.error("Please enter an ID number.");
       return;
     }
- // Default purpose of visit
- if (!newVisitor.purposeOfVisit || newVisitor.purposeOfVisit.trim() === "") {
-  newVisitor.purposeOfVisit = "Reception";
-}
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+    // if (!newVisitor.idNumber) {
+    //   message.error("Please enter an ID number.");
+    //   return;
+    // }
+    // Default purpose of visit
+    if (!newVisitor.purposeOfVisit || newVisitor.purposeOfVisit.trim() === "") {
+      newVisitor.purposeOfVisit = "Reception";
+    }
 
     const existingVisitor = visitors?.find(
       (visitor) =>
@@ -156,8 +169,8 @@ const VisitorForm = () => {
 
       // If visitor exists, update their details before admitting
       const updatedVisitorData = {
-        myAction: "edit",
-        visitorNo: existingVisitor.No, // Keep the existing visitor number
+        myAction: "create",
+        // visitorNo: existingVisitor.No, // Keep the existing visitor number
         ...newVisitor,
       };
 
@@ -167,11 +180,11 @@ const VisitorForm = () => {
 
         // Now admit the visitor (change status)
         await dispatch(admitVisitor(existingVisitor.No));
- // Show success notification
- notification.success({
-  message: "Visitor Checked In",
-  description: `Visitor checked in successfully! Visitor No: ${existingVisitor.No}`,
-})
+        // Show success notification
+        notification.success({
+          message: "Visitor Checked In",
+          description: `Visitor checked in successfully! Visitor No: ${existingVisitor.No}`,
+        });
         form.resetFields();
         setNewVisitor({
           visitorCategory: null,
@@ -200,7 +213,7 @@ const VisitorForm = () => {
     }
 
     //if purpose of visit is not selected set it to other
-   
+
     // If visitor does not exist, create a new record
     const visitorData = {
       myAction: "create",
@@ -212,8 +225,10 @@ const VisitorForm = () => {
       const visitorId = await dispatch(createVisitor(visitorData));
       if (visitorId) {
         message.success("Visitor created successfully!");
-     const admitVisitorResponse =   await dispatch(admitVisitor(visitorId)); // Admit the newly created visitor
-        notification.success(`Visitor Number: ${admitVisitorResponse} checked iin successfully!`);
+        const admitVisitorResponse = await dispatch(admitVisitor(visitorId)); // Admit the newly created visitor
+        notification.success(
+          `Visitor Number: ${admitVisitorResponse} checked iin successfully!`
+        );
 
         setVisitorPassCounter((prev) => prev + 1);
         form.resetFields();
@@ -265,13 +280,16 @@ const VisitorForm = () => {
         );
         if (existingVisitor) {
           message.success("Visitor Information already exists", 5);
-          
+
           // Extract names from visitorName field
-          const nameParts = existingVisitor?.VisitorName?.trim().split(/\s+/) || [];
+          const nameParts =
+            existingVisitor?.VisitorName?.trim().split(/\s+/) || [];
           const firstName = nameParts[0] || "";
-          const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
-          const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
-        
+          const middleName =
+            nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "";
+          const lastName =
+            nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+
           setNewVisitor((prevState) => ({
             ...prevState,
             visitorName: existingVisitor?.VisitorName,
@@ -282,7 +300,7 @@ const VisitorForm = () => {
             middleName,
             lastName,
           }));
-        
+
           form.setFieldsValue({
             visitorName: existingVisitor?.VisitorName,
             phoneNumber: existingVisitor.PhoneNumber,
@@ -292,8 +310,7 @@ const VisitorForm = () => {
             middleName,
             lastName,
           });
-        }
-        else {
+        } else {
           setVisitorExistsError("Visitor does not exist"); // Set error message
           setNewVisitor((prevState) => ({
             ...prevState,

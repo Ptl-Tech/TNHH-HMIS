@@ -60,7 +60,7 @@ import Admissions from './pages/nurse-view/Admissions';
 import AdmissionRequests from './pages/nurse-view/AdmissionRequests';
 import AdmissionRequest from './pages/nurse-view/AdmissionRequest';
 import DischargeList from './pages/nurse-view/DischargeList';
-import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
+// import LabOutPatient from "./pages/doctorsViews/tables/lab/LabOutPatient";
 import RadiologyOutPatient from './pages/doctorsViews/tables/Radiology/RadiologyOutPatient';
 import RadiologyOutPatients from './pages/doctorsViews/tables/Radiology/RadiologyOutPatients';
 

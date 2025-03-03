@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTriageList } from "../actions/triage-actions/getTriageListSlice";
 import { getInpatientAllergiesSlice } from "../actions/nurse-actions/getInpatientAllergiesSlice";
 
-const useFetchAllergiesAndMedicationsHook = () => {
+const useFetchAllergiesAndMedicationsHook = (refreshTable) => {
     const dispatch = useDispatch();
 
     // Fetch data from Redux store
@@ -40,6 +40,11 @@ const useFetchAllergiesAndMedicationsHook = () => {
       }
     }, [dispatch, allergies?.length]);
   
+useEffect(() => {
+  dispatch(getTriageList());
+  dispatch(getInpatientAllergiesSlice());
+}, [dispatch, refreshTable]);
+
     // Return the combined list and loading states
     return {
       combinedList,
