@@ -47,6 +47,8 @@ import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCha
 import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
 import ViewReceipt from "./ViewReceipt";
 import LoadingSkeleton from "../../components/LoadingSkeleton";
+import { IoReceiptOutline } from "react-icons/io5";
+import SplitReceipt from "./SplitReceipt";
 
 const { Title, Text } = Typography;
 
@@ -58,7 +60,6 @@ const ViewPatientsReceipts = () => {
   const { state } = useLocation();
   const { patientData } = state;
 
-  console.log("patientData", patientData);
 
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
@@ -110,6 +111,10 @@ const ViewPatientsReceipts = () => {
   // NEW: Track whether the receipt has been posted.
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
   const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
+  const [open, setOpen] = useState(false);
+  const [size, setSize] = useState();
+  const [record, setRecord] = useState(null);
+
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
     if (appointmentNo) {
@@ -155,6 +160,7 @@ const ViewPatientsReceipts = () => {
     setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
     setViewReceipts(false);
+    setOpen(false);
   };
   
 
@@ -183,6 +189,12 @@ const ViewPatientsReceipts = () => {
     setReverseChargeModalVisible(true);
     setSelectedRecId(receiptLines[0]?.SystemId);
   };
+  const showLargeDrawer=()=>{
+    setOpen(true);
+    setReceiptNo(receiptNo);  
+      setSize('large');
+
+  }
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
@@ -331,7 +343,16 @@ const ViewPatientsReceipts = () => {
             </div>
           </Col>
           <Col span={12} className="mt-3 text-end">
-            <Space align="end">
+            <Space  justify="end" align="end">
+            <Button
+                type="default"
+                size="medium"
+                icon={<IoReceiptOutline />}
+                
+                onClick={showLargeDrawer}
+              >
+               Split Receipt
+              </Button>
               <Button
                 type="default"
                 size="medium"
@@ -478,6 +499,13 @@ const ViewPatientsReceipts = () => {
         visible={viewReceipts}
         onClose={() => setViewReceipts(false)}
         visitNo={appointmentNo}
+      />
+      <SplitReceipt
+        open={open} 
+               receiptNo={receiptNo}
+
+        onClose={()=>setOpen(false)}
+        size={size}
       />
       <Modal
         title="Receipt Preview"
