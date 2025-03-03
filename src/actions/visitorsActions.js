@@ -127,14 +127,13 @@ export const createVisitor = (visitor) => async (dispatch, getState) => {
             },
       };
   
-      const response = await axios.get(`${API}data/odatafilter?webservice=QyVisitors`, config);
+      const {data} = await axios.get(`${API}data/odatafilter?webservice=QyVisitors`, config);
 
-const data = response.data; // Ensure data is correctly accessed
-if (!data) {
-  throw new Error("No data received from API");
-}
+const filteredData=data.filter(
+  (visitor)=>visitor.GlobalDimension1Code===branchCode
+);
 
-dispatch({ type: VISITORS_LIST_SUCCESS, payload: data });
+dispatch({ type: VISITORS_LIST_SUCCESS, payload: filteredData });
 
     } catch (error) {
       dispatch({ type: VISITORS_LIST_FAIL, payload: error.message });
