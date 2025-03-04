@@ -49,7 +49,9 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
         receiptDate: values.receiptDate.format("YYYY-MM-DD"),
         depositDate: values.receiptDate?.format("YYYY-MM-DD") || null,
         payMode: values.payMode,
-        amountReceived: parseFloat(values.amountReceived),
+        transactionCode: values.transactionCode || "",  
+        splitAmount: values.splitAmount || false,
+               amountReceived: parseFloat(values.amountReceived),
         coPay: values.coPay,
         ...(values.payMode === 7 && {
           transactionCode: values.transactionCode,
@@ -159,11 +161,16 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
 
         {/* Co-Pay Checkbox (Always Visible) */}
         <Row gutter={16}>
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item name="coPay" valuePropName="checked">
               <Checkbox>Co-Pay</Checkbox>
             </Form.Item>
           </Col>
+          {/* <Col span={12}>
+            <Form.Item name="splitAmount" valuePropName="checked">
+              <Checkbox>Split Amount</Checkbox>
+            </Form.Item>
+          </Col> */}
         </Row>
 
         <Row>
