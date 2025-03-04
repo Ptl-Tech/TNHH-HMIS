@@ -45,12 +45,12 @@ export const postReceiptHeader = (receiptData) => async (dispatch, getState) => 
       });
 
       // Display success message
-      message.success(`Receipt Generated: ${ReceiptNo}`);
+      // message.success(`Receipt Generated: ${ReceiptNo}`);
 
       // Return the receipt number 
       return ReceiptNo;
     } else {
-      throw new Error("Invalid response format or missing ReceiptNo.");
+      return status;
     }
   } catch (error) {
     // Dispatch failure action

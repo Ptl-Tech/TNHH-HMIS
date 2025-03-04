@@ -252,6 +252,8 @@ import { getSinglePatientReducer } from './reception-reducers/getSinglePatientRe
 import { createLabTestHeaderReducer } from './lab-reducers/createLabTestHeader';
 import { postLabTestLinesReducer } from './lab-reducers/postLabTestLinesReducer';
 import { getSplitReceiptLinesReducer } from './ChargesReducers/getSplitReceiptLinesReducer';
+import { postReceiptSplitLineReducer } from './ChargesReducers/postReceiptSplitLinesReducer';
+import { getReceiptPageReducer } from './ChargesReducers/getReceiptPageReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -430,6 +432,8 @@ export const rootReducer = combineReducers({
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
   getQyReceiptSplitList:getSplitReceiptLinesReducer,
+  postSplitReceipt:postReceiptSplitLineReducer,
+  getReceiptPage:getReceiptPageReducer,
 
   postDoctorNotes: postDoctorNotesReducer,
   getBillingList: getBillingListReducer,

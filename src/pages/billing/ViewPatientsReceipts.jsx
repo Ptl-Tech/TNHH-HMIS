@@ -60,14 +60,12 @@ const ViewPatientsReceipts = () => {
   const { state } = useLocation();
   const { patientData } = state;
 
-
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
   );
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
-
 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector(
@@ -91,7 +89,9 @@ const ViewPatientsReceipts = () => {
     (state) => state.getPatientReceiptHeader
   );
 
-  const { loading:deleteLoading } = useSelector((state) => state.deletePatientCharges);
+  const { loading: deleteLoading } = useSelector(
+    (state) => state.deletePatientCharges
+  );
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -121,7 +121,7 @@ const ViewPatientsReceipts = () => {
       dispatch(getUnpostedCharges(appointmentNo));
     }
   }, [dispatch, patientData?.ActiveVisitNo]);
-  
+
   useEffect(() => {
     if (patientNo) {
       dispatch(getPatientReceiptLines(patientNo));
@@ -136,11 +136,13 @@ const ViewPatientsReceipts = () => {
   useEffect(() => {
     if (chargesList) {
       // Recalculate balance from the latest charges list
-      const newTotal = chargesList.reduce((acc, charge) => acc + charge.Total_Amount, 0);
+      const newTotal = chargesList.reduce(
+        (acc, charge) => acc + charge.Total_Amount,
+        0
+      );
       setBalance(newTotal);
     }
   }, [chargesList]); // Recalculate when chargesList changes
-  
 
   const handleGoBack = () => {
     navigate(-1);
@@ -162,7 +164,6 @@ const ViewPatientsReceipts = () => {
     setViewReceipts(false);
     setOpen(false);
   };
-  
 
   const handlePrintReceipt = () => {
     const invoiceData = {
@@ -188,13 +189,15 @@ const ViewPatientsReceipts = () => {
   const showReverseModal = () => {
     setReverseChargeModalVisible(true);
     setSelectedRecId(receiptLines[0]?.SystemId);
+    setAppointmentNo(patientData?.ActiveVisitNo);
   };
-  const showLargeDrawer=()=>{
+  const showLargeDrawer = () => {
     setOpen(true);
-    setReceiptNo(receiptNo);  
-      setSize('large');
+    setReceiptNo(receiptNo);
+    setSize("large");
+    setAppointmentNo(patientData?.ActiveVisitNo);
 
-  }
+  };
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
@@ -237,7 +240,7 @@ const ViewPatientsReceipts = () => {
     });
   };
 
-    const postedCharges =
+  const postedCharges =
     chargesList?.filter(
       (charge) => charge.Posted && charge.Transaction_Type !== "ZRECEIPT"
     ) || [];
@@ -343,15 +346,14 @@ const ViewPatientsReceipts = () => {
             </div>
           </Col>
           <Col span={12} className="mt-3 text-end">
-            <Space  justify="end" align="end">
-            <Button
+            <Space justify="end" align="end">
+              <Button
                 type="default"
                 size="medium"
                 icon={<IoReceiptOutline />}
-                
                 onClick={showLargeDrawer}
               >
-               Split Receipt
+                Split Receipt
               </Button>
               <Button
                 type="default"
@@ -409,43 +411,44 @@ const ViewPatientsReceipts = () => {
                   : balance.toLocaleString("en-KE", {
                       style: "currency",
                       currency: "KES",
-                  })}
+                    })}
               </p>
 
               <Text strong>Receipt No:</Text>
-              <p style={{ fontWeight: "bold", color: "green" }}>
-                {receiptNo}
-              </p>
+              <p style={{ fontWeight: "bold", color: "green" }}>{receiptNo}</p>
             </div>
           </Col>
         </Row>
 
         <Divider />
-<LoadingSkeleton loading={chargesLoading || deleteLoading} rows={8} avatar={false}>
-        <div className="d-flex  flex-column">
-          <div className="d-flex flex-column text-start">
-            <Title level={4}>Unposted Charges </Title>
-            <Table
-              dataSource={unpostedCharges}
-              columns={unpostedColumns}
-              rowKey="Code"
-              pagination={{ pageSize: 5 }}
-              // loading={chargesLoading}
-            />
+        <LoadingSkeleton
+          loading={chargesLoading || deleteLoading}
+          rows={8}
+          avatar={false}
+        >
+          <div className="d-flex  flex-column">
+            <div className="d-flex flex-column text-start">
+              <Title level={4}>Unposted Charges </Title>
+              <Table
+                dataSource={unpostedCharges}
+                columns={unpostedColumns}
+                rowKey="Code"
+                pagination={{ pageSize: 5 }}
+                // loading={chargesLoading}
+              />
+            </div>
+            <div className="d-flex flex-column text-start">
+              <Title level={4}>Posted Charges </Title>
+              <Table
+                dataSource={postedCharges}
+                columns={columns}
+                rowKey="Code"
+                pagination={{ pageSize: 5 }}
+                loading={chargesLoading}
+              />
+            </div>
           </div>
-          <div className="d-flex flex-column text-start">
-            <Title level={4}>Posted Charges </Title>
-            <Table
-              dataSource={postedCharges}
-              columns={columns}
-              rowKey="Code"
-              pagination={{ pageSize: 5 }}
-              loading={chargesLoading}
-
-            />
-          </div>
-        </div>
-</LoadingSkeleton>
+        </LoadingSkeleton>
         <Divider />
 
         <Row gutter={16}>
@@ -501,10 +504,10 @@ const ViewPatientsReceipts = () => {
         visitNo={appointmentNo}
       />
       <SplitReceipt
-        open={open} 
-               receiptNo={receiptNo}
-
-        onClose={()=>setOpen(false)}
+        open={open}
+        receiptNo={receiptNo}
+        visitNo={appointmentNo}
+        onClose={() => setOpen(false)}
         size={size}
       />
       <Modal
