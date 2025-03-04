@@ -132,11 +132,11 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
                 { required: true, message: 'Phone Number is required' },
                 {
                     validator: (_, value) => {
-                    const regex = /^07\d{8}$/;
+                    const regex = /^(?:\+?\d{1,3})?\d{10}$/;
                     if (!value || regex.test(value)) {
                         return Promise.resolve();
                     }
-                    return Promise.reject('Phone Number must start with 07 and be 10 digits long');
+                    return Promise.reject('PPlease enter a valid phone number');
                     },
                 },
                 ]}
@@ -177,8 +177,8 @@ const VisitorsListFormData = ({ setIsFormVisible, loadingIpVisitors, loadingVisi
 export default VisitorsListFormData
 // props validation
 VisitorsListFormData.propTypes = {
-    setIsFormVisible: PropTypes.bool.isRequired,
-    loadingIpVisitors: PropTypes.bool.isRequired,
-    loadingVisitor: PropTypes.bool.isRequired,
-    patientDetails: PropTypes.object.isRequired
+    setIsFormVisible: PropTypes.bool,
+    loadingIpVisitors: PropTypes.bool,
+    loadingVisitor: PropTypes.bool,
+    patientDetails: PropTypes.object
 }
