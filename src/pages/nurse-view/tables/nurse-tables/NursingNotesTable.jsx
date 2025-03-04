@@ -2,55 +2,66 @@ import { Button, Table } from "antd"
 import PropTypes from "prop-types"
 import Loading from "../../../../partials/nurse-partials/Loading"
 import { useState } from "react"
+import DOMPurify from 'dompurify';
 import { FolderViewOutlined } from '@ant-design/icons'
 
 const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseNotes }) => {
 
+  const renderNotes = (notes) => {
+    if (!notes) return null;
+    // Sanitize and render HTML safely
+    const sanitizedHtml = DOMPurify.sanitize(notes);
+    return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
+    };
+
   const columns = [
-    
-    {
-      title: 'Admission No',
-      dataIndex: 'AdmissionNo', // Matches key in data
-      key: 'AdmissionNo',
-      fixed: 'left',
-      width: 100
-    },
     {
       title: 'Notes Date',
-      dataIndex: 'NotesDate', // Matches key in data
+      dataIndex: 'NotesDate', 
       key: 'NotesDate',
     },
     {
       title: 'Notes Time',
-      dataIndex: 'NotesTime', // Matches key in data
+      dataIndex: 'NotesTime',
       key: 'NotesTime',
       render: (time) => {
-        // Check if time exists
         if (!time) return '-';
     
-        // Convert `HH:mm:ss` to a Date object
-        const today = new Date(); // Get today's date
-        const dateString = `${today.toISOString().split('T')[0]}T${time}`; // Combine date with time (ISO format)
-    
+        const today = new Date();
+        const dateString = `${today.toISOString().split('T')[0]}T${time}`;
         const date = new Date(dateString);
+    
         if (isNaN(date.getTime())) return 'Invalid Time';
     
-        // Format time to "hh:mm AM/PM"
-        const formattedTime = date.toLocaleTimeString([], {
+        return date.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
         });
+      },
+      sorter: (a, b) => {
+        const today = new Date();
+        
+        const getTimeValue = (time) => {
+          if (!time) return 0;
+          const dateString = `${today.toISOString().split('T')[0]}T${time}`;
+          return new Date(dateString).getTime();
+        };
     
-        return formattedTime;
+        return getTimeValue(b.NotesTime) - getTimeValue(a.NotesTime); // Newest first
       },
     },
+    
     {
       title: 'Notes',
-      dataIndex: 'Notes', // Matches key in data
+      dataIndex: 'Notes', 
       key: 'Notes',
-      // render: (text) => 
-      //   text.length > 50 ? `${text.substring(0, 47)}...` : text,
+      render: (text) => renderNotes(text),
+    },
+    {
+      title: 'Added By',
+      'dataIndex': 'NurseID',
+      key: 'NurseID',
     },
     {
       title: 'Action',
@@ -74,14 +85,12 @@ const NursingNotesTable = ({ showModal, loadingGetNurseAdmissionNotes, getNurseN
           setPagination(newPagination); // Update pagination settings
       };
 
-      const formattedDataSource = Array.isArray(getNurseNotes) ? getNurseNotes : [getNurseNotes];
-
 
   return (
     <div style={{ paddingTop: '30px' }}>
          {
           loadingGetNurseAdmissionNotes ? <Loading /> :
-          <Table columns={columns} dataSource={formattedDataSource} 
+          <Table columns={columns} dataSource={getNurseNotes} 
           rowKey='SystemId'
           scroll={{ x: 'max-content' }}
           bordered size='middle' 
