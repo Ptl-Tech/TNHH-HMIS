@@ -17,6 +17,7 @@ import { getSplitReceiptLines } from "../../actions/Charges-Actions/getSplitRece
 import { postReceiptSplitLine } from "../../actions/Charges-Actions/postReceiptSplitLine";
 import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader";
+import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -29,7 +30,7 @@ const SplitReceipt = ({ open, onClose, size, visitNo, receiptNo:propReceiptNo}) 
   const { loading: postReceiptLinesLoading } = useSelector(
     (state) => state.postSplitReceipt
   );
-    const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
+    const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
     const receiptNo = propReceiptNo || receiptHeader[0]?.No;
   const { loading } = useSelector((state) => state.postReceipt);
 console.log("receiptHeader", receiptHeader);
@@ -44,7 +45,8 @@ console.log("receiptHeader", receiptHeader);
 
   useEffect(() => {
     if (visitNo) {
-      dispatch(getReceiptHeader(visitNo));
+      dispatch(getReceiptPage(visitNo));
+      console.log("data", receiptHeader);
     }
   }, [dispatch, visitNo]);
 
@@ -141,7 +143,7 @@ console.log("receiptHeader", receiptHeader);
     // Prepare an array of formatted data for each split record
     const formattedData = records.map((record) => ({
       myAction: "edit",
-      recId: receiptNo,
+      recId:  receiptHeader[0]?.SystemId,
       patientNo: receiptHeader[0]?.Patient_No,
       receiptDate: documentDate,
       depositDate: depositDate,
@@ -152,6 +154,7 @@ console.log("receiptHeader", receiptHeader);
       splitAmount: true,
     }));
   
+    console.log("Formatted data:", formattedData);
     try {
       await Promise.all(formattedData.map((data) => dispatch(postReceiptHeader(data))));
       notification.success({

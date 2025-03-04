@@ -175,7 +175,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
 
         <Row>
           <Col span={24}>
-            <Button type="primary" size="large" style={{ width: "100%" }} loading={loading} onClick={handleOk}>
+            <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>
               Generate Receipt
             </Button>
           </Col>
