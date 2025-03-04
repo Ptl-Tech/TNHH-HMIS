@@ -59,7 +59,7 @@ const PatientFile = ({ patientDetails }) => {
         setSelectedItem(<PastDoctorNotes />);
         break;
       case "Nursing Notes":
-        userRole.userData.departmentName !== 'Nurse' ? setSelectedItem(<ReadNurseNotes/>) : setSelectedItem(<NursingNotes />)
+        setSelectedItem(<ReadNurseNotes/>)
         break;
       case "Past Encounters Notes":
         setSelectedItem(<TreatmentHistory />);

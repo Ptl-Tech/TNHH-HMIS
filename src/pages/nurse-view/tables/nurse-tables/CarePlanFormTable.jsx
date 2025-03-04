@@ -12,6 +12,7 @@ const CarePlanFormTable = ({
   
   const handleShowRecord = (record) => {
     // Filter out undefined/null fields before setting values
+    console.log('records from the view', record);
     const sanitizedRecord = Object.keys(record).reduce((acc, key) => {
       if (record[key] !== undefined && record[key] !== null) {
         acc[key] = record[key];

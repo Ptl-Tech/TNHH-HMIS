@@ -1,13 +1,21 @@
-import { Table } from "antd";
+import { Button, message, Table } from "antd";
 import PropTypes from "prop-types";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { DeleteOutlined } from "@ant-design/icons";
+import { POST_VISITOR_LIST_FAILURE, POST_VISITOR_LIST_SUCCESS, postVisitorListSlice } from "../../../../actions/nurse-actions/postVisitorListSlice";
+import { getVisitorsListSlice } from "../../../../actions/nurse-actions/getVisitorsListSlice";
+import { useLocation } from "react-router-dom";
 
 const VisitorFormTable = ({
   loadingIpVisitors,
   filterVisitorList,
   rowSelection,
 }) => {
+  const location = useLocation();
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
+  const dispatch = useDispatch();
   const columns = [
     {
       title: "Admission Number",
@@ -43,6 +51,12 @@ const VisitorFormTable = ({
       dataIndex: "IdNumber",
       key: "IdNumber",
     },
+    {
+      title: 'Action',
+      dataIndex: 'Action',
+      key: 'Action',
+      render: (text, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleDelete(record)} icon={<DeleteOutlined />}>Delete</Button>
+    }
   ];
 
   const [pagination, setPagination] = useState({
@@ -54,6 +68,20 @@ const VisitorFormTable = ({
   const handleTableChange = (newPagination) => {
     setPagination(newPagination); // Update pagination settings
   };
+
+  const handleDelete = async (record) => {
+    const formData = {
+      ...record,
+      myAction: 'delete'
+    }
+     const result = await dispatch(postVisitorListSlice('/InpatientForms/VisitorsListForm', formData))
+     if( result.type === POST_VISITOR_LIST_SUCCESS){
+       dispatch(getVisitorsListSlice(patientNo));
+       message.success(`Records updated successfully!`);
+     }else if(result.type === POST_VISITOR_LIST_FAILURE){
+       message.error(result.payload.message || "Internal server error, please try again later.");
+     }
+  }
 
   return (
     <>

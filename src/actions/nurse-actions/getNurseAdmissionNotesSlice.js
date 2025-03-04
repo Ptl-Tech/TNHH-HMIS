@@ -7,13 +7,13 @@ export const GET_NURSE_ADMISSION_NOTES_FAILURE = 'GET_NURSE_ADMISSION_NOTES_FAIL
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
 
-export const getNurseAdmissionNotesSlice = () => 
+export const getNurseAdmissionNotesSlice = (admissionNo) => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_NURSE_ADMISSION_NOTES_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAdmissionNurseNotes&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyAdmissionNurseNotes&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
     
 
         dispatch({ type: GET_NURSE_ADMISSION_NOTES_SUCCESS, payload: data });
