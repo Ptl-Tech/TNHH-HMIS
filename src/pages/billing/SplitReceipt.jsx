@@ -22,7 +22,7 @@ import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
 const { Option } = Select;
 const { Text } = Typography;
 
-const SplitReceipt = ({ open, onClose, size, visitNo, receiptNo:propReceiptNo}) => {
+const SplitReceipt = ({ open, onClose, size, visitNo}) => {
   const dispatch = useDispatch();
   const { data, loading: receiptLinesLoading } = useSelector(
     (state) => state.getQyReceiptSplitList
@@ -31,17 +31,19 @@ const SplitReceipt = ({ open, onClose, size, visitNo, receiptNo:propReceiptNo}) 
     (state) => state.postSplitReceipt
   );
     const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
-    const receiptNo = propReceiptNo || receiptHeader[0]?.No;
+    const lastReceipt = receiptHeader?.[receiptHeader.length - 1]; // Get the last record
+
+    const receiptNo =  lastReceipt?.No;
   const { loading } = useSelector((state) => state.postReceipt);
 console.log("receiptHeader", receiptHeader);
   const [form] = Form.useForm();
   const [records, setRecords] = useState([]);
 
-  const grandTotal = 5000;
-  // const totalAccumulative = records.reduce(
-  //   (sum, record) => sum + parseFloat(record.amountPaid || 0),
-  //   0
-  // );
+  const grandTotal = lastReceipt?.Total_Amount || 0;
+  const totalAccumulative = records.reduce(
+    (sum, record) => sum + parseFloat(record.amountPaid || 0),
+    0
+  );
 
   useEffect(() => {
     if (visitNo) {
@@ -68,8 +70,19 @@ console.log("receiptHeader", receiptHeader);
       );
     }
   }, [data]);
-
   const handleAdd = async (values) => {
+    const newAmount = parseFloat(values.amountPaid || 0);
+    const newTotal = totalAccumulative + newAmount;
+  
+    if (newTotal > grandTotal) {
+      notification.error({
+        message: "Exceeds not Allowed Amount",
+        description: `The total split amount cannot exceed the grand total of Ksh ${grandTotal}.`,
+        duration: 5,
+      });
+      return;
+    }
+  
     const SplitLinesReceipt = {
       myAction: "create",
       recId: "",
@@ -77,7 +90,7 @@ console.log("receiptHeader", receiptHeader);
       payMode: values.paymentMode,
       bankAccountNo: "",
       transactionNo: values.transactionCode,
-      amount: values.amountPaid,
+      amount: newAmount,
     };
   
     try {
@@ -101,6 +114,7 @@ console.log("receiptHeader", receiptHeader);
       });
     }
   };
+  
   const handleSubmit = async () => {
     if (!receiptHeader || receiptHeader.length === 0) {
       notification.error({
@@ -117,13 +131,13 @@ console.log("receiptHeader", receiptHeader);
       });
       return;
     }
-  
-    const documentDate = receiptHeader[0]?.Document_Date
-      ? new Date(receiptHeader[0]?.Document_Date).toISOString().split("T")[0]
+
+    const documentDate = lastReceipt?.Document_Date
+      ? new Date(lastReceipt?.Document_Date).toISOString().split("T")[0]
       : null;
   
-    const depositDate = receiptHeader[0]?.Date_Posted
-      ? new Date(receiptHeader[0]?.Date_Posted).toISOString().split("T")[0]
+    const depositDate = lastReceipt?.Date_Posted
+      ? new Date(lastReceipt?.Date_Posted).toISOString().split("T")[0]
       : null;
   
     // Define the mapping of payment modes
@@ -143,14 +157,14 @@ console.log("receiptHeader", receiptHeader);
     // Prepare an array of formatted data for each split record
     const formattedData = records.map((record) => ({
       myAction: "edit",
-      recId:  receiptHeader[0]?.SystemId,
-      patientNo: receiptHeader[0]?.Patient_No,
+      recId:  lastReceipt?.SystemId,
+      patientNo: lastReceipt?.Patient_No,
       receiptDate: documentDate,
       depositDate: depositDate,
-      payMode: paymentModes[record.paymentMode] || null, // Convert to integer     
-      amountReceived: record.amountPaid,
-      coPay: receiptHeader[0]?.Co_Pay,
-      transactionCode: record.transactionCode,
+      payMode:0,  
+      amountReceived: 0,
+      coPay: false,
+      transactionCode: "",
       splitAmount: true,
     }));
   
@@ -185,19 +199,19 @@ console.log("receiptHeader", receiptHeader);
       dataIndex: "transactionCode",
       key: "transactionCode",
     },
-    { title: "Amount Paid", dataIndex: "amountPaid", key: "amountPaid" },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Button
-          danger
-          size="small"
-          icon={<DeleteOutlined />}
-          onClick={() => handleRemove(record.key)}
-        />
-      ),
-    },
+    { title: "Amount Paid", dataIndex: "amountPaid", key: "amountPaid", render: (value) => `Ksh ${value.toFixed(2)}` }, //to  2 decimal places and ksh
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (_, record) => (
+    //     <Button
+    //       danger
+    //       size="small"
+    //       icon={<DeleteOutlined />}
+    //       onClick={() => handleRemove(record.key)}
+    //     />
+    //   ),
+    // },
   ];
 
   return (
@@ -224,7 +238,7 @@ console.log("receiptHeader", receiptHeader);
           </div>
           <div>
             <Text strong>Total Accumulative: </Text>
-            {/* <Text type="secondary">Ksh {totalAccumulative}</Text> */}
+             <Text type="secondary">Ksh {totalAccumulative}</Text> 
           </div>
           <Button
             type="primary"
