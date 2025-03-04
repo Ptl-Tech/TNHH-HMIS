@@ -5,6 +5,7 @@ import {
   REQUEST_RECEIPT_PAGE_RESET,
 } from "../../actions/Charges-Actions/getReceiptPage";
 
+
 export const getReceiptPageReducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case REQUEST_RECEIPT_PAGE:

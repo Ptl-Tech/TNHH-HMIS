@@ -49,6 +49,8 @@ import ViewReceipt from "./ViewReceipt";
 import LoadingSkeleton from "../../components/LoadingSkeleton";
 import { IoReceiptOutline } from "react-icons/io5";
 import SplitReceipt from "./SplitReceipt";
+import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
+import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
 
 const { Title, Text } = Typography;
 
@@ -75,23 +77,15 @@ const ViewPatientsReceipts = () => {
     (state) => state.getUnpostedCharges
   );
 
-  // For corporate printing we already have a printInvoice action.
-  const { loading: printReceiptLoading } = useSelector(
-    (state) => state.printReceipt
-  );
-  const { loading: processReceiptLoading } = useSelector(
-    (state) => state.processReceipt
-  );
-  const { data: patientReceipts } = useSelector(
-    (state) => state.getPatientReceipt
-  );
-  const { data: patientHeader } = useSelector(
-    (state) => state.getPatientReceiptHeader
-  );
 
   const { loading: deleteLoading } = useSelector(
     (state) => state.deletePatientCharges
   );
+  const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
+  const lastReceipt = receiptHeader?.[receiptHeader.length - 1]; // Get the last record
+
+  const { loading } = useSelector((state) => state.postReceipt);
+
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -121,6 +115,7 @@ const ViewPatientsReceipts = () => {
       dispatch(getUnpostedCharges(appointmentNo));
     }
   }, [dispatch, patientData?.ActiveVisitNo]);
+  
 
   useEffect(() => {
     if (patientNo) {
@@ -143,7 +138,13 @@ const ViewPatientsReceipts = () => {
       setBalance(newTotal);
     }
   }, [chargesList]); // Recalculate when chargesList changes
-
+  useEffect(() => {
+    const appointmentNo = patientData?.ActiveVisitNo;
+console.log("appointmentNo", appointmentNo);
+    if (appointmentNo) {
+      dispatch(getReceiptPage(appointmentNo));
+    }
+  }, [dispatch, appointmentNo]);
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -191,14 +192,34 @@ const ViewPatientsReceipts = () => {
     setSelectedRecId(receiptLines[0]?.SystemId);
     setAppointmentNo(patientData?.ActiveVisitNo);
   };
-  const showLargeDrawer = () => {
-    setOpen(true);
-    setReceiptNo(receiptNo);
-    setSize("large");
-    setAppointmentNo(patientData?.ActiveVisitNo);
-
+  const showLargeDrawer = async () => {
+    try {
+      const formattedData = {
+        myAction: "create",
+        recId: "",
+        patientNo: patientNo,
+        receiptDate: new Date().toISOString().split("T")[0], // Correct date formatting
+        depositDate: new Date().toISOString().split("T")[0], // Correct date formatting
+        payMode: 0,
+        transactionCode: "",
+        splitAmount: false,
+        amountReceived: 0,
+        coPay: false,
+      };
+  
+      const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
+  
+      if (newReceiptNo) {
+        setOpen(true);
+        setReceiptNo(newReceiptNo); // Fixed: using newReceiptNo
+        setSize("large");
+        setAppointmentNo(patientData?.ActiveVisitNo);
+      }
+    } catch (error) {
+      console.error("Validation or processing failed:", error);
+    }
   };
-
+  
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
