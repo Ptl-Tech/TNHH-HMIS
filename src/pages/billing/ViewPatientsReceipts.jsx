@@ -81,8 +81,8 @@ const ViewPatientsReceipts = () => {
   const { loading: deleteLoading } = useSelector(
     (state) => state.deletePatientCharges
   );
-  const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
-  const lastReceipt = receiptHeader?.[receiptHeader.length - 1]; // Get the last record
+  const { data: lastreceiptHeader } = useSelector((state) => state.getReceiptPage);
+  const lastReceipt = lastreceiptHeader?.[lastreceiptHeader.length - 1]; // Get the last record
 
   const { loading } = useSelector((state) => state.postReceipt);
 
