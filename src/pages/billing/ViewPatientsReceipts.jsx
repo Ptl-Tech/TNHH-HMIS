@@ -90,7 +90,7 @@ const ViewPatientsReceipts = () => {
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
+  const [receiptNo, setReceiptNo] = useState(lastReceipt?.No || "");
   const [viewReceipts, setViewReceipts] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
@@ -108,7 +108,7 @@ const ViewPatientsReceipts = () => {
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState();
   const [record, setRecord] = useState(null);
-
+console.log("lastReceipt", lastReceipt);
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
     if (appointmentNo) {
@@ -231,7 +231,7 @@ console.log("appointmentNo", appointmentNo);
     const receipt = {
       recId: "",
       patientNo: patientData?.PatientNo,
-      receiptNo: receiptNo,
+      receiptNo: receiptNo ,
     };
 
     await dispatch(postReceipt(receipt)).then((status) => {

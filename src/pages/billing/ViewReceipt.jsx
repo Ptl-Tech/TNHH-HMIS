@@ -93,7 +93,7 @@ const ViewReceipt = ({ visitNo, visible, onClose }) => {
         <Typography.Title level={4}>Receipt Details</Typography.Title>
         <Table 
   dataSource={[...(receiptHeader || [])]
-    .filter(receipt => receipt.posted === true) // Filter posted receipts
+    .filter(receipt => receipt.Posted === true) // Filter posted receipts
     .sort((a, b) => b.No - a.No)} // Sort in descending order
   columns={columns} 
   rowKey="No" 
