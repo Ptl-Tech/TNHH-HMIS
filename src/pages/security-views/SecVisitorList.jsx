@@ -66,12 +66,12 @@ const SecVisitorList = () => {
           (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
           (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone));
   
-        const isValidStatus = visitor.Status === "Entered" && visitor.Status !== "Cleared";
+     //   const isValidStatus = visitor.Status === "Entered" && visitor.Status !== "Cleared";
   
         const isCreatedToday = dayjs(visitor.InitiatedDate).isSame(currentDate, "day");
   
         // Return true if all conditions are met (only today's visitors)
-        return isCreatedToday && isValidStatus && matchesSearchParams;
+        return isCreatedToday  && matchesSearchParams;
       });
     };
   
@@ -201,18 +201,21 @@ const SecVisitorList = () => {
       title: "Action",
       key: "action",
       render: (_, visitor) => {
-        
-
         return (
           <Button
-            onClick={() => handleClearVisitor(visitor)}
+            onClick={() =>
+              visitor.Status === "Cleared"
+                ? handleCheckInVisitor(visitor) // Function to check in visitor
+                : handleClearVisitor(visitor) // Function to clear visitor
+            }
             type="primary"
           >
-            Clear Visitor
+            {visitor.Status === "Cleared" ? "Check In Visitor" : "Clear Visitor"}
           </Button>
         );
       },
-    },
+    }
+    
   ];
 
   return (

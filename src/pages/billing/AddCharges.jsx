@@ -24,7 +24,8 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   const [filteredCharges, setFilteredCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [localChargesList, setLocalChargesList] = useState([]);
-
+  const [quantity, setQuantity] = useState(1); // Default to 1
+  const [amount, setAmount] = useState(0); // Default amount
   useEffect(() => {
     if (chargesList) {
       setLocalChargesList(chargesList.filter(item => item.Transaction_Type !== "ZRECEIPT"));
@@ -33,11 +34,13 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
   const handleClose = () => {
     setLocalChargesList([]); // Clear table data on modal close
+    setSelectedCharge(null); // Reset selected charge
+    setSelectedTransactionType(null); // Reset selected transaction type
+    setFilteredCharges([]); // Clear filtered charges
+    form.resetFields(); // Reset form fields, including the amount
     onClose();
-    // Calculate total amount before closing
-    const totalAmount = localChargesList.reduce((total, charge) => total + charge.Total_Amount, 0);
-    setTotalAmount(totalAmount); // Pass total amount to parent component
   };
+  
 
   useEffect(() => {
     if (visitNo) {
@@ -53,13 +56,25 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   const handleTransactionTypeChange = (value) => {
     setSelectedTransactionType(value);
     setFilteredCharges(charges.filter((item) => item.Transaction_Type === value));
+    setSelectedCharge(null);
   };
 
   const handleChargeTypeChange = (value) => {
     const charge = charges.find((item) => item.Description === value);
     setSelectedCharge(charge || null);
+  
+    if (charge) {
+      setAmount(charge.Amount * quantity); // Update amount when charge changes
+    }
   };
-
+  
+  const handleQuantityChange = (e) => {
+    const qty = e.target.value;
+    setQuantity(qty);
+    if (selectedCharge) {
+      setAmount(selectedCharge.Amount * qty); // Update amount when quantity changes
+    }
+  };
   const handleAddCharge = async (values) => {
     if (!selectedCharge) return;
 
@@ -74,6 +89,11 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       patientNo: patientNo,
     };
   await  dispatch(postPatientCharges(payload));
+  setLocalChargesList([]); // Clear table data on modal close
+  setSelectedCharge(null); // Reset selected charge
+  setSelectedTransactionType(null); // Reset selected transaction type
+  setFilteredCharges([]); // Clear filtered charges
+  form.resetFields(); // Reset form fields, including the amount
   onClose();
    //simulate delay time to show loading when refreshing table
     setTimeout(() => {
@@ -83,7 +103,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
     
 
       
-    form.resetFields();
+   
   };
 
   const handleDeleteCharge = (chargeId) => {
@@ -186,18 +206,17 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item
-              label="Quantity"
-              name="quantity"
-              rules={[{ required: true, message: "Please enter quantity!" }]}>
-              <Input size="large" type="number" />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label="Amount">
-              <Input size="large" value={selectedCharge ? selectedCharge.Amount : 0} readOnly />
-            </Form.Item>
-          </Col>
+  <Form.Item label="Quantity" name="quantity" rules={[{ required: true, message: "Please enter quantity!" }]}>
+    <Input size="large" type="number" value={quantity} onChange={handleQuantityChange} />
+  </Form.Item>
+</Col>
+
+<Col span={6}>
+  <Form.Item label="Amount">
+    <Input size="large" type="number" value={amount} readOnly />
+  </Form.Item>
+</Col>
+
         </Row>
 
         <Row gutter={16}>

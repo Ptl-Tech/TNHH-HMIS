@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, DatePicker, Button, Row, Col } from "antd";
+import { Modal, Form, Input, Select, DatePicker, Button, Row, Col, Checkbox } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
@@ -10,13 +10,7 @@ import moment from "moment";
 
 const { Option } = Select;
 
-const ProcessPayment = ({
-  visible,
-  onClose,
-  patientNo,
-  amount,
-  onReceiptedNo,
-}) => {
+const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,15 +18,15 @@ const ProcessPayment = ({
   const [payMode, setPayMode] = useState(""); // Track selected payment mode
 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
-  const { data: receiptHeader } = useSelector(
-    (state) => state.getReceiptHeaderLines
-  );
+  const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
   const { loading } = useSelector((state) => state.postReceipt);
+
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
-        receiptDate: moment(), // Set today's date
+        receiptDate: moment(),
         amountReceived: "",
+        coPay: false, // Default Co-Pay to false
       });
     }
   }, [visible, form]);
@@ -49,13 +43,15 @@ const ProcessPayment = ({
       const values = await form.validateFields();
 
       const formattedData = {
-        myAction: receiptNo ? "edit" : "create",
+        myAction: "create",
         recId: receiptNo || "",
         patientNo: patientNo,
         receiptDate: values.receiptDate.format("YYYY-MM-DD"),
         depositDate: values.receiptDate?.format("YYYY-MM-DD") || null,
         payMode: values.payMode,
-        amountReceived: parseFloat(values.amountReceived),
+        transactionCode: values.transactionCode || "",  
+        splitAmount: values.splitAmount || false,
+               amountReceived: parseFloat(values.amountReceived),
         coPay: values.coPay,
         ...(values.payMode === 7 && {
           transactionCode: values.transactionCode,
@@ -79,18 +75,9 @@ const ProcessPayment = ({
   return (
     <Modal
       title={
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>Generate Payment</span>
-          <CloseOutlined
-            onClick={onClose}
-            style={{ marginRight: 10, fontSize: 16 }}
-          />
+          <CloseOutlined onClick={onClose} style={{ marginRight: 10, fontSize: 16 }} />
         </div>
       }
       open={visible}
@@ -102,23 +89,16 @@ const ProcessPayment = ({
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ payMode: "", amountReceived: 0, coPay: true }}
+        initialValues={{ payMode: "", amountReceived: 0, coPay: false }}
       >
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
               label="Receipt Date"
               name="receiptDate"
-              rules={[
-                { required: true, message: "Please select receipt date!" },
-              ]}
+              rules={[{ required: true, message: "Please select receipt date!" }]}
             >
-              <DatePicker
-                size="large"
-                format="YYYY-MM-DD"
-                style={{ width: "100%", color: "#0F5689 !important" }}
-                disabled
-              />
+              <DatePicker size="large" format="YYYY-MM-DD" style={{ width: "100%" }} disabled />
             </Form.Item>
           </Col>
         </Row>
@@ -128,14 +108,12 @@ const ProcessPayment = ({
             <Form.Item
               label="Payment Mode"
               name="payMode"
-              rules={[
-                { required: true, message: "Please select payment mode!" },
-              ]}
+              rules={[{ required: true, message: "Please select payment mode!" }]}
             >
               <Select
                 size="large"
-                onChange={(value) => setPayMode(value)} // Track selected payment mode
-                placeholder="select Payment option"
+                onChange={(value) => setPayMode(value)}
+                placeholder="Select Payment Option"
               >
                 <Option value="">--Select Payment Option--</Option>
                 <Option value={7}>Mpesa</Option>
@@ -148,9 +126,7 @@ const ProcessPayment = ({
             <Form.Item
               label="Amount Received"
               name="amountReceived"
-              rules={[
-                { required: true, message: "Please enter amount received!" },
-              ]}
+              rules={[{ required: true, message: "Please enter amount received!" }]}
             >
               <Input
                 prefix="KSh"
@@ -169,42 +145,37 @@ const ProcessPayment = ({
 
         {/* Conditional Fields for Mpesa */}
         {payMode === 7 && (
-          <>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  label="Transaction Code"
-                  name="transactionCode"
-                  // rules={[{ required: true, message: "Please enter transaction code!" }]}
-                >
-                  <Input placeholder="Enter Transaction Code" size="large" />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item
-                  label="Phone Number"
-                  name="phoneNumber"
-                  // rules={[
-                  //   { required: true, message: "Please enter phone number!" },
-                  //   { pattern: /^[0-9]{10}$/, message: "Enter a valid 10-digit number!" },
-                  // ]}
-                >
-                  <Input placeholder="Enter Phone Number" size="large" />
-                </Form.Item>
-              </Col>
-            </Row>
-          </>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Transaction Code" name="transactionCode">
+                <Input placeholder="Enter Transaction Code" size="large" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Phone Number" name="phoneNumber">
+                <Input placeholder="Enter Phone Number" size="large" />
+              </Form.Item>
+            </Col>
+          </Row>
         )}
+
+        {/* Co-Pay Checkbox (Always Visible) */}
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item name="coPay" valuePropName="checked">
+              <Checkbox>Co-Pay</Checkbox>
+            </Form.Item>
+          </Col>
+          {/* <Col span={12}>
+            <Form.Item name="splitAmount" valuePropName="checked">
+              <Checkbox>Split Amount</Checkbox>
+            </Form.Item>
+          </Col> */}
+        </Row>
 
         <Row>
           <Col span={24}>
-            <Button
-              type="primary"
-              size="large"
-              style={{ width: "100%" }}
-              loading={loading}
-              onClick={handleOk}
-            >
+            <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>
               Generate Receipt
             </Button>
           </Col>

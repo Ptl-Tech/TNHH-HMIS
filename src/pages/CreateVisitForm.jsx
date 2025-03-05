@@ -2,29 +2,27 @@ import {
   Avatar,
   Button,
   Card,
-  Dropdown,
   Form,
   Input,
-  Menu,
   message,
   notification,
   Select,
   Switch,
-} from "antd";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   listDoctors,
   listInsuranceOptions,
   listClinics,
-} from "../actions/DropdownListActions";
+} from '../actions/DropdownListActions';
 import {
   appmntList,
-  createPatient,
   createTriageVisit,
   listPatients,
   postTriageVisit,
+
 } from "../actions/patientActions";
 import { IoCaretBack, IoCloseOutline } from "react-icons/io5";
 import LoadingSkeleton from "../components/LoadingSkeleton";
@@ -34,11 +32,12 @@ const CreateVisitForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const patientNo = queryParams.get("PatientNo");
+  const patientNo = queryParams.get('PatientNo');
   const { state } = location; // Access the state passed via navigate
   const { patientData, existingPatient, visitData } = state || {}; // Destructure patient data if available
   const { loading: appmntListLoading, patients: visitPatients } = useSelector(
     (state) => state.appmntList
+
   );
   const {
     loading: patientListLoading,
@@ -90,21 +89,23 @@ const CreateVisitForm = () => {
   const loading=   visitLoading ||  postTriageVisitLoading;
 
   const [newVisit, setNewVisit] = useState({
-    clinic: "",
-    doctor: "",
-    paymentMode: "",
-    insuranceNo: "",
-    membershipNo: "",
-    patientType: "",
+    clinic: '',
+    doctor: '',
+    paymentMode: '',
+    insuranceNo: '',
+    membershipNo: '',
+    patientType: '',
     // appointmentType: "",
-    insuranceNo: "",
-    gender: "",
+    insuranceNo: '',
+    gender: '',
     // dob: "",
-    insuranceName: "",
-    insurancePrincipalMemberName: "",
+    insuranceName: '',
+    insurancePrincipalMemberName: '',
     isPrincipleMember: false,
-    schemeName: "",
+    schemeName: '',
   });
+
+  console.log({ patientData });
 
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [appointmentId, setAppointmentId] = useState(null);
@@ -117,26 +118,26 @@ const CreateVisitForm = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
+    const branchCode = localStorage.getItem('branchCode'); // Fetch branch code from localStorage
     if (doctorsPayload) {
       let filtered;
 
-      if (newVisit.clinic === "PSYCHOLOGIST") {
+      if (newVisit.clinic === 'PSYCHOLOGIST') {
         // If clinic is PSYCHOLOGY, do not filter by branch code
         filtered = doctorsPayload.filter(
-          (doctor) => doctor.Specialization === newVisit.clinic
+          (doctor) => doctor.Specialization === newVisit.clinic,
         );
-      } else if (newVisit.clinic === "PSYCHIATRIST") {
+      } else if (newVisit.clinic === 'PSYCHIATRIST') {
         // If clinic is PSYCHIATRY, filter by both specialization and branch code
         filtered = doctorsPayload.filter(
           (doctor) =>
             doctor.Specialization === newVisit.clinic &&
-            doctor.GlobalDimension1Code === branchCode
+            doctor.GlobalDimension1Code === branchCode,
         );
       } else {
         // Default filtering for other clinics
         filtered = doctorsPayload.filter(
-          (doctor) => doctor.Specialization === newVisit.clinic
+          (doctor) => doctor.Specialization === newVisit.clinic,
           // && doctor.GlobalDimension1Code === branchCode
         );
       }
@@ -146,9 +147,9 @@ const CreateVisitForm = () => {
   }, [doctorsPayload, newVisit.clinic]);
 
   const savepatientVisit = async () => {
-    if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+    if (newVisit.clinic === 'PSYCHIATRY' || newVisit.clinic === 'PSYCHOLOGY') {
       if (!newVisit.doctor) {
-        message.error("Please select a doctor before saving the visit.");
+        message.error('Please select a doctor before saving the visit.');
         return;
       }
     }
@@ -177,6 +178,7 @@ const CreateVisitForm = () => {
 
       if (response) {
         const newAppointmentId = response;
+
         console.log("Visit created with ID:", newAppointmentId);
         // message.success("Visit created successfully!");
         notification.success({
@@ -191,34 +193,35 @@ const CreateVisitForm = () => {
             color: "white", // White text
           },
         });
-              setAppointmentId(newAppointmentId);
+        setAppointmentId(newAppointmentId);
+
 
         // Call dispatchPatient after successfully setting the appointment ID
         // dispatchPatient(newAppointmentId);
       } else {
-        throw new Error("Failed to retrieve appointment ID");
+        throw new Error('Failed to retrieve appointment ID');
       }
     } catch (error) {
-      console.error("Error creating visit:", error);
-      message.error("Failed to create visit!");
+      console.error('Error creating visit:', error);
+      message.error('Failed to create visit!');
     }
   };
 
   const dispatchPatient = async (appointmentId) => {
     if (!appointmentId) {
-      message.error("Appointment ID is required!");
+      message.error('Appointment ID is required!');
       return;
     }
 
-    if (newVisit.clinic === "PSYCHIATRY" || newVisit.clinic === "PSYCHOLOGY") {
+    if (newVisit.clinic === 'PSYCHIATRY' || newVisit.clinic === 'PSYCHOLOGY') {
       if (!newVisit.doctor) {
-        message.error("Please select a doctor before dispatching the patient.");
+        message.error('Please select a doctor before dispatching the patient.');
         return;
       }
     }
 
     try {
-      console.log("Dispatching patient with appointment ID:", appointmentId);
+      console.log('Dispatching patient with appointment ID:', appointmentId);
 
     const OBNo=  await dispatch(postTriageVisit({ appointmentNo: appointmentId }));
     if (OBNo) {
@@ -235,7 +238,7 @@ const CreateVisitForm = () => {
       navigate(-1 || "/reception/visitors-list");
     }
     } catch (postTriageVisitError) {
-      console.error("Error dispatching patient:", error);
+      console.error('Error dispatching patient:', error);
       //display error message from postTriageVisitError
       message.error(postTriageVisitError, error);
     }
@@ -245,7 +248,7 @@ const CreateVisitForm = () => {
     setNewVisit((prev) => {
       const updatedVisitData = { ...prev, [name]: value };
 
-      if (name === "isPrincipleMember" && value) {
+      if (name === 'isPrincipleMember' && value) {
         // Set the insurancePrincipalMemberName in uppercase
         updatedVisitData.insurancePrincipalMemberName =
           existingPatient?.FirstName ||
@@ -254,15 +257,15 @@ const CreateVisitForm = () => {
           `${patientData?.firstName} ${patientData?.middleName} ${patientData?.lastName} `
             .trim()
             .toUpperCase();
-      } else if (name === "isPrincipleMember" && !value) {
-        updatedVisitData.insurancePrincipalMemberName = ""; // Clear the name if unchecked
+      } else if (name === 'isPrincipleMember' && !value) {
+        updatedVisitData.insurancePrincipalMemberName = ''; // Clear the name if unchecked
       }
       return updatedVisitData;
     });
   };
 
   const handleInputChange = (field, value) => {
-    if (field === "doctor") {
+    if (field === 'doctor') {
       setNewVisit((prev) => ({ ...prev, [field]: value }));
     } else {
       setNewVisit((prev) => ({ ...prev, [field]: value }));
@@ -271,17 +274,17 @@ const CreateVisitForm = () => {
 
   // Use the selected DoctorID to find the doctor for display
   const selectedDoctor = filteredDoctors.find(
-    (doc) => doc.DoctorID === newVisit.doctor
+    (doc) => doc.DoctorID === newVisit.doctor,
   );
 
   const handleEditPatient = () => {
-    if (typeof patientNo !== "string") {
-      console.error("Invalid patientNo:", patientNo);
+    if (typeof patientNo !== 'string') {
+      console.error('Invalid patientNo:', patientNo);
       return;
     }
 
     // Fetch patientNo starts with WLK navigate to walk-in registration else navigate to outpatient registration with patient data
-    if (patientNo.startsWith("WLK")) {
+    if (patientNo.startsWith('WLK')) {
       navigate(`/reception/Register-walkin?PatientNo=${patientNo}`, {
         state: { patientDet: existingPatient },
       });
@@ -292,6 +295,20 @@ const CreateVisitForm = () => {
     }
   };
 
+  const fullNameGenerator = (namesArray) => {
+    return namesArray
+      .flatMap((item) => item)
+      .reduce((acc, curr) => {
+        if (curr) {
+          acc.push(curr);
+        }
+
+        console.log({ acc });
+        return acc;
+      }, [])
+      .join(' ');
+  };
+
   return (
     <div>
       <div>
@@ -299,7 +316,7 @@ const CreateVisitForm = () => {
           <div className="div">
             <h4
               className="text-start px-3"
-              style={{ color: "#E89641" }}
+              style={{ color: '#E89641' }}
               id="appointment-card"
             >
               Create Visit
@@ -354,15 +371,18 @@ const CreateVisitForm = () => {
                       Patient Names:<span className="text-danger px-1">*</span>
                     </label>
                     <Input
-                      label="Patient Names"
-                      value={
-                        existingPatient?.FirstName ||
-                        existingPatient?.SearchNames ||
-                        existingPatient?.SearchName ||
-                        `${patientData?.firstName} ${patientData?.middleName} ${patientData?.lastName} `
-                      }
                       disabled
+                      label="Patient Names"
                       className="text-dark fw-medium"
+                      value={fullNameGenerator([
+                        existingPatient?.SearchNames?.split(' '),
+                        existingPatient?.FirstName,
+                        existingPatient?.SearchName?.split(' '),
+                        patientData?.firstName,
+                        patientData?.surname,
+                        patientData?.middleName,
+                        patientData?.lastName,
+                      ])}
                     />
                   </div>
                 </div>
@@ -375,7 +395,7 @@ const CreateVisitForm = () => {
                       placeholder="Select Clinic"
                       className="w-100"
                       value={newVisit.clinic}
-                      onChange={(value) => handleInputChange("clinic", value)}
+                      onChange={(value) => handleInputChange('clinic', value)}
                       showSearch
                       filterOption={(input, option) =>
                         option.children
@@ -386,7 +406,10 @@ const CreateVisitForm = () => {
                       <Select.Option value="">--Select Clinic--</Select.Option>
                       {clinicsPayload &&
                         clinicsPayload.map((clinic) => (
-                          <Select.Option key={clinic.No} value={clinic.No}>
+                          <Select.Option
+                            key={clinic.No}
+                            value={clinic.No}
+                          >
                             {clinic.Description}
                           </Select.Option>
                         ))}
@@ -400,7 +423,7 @@ const CreateVisitForm = () => {
                       placeholder="Select Doctor"
                       className="w-100"
                       value={newVisit.doctor} // This will hold the DoctorID
-                      onChange={(value) => handleInputChange("doctor", value)} // Update DoctorID
+                      onChange={(value) => handleInputChange('doctor', value)} // Update DoctorID
                       showSearch
                       // filterOption = {true}
                       filterOption={(input, option) =>
@@ -433,14 +456,14 @@ const CreateVisitForm = () => {
                       placeholder="Select Settlement Type"
                       className="w-100"
                       value={
-                        newVisit.paymentMode === "1"
-                          ? "Insurance"
-                          : newVisit.paymentMode === "2"
-                          ? "Cash"
-                          : ""
+                        newVisit.paymentMode === '1'
+                          ? 'Insurance'
+                          : newVisit.paymentMode === '2'
+                          ? 'Cash'
+                          : ''
                       }
                       onChange={(value) =>
-                        handleInputChange("paymentMode", value)
+                        handleInputChange('paymentMode', value)
                       }
                       showSearch
                       filterOption={(input, option) =>
@@ -455,7 +478,7 @@ const CreateVisitForm = () => {
                     </Select>
                   </div>
 
-                  {newVisit.paymentMode === "1" && (
+                  {newVisit.paymentMode === '1' && (
                     <div className="col-12 col-md-6">
                       <label className="py-1">
                         Insurance Name:
@@ -465,17 +488,13 @@ const CreateVisitForm = () => {
                         placeholder="Select Insurance"
                         className="w-100"
                         value={
-                          newVisit.insuranceNo ||
-                          insurancePayload?.find(
-                            (insurance) =>
-                              insurance.No === existingPatient?.InsuranceNo
-                          )?.No ||
+                          newVisit.insuranceNo || existingPatient?.InsuranceNo ||
                           ""
                         }
                         onChange={(value) =>
-                          handleInputChange("insuranceNo", value)
+                          handleInputChange('insuranceNo', value)
                         }
-                        disabled={newVisit.paymentMode !== "1"}
+                        disabled={newVisit.paymentMode !== '1'}
                         showSearch
                         allowClear
                         filterOption={(input, option) =>
@@ -497,7 +516,10 @@ const CreateVisitForm = () => {
                             </Select.Option>
                           ))
                         ) : (
-                          <Select.Option value="" disabled>
+                          <Select.Option
+                            value=""
+                            disabled
+                          >
                             No data available
                           </Select.Option>
                         )}
@@ -506,7 +528,7 @@ const CreateVisitForm = () => {
                   )}
                 </div>
 
-                {newVisit.paymentMode === "1" && (
+                {newVisit.paymentMode === '1' && (
                   <>
                     <div className="row px-3 py-2 align-items-center justify-content-between">
                       <div className="col-12 col-md-6">
@@ -521,9 +543,9 @@ const CreateVisitForm = () => {
                             existingPatient?.MembershipNo
                           }
                           onChange={(e) =>
-                            handleInputChange("membershipNo", e.target.value)
+                            handleInputChange('membershipNo', e.target.value)
                           }
-                          disabled={newVisit.paymentMode !== "1"}
+                          disabled={newVisit.paymentMode !== '1'}
                         />
                       </div>
 
@@ -538,9 +560,9 @@ const CreateVisitForm = () => {
                             newVisit.schemeName || existingPatient?.SchemeName
                           }
                           onChange={(e) =>
-                            handleInputChange("schemeName", e.target.value)
+                            handleInputChange('schemeName', e.target.value)
                           }
-                          disabled={newVisit.paymentMode !== "1"}
+                          disabled={newVisit.paymentMode !== '1'}
                         />
                       </div>
                     </div>
@@ -558,18 +580,18 @@ const CreateVisitForm = () => {
                           } // Use insurancePrincipalMemberName here
                           onChange={(e) =>
                             handleInputChange(
-                              "insurancePrincipalMemberName",
-                              e.target.value
+                              'insurancePrincipalMemberName',
+                              e.target.value,
                             )
                           }
                           disabled={
-                            newVisit.paymentMode !== "1" ||
+                            newVisit.paymentMode !== '1' ||
                             newVisit.isPrincipleMember
                           } // Disable if the user is the principal member
                           style={{
-                            width: "100%",
-                            fontWeight: "bold",
-                            color: "black",
+                            width: '100%',
+                            fontWeight: 'bold',
+                            color: 'black',
                           }}
                         />
                       </div>
@@ -584,9 +606,9 @@ const CreateVisitForm = () => {
                             existingPatient?.Principal
                           }
                           onChange={(checked) =>
-                            handleSwitchChange("isPrincipleMember", checked)
+                            handleSwitchChange('isPrincipleMember', checked)
                           }
-                          disabled={newVisit.paymentMode !== "1"}
+                          disabled={newVisit.paymentMode !== '1'}
                         />
                       </div>
                     </div>
@@ -597,7 +619,10 @@ const CreateVisitForm = () => {
             </Card>
           </div>
           <div className="col-12 col-md-4">
-            <Card title="Billing Details" style={{ width: "100%" }}>
+            <Card
+              title="Billing Details"
+              style={{ width: '100%' }}
+            >
               <Form
                 name="basic"
                 initialValues={{ remember: true }}
@@ -608,47 +633,47 @@ const CreateVisitForm = () => {
                     <Avatar
                       size={100}
                       style={{
-                        backgroundColor: "#87d068",
-                        fontSize: "2rem",
-                        fontWeight: "bold",
+                        backgroundColor: '#87d068',
+                        fontSize: '2rem',
+                        fontWeight: 'bold',
                       }}
                     >
                       {`${
                         patientData?.firstName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(0) ||
-                        ""
+                        ''
                       }${
                         patientData?.lastName?.charAt(0) ||
                         existingPatient?.LastName?.charAt(1).toUpperCase() ||
-                        ""
+                        ''
                       }`}
                     </Avatar>
                   </div>
                   {/* Add dynamic data fields for patientType, settlementType, clinic, doctor */}
                   <div className="col-12 mb-4">
                     <p>
-                      <strong>Patient Type:</strong>{" "}
-                      {patientData?.paymentMode === "1"
-                        ? "Insurance"
-                        : patientData?.paymentMode === "2"
-                        ? "Cash"
-                        : existingPatient?.PatientType || "N/A"}
+                      <strong>Patient Type:</strong>{' '}
+                      {patientData?.paymentMode === '1'
+                        ? 'Insurance'
+                        : patientData?.paymentMode === '2'
+                        ? 'Cash'
+                        : existingPatient?.PatientType || 'N/A'}
                     </p>
 
                     <p>
-                      <strong>Settlement Type:</strong>{" "}
-                      {newVisit.paymentMode === "1"
-                        ? "Insurance"
-                        : newVisit.paymentMode === "2"
-                        ? "Cash"
-                        : "N/A"}
+                      <strong>Settlement Type:</strong>{' '}
+                      {newVisit.paymentMode === '1'
+                        ? 'Insurance'
+                        : newVisit.paymentMode === '2'
+                        ? 'Cash'
+                        : 'N/A'}
                     </p>
                     <p>
-                      <strong>Clinic:</strong> {newVisit.clinic || "N/A"}
+                      <strong>Clinic:</strong> {newVisit.clinic || 'N/A'}
                     </p>
                     <p>
-                      <strong>Doctor:</strong>{" "}
-                      {selectedDoctor ? selectedDoctor.DoctorsName : "N/A"}
+                      <strong>Doctor:</strong>{' '}
+                      {selectedDoctor ? selectedDoctor.DoctorsName : 'N/A'}
                     </p>
 
                     {/* <p>
@@ -660,10 +685,10 @@ const CreateVisitForm = () => {
               </Form>
             </Card>
             <div className="float-end mt-3">
-            <Button onClick={() => navigate(-1)} >
-            <IoCaretBack/>
-              Go Back
-          </Button>
+              <Button onClick={() => navigate(-1)}>
+                <IoCaretBack />
+                Go Back
+              </Button>
             </div>
           </div>
         </div>

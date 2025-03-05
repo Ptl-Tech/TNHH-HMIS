@@ -2,6 +2,7 @@ import axios from 'axios';
 import apiHeaderConfig from '../configHelpers';
 
 export const POST_LAB_TEST_RESULTS_FAIL = 'POST_LAB_TEST_RESULTS_FAIL';
+export const POST_LAB_TEST_RESULTS_RESET = 'POST_LAB_TEST_RESULTS_RESET';
 export const POST_LAB_TEST_RESULTS_REQUEST = 'POST_LAB_TEST_RESULTS_REQUEST';
 export const POST_LAB_TEST_RESULTS_SUCCESS = 'POST_LAB_TEST_RESULTS_SUCCESS';
 

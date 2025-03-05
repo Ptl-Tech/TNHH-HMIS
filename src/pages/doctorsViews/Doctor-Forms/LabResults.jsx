@@ -36,7 +36,7 @@ const LabResults = () => {
   const location = useLocation();
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo");
+  const treatmentNo = queryParams.get("TreatmentNo" || "AdmNo");
   const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
@@ -87,24 +87,22 @@ const LabResults = () => {
   }, [dispatch, treatmentNo, admissionNo]);
 
   const handleLabRequest = async () => {
-    if (selectedRow && selectedRow.TreatmentNo) {
-      try {
-        const response = await dispatch(requestLabTest(selectedRow.TreatmentNo));
-        if (response) {
-          message.success(
-            `Requesting test for ${selectedRow.LaboratoryTestPackageName} with Laboratory No: ${response.laboratoryNo}`
-          );
-          // Refresh the patient lab test data
-          dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
-        } else {
-          message.error("Failed to request the lab test. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error requesting lab test:", error);
-        message.error("An error occurred while requesting the lab test.");
+    //fetch treatmentNo from the URL
+    const treatmentNo= admissionNo ?? treatmentNo;
+    try {
+      const response = await dispatch(requestLabTest(treatmentNo));
+      if (response) {
+        message.success(
+          `Requesting test for Laboratory No: ${response.laboratoryNo}`
+        );
+        // Refresh the patient lab test data
+        dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
+      } else {
+        message.error("Failed to request the lab test. Please try again.");
       }
-    } else {
-      message.warning("Please select a lab test to proceed.");
+    } catch (error) {
+      console.error("Error requesting lab test:", error);
+      message.error("An error occurred while requesting the lab test.");
     }
   };
   
@@ -172,7 +170,7 @@ const LabResults = () => {
           case "Forwarded":
             color = "green";
             break;
-          case "Cancelled":
+          case "Voided":
             color = "red";
             break;
           default:

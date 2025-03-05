@@ -23,16 +23,20 @@ import TextArea from "antd/es/input/TextArea";
 const AllergyAndMedication = ({
   observationNumber,
   patientNumber,
-  setIsFormVisible
+  setIsFormVisible,
+  refreshData
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-console.log(observationNumber);
   const config = useAuth().userData;
 
   const { postAllergyMedicationLoading } = useSelector(
     (state) => state.postAllergiesMedication
   );
+  const { allergiesMedication } = useSelector(
+    (state) => state.getAllergiesAndMedications
+  );
+  
 
   useEffect(() => {
     dispatch(getAllergiesAndMedicationsSlice(observationNumber));
@@ -67,7 +71,7 @@ console.log(observationNumber);
         }
       }
     );
-
+refreshData();
     dispatch(getAllergiesAndMedicationsSlice(observationNumber));
   };
   return (

@@ -42,7 +42,6 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
     const filteredData = data.filter((patient) => patient.InPatient === false);
     //patient.GlobalDimension1Code === branchCode  &&
 
-    console.log('filteredData: ', filteredData);
 
     dispatch({ type: TREATMENT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {

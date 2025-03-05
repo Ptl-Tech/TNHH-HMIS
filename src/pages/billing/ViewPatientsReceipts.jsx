@@ -47,6 +47,10 @@ import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCha
 import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
 import ViewReceipt from "./ViewReceipt";
 import LoadingSkeleton from "../../components/LoadingSkeleton";
+import { IoReceiptOutline } from "react-icons/io5";
+import SplitReceipt from "./SplitReceipt";
+import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
+import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
 
 const { Title, Text } = Typography;
 
@@ -58,15 +62,12 @@ const ViewPatientsReceipts = () => {
   const { state } = useLocation();
   const { patientData } = state;
 
-  console.log("patientData", patientData);
-
   const { loading: loadingChargesLines, data } = useSelector(
     (state) => state.getChargesLines
   );
   const { loading: printInvoiceLoading } = useSelector(
     (state) => state.printInvoice
   );
-
 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector(
@@ -76,26 +77,20 @@ const ViewPatientsReceipts = () => {
     (state) => state.getUnpostedCharges
   );
 
-  // For corporate printing we already have a printInvoice action.
-  const { loading: printReceiptLoading } = useSelector(
-    (state) => state.printReceipt
-  );
-  const { loading: processReceiptLoading } = useSelector(
-    (state) => state.processReceipt
-  );
-  const { data: patientReceipts } = useSelector(
-    (state) => state.getPatientReceipt
-  );
-  const { data: patientHeader } = useSelector(
-    (state) => state.getPatientReceiptHeader
-  );
 
-  const { loading:deleteLoading } = useSelector((state) => state.deletePatientCharges);
+  const { loading: deleteLoading } = useSelector(
+    (state) => state.deletePatientCharges
+  );
+  const { data: lastreceiptHeader } = useSelector((state) => state.getReceiptPage);
+  const lastReceipt = lastreceiptHeader?.[lastreceiptHeader.length - 1]; // Get the last record
+
+  const { loading } = useSelector((state) => state.postReceipt);
+
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [appointmentNo, setAppointmentNo] = useState("");
-  const [receiptNo, setReceiptNo] = useState("");
+  const [receiptNo, setReceiptNo] = useState(lastReceipt?.No || "");
   const [viewReceipts, setViewReceipts] = useState(false);
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
@@ -110,6 +105,10 @@ const ViewPatientsReceipts = () => {
   // NEW: Track whether the receipt has been posted.
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
   const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
+  const [open, setOpen] = useState(false);
+  const [size, setSize] = useState();
+  const [record, setRecord] = useState(null);
+console.log("lastReceipt", lastReceipt);
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
     if (appointmentNo) {
@@ -117,6 +116,7 @@ const ViewPatientsReceipts = () => {
     }
   }, [dispatch, patientData?.ActiveVisitNo]);
   
+
   useEffect(() => {
     if (patientNo) {
       dispatch(getPatientReceiptLines(patientNo));
@@ -131,12 +131,20 @@ const ViewPatientsReceipts = () => {
   useEffect(() => {
     if (chargesList) {
       // Recalculate balance from the latest charges list
-      const newTotal = chargesList.reduce((acc, charge) => acc + charge.Total_Amount, 0);
+      const newTotal = chargesList.reduce(
+        (acc, charge) => acc + charge.Total_Amount,
+        0
+      );
       setBalance(newTotal);
     }
   }, [chargesList]); // Recalculate when chargesList changes
-  
-
+  useEffect(() => {
+    const appointmentNo = patientData?.ActiveVisitNo;
+console.log("appointmentNo", appointmentNo);
+    if (appointmentNo) {
+      dispatch(getReceiptPage(appointmentNo));
+    }
+  }, [dispatch, appointmentNo]);
   const handleGoBack = () => {
     navigate(-1);
   };
@@ -155,8 +163,8 @@ const ViewPatientsReceipts = () => {
     setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
     setViewReceipts(false);
+    setOpen(false);
   };
-  
 
   const handlePrintReceipt = () => {
     const invoiceData = {
@@ -182,8 +190,36 @@ const ViewPatientsReceipts = () => {
   const showReverseModal = () => {
     setReverseChargeModalVisible(true);
     setSelectedRecId(receiptLines[0]?.SystemId);
+    setAppointmentNo(patientData?.ActiveVisitNo);
   };
-
+  const showLargeDrawer = async () => {
+    try {
+      const formattedData = {
+        myAction: "create",
+        recId: "",
+        patientNo: patientNo,
+        receiptDate: new Date().toISOString().split("T")[0], // Correct date formatting
+        depositDate: new Date().toISOString().split("T")[0], // Correct date formatting
+        payMode: 0,
+        transactionCode: "",
+        splitAmount: false,
+        amountReceived: 0,
+        coPay: false,
+      };
+  
+      const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
+  
+      if (newReceiptNo) {
+        setOpen(true);
+        setReceiptNo(newReceiptNo); // Fixed: using newReceiptNo
+        setSize("large");
+        setAppointmentNo(patientData?.ActiveVisitNo);
+      }
+    } catch (error) {
+      console.error("Validation or processing failed:", error);
+    }
+  };
+  
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
@@ -195,7 +231,7 @@ const ViewPatientsReceipts = () => {
     const receipt = {
       recId: "",
       patientNo: patientData?.PatientNo,
-      receiptNo: receiptNo,
+      receiptNo: receiptNo ,
     };
 
     await dispatch(postReceipt(receipt)).then((status) => {
@@ -225,7 +261,7 @@ const ViewPatientsReceipts = () => {
     });
   };
 
-    const postedCharges =
+  const postedCharges =
     chargesList?.filter(
       (charge) => charge.Posted && charge.Transaction_Type !== "ZRECEIPT"
     ) || [];
@@ -331,7 +367,15 @@ const ViewPatientsReceipts = () => {
             </div>
           </Col>
           <Col span={12} className="mt-3 text-end">
-            <Space align="end">
+            <Space justify="end" align="end">
+              <Button
+                type="default"
+                size="medium"
+                icon={<IoReceiptOutline />}
+                onClick={showLargeDrawer}
+              >
+                Split Receipt
+              </Button>
               <Button
                 type="default"
                 size="medium"
@@ -388,43 +432,44 @@ const ViewPatientsReceipts = () => {
                   : balance.toLocaleString("en-KE", {
                       style: "currency",
                       currency: "KES",
-                  })}
+                    })}
               </p>
 
               <Text strong>Receipt No:</Text>
-              <p style={{ fontWeight: "bold", color: "green" }}>
-                {receiptNo}
-              </p>
+              <p style={{ fontWeight: "bold", color: "green" }}>{receiptNo}</p>
             </div>
           </Col>
         </Row>
 
         <Divider />
-<LoadingSkeleton loading={chargesLoading || deleteLoading} rows={8} avatar={false}>
-        <div className="d-flex  flex-column">
-          <div className="d-flex flex-column text-start">
-            <Title level={4}>Unposted Charges </Title>
-            <Table
-              dataSource={unpostedCharges}
-              columns={unpostedColumns}
-              rowKey="Code"
-              pagination={{ pageSize: 5 }}
-              // loading={chargesLoading}
-            />
+        <LoadingSkeleton
+          loading={chargesLoading || deleteLoading}
+          rows={8}
+          avatar={false}
+        >
+          <div className="d-flex  flex-column">
+            <div className="d-flex flex-column text-start">
+              <Title level={4}>Unposted Charges </Title>
+              <Table
+                dataSource={unpostedCharges}
+                columns={unpostedColumns}
+                rowKey="Code"
+                pagination={{ pageSize: 5 }}
+                // loading={chargesLoading}
+              />
+            </div>
+            <div className="d-flex flex-column text-start">
+              <Title level={4}>Posted Charges </Title>
+              <Table
+                dataSource={postedCharges}
+                columns={columns}
+                rowKey="Code"
+                pagination={{ pageSize: 5 }}
+                loading={chargesLoading}
+              />
+            </div>
           </div>
-          <div className="d-flex flex-column text-start">
-            <Title level={4}>Posted Charges </Title>
-            <Table
-              dataSource={postedCharges}
-              columns={columns}
-              rowKey="Code"
-              pagination={{ pageSize: 5 }}
-              loading={chargesLoading}
-
-            />
-          </div>
-        </div>
-</LoadingSkeleton>
+        </LoadingSkeleton>
         <Divider />
 
         <Row gutter={16}>
@@ -478,6 +523,13 @@ const ViewPatientsReceipts = () => {
         visible={viewReceipts}
         onClose={() => setViewReceipts(false)}
         visitNo={appointmentNo}
+      />
+      <SplitReceipt
+        open={open}
+        receiptNo={receiptNo}
+        visitNo={appointmentNo}
+        onClose={() => setOpen(false)}
+        size={size}
       />
       <Modal
         title="Receipt Preview"

@@ -1,5 +1,6 @@
 import {
   POST_LAB_TEST_RESULTS_FAIL,
+  POST_LAB_TEST_RESULTS_RESET,
   POST_LAB_TEST_RESULTS_REQUEST,
   POST_LAB_TEST_RESULTS_SUCCESS,
 } from '../../actions/lab-actions/postLabTestResults';
@@ -23,6 +24,8 @@ export const postLabTestResultsReducer = (state = initialState, action) => {
         loading: false,
         data: action.payload,
       };
+    case POST_LAB_TEST_RESULTS_RESET:
+      return initialState;
     case POST_LAB_TEST_RESULTS_FAIL:
       return {
         ...state,
