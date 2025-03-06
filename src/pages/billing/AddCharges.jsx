@@ -17,7 +17,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
-  const { loading } = useSelector((state) => state.postPatientCharges);
+  const { loading:addChargesLoading } = useSelector((state) => state.postPatientCharges);
   const { loading: chargesLoading, data: chargesList } = useSelector((state) => state.getUnpostedCharges);
 
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
@@ -227,10 +227,9 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit">Save</Button>
+          <Button type="primary" htmlType="submit" disabled={addChargesLoading} loading={addChargesLoading}>Save</Button>
         </div>
       </Form>
-
       
     </Modal>
   );

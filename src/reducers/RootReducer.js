@@ -44,6 +44,7 @@ import {
 import { triageWaitingListReducer } from './TriageReducers';
 import {
   admitVisitorReducer,
+  clearVisitorReducer,
   visitorCreateReducer,
   visitorListReducer,
 } from './visitorsReducer';
@@ -291,6 +292,7 @@ export const rootReducer = combineReducers({
   getTriageList: getTriageListReducer,
   triageWaitingList: triageWaitingListReducer,
   admitVisitor: admitVisitorReducer,
+  clearVisitor:clearVisitorReducer,
   getPatientDetails: getPatientDetailsReducer,
   getTriageListDetails: getTriageListDetailsReducer,
   getSpecificInjection: getSpecificInjectionReducer,

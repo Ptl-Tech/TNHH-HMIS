@@ -1,4 +1,4 @@
-import { ADMIT_VISITOR_FAIL, ADMIT_VISITOR_REQUEST, ADMIT_VISITOR_RESET, ADMIT_VISITOR_SUCCESS, REGISTER_VISITOR_FAIL, REGISTER_VISITOR_REQUEST, REGISTER_VISITOR_RESET, REGISTER_VISITOR_SUCCESS, VISITORS_LIST_FAIL, VISITORS_LIST_REQUEST, VISITORS_LIST_RESET, VISITORS_LIST_SUCCESS } from "../constants/visitorsConstants";
+import { ADMIT_VISITOR_FAIL, ADMIT_VISITOR_REQUEST, ADMIT_VISITOR_RESET, ADMIT_VISITOR_SUCCESS, REGISTER_VISITOR_FAIL, REGISTER_VISITOR_REQUEST, REGISTER_VISITOR_RESET, REGISTER_VISITOR_SUCCESS, VISITOR_CLEARANCE_FAIL, VISITOR_CLEARANCE_REQUEST, VISITOR_CLEARANCE_SUCCESS, VISITOR_DETAILS_FAIL, VISITORS_LIST_FAIL, VISITORS_LIST_REQUEST, VISITORS_LIST_RESET, VISITORS_LIST_SUCCESS } from "../constants/visitorsConstants";
 
 export const visitorCreateReducer = (state = { loading: false }, action) => {
     switch (action.type) {
@@ -46,3 +46,19 @@ export const visitorCreateReducer = (state = { loading: false }, action) => {
         return state;
     }
   }
+
+  
+  export const clearVisitorReducer = (state = {}, action) => {
+    switch (action.type) {
+      case VISITOR_CLEARANCE_REQUEST:
+        return { loading: true };
+      case VISITOR_CLEARANCE_SUCCESS:
+        return { loading: false, success: true, data: action.payload };
+      case VISITOR_CLEARANCE_FAIL:
+        return { loading: false, error: action.payload };
+      case VISITOR_DETAILS_FAIL:
+        return {};
+      default:
+        return state;
+    }
+  };
