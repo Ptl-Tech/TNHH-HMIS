@@ -221,7 +221,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Remarks" name="remarks" rules={[{ required: true, message: "Please input Remarks!" }]}>
+            <Form.Item label="Remarks" name="remarks" >
               <Input.TextArea size="large" />
             </Form.Item>
           </Col>
