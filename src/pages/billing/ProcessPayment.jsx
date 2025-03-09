@@ -7,6 +7,7 @@ import { getReceiptLines } from "../../actions/Charges-Actions/getReceiptLines";
 import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const { Option } = Select;
 
@@ -20,7 +21,9 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
   const { loading } = useSelector((state) => state.postReceipt);
-
+console.log("patientNo",patientNo);
+const patientDetails=useFetchPatientDetailsHook(patientNo);
+console
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
@@ -160,19 +163,18 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
         )}
 
         {/* Co-Pay Checkbox (Always Visible) */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="coPay" valuePropName="checked">
-              <Checkbox>Co-Pay</Checkbox>
-            </Form.Item>
-          </Col>
-          {/* <Col span={12}>
-            <Form.Item name="splitAmount" valuePropName="checked">
-              <Checkbox>Split Amount</Checkbox>
-            </Form.Item>
-          </Col> */}
-        </Row>
-
+       {patientDetails?.PatientType !== "Cash" && (
+           <Row gutter={16}>
+           <Col span={12}>
+             <Form.Item name="coPay" valuePropName="checked">
+               <Checkbox>Co-Pay</Checkbox>
+             </Form.Item>
+           </Col>
+          
+         </Row>
+ 
+        )
+       }
         <Row>
           <Col span={24}>
             <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>

@@ -317,10 +317,6 @@ const PatientRegistration = () => {
     }
   };
 
-  console.log("visitor data", visitorData);
-  console.log("new patient", newPatient);
-  console.log("patient det", patientDet);
-
   useEffect(() => {
     if (patientDet) {
       setNewPatient({
@@ -350,7 +346,6 @@ const PatientRegistration = () => {
     }
   }, [patientDet]);
 
-  console.log(patientDet);
 
   const handleSavePatient = async (e) => {
     e.preventDefault();
@@ -628,11 +623,7 @@ const PatientRegistration = () => {
                       onChange={handleInputChange}
                       className="text-center fw-bold"
                     />
-                    {errors.middleName && (
-                      <span style={{ color: "red", fontSize: "0.875rem" }}>
-                        {errors.middleName}
-                      </span>
-                    )}
+                    
                   </div>
                 </div>
                 <div className="row px-3 py-2  align-items-center justify-content-between">

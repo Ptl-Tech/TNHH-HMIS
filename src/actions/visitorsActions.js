@@ -6,6 +6,9 @@ import {
   REGISTER_VISITOR_FAIL,
   REGISTER_VISITOR_REQUEST,
   REGISTER_VISITOR_SUCCESS,
+  VISITOR_CLEARANCE_FAIL,
+  VISITOR_CLEARANCE_REQUEST,
+  VISITOR_CLEARANCE_SUCCESS,
   VISITORS_LIST_FAIL,
   VISITORS_LIST_REQUEST,
   VISITORS_LIST_SUCCESS,
@@ -139,3 +142,45 @@ dispatch({ type: VISITORS_LIST_SUCCESS, payload: filteredData });
       dispatch({ type: VISITORS_LIST_FAIL, payload: error.message });
     }
   };
+
+
+  export const clearVisitor = (visitorId) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: VISITOR_CLEARANCE_REQUEST });
+  
+      const {
+        otpVerify: { userInfo },
+      } = getState();
+  
+      const branchCode = localStorage.getItem("branchCode");
+      const staffNo = userInfo.userData.no; 
+  
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: staffNo, 
+          sessionToken: userInfo.userData.portalSessionToken,
+          branchCode: branchCode,
+        },
+      };
+  
+      const response = await axios.post(
+        `${API}Security/GateClearVisitor`,
+        { staffNo: staffNo, visitorNo: visitorId }, 
+        config
+      );
+  
+      // Extract response details
+      const responseData = {
+        status: response.data.status,
+        visitorNo: response.data.visitorNo, 
+      };
+  
+      dispatch({ type: VISITOR_CLEARANCE_SUCCESS, payload: responseData });
+  
+      return responseData.visitorNo;
+    } catch (error) {
+      dispatch({ type: VISITOR_CLEARANCE_FAIL, payload: error.message });
+    }
+  };
+  
