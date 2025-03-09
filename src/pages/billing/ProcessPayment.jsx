@@ -44,7 +44,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
 
       const formattedData = {
         myAction: "create",
-        recId: receiptNo || "",
+        recId: "",
         patientNo: patientNo,
         receiptDate: values.receiptDate.format("YYYY-MM-DD"),
         depositDate: values.receiptDate?.format("YYYY-MM-DD") || null,
