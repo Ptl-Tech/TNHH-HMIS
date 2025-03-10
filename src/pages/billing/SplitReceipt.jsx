@@ -35,7 +35,6 @@ const SplitReceipt = ({ open, onClose, size, visitNo}) => {
 
     const receiptNo =  lastReceipt?.No;
   const { loading } = useSelector((state) => state.postReceipt);
-console.log("receiptHeader", receiptHeader);
   const [form] = Form.useForm();
   const [records, setRecords] = useState([]);
 

@@ -17,12 +17,11 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
   const navigate = useNavigate();
   const [receiptNo, setReceiptNo] = useState("");
   const [payMode, setPayMode] = useState(""); // Track selected payment mode
-
+const patientNumber= new URLSearchParams(window.location.search).get("PatientNo");
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
   const { loading } = useSelector((state) => state.postReceipt);
-console.log("patientNo",patientNo);
-const patientDetails=useFetchPatientDetailsHook(patientNo);
+const patientDetails=useFetchPatientDetailsHook(patientNumber );
 console
   useEffect(() => {
     if (visible) {
@@ -163,7 +162,7 @@ console
         )}
 
         {/* Co-Pay Checkbox (Always Visible) */}
-       {patientDetails?.PatientType !== "Cash" && (
+       {patientDetails?.PatientType === "Cash" && (
            <Row gutter={16}>
            <Col span={12}>
              <Form.Item name="coPay" valuePropName="checked">

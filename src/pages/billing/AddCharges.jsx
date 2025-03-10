@@ -227,7 +227,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit" disabled={addChargesLoading} loading={addChargesLoading}>Save</Button>
+          <Button type="primary" htmlType="submit" >Save</Button>
         </div>
       </Form>
       
