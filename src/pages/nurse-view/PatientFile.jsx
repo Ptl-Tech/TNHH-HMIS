@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
 import TCAAppointments from "./nurse-care-plan/TCAAppointments";
 import { UserOutlined, FileMarkdownOutlined, FileProtectOutlined, ExperimentOutlined, FilterOutlined, UserAddOutlined } from "@ant-design/icons";
-import ReadNurseNotes from "./ReadNurseNotes";
 import { useDispatch} from "react-redux";
 import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
 import { useLocation } from "react-router-dom";
@@ -55,14 +54,14 @@ const PatientFile = ({ patientDetails }) => {
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
-      case "Past Doctor Notes":
-        setSelectedItem(<PastDoctorNotes />);
-        break;
+      // case "Past Doctor Notes":
+      //   setSelectedItem(<PastDoctorNotes />);
+      //   break;
       case "Nursing Notes":
-        setSelectedItem(<ReadNurseNotes/>)
+        setSelectedItem(<NursingNotes />)
         break;
       case "Past Encounters Notes":
-        setSelectedItem(<TreatmentHistory />);
+        setSelectedItem(<PastDoctorNotes/>);
         break;
       case "Order Sheet":
         setSelectedItem(<Consumables />);
@@ -107,5 +106,5 @@ export default PatientFile;
 
 // Props validation
 PatientFile.propTypes = {
-  patientDetails: PropTypes.object.isRequired,
+  patientDetails: PropTypes.object,
 };
