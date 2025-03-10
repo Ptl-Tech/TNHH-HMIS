@@ -77,6 +77,7 @@ const ViewInvoice = () => {
 
 
   const { loading } = useSelector((state) => state.deletePatientCharges);
+  const { loading:postReceiptLoading } = useSelector((state) => state.postReceipt);
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -91,7 +92,8 @@ const ViewInvoice = () => {
   const [pdfBase64, setPdfBase64] = useState("");
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
-  
+  const [receiptNo, setReceiptNo] = useState( "");
+
   const [isPostInvoiceModal, setIsPostInvoiceModal] = useState(false);
   const[isReopenInvoiceModal, setIsReopenInvoiceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -281,6 +283,28 @@ const handleReversePostedInvoice = async () => {
   // When processing (posting) the Invoice, update the state so printing is enabled.
  
   
+  const handlePaymentModal = () => {
+    setShowPaymentModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    setSelectedPatientAmount(patientData?.Balance || balance);
+  };
+  const handleProcessReceipt = async () => {
+    const receipt = {
+      recId: "",
+      patientNo: patientData?.PatientNo,
+      receiptNo: receiptNo ,
+    };
+
+    await dispatch(postReceipt(receipt)).then((status) => {
+      // Assuming a successful post returns data; adjust the check per your API response.
+      if (status && status == "success") {
+        setIsReceiptPosted(true);
+        message.success("Receipt posted successfully");
+      }
+    });
+  };
+
+
   const handleRemoveCharge = (recId) => {
     const payload = {
       myAction: "delete",
@@ -379,6 +403,24 @@ const handleReversePostedInvoice = async () => {
         </Button>
       </Menu.Item>
       <Menu.Item key="3">
+        <Button
+          type="text"
+          icon={<DollarOutlined style={{ color: "gold" }} />}
+          onClick={()=>handlePaymentModal()}
+        >
+         Co-Pay
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="4">
+        <Button
+          type="text"
+          icon={<DollarOutlined style={{ color: "gold" }} />}
+          onClick={()=>handleProcessReceipt()}
+        >
+     Post Co-Pay Receipt
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="5">
         <Button
           type="text"
           icon={<DollarOutlined style={{ color: "gold" }} />}
@@ -598,7 +640,13 @@ const handleReversePostedInvoice = async () => {
           dispatch(getUnpostedCharges(patientData?.ActiveVisitNo))
         }
       />
-
+<ProcessPayment
+        visible={showPaymentModal}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
+        amount={selectedPatientAmount}
+        onReceiptedNo={setReceiptNo}
+      />
       <ReversCharge
         visible={ReverseChargeModalVisible}
         onClose={handleClose}

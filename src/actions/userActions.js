@@ -38,6 +38,9 @@ export const login = (staffNo, password) => async (dispatch) => {
     const errorMessage =
       error.response?.data?.message || error.response?.data?.errors || "An unknown error occurred";
 
+
+console.log("login error",error);
+
     // Dispatch failure action
     dispatch({
       type: USER_LOGIN_FAIL,

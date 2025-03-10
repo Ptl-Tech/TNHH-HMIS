@@ -17,7 +17,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
-  const { loading } = useSelector((state) => state.postPatientCharges);
+  const { loading:addChargesLoading } = useSelector((state) => state.postPatientCharges);
   const { loading: chargesLoading, data: chargesList } = useSelector((state) => state.getUnpostedCharges);
 
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
@@ -221,16 +221,15 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Remarks" name="remarks" rules={[{ required: true, message: "Please input Remarks!" }]}>
+            <Form.Item label="Remarks" name="remarks" >
               <Input.TextArea size="large" />
             </Form.Item>
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit">Save</Button>
+          <Button type="primary" htmlType="submit" >Save</Button>
         </div>
       </Form>
-
       
     </Modal>
   );

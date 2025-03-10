@@ -7,6 +7,7 @@ import { getReceiptLines } from "../../actions/Charges-Actions/getReceiptLines";
 import { getReceiptHeader } from "../../actions/Charges-Actions/getReceiptHeader";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const { Option } = Select;
 
@@ -16,11 +17,12 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
   const navigate = useNavigate();
   const [receiptNo, setReceiptNo] = useState("");
   const [payMode, setPayMode] = useState(""); // Track selected payment mode
-
+const patientNumber= new URLSearchParams(window.location.search).get("PatientNo");
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptHeaderLines);
   const { loading } = useSelector((state) => state.postReceipt);
-
+const patientDetails=useFetchPatientDetailsHook(patientNumber );
+console
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
@@ -44,7 +46,7 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
 
       const formattedData = {
         myAction: "create",
-        recId: receiptNo || "",
+        recId: "",
         patientNo: patientNo,
         receiptDate: values.receiptDate.format("YYYY-MM-DD"),
         depositDate: values.receiptDate?.format("YYYY-MM-DD") || null,
@@ -160,19 +162,18 @@ const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) 
         )}
 
         {/* Co-Pay Checkbox (Always Visible) */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="coPay" valuePropName="checked">
-              <Checkbox>Co-Pay</Checkbox>
-            </Form.Item>
-          </Col>
-          {/* <Col span={12}>
-            <Form.Item name="splitAmount" valuePropName="checked">
-              <Checkbox>Split Amount</Checkbox>
-            </Form.Item>
-          </Col> */}
-        </Row>
-
+       {patientDetails?.PatientType === "Cash" && (
+           <Row gutter={16}>
+           <Col span={12}>
+             <Form.Item name="coPay" valuePropName="checked">
+               <Checkbox>Co-Pay</Checkbox>
+             </Form.Item>
+           </Col>
+          
+         </Row>
+ 
+        )
+       }
         <Row>
           <Col span={24}>
             <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>

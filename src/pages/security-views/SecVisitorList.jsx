@@ -17,7 +17,7 @@ import {
 import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
-import { getVisitorsList } from "../../actions/visitorsActions";
+import { clearVisitor, getVisitorsList } from "../../actions/visitorsActions";
 import { useNavigate } from "react-router-dom";
 import { convertPatient, listPatients } from "../../actions/patientActions";
 import Loading from "../../partials/nurse-partials/Loading";
@@ -40,7 +40,14 @@ const SecVisitorList = () => {
     error,
     visitors,
   } = useSelector((state) => state.visitorsList);
+  const {
+    loading: clearVisitorLoading,
+    error:clearVisitorError,
+    data,
+  } = useSelector((state) => state.clearVisitor);
  
+  
+
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
   const { userInfo } = useSelector((state) => state.otpVerify);
@@ -75,39 +82,11 @@ const SecVisitorList = () => {
       });
     };
   
-    if (visitors.length > 0) {
+    if (visitors?.length > 0) {
       setFilteredVisitors(filteredVisitorsMemo());
     }
   }, [visitors, searchParams, currentDate]);
   
-  const handleUpdateStatus = () => {
-    statusForm.validateFields().then((values) => {
-      setFilteredVisitors((prevVisitors) =>
-        prevVisitors.map((visitor) =>
-          visitor.key === editingVisitor.key
-            ? {
-                ...visitor,
-                ...values,
-                timeIn: values.timeIn?.format("HH:mm"),
-                timeOut: values.timeOut?.format("HH:mm"),
-              }
-            : visitor
-        )
-      );
-      setModalVisible(false);
-      setEditingVisitor(null);
-    });
-  };
-
-  const handleEditStatus = (visitor) => {
-    setEditingVisitor(visitor);
-    statusForm.setFieldsValue({
-      status: visitor.Status,
-      timeIn: visitor.timeIn ? dayjs(visitor.timeIn, "HH:mm") : null,
-      timeOut: visitor.timeOut ? dayjs(visitor.timeOut, "HH:mm") : null,
-    });
-    setModalVisible(true);
-  };
 
   const handleSearchChange = (e, field) => {
     const value = e.target.value;
@@ -135,18 +114,23 @@ const SecVisitorList = () => {
   // Define globally accessible function to determine button text
 
   const handleClearVisitor = async (visitor) => {
-    try {
-      // Set the visitor details to be edited in the modal
-      setEditingVisitor(visitor);
+     // Set the visitor details to be edited in the modal
+     setEditingVisitor(visitor);
 
-      // Show the modal with the visitor's details
-      setModalVisible(true);
-    } catch (error) {
-      message.error("Failed to clear visitor.", 5);
-    }
+     // Show the modal with the visitor's details
+     setModalVisible(true);
   };
 
+  const confirmClearVisitor = async () => {
+    if (!editingVisitor) return;
+  
+     await dispatch(clearVisitor(editingVisitor.No)); // Dispatch clear action
+      message.success("Visitor cleared successfully", 5);
+      setModalVisible(false);
+      dispatch(getVisitorsList()); // Refresh visitor list
+  };
 
+  
   const columns = [
     {
       title: "Index",
@@ -204,9 +188,7 @@ const SecVisitorList = () => {
         return (
           <Button
             onClick={() =>
-              visitor.Status === "Cleared"
-                ? handleCheckInVisitor(visitor) // Function to check in visitor
-                : handleClearVisitor(visitor) // Function to clear visitor
+              handleClearVisitor(visitor)
             }
             type="primary"
           >
@@ -284,91 +266,18 @@ const SecVisitorList = () => {
           />
         )
       }
-      {/* // Modal Form with Visitor Details */}
       <Modal
-      visible={modalVisible}
-      title="Visitor Details"
-      onCancel={() => setModalVisible(false)}
-      footer={[
-        <Button key="cancel" onClick={() => setModalVisible(false)}>
-          Cancel
-        </Button>,
-        <Button
-          key="save"
-          type="primary"
-         // loading={loading}
-          onClick={handleUpdateStatus}
-        >
-          Save Changes
-        </Button>,
-      ]}
-      style={{ top: 20 }}
-    >
-      <Form
-        form={statusForm}
-        name="visitorDetails"
-        layout="vertical"
-        initialValues={{
-          status: editingVisitor?.Status,
-          timeIn: editingVisitor?.CreatedTime
-            ? dayjs(editingVisitor.CreatedTime, "HH:mm:ss.SS") // Parse only the time part
-            : null,
-          timeOut: editingVisitor?.timeOut
-            ? dayjs(editingVisitor.timeOut, "HH:mm")
-            : null,
-        }}
-        onFinish={handleUpdateStatus}
-      >
-        {/* Visitor Details */}
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Visitor Name">
-              <Input value={editingVisitor?.VisitorName} readOnly />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Phone Number">
-              <Input value={editingVisitor?.PhoneNumber} readOnly />
-            </Form.Item>
-          </Col>
-        </Row>
+  title="Confirm Visitor Clearance"
+  visible={modalVisible}
+  onOk={confirmClearVisitor} // Call function when confirmed
+  onCancel={() => setModalVisible(false)}
+  okText="Yes, Clear"
+  cancelText="Cancel"
+  loading={clearVisitorLoading}
+>
+  <p>Are you sure you want to clear visitor <strong>{editingVisitor?.VisitorName}</strong>?</p>
+</Modal>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Purpose of Visit">
-              <Input value={editingVisitor?.PurposeofVisit} readOnly />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="status" label="Status">
-              <Select>
-                <Select.Option value="Arrived">Arrived</Select.Option>
-                <Select.Option value="Entered">Entered</Select.Option>
-                <Select.Option value="Cleared">Cleared</Select.Option>
-                <Select.Option value="Received">Received</Select.Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="timeIn" label="Time In">
-              <TimePicker
-                format="HH:mm"
-                style={{ width: "100%" }}
-                value={dayjs(editingVisitor?.CreatedTime, "HH:mm:ss.SS")} // Parse time correctly
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="timeOut" label="Time Out">
-              <TimePicker format="HH:mm" style={{ width: "100%" }} />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    </Modal>
     </div>
   );
 };
