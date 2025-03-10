@@ -6,7 +6,7 @@ import BedTransferTable from "./tables/nurse-tables/BedTransferTable";
 import WardTransferTable from "./tables/nurse-tables/WardTransferTable";
 import { useDispatch } from "react-redux";
 import { getPgBedsDetailsSlice } from "../../actions/nurse-actions/getPgBedsSlice";
-import { postReleaseBedSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
+import { POST_BED_TRANSFER_LINE_SUCCESS, POST_SAVE_BED_TRANSFER_LINE_SUCCESS, postBedTransferLineSlice, postSaveBedTransferLineSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import { getPgWardsListSlice } from "../../actions/nurse-actions/getPgWardsListSlice";
 import useBedTransferHook from "../../hooks/useBedTransferHook";
@@ -23,17 +23,48 @@ const WardTransfer = () => {
     combinedPatientsBed,
   } = useBedTransferHook(patientDetail?.Ward);
 
-  console.log('patient detail', patientDetail)
-
-  const handleBedTransfer = (record) => {
-    const result = dispatch(postReleaseBedSlice(record));
-    if (result.type === "POST_RELEASE_BED_SUCCESS") {
+  const handleBedTransfer = async (record) => {
+    try {
+      const bedTransferData = {
+        myAction: "create",
+        recId: "",
+        admissionNo: patientDetail?.Admission_No,
+        newWard: record?.WardNo,
+        newBedNo: record?.BedNo,
+        currentWard: patientDetail?.Ward,
+        currentBedNo: patientDetail?.Bed,
+      };
+  
+      const saveBedTransferData = {
+        myAction: "create",
+        recId: "",
+        admissionNo: patientDetail?.Admission_No,
+        patientNo: patientDetail?.Patient_No,
+      };
+  
+      // Dispatch bed transfer
+      const bedTransferResult = await dispatch(postBedTransferLineSlice(bedTransferData));
+  
+      if (bedTransferResult.type !== POST_BED_TRANSFER_LINE_SUCCESS) {
+        message.error("Failed to transfer patient");
+      }
+  
+      // Refresh bed details
       dispatch(getPgBedsDetailsSlice(patientDetail?.Ward));
+  
+      // Dispatch save bed transfer
+      const saveBedTransferResult = await dispatch(postSaveBedTransferLineSlice(saveBedTransferData));
+  
+      if (saveBedTransferResult.type !== POST_SAVE_BED_TRANSFER_LINE_SUCCESS) {
+        message.error("Failed to save bed transfer details");
+      }
+  
       message.success("Patient transferred successfully");
-    } else {
-      message.error("Failed to transfer patient");
+    } catch (error) {
+      message.error(error.message || "An error occurred");
     }
   };
+  
 
   const items = [
     {

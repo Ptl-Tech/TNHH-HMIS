@@ -565,6 +565,7 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
     // Fetch patient details by patientNo
     const { data } = await axios.get(`${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`, config);
 
+
     // Check if a patient was found
     if (data && Object.keys(data).length > 0) {
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });

@@ -23,6 +23,7 @@ const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
     useBedTransferHook(record?.Ward_Code);
 
   const handleBedTransfer = (record) => {
+    console.log('records from the bed transfer', record)
     const result = dispatch(postReleaseBedSlice(record));
     if (result.type === "POST_RELEASE_BED_SUCCESS") {
       dispatch(getPgBedsDetailsSlice(record?.Ward));
