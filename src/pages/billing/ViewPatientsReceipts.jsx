@@ -200,31 +200,35 @@ const ViewPatientsReceipts = () => {
   };
   const showLargeDrawer = async () => {
     try {
-      const formattedData = {
-        myAction: "create",
-        recId: "",
-        patientNo: patientNo,
-        receiptDate: new Date().toISOString().split("T")[0], // Correct date formatting
-        depositDate: new Date().toISOString().split("T")[0], // Correct date formatting
-        payMode: 0,
-        transactionCode: "",
-        splitAmount: false,
-        amountReceived: 0,
-        coPay: false,
-      };
-
-      const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
-
-      if (newReceiptNo) {
-        setOpen(true);
-        setReceiptNo(newReceiptNo); // Fixed: using newReceiptNo
-        setSize("large");
-        setAppointmentNo(patientData?.ActiveVisitNo);
+      if (!receiptNo) {  
+        const formattedData = {
+          myAction: "create",
+          recId: "",
+          patientNo: patientNo,
+          receiptDate: new Date().toISOString().split("T")[0], 
+          depositDate: new Date().toISOString().split("T")[0], 
+          payMode: 0,
+          transactionCode: "",
+          splitAmount: false,
+          amountReceived: 0,
+          coPay: false,
+        };
+  
+        const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
+  
+        if (newReceiptNo) {
+          setReceiptNo(newReceiptNo);  
+        }
       }
+  
+      setOpen(true);
+      setSize("large");
+      setAppointmentNo(patientData?.ActiveVisitNo);
     } catch (error) {
       console.error("Validation or processing failed:", error);
     }
   };
+  
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
