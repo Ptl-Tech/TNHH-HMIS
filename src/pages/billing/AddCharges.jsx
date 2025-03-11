@@ -94,6 +94,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   setSelectedTransactionType(null); // Reset selected transaction type
   setFilteredCharges([]); // Clear filtered charges
   form.resetFields(); // Reset form fields, including the amount
+  setAmount(0);
   onClose();
    //simulate delay time to show loading when refreshing table
     setTimeout(() => {
@@ -227,7 +228,7 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit" >Save</Button>
+          <Button type="primary" htmlType="submit" loading={addChargesLoading} disabled={addChargesLoading} >Save</Button>
         </div>
       </Form>
       

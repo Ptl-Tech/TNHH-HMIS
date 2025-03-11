@@ -52,6 +52,7 @@ import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharge
 import{postsalesInvoice}from"../../actions/Charges-Actions/postSalesInvoice"
 import ViewReceipt from "./ViewReceipt";
 import { reopensalesInvoice } from "../../actions/Charges-Actions/postReopenInvoice";
+import InvoicePayment from "./InvoicePayment";
 
 const { Title, Text } = Typography;
 
@@ -99,7 +100,7 @@ const ViewInvoice = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // NEW: Track whether the Invoice has been posted.
   const [isInvoicePosted, setIsInvoicePosted] = useState(false);
-  const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
+  const [balance, setBalance] = useState(patientData?.Balance || 0);
 
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
@@ -108,17 +109,23 @@ const ViewInvoice = () => {
     }
   }, [dispatch, patientData?.ActiveVisitNo]);
 
-  useEffect(() => {
-    if (chargesList) {
-      // Recalculate balance from the latest charges list
-      const newTotal = chargesList.reduce(
-        (acc, charge) => acc + charge.Total_Amount,
-        0
-      );
-      setBalance(newTotal);
-    }
-  }, [chargesList]); // Recalculate when chargesList changes
-
+ useEffect(() => { 
+     if (chargesList && chargesList.length > 0) {
+       // Recalculate balance from chargesList
+       const newTotal = chargesList.reduce(
+         (acc, charge) => acc + (charge.Total_Amount || 0), 
+         0
+       );
+       setBalance(newTotal);
+     }
+   }, [chargesList]); // Recalculate when chargesList changes
+   
+   // Also update balance when patientData changes
+   useEffect(() => {
+     if (patientData?.Balance !== undefined) {
+       setBalance(patientData.Balance);
+     }
+   }, [patientData]);
 
 
   const postedCharges = chargesList?.filter((charge) => charge.Posted) || [];
@@ -411,7 +418,7 @@ const handleReversePostedInvoice = async () => {
          Co-Pay
         </Button>
       </Menu.Item>
-      <Menu.Item key="4">
+      {/* <Menu.Item key="4">
         <Button
           type="text"
           icon={<DollarOutlined style={{ color: "gold" }} />}
@@ -419,8 +426,8 @@ const handleReversePostedInvoice = async () => {
         >
      Post Co-Pay Receipt
         </Button>
-      </Menu.Item>
-      <Menu.Item key="5">
+      </Menu.Item> */}
+      <Menu.Item key="4">
         <Button
           type="text"
           icon={<DollarOutlined style={{ color: "gold" }} />}
@@ -537,15 +544,10 @@ const handleReversePostedInvoice = async () => {
 
               <Text strong>Balance:</Text>
               <p>
-                {patientData.Balance
-                  ? patientData.Balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })
-                  : balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })}
+                {balance.toLocaleString("en-KE", {
+                  style: "currency",
+                  currency: "KES",
+                })}
               </p>
 
               <Text strong>Invoice No:</Text>
@@ -640,7 +642,7 @@ const handleReversePostedInvoice = async () => {
           dispatch(getUnpostedCharges(patientData?.ActiveVisitNo))
         }
       />
-<ProcessPayment
+<InvoicePayment
         visible={showPaymentModal}
         onClose={handleClose}
         patientNo={selectedpatientNo}

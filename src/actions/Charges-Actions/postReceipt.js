@@ -1,5 +1,5 @@
-import { message } from "antd";
 import axios from "axios";
+import { message } from "antd";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
@@ -53,20 +53,27 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
       throw new Error("Invalid response format or missing ReceiptNo.");
     }
   } catch (error) {
-    // Extract error response data
-    const errorMessage = error.response?.data?.errors ;
+    let errorMessage = "An unexpected error occurred.";
 
-    // Dispatch failure action
+    if (error.response) {
+      // Extract validation errors properly
+      const { data } = error.response;
+      if (data.errors) {
+        errorMessage = data.errors
+      } else {
+        errorMessage = data.title || error.message;
+      }
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
     dispatch({
       type: POST_RECEIPT_FAIL,
       payload: errorMessage,
     });
 
-    // Display error message
-    message.error(error.response?.data?.errors); 
+    message.error(errorMessage);
 
-    // Rethrow error for handling by other parts of the app
     throw error;
-}
-
+  }
 };

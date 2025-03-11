@@ -77,15 +77,16 @@ const ViewPatientsReceipts = () => {
     (state) => state.getUnpostedCharges
   );
 
-
   const { loading: deleteLoading } = useSelector(
     (state) => state.deletePatientCharges
   );
-  const { data: lastreceiptHeader } = useSelector((state) => state.getReceiptPage);
+  const { data: lastreceiptHeader } = useSelector(
+    (state) => state.getReceiptPage
+  );
   const lastReceipt = lastreceiptHeader?.[lastreceiptHeader.length - 1]; // Get the last record
 
   const { loading } = useSelector((state) => state.postReceipt);
-
+  const { loading:processReceiptLoading, error } = useSelector((state) => state.processReceipt);
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -104,18 +105,16 @@ const ViewPatientsReceipts = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   // NEW: Track whether the receipt has been posted.
   const [isReceiptPosted, setIsReceiptPosted] = useState(false);
-  const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
+  const [balance, setBalance] = useState(patientData?.Balance || 0);
   const [open, setOpen] = useState(false);
   const [size, setSize] = useState();
   const [record, setRecord] = useState(null);
-console.log("lastReceipt", lastReceipt);
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
     if (appointmentNo) {
       dispatch(getUnpostedCharges(appointmentNo));
     }
   }, [dispatch, patientData?.ActiveVisitNo]);
-  
 
   useEffect(() => {
     if (patientNo) {
@@ -129,18 +128,25 @@ console.log("lastReceipt", lastReceipt);
     }
   }, [dispatch, patientNo]);
   useEffect(() => {
-    if (chargesList) {
-      // Recalculate balance from the latest charges list
+    if (chargesList && chargesList.length > 0) {
+      // Recalculate balance from chargesList
       const newTotal = chargesList.reduce(
-        (acc, charge) => acc + charge.Total_Amount,
+        (acc, charge) => acc + (charge.Total_Amount || 0),
         0
       );
       setBalance(newTotal);
     }
   }, [chargesList]); // Recalculate when chargesList changes
+
+  // Also update balance when patientData changes
+  useEffect(() => {
+    if (patientData?.Balance !== undefined) {
+      setBalance(patientData.Balance);
+    }
+  }, [patientData]);
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
-console.log("appointmentNo", appointmentNo);
+    console.log("appointmentNo", appointmentNo);
     if (appointmentNo) {
       dispatch(getReceiptPage(appointmentNo));
     }
@@ -206,9 +212,9 @@ console.log("appointmentNo", appointmentNo);
         amountReceived: 0,
         coPay: false,
       };
-  
+
       const newReceiptNo = await dispatch(postReceiptHeader(formattedData));
-  
+
       if (newReceiptNo) {
         setOpen(true);
         setReceiptNo(newReceiptNo); // Fixed: using newReceiptNo
@@ -219,7 +225,7 @@ console.log("appointmentNo", appointmentNo);
       console.error("Validation or processing failed:", error);
     }
   };
-  
+
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
@@ -231,7 +237,7 @@ console.log("appointmentNo", appointmentNo);
     const receipt = {
       recId: "",
       patientNo: patientData?.PatientNo,
-      receiptNo: receiptNo ,
+      receiptNo: receiptNo,
     };
 
     await dispatch(postReceipt(receipt)).then((status) => {
@@ -239,6 +245,8 @@ console.log("appointmentNo", appointmentNo);
       if (status && status == "success") {
         setIsReceiptPosted(true);
         message.success("Receipt posted successfully");
+      }else{
+        message.error(error);
       }
     });
   };
@@ -424,17 +432,11 @@ console.log("appointmentNo", appointmentNo);
 
               <Text strong>Balance:</Text>
               <p>
-                {patientData.Balance
-                  ? patientData.Balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })
-                  : balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })}
+                {balance.toLocaleString("en-KE", {
+                  style: "currency",
+                  currency: "KES",
+                })}
               </p>
-
               <Text strong>Receipt No:</Text>
               <p style={{ fontWeight: "bold", color: "green" }}>{receiptNo}</p>
             </div>
@@ -442,34 +444,28 @@ console.log("appointmentNo", appointmentNo);
         </Row>
 
         <Divider />
-        <LoadingSkeleton
-          loading={chargesLoading || deleteLoading}
-          rows={8}
-          avatar={false}
-        >
-          <div className="d-flex  flex-column">
-            <div className="d-flex flex-column text-start">
-              <Title level={4}>Unposted Charges </Title>
-              <Table
-                dataSource={unpostedCharges}
-                columns={unpostedColumns}
-                rowKey="Code"
-                pagination={{ pageSize: 5 }}
-                // loading={chargesLoading}
-              />
-            </div>
-            <div className="d-flex flex-column text-start">
-              <Title level={4}>Posted Charges </Title>
-              <Table
-                dataSource={postedCharges}
-                columns={columns}
-                rowKey="Code"
-                pagination={{ pageSize: 5 }}
-                loading={chargesLoading}
-              />
-            </div>
+        <div className="d-flex  flex-column">
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Unposted Charges </Title>
+            <Table
+              dataSource={unpostedCharges}
+              columns={unpostedColumns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+              loading={chargesLoading}
+            />
           </div>
-        </LoadingSkeleton>
+          <div className="d-flex flex-column text-start">
+            <Title level={4}>Posted Charges </Title>
+            <Table
+              dataSource={postedCharges}
+              columns={columns}
+              rowKey="Code"
+              pagination={{ pageSize: 5 }}
+              loading={chargesLoading}
+            />
+          </div>
+        </div>
         <Divider />
 
         <Row gutter={16}>
@@ -509,7 +505,7 @@ console.log("appointmentNo", appointmentNo);
         visible={showPaymentModal}
         onClose={handleClose}
         patientNo={selectedpatientNo}
-        amount={selectedPatientAmount}
+        amount={balance}
         onReceiptedNo={setReceiptNo}
       />
       <ReversCharge
@@ -529,6 +525,7 @@ console.log("appointmentNo", appointmentNo);
         receiptNo={receiptNo}
         visitNo={appointmentNo}
         onClose={() => setOpen(false)}
+        amount={balance}
         size={size}
       />
       <Modal
