@@ -22,7 +22,7 @@ import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
 const { Option } = Select;
 const { Text } = Typography;
 
-const SplitReceipt = ({ open, onClose, size, visitNo}) => {
+const SplitReceipt = ({ open, onClose, size, visitNo, amount}) => {
   const dispatch = useDispatch();
   const { data, loading: receiptLinesLoading } = useSelector(
     (state) => state.getQyReceiptSplitList
@@ -38,7 +38,7 @@ const SplitReceipt = ({ open, onClose, size, visitNo}) => {
   const [form] = Form.useForm();
   const [records, setRecords] = useState([]);
 
-  const grandTotal = lastReceipt?.Total_Amount || 0;
+  const grandTotal = amount || 0;
   const totalAccumulative = records.reduce(
     (sum, record) => sum + parseFloat(record.amountPaid || 0),
     0
@@ -47,7 +47,6 @@ const SplitReceipt = ({ open, onClose, size, visitNo}) => {
   useEffect(() => {
     if (visitNo) {
       dispatch(getReceiptPage(visitNo));
-      console.log("data", receiptHeader);
     }
   }, [dispatch, visitNo]);
 
