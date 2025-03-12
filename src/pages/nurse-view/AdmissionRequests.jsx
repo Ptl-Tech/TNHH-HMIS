@@ -122,7 +122,7 @@ const [pagination, setPagination] = useState({
         
             if (result.type === POST_VERIFY_ADMISSION_SUCCESS) {
               message.success(
-                result.payload.message || `${selectedRow[0]?.Patient_Name} discharge initiated successfully!`
+                result.payload.message || `Verification complete ${selectedRow[0]?.Patient_Name} is now admitted!`
               );
               dispatch(getPgAdmissionsPendingVerificationSlice());
               return Promise.resolve(); // Resolve the Promise to close the modal

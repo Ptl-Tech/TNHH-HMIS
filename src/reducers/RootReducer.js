@@ -485,6 +485,7 @@ export const rootReducer = combineReducers({
   postSalesInvoice:postsalesInvoiceReducer,
   reopenPostedCharges:reopensalesInvoiceReducer,
 
+
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,
   getSingleRadiologyDetails: getSingleRadiologyDetailsReducer,
