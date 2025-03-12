@@ -22,7 +22,7 @@ const EvaluationCardContent = ({
     <div>
       <Card className="card" style={{ padding: "10px 16px" }}>
         <Tabs defaultActiveKey="1">
-          {(role === "Doctor" || role === "Psychology" || role === "Nurse") && (
+          {(role === "Doctor" ||  role === "Nurse") && (
             <Tabs.TabPane tab="Triage Room" key="2">
               <ObservationRoom
                 treatmentNo={treatmentNo}
