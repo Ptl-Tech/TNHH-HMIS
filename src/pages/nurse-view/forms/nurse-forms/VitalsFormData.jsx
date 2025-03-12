@@ -5,7 +5,7 @@ import { POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../.
 import Loading from '../../../../partials/nurse-partials/Loading';
 import { SaveOutlined } from '@ant-design/icons';
 import { CloseOutlined } from '@ant-design/icons';
-import { getInpatientVitalsSlice } from '../../../../actions/nurse-actions/getInpatientVitalsSlice';
+import { getSinglePatientAllVitalsLines } from '../../../../actions/triage-actions/getVitalsLinesSlice';
 
 const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible}) => {
 
@@ -53,12 +53,11 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
           const response = await dispatch(postTriageListVitalsSlice(createVitals));
           if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
             setIsVitalFormVisible(false);
+            dispatch(getSinglePatientAllVitalsLines(patientNumber))
             message.success(response.payload.message || "Vitals successfully created");
           } else if(response.type === "POST_TRIAGE_LIST_VITALS_FAIL"){
             message.error(response.payload.message ||"Error saving vitals data");
           }
-
-          dispatch(getInpatientVitalsSlice());
         
       } catch (error) {
         // Generic error handling

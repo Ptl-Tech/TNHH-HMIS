@@ -1,60 +1,37 @@
 import { Button, Form, Input, Modal } from "antd";
-import {
-  PlusOutlined,
-  FolderViewOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, FileOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
-import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
 
 const AddAllergies = () => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { patientDetails } = useLocation().state;
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [refeshTable, setRefreshTable] = useState(false);
-  const { selectedRowKey, rowSelection, selectedRow } =
-    useSetTableCheckBoxHook();
-  const { combinedList, loadingAllergies, loadingTriageList } =
-    useFetchAllergiesAndMedicationsHook();
-  const filterAllergies = combinedList?.filter(
-    (allergy) => allergy.PatientNo === patientDetails?.Patient_No
-  );
-  const observationNumber = filterAllergies[0]?.ObservationNo;
+  const { rowSelection } = useSetTableCheckBoxHook();
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const { loadingGetAllergiesAndMedications, allergiesMedication } =
+    useSelector((state) => state.getAllergiesAndMedications);
+  const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
+
+  console.log("allegies medications", allergiesMedication);
   const handleCancel = () => {
     setIsModalOpen(false);
-    refreshData();
   };
 
   const handleButtonVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
-  const refreshData = () => {
-    setRefreshTable((prev) => !prev); // Toggle refresh state to re-fetch data
-  };
-  useEffect(() => {
-    if (!isFormVisible) {
-      setRefreshTable((prev) => !prev);
-    }
-  }, [isFormVisible]);
 
-  const handleViewAllergies = () => {
-    if (selectedRow[0]) {
-      //set form fields
-      form.resetFields();
-      form.setFieldsValue({
-        complaints: selectedRow[0]?.Complaints,
-        foodAllergy: selectedRow[0]?.FoodAllergy,
-        drugAllergy: selectedRow[0]?.DrugAllergy,
-      });
-      setIsModalOpen(true);
-    }
-  };
+  useEffect(() => {
+    dispatch(getAllergiesAndMedicationsSlice(admissionNo));
+  }, [dispatch, admissionNo]);
 
   return (
     <div>
@@ -80,24 +57,21 @@ const AddAllergies = () => {
           >
             Add Allergies and Medications
           </Button>
-          {/* <Button type="primary" disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button> */}
         </div>
       )}
 
       {isFormVisible && (
         <AllergyAndMedication
           setIsFormVisible={setIsFormVisible}
-          observationNumber={observationNumber}
-          refreshData={refreshData}
+          observationNumber={admissionNo}
         />
       )}
 
       {!isFormVisible && (
         <AddAllergiesTable
           rowSelection={rowSelection}
-          filterAllergies={filterAllergies}
-          loadingAllergies={loadingAllergies}
-          loadingTriageList={loadingTriageList}
+          loadingGetAllergiesAndMedications={loadingGetAllergiesAndMedications}
+          allergiesMedication={allergiesMedication}
         />
       )}
 

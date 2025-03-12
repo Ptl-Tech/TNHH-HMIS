@@ -1,31 +1,13 @@
 import { Table } from "antd"
 import PropTypes from "prop-types"
-import Loading from "../../../../partials/nurse-partials/Loading"
 import useSetTablePagination from "../../../../hooks/useSetTablePagination"
 
-const AddAllergiesTable = ({ rowSelection, filterAllergies, loadingAllergies, loadingTriageList }) => {
+const AddAllergiesTable = ({ allergiesMedication, loadingGetAllergiesAndMedications }) => {
     const columns = [
         {
-          title: 'Patient No',
-          dataIndex: 'PatientNo',
-          key: 'PatientNo',
-          fixed: 'left',
-          width: 100,
-        },
-        {
-          title: 'Observation No',
+          title: 'Admission No',
           dataIndex: 'ObservationNo',
           key: 'ObservationNo',
-        },
-        {
-          title: 'Assessed By',
-          dataIndex: 'AssessedBy',
-          key: 'AssessedBy',
-        },
-        {
-          title: 'Complains',
-          dataIndex: 'Complaints',
-          key: 'Complaints',
         },
         {
           title: 'Food Allergy',
@@ -39,25 +21,31 @@ const AddAllergiesTable = ({ rowSelection, filterAllergies, loadingAllergies, lo
             fixed: 'right',
             width: 100,
         },
+        {
+          title: 'Complains',
+          dataIndex: 'Complaints',
+          key: 'Complaints',
+        },
+        {
+          title: 'Assessed By',
+          dataIndex: 'AssessedBy',
+          key: 'AssessedBy',
+        },
         ]
 
-        const { pagination, handleTableChange } = useSetTablePagination(filterAllergies);
+        const { pagination, handleTableChange } = useSetTablePagination(allergiesMedication);
   return (
     <div style={{ paddingTop: '30px' }}>
-         {
-           loadingAllergies || loadingTriageList ? (
-              <Loading />
-           ) : (
             <Table 
             rowKey={(record, index) => (record.ObservationNo || '') + '-' + index} 
             scroll={{ x: 'max-content' }}
             columns={columns} 
-            dataSource={filterAllergies} 
-            // rowSelection={rowSelection}
+            dataSource={allergiesMedication} 
+            loading={loadingGetAllergiesAndMedications}
             bordered size='middle' 
                 pagination={{
                 ...pagination,
-                total: filterAllergies?.length,
+                total: allergiesMedication?.length,
                 showSizeChanger: true,
                 showQuickJumper: true,
                 position: ['bottom', 'right'],
@@ -69,8 +57,6 @@ const AddAllergiesTable = ({ rowSelection, filterAllergies, loadingAllergies, lo
                     }
                 }}
             />
-           )
-         }
     </div>
   )
 }
@@ -79,8 +65,6 @@ export default AddAllergiesTable
 
 //props types validations
 AddAllergiesTable.propTypes = {
-  rowSelection: PropTypes.object.isRequired,
-  filterAllergies: PropTypes.array,
-  loadingAllergies: PropTypes.bool,
-  loadingTriageList: PropTypes.bool
+  allergiesMedication: PropTypes.array,
+  loadingGetAllergiesAndMedications: PropTypes.bool
 }

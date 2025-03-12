@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import { CloseOutlined, SaveOutlined } from "@ant-design/icons";
 import Loading from "../../../partials/nurse-partials/Loading";
 import axios from "axios"; // Ensure axios is installed
+import { POST_MSE_NOTES_FAIL, POST_MSE_NOTES_SUCCESS, postMSENotes } from "../../../actions/Doc-actions/postMentalStateForm";
 
 const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
     const [form] = Form.useForm();
@@ -95,16 +96,13 @@ const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
 
         console.log("Submitting Data:", formData);
 
-        try {
-            const response = await axios.post("https://your-api-endpoint.com", formData);
-            if (response.status === 200) {
-                message.success("Data saved successfully!");
-                form.resetFields();
-                setSelectedValues({});
-                setOtherInputs({});
-            }
-        } catch (error) {
-            console.error("API Error:", error);
+        const result = await dispatch(postMSENotes(formData));
+        if (result.type === POST_MSE_NOTES_SUCCESS) {
+            message.success("Data saved successfully!");
+            form.resetFields();
+            setSelectedValues({});
+            setOtherInputs({});
+        }else if(result.type === POST_MSE_NOTES_FAIL){
             message.error("Failed to save data.");
         }
     };

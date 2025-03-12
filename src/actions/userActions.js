@@ -66,6 +66,8 @@ export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (
       },
     };
 
+    console.log('otp veryfication details', staffNo, otpCode, sessionToken, branchCode);
+
     const { data } = await axios.post(`${API}Authentication/OTPLogin`, { otpCode }, config);
 
     dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
