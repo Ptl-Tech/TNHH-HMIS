@@ -37,8 +37,6 @@ const useSignIn = () => {
   const handleVerifyOtp = async () => {
     await dispatch(verifyOtp(staffNo, otp, userInfo?.sessionToken, branchCode));
 
-    console.log('verifyOtpUserInfo:', verifyOtpUserInfo);
-    console.log('verifyOtpUserSuccess:', verifyOtpSuccess);
   };
 
   // Handle forgot password action
@@ -88,9 +86,7 @@ useEffect(() => {
     const sessionStart = Date.now();
     localStorage.setItem('sessionStart', sessionStart);
 
-    console.log('Session started. Redirecting in 10 seconds...');
     const timeout = setTimeout(() => {
-      console.log('Session expired. Logging out...');
       localStorage.removeItem('sessionStart'); // Clear session from localStorage
       navigate('/'); // Redirect to login
     }, SESSION_TIMEOUT);
@@ -106,15 +102,12 @@ useEffect(() => {
   if (storedSessionStart) {
     const elapsedTime = Date.now() - parseInt(storedSessionStart, 10);
     if (elapsedTime >= SESSION_TIMEOUT) {
-      console.log('Session expired on reload. Redirecting to login...');
       localStorage.removeItem('sessionStart'); // Clear storage
       navigate('/');
     } else {
       const remainingTime = SESSION_TIMEOUT - elapsedTime;
-      console.log(`Session resuming. Redirecting in ${remainingTime / 1000} seconds...`);
       
       const timeout = setTimeout(() => {
-        console.log('Session expired. Logging out...');
         localStorage.removeItem('sessionStart');
         navigate('/');
       }, remainingTime);

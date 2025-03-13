@@ -49,7 +49,6 @@ const ConsultationRoomPatients = () => {
     return item.Status === "New";
   });
 
-  console.log('open visits', openDoctorVisitList);
 
   const activeConsultationList = treatmentList?.filter((item) => {
     if (role === "Doctor") {
