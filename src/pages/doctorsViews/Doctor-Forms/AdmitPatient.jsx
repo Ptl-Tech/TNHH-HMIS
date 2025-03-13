@@ -109,14 +109,20 @@ const AdmitPatientForm = () => {
   };
 
   // Function to close the modal
-  const handleCancel = () => setHistoryVisible(false);
+  const handleCancel = () => {
+    form.resetFields();
+    setHistoryVisible(false);
+  }
 
   const handleAdmissionRequest = () => {
-    dispatch(requestPatientAdmission(treatmentNo));
+  const res=  dispatch(requestPatientAdmission(treatmentNo));
 
-    if (admissionRequestSuccess) {
+    if (res) {
       dispatch(getAdmissionLines(treatmentNo));
     }
+
+    form.resetFields();
+    onCancel();
   };
 
   const handlePatientAdmission = () => {
