@@ -4,40 +4,71 @@ import {
   message,
   Space,
   Table,
+  Tabs,
   Tooltip,
   Typography,
 } from "antd";
 import PropTypes from "prop-types";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getPgBedsDetailsSlice } from "../../actions/nurse-actions/getPgBedsSlice";
-import { SendOutlined, CloseOutlined } from "@ant-design/icons";
-import { postReleaseBedSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
+import { CloseOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  getQyBedTransferLines,
+  postBedTransferLineSlice,
+} from "../../actions/nurse-actions/postReleaseBedSlice";
 import Loading from "../../partials/nurse-partials/Loading";
 import useBedTransferHook from "../../hooks/useBedTransferHook";
+import BedTransferLinesTable from "./tables/nurse-tables/BedTransferLinesTable";
+import { useLocation } from "react-router-dom";
 
 const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
-  console.log("record table", record);
   const dispatch = useDispatch();
   const { loadingBeds, loadingAdmittedPatients, combinedPatientsBed } =
     useBedTransferHook(record?.Ward_Code);
+  const [activeBedTab, setActiveBedTab] = useState("1");
+  const location = useLocation();
+  const patientDetail = location.state?.patientDetails || {};
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
+  const { loading: loadingQyBedTransferLines, data: bedTransferLines } =
+    useSelector((state) => state.getQyBedTransferLine);
 
-  const handleBedTransfer = (record) => {
-    console.log('records from the bed transfer', record)
-    const result = dispatch(postReleaseBedSlice(record));
-    if (result.type === "POST_RELEASE_BED_SUCCESS") {
-      dispatch(getPgBedsDetailsSlice(record?.Ward));
-      message.success("Patient transferred successfully");
-      setOpen(false)
-    } else {
-      message.error("Failed to transfer patient");
-      setOpen(false)
+  const handleBedTransfer = async (record) => {
+    try {
+      const bedTransferData = {
+        myAction: "create",
+        recId: "",
+        admissionNo: patientDetail?.Admission_No,
+        newWard: record?.WardNo,
+        newBedNo: record?.BedNo,
+        currentWard: patientDetail?.Ward,
+        currentBedNo: patientDetail?.Bed,
+      };
+
+      // Dispatch bed transfer
+      await dispatch(postBedTransferLineSlice(bedTransferData)).then((res) => {
+        const { status, msg } = res?.payload || {};
+
+        if (status === "success") {
+          message.success(msg || "Successfully saved new bed transfer details");
+          setActiveBedTab("2");
+        } else {
+          message.error(msg || "Failed to save bed transfer details");
+        }
+      });
+    } catch (error) {
+      message.error(error.message || "An error occurred");
     }
   };
 
   useEffect(() => {
     dispatch(getPgBedsDetailsSlice(record?.Ward));
   }, [dispatch, record?.Ward]);
+
+  useEffect(() => {
+    dispatch(getQyBedTransferLines(admissionNo));
+  }, [dispatch, admissionNo]);
 
   const columns = [
     {
@@ -71,10 +102,11 @@ const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
           return (
             <Tooltip title="Transfer patient to this bed">
               <Button
-                icon={<SendOutlined />}
+                type="primary"
+                icon={<SaveOutlined />}
                 onClick={() => handleBedTransfer(record)}
               >
-                Transfer Patient
+                Post this Bed
               </Button>
             </Tooltip>
           );
@@ -89,20 +121,21 @@ const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
         if (record?.Admission_Date && record?.Occupied === true) {
           return record?.Admission_Date;
         } else {
-          return (
-            <Tooltip title="Transfer patient to this bed">
-              <Button
-                icon={<SendOutlined />}
-                onClick={() => handleBedTransfer(record)}
-              >
-                Transfer Patient
-              </Button>
-            </Tooltip>
-          );
+          return "-";
         }
       },
     },
   ];
+
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: bedTransferLines?.length,
+  });
+
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+  };
   return (
     <Drawer
       title={`Rooms and Beds for ${record?.Ward_Name} Ward`}
@@ -132,17 +165,51 @@ const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
       }
     >
       <div>
-        {loadingBeds || loadingAdmittedPatients ? (
-          <Loading />
-        ) : (
-          <Table
-            columns={columns}
-            rowKey={() => Math.random().toString(36).substr(2, 9)}
-            dataSource={combinedPatientsBed}
-            size="small"
-            bordered
-          />
-        )}
+        <Tabs activeKey={activeBedTab} onChange={(key) => setActiveBedTab(key)}>
+          <Tabs.TabPane tab="Assign New Ward and Bed" key="1">
+            {loadingBeds || loadingAdmittedPatients ? (
+              <Loading />
+            ) : (
+              <Table
+                columns={columns}
+                rowKey={() => Math.random().toString(36).substr(2, 9)}
+                dataSource={combinedPatientsBed}
+                size="small"
+                bordered
+                pagination={{
+                  ...pagination,
+                  total: bedTransferLines?.length,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  position: ["bottom", "right"],
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} of ${total} items`,
+                  onChange: (page, pageSize) =>
+                    handleTableChange({
+                      current: page,
+                      pageSize,
+                      total: pagination.total,
+                    }),
+                  onShowSizeChange: (current, size) =>
+                    handleTableChange({
+                      current,
+                      pageSize: size,
+                      total: pagination.total,
+                    }),
+                }}
+              />
+            )}
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Save New Ward and Bed" key="2">
+            <BedTransferLinesTable
+              bedTransferLines={bedTransferLines}
+              loadingQyBedTransferLines={loadingQyBedTransferLines}
+              patientNo={patientNo}
+              dispatch={dispatch}
+              setOpen={setOpen}
+            />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     </Drawer>
   );
