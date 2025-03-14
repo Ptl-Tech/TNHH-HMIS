@@ -236,7 +236,7 @@ import {
 } from './ChargesReducers/getPatientReceiptsReducer';
 import { getPatientEncounterListReducer } from './doc-reducers/pastDoctorNotesEncounterReducers';
 import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
-import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
+// import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
 import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
 import { deletePatientChargesReducer } from './ChargesReducers/deletePatientChargesReducer';
 
@@ -255,6 +255,7 @@ import { postLabTestLinesReducer } from './lab-reducers/postLabTestLinesReducer'
 import { getSplitReceiptLinesReducer } from './ChargesReducers/getSplitReceiptLinesReducer';
 import { postReceiptSplitLineReducer } from './ChargesReducers/postReceiptSplitLinesReducer';
 import { getReceiptPageReducer } from './ChargesReducers/getReceiptPageReducer';
+import { postRebatesReducer } from './ChargesReducers/postRebatesReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -484,6 +485,7 @@ export const rootReducer = combineReducers({
   deletePatientCharges: deletePatientChargesReducer,
   postSalesInvoice:postsalesInvoiceReducer,
   reopenPostedCharges:reopensalesInvoiceReducer,
+  postRebates:postRebatesReducer,
 
 
   // radiology reducers

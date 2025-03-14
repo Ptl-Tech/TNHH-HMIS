@@ -38,6 +38,7 @@ const InpatientCorporate = () => {
   const [isGenerateReceiptModalVisible, setIsGenerateReceiptModalVisible] =
     useState(false);
   const [addChargeModal, setAddChargeModal] = useState(false);
+  const [showRebatesModal, setshowRebatesModal] = useState(false);
 
   // To update patient balance in the list when new charges are added
   const [updatedAmounts, setUpdatedAmounts] = useState({});
@@ -95,6 +96,8 @@ const InpatientCorporate = () => {
   const handleClose = () => {
     setIsGenerateReceiptModalVisible(false);
     setAddChargeModal(false);
+    setshowRebatesModal(false);
+    setPatientNo(null);
   };
 
   const showPaymentModal = (record) => {
@@ -111,6 +114,12 @@ const InpatientCorporate = () => {
     setAddChargeModal(true);
     setPatientNo(record.PatientNo);
     setVisitNo(record.AppointmentNo);
+  };
+
+  const handleRebatesModal = () => {
+    setshowRebatesModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    // setSelectedPatientAmount(patientData?.Balance || balance);
   };
 
   const handleBalanceUpdate = (patientNo, newBalance) => {
