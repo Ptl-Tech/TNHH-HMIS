@@ -7,7 +7,10 @@ import {
     POST_BED_TRANSFER_LINE_FAILURE,
     POST_SAVE_BED_TRANSFER_LINE_REQUEST,
     POST_SAVE_BED_TRANSFER_LINE_SUCCESS,
-    POST_SAVE_BED_TRANSFER_LINE_FAILURE
+    POST_SAVE_BED_TRANSFER_LINE_FAILURE,
+    GET_QY_BED_TRANSFER_LINES_REQUEST,
+    GET_QY_BED_TRANSFER_LINES_SUCCESS,
+    GET_QY_BED_TRANSFER_LINES_FAILURE
 } from "../../actions/nurse-actions/postReleaseBedSlice";
 
 const initialState = {
@@ -55,6 +58,19 @@ export const postSaveBedTransferLineReducer = (state = initialBedState, action) 
         case POST_SAVE_BED_TRANSFER_LINE_SUCCESS:
             return { ...state, loading: false, data: action.payload };
         case POST_SAVE_BED_TRANSFER_LINE_FAILURE:
+            return { ...state, loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};
+
+export const getQyBedTransferLineReducer = (state = initialBedState, action) => {
+    switch (action.type) {
+        case GET_QY_BED_TRANSFER_LINES_REQUEST:
+            return { ...state, loading: true };
+        case GET_QY_BED_TRANSFER_LINES_SUCCESS:
+            return { ...state, loading: false, data: action.payload };
+        case GET_QY_BED_TRANSFER_LINES_FAILURE:
             return { ...state, loading: false, error: action.payload };
         default:
             return state;

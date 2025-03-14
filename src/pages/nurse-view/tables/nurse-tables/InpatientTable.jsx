@@ -16,7 +16,6 @@ const InpatientTable = ({
   searchAdmissionNumber,
 }) => {
   const role = useAuth().userData.departmentName;
-
   const columns = [
     {
       title: "Adm No",
@@ -106,7 +105,7 @@ const InpatientTable = ({
             <ExclamationCircleOutlined
               style={{ color: "red", marginRight: 8 }}
             />
-            <span>Assign Ward</span>
+            <span>Assign Bed</span>
           </Button>
         ) : (
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
@@ -126,16 +125,16 @@ const InpatientTable = ({
         let color = null;
         switch (coding) {
           case "Red":
-            color = "red";
+            color = "#ff0000";
             break;
           case "Amber":
-            color = "orange";
+            color = "#FFBF00";
             break;
           case "Yellow":
-            color = "yellow";
+            color = "#FFFF00";
             break;
           case "Green":
-            color = "green";
+            color = "#008000";
             break;
         }
         return color ? <Tag color={color}>{coding}</Tag> : null;
@@ -206,11 +205,11 @@ export default InpatientTable;
 
 // props validation
 InpatientTable.propTypes = {
-  loadingPatientList: PropTypes.bool.isRequired,
-  handleNavigate: PropTypes.func.isRequired,
-  filterInPatients: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired,
-  searchName: PropTypes.string.isRequired,
-  searchPatientNumber: PropTypes.string.isRequired,
-  searchAdmissionNumber: PropTypes.string.isRequired,
+  loadingPatientList: PropTypes.bool,
+  handleNavigate: PropTypes.func,
+  filterInPatients: PropTypes.array,
+  loading: PropTypes.bool,
+  searchName: PropTypes.string,
+  searchPatientNumber: PropTypes.string,
+  searchAdmissionNumber: PropTypes.string,
 };

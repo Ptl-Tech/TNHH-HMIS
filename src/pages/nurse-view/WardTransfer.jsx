@@ -1,19 +1,26 @@
-import { Collapse, message } from "antd";
+import { Collapse, message, Tabs } from "antd";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import { FileOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import BedTransferTable from "./tables/nurse-tables/BedTransferTable";
 import WardTransferTable from "./tables/nurse-tables/WardTransferTable";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getPgBedsDetailsSlice } from "../../actions/nurse-actions/getPgBedsSlice";
-import { POST_BED_TRANSFER_LINE_SUCCESS, POST_SAVE_BED_TRANSFER_LINE_SUCCESS, postBedTransferLineSlice, postSaveBedTransferLineSlice } from "../../actions/nurse-actions/postReleaseBedSlice";
+import {
+  getQyBedTransferLines,
+  postBedTransferLineSlice,
+} from "../../actions/nurse-actions/postReleaseBedSlice";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import { getPgWardsListSlice } from "../../actions/nurse-actions/getPgWardsListSlice";
 import useBedTransferHook from "../../hooks/useBedTransferHook";
+import { useEffect, useState } from "react";
+import BedTransferLinesTable from "./tables/nurse-tables/BedTransferLinesTable";
 
 const WardTransfer = () => {
   const location = useLocation();
   const patientDetail = location.state?.patientDetails || {};
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const dispatch = useDispatch();
   const {
     loadingBeds,
@@ -22,6 +29,14 @@ const WardTransfer = () => {
     loadingAdmittedPatients,
     combinedPatientsBed,
   } = useBedTransferHook(patientDetail?.Ward);
+
+  const [activeBedTab, setActiveBedTab] = useState("1");
+  const { loading: loadingQyBedTransferLines, data: bedTransferLines } =
+    useSelector((state) => state.getQyBedTransferLine);
+
+  const { loading: loadingBedTransferLines } = useSelector(
+    (state) => state.postBedTransfer
+  );
 
   const handleBedTransfer = async (record) => {
     try {
@@ -34,37 +49,24 @@ const WardTransfer = () => {
         currentWard: patientDetail?.Ward,
         currentBedNo: patientDetail?.Bed,
       };
-  
-      const saveBedTransferData = {
-        myAction: "create",
-        recId: "",
-        admissionNo: patientDetail?.Admission_No,
-        patientNo: patientDetail?.Patient_No,
-      };
-  
+
       // Dispatch bed transfer
-      const bedTransferResult = await dispatch(postBedTransferLineSlice(bedTransferData));
-  
-      if (bedTransferResult.type !== POST_BED_TRANSFER_LINE_SUCCESS) {
-        message.error("Failed to transfer patient");
-      }
-  
-      // Refresh bed details
-      dispatch(getPgBedsDetailsSlice(patientDetail?.Ward));
-  
-      // Dispatch save bed transfer
-      const saveBedTransferResult = await dispatch(postSaveBedTransferLineSlice(saveBedTransferData));
-  
-      if (saveBedTransferResult.type !== POST_SAVE_BED_TRANSFER_LINE_SUCCESS) {
-        message.error("Failed to save bed transfer details");
-      }
-  
-      message.success("Patient transferred successfully");
+      await dispatch(
+        postBedTransferLineSlice(bedTransferData)
+      ).then((res) => {
+        const { status, msg } = res?.payload || {};
+
+        if (status === "success") {
+          message.success(msg || "Successfully saved new bed transfer details");
+          setActiveBedTab("2");
+        } else {
+          message.error(msg || "Failed to save bed transfer details");
+        }
+      });
     } catch (error) {
       message.error(error.message || "An error occurred");
     }
   };
-  
 
   const items = [
     {
@@ -75,12 +77,26 @@ const WardTransfer = () => {
         </p>
       ),
       children: (
-        <BedTransferTable
-          handleBedTransfer={handleBedTransfer}
-          combinedPatientsBed={combinedPatientsBed}
-          loadingBeds={loadingBeds}
-          loadingAdmittedPatients={loadingAdmittedPatients}
-        />
+        <Tabs activeKey={activeBedTab} onChange={(key) => setActiveBedTab(key)}>
+          <Tabs.TabPane tab="Assign New Ward and Bed" key="1">
+            <BedTransferTable
+              handleBedTransfer={handleBedTransfer}
+              combinedPatientsBed={combinedPatientsBed}
+              loadingBeds={loadingBeds}
+              loadingAdmittedPatients={loadingAdmittedPatients}
+              loadingBedTransferLines={loadingBedTransferLines}
+            />
+          </Tabs.TabPane>
+
+          <Tabs.TabPane tab="Save New Ward and Bed" key="2">
+            <BedTransferLinesTable
+              bedTransferLines={bedTransferLines}
+              loadingQyBedTransferLines={loadingQyBedTransferLines}
+              patientNo={patientNo}
+              dispatch={dispatch}
+            />
+          </Tabs.TabPane>
+        </Tabs>
       ),
     },
     {
@@ -107,6 +123,10 @@ const WardTransfer = () => {
       dispatch(getPgWardsListSlice());
     }
   };
+
+  useEffect(() => {
+    dispatch(getQyBedTransferLines(admissionNo));
+  }, [dispatch, admissionNo]);
 
   return (
     <div>

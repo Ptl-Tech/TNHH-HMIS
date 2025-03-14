@@ -5,8 +5,7 @@ import { getQyIpLookupValuesSlice } from "../../../actions/nurse-actions/getQyIP
 import PropTypes from "prop-types";
 import { CloseOutlined, SaveOutlined } from "@ant-design/icons";
 import Loading from "../../../partials/nurse-partials/Loading";
-import axios from "axios"; // Ensure axios is installed
-import { POST_MSE_NOTES_FAIL, POST_MSE_NOTES_SUCCESS, postMSENotes } from "../../../actions/Doc-actions/postMentalStateForm";
+import { postMSENotes } from "../../../actions/Doc-actions/postMentalStateForm";
 
 const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
     const [form] = Form.useForm();
@@ -84,6 +83,7 @@ const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
             selectedValues[category].forEach((descriptor) => {
                 const dataEntry = {
                     myAction: "create",
+                    recId: "",
                     patientNo: patientNo,
                     date: today,
                     category: category,
@@ -94,17 +94,28 @@ const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
             });
         });
 
-        console.log("Submitting Data:", formData);
+        const apiResult = await Promise.allSettled(
+            formData.map(async (dataEntry) => dispatch(postMSENotes(dataEntry)))
+        );
 
-        const result = await dispatch(postMSENotes(formData));
-        if (result.type === POST_MSE_NOTES_SUCCESS) {
+        console.log("API Result for form submission:", apiResult);
+
+        
+        // Check if all API calls were successful
+        const allSuccess = apiResult.every(
+            (res) => res.status === "fulfilled" && res.value?.payload === "success"
+        );
+        
+        if (allSuccess) {
             message.success("Data saved successfully!");
             form.resetFields();
             setSelectedValues({});
             setOtherInputs({});
-        }else if(result.type === POST_MSE_NOTES_FAIL){
-            message.error("Failed to save data.");
+        } else {
+            message.error("Some data failed to save. Please retry.");
+            console.error("Failed Responses:", apiResult.filter((res) => res.status === "rejected"));
         }
+        
     };
 
     // Fetch data on mount

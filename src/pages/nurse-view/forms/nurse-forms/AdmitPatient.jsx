@@ -51,10 +51,10 @@ const AdmitPatientForm = () => {
   const [codingReason, setCodingReason] = useState(null);
 
   const psychiatricCodingOptions = [
-    { label: "Red", value: 0 },
-    { label: "Amber", value: 1 },
-    { label: "Yellow", value: 2 },
-    { label: "Green", value: 3 },
+    { label: "Red", value: 1 },
+    { label: "Amber", value: 2 },
+    { label: "Yellow", value: 3 },
+    { label: "Green", value: 4 },
   ];
 
   useEffect(() => {
