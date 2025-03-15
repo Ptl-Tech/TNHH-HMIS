@@ -5,7 +5,6 @@ import { getPatientByNo } from "../actions/patientActions";
 const useFetchPatientDetailsHook = (patientNo) => {
   const dispatch = useDispatch();
 
-  console.log('patientNo from the hooks', patientNo);
 
   const { loading:loadingPatientDetails, patients:patientDetails } = useSelector((state) => state.patientList) || {};
 
