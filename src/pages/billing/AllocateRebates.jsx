@@ -105,6 +105,11 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
             onChange={(value) => handleInputChange("insuaranceCode", value)}
             showSearch
             allowClear
+            filterOption={(input, option) =>
+              option.children
+                .toLowerCase()
+                .indexOf(input.toLowerCase()) >= 0
+            }
           >
             <Select.Option value="">--Select Insurance--</Select.Option>
             {insurancePayload && insurancePayload.length > 0 ? (

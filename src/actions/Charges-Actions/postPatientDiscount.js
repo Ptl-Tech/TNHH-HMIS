@@ -3,15 +3,15 @@ import axios from "axios";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
-export const POST_REBATES_REQUEST = "POST_REBATES_REQUEST";
-export const POST_REBATES_SUCCESS = "POST_REBATES_SUCCESS";
-export const POST_REBATES_FAIL = "POST_REBATES_FAIL";
-export const POST_REBATES_RESET = "POST_REBATES_RESET";
+export const POST_DISCOUNT_REQUEST = "POST_DISCOUNT_REQUEST";
+export const POST_DISCOUNT_SUCCESS = "POST_DISCOUNT_SUCCESS";
+export const POST_DISCOUNT_FAIL = "POST_DISCOUNT_FAIL";
+export const POST_DISCOUNT_RESET = "POST_DISCOUNT_RESET";
 
-export const postRebates =
-  (rebatesData) => async (dispatch, getState) => {
+export const postDiscount =
+  (DiscountData) => async (dispatch, getState) => {
     try {
-      dispatch({ type: POST_REBATES_REQUEST });
+      dispatch({ type: POST_DISCOUNT_REQUEST });
 
       // Get user information and branch code from state and localStorage
       const {
@@ -31,27 +31,27 @@ export const postRebates =
 
       // Make the POST request to the server
       const response = await axios.post(
-        `${API}GeneralProcesses/SHIFRebatesCalculation`,
-        rebatesData,
+        `${API}GeneralProcesses/DiscountCalculation `,
+        DiscountData,
         config
       );
-console.log("status78", response.data.status);
+
       // Extract and validate the response data
       dispatch({
-        type: POST_REBATES_SUCCESS,
+        type: POST_DISCOUNT_SUCCESS,
         payload: response.data.status,
       });
-      message.success(`Patient Rebates allocated: ${response.data.status}fully`);
+      message.success(`Patient Discount allocated: ${response.data.status}fully`);
     } catch (error) {
         console.error(error);
       // Dispatch failure action
       dispatch({
-        type: POST_REBATES_FAIL,
+        type: POST_DISCOUNT_FAIL,
         payload: error.response?.data?.errors ,
       });
 
       // Display error message
-      message.error(error.response?.data?.errors );
+      message.error(error.response?.data?.errors);
 
       // Rethrow error for handling by other parts of the app
       throw error;

@@ -256,6 +256,7 @@ import { getSplitReceiptLinesReducer } from './ChargesReducers/getSplitReceiptLi
 import { postReceiptSplitLineReducer } from './ChargesReducers/postReceiptSplitLinesReducer';
 import { getReceiptPageReducer } from './ChargesReducers/getReceiptPageReducer';
 import { postRebatesReducer } from './ChargesReducers/postRebatesReducer';
+import { postDiscountReducer } from './ChargesReducers/postPatientDiscount';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -486,6 +487,7 @@ export const rootReducer = combineReducers({
   postSalesInvoice:postsalesInvoiceReducer,
   reopenPostedCharges:reopensalesInvoiceReducer,
   postRebates:postRebatesReducer,
+  postDiscount:postDiscountReducer,
 
 
   // radiology reducers

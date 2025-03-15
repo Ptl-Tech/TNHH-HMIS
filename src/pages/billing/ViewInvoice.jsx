@@ -57,6 +57,7 @@ import ViewReceipt from "./ViewReceipt";
 import { reopensalesInvoice } from "../../actions/Charges-Actions/postReopenInvoice";
 import InvoicePayment from "./InvoicePayment";
 import AllocateRebates from "./AllocateRebates";
+import AllocateDiscount from "./AllocateDiscount";
 
 const { Title, Text } = Typography;
 
@@ -108,6 +109,7 @@ const ViewInvoice = () => {
   const [isReopenInvoiceModal, setIsReopenInvoiceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showRebatesModal, setshowRebatesModal] = useState(false);
+  const[showDiscountModal, setshowDiscountModal]= useState(false)
   // NEW: Track whether the Invoice has been posted.
   const [isInvoicePosted, setIsInvoicePosted] = useState(false);
   const [balance, setBalance] = useState(patientData?.Balance || 0);
@@ -242,6 +244,7 @@ const ViewInvoice = () => {
     setReverseChargeModalVisible(false);
     setViewInvoice(false);
     setshowRebatesModal(false);
+    setshowDiscountModal(false);
   };
 
   const showModal = () => {
@@ -296,6 +299,11 @@ const ViewInvoice = () => {
 
   const handleRebatesModal = () => {
     setshowRebatesModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    // setSelectedPatientAmount(patientData?.Balance || balance);
+  };
+  const handleDiscountModal = () => {
+    setshowDiscountModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
     // setSelectedPatientAmount(patientData?.Balance || balance);
   };
@@ -431,6 +439,15 @@ const ViewInvoice = () => {
         </Button>
       </Menu.Item>
       <Menu.Item key="5">
+        <Button
+          type="text"
+          icon={<TransactionOutlined style={{ color: "blue" }} />}
+          onClick={handleDiscountModal}
+        >
+          Allocate Patient Discount
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="6">
         <Button
           type="text"
           icon={<DeleteOutlined style={{ color: "red" }} />}
@@ -656,6 +673,11 @@ const ViewInvoice = () => {
         patientNo={selectedpatientNo}
         amount={selectedPatientAmount}
         onReceiptedNo={setReceiptNo}
+      />
+      <AllocateDiscount
+        visible={showDiscountModal}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
       />
       <ReversCharge
         visible={ReverseChargeModalVisible}
