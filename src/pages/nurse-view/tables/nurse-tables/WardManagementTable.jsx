@@ -125,14 +125,7 @@ export default WardManagementTable
 
 // props validation
 WardManagementTable.propTypes = {
-    rowSelection: PropTypes.array.isRequired,
-    filteredBeds: PropTypes.array.isRequired,
-    loadingBeds: PropTypes.bool.isRequired,
-};
-
-//props validation
-WardManagementTable.propTypes = {
-    rowSelection: PropTypes.array.isRequired,
-    filteredBeds: PropTypes.array.isRequired,
-    loadingBeds: PropTypes.bool.isRequired,
+    rowSelection: PropTypes.object,
+    filteredBeds: PropTypes.array,
+    loadingBeds: PropTypes.bool,
 };
