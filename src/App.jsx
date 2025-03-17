@@ -174,7 +174,6 @@ function App() {
           <Route path="Consultation-List" element={<DoctorVisits />} />
           <Route path="Admission-requests" element={<AdmissionRequests />} />
           <Route path="Admission-requests/:id" element={<AdmissionRequest />} />
-
           <Route path="Discharge-requests" element={<DischargeRequests />} />
 
           <Route path="Inpatient/Doctor-Notes" element={<ViewDoctorNotes />} />

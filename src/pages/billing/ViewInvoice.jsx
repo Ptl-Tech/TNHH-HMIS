@@ -24,6 +24,9 @@ import {
   StopOutlined,
   MinusCircleOutlined,
   UndoOutlined,
+  FileDoneOutlined,
+  CreditCardOutlined,
+  TransactionOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaCoins, FaFileInvoice, FaReceipt } from "react-icons/fa";
@@ -49,9 +52,12 @@ import {
 } from "../../actions/Charges-Actions/getPatientReceipts";
 import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
 import { deletePatientCharges } from "../../actions/Charges-Actions/deleteCharges";
-import{postsalesInvoice}from"../../actions/Charges-Actions/postSalesInvoice"
+import { postsalesInvoice } from "../../actions/Charges-Actions/postSalesInvoice";
 import ViewReceipt from "./ViewReceipt";
 import { reopensalesInvoice } from "../../actions/Charges-Actions/postReopenInvoice";
+import InvoicePayment from "./InvoicePayment";
+import AllocateRebates from "./AllocateRebates";
+import AllocateDiscount from "./AllocateDiscount";
 
 const { Title, Text } = Typography;
 
@@ -71,13 +77,18 @@ const ViewInvoice = () => {
     (state) => state.getPatientReceiptHeader
   );
 
-  const { loading: postSalesInvoiceLoading } = useSelector((state) => state.postSalesInvoice);
-  
-  const { loading: reopenPostedChargesLoading } = useSelector((state) => state.reopenPostedCharges);
+  const { loading: postSalesInvoiceLoading } = useSelector(
+    (state) => state.postSalesInvoice
+  );
 
+  const { loading: reopenPostedChargesLoading } = useSelector(
+    (state) => state.reopenPostedCharges
+  );
 
   const { loading } = useSelector((state) => state.deletePatientCharges);
-  const { loading:postReceiptLoading } = useSelector((state) => state.postReceipt);
+  const { loading: postReceiptLoading } = useSelector(
+    (state) => state.postReceipt
+  );
 
   const branchName = localStorage.getItem("branchCode");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -92,14 +103,16 @@ const ViewInvoice = () => {
   const [pdfBase64, setPdfBase64] = useState("");
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
-  const [receiptNo, setReceiptNo] = useState( "");
+  const [receiptNo, setReceiptNo] = useState("");
 
   const [isPostInvoiceModal, setIsPostInvoiceModal] = useState(false);
-  const[isReopenInvoiceModal, setIsReopenInvoiceModal] = useState(false);
+  const [isReopenInvoiceModal, setIsReopenInvoiceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showRebatesModal, setshowRebatesModal] = useState(false);
+  const[showDiscountModal, setshowDiscountModal]= useState(false)
   // NEW: Track whether the Invoice has been posted.
   const [isInvoicePosted, setIsInvoicePosted] = useState(false);
-  const [balance, setBalance] = useState(patientData?.Total_Amount || 0);
+  const [balance, setBalance] = useState(patientData?.Balance || 0);
 
   useEffect(() => {
     const appointmentNo = patientData?.ActiveVisitNo;
@@ -109,21 +122,25 @@ const ViewInvoice = () => {
   }, [dispatch, patientData?.ActiveVisitNo]);
 
   useEffect(() => {
-    if (chargesList) {
-      // Recalculate balance from the latest charges list
+    if (chargesList && chargesList.length > 0) {
+      // Recalculate balance from chargesList
       const newTotal = chargesList.reduce(
-        (acc, charge) => acc + charge.Total_Amount,
+        (acc, charge) => acc + (charge.Total_Amount || 0),
         0
       );
       setBalance(newTotal);
     }
   }, [chargesList]); // Recalculate when chargesList changes
 
-
+  // Also update balance when patientData changes
+  useEffect(() => {
+    if (patientData?.Balance !== undefined) {
+      setBalance(patientData.Balance);
+    }
+  }, [patientData]);
 
   const postedCharges = chargesList?.filter((charge) => charge.Posted) || [];
   const unpostedCharges = chargesList?.filter((charge) => !charge.Posted) || [];
-
 
   const handleGoBack = () => {
     navigate(-1);
@@ -144,8 +161,7 @@ const ViewInvoice = () => {
     setSelectedPatientNo(patientData.PatientNo);
     setAppointmentNo(patientData.ActiveVisitNo);
     setIsReopenInvoiceModal(true);
-  }
-
+  };
 
   const handleConfirmGenerateInvoice = () => {
     dispatch(postGenerateInvoice(selectedpatientNo)).then((status) => {
@@ -158,48 +174,44 @@ const ViewInvoice = () => {
   };
   const handleProcessInvoice = async () => {
     try {
-        const Invoice = {
-            patientNo: patientData?.PatientNo,
-            invoiceNo: invoiceNo,
-        };
-
-        console.log(Invoice);
-        
-        // Dispatch the action and wait for its response
-        const status = await dispatch(postsalesInvoice(Invoice));
-
-        setIsPostInvoiceModal(false);
-
-        if (status === "success") {
-            setIsInvoicePosted(true);
-            notification.success({
-                message: "Invoice Posted",
-                description: "Invoice posted successfully!",
-                duration: 5,
-            });
-        } 
-        
-
-    } catch (error) {
-        console.error("Error posting invoice:", error);
-        notification.error({
-            message: "Error",
-            description: error.response?.data?.errors || "Something went wrong.",
-            duration: 5,
-        });
-        setIsPostInvoiceModal(false);
-    }
-};
-
-const handleReversePostedInvoice = async () => {
-  try {
       const Invoice = {
-          patientNo: patientData?.PatientNo,
-          appointmentNo: patientData?.ActiveVisitNo,
+        patientNo: patientData?.PatientNo,
+        invoiceNo: invoiceNo,
+      };
+
+      // Dispatch the action and wait for its response
+      const status = await dispatch(postsalesInvoice(Invoice));
+
+      setIsPostInvoiceModal(false);
+
+      if (status === "success") {
+        setIsInvoicePosted(true);
+        notification.success({
+          message: "Invoice Posted",
+          description: "Invoice posted successfully!",
+          duration: 5,
+        });
+      }
+    } catch (error) {
+      console.error("Error posting invoice:", error);
+      notification.error({
+        message: "Error",
+        description: error.response?.data?.errors || "Something went wrong.",
+        duration: 5,
+      });
+      setIsPostInvoiceModal(false);
+    }
+  };
+
+  const handleReversePostedInvoice = async () => {
+    try {
+      const Invoice = {
+        patientNo: patientData?.PatientNo,
+        appointmentNo: patientData?.ActiveVisitNo,
       };
 
       console.log(Invoice);
-      
+
       // Dispatch the action and wait for its response
       const status = await dispatch(reopensalesInvoice(Invoice));
 
@@ -207,34 +219,32 @@ const handleReversePostedInvoice = async () => {
 
       if (status === "success") {
         setIsReopenInvoiceModal(true);
-          notification.success({
-              message: "Reverse Invoice",
-              description: "Invoice reversed successfully!",
-              duration: 5,
-          });
+        notification.success({
+          message: "Reverse Invoice",
+          description: "Invoice reversed successfully!",
+          duration: 5,
+        });
 
-          dispatch(getUnpostedCharges(patientData?.ActiveVisitNo)); 
-      } 
-      
-
-  } catch (error) {
+        dispatch(getUnpostedCharges(patientData?.ActiveVisitNo));
+      }
+    } catch (error) {
       console.error("Error posting invoice:", error);
       notification.error({
-          message: "Error",
-          description: error.response?.data?.errors || "Something went wrong.",
-          duration: 5,
+        message: "Error",
+        description: error.response?.data?.errors || "Something went wrong.",
+        duration: 5,
       });
       setIsReopenInvoiceModal(false);
-  }
-};
-
-
+    }
+  };
 
   const handleClose = () => {
     setIsModalVisible(false);
     setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
     setViewInvoice(false);
+    setshowRebatesModal(false);
+    setshowDiscountModal(false);
   };
 
   const showModal = () => {
@@ -268,9 +278,9 @@ const handleReversePostedInvoice = async () => {
     if (postedCharges.length === 0) {
       return message.error("Please post Final Invoice before printing invoice");
     }
-  
+
     const patientNo = patientData?.PatientNo;
-  
+
     dispatch(postPrintInvoice(patientNo)).then((response) => {
       if (response?.data.base64) {
         setPdfBase64(response.data.base64);
@@ -278,21 +288,30 @@ const handleReversePostedInvoice = async () => {
       }
     });
   };
-  
 
   // When processing (posting) the Invoice, update the state so printing is enabled.
- 
-  
+
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
     setSelectedPatientAmount(patientData?.Balance || balance);
   };
+
+  const handleRebatesModal = () => {
+    setshowRebatesModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    // setSelectedPatientAmount(patientData?.Balance || balance);
+  };
+  const handleDiscountModal = () => {
+    setshowDiscountModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    // setSelectedPatientAmount(patientData?.Balance || balance);
+  };
   const handleProcessReceipt = async () => {
     const receipt = {
       recId: "",
       patientNo: patientData?.PatientNo,
-      receiptNo: receiptNo ,
+      receiptNo: receiptNo,
     };
 
     await dispatch(postReceipt(receipt)).then((status) => {
@@ -303,7 +322,6 @@ const handleReversePostedInvoice = async () => {
       }
     });
   };
-
 
   const handleRemoveCharge = (recId) => {
     const payload = {
@@ -379,7 +397,7 @@ const handleReversePostedInvoice = async () => {
         <Button
           type="text"
           icon={<PrinterOutlined style={{ color: "green" }} />}
-          onClick={() => handlePrintInterimInvoice()}
+          onClick={handlePrintInterimInvoice}
         >
           Print Interim Invoice
         </Button>
@@ -387,8 +405,8 @@ const handleReversePostedInvoice = async () => {
       <Menu.Item key="1">
         <Button
           type="text"
-          icon={<FaFileInvoice style={{ color: "green" }} />}
-          onClick={() => postSalesInvoice()}
+          icon={<FileDoneOutlined style={{ color: "green" }} />}
+          onClick={postSalesInvoice}
         >
           Post Invoice
         </Button>
@@ -397,7 +415,7 @@ const handleReversePostedInvoice = async () => {
         <Button
           type="text"
           icon={<PrinterOutlined style={{ color: "blue" }} />}
-          onClick={() => handlePrintInvoice()}
+          onClick={handlePrintInvoice}
         >
           Print Invoice
         </Button>
@@ -405,25 +423,34 @@ const handleReversePostedInvoice = async () => {
       <Menu.Item key="3">
         <Button
           type="text"
-          icon={<DollarOutlined style={{ color: "gold" }} />}
-          onClick={()=>handlePaymentModal()}
+          icon={<CreditCardOutlined style={{ color: "gold" }} />}
+          onClick={handlePaymentModal}
         >
-         Co-Pay
+          Co-Pay
         </Button>
       </Menu.Item>
       <Menu.Item key="4">
         <Button
           type="text"
-          icon={<DollarOutlined style={{ color: "gold" }} />}
-          onClick={()=>handleProcessReceipt()}
+          icon={<TransactionOutlined style={{ color: "blue" }} />}
+          onClick={handleRebatesModal}
         >
-     Post Co-Pay Receipt
+          Allocate SHIF Rebates
         </Button>
       </Menu.Item>
       <Menu.Item key="5">
         <Button
           type="text"
-          icon={<DollarOutlined style={{ color: "gold" }} />}
+          icon={<TransactionOutlined style={{ color: "blue" }} />}
+          onClick={handleDiscountModal}
+        >
+          Allocate Patient Discount
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="6">
+        <Button
+          type="text"
+          icon={<DeleteOutlined style={{ color: "red" }} />}
           onClick={handleReverseCharge}
           danger
         >
@@ -537,15 +564,10 @@ const handleReversePostedInvoice = async () => {
 
               <Text strong>Balance:</Text>
               <p>
-                {patientData.Balance
-                  ? patientData.Balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })
-                  : balance.toLocaleString("en-KE", {
-                      style: "currency",
-                      currency: "KES",
-                    })}
+                {balance.toLocaleString("en-KE", {
+                  style: "currency",
+                  currency: "KES",
+                })}
               </p>
 
               <Text strong>Invoice No:</Text>
@@ -620,7 +642,7 @@ const handleReversePostedInvoice = async () => {
         </p>
       </Modal>
       <Modal
-      title="Reverse Invoice"
+        title="Reverse Invoice"
         visible={isReopenInvoiceModal}
         onOk={handleReversePostedInvoice}
         onCancel={() => setIsReopenInvoiceModal(false)}
@@ -640,12 +662,22 @@ const handleReversePostedInvoice = async () => {
           dispatch(getUnpostedCharges(patientData?.ActiveVisitNo))
         }
       />
-<ProcessPayment
+      <AllocateRebates
+        visible={showRebatesModal}
+        onClose={handleClose}
+        patientNo={patientData.PatientNo}
+      />
+      <InvoicePayment
         visible={showPaymentModal}
         onClose={handleClose}
         patientNo={selectedpatientNo}
         amount={selectedPatientAmount}
         onReceiptedNo={setReceiptNo}
+      />
+      <AllocateDiscount
+        visible={showDiscountModal}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
       />
       <ReversCharge
         visible={ReverseChargeModalVisible}

@@ -12,7 +12,7 @@ import { postReceipt } from "../../actions/Charges-Actions/postReceipt";
 
 const { Option } = Select;
 
-const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) => {
+const InvoicePayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -70,23 +70,23 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         if (newReceiptNo) {
           // setReceiptNo(newReceiptNo);
           onReceiptedNo(newReceiptNo);
-          // if (patientDetails?.PatientType !== "Cash") {
-          //   const receipt = {
-          //     recId: "",
-          //     patientNo: patientNo,
-          //     receiptNo: newReceiptNo,
-          //   };
+          if (patientDetails?.PatientType !== "Cash") {
+            const receipt = {
+              recId: "",
+              patientNo: patientNo,
+              receiptNo: newReceiptNo,
+            };
   
-          //   // Post the receipt if the patient is NOT Cash
-          //   const status = await dispatch(postReceipt(receipt));
+            // Post the receipt if the patient is NOT Cash
+            const status = await dispatch(postReceipt(receipt));
   
-          //   if (status === "success") {
-          //     message.success("Receipt posted successfully");
-          //     onReceiptedNo(newReceiptNo);
-          //   } else {
-          //     throw new Error("Failed to process receipt");
-          //   }
-          // }
+            if (status === "success") {
+              message.success("Receipt posted successfully");
+              onReceiptedNo(newReceiptNo);
+            } else {
+              throw new Error("Failed to process receipt");
+            }
+          }
         }
   
         // Regardless of patient type, reset form and close modal
@@ -189,7 +189,7 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         )}
 
         {/* Co-Pay Checkbox (Always Visible) */}
-       {/* {patientDetails && patientDetails?.PatientType !== "Cash" && (
+       {patientDetails && patientDetails?.PatientType !== "Cash" && (
            <Row gutter={16}>
            <Col span={12}>
              <Form.Item name="coPay" valuePropName="checked">
@@ -200,7 +200,7 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
          </Row>
  
         )
-       } */}
+       }
         <Row>
           <Col span={24}>
             <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>
@@ -213,4 +213,4 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
   );
 };
 
-export default ProcessPayment;
+export default InvoicePayment;

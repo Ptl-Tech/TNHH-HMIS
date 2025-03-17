@@ -107,7 +107,7 @@ export const requestPatientAdmission = (treatmentId) => async (dispatch, getStat
     // Extract response details
     const responseData = {
       status: response.data.status,
-      data: response.data, // Assuming `data` contains the response data
+      data: response.data, 
     };
 
     // Dispatch success after a small delay
@@ -120,7 +120,6 @@ export const requestPatientAdmission = (treatmentId) => async (dispatch, getStat
       message.success(`Admission No ${responseData.data.admissionNo} requested ${responseData.data.status}fully!`, 5);
 
     }, 2000);
-
     // Return the patient ID for further use
     return responseData.data; 
 

@@ -107,9 +107,8 @@ localStorage.removeItem("branchCode");
     // Dispatch logout action to update state
     dispatch({ type: USER_LOGOUT });
 
-    console.log("logged out");
   } catch (error) {
-    console.log("Error during logout:", error);
+    message.error(error);
   }
 };
 
@@ -176,7 +175,6 @@ export const resetPassword = (formData) => async (dispatch) => {
       const { data } = await axios.post(`${API}auth/register`, userData, config);
   
       dispatch({ type: USER_REGISTER_SUCCESS, payload: data });
-      console.log('Dispatch USER_REGISTER_SUCCESS', data);
       message.success(data.message, 5);
   
       localStorage.setItem('userInfo', JSON.stringify(data)); // This persists the token
