@@ -80,7 +80,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
           loading={loadingIpLookupValues}
           options={filterIpLookupValues?.map((item) => ({
             value: item.Category,
-            label: item.Description,
+            label: item.Category,
           }))}
           allowClear
 

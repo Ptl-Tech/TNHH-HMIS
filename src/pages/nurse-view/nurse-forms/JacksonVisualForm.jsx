@@ -20,7 +20,8 @@ const JacksonVisualForm = () => {
     const dispatch = useDispatch();
 
     const { loadingGetJacksonVisual, getJacksonVisual } = useSelector((state) => state.getJacksonVisualForm);
-    const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm);  
+    const { loadingJackson } = useSelector((state) => state.postJacksonVisualForm); 
+  
 
     const handleButtonVisibility = () => {
       setIsFormVisible(!isFormVisible);

@@ -193,7 +193,7 @@ const DietaryIntakeForm = () => {
           loading={loadingIpLookupValues}
           options={ipLookupValues?.map((item) => ({
             value: item.Category,
-            label: item.Description,
+            label: item.Category
           }))}
           allowClear
 
