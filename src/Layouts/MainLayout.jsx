@@ -56,11 +56,6 @@ const MainLayout = () => {
         label: 'Dashboard',
       },
       {
-        key: 'patient-list',
-        icon: <FileTextOutlined style={{ color: '#fff' }} />,
-        label: 'Patient List',
-      },
-      {
         icon: <FileTextOutlined style={{ color: '#fff' }} />,
         label: 'Triage',
         children: [
@@ -75,6 +70,11 @@ const MainLayout = () => {
         icon: <UsergroupAddOutlined style={{ color: '#fff' }} />,
         label: 'Patients',
         children: [
+          {
+            key: 'patient-list',
+            label: 'Patient Registration',
+            icon: <UserAddOutlined style={{ color: '#fff' }} />,
+          },
           {
             key: 'Consultation-List',
             label: 'Outpatients List',

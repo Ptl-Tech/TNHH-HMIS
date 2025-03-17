@@ -27,10 +27,10 @@ const DoctorNotes = () => {
     }));
   }, [data]);
 
-  const combinedPatients = patientEncounters?.map(patient => {
-    const matchingDoctor = formattedDoctorDetails?.find(doctor => (
-      patient?.Doctor === doctor?.DoctorID
-    ));
+  const combinedPatients = patientEncounters?.map((patient) => {
+    const matchingDoctor = formattedDoctorDetails?.find(
+      (doctor) => patient?.Doctor === doctor?.DoctorID
+    );
     return {
       ...patient,
       DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
@@ -61,7 +61,7 @@ const DoctorNotes = () => {
         <Typography.Text
           style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
         >
-          Past Doctor Notes
+          Past Encounter Notes
         </Typography.Text>
       </Space>
       <div
@@ -73,7 +73,12 @@ const DoctorNotes = () => {
         }}
       ></div>
 
-      <PastDoctorNotesTable role={role} combinedPatients={combinedPatients} loadingDoctors={loadingDoctors} loadingEncounters={loadingEncounters} />
+      <PastDoctorNotesTable
+        role={role}
+        combinedPatients={combinedPatients}
+        loadingDoctors={loadingDoctors}
+        loadingEncounters={loadingEncounters}
+      />
     </div>
   );
 };

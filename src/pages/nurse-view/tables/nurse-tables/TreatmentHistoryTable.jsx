@@ -1,7 +1,7 @@
 import { Table } from "antd"
 import PropTypes from "prop-types"
 
-const TreatmentHistoryTable = ({ showModal }) => {
+const TreatmentHistoryTable = () => {
 
     const columns = [
     

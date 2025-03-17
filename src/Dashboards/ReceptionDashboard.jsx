@@ -31,7 +31,7 @@ const ReceptionDashboard = () => {
     (visitor) => moment(visitor.CreatedDate).format("YYYY-MM-DD") === today && visitor.Status === "Entered"
   ).length || 0;
 
-  const activeVisitsCount = patients?.filter((item) => item.Activated && !item.Inpatient).length || 0;
+  const activeVisitsCount = patients?.filter((item) => item?.Activated && !item.Inpatient).length || 0;
   const inPatientCount = patients?.filter((item) => item.Inpatient).length || 0;
   const walkInPatientsCount = patients?.filter((item) => item.Walkin && item.Activated).length || 0;
 

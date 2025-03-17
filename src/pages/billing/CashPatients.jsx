@@ -21,7 +21,6 @@ import TabPane from "antd/es/tabs/TabPane";
 import ProcessPayment from "./ProcessPayment";
 import AddCharges from "./AddCharges";
 import PostedReceipts from "./PostedReceipts";
-import LoadingSkeleton from "../../components/LoadingSkeleton";
 
 const CashPatients = () => {
   const dispatch = useDispatch();
@@ -49,9 +48,8 @@ const CashPatients = () => {
   });
   // Track which tab is active: "1" for Cash, "2" for Corporate
   const [activeTab, setActiveTab] = useState("1");
-const [loadingCashData, setLoadingCashData] = useState(false);
+
   useEffect(() => {
-    setLoadingCashData(true);
     dispatch(getBillingList());
     dispatch(appmntList());
   }, [dispatch]);
@@ -66,13 +64,12 @@ const [loadingCashData, setLoadingCashData] = useState(false);
       );
 
       setCashPatients(cash);
+
       setFilteredCashPatients(cash);
-      setLoadingCashData(false);
     }
   }, [billingData]);
 
   const handleSearch = (e, field) => {
-    setLoadingCashData(true);
     const value = e.target.value.toLowerCase();
     const updatedSearchParams = { ...searchParams, [field]: value };
     setSearchParams(updatedSearchParams);
@@ -88,9 +85,8 @@ const [loadingCashData, setLoadingCashData] = useState(false);
             updatedSearchParams.AppointmentNo
           ))
     );
-    setFilteredCashPatients(filteredCash);
-    setLoadingCashData(false)
 
+    setFilteredCashPatients(filteredCash);
   };
 
   const handleClose = () => {
@@ -293,7 +289,6 @@ const [loadingCashData, setLoadingCashData] = useState(false);
       </Row>
       <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)}>
         <TabPane tab="Cash Patients" key="1">
-          <LoadingSkeleton loading={loadingCashData} avatar={false} rows={3} >
           <Table
             columns={baseColumns} // No inline actions; actions come from the external area.
             dataSource={filteredCashPatients.map((patient) => ({
@@ -303,7 +298,6 @@ const [loadingCashData, setLoadingCashData] = useState(false);
             pagination={{ pageSize: 25 }}
             size="small"
           />
-          </LoadingSkeleton>
         </TabPane>
         {/* <TabPane tab="Receipt List" key="2">
           <PostedReceipts />

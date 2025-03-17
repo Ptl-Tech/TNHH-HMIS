@@ -1,15 +1,16 @@
 import { Button, Table, Tooltip, Typography } from "antd";
 import PropTypes from "prop-types";
-import { SendOutlined } from "@ant-design/icons";
+import { SaveOutlined } from "@ant-design/icons";
 import Loading from "../../../../partials/nurse-partials/Loading";
+import { useState } from "react";
 
 const BedTransferTable = ({
   handleBedTransfer,
   combinedPatientsBed,
   loadingBeds,
   loadingAdmittedPatients,
+  loadingBedTransferLines,
 }) => {
-  
   const columns = [
     {
       title: "#",
@@ -42,10 +43,12 @@ const BedTransferTable = ({
           return (
             <Tooltip title="Transfer patient to this bed">
               <Button
-                icon={<SendOutlined />}
+                type="primary"
+                icon={<SaveOutlined />}
+                disabled={loadingBedTransferLines}
                 onClick={() => handleBedTransfer(record)}
               >
-                Transfer Patient
+                Post this Bed
               </Button>
             </Tooltip>
           );
@@ -61,19 +64,22 @@ const BedTransferTable = ({
           return record?.Admission_Date;
         } else {
           return (
-            <Tooltip title="Transfer patient to this bed">
-              <Button
-                icon={<SendOutlined />}
-                onClick={() => handleBedTransfer(record)}
-              >
-                Transfer Patient
-              </Button>
-            </Tooltip>
+            // current date
+            '-'
           );
         }
       },
     },
   ];
+  const [pagination, setPagination] = useState({
+      current: 1,
+      pageSize: 10,
+      total: combinedPatientsBed?.length,
+    });
+  
+    const handleTableChange = (newPagination) => {
+      setPagination(newPagination); // Update pagination settings
+    };
   return (
     <div>
       {loadingBeds || loadingAdmittedPatients ? (
@@ -81,10 +87,31 @@ const BedTransferTable = ({
       ) : (
         <Table
           columns={columns}
-          rowKey={() => Math.random().toString(36).substr(2, 9)} 
+          rowKey={(record, index) => index + 1}
           dataSource={combinedPatientsBed}
           size="small"
           bordered
+          pagination={{
+            ...pagination,
+            total: combinedPatientsBed?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ["bottom", "right"],
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) =>
+              handleTableChange({
+                current: page,
+                pageSize,
+                total: pagination.total,
+              }),
+            onShowSizeChange: (current, size) =>
+              handleTableChange({
+                current,
+                pageSize: size,
+                total: pagination.total,
+              }),
+          }}
         />
       )}
     </div>
@@ -98,4 +125,5 @@ BedTransferTable.propTypes = {
   combinedPatientsBed: PropTypes.array,
   loadingBeds: PropTypes.bool,
   loadingAdmittedPatients: PropTypes.bool,
+  loadingBedTransferLines: PropTypes.bool,
 };
