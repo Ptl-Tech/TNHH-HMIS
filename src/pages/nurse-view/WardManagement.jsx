@@ -87,8 +87,6 @@ const WardManagement = () => {
       patient?.Ward === selectedRow[0]?.WardNo
   );
 
-  console.log('patient details', filterPatientBed?.Admission_No)
-
   function handleWardChange(value) {
     setSelectedWard(value);
   }

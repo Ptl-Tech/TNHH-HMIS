@@ -5,19 +5,21 @@ import { useState } from 'react'
 import moment from 'moment'
 
 const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection}) => {
+
     const columns = [
-        {
-          title: 'Date',
-          dataIndex: 'Date',
-          key: 'Date',
-          render: (text) => (
-            <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
-              {
-                moment(text).format('DD-MM-YYYY')
-              }
-            </span>
-          )
-        },
+      {
+        title: 'Date',
+        dataIndex: 'Date',
+        key: 'Date',
+        fixed: 'left',
+        width: 150,
+        sorter: (a, b) => moment(b.Date, "DD-MM-YYYY").valueOf() - moment(a.Date, "DD-MM-YYYY").valueOf(),
+        render: (text) => (
+          <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#0f5689' }}>
+            {moment(text).format('DD-MM-YYYY')}
+          </span>
+        ),
+      },
         {
           title: 'Time',
           dataIndex: 'Time',
@@ -50,6 +52,18 @@ const SuicidalFormTable = ({ loadingIpSuicidalForm, ipSuicidalForm, rowSelection
               </span>
             ) 
         },
+        {
+          title: 'Remarks',    
+          dataIndex: 'Remarks',
+          key: 'Remarks',
+          fixed: 'right',
+          width: 200,
+          render: (text) => (
+            <span style={{ fontSize: '14px' }}>
+              {text}
+            </span>
+          ) 
+      },
     ]
 
      const [pagination, setPagination] = useState({
@@ -97,9 +111,9 @@ export default SuicidalFormTable
 
 // props validation
 SuicidalFormTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
-    loadingIpSuicidalForm: PropTypes.bool.isRequired,
-    ipSuicidalForm: PropTypes.array.isRequired,
-    rowSelection: PropTypes.array.isRequired
+    showModal: PropTypes.func,
+    loadingIpSuicidalForm: PropTypes.bool,
+    ipSuicidalForm: PropTypes.object,
+    rowSelection: PropTypes.object
 
 }

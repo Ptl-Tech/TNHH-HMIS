@@ -28,7 +28,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
             await dispatch(postSuicidalFormSlice('/InpatientForms/SuicidalPrecautionForm', data))
               .then((result) => {
                 if (result.type === POST_SUICIDAL_FORM_SUCCESS) {
-                  message.success(`suicidal precaution form has been saved successfully!`);
+                  message.success(`suicidal precaution form saved successfully!`);
                   setIsFormVisible(false);
                   dispatch(getSuicidalFormSlice(patientDetails?.Admission_No));
                 } else if (result.type === POST_SUICIDAL_FORM_FAILURE) {
@@ -76,7 +76,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                     rules={[
                     {
                         required: true,
-                        message: "Handing Over is required.",
+                        message: "Handing Over nurse field is required.",
                     },
                     {
                         pattern: /^[a-zA-Z ]{3,}$/,
@@ -119,7 +119,7 @@ const SuicidalFormData = ({ setIsFormVisible, patientDetails, loadingSuicidalFor
                     loading={loadingSuicidalForm}
                     disabled={loadingSuicidalForm}     
                     >
-                        Save Visitor
+                        Save Suicidal Form
                     </Button>
                     <Button color="danger" variant="outlined" icon={<CloseOutlined />} onClick={() => setIsFormVisible(false)}
                     >

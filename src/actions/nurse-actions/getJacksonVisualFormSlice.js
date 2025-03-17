@@ -14,7 +14,7 @@ export const getJacksonVisualFormSlice = (admissionNo) =>
     try {
         dispatch({ type: GET_JACKSON_VISUAL_FORM_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPJacksonVisualList&isList=true &query=$filter=AdmissionNo eq '${admissionNo}`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyIPJacksonVisualList&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
     
 
         dispatch({ type: GET_JACKSON_VISUAL_FORM_SUCCESS, payload: data });
