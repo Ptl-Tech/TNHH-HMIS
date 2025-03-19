@@ -57,7 +57,8 @@ const WardTransfer = () => {
         const { status, msg } = res?.payload || {};
 
         if (status === "success") {
-          message.success(msg || "Successfully saved new bed transfer details");
+          message.success(msg || "Successfully signed new bed, please go to save bed.");
+          dispatch(getQyBedTransferLines(admissionNo));
           setActiveBedTab("2");
         } else {
           message.error(msg || "Failed to save bed transfer details");

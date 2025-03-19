@@ -1,6 +1,5 @@
 import { Space, Table, Tag, Typography } from "antd";
 import PropTypes from "prop-types";
-import Loading from "../../../../partials/nurse-partials/Loading";
 import { useState } from "react";
 import {InsertRowBelowOutlined} from "@ant-design/icons"
 
@@ -56,14 +55,12 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
 
   return (
     <>
-    {
-        loadingBeds ? (
-         <Loading />
-        ):(
+   
         <Table 
         rowKey={'BedNo'}
         columns={columns} 
         dataSource={filteredBeds} 
+        loading={loadingBeds}
         rowSelection={rowSelection}
         bordered size='middle' 
         locale={{
@@ -114,9 +111,7 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
                     ));
                 },
             })}
-        />
-        )
-    }       
+        />       
     </>
   )
 }
