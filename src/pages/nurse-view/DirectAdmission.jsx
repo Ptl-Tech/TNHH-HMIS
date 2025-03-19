@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { postPatientAdmission } from "../../actions/Doc-actions/Admission/postAdmitPatient";
 const DirectAdmission = () => {
   const { selectedRow, selectedRowKey, rowSelection } =
     useSetTableCheckBoxHook();
@@ -59,20 +60,19 @@ const DirectAdmission = () => {
       admissionType: "0",
     };
 
-    console.log("formData", formData);
-
     try {
       const result = await dispatch(postAdmissionFormDetailsSlice(formData));
       if (result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS) {
+        await dispatch(postPatientAdmission({ admissionNo: result.payload.admissionNo }));
         message.success(
           result.payload.message ||
-            "Ward, Room and Bed assigned successfully to patient"
+            "Patient addmitted successfully"
         );
         navigate(`/Nurse/Inpatient`);
       } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
         message.error(
           result.payload.message ||
-            "Failed to assign ward, bed and room to patient"
+            "Failed to admit patient, please try again"
         );
       }
     } catch (error) {

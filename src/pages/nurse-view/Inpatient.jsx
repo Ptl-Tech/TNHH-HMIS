@@ -79,9 +79,6 @@ const Impatient = () => {
     return combinedPatients;
   }, [combinedPatients, doctorId, role]);
   
-
-
-
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
   }, [dispatch]);
