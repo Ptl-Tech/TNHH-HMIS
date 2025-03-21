@@ -3,7 +3,7 @@ import {
   POST_PHARMACY_HEADER_RESET,
   POST_PHARMACY_HEADER_REQUEST,
   POST_PHARMACY_HEADER_SUCCESS,
-} from '../../actions/pharmacy-actions/getNewPharmacyRequest';
+} from '../../actions/pharmacy-actions/postPharmacyHeader';
 
 const initialState = {
   data: null,

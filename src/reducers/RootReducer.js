@@ -273,6 +273,8 @@ import { createLabTestHeaderReducer } from './lab-reducers/createLabTestHeader';
 import { postLabTestLinesReducer } from './lab-reducers/postLabTestLinesReducer';
 import { updateLabTestLinesReducer } from './lab-reducers/updateLabTestLines';
 import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
+import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
+import getPharmacyRequestsAllReducer from './pharmacy-reducers/getPharmacyRequestsAllReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -378,7 +380,16 @@ export const rootReducer = combineReducers({
   // ************************************* /
 
   // pharmacy
+  postDrugIssuance: postDrugIssuanceReducer,
   postPharmacyHeader: postPharmacyHeaderReducer,
+  getNewPharmacyList: getNewPharmacyRequestsReducer,
+  getPharmacyHistoryList: getPharmacyHistoryListReducer,
+  getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
+  getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
+  postArchivePrescription: postArchivePrescriptionReducer,
+  postPrescriptionQuantity: postPrescriptionQuantityReducer,
+  getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
+  getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
   // ************************************* /
 
   getSinglePatient: getSinglePatientReducer,
@@ -445,13 +456,6 @@ export const rootReducer = combineReducers({
   getAdmissionLines: getAdmissionLinesReducer,
   getDiagnosisLines: getDiagnosisLinesReducer,
   getReferralLines: getReferralLinesReducer,
-  getNewPharmacyList: getNewPharmacyRequestsReducer,
-  postDrugIssuance: postDrugIssuanceReducer,
-  postPrescriptionQuantity: postPrescriptionQuantityReducer,
-  postArchivePrescription: postArchivePrescriptionReducer,
-  getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
-  getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
-  getPharmacyHistoryList: getPharmacyHistoryListReducer,
   getPatientVisit: getPatientVisitReducer,
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,

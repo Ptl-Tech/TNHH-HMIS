@@ -10,7 +10,7 @@ const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
   'https://chiromo.potestastechnologies.net:8085';
 
-export const postPharamcyHeader =
+export const postPharmacyHeader =
   (pharmacyHeaderData) => async (dispatch, getState) => {
     console.log({ pharmacyHeaderData });
 

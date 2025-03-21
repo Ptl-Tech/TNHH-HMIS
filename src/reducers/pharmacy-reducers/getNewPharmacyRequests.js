@@ -3,18 +3,24 @@ import {
   GET_NEW_PHARMACY_REQUESTS_SUCCESS,
   GET_NEW_PHARMACY_REQUESTS_FAILURE,
   GET_NEW_PHARMACY_REQUESTS_RESET,
-} from "../../actions/pharmacy-actions/getNewPharmacyRequest";
+} from '../../actions/pharmacy-actions/getNewPharmacyRequest';
 
-export const getNewPharmacyRequestsReducer = (state = { data: [] }, action) => {
+const initialState = {
+  data: [],
+  loading: false,
+  error: null,
+};
+
+export const getNewPharmacyRequestsReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_NEW_PHARMACY_REQUESTS:
-      return { loading: true, data: [] };
+      return { ...state, loading: true };
     case GET_NEW_PHARMACY_REQUESTS_SUCCESS:
-      return { loading: false, data: action.payload };
+      return { ...state, loading: false, data: action.payload };
     case GET_NEW_PHARMACY_REQUESTS_FAILURE:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     case GET_NEW_PHARMACY_REQUESTS_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }
