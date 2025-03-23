@@ -35,12 +35,14 @@ const PatientRegistration = () => {
       }}
     >
       <div className="d-flex flex-column" style={{ width: "100%" }}>
+        {/* Patient Details Card */}
         <Card
           style={{
             width: "100%",
             maxWidth: "2900px",
             padding: "20px",
             boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+            border: "2px solid #0f5689", // Added border color
           }}
         >
           {loadingPatientDetails ? (
@@ -65,21 +67,20 @@ const PatientRegistration = () => {
                   }}
                 >
                   <span>
-                    <b>Patient No:</b> {patientDetails?.PatientNo || "N/A"}
+                    <b>Patient No:</b> {patientDetails?.PatientNo || ""}
                   </span>
                   <span>
-                    <b>Name:</b>                     {patientDetails?.SearchName || ""}
+                    <b>Name:</b> {patientDetails?.SearchName || ""}
+                  </span>
 
-                  </span>
-
                   <span>
-                    <b>ID No:</b> {patientDetails?.IDNumber || "N/A"}
+                    <b>ID No:</b> {patientDetails?.IDNumber || ""}
                   </span>
                   <span>
-                    <b>DOB:</b> {patientDetails?.DateOfBirth || "N/A"}
+                    <b>DOB:</b> {patientDetails?.DateOfBirth || ""}
                   </span>
                   <span>
-                    <b>Gender:</b> {patientDetails?.Gender || "N/A"}
+                    <b>Gender:</b> {patientDetails?.Gender || ""}
                   </span>
                 </div>
               </Col>
@@ -95,9 +96,18 @@ const PatientRegistration = () => {
             padding: "20px",
             boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
             marginTop: "20px",
+            border: "2px solid #0f5689", // Added border color
           }}
         >
-          <Tabs defaultActiveKey="1" tabPosition="left">
+          <Tabs
+            defaultActiveKey="1"
+            tabPosition="left"
+            style={{
+              border: "2px solid #0f5689", // Added border color
+              borderRadius: "5px",
+              padding: "5px",
+            }}
+          >
             <Tabs.TabPane tab="General Information" key="1">
               <GeneralInformation
                 patientDetails={patientDetails}
@@ -105,16 +115,28 @@ const PatientRegistration = () => {
               />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Next of Kin" key="2">
-              <NextofKinInformatiotion patientDetails={patientDetails} onUpdate={handleUpdatePatientDetails} />
+              <NextofKinInformatiotion
+                patientDetails={patientDetails}
+                onUpdate={handleUpdatePatientDetails}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Address & Region" key="3">
-              <RegionalInformation patientDetails={patientDetails} onUpdate={handleUpdatePatientDetails} />
+              <RegionalInformation
+                patientDetails={patientDetails}
+                onUpdate={handleUpdatePatientDetails}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Billing Information" key="4">
-              <BillingInformation patientDetails={patientDetails} onUpdate={handleUpdatePatientDetails} />
+              <BillingInformation
+                patientDetails={patientDetails}
+                onUpdate={handleUpdatePatientDetails}
+              />
             </Tabs.TabPane>
             <Tabs.TabPane tab="How Did You Hear About Us ?" key="5">
-              <MarketingInformation patientDetails={patientDetails} onUpdate={handleUpdatePatientDetails} />
+              <MarketingInformation
+                patientDetails={patientDetails}
+                onUpdate={handleUpdatePatientDetails}
+              />
             </Tabs.TabPane>
           </Tabs>
         </Card>

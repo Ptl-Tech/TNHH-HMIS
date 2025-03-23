@@ -15,11 +15,16 @@ import { listInsuranceOptions } from "../../../actions/DropdownListActions";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { saveBillingInformation } from "../../../actions/reception-actions/save-patient-actions/saveBillingInformation";
+import { getPatientByNo } from "../../../actions/patientActions";
 
 const BillingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch(); // Declare the dispatch function
   const [form] = Form.useForm();
   const [paymentMethod, setPaymentMethod] = useState(null);
+
+  const { loading: loadingPatientDetails, patients: data } =
+    useSelector((state) => state.patientList) || {};
+
   const { loading, success, error } = useSelector(
     (state) => state.saveBillingInfo
   );
@@ -34,6 +39,13 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     dispatch(listInsuranceOptions()); // Dispatch the action to fetch insurance options
   }, [dispatch]);
+
+  useEffect(() => {
+    if (success || patientDetails?.PatientNo) {
+      dispatch(getPatientByNo(patientDetails?.PatientNo));
+    }
+  }, [success, dispatch, patientDetails?.PatientNo]);
+  console.log(patientDetails);
 
   useEffect(() => {
     if (patientDetails) {
@@ -53,30 +65,30 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
           : null,
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
-        nationality: patientDetails?.nationality || "",
-        county: patientDetails?.county || "",
+        nationality: patientDetails?.Nationality || "",
+        county: patientDetails?.PlaceofBirthDistrict || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
-        paymentMode: patientDetails?.PatientType || 0,
-        insuranceNo: patientDetails?.insuranceNo || "",
-        insuranceName: patientDetails?.insuranceName || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+        paymentMode: patientDetails?.PatientType === "Corporate" ? 1 :
+        patientDetails?.PatientType === "Cash" ? 2 : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
+        insuranceName: patientDetails?.InsuranceName || "",
         insurancePrinicipalMemberName:
-          patientDetails?.insurancePrinicipalMemberName || "",
-        isPrincipleMember: patientDetails?.isPrincipleMember || false,
-        membershipNo: patientDetails?.membershipNo || "",
-        schemeName: patientDetails?.schemeName || "",
-        howYouKnewABoutUs: patientDetails?.howYouKnewABoutUs || "",
-        subcounty: patientDetails?.subcounty || "",
+          patientDetails?.PrincipalMemberName || "",
+        isPrincipleMember: patientDetails?.Principal || false,
+        membershipNo: patientDetails?.MembershipNo || "",
+        schemeName: patientDetails?.SchemeName || "",
+        howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+        subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
-        residence: patientDetails?.residence || "",
+        residence: patientDetails?.PlaceofBirthVillage || "",
+        countyWard: patientDetails?.Ward || "",
         patientStatus: patientDetails?.patientStatus || 0,
       });
     }
   }, [patientDetails, form]);
 
   const handleSubmission = (values) => {
-
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -92,35 +104,34 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       dob: patientDetails?.DateOfBirth
         ? moment(patientDetails.DateOfBirth).format("YYYY-MM-DD")
         : "", // Ensure valid date format
-      nationality: patientDetails?.nationality || "",
-      county: patientDetails?.county || "",
-      idNumber: patientDetails?.IDNumber  || "",
+      idNumber: patientDetails?.IDNumber || "",
       phoneNumber: patientDetails?.TelephoneNo1 || "",
-      paymentMode: values.paymentMode || patientDetails?.PatientType || 0,
-      nextOfKinRelationship: patientDetails?.nextOfKinRelationship || "",
-      nextOfKinFullName: patientDetails?.nextOfKinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
-      insuranceNo: values.insuranceNo || patientDetails?.insuranceNo || "",
+      nationality: patientDetails?.Nationality || "",
+      county: patientDetails?.PlaceofBirthDistrict || "",
+      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
+      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
+      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+    paymentMode:values.paymentMode,
+      insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
-        values.insuranceName || patientDetails?.insuranceName || "",
-      insurancePrinicipalMemberName:
+        values.insuranceName || patientDetails?.InsuranceName || "",
+        insurancePrinicipalMemberName:
         values.insurancePrinicipalMemberName ||
-        patientDetails?.insurancePrinicipalMemberName ||
+        patientDetails?.PrincipalMemberName ||
         "",
       isPrincipleMember:
-        values.isPrincipleMember || patientDetails?.isPrincipleMember || false,
-      membershipNo: values.membershipNo || patientDetails?.membershipNo || "",
-      schemeName: values.schemeName || patientDetails?.schemeName || "",
-      howYouKnewABoutUs:patientDetails?.HowYouKnewABoutUs || "",
-      subcounty: patientDetails?.subcounty || "",
-      email: patientDetails?.Email || "",
-      residence: patientDetails?.residence || "",
+        values.isPrincipleMember || patientDetails?.Principal || false,
+      membershipNo: values.membershipNo || patientDetails?.MembershipNo || "",
+      schemeName: values.schemeName || patientDetails?.SchemeName || "",
+      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+      subcounty: patientDetails?.SubCountyName || "",
+      residence: patientDetails?.PlaceofBirthVillage || "",
       patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
     };
 
     // Dispatch to save or update patient data
     dispatch(saveBillingInformation(formattedData));
-    onUpdate(formattedData);
+    onUpdate(data);
   };
 
   return (
@@ -128,11 +139,15 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       <Typography.Title level={5} underline>
         Billing Information
       </Typography.Title>
-      {error && (
-        <Alert message={error} type="error" showIcon />
-      )}
+      {error && <Alert message={error} type="error" showIcon />}
       {success && (
-        <Alert message="Patient Billing data saved successfully!" type="success" showIcon closeText="Close" onClose={() => dispatch({ type: "CLEAR_SUCCESS" })} />
+        <Alert
+          message="Patient Billing data saved successfully!"
+          type="success"
+          showIcon
+          closeText="Close"
+          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
+        />
       )}
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
         <Row gutter={16}>
@@ -148,67 +163,68 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 placeholder="Select payment method"
                 onChange={(value) => setPaymentMethod(value)}
               >
-                <Select.Option value="2">Cash</Select.Option>
-                <Select.Option value="1">Insurance</Select.Option>
+                <Select.Option value={2}>Cash</Select.Option>
+<Select.Option value={1}>Corporate</Select.Option>
+
               </Select>
             </Form.Item>
           </Col>
-          {paymentMethod === "1" && (
-              <Col span={12}>
-                <Form.Item
-                  label="Select Insurance Name"
-                  name="insuranceName" // Name for insurance name field
-                  rules={[
-                    { required: true, message: "Please enter insurance name!" },
-                  ]}
-                >
-                  {insuranceLoading ? (
-                    <Skeleton.Input active size="large" />
-                  ) : (
-                    <Select
-                      showSearch
-                      placeholder="Select insurance name"
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option.children
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      onChange={(value, option) => {
-                        // Set both insuranceName and insuranceNo using form.setFieldsValue()
-                        form.setFieldsValue({
-                          insuranceName: option.children, // Set insurance name (option name)
-                          insuranceNo: value, // Set insurance number (option value)
-                        });
+          {paymentMethod === 1 && (
+            <Col span={12}>
+              <Form.Item
+                label="Select Insurance Name"
+                name="insuranceName" // Name for insurance name field
+                rules={[
+                  { required: true, message: "Please enter insurance name!" },
+                ]}
+              >
+                {insuranceLoading ? (
+                  <Skeleton.Input active size="large" />
+                ) : (
+                  <Select
+                    showSearch
+                    placeholder="Select insurance name"
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    onChange={(value, option) => {
+                      // Set both insuranceName and insuranceNo using form.setFieldsValue()
+                      form.setFieldsValue({
+                        insuranceName: option.children, // Set insurance name (option name)
+                        insuranceNo: value, // Set insurance number (option value)
+                      });
 
-                        console.log("Selected Insurance:", option.children);
-                        console.log("Selected Insurance No:", value);
-                      }}
-                    >
-                      {insurancePayload?.map((option) => (
-                        <Select.Option key={option.No} value={option.No}>
-                          {option.Name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  )}
-                </Form.Item>
+                      console.log("Selected Insurance:", option.children);
+                      console.log("Selected Insurance No:", value);
+                    }}
+                  >
+                    {insurancePayload?.map((option) => (
+                      <Select.Option key={option.No} value={option.No}>
+                        {option.Name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
 
-                <Form.Item
-                  label="Insurance No"
-                  name="insuranceNo" // Name for insurance number field
-                  rules={[
-                    { required: true, message: "Please select insurance!" },
-                  ]}
-                  style={{ display: "none" }}
-                >
-                  {/* Disabled input field to display the selected insurance number */}
-                  <Input disabled value={form.getFieldValue("insuranceNo")} />
-                </Form.Item>
-              </Col>
+              <Form.Item
+                label="Insurance No"
+                name="insuranceNo" // Name for insurance number field
+                rules={[
+                  { required: true, message: "Please select insurance!" },
+                ]}
+                style={{ display: "none" }}
+              >
+                {/* Disabled input field to display the selected insurance number */}
+                <Input disabled value={form.getFieldValue("insuranceNo")} />
+              </Form.Item>
+            </Col>
           )}
         </Row>
-        {paymentMethod === "1" && (
+        {paymentMethod === 1 && (
           <>
             <Row gutter={16}>
               <Col span={12}>
@@ -259,6 +275,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 <Form.Item
                   label="Is Patient Principal Member"
                   name="isPrincipleMember"
+                  valuePropName="checked"
                   rules={[
                     { required: true, message: "Please select an option!" },
                   ]}
@@ -270,8 +287,8 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
           </>
         )}
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={insuranceLoading}>
-            {insuranceLoading ? "Saving..." : "Save"}
+          <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
+            {loading ? "Saving..." : "Save"}
           </Button>
         </Form.Item>
       </Form>

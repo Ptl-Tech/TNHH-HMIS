@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
-export const SAVE_GENERAL_INFORMATION_REQUEST =
-  "SAVE_GENERAL_INFORMATION_REQUEST";
-export const SAVE_GENERAL_INFORMATION_SUCCESS =
-  "SAVE_GENERAL_INFORMATION_SUCCESS";
+export const SAVE_GENERAL_INFORMATION_REQUEST = "SAVE_GENERAL_INFORMATION_REQUEST";
+export const SAVE_GENERAL_INFORMATION_SUCCESS = "SAVE_GENERAL_INFORMATION_SUCCESS";
 export const SAVE_GENERAL_INFORMATION_FAIL = "SAVE_GENERAL_INFORMATION_FAIL";
 export const SAVE_GENERAL_INFORMATION_RESET = "SAVE_GENERAL_INFORMATION_RESET";
 
@@ -15,9 +13,7 @@ export const saveGeneralInformation = (formData, navigate) => async (dispatch, g
   try {
     dispatch({ type: SAVE_GENERAL_INFORMATION_REQUEST });
 
-    const {
-      otpVerify: { userInfo },
-    } = getState();
+    const { otpVerify: { userInfo } } = getState();
 
     if (!userInfo || !userInfo.userData) {
       navigate("/login"); // Redirect to login
@@ -46,15 +42,22 @@ export const saveGeneralInformation = (formData, navigate) => async (dispatch, g
       config
     );
 
-    dispatch({ type: SAVE_GENERAL_INFORMATION_SUCCESS, payload: response.data });
+    // Extract patient number safely
+    const patientNo = response.data.patientNo || response.data.patient?.patientNo || null;
 
-    return response.data;
+    if (!patientNo) {
+      throw new Error("Patient number not found in the response.");
+    }
+
+    dispatch({ type: SAVE_GENERAL_INFORMATION_SUCCESS, payload: { ...response.data, patientNo } });
+
+    return { patientNo }; // Return the patient number for further use
   } catch (error) {
     dispatch({
       type: SAVE_GENERAL_INFORMATION_FAIL,
       payload: error.response?.data?.errors || "An error occurred while saving.",
     });
 
-    throw new Error(error.response?.data?.errors || "An error occurred while saving.");
+    throw error;
   }
 };

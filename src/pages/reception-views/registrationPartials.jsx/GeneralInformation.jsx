@@ -1,16 +1,42 @@
 import React, { useEffect } from "react";
-import { Form, Input, Typography, Radio, DatePicker, Col, Row, Button, Alert, Spin } from "antd";
+import {
+  Form,
+  Input,
+  Typography,
+  Radio,
+  DatePicker,
+  Col,
+  Row,
+  Button,
+  Alert,
+  Spin,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { saveGeneralInformation } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
+import { getPatientByNo } from "../../../actions/patientActions";
+import { useState } from "react";
 
-const GeneralInformation = ({ patientDetails , onUpdate }) => {
+const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const { loading, success, error } = useSelector((state) => state.savegeneralInfo);
-  const { loadingPatientDetails, patientDetails: data } = useFetchPatientDetailsHook(patientDetails?.PatientNo);
+  const { loading, success, error, data } = useSelector(
+    (state) => state.savegeneralInfo
+  );
+  const { loading: loadingPatientDetails, patients: dataPatient } =
+    useSelector((state) => state.patientList) || {};
+  const [patientNo, setPatientNo] = useState("");
 
+
+  useEffect(() => {
+    if (success && data?.patientNo) {
+      setPatientNo(data.patientNo);
+      dispatch(getPatientByNo(data.patientNo)); // Fetch new patient details
+    }
+  }, [success, data, dispatch]);
+  
+  console.log(patientDetails);
   // Update form values when patientDetails change
   useEffect(() => {
     if (patientDetails) {
@@ -19,8 +45,15 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
         lastName: patientDetails?.LastName || "",
-        gender: patientDetails?.Gender === "Male" ? 1 : patientDetails?.Gender === "Female" ? 2 : values.gender === 1 ? "Male" : values.gender === 2 ? "Female" : "",
-        dob: patientDetails?.DateOfBirth ? moment(patientDetails.DateOfBirth) : null,
+        gender:
+          patientDetails?.Gender === "Male"
+            ? 1
+            : patientDetails?.Gender === "Female"
+            ? 2
+            : 0,
+        dateOfBirth: patientDetails.DateOfBirth
+          ? moment(patientDetails.DateOfBirth)
+          : null,
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
         nationality: patientDetails?.nationality || "",
@@ -30,7 +63,8 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
         nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
         insuranceNo: patientDetails?.insuranceNo || "",
         insuranceName: patientDetails?.insuranceName || "",
-        insurancePrinicipalMemberName: patientDetails?.insurancePrinicipalMemberName || "",
+        insurancePrinicipalMemberName:
+          patientDetails?.insurancePrinicipalMemberName || "",
         isPrincipleMember: patientDetails?.isPrincipleMember || false,
         membershipNo: patientDetails?.membershipNo || "",
         schemeName: patientDetails?.schemeName || "",
@@ -47,11 +81,23 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
-      firstName: values.firstName || patientDetails?.Surname?.split(" ")[0] || "",
+      firstName:
+        values.firstName || patientDetails?.Surname?.split(" ")[0] || "",
       middleName: values.middleName || patientDetails?.MiddleName || "",
       lastName: values.lastName || patientDetails?.LastName || "",
-      gender: values.gender || patientDetails?.Gender === "Male" ? 1 : patientDetails?.Gender === "Female" ? 2 : values.gender === 1 ? "Male" : values.gender === 2 ? "Female" : "",
-      dob: values.dob ? values.dob.format("YYYY-MM-DD") : "", // Ensure valid date format
+      gender:
+        values.gender || patientDetails?.Gender === "Male"
+          ? 1
+          : patientDetails?.Gender === "Female"
+          ? 2
+          : values.gender === 1
+          ? "Male"
+          : values.gender === 2
+          ? "Female"
+          : "",
+      dob: values.dob
+        ? values.dob.format("YYYY-MM-DD")
+        : patientDetails?.DateOfBirth || "",
       nationality: patientDetails?.nationality || "",
       county: patientDetails?.county || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
@@ -62,7 +108,8 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
       nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
       insuranceNo: patientDetails?.insuranceNo || "",
       insuranceName: patientDetails?.insuranceName || "",
-      insurancePrinicipalMemberName: patientDetails?.insurancePrinicipalMemberName || "",
+      insurancePrinicipalMemberName:
+        patientDetails?.insurancePrinicipalMemberName || "",
       isPrincipleMember: patientDetails?.isPrincipleMember || false,
       membershipNo: patientDetails?.membershipNo || "",
       schemeName: patientDetails?.schemeName || "",
@@ -72,12 +119,13 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
       residence: patientDetails?.residence || "",
       patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
     };
-  
-    dispatch(saveGeneralInformation(formattedData));
 
+    dispatch(saveGeneralInformation(formattedData));
+    console.log("response", response);
+    
     onUpdate(data);
   };
-  
+
   return (
     <div>
       <Typography.Title level={5} underline>
@@ -85,13 +133,33 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
       </Typography.Title>
 
       {/* Display alerts for errors and success messages */}
-      {error && <Alert message={error} type="error" showIcon closeText="Close" onClose={() => dispatch({ type: "CLEAR_ERROR" })} />}
-      {success && <Alert message="Information saved successfully!" type="success" showIcon closeText="Close" onClose={() => dispatch({ type: "CLEAR_SUCCESS" })} />}
+      {error && (
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          closeText="Close"
+          onClose={() => dispatch({ type: "CLEAR_ERROR" })}
+        />
+      )}
+      {success && (
+        <Alert
+          message="Information saved successfully!"
+          type="success"
+          showIcon
+          closeText="Close"
+          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
+        />
+      )}
 
       <Form layout="vertical" form={form} onFinish={handleSubmission}>
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="First Name" name="firstName" rules={[{ required: true, message: "Please enter first name" }]}>
+            <Form.Item
+              label="First Name"
+              name="firstName"
+              rules={[{ required: true, message: "Please enter first name" }]}
+            >
               <Input placeholder="Enter First Name" />
             </Form.Item>
           </Col>
@@ -101,14 +169,22 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Last Name" name="lastName" rules={[{ required: true, message: "Please enter last name" }]}>
+            <Form.Item
+              label="Last Name"
+              name="lastName"
+              rules={[{ required: true, message: "Please enter last name" }]}
+            >
               <Input placeholder="Enter Last Name" />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item label="Gender" name="gender" rules={[{ required: true, message: "Please select gender" }]}>
-          <Radio.Group>
+        <Form.Item
+          label="Gender"
+          name="gender"
+          rules={[{ required: true, message: "Please select gender" }]}
+        >
+          <Radio.Group style={{ width: "100%" }}>
             <Radio value="1">Male</Radio>
             <Radio value="2">Female</Radio>
             <Radio value="0">Other</Radio>
@@ -117,7 +193,13 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item label="Date of Birth" name="dob" rules={[{ required: true, message: "Please enter date of birth" }]}>
+            <Form.Item
+              label="Date of Birth"
+              name="dob"
+              rules={[
+                { required: true, message: "Please enter date of birth" },
+              ]}
+            >
               <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
             </Form.Item>
           </Col>
@@ -146,17 +228,21 @@ const GeneralInformation = ({ patientDetails , onUpdate }) => {
             </Form.Item>
           </Col>
         </Row>
-<Row>
-        <Col span={8}>
+        <Row>
+          <Col span={8}>
             <Form.Item label="Email" name="email">
               <Input placeholder="Enter Email" />
             </Form.Item>
           </Col>
-         
-</Row>
+        </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={loading}>
-            {loading ? <Spin /> : "Submit"}
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit"}
           </Button>
         </Form.Item>
       </Form>

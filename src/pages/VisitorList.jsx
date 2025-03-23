@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
 import { convertPatient, getpatientById } from "../actions/patientActions"; // Fetch patient details
-import { Table,  Skeleton, message } from "antd";
+import { Table,  Skeleton, message, Button } from "antd";
 import dayjs from "dayjs";
 import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
 import { useNavigate } from "react-router-dom";
@@ -111,18 +111,29 @@ const VisitorList = () => {
       dataIndex: "action",
       render: (_, record) => (
         <>
-          <a
+          <Button
+            type="link"
             onClick={() => {
               setSelectedVisitor(record);
               setConvertPatientModal(true);
             }}
           >
             Convert to Patient
-          </a>{" "}
-          | <a href={`/visitor/${record.No}`}>Register Walk In</a>
+          </Button>{" "}
+          |{" "}
+          <Button
+            type="link"
+            onClick={() =>
+              navigate(`/reception/Register-walkin`, { state: { visitorData: record } })
+            }
+          >
+            Register Walk In
+          </Button>
         </>
       ),
-    },
+    }
+    
+    
   ];
 
   return (

@@ -1,9 +1,10 @@
-import { Button, Col, Form, Input, Row, Select, Typography } from "antd"; 
+import { Button, Col, Form, Input, Row, Select, Typography } from "antd";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { marketingStrategies } from "../../../actions/DropdownListActions";
 import { saveMarketingInformation } from "../../../actions/reception-actions/save-patient-actions/saveMarketingInformation";
 import moment from "moment";
+import { getPatientByNo } from "../../../actions/patientActions";
 
 const MarketingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
     success: marketingStrategiesSuccess,
     data: marketingStrategiesPayload,
   } = useSelector((state) => state.marketingList);
+  const { loading:loadingPatientDetails, patients:data } = useSelector((state) => state.patientList) || {};
 
   useEffect(() => {
     form.setFieldsValue(patientDetails);
@@ -25,6 +27,14 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     dispatch(marketingStrategies());
   }, [success, form]);
+      useEffect(() => {
+        if (success && patientDetails?.PatientNo) {
+          dispatch(getPatientByNo(patientDetails?.PatientNo));
+        }
+    
+      }, [success, dispatch, patientDetails?.PatientNo]);
+    
+  
 
   useEffect(() => {
     if (patientDetails) {
@@ -45,26 +55,28 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
         nationality: patientDetails?.Nationality || "",
-        county: patientDetails?.County || "",
+        county: patientDetails?.PlaceofBirthDistrict || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
-        paymentMode: patientDetails?.PatientType || 0,
-        insuranceNo: patientDetails?.InsuranceNonsuranceNo || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+        paymentMode: patientDetails?.PatientType === "Corporate" ? 1 :
+        patientDetails?.PatientType === "Cash" ? 2 : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
         insuranceName: patientDetails?.InsuranceName || "",
         insurancePrinicipalMemberName:
           patientDetails?.PrincipalMemberName || "",
         isPrincipleMember: patientDetails?.Principal || false,
         membershipNo: patientDetails?.MembershipNo || "",
-        schemeName: patientDetails?.schemeName || "",
+        schemeName: patientDetails?.SchemeName || "",
         howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-        subcounty: patientDetails?.subcounty || "",
+        subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
-        residence: patientDetails?.residence || "",
+        residence: patientDetails?.PlaceofBirthVillage || "",
+        countyWard: patientDetails?.Ward || "",
         patientStatus: patientDetails?.patientStatus || 0,
       });
     }
   }, [patientDetails, form]);
+
 
   const handleSubmission = (values) => {
     const formattedData = {
@@ -82,31 +94,38 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
       dob: patientDetails?.DateOfBirth
         ? moment(patientDetails.DateOfBirth).format("YYYY-MM-DD")
         : "", // Ensure valid date format
-      nationality: patientDetails?.nationality || "",
-      county: patientDetails?.county || "",
-      idNumber: patientDetails.IDNumber || "",  // Accessing idNumber from the values
+      nationality: patientDetails?.Nationality || "",
+      county: patientDetails?.PlaceofBirthDistrict || "",
+      idNumber: patientDetails.IDNumber || "", // Accessing idNumber from the values
       phoneNumber: patientDetails?.TelephoneNo1 || "",
-      paymentMode: patientDetails?.PatientType || 0,
-      nextOfKinRelationship: patientDetails?.nextOfKinRelationship || "",
-      nextOfKinFullName: patientDetails?.nextOfKinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
+      paymentMode:
+        patientDetails?.PatientType === "Corporate"
+          ? 1
+          : patientDetails?.PatientType === "Cash"
+          ? 2
+          : patientDetails?.PatientType
+          ? patientDetails.PatientType
+          : 0,
+      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
+        nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
       insuranceNo: patientDetails?.InsuranceNo || "",
       insuranceName: patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName:
-        patientDetails?.PrincipalMemberName || "",
+      insurancePrinicipalMemberName: patientDetails?.PrincipalMemberName || "",
       isPrincipleMember: patientDetails?.Principal || false,
       membershipNo: patientDetails?.MembershipNo || "",
       schemeName: patientDetails?.SchemeName || "",
-      howYouKnewABoutUs: values.howYouKnewABoutUs || patientDetails?.HowyouKnewAboutUs || "",
-      subcounty: patientDetails?.subcounty || "",
+      howYouKnewABoutUs:
+        values.howYouKnewABoutUs || patientDetails?.HowyouKnewAboutUs || "",
+      subcounty: patientDetails?.SubCountyName || "",
       email: patientDetails?.Email || "",
-      residence: patientDetails?.residence || "",
+      residence: patientDetails?.PlaceofBirthVillage || "",
       patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
     };
 
     // Dispatch to save or update patient data
     dispatch(saveMarketingInformation(formattedData));
-    onUpdate(formattedData);
+    onUpdate(data);
   };
 
   return (
@@ -115,7 +134,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
         Marketing Information
       </Typography.Title>
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
-        <Row gutter={16}>
+        {/* <Row gutter={16}>
           <Col span={12}>
             <Form.Item
               label="Email"
@@ -134,7 +153,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
               <Input type="email" />
             </Form.Item>
           </Col>
-        </Row>
+        </Row> */}
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -147,14 +166,13 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
                 },
               ]}
             >
-              <Select 
+              <Select
                 showSearch
                 placeholder="Select a marketing strategy"
                 optionFilterProp="children"
                 filterOption={(input, option) =>
-                  option.children
-                    .toLowerCase()
-                    .indexOf(input.toLowerCase()) >= 0
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
                 }
               >
                 {marketingStrategiesPayload &&
@@ -168,7 +186,12 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save"}
           </Button>
         </Form.Item>

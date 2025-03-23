@@ -23,7 +23,7 @@ export const saveAddressInformationReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         success: false,
-        error: action.payload,
+        error: action.payload || "An unexpected error occurred.",
       };
     case SAVE_ADDRESS_INFORMATION_RESET:
       return initialState;

@@ -86,9 +86,9 @@ const filterPatients = (params) => {
   const { SearchName, patientId, patientNo } = params;
   const filtered = patientsToFilter.filter((patient) => {
     return (
-      (!SearchName || patient.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
-      (!patientId || patient.IDNumber.includes(patientId)) &&
-      (!patientNo || patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase()))
+      (!SearchName || patient?.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
+      (!patientId || patient?.IDNumber.includes(patientId)) &&
+      (!patientNo || patient?.PatientNo.toLowerCase().includes(patientNo.toLowerCase()))
     );
   });
   setFilteredPatients(filtered);
@@ -135,10 +135,10 @@ const filterPatients = (params) => {
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
           {role === "Reception" ? (
-            record.Activated ? (
-              <Tooltip title="View Details">
+           <>
+           <Tooltip title="View Details">
                 <Button
-                  type="primary"
+                  type="link"
                   icon={<EyeOutlined />}
                   onClick={() =>
                     navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
@@ -148,12 +148,9 @@ const filterPatients = (params) => {
                 >
                   View Details
                 </Button>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Create Visit">
-                <Button
+              <Button
                   icon={<PlusOutlined />}
-                  type="primary"
+                  type="link"
                   onClick={() =>
                     navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
                       state: { existingPatient: record, previousPath: location.pathname },
@@ -161,9 +158,8 @@ const filterPatients = (params) => {
                   }
                 >
                   Create Visit
-                </Button>
-              </Tooltip>
-            )
+                </Button>   </Tooltip>
+           </>
           ) : role === "Nurse" ? (
             <Tooltip title="Admit Patient">
               <Button

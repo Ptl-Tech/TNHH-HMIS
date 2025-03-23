@@ -71,7 +71,6 @@ export const listCountries = () => async (dispatch, getState) => {
 
     dispatch({ type: COUNTRIES_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: COUNTRIES_LIST_FAIL, payload: error.message });
   }
@@ -103,7 +102,6 @@ export const listCounties = () => async (dispatch, getState) => {
 
     dispatch({ type: COUNTIES_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: COUNTIES_LIST_FAIL, payload: error.message });
   }
@@ -135,7 +133,6 @@ export const listSubCounties = () => async (dispatch, getState) => {
 
     dispatch({ type: SUB_COUNTIES_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: SUB_COUNTIES_LIST_FAIL, payload: error.message });
   }
@@ -154,7 +151,6 @@ export const listSubCountyWards = () => async (dispatch, getState) => {
 
     dispatch({ type: SUB_COUNTY_WARDS_LIST_SUCCESS, payload: data });
 
-    console.log("WARDS data: ", data);
   } catch (error) {
     dispatch({ type: SUB_COUNTY_WARDS_LIST_FAIL, payload: error.message });
   }
