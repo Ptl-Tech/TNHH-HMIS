@@ -216,7 +216,6 @@ export const listKinsRelationships = () => async (dispatch, getState) => {
 
     dispatch({ type: KINS_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: KINS_LIST_FAIL, payload: error.message });
   }

@@ -55,6 +55,11 @@ export const DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL =
 export const DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET =
   'DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET';
 
+  export const PATIENT_BY_ID_REQUEST = 'PATIENT_BY_ID_REQUEST'; 
+  export const PATIENT_BY_ID_SUCCESS = 'PATIENT_BY_ID_SUCCESS';
+  export const PATIENT_BY_ID_FAIL = 'PATIENT_BY_ID_FAIL';
+  export const PATIENT_BY_ID_RESET = 'PATIENT_BY_ID_RESET';
+
 import { message } from 'antd';
 import useAuth from '../hooks/useAuth';
 
@@ -500,7 +505,7 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
 
     //  // Extract response details
     const responseData = data.patientNo;
-
+console.log(responseData);
     dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: responseData });
     //message with success message and observationNo
     return responseData;
@@ -544,6 +549,49 @@ export const activePatients = () => async (dispatch, getState) => {
   }
 };
 
+
+
+export const getpatientById = (idNumber) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: PATIENT_BY_ID_REQUEST });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+
+    if (!userInfo || !userInfo.userData) {
+      throw new Error("User information not available.");
+    }
+
+    const branchCode = localStorage.getItem("branchCode") || "";
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
+
+    const { data } = await axios.get(
+      `${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=IDNumber eq '${idNumber}'`,
+      config
+    );
+
+    if (data && Object.keys(data).length > 0) {
+      dispatch({ type: PATIENT_BY_ID_SUCCESS, payload: data });
+      return data;
+    } else {
+      dispatch({ type: PATIENT_BY_ID_FAIL, payload: "Registered visitor not found" });
+      return null;
+    }
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "An error occurred while fetching visitor data.";
+    dispatch({ type: PATIENT_BY_ID_FAIL, payload: errorMessage });
+    return null;
+  }
+};
 export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: PATIENT_LIST_REQUEST });
