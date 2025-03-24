@@ -40,6 +40,7 @@ const LabResults = () => {
   const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+  console.log('admission number', admissionNo)
 
 
   const dispatch = useDispatch();
@@ -89,7 +90,7 @@ const LabResults = () => {
   const handleLabRequest = async () => {
     //fetch treatmentNo from the URL
     try {
-      const response = await dispatch(requestLabTest(treatmentNo));
+      const response = await dispatch(requestLabTest(treatmentNo ?? admissionNo));
       if (response) {
         message.success(
           `Requesting test for Laboratory No: ${response.laboratoryNo}`

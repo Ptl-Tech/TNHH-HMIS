@@ -18,6 +18,8 @@ const PastDoctorVisit = () => {
     const [showList, setShowList] = useState(false);
     const [filteredPatients, setFilteredPatients] = useState([]);
 
+    console.log('filtared patients', filteredPatients)
+
     const [searchParams, setSearchParams] = useState({
         SearchName: "",
         visitNo: "",
@@ -37,15 +39,15 @@ const PastDoctorVisit = () => {
 
     const handleNavigate = (record) => {
         if(userDetails.userData.departmentName === 'Nurse'){
-         navigate(`/Nurse/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+         navigate(`/Nurse/Past-doctor-visit/Patient?PatientNo=${record?.PatientNo}`, {
            state: { patientDetails: record },
          });
         }else if(userDetails.userData.departmentName === 'Doctor'){
-            navigate(`/Doctor/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+            navigate(`/Doctor/Past-doctor-visit/Patient?PatientNo=${record?.PatientNo}`, {
                 state: { patientDetails: record },
             });
         }else{
-            navigate(`/Psychology/Past-doctor-visit/Patient?TreatmentNo=${record?.TreatmentNo}`, {
+            navigate(`/Psychology/Past-doctor-visit/Patient?PatientNo=${record?.PatientNo}`, {
                 state: { patientDetails: record },
             });
         }
@@ -58,11 +60,6 @@ const PastDoctorVisit = () => {
         key: 'key',
         render: (_, __, index) => index + 1,
       },
-        {
-            title: 'Treatment No',
-            dataIndex: 'TreatmentNo',
-            key: 'TreatmentNo',
-        },
         {
             title: 'Patient No',
             dataIndex: 'PatientNo',
@@ -79,90 +76,102 @@ const PastDoctorVisit = () => {
                 }
         },
         {
-            title: 'Treatment Type',
-            dataIndex: 'TreatmentType',
-            key: 'TreatmentType',
+            title: 'Date of Birth',
+            dataIndex: 'DateOfBirth',
+            key: 'DateOfBirth',
            
         },
         {
-            title: 'Doctor',
-            dataIndex: 'DoctorsName',
-            key: 'DoctorsName',
+            title: 'ID Number',
+            dataIndex: 'IDNumber',
+            key: 'IDNumber',
         },
         {
-            title: 'Clinic',
-            dataIndex: 'Clinic',
-            key: 'Clinic',
+            title: 'File No',
+            dataIndex: 'FileNo',
+            key: 'FileNo',
+        },
+        {
+          title: 'Telephone',
+          dataIndex: 'TelephoneNo1',
+          key: 'TelephoneNo1',
         },
         {
             title: 'Date',
-            dataIndex: 'TreatmentDate',
-            key: 'TreatmentDate',
+            dataIndex: 'DateRegistered',
+            key: 'DateRegistered',
             sorter: (a, b) => new Date(a.TreatmentDate) - new Date(b.TreatmentDate), // Compare the dates
             render: (date) => new Date(date).toLocaleDateString(), // Format the date display (optional)
         }
     ];
     
 
-    const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
-    const { triageWaitingList } = useSelector(state => state.getTriageWaitingList);
+    // const { loadingConsultationRoomList, consultationRoomList } = useSelector(state => state.getConsultationRoom);
+    const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
     const { data } = useSelector(state => state.getDoctorsList);
 
+    console.log('patient list', triageWaitingList)
+
     const dispatch = useDispatch();
-    
-    const filteredConsultationRooms = useMemo(
-        () => consultationRoomList.filter(room => room?.Status === 'Completed'),
-        [consultationRoomList]
-    );
-    
-    const formattedTriageWaitingList = useMemo(() => {
-        return triageWaitingList?.map(patient => ({
-            PatientNo: patient?.PatientNo,
-            SearchName: patient?.SearchName,
-        }));
-    }, [triageWaitingList]);
-    
-    const formattedDoctorDetails = useMemo(() => {
-        return data?.map(doctor => ({
-            DoctorID: doctor?.DoctorID,
-            DoctorsName: doctor?.DoctorsName,
-        }));
-    }, [data]);
 
-    const combinedList = useMemo(() => {
-        return filteredConsultationRooms?.map(room => {
-            const matchingPatient = formattedTriageWaitingList?.find(patient => patient?.PatientNo === room?.PatientNo);
-            return {
-                ...room,
-                PatientNo: room?.PatientNo,
-                SearchName: matchingPatient ? matchingPatient?.SearchName : null,
-            };
-        });
-    }, [filteredConsultationRooms, formattedTriageWaitingList]);
     
-    const combinedListWithDoctors = useMemo(() => {
-        return combinedList?.map(item => {
-            const matchingDoctor = formattedDoctorDetails?.find(doctor => doctor?.DoctorID === item?.DoctorID);
-            return {
-                ...item,
-                DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
-            };
-        });
-    }, [combinedList, formattedDoctorDetails]);
+    // const filteredConsultationRooms = useMemo(
+    //     () => consultationRoomList.filter(room => room?.Status === 'Completed'),
+    //     [consultationRoomList]
+    // );
+    
+    // const formattedTriageWaitingList = useMemo(() => {
+    //     return triageWaitingList?.map(patient => ({
+    //         PatientNo: patient?.PatientNo,
+    //         SearchName: patient?.SearchName,
+    //     }));
+    // }, [triageWaitingList]);
+    
+    // const formattedDoctorDetails = useMemo(() => {
+    //     return data?.map(doctor => ({
+    //         DoctorID: doctor?.DoctorID,
+    //         DoctorsName: doctor?.DoctorsName,
+    //     }));
+    // }, [data]);
 
-    const filterPatients = (params) => {
+    // const combinedList = useMemo(() => {
+    //     return filteredConsultationRooms?.map(room => {
+    //         const matchingPatient = formattedTriageWaitingList?.find(patient => patient?.PatientNo === room?.PatientNo);
+    //         return {
+    //             ...room,
+    //             PatientNo: room?.PatientNo,
+    //             SearchName: matchingPatient ? matchingPatient?.SearchName : null,
+    //         };
+    //     });
+    // }, [filteredConsultationRooms, formattedTriageWaitingList]);
+    
+    // const combinedListWithDoctors = useMemo(() => {
+    //     return combinedList?.map(item => {
+    //         const matchingDoctor = formattedDoctorDetails?.find(doctor => doctor?.DoctorID === item?.DoctorID);
+    //         return {
+    //             ...item,
+    //             DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
+    //         };
+    //     });
+    // }, [combinedList, formattedDoctorDetails]);
+
+    const filterPatients = useMemo(() => {
+      return (params) => {
         const { SearchName, visitNo, patientNo } = params;
-        const filtered = combinedListWithDoctors.filter((patient) => {
+        
+        const filtered = triageWaitingList.filter((patient) => {
           return (
             patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
-            patient.TreatmentNo.toLowerCase().includes(visitNo.toLowerCase()) &&
-            patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase())
+            patient.PatientNo.toLowerCase().includes(visitNo.toLowerCase()) &&
+            patient.IDNumber.toLowerCase().includes(patientNo.toLowerCase())
           );
         });
+    
         setFilteredPatients(filtered);
       };
+    }, [triageWaitingList]);
 
-    const { pagination, handleTableChange } = useSetTablePagination(combinedListWithDoctors);
+    const { pagination, handleTableChange } = useSetTablePagination(filterPatients);
 
     
 
@@ -212,7 +221,7 @@ return (
           <Col span={8}>
             <Input.Search
               size="large"
-              placeholder="Visit No"
+              placeholder="ID Number"
               value={searchParams.visitNo}
               onChange={(e) => handleSearchChange(e, "visitNo")}
               allowClear
@@ -238,7 +247,7 @@ return (
         // rowSelection={rowSelection}
         rowKey={(record) => record.TreatmentNo}
         scroll={{ x: 'max-content' }}
-        loading={loadingConsultationRoomList}
+        loading={loadingWaitingList}
         dataSource={filteredPatients} 
         className="admit-patient-table"
         bordered size='middle' 
