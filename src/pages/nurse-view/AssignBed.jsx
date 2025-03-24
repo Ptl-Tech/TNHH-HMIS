@@ -2,7 +2,6 @@ import { useLocation } from "react-router-dom";
 import { useGetWardManagementHook } from "../../hooks/useGetWardManagementHook";
 import { useEffect, useState } from "react";
 import { Space, Typography, Row, Col, List } from "antd";
-import Loading from "../../partials/nurse-partials/Loading";
 import FilterWardManagement from "../../partials/nurse-partials/FilterWardManagement";
 import WardManagementTable from "./tables/nurse-tables/WardManagementTable";
 import { InsertRowLeftOutlined } from "@ant-design/icons";
@@ -106,10 +105,8 @@ const AssignBed = ({
             )
         }
          
-          {loadingRooms ? (
-            <Loading />
-          ) : (
             <List
+              loading={loadingRooms}
               style={{ cursor: "pointer" }}
               dataSource={filteredRooms.map((room) => ({
                 value: room.Room_No, // The unique identifier for the room
@@ -150,10 +147,13 @@ const AssignBed = ({
               )}
               bordered
             />
-          )}
         </Col>
         <Col xs={24} md={24} lg={16} style={{ overflowX: "hidden" }}>
-          <Typography.Title level={5} style={{ paddingBottom: '10px' }}>Room Beds</Typography.Title>
+        {selectedRoom && selectedWard ? (
+            <Typography.Title level={5} style={{ paddingBottom: '10px' }}>Beds Available {selectedWard} Ward, Room {selectedRoom}</Typography.Title>
+          ) : (
+            <Typography.Title level={5} style={{ paddingBottom: '10px' }}>Ward Rooms</Typography.Title>
+          )}
           <WardManagementTable
             rowSelection={rowSelection}
             filteredBeds={filteredBeds}

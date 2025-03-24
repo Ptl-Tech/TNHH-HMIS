@@ -52,6 +52,7 @@ const BedsDrawer = ({ open, onClose, size, record, setOpen }) => {
 
         if (status === "success") {
           message.success(msg || "Successfully saved new bed transfer details");
+          dispatch(getQyBedTransferLines(admissionNo));
           setActiveBedTab("2");
         } else {
           message.error(msg || "Failed to save bed transfer details");

@@ -3,20 +3,16 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { SaveOutlined } from "@ant-design/icons";
 import {
+  getQyBedTransferLines,
   postSaveBedTransferLineSlice,
 } from "../../../../actions/nurse-actions/postReleaseBedSlice";
-import { useSelector } from "react-redux";
 
 const BedTransferLinesTable = ({
   bedTransferLines,
   loadingQyBedTransferLines,
   patientNo,
-  dispatch,
-  setOpen
+  dispatch
 }) => {
-  const { loading: loadingPostTransferBed } = useSelector(
-    (state) => state.postSaveBedTransfer
-  );
   const handleBedTransfer = async (record) => {
     const bedTransferData = {
       myAction: "create",
@@ -33,10 +29,11 @@ const BedTransferLinesTable = ({
           success: msg || "Bed transfer successful",
           failed: msg || "Failed to transfer patient",
         };
-        setOpen(false);
+    
         message[status === "success" ? "success" : "error"](
           messages[status] || "Unexpected error, please try again"
         );
+        dispatch(getQyBedTransferLines(record?.AdmissionNo));
       }
     );
   };
@@ -86,10 +83,14 @@ const BedTransferLinesTable = ({
           <Button
             type="primary"
             icon={<SaveOutlined />}
-            disabled={loadingPostTransferBed}
+            disabled={record?.Posted} 
             onClick={() => handleBedTransfer(record)}
           >
-            Transfer Bed
+            {
+              record?.Posted
+                ? "Transfer Successful"
+                : "Transfer Bed"
+            }
           </Button>
         );
       },
@@ -147,5 +148,4 @@ BedTransferLinesTable.propTypes = {
   loadingQyBedTransferLines: PropTypes.bool,
   patientNo: PropTypes.string,
   dispatch: PropTypes.func,
-  setOpen: PropTypes.bool
 };

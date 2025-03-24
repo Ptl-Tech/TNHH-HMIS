@@ -8,7 +8,6 @@ import {
   Button,
   Col,
   Form,
-  Input,
   message,
   Row,
   Select,
@@ -26,6 +25,7 @@ const JacksonVisualFormData = ({
   setIsFormVisible,
   loadingJackson,
 }) => {
+  console.log('patient details', patientDetails)
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const handleOnFinish = async (values) => {
@@ -43,7 +43,6 @@ const JacksonVisualFormData = ({
 
       // Dispatch function to handle API call and feedback
       const dispatchJacksonVisualFormData = async (data) => {
-        console.log("Jackson visual data", data);
         await dispatch(
           postJacksonVisualFormSlice("/InpatientForms/JacksonVisualForm", data)
         )

@@ -76,8 +76,8 @@ const ActiveOutPatients = () => {
 
   useEffect(() => {
     if (visitData && billingData) {
-      const formattedBillingList = visitData.map((patient) => {
-        const matchingPatient = billingData.find(
+      const formattedBillingList = visitData?.map((patient) => {
+        const matchingPatient = billingData?.find(
           (p) => p.PatientNo === patient.PatientNo
         );
         return {
@@ -117,11 +117,11 @@ const ActiveOutPatients = () => {
     const filteredCash = cashPatients.filter(
       (patient) =>
         (!updatedSearchParams.SearchNames ||
-          patient.Names.toLowerCase().includes(
+          patient.Names?.toLowerCase().includes(
             updatedSearchParams.SearchNames
           )) &&
         (!updatedSearchParams.AppointmentNo ||
-          patient.AppointmentNo.toLowerCase().includes(
+          patient.AppointmentNo?.toLowerCase().includes(
             updatedSearchParams.AppointmentNo
           ))
     );
@@ -129,11 +129,11 @@ const ActiveOutPatients = () => {
     const filteredCorporate = corporatePatients.filter(
       (patient) =>
         (!updatedSearchParams.SearchNames ||
-          patient.Names.toLowerCase().includes(
+          patient.Names?.toLowerCase().includes(
             updatedSearchParams.SearchNames
           )) &&
         (!updatedSearchParams.AppointmentNo ||
-          patient.AppointmentNo.toLowerCase().includes(
+          patient.AppointmentNo?.toLowerCase().includes(
             updatedSearchParams.AppointmentNo
           ))
     );

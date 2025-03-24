@@ -36,7 +36,7 @@ const LabResults = () => {
   const location = useLocation();
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo" || "AdmNo");
+  const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
@@ -88,7 +88,6 @@ const LabResults = () => {
 
   const handleLabRequest = async () => {
     //fetch treatmentNo from the URL
-    const treatmentNo= admissionNo ?? treatmentNo;
     try {
       const response = await dispatch(requestLabTest(treatmentNo));
       if (response) {
