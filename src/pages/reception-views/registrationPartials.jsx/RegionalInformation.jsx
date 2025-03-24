@@ -66,7 +66,8 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
-
+const initialCountry = patientDetails?.Nationality === "Kenya" ? "KE" : "";
+setSelectedCountry(initialCountry);
       const genderValue =
         patientDetails?.Gender === "Female"
           ? 2
@@ -261,7 +262,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Select Nationality" name="nationality">
+            <Form.Item label="Select Nationality" name="nationality" rules={[{ required: true, message: 'Please select a nationality' }]}>
               {loadingCountries ? (
                 <Skeleton.Input active size="small" style={{ width: "100%" }} />
               ) : (
@@ -292,7 +293,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
             </Form.Item>
           </Col>
 
-          {selectedCountry === "KE" && (
+          {selectedCountry === "KE"  || selectedCountry === "Kenya" && (
             <>
               <Col span={12}>
                 <Form.Item label="Select County" name="county">
@@ -378,7 +379,9 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
         {/* Residence field (visible regardless of nationality) */}
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Residence" name="residence">
+            <Form.Item label="Residence" name="residence"  rules={[
+                { required: true, message: "Residence is required!" },
+              ]}>
               <Input placeholder="Residence" />
             </Form.Item>
           </Col>

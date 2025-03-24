@@ -50,6 +50,11 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
+      const initialPaymentMode =
+      patientDetails?.PatientType === "Corporate" ? 1 :
+      patientDetails?.PatientType === "Cash" ? 2 : null;
+      
+    setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",

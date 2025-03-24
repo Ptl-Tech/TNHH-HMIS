@@ -34,13 +34,17 @@ const OutpatientList = () => {
 
   // get patient whose ActiveVisitNo ="" and CurrentAdmNo = ""
   const patientsToFilter = useMemo(() => {
-    const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
+    if (!patients || (Array.isArray(patients) && patients.length === 0)) {
+      return []; // Ensure it's always an array
+    }
   
+    const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
+    
     return role === "Nurse"
       ? patientsArray.filter((patient) => patient?.ActiveVisitNo === "" && patient?.CurrentAdmNo === "")
       : patientsArray;
   }, [role, patients]);
-
+  
 
   const [searchParams, setSearchParams] = useState({
     SearchName: '',
@@ -82,17 +86,22 @@ const OutpatientList = () => {
     });
   };
 
-const filterPatients = (params) => {
-  const { SearchName, patientId, patientNo } = params;
-  const filtered = patientsToFilter.filter((patient) => {
-    return (
-      (!SearchName || patient?.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
-      (!patientId || patient?.IDNumber.includes(patientId)) &&
-      (!patientNo || patient?.PatientNo.toLowerCase().includes(patientNo.toLowerCase()))
-    );
-  });
-  setFilteredPatients(filtered);
-};
+  const filterPatients = (params) => {
+    const { SearchName, patientId, patientNo } = params;
+    
+    if (!Array.isArray(patientsToFilter)) return; // Ensure no filter on undefined data
+  
+    const filtered = patientsToFilter.filter((patient) => {
+      return (
+        (!SearchName || (patient?.SearchName && patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()))) &&
+        (!patientId || (patient?.IDNumber && patient.IDNumber.includes(patientId))) &&
+        (!patientNo || (patient?.PatientNo && patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase())))
+      );
+    });
+  
+    setFilteredPatients(filtered);
+  };
+  
 
   const columns = [
     {

@@ -27,7 +27,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const { loading: loadingPatientDetails, patients: dataPatient } =
     useSelector((state) => state.patientList) || {};
   const [patientNo, setPatientNo] = useState("");
-
+  const [isEditingDOB, setIsEditingDOB] = useState(false);
 
   useEffect(() => {
     if (success && data?.patientNo) {
@@ -35,7 +35,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       dispatch(getPatientByNo(data.patientNo)); // Fetch new patient details
     }
   }, [success, data, dispatch]);
-  
+
   console.log(patientDetails);
   // Update form values when patientDetails change
   useEffect(() => {
@@ -95,8 +95,8 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           : values.gender === 2
           ? "Female"
           : "",
-      dob: values.dob
-        ? values.dob.format("YYYY-MM-DD")
+      dob: values.dateOfBirth
+        ? values.dateOfBirth.format("YYYY-MM-DD")
         : patientDetails?.DateOfBirth || "",
       nationality: patientDetails?.nationality || "",
       county: patientDetails?.county || "",
@@ -121,8 +121,8 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     };
 
     dispatch(saveGeneralInformation(formattedData));
-    console.log("response", response);
-    
+    console.log("response", formattedData.dob);
+
     onUpdate(data);
   };
 
@@ -185,9 +185,9 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           rules={[{ required: true, message: "Please select gender" }]}
         >
           <Radio.Group style={{ width: "100%" }}>
-            <Radio value="1">Male</Radio>
-            <Radio value="2">Female</Radio>
-            <Radio value="0">Other</Radio>
+            <Radio value={1}>Male</Radio>
+            <Radio value={2}>Female</Radio>
+            <Radio value={0}>Other</Radio>
           </Radio.Group>
         </Form.Item>
 
@@ -195,12 +195,28 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           <Col span={8}>
             <Form.Item
               label="Date of Birth"
-              name="dob"
+              name="dateOfBirth"
               rules={[
                 { required: true, message: "Please enter date of birth" },
               ]}
             >
-              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD" />
+              {isEditingDOB ? (
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD"
+                  onChange={() => setIsEditingDOB(false)}
+                />
+              ) : (
+                <Input
+                  value={
+                    form.getFieldValue("dateOfBirth")
+                      ? moment(form.getFieldValue("dateOfBirth")).format("dd/MM/yyyy")
+                      : ""
+                  }
+                  onClick={() => setIsEditingDOB(true)}
+                  readOnly
+                />
+              )}
             </Form.Item>
           </Col>
           <Col span={8}>
