@@ -56,7 +56,7 @@ const CashPatients = () => {
 
   useEffect(() => {
     if (billingData && billingData.length > 0) {
-      const cash = billingData.filter(
+      const cash = billingData?.filter(
         (patient) =>
           patient.PatientType === "Cash" &&
           patient.Activated &&

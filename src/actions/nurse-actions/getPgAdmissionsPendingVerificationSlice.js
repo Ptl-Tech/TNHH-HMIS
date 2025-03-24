@@ -13,7 +13,7 @@ export const getPgAdmissionsPendingVerificationSlice = () =>
     try {
         dispatch({ type: GET_PG_ADMISSIONS_PENDING_VERIFICATION_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgAdmissionsPendingVerification&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgNewAdmissionRequests&isList=true`, config);
     
 
         dispatch({ type: GET_PG_ADMISSIONS_PENDING_VERIFICATION_SUCCESS, payload: data });

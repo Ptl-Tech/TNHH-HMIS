@@ -27,7 +27,10 @@ const initialState = {
 const store = configureStore({
   reducer: rootReducer,
   preloadedState: initialState,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    immutableCheck: false,
+    serializableCheck: false
+  }).concat(thunk),
   devTools: true,
 });
 
