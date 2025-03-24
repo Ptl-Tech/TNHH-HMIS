@@ -48,7 +48,6 @@ import {
   visitorCreateReducer,
   visitorListReducer,
 } from './visitorsReducer';
-import { updateTriageListVitalsReducer } from './triage-reducers/updateTriageListVitalsReducer';
 import { getTriageListReducer } from './triage-reducers/getTriageListReducer';
 
 // Triage reducers
@@ -94,7 +93,6 @@ import {
   viewPatientRadiologyReducer,
 } from './doc-reducers/radiologyRequestReducer';
 import { postDiagnosisReducer } from './doc-reducers/diagnosisRequestReducer';
-import { saveAdmissionDetails } from '../actions/Doc-actions/postAdmissionRequest';
 import {
   requestAdmissionReducer,
   saveAdmissionDetailsReducer,
@@ -133,7 +131,6 @@ import {
 } from './doc-reducers/Admission/getDischargeListReducer';
 import { getPendingAdmissionListReducer } from './doc-reducers/Admission/getPendingAdmissionListReducer';
 import {
-  postInitiateInpatientDischargeReducer,
   postInpatientDischargeReducer,
 } from './doc-reducers/Admission/postInpatientDischarge';
 import { getAdmissionLinesReducer } from './doc-reducers/Admission/getAdmissionLinesReducer';
@@ -205,12 +202,10 @@ import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
 import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
 import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
-import { getInPatientQyPrescriptionLines, getQyPrescriptionLinesReducer } from "./doc-reducers/QyPrescriptionLinesReducer";
+import { getInPatientQyPrescriptionLines, getQyPrescriptionLinesReducer, getTreatmentSheetLines, postTreatmentSheetLines } from "./doc-reducers/QyPrescriptionLinesReducer";
 import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest, getPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
-import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
-import { dispatchWalkInLab } from "../actions/patientActions";
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
@@ -452,6 +447,8 @@ export const rootReducer = combineReducers({
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,
+  postTreatmentSheet: postTreatmentSheetLines,
+  getTreatmentSheet: getTreatmentSheetLines,
   getInPatientPrescriptionLine:getInPatientQyPrescriptionLines,
   postPatientETC: postPatientECTRequest,
   getPatientETC: getPatientECTRequest,

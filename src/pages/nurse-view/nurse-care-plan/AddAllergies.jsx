@@ -20,7 +20,6 @@ const AddAllergies = () => {
     useSelector((state) => state.getAllergiesAndMedications);
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
 
-  console.log("allegies medications", allergiesMedication);
   const handleCancel = () => {
     setIsModalOpen(false);
   };

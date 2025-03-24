@@ -131,6 +131,7 @@ function App() {
           <Route path="Admit-patient/Charges" element={<PatientCharges />} />
           <Route path="Ward-management" element={<WardManagement />} />
           <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
+          <Route path="Discharge-list" element={<DischargeList />} />
           <Route
             path="Ward-management/Transfer-bed"
             element={<TransferBed />}
