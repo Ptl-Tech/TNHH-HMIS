@@ -36,7 +36,6 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     }
   }, [success, data, dispatch]);
 
-  console.log(patientDetails);
   // Update form values when patientDetails change
   useEffect(() => {
     if (patientDetails) {
@@ -52,7 +51,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             ? 2
             : 0,
         dateOfBirth: patientDetails.DateOfBirth
-          ? moment(patientDetails.DateOfBirth)
+          ? moment(patientDetails.DateOfBirth, "YYYY-MM-DD")
           : null,
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
@@ -121,7 +120,6 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     };
 
     dispatch(saveGeneralInformation(formattedData));
-    console.log("response", formattedData.dob);
 
     onUpdate(data);
   };
@@ -144,7 +142,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       )}
       {success && (
         <Alert
-          message="Information saved successfully!"
+          message={success || "Data saved successfully"}
           type="success"
           showIcon
           closeText="Close"
