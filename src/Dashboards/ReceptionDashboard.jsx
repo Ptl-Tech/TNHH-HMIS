@@ -1,30 +1,55 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  UserOutlined,
-  HourglassOutlined,
-  SafetyOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
-import { listPatients } from "../actions/patientActions";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@ant-design/icons'; 
+import { FaUser } from "react-icons/fa6";
 import { getVisitorsList } from "../actions/visitorsActions";
+
+import { appmntList, listPatients } from "../actions/patientActions";
 import DashboardCard from "../pages/nurse-view/DashboardCard";
 import DashboardStatistics from "../pages/nurse-view/DashboardStatistics";
 import useAuth from "../hooks/useAuth";
 import { getPgAdmissionsPendingVerificationSlice } from "../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice";
 
 const ReceptionDashboard = () => {
-  const dispatch = useDispatch();
-  const userDetails = useAuth();
-  const today = moment().format("YYYY-MM-DD");
+  const { visitors } = useSelector(
+    (state) => state.visitorsList
+  );
 
-  const { visitors } = useSelector((state) => state.visitorsList);
-  const { loading, patients } = useSelector((state) => state.patientList);
-  const { loadingPendingAdmissionVerification, pendingAdmissionVerification } =
-    useSelector((state) => state.getPgAdmissionsPendingVerification);
+  const { patients: appointments } = useSelector((state) => state.appmntList);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize useNavigate
+
+
+  const [activeAppmnts, setActiveAppmnts] = useState(0);
 
   useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+    const filteredAppointments = appointments.filter((appointment) => {
+      const appointmentDate = new Date(appointment.AppointmentDate).toISOString().split("T")[0];
+      return appointmentDate === today && appointment.Status === "New"; // Filter by today's date and status "new"
+    });
+    setActiveAppmnts(filteredAppointments.length); // Set the count of active appointments
+  }, [appointments]);
+
+  // Calculate today's date
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+  // Filter visitors based on today's date and status "Entered"
+  useEffect(() => {
+    if (visitors && visitors.length > 0) {
+      const currentVisitors = visitors.filter(visitor => {
+        const visitorDate = new Date(visitor.CreatedDate).toISOString().split('T')[0];
+        return visitorDate === today && visitor.Status === "Entered"; // Filter visitors by today's date and status "Entered"
+      });
+
+      setCurrentVisitorsCount(currentVisitors.length);
+    }
+  }, [visitors, today]);
+
+  useEffect(() => {
+    dispatch(appmntList());
     dispatch(listPatients());
     dispatch(getVisitorsList());
     dispatch(getPgAdmissionsPendingVerificationSlice());
@@ -38,77 +63,94 @@ const ReceptionDashboard = () => {
         visitor.Status === "Entered"
     ).length || 0;
 
-  const activeVisitsCount = Array.isArray(patients)
-    ? patients.filter((item) => item?.Activated && !item.Inpatient).length
-    : 0;
-  const inPatientCount = pendingAdmissionVerification?.length || 0;
-  const walkInPatientsCount = Array.isArray(patients)
-    ? patients.filter((item) => item.Walkin && item.Activated).length
-    : 0;
-
-  // Dashboard Cards Data
-  const cardData = [
-    {
-      title: "Current Visitors List",
-      value: currentVisitorsCount,
-      subtitle: "Today’s Entries",
-      icon: <HourglassOutlined />,
-      color: "#fff",
-      backgroundColor: "#0f5689",
-      link: "/reception/visitors-list",
-    },
-    {
-      title: "Active Visits List",
-      value: activeVisitsCount,
-      subtitle: "Active Consultations",
-      icon: <SafetyOutlined />,
-      color: "#000",
-      backgroundColor: "#ac8342",
-      link: "/reception/appointments/Dispatched",
-    },
-    {
-      title: "Walk-In Consultations",
-      value: walkInPatientsCount,
-      subtitle: "Walk-In Consultations",
-      icon: <UserOutlined />,
-      color: "#000",
-      backgroundColor: "#5c85d6",
-      link: "/reception/Walkin-patient-list",
-    },
-    {
-      title: "Admission Requests",
-      value: inPatientCount,
-      subtitle: "Currently Admitted",
-      icon: <UserAddOutlined />,
-      color: "#000",
-      backgroundColor: "#b0afaf",
-      link: "/reception/admission-requests",
-    },
-  ];
-
-  // Generate Chart Data for Last 30 Days
-  const chartData = useMemo(() => {
-    const last30Days = Array.from({ length: 30 }, (_, i) =>
-      moment().subtract(i, "days").format("YYYY-MM-DD")
-    ).reverse();
-
-    return last30Days.map((date) => ({
-      date,
-      visitors: Math.floor(Math.random() * 20) + 5, // Random values between 5-25
-      activeVisits: Math.floor(Math.random() * 15) + 3, // Random values between 3-18
-      walkIns: Math.floor(Math.random() * 10) + 2, // Random values between 2-12
-      inpatients: Math.floor(Math.random() * 5) + 1, // Random values between 1-6
-    }));
-  }, []);
+ 
+  // Navigate to the visitor list page// General handler for card clicks to navigate to respective pages
+  const handleCardClick = (route) => {
+    navigate(route); // Navigate to the respective route based on the card clicked
+  };
 
   return (
-    <div style={{ padding: "10px 10px" }}>
-      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-        {cardData.map((card, index) => (
-          <DashboardCard card={card} key={index} />
-        ))}
+    <div className="">
+      <div className="card-title">
+        <h5 className="card-title px-2 text-dark">Dashboard</h5>
       </div>
-      <DashboardStatistics userDetails={userDetails} chartData={chartData} />
+      <div className="card-body text-dark">
+        <p>Welcome to the Reception Dashboard</p>
+
+        <div className="row gap-3 gap-md-0">
+          {/* Current Visitors KPI Card */}
+          <div className="col col-12 col-md-3">
+            <div
+              className="card"
+              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              onClick={() => handleCardClick('/reception/visitors-list')} // Use dynamic navigation
+            >
+              <div className="card-body">
+                <div className="card-title p-2">
+                  <FaUser style={{ marginRight: 8 }} />
+                  Current Visitors List
+                </div>
+                <p className="text-white">{currentVisitorsCount}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Total Appointments KPI Card */}
+          <div className="col col-12 col-md-3">
+            <div
+              className="card"
+              style={{ backgroundColor: "#58586e", color: "#fafafa" }}
+              onClick={() => handleCardClick('/reception/appointments/list')} // Use dynamic navigation
+
+            >
+              <div className="card-body">
+                <div className="card-title p-2">
+                  <FileDoneOutlined style={{ marginRight: 8 }} />
+                  Total Appointments
+                </div>
+                <p className="text-white">{activeAppmnts}</p> {/* Show active appointments count */}
+              </div>
+            </div>
+          </div>
+
+          {/* Active Patients KPI Card */}
+          <div className="col col-12 col-md-3">
+            <div
+              className="card"
+              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+            >
+              <div className="card-body">
+                <div className="card-title p-2">
+                  <UsergroupAddOutlined style={{ marginRight: 8 }} />
+                  Active Patients List
+                </div>
+                <p className="text-white">0</p> {/* Replace with dynamic count */}
+              </div>
+            </div>
+          </div>
+
+          {/* Pharmacy List KPI Card */}
+          <div className="col col-12 col-md-3">
+            <div
+              className="card"
+              style={{ backgroundColor: "#ac8342", color: "#fafafa" }}
+            >
+              <div className="card-body">
+                <div className="card-title p-2">
+                  <CheckCircleOutlined style={{ marginRight: 8 }} />
+                  Pharmacy List
+                </div>
+                <p className="text-white">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3">
+          {/* <VisitorList/> */}
+          {/* <OutpatientList /> */}
+        </div>
+      </div>
     </div>
   );
 };

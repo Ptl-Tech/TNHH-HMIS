@@ -1,337 +1,747 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Row,
   Col,
-  Button,
+  Tag,
   Table,
   Typography,
-  Modal,
-  Form,
+  Space,
   Input,
+  Button,
+  Card,
   message,
-} from "antd";
+  Form,
+  Popconfirm,
+  InputNumber,
+  Modal,
+} from 'antd';
 import {
+  IdcardOutlined,
+  SignatureOutlined,
   MedicineBoxOutlined,
-  PlusOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { FaFolderClosed, FaTablets } from "react-icons/fa6";
-import { IoListOutline } from "react-icons/io5";
-import { useLocation, useNavigate } from "react-router-dom";
-import {
-  postArchivePrescription,
-  postDrugIssuance,
-  postPrescriptionQuantity,
-} from "../../actions/pharmacy-actions/postPharmacyAction";
-import { useDispatch, useSelector } from "react-redux";
-import { getPharmacyLineReturnbyPharmacyNo } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
-import { getNewPharmacyRequests } from "../../actions/pharmacy-actions/getNewPharmacyRequest";
+  ExclamationCircleFilled,
+} from '@ant-design/icons';
+import { Select } from 'antd';
 
+import {
+  GET_PHARMACY_RETURN_LIST_RESET,
+  getPharmacyLineReturnbyPharmacyNo,
+} from '../../actions/pharmacy-actions/getPharmacyLineReturns';
+import { getItemsSlice } from '../../actions/triage-actions/getItemsSlice';
+import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
+import {
+  postDrugIssuance,
+  postArchivePrescription,
+  postPrescriptionQuantity,
+  POST_EDIT_PRESCRIPTION_RESET,
+  POST_ARCHIVE_PRESCRIPTION_RESET,
+  POST_PHARMACY_DRUG_ISSUANCE_RESET,
+} from '../../actions/pharmacy-actions/postPharmacyAction';
+import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
+import { useLocation } from 'react-router-dom';
+
+const { confirm } = Modal;
 const { Title, Text } = Typography;
 
-const PharmacyCard = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const pharmacyNo = queryParams.get("PharmacyNo");
-  const [prescriptionData, setPrescriptionData] = useState({});
+const EditableCell = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  children,
+  ...restProps
+}) => {
+  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
 
-  const {
-    data: newPharmacyRequests = [], // Default to an empty array
-  } = useSelector((state) => state.getNewPharmacyList);
-
-  let singlePharmacyRecord; // Declare it once in the outer scope
-  if (pharmacyNo) {
-    singlePharmacyRecord = newPharmacyRequests.find((patient) => {
-      const patientPharmacyNo = patient.PharmacyNo?.toLowerCase() || "";
-      return patientPharmacyNo === pharmacyNo.toLowerCase(); // Match the pharmacyNo
-    });
-  }
-
-  const { data } = useSelector(
-    (state) => state.postPrescriptionQuantity
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
   );
+};
 
-  const { loading: loadingDrugIssuance } = useSelector(
-    (state) => state.postDrugIssuance
-  );
-  const { loading: loadingArchivePrescription } = useSelector(
-    (state) => state.postArchivePrescription
-  );
-
-  const { data: pharmacyLineData = [] } =
-    useSelector((state) => state.getPatientPharmacyReturnLine);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [form] = Form.useForm();
+const PharmacyCard = ({ type }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+
+  const [form] = Form.useForm();
+
+  const [Status, setStatus] = useState(searchParams.get('status') || '');
+  const [editingKey, setEditingKey] = useState('');
+  const [currentRequest, setCurrentRequest] = useState(null);
+
+  const statuses = [
+    { label: 'All', value: '' },
+    { label: 'New', value: 'New' },
+    { label: 'Forwaded', value: 'Forwaded' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Cancelled', value: 'Cancelled' },
+  ];
+
+  const { data: pharmacyRequests } = useSelector(
+    (state) => state.getPharmacyRequestsAll,
+  );
+  const { data: postDrugIssuanceData, loading: postDrugIssuanceLoading } =
+    useSelector((state) => state.postDrugIssuance);
+  const {
+    data: postArchivePrescriptionData,
+    loading: postArchivePrescriptionLoading,
+  } = useSelector((state) => state.postArchivePrescription);
+  const { items } = useSelector((state) => state.getItems);
+  const {
+    data: postPharmacyLineData,
+    loading: postPharmacyLineLoading,
+    error: postPharmacyLineError,
+  } = useSelector((state) => state.postPrescriptionQuantity);
+  const {
+    data: pharmacyLineData,
+    success: pharmacyLineDataSuccess,
+    loading: pharmacyLineDataLoading,
+  } = useSelector((state) => state.getPatientPharmacyReturnLine);
+  const { data: pharmacyRecord } = useSelector(
+    (state) => state.getSinglePharmacyRecord,
+  );
+
+  const disabled =
+    pharmacyRecord?.Status === 'Completed' ||
+    pharmacyRecord?.Status === 'Cancelled';
+
+  const isEditing = (record) => record.No === editingKey;
+
+  const edit = (record) => {
+    form.setFieldsValue({ ...record });
+    setEditingKey(record.No);
+  };
+
+  const cancel = () => {
+    setEditingKey('');
+  };
+
+  const save = async (record) => {
+    try {
+      const row = await form.validateFields();
+      const { SystemId, Pharmacy_No, No, UnitPrice } = record;
+      const { Dosage, Duration_Days, Frequency, Quantity } = row;
+
+      dispatch(
+        postPrescriptionQuantity({
+          myAction: 'edit',
+          recId: SystemId,
+          Pharmacy_No,
+          quantity: Quantity,
+          drugNo: No,
+          Duration_Days,
+          Frequency,
+          Dosage,
+          TotalAmount: Math.round(UnitPrice * Quantity),
+        }),
+      );
+
+      setEditingKey('');
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
+  const showConfirm = (record) => {
+    confirm({
+      title: 'Delete the pharmacy line?',
+      icon: <ExclamationCircleFilled />,
+      content: 'Are you sure you want to delete the pharmacy line?',
+      onOk() {
+        deleteRecord(record);
+      },
+      onCancel() {},
+    });
+  };
+
+  // getting the items to be searched with
+  useEffect(() => {
+    // if we don't have items, then we get the items
+    if (!items.length) {
+      dispatch(getItemsSlice());
+    }
+
+    if (
+      (!pharmacyLineDataSuccess && currentRequest) ||
+      postPharmacyLineData?.status === 'success'
+    ) {
+      dispatch(getPharmacyLineReturnbyPharmacyNo(currentRequest));
+    } else {
+      dispatch({ type: GET_PHARMACY_RETURN_LIST_RESET });
+    }
+  }, [
+    currentRequest,
+    items,
+    pharmacyLineDataSuccess,
+    postPharmacyLineData,
+    postDrugIssuanceData,
+  ]);
 
   useEffect(() => {
-    dispatch(getNewPharmacyRequests());
-    if (pharmacyNo) {
-      dispatch(getPharmacyLineReturnbyPharmacyNo(pharmacyNo));
+    dispatch(getPharmacyRequestsAll({ type, status: Status }));
+  }, [postArchivePrescriptionData, type, Status]);
+
+  // to track once we post the pharmacy line has been updated
+  useEffect(() => {
+    if (postPharmacyLineData) {
+      const status = postPharmacyLineData.status;
+
+      message[status === 'success' ? status : 'error'](
+        status === 'success'
+          ? 'Pharmacy line updated successfully'
+          : postPharmacyLineData.data.msg,
+      );
+
+      dispatch({ type: POST_EDIT_PRESCRIPTION_RESET });
     }
-  }, [dispatch, pharmacyNo]);
+    if (postPharmacyLineError) {
+      message.error("Something wen't wrong while deleting the pharmacy line");
+      dispatch({ type: POST_EDIT_PRESCRIPTION_RESET });
+    }
+  }, [postPharmacyLineData, postPharmacyLineError]);
+
+  // The archive effect
+  useEffect(() => {
+    if (postArchivePrescriptionData) {
+      const status = postArchivePrescriptionData.status;
+
+      message[status](
+        status === 'success'
+          ? 'The prescription has been archived successfully'
+          : 'Something went wrong when acrchiving the prescription',
+      );
+      dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
+    }
+  }, [postArchivePrescriptionData]);
+
+  // to track once we post the drug issuance
+  useEffect(() => {
+    if (postDrugIssuanceData) {
+      const status = postDrugIssuanceData.status;
+
+      message[status](
+        status === 'success'
+          ? 'The prescription has been posted successfully'
+          : 'Something went wrong when posting the prescription',
+      );
+    }
+  }, [postDrugIssuanceData]);
+
+  // to get a single pharmacy record
+  useEffect(() => {
+    console.log({ pharmacyRecord });
+
+    // We cannot update based on whether we have archived or not because the request will not be found
+    if (
+      (currentRequest && !pharmacyRecord) ||
+      (currentRequest &&
+        pharmacyRecord &&
+        currentRequest !== pharmacyRecord.Pharmacy_No) ||
+      postDrugIssuanceData?.status === 'success' ||
+      postArchivePrescriptionData?.status === 'success' ||
+      postPharmacyLineData
+    ) {
+      dispatch(getSinglePharmacyRecord(currentRequest));
+      if (postArchivePrescriptionData)
+        dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
+      if (postDrugIssuanceData)
+        dispatch({ type: POST_PHARMACY_DRUG_ISSUANCE_RESET });
+    }
+  }, [
+    currentRequest,
+    pharmacyRecord,
+    postDrugIssuanceData,
+    postPharmacyLineData,
+    postArchivePrescriptionData,
+  ]);
+
+  const deleteRecord = (record) => {
+    // deleting a pharmacy line
+    dispatch(
+      postPrescriptionQuantity({
+        myAction: 'delete',
+        recId: record.SystemId,
+        pharmacyNo: record.Pharmacy_No,
+        quantity: record.Quantity,
+        drugNo: record.No,
+      }),
+    );
+  };
 
   const columns = [
-    { title: "No", dataIndex: "no", key: "no" },
-    { title: "Drug Name", dataIndex: "drugName", key: "drugName" },
-    { title: "Unit Price", dataIndex: "unitPrice", key: "unitPrice" },
-    { title: "Total Price", dataIndex: "totalPrice", key: "totalPrice" },
-    { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
-    // { title: "Actual Qty", dataIndex: "actualQty", key: "actualQty" },
-    // { title: "Dosage", dataIndex: "dosage", key: "dosage" },
-    // { title: "Frequency", dataIndex: "frequency", key: "frequency" },
-    // { title: "Take", dataIndex: "take", key: "take" },
-    { title: "Route", dataIndex: "route", key: "route" },
-    { title: "Days", dataIndex: "days", key: "days" },
+    { title: 'No', dataIndex: 'No', key: 'No' },
     {
-      title: "Remarks",
-      dataIndex: "remarks",
-      key: "remarks",
-      render: (_, record) => (
-        <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        style={{
-          marginTop: "20px",
-          marginBottom: "10px",
-          border: "1px solid #ddd",
-        }}
-        onClick= {() => openModal(record)}
-      >
-        Edit Quantity
-      </Button>
-      )
+      title: 'Drug Name',
+      dataIndex: 'Description',
+      key: 'Description',
+      render: (value, record) => {
+        var returnValue;
+        returnValue = Object.hasOwn(record, 'Description')
+          ? value
+          : record['DrugName'];
+        return returnValue;
+      },
+    },
+    {
+      title: 'Available Qty',
+      dataIndex: 'ActualQty',
+      key: 'ActualQty',
+    },
+    { title: 'Dosage', dataIndex: 'Dosage', key: 'Dosage', editable: true },
+    {
+      title: 'Frequency',
+      dataIndex: 'Frequency',
+      key: 'Frequency',
+      editable: true,
+      inputType: 'number',
+    },
+    {
+      title: 'Duration in Days',
+      dataIndex: 'Duration_Days',
+      key: 'Duration_Days',
+      editable: true,
+      inputType: 'number',
+    },
+    {
+      title: 'Billable Quantity',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
+      editable: true,
+      inputType: 'number',
+    },
+    {
+      title: 'Unit Price',
+      dataIndex: 'UnitPrice',
+      key: 'UnitPrice',
+    },
+    {
+      title: 'Total Price',
+      dataIndex: 'TotalPrice',
+      key: 'TotalPrice',
+      render: (value, record) => {
+        return Math.round(record.UnitPrice * record.Quantity);
+      },
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (value, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Space direction="horizontal">
+            <Button
+              type={'default'}
+              style={{ textTransform: 'capitalize' }}
+              onClick={() => save(record)}
+            >
+              Save
+            </Button>
+            <Popconfirm
+              type={'primary'}
+              onConfirm={cancel}
+              title="Sure to cancel?"
+            >
+              <a>Cancel</a>
+            </Popconfirm>
+          </Space>
+        ) : (
+          <>
+            <Space direction="horizontal">
+              <Button
+                type={'default'}
+                disabled={disabled}
+                onClick={() => edit(record)}
+                style={{ textTransform: 'capitalize' }}
+              >
+                Edit
+              </Button>
+              <Button
+                type={'primary'}
+                disabled={disabled}
+                style={{ textTransform: 'capitalize' }}
+                onClick={() => showConfirm(record)}
+              >
+                Delete
+              </Button>
+            </Space>
+          </>
+        );
+      },
     },
   ];
 
-
-const dataSource = pharmacyLineData?.map(line => ({
-  ...line,
-  key: line?.PharmacyReturnLineNo,
-  no: line?.No,
-  drugName: line?.DrugName,
-  unitPrice: line?.UnitPrice,
-  totalPrice: line?.TotalAmount,
-  actualQty: line?.ActualQty,
-  dosage: line?.Dosage,
-  frequency: line?.Frequency,
-  take: line?.Take,
-  route: line?.Route,
-  days: line?.Duration_Days,
-  remarks: line?.Remarks,
-}))
-
-
-// set form values and open modal
-
-
-const openModal = (singlePharmacyRecord) => {
-  console.log("Single Pharmacy Record:", singlePharmacyRecord);
-
-  setPrescriptionData({
-    Quantity: singlePharmacyRecord?.Quantity,
-    recId: singlePharmacyRecord.SystemId,
-    pharmacyNo: singlePharmacyRecord?.Pharmacy_No,    
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        inputType: col.dataIndex === 'age' ? 'number' : 'text',
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+        inputType: col.inputType,
+      }),
+    };
   });
 
-  form.setFieldsValue({
-    quantity: singlePharmacyRecord?.Quantity,
-    recId: singlePharmacyRecord.SystemId,
-    pharmacyNo: singlePharmacyRecord?.Pharmacy_No,
-  })
+  const patientData = [
+    [
+      {
+        name: 'Pharmacy No',
+        value: 'Pharmacy_No',
+      },
+      {
+        name: 'Visit Number',
+        value: 'Link_No',
+      },
+      {
+        name: 'Patient Number',
+        value: 'Patient_No',
+      },
+      {
+        name: 'Name',
+        value: 'Search_Name',
+      },
+      {
+        name: 'Date',
+        value: 'Pharmacy_Date',
+      },
+      {
+        name: 'Total Price',
+        value: 'Visit_Total',
+        noBorder: true,
+      },
+    ],
+    [
+      {
+        name: 'Patient Type',
+        value: 'Patient_Type',
+      },
+      {
+        name: 'Transaction Type',
+        value: 'Patient_Type',
+      },
+      {
+        name: 'Request Area',
+        value: 'Link_Type',
+      },
+      {
+        name: 'Insurance',
+        value: 'Insurance_No',
+      },
+      {
+        name: 'Remarks',
+        value: 'Link_Type',
+      },
+    ],
+  ];
 
-  setIsModalOpen(true);
-}
+  const handleRequestChange = (value) => {
+    setCurrentRequest(value.split('-').at(-1));
+  };
 
-const closeModal = () => {
-  form.resetFields();
-  setIsModalOpen(false);
-};
+  const handleStatusChange = (value) => {
+    console.log({ value });
+    setStatus(value);
+  };
 
+  const handleArchivePrescription = () => {
+    dispatch(postArchivePrescription(currentRequest));
+  };
 
+  const handleIssuePrescription = () => {
+    // TODO: print the pharmacy prescription and the printable
+    dispatch(postDrugIssuance(currentRequest));
+  };
 
-const handleFormSubmit = (values) => {
-
-  const prescriptionformData = {
-    ...prescriptionData,
-    myAction: "edit",
-    Quantity: values.quantity,
-  }
-  
-  dispatch(postPrescriptionQuantity(prescriptionformData)).then((data) => {
-    if (data.status === "success") {
-      message.success("Prescription updated successfully");
-    } else {
-      message.error("An error occurred, please try again");
-    }
-  })
-  closeModal();
-};
-
-const handleDrugIssuance = () => {
-  dispatch(postDrugIssuance(pharmacyNo));
-};
-
-const handleArchivePrescription = () => {
-  dispatch(postArchivePrescription(pharmacyNo)).then((data) => {
-    if (data.status === "success") {
-      message.success("Prescription archived successfully");
-    } else {
-      message.error("An error occurred, please try again");
-    }
-  });
-};
-
-return (
-  <div style={{ padding: "20px" }}>
-    <Title
-      level={3}
-      style={{
-        color: "#0F5689",
-        marginBottom: "12px",
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
-      <MedicineBoxOutlined style={{ marginRight: "8px" }} />
-      Pharmacy Card
-    </Title>
-
-    <Row justify="space-between" style={{ marginBottom: "20px" }}>
-      <Button
-        type="primary"
-        onClick={() => navigate("/Pharmacy/Pharmacy-OutPatient")}
-        icon={<IoListOutline />}
+  return (
+    <div style={{ display: 'grid', gap: '16px', padding: '16px 0' }}>
+      <Space direction="horizontal">
+        <Select
+          showSearch
+          style={{ width: '400px' }}
+          onChange={handleRequestChange}
+          placeholder="Select a patient"
+          options={pharmacyRequests.map((request) => ({
+            label: (
+              <span>
+                {request.Search_Name} - {request.Link_No}
+              </span>
+            ),
+            value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
+          }))}
+        />
+        <Select
+          showSearch
+          options={statuses}
+          prefix={<Tag color="#ac8342">Status</Tag>}
+          placeholder="Status"
+          defaultValue={Status}
+          style={{ width: '400px' }}
+          onChange={handleStatusChange}
+        />
+      </Space>
+      <Card
+        style={{ background: '#00000006' }}
+        title={
+          <Title
+            level={5}
+            style={{
+              gap: '8px',
+              display: 'flex',
+              color: '#0f5689',
+              alignItems: 'center',
+            }}
+          >
+            <IdcardOutlined />
+            Pharmacy Card
+          </Title>
+        }
+        variant="borderless"
       >
-        Pharmacy List
-      </Button>
-
-      <Row justify="space-between" className="gap-2">
-        <Button
-          type="primary"
-          onClick={handleDrugIssuance}
-          icon={<PlusOutlined />}
+        <div
+          style={{
+            color: '#0F5689',
+            padding: '0 16px',
+            borderRadius: '5px',
+            fontWeight: 'semibold',
+          }}
         >
-          Post Drug Issuance
-        </Button>
-        <Button
-          type="primary"
-          onClick={handleArchivePrescription}
-          icon={<FaFolderClosed />}
-        >
-          Archive Prescription
-        </Button>
-      </Row>
-    </Row>
-
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "5px",
-        padding: "10px",
-        backgroundColor: "#f5f5f5",
-        color: "#0F5689",
-        fontWeight: "semibold",
-      }}
-    >
-      {/* <Typography.Title level={5} style={{ color: "#0F5689", fontSize: "16px", marginBottom: "12px", display: "flex", alignItems: "center", }}>
-          <UserOutlined style={{ marginRight: "8px" }} />
-            Patient Details
-        </Typography.Title> */}
-      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-        <Col span={12}>
-          <Text strong>Number :</Text>  {singlePharmacyRecord?.PharmacyNo}
-        </Col>
-        <Col span={12}>
-          <Text strong>Patient No. :</Text>  {singlePharmacyRecord?.PatientNo}
-        </Col>
-      </Row>
-      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-        <Col span={12}>
-          <Text strong>Names :</Text>  {singlePharmacyRecord?.Names}
-        </Col>
-        <Col span={12}>
-          <Text strong>Date :</Text>  {singlePharmacyRecord?.PharmacyDate}
-        </Col>
-      </Row>
-      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-        <Col span={12}>
-          <Text strong>Patient Type :</Text>  {singlePharmacyRecord?.Patient_Type}
-        </Col>
-        <Col span={12}>
-          <Text strong>Transaction Type :</Text>  {singlePharmacyRecord?.Patient_Type}
-        </Col>
-      </Row>
-      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-        <Col span={12}>
-          <Text strong>Request Area :</Text> {singlePharmacyRecord?.LinkType}
-        </Col>
-        <Col span={12}>
-          <Text strong>Insurance :</Text> {singlePharmacyRecord?.InsuranceNo}
-        </Col>
-      </Row>
-      <Row style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-        <Col span={12}>
-          <Text strong>Remarks :</Text>
-        </Col>
-        <Col span={12}>
-          <Text strong>Status :</Text>
-        </Col>
-      </Row>
-      <Row style={{ padding: "10px 0" }}>
-        <Col span={24}>
-          <Text strong>Total Price :</Text>{" "}
-          <span style={{ color: "blue" }}>{singlePharmacyRecord?.Visit_Total}</span>
-        </Col>
-      </Row>
+          <Row>
+            {patientData.map((patientRow) => (
+              <Col span={12}>
+                {patientRow.map(({ name, value, noBorder }) => (
+                  <Row
+                    style={{
+                      gap: '8px',
+                      display: 'flex',
+                      padding: '8px 16px',
+                      borderBottom: !noBorder && '1px solid #ebebeb',
+                    }}
+                  >
+                    <Text strong>{name} :</Text>
+                    {` ${pharmacyRecord ? pharmacyRecord[value] : ''}`}
+                  </Row>
+                ))}
+              </Col>
+            ))}
+          </Row>
+        </div>
+      </Card>
+      {currentRequest && pharmacyRecord && (
+        <>
+          <Card
+            title={
+              <Title
+                level={5}
+                style={{
+                  gap: '8px',
+                  display: 'flex',
+                  color: '#0f5689',
+                  alignItems: 'center',
+                }}
+              >
+                <SignatureOutlined />
+                Prescription
+              </Title>
+            }
+            extra={
+              <Space direction="horizontal">
+                <Button
+                  disabled={
+                    disabled ||
+                    postDrugIssuanceLoading ||
+                    postArchivePrescriptionLoading
+                  }
+                  onClick={handleArchivePrescription}
+                >
+                  Archive
+                </Button>
+                <Button
+                  type="primary"
+                  disabled={
+                    disabled ||
+                    postDrugIssuanceLoading ||
+                    postArchivePrescriptionLoading
+                  }
+                  onClick={handleIssuePrescription}
+                >
+                  Issue Drugs
+                </Button>
+              </Space>
+            }
+          >
+            <Form
+              form={form}
+              component={false}
+            >
+              <Table
+                components={{
+                  body: { cell: EditableCell },
+                }}
+                bordered
+                size="small"
+                pagination={false}
+                columns={mergedColumns}
+                style={{ padding: '16px' }}
+                dataSource={[...pharmacyLineData]}
+                loading={pharmacyLineDataLoading || postPharmacyLineLoading}
+              />
+            </Form>
+          </Card>
+          <SearchDrugTable
+            items={items}
+            pharmacyNo={currentRequest}
+            loading={postPharmacyLineLoading}
+          />
+        </>
+      )}
     </div>
+  );
+};
 
-    {/*  <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        style={{
-          marginTop: "20px",
-          marginBottom: "10px",
-          border: "1px solid #ddd",
-        }}
-        onClick={openModal}
-      >
-        Add
-      </Button> */}
+const SearchDrugTable = ({ items, loading, pharmacyNo }) => {
+  const dispatch = useDispatch();
 
+  const { Compact } = Space;
+  const [filter, setFilter] = useState({ specificName: '', genericName: '' });
 
-    <Table
-      dataSource={dataSource}
-      columns={columns}
-      pagination={false}
-      bordered
-    />
+  const handleAddDrug = (drugNo) => {
+    dispatch(
+      postPrescriptionQuantity({
+        drugNo,
+        pharmacyNo,
+        quantity: 0,
+        myAction: 'create',
+      }),
+    );
+  };
 
-    <Modal
-      title="Add Prescription"
-      visible={isModalOpen}
-      onCancel={closeModal}
-      footer={null}
-    >
-      <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
-        <Form.Item
-          label="Quantity"
-          name="quantity"
-          rules={[{ required: true, message: "Please enter Quantity!" }]}
-        >
-          <Input placeholder="Enter quantity" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Save
+  const columns = [
+    {
+      title: 'Item Code',
+      key: 'No',
+      dataIndex: 'No',
+    },
+    {
+      title: 'Item Name',
+      key: 'Description',
+      dataIndex: 'Description',
+    },
+    {
+      title: 'Generic Name',
+      key: 'Description_2',
+      dataIndex: 'Description_2',
+    },
+    {
+      title: 'Available Qty',
+      key: 'Qunatity',
+      dataIndex: 'Qunatity',
+    },
+    {
+      title: 'Price',
+      key: 'UnitPrice',
+      dataIndex: 'UnitPrice',
+    },
+    {
+      key: 'No',
+      dataIndex: 'No',
+      title: 'Select',
+      render: (cell, record) => {
+        return (
+          <Button
+            type="primary"
+            onClick={() => handleAddDrug(cell)}
+          >
+            Select
           </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
-  </div>
-);
+        );
+      },
+    },
+  ];
+
+  return (
+    <Card
+      title={
+        <Title
+          level={5}
+          style={{
+            gap: '8px',
+            display: 'flex',
+            color: '#0f5689',
+            alignItems: 'center',
+          }}
+        >
+          <MedicineBoxOutlined />
+          Add Drugs
+        </Title>
+      }
+      variant="borderless"
+    >
+      <Compact style={{ width: '100%', padding: '16px' }}>
+        <Input
+          style={{ width: '50%' }}
+          value={filter.specificName}
+          onChange={(e) =>
+            setFilter({ ...filter, specificName: e.currentTarget.value })
+          }
+          placeholder="Search Specific Name"
+        />
+        <Input
+          style={{ width: '50%' }}
+          value={filter.genericName}
+          onChange={(e) =>
+            setFilter({ ...filter, genericName: e.currentTarget.value })
+          }
+          placeholder="Search Generic Name"
+        />
+      </Compact>
+      <Table
+        bordered
+        size="small"
+        loading={loading}
+        columns={columns}
+        style={{ padding: '16px' }}
+        dataSource={
+          filter.specificName || filter.genericName
+            ? items.filter(
+                (drug) =>
+                  drug.Description.toLowerCase().includes(
+                    filter.specificName.toLowerCase(),
+                  ) &&
+                  drug.Description.toLowerCase().includes(
+                    filter.genericName.toLowerCase(),
+                  ),
+              )
+            : []
+        }
+      />
+    </Card>
+  );
 };
 
 export default PharmacyCard;

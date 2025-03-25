@@ -63,6 +63,7 @@ export const postRadiologyResults = (resultsData) => async (dispatch, getState) 
     throw error; // Rethrow the error to handle in the calling function
   }
 };
+
 export const forwardRadiologyResults = (radiologyNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: FORWARD_RADIOLOGY_RESULTS_REQUEST });

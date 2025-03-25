@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { message } from 'antd';
+import axios from "axios";
+import { message } from "antd";
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action Types
-export const REQUEST_LAB_DETAILS = 'REQUEST_LAB_DETAILS';
-export const REQUEST_LAB_DETAILS_FAIL = 'REQUEST_LAB_DETAILS_FAIL';
-export const REQUEST_LAB_DETAILS_RESET = 'REQUEST_LAB_DETAILS_RESET';
-export const REQUEST_LAB_DETAILS_SUCCESS = 'REQUEST_LAB_DETAILS_SUCCESS';
+export const REQUEST_LAB_DETAILS = "REQUEST_LAB_DETAILS";
+export const REQUEST_LAB_DETAILS_FAIL = "REQUEST_LAB_DETAILS_FAIL";
+export const REQUEST_LAB_DETAILS_RESET = "REQUEST_LAB_DETAILS_RESET";
+export const REQUEST_LAB_DETAILS_SUCCESS = "REQUEST_LAB_DETAILS_SUCCESS";
 
 export const getLabDetails = (labNo) => async (dispatch, getState) => {
   try {
@@ -18,14 +18,14 @@ export const getLabDetails = (labNo) => async (dispatch, getState) => {
     } = getState();
 
     // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = localStorage.getItem("branchCode") || "";
 
     // Set up the request configuration with headers
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo?.userData?.no || '',
-        sessionToken: userInfo?.userData?.portalSessionToken || '',
+        "Content-Type": "application/json",
+        staffNo: userInfo?.userData?.no || "",
+        sessionToken: userInfo?.userData?.portalSessionToken || "",
         branchCode,
       },
     };
@@ -33,7 +33,7 @@ export const getLabDetails = (labNo) => async (dispatch, getState) => {
     // API request
     const { data } = await axios.get(
       `${API}data/odatafilter?isList=true&webservice=PgLaboratoryTestLines&query=$filter=Laboratory_No eq '${labNo}'`,
-      config,
+      config
     );
 
     // Dispatch success action with the fetched data
@@ -46,7 +46,7 @@ export const getLabDetails = (labNo) => async (dispatch, getState) => {
   } catch (error) {
     // Extract and handle errors properly
     const errorMessage =
-      error.response?.data?.message || error.message || 'An error occurred';
+      error.response?.data?.message || error.message || "An error occurred";
 
     dispatch({
       type: REQUEST_LAB_DETAILS_FAIL,
