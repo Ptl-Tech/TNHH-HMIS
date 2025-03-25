@@ -95,34 +95,6 @@ export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (
       staffNo: data.staffNo,
     };
 
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          staffNo,
-          sessionToken,
-          branchCode,
-        },
-      };
-
-      const { data } = await axios.post(
-        `${API}Authentication/OTPLogin`,
-        { otpCode },
-        config
-      );
-
-      dispatch({ type: OTP_VERIFY_SUCCESS, payload: data });
-
-      // Extract branch code from userInfo.userData
-      const extractedBranchCode =
-        data.userData?.shortcut_Dimension_1_Code || branchCode;
-
-      // Save updated OTP state and user info to localStorage
-      const otpState = {
-        isVerified: true,
-        portalSession: data.portalSession,
-        staffNo: data.staffNo,
-      };
-
       localStorage.setItem("otpVerifyState", JSON.stringify(otpState));
       localStorage.setItem("userInfo", JSON.stringify(data));
       localStorage.setItem("branchCode", extractedBranchCode); // Save extracted branch code
