@@ -66,8 +66,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
-const initialCountry = patientDetails?.Nationality === "Kenya" ? "KE" : "";
-setSelectedCountry(initialCountry);
+
       const genderValue =
         patientDetails?.Gender === "Female"
           ? 2
@@ -293,7 +292,7 @@ setSelectedCountry(initialCountry);
             </Form.Item>
           </Col>
 
-          {selectedCountry === "KE"  || selectedCountry === "Kenya" && (
+          {selectedCountry === "KE"   && (
             <>
               <Col span={12}>
                 <Form.Item label="Select County" name="county">
