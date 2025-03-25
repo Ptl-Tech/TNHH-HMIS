@@ -17,13 +17,10 @@ const getPharmacyRequestsAllReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_PHARMACY_REQUESTS_ALL:
       return { ...state, loading: true };
-
     case GET_PHARMACY_REQUESTS_ALL_SUCCESS:
       return { ...state, loading: false, data: action.payload };
-
     case GET_PHARMACY_REQUESTS_ALL_FAILURE:
       return { ...state, loading: false, error: action.payload };
-
     case GET_PHARMACY_REQUESTS_ALL_RESET:
       return initialState;
     default:

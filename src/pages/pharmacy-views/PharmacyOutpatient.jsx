@@ -1,7 +1,7 @@
 import PharmacyCard from './PharmacyCard';
 
 const PharmacyOutpatient = () => {
-  return <PharmacyCard />;
+  return <PharmacyCard type="OutPatient" />;
 };
 
 export default PharmacyOutpatient;

@@ -1,7 +1,7 @@
 import PharmacyCard from './PharmacyCard';
 
 const PharmacyWalkIn = () => {
-  return <PharmacyCard />;
+  return <PharmacyCard type="WalkIn" />;
 };
 
 export default PharmacyWalkIn;

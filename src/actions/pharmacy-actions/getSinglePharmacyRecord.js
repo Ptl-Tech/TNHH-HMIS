@@ -31,11 +31,9 @@ export const getSinglePharmacyRecord =
       };
 
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgPharmacyListNew&isList=false&query=$filter=PharmacyNo eq '${pharmacyNo}'`,
+        `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=false&query=$filter=Pharmacy_No eq '${pharmacyNo}'`,
         config,
       );
-
-      console.log({ pharmacyNo, response });
 
       if (response.data === '') {
         return message.error(

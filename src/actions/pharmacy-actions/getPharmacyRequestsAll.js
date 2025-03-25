@@ -11,9 +11,51 @@ export const GET_PHARMACY_REQUESTS_ALL_FAILURE =
 export const GET_PHARMACY_REQUESTS_ALL_RESET =
   'GET_PHARMACY_REQUESTS_ALL_RESET';
 
+const generateQuery = ({ type, status }) => {
+  var query = '&query=$filter=';
+  switch (type) {
+    case 'WalkIn':
+      query += 'Walkin eq true';
+      break;
+    case 'InPatient':
+      query += 'InPatient eq true';
+      break;
+    case 'OutPatient':
+      query += 'InPatient eq false and Walkin eq false';
+      break;
+    default:
+      break;
+  }
+
+  query = query === '&query=$filter=' ? query : `${query}  and `;
+
+  switch (status) {
+    case 'New':
+      query += "Status eq 'New'";
+      break;
+    case 'Forwaded':
+      query += "Status eq 'Forwaded'";
+      break;
+    case 'Completed':
+      query += "Status eq 'Completed'";
+      break;
+    case 'Cancelled':
+      query += "Status eq 'Cancelled'";
+      break;
+    default:
+      query = query.endsWith(' and ') ? query.slice(0, query.lastIndexOf(' and ')) : query;
+      break;
+  }
+  return query === '&query=$filter=' ? '' : query;
+};
+
 export const getPharmacyRequestsAll =
-  (Status = '') =>
+  ({ type, status }) =>
   async (dispatch, getState) => {
+    const query = generateQuery({ type, status });
+
+    console.log({ type, status, query });
+
     try {
       dispatch({ type: GET_PHARMACY_REQUESTS_ALL });
 
@@ -32,13 +74,11 @@ export const getPharmacyRequestsAll =
       };
 
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=true`,
+        `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=true${query}`,
         config,
       );
 
-      //   &query=$filter=Status eq '${Status}'
-
-      console.log({ pharmacyNo, response });
+      console.log({ response });
 
       if (response.data === '') {
         return message.error(

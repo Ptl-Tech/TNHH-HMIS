@@ -4,10 +4,12 @@ import ViewProfile from '../Auth/ViewProfile';
 import MainLayout from '../Layouts/MainLayout';
 import PrivateRoute from '../private/PrivateRoute';
 import {
-  AppstoreOutlined,
-  SignatureOutlined,
-  SolutionOutlined,
-} from '@ant-design/icons';
+  FaBedPulse,
+  FaHouseMedical,
+  FaPersonWalking,
+  FaPersonWalkingArrowRight,
+} from 'react-icons/fa6';
+
 import PharmacyCard from '../pages/pharmacy-views/PharmacyCard';
 import PharmacyWalkIn from '../pages/pharmacy-views/PharmacyWalkIn.jsx';
 import PharmacyInpatient from '../pages/pharmacy-views/PharmacyInpatient';
@@ -19,23 +21,23 @@ import PharmacyListReturnLines from '../pages/pharmacy-views/PharmacyListReturnL
 export const pharmacyRoutes = [
   {
     key: '/Pharmacy',
-    icon: <AppstoreOutlined style={{ color: '#fff' }} />,
+    icon: <FaHouseMedical style={{ color: '#fff' }} />,
     label: 'Dashboard',
   },
   {
     key: '/Pharmacy/Pharmacy-OutPatient',
     label: 'Pharmacy Outpatient',
-    icon: <SignatureOutlined style={{ color: '#fff' }} />,
+    icon: <FaPersonWalkingArrowRight style={{ color: '#fff' }} />,
   },
   {
-    key: '/Pharmacy/Pharmacy-Inpatient',
+    key: '/Pharmacy/Pharmacy-InPatient',
     label: 'Pharmacy Inpatient',
-    icon: <SignatureOutlined style={{ color: '#fff' }} />,
+    icon: <FaBedPulse style={{ color: '#fff' }} />,
   },
   {
     key: '/Pharmacy/Pharmacy-WalkIn',
     label: 'Pharmacy Walk In',
-    icon: <SolutionOutlined style={{ color: '#fff' }} />,
+    icon: <FaPersonWalking style={{ color: '#fff' }} />,
   },
 ];
 
@@ -55,7 +57,7 @@ export default function PharmacyRoutes() {
           element={<PharmacyOutpatient />}
         />
         <Route
-          path="/Pharmacy/Pharmacy-Inpatient"
+          path="/Pharmacy/Pharmacy-InPatient"
           element={<PharmacyInpatient />}
         />
         <Route

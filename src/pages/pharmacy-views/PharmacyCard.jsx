@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Row,
   Col,
+  Tag,
   Table,
   Typography,
   Space,
@@ -39,6 +40,7 @@ import {
   POST_PHARMACY_DRUG_ISSUANCE_RESET,
 } from '../../actions/pharmacy-actions/postPharmacyAction';
 import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
+import { useLocation } from 'react-router-dom';
 
 const { confirm } = Modal;
 const { Title, Text } = Typography;
@@ -76,15 +78,25 @@ const EditableCell = ({
   );
 };
 
-const PharmacyCard = () => {
+const PharmacyCard = ({ type }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
 
   const [form] = Form.useForm();
 
-  const [issued, setIssued] = useState(false);
-  const [archived, setArchived] = useState(false);
+  const [Status, setStatus] = useState(searchParams.get('status') || '');
   const [editingKey, setEditingKey] = useState('');
   const [currentRequest, setCurrentRequest] = useState(null);
+
+  const statuses = [
+    { label: 'All', value: '' },
+    { label: 'New', value: 'New' },
+    { label: 'Forwaded', value: 'Forwaded' },
+    { label: 'Completed', value: 'Completed' },
+    { label: 'Cancelled', value: 'Cancelled' },
+  ];
 
   const { data: pharmacyRequests } = useSelector(
     (state) => state.getPharmacyRequestsAll,
@@ -109,6 +121,10 @@ const PharmacyCard = () => {
   const { data: pharmacyRecord } = useSelector(
     (state) => state.getSinglePharmacyRecord,
   );
+
+  const disabled =
+    pharmacyRecord?.Status === 'Completed' ||
+    pharmacyRecord?.Status === 'Cancelled';
 
   const isEditing = (record) => record.No === editingKey;
 
@@ -159,7 +175,9 @@ const PharmacyCard = () => {
     });
   };
 
+  // getting the items to be searched with
   useEffect(() => {
+    // if we don't have items, then we get the items
     if (!items.length) {
       dispatch(getItemsSlice());
     }
@@ -172,27 +190,22 @@ const PharmacyCard = () => {
     } else {
       dispatch({ type: GET_PHARMACY_RETURN_LIST_RESET });
     }
-
-    if (
-      !pharmacyRequests?.length ||
-      postArchivePrescriptionData?.status === 'success'
-    ) {
-      dispatch(getPharmacyRequestsAll(''));
-    }
   }, [
     currentRequest,
     items,
     pharmacyLineDataSuccess,
-    pharmacyRequests,
     postPharmacyLineData,
     postDrugIssuanceData,
-    postArchivePrescriptionData,
   ]);
 
   useEffect(() => {
+    dispatch(getPharmacyRequestsAll({ type, status: Status }));
+  }, [postArchivePrescriptionData, type, Status]);
+
+  // to track once we post the pharmacy line has been updated
+  useEffect(() => {
     if (postPharmacyLineData) {
       const status = postPharmacyLineData.status;
-      console.log({ postPharmacyLineData, status });
 
       message[status === 'success' ? status : 'error'](
         status === 'success'
@@ -212,7 +225,6 @@ const PharmacyCard = () => {
   useEffect(() => {
     if (postArchivePrescriptionData) {
       const status = postArchivePrescriptionData.status;
-      setArchived(status === 'success');
 
       message[status](
         status === 'success'
@@ -223,10 +235,10 @@ const PharmacyCard = () => {
     }
   }, [postArchivePrescriptionData]);
 
+  // to track once we post the drug issuance
   useEffect(() => {
     if (postDrugIssuanceData) {
       const status = postDrugIssuanceData.status;
-      setIssued(status === 'success');
 
       message[status](
         status === 'success'
@@ -236,6 +248,7 @@ const PharmacyCard = () => {
     }
   }, [postDrugIssuanceData]);
 
+  // to get a single pharmacy record
   useEffect(() => {
     console.log({ pharmacyRecord });
 
@@ -244,7 +257,10 @@ const PharmacyCard = () => {
       (currentRequest && !pharmacyRecord) ||
       (currentRequest &&
         pharmacyRecord &&
-        pharmacyRecord.PharmacyNo !== currentRequest)
+        currentRequest !== pharmacyRecord.Pharmacy_No) ||
+      postDrugIssuanceData?.status === 'success' ||
+      postArchivePrescriptionData?.status === 'success' ||
+      postPharmacyLineData
     ) {
       dispatch(getSinglePharmacyRecord(currentRequest));
       if (postArchivePrescriptionData)
@@ -252,7 +268,13 @@ const PharmacyCard = () => {
       if (postDrugIssuanceData)
         dispatch({ type: POST_PHARMACY_DRUG_ISSUANCE_RESET });
     }
-  }, [currentRequest, pharmacyRecord]);
+  }, [
+    currentRequest,
+    pharmacyRecord,
+    postDrugIssuanceData,
+    postPharmacyLineData,
+    postArchivePrescriptionData,
+  ]);
 
   const deleteRecord = (record) => {
     // deleting a pharmacy line
@@ -348,13 +370,15 @@ const PharmacyCard = () => {
             <Space direction="horizontal">
               <Button
                 type={'default'}
-                style={{ textTransform: 'capitalize' }}
+                disabled={disabled}
                 onClick={() => edit(record)}
+                style={{ textTransform: 'capitalize' }}
               >
                 Edit
               </Button>
               <Button
                 type={'primary'}
+                disabled={disabled}
                 style={{ textTransform: 'capitalize' }}
                 onClick={() => showConfirm(record)}
               >
@@ -388,23 +412,23 @@ const PharmacyCard = () => {
     [
       {
         name: 'Pharmacy No',
-        value: 'PharmacyNo',
+        value: 'Pharmacy_No',
       },
       {
         name: 'Visit Number',
-        value: 'LinkNo',
+        value: 'Link_No',
       },
       {
         name: 'Patient Number',
-        value: 'PatientNo',
+        value: 'Patient_No',
       },
       {
         name: 'Name',
-        value: 'Names',
+        value: 'Search_Name',
       },
       {
         name: 'Date',
-        value: 'PharmacyDate',
+        value: 'Pharmacy_Date',
       },
       {
         name: 'Total Price',
@@ -423,23 +447,26 @@ const PharmacyCard = () => {
       },
       {
         name: 'Request Area',
-        value: 'LinkType',
+        value: 'Link_Type',
       },
       {
         name: 'Insurance',
-        value: 'InsuranceNo',
+        value: 'Insurance_No',
       },
       {
         name: 'Remarks',
-        value: 'LinkType',
+        value: 'Link_Type',
       },
     ],
   ];
 
   const handleRequestChange = (value) => {
     setCurrentRequest(value.split('-').at(-1));
-    setArchived(false);
-    setIssued(false);
+  };
+
+  const handleStatusChange = (value) => {
+    console.log({ value });
+    setStatus(value);
   };
 
   const handleArchivePrescription = () => {
@@ -453,16 +480,31 @@ const PharmacyCard = () => {
 
   return (
     <div style={{ display: 'grid', gap: '16px', padding: '16px 0' }}>
-      <Select
-        showSearch
-        style={{ width: '400px' }}
-        onChange={handleRequestChange}
-        placeholder="Select a patient"
-        options={pharmacyRequests.map((request) => ({
-          label: `${request.Seach_Name} - ${request.Link_No}`,
-          value: `${request.Seach_Name}-${request.Link_No}-${request.Pharmacy_No}`,
-        }))}
-      />
+      <Space direction="horizontal">
+        <Select
+          showSearch
+          style={{ width: '400px' }}
+          onChange={handleRequestChange}
+          placeholder="Select a patient"
+          options={pharmacyRequests.map((request) => ({
+            label: (
+              <span>
+                {request.Search_Name} - {request.Link_No}
+              </span>
+            ),
+            value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
+          }))}
+        />
+        <Select
+          showSearch
+          options={statuses}
+          prefix={<Tag color="#ac8342">Status</Tag>}
+          placeholder="Status"
+          defaultValue={Status}
+          style={{ width: '400px' }}
+          onChange={handleStatusChange}
+        />
+      </Space>
       <Card
         style={{ background: '#00000006' }}
         title={
@@ -531,8 +573,7 @@ const PharmacyCard = () => {
               <Space direction="horizontal">
                 <Button
                   disabled={
-                    issued ||
-                    archived ||
+                    disabled ||
                     postDrugIssuanceLoading ||
                     postArchivePrescriptionLoading
                   }
@@ -543,8 +584,7 @@ const PharmacyCard = () => {
                 <Button
                   type="primary"
                   disabled={
-                    issued ||
-                    archived ||
+                    disabled ||
                     postDrugIssuanceLoading ||
                     postArchivePrescriptionLoading
                   }
