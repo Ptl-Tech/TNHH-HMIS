@@ -1,34 +1,36 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@ant-design/icons'; 
-import { FaUser } from "react-icons/fa6";
-import { getVisitorsList } from "../actions/visitorsActions";
+import moment from 'moment';
 
-import { appmntList, listPatients } from "../actions/patientActions";
-import DashboardCard from "../pages/nurse-view/DashboardCard";
-import DashboardStatistics from "../pages/nurse-view/DashboardStatistics";
-import useAuth from "../hooks/useAuth";
-import { getPgAdmissionsPendingVerificationSlice } from "../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import {
+  UsergroupAddOutlined,
+  FileDoneOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
+import { FaUser } from 'react-icons/fa6';
+import { getVisitorsList } from '../actions/visitorsActions';
+
+import { appmntList, listPatients } from '../actions/patientActions';
+import { getPgAdmissionsPendingVerificationSlice } from '../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice';
 
 const ReceptionDashboard = () => {
-  const { visitors } = useSelector(
-    (state) => state.visitorsList
-  );
+  const { visitors } = useSelector((state) => state.visitorsList);
 
   const { patients: appointments } = useSelector((state) => state.appmntList);
 
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize useNavigate
 
-
   const [activeAppmnts, setActiveAppmnts] = useState(0);
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
     const filteredAppointments = appointments.filter((appointment) => {
-      const appointmentDate = new Date(appointment.AppointmentDate).toISOString().split("T")[0];
-      return appointmentDate === today && appointment.Status === "New"; // Filter by today's date and status "new"
+      const appointmentDate = new Date(appointment.AppointmentDate)
+        .toISOString()
+        .split('T')[0];
+      return appointmentDate === today && appointment.Status === 'New'; // Filter by today's date and status "new"
     });
     setActiveAppmnts(filteredAppointments.length); // Set the count of active appointments
   }, [appointments]);
@@ -39,9 +41,11 @@ const ReceptionDashboard = () => {
   // Filter visitors based on today's date and status "Entered"
   useEffect(() => {
     if (visitors && visitors.length > 0) {
-      const currentVisitors = visitors.filter(visitor => {
-        const visitorDate = new Date(visitor.CreatedDate).toISOString().split('T')[0];
-        return visitorDate === today && visitor.Status === "Entered"; // Filter visitors by today's date and status "Entered"
+      const currentVisitors = visitors.filter((visitor) => {
+        const visitorDate = new Date(visitor.CreatedDate)
+          .toISOString()
+          .split('T')[0];
+        return visitorDate === today && visitor.Status === 'Entered'; // Filter visitors by today's date and status "Entered"
       });
 
       setCurrentVisitorsCount(currentVisitors.length);
@@ -59,11 +63,10 @@ const ReceptionDashboard = () => {
   const currentVisitorsCount =
     visitors?.filter(
       (visitor) =>
-        moment(visitor.CreatedDate).format("YYYY-MM-DD") === today &&
-        visitor.Status === "Entered"
+        moment(visitor.CreatedDate).format('YYYY-MM-DD') === today &&
+        visitor.Status === 'Entered',
     ).length || 0;
 
- 
   // Navigate to the visitor list page// General handler for card clicks to navigate to respective pages
   const handleCardClick = (route) => {
     navigate(route); // Navigate to the respective route based on the card clicked
@@ -82,7 +85,7 @@ const ReceptionDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
               onClick={() => handleCardClick('/reception/visitors-list')} // Use dynamic navigation
             >
               <div className="card-body">
@@ -99,16 +102,16 @@ const ReceptionDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: "#58586e", color: "#fafafa" }}
+              style={{ backgroundColor: '#58586e', color: '#fafafa' }}
               onClick={() => handleCardClick('/reception/appointments/list')} // Use dynamic navigation
-
             >
               <div className="card-body">
                 <div className="card-title p-2">
                   <FileDoneOutlined style={{ marginRight: 8 }} />
                   Total Appointments
                 </div>
-                <p className="text-white">{activeAppmnts}</p> {/* Show active appointments count */}
+                <p className="text-white">{activeAppmnts}</p>{' '}
+                {/* Show active appointments count */}
               </div>
             </div>
           </div>
@@ -117,14 +120,15 @@ const ReceptionDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
             >
               <div className="card-body">
                 <div className="card-title p-2">
                   <UsergroupAddOutlined style={{ marginRight: 8 }} />
                   Active Patients List
                 </div>
-                <p className="text-white">0</p> {/* Replace with dynamic count */}
+                <p className="text-white">0</p>{' '}
+                {/* Replace with dynamic count */}
               </div>
             </div>
           </div>
@@ -133,7 +137,7 @@ const ReceptionDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: "#ac8342", color: "#fafafa" }}
+              style={{ backgroundColor: '#ac8342', color: '#fafafa' }}
             >
               <div className="card-body">
                 <div className="card-title p-2">
