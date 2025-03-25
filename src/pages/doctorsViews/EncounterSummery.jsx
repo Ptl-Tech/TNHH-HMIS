@@ -18,18 +18,22 @@ const EncounterSummery = () => {
   const otherPatientDetails = location.state?.patientDetails || {};
   const dispatch = useDispatch();
 
-  const { loading: loadingPatientDetail, data: patientDetail } = useSelector((state) => state.getPatientVisit);
-  const { data } = useFetchPatientDetailsHook(patientDetails?.PatientNo);
+  const { loading: loadingPatientDetail, data: patientDetail } = useSelector(
+    (state) => state.getPatientVisit
+  );
+
+  const { patientDetails: data } = useFetchPatientDetailsHook(patientDetails?.PatientNo);
+
+  console.log('patientDetails', patientDetails);
+  console.log('Patient details data from the component', data);
 
   useEffect(() => {
     dispatch(getAppmntDetails(patientDetails?.LinkNo));
   }, [dispatch, patientDetails?.LinkNo]);
 
-
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
-      
-      <NurseInnerHeader title="Encounter Summery" />
+      <NurseInnerHeader title="Encounter Summary" />
 
       <Row gutter={8}>
         <Col
@@ -39,8 +43,12 @@ const EncounterSummery = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-          <EncounterSummeryCard patientDetails={patientDetail} otherPatientDetails={otherPatientDetails} loadingPatientDetail={loadingPatientDetail} data={data} />
-
+          <EncounterSummeryCard
+            patientDetails={patientDetail}
+            otherPatientDetails={otherPatientDetails}
+            loadingPatientDetail={loadingPatientDetail}
+            data={data}
+          />
         </Col>
         <Col
           xs={24}
@@ -49,8 +57,12 @@ const EncounterSummery = () => {
           xl={24}
           className="inpatient-card-left-col"
         >
-            <EvaluationCardContent treatmentNo={treatmentNo} patientNo={patientNo} patientDetails={patientDetails} role={role}/>
-
+          <EvaluationCardContent
+            treatmentNo={treatmentNo}
+            patientNo={patientNo}
+            patientDetails={patientDetails}
+            role={role}
+          />
         </Col>
       </Row>
     </div>

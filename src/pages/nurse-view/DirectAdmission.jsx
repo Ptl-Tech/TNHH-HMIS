@@ -1,91 +1,117 @@
-import { DisconnectOutlined } from "@ant-design/icons";
+import { DisconnectOutlined, BankOutlined } from "@ant-design/icons";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import PatientInfo from "./nurse-patient-file/PatientInfo";
-import { Button, Card, Col, Form, Input, Row } from "antd";
+import AssignBed from "./AssignBed";
+import { Button, Card, Form, message } from "antd";
+import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
+import {
+  POST_ADMISSION_FORM_DETAILS_FAILURE,
+  POST_ADMISSION_FORM_DETAILS_SUCCESS,
+  postAdmissionFormDetailsSlice,
+} from "../../actions/nurse-actions/postAdmissionFormDetailsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { postPatientAdmission } from "../../actions/Doc-actions/Admission/postAdmitPatient";
 const DirectAdmission = () => {
+  const { selectedRow, selectedRowKey, rowSelection } =
+    useSetTableCheckBoxHook();
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const [psychiatricCoding, setPsychiatricCoding] = useState(null);
+  const [codingReason, setCodingReason] = useState(null);
+  const location = useLocation();
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
+  const { loadingAdmissionDetails } = useSelector(
+    (state) => state.postAdmissionFormDetails);
+  const handleOnFinish = async () => {
+    //validate form fields
+    form
+      .validateFields()
+      .then(() => {
+        handleAssignBed();
+      })
+      .catch(() => {
+        message.error("Please fill in all required fields");
+      });
+  };
+  const handleAssignBed = async () => {
+    if (!selectedRow[0]) {
+      return message.warning("Please select bed to assign patient");
+    }
+
+    if (selectedRow[0]?.Occupied === true) {
+      return message.warning(
+        "Bed is already occupied, please select another bed"
+      );
+    }
+
+    const formData = {
+      myAction: "create",
+      admissionNo: "",
+      recId: "",
+      patientNo,
+      wardRoom: selectedRow[0]?.Room_No,
+      ward: selectedRow[0]?.WardNo,
+      bed: selectedRow[0]?.BedNo,
+      psychiatricCoding,
+      codingReason,
+      admissionType: "0",
+    };
+
+    try {
+      const result = await dispatch(postAdmissionFormDetailsSlice(formData));
+      if (result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS) {
+        await dispatch(postPatientAdmission({ admissionNo: result.payload.admissionNo }));
+        message.success(
+          result.payload.message ||
+            "Patient addmitted successfully"
+        );
+        navigate(`/Nurse/Inpatient`);
+      } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
+        message.error(
+          result.payload.message ||
+            "Failed to admit patient, please try again"
+        );
+      }
+    } catch (error) {
+      message.error(
+        error.message || "An internal error occurred, please try again"
+      );
+    }
+  };
   return (
     <div>
       <PatientInfo />
 
       <div style={{ marginTop: "20px" }}>
-        <NurseInnerHeader
-          icon={<DisconnectOutlined />}
-          title="Direct Admissions Form"
-        />
+        <Card className="admit-patient-card-container">
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <NurseInnerHeader
+              icon={<DisconnectOutlined />}
+              title="Direct Admissions Form"
+            />
+            <Button
+              size="large"
+              type="primary"
+              disabled={!selectedRowKey}
+              onClick={handleOnFinish}
+              loading={loadingAdmissionDetails}
+            >
+              <BankOutlined />
+              Assign Bed
+            </Button>
+          </div>
+        </Card>
         <div style={{ marginTop: "20px" }}>
-          <Card style={{ padding: "20px" }}>
-            <Form layout="vertical" style={{ paddingTop: "10px" }}>
-              <Row gutter={[16, 16]}>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Admission Reason">
-                    <Input
-                      type="text"
-                      placeholder="Enter admission reason"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Psychiatric coding">
-                    <Input
-                      type="text"
-                      placeholder="Enter psychiatric coding"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]}>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Code Reason">
-                    <Input
-                      type="text"
-                      placeholder="Enter code reason"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Select Ward">
-                    <Input
-                      type="text"
-                      placeholder="Please select ward"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]}>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Select Ward Room">
-                    <Input
-                      type="text"
-                      placeholder="Please select ward room"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col md={12} sm={24}>
-                  <Form.Item label="Select Bed">
-                    <Input
-                      type="text"
-                      placeholder="Please select bed"
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                style={{ width: "50%" }}
-                icon={<DisconnectOutlined />}
-              >
-                Admit Patient
-              </Button>
-            </Form>
-          </Card>
+          <AssignBed
+            rowSelection={rowSelection}
+            handleOnFinish={handleOnFinish}
+            form={form}
+            setPsychiatricCoding={setPsychiatricCoding}
+            setCodingReason={setCodingReason}
+          />
         </div>
       </div>
     </div>

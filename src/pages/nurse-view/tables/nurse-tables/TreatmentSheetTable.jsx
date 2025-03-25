@@ -1,7 +1,8 @@
 import { Table } from "antd"
 import PropTypes from "prop-types";
+import { useState } from "react";
 
-const TreatmentSheetTable = ({ rowSelection }) => {
+const TreatmentSheetTable = ({ loadingTreatmentSheet, treatmentSheet }) => {
 
     const columns = [
         {
@@ -40,28 +41,53 @@ const TreatmentSheetTable = ({ rowSelection }) => {
             key: 'status',
         }
       ];
+
+       const [pagination, setPagination] = useState({
+          current: 1,
+          pageSize: 10,
+          total: treatmentSheet?.length,
+        });
       
-      const data = [
-        {
-            key: '1',
-            drugNumber: '1',
-            drugName: 'Paracetamol',
-            datePrescribed: '2023-04-20',
-            prescribedBy: 'Dr. John Doe',
-            daysPrescribed: '3',
-            daysRemaining: '2',
-            status: 'Active'
-        }
-      ];
+        const handleTableChange = (newPagination) => {
+          setPagination(newPagination); // Update pagination settings
+        };
+  
   return (
-    <div style={{ paddingTop: '30px' }}>
+    <div>
          <Table 
          
             columns={columns} 
-            dataSource={data} 
+            rowKey={(record, index) => record.Time + index}
+            bordered
+            size="middle"
+            dataSource={treatmentSheet}
+            loading={loadingTreatmentSheet} 
             className="admit-patient-table"
-            rowSelection={rowSelection}
-         
+            pagination={{
+              ...pagination,
+              total: treatmentSheet?.length,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              position: ["bottom", "right"],
+              showTotal: (total, range) =>
+                `${range[0]}-${range[1]} of ${total} items`,
+              onChange: (page, pageSize) =>
+                handleTableChange({
+                  current: page,
+                  pageSize,
+                  total: pagination.total,
+                }),
+              onShowSizeChange: (current, size) =>
+                handleTableChange({
+                  current,
+                  pageSize: size,
+                  total: pagination.total,
+                }),
+              style: {
+                marginTop: "30px",
+              },
+            }}
+            
          />
     </div>
   )
@@ -71,5 +97,6 @@ export default TreatmentSheetTable
 
 //props types validations
 TreatmentSheetTable.propTypes = {
-    rowSelection: PropTypes.object.isRequired,
+    loadingTreatmentSheet: PropTypes.bool,
+    treatmentSheet: PropTypes.array
 }

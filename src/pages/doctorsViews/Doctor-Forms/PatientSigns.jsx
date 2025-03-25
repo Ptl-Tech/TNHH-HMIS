@@ -243,51 +243,72 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
   ];
 
   const handleNext = async () => {
+    console.log("button clicked 1");
     try {
+      // Ensure latest form values are retrieved
       const values = await form.validateFields();
+      
+      // Ensure correct step data
       const currentStepData = steps[currentStep];
-      const updatedNotes = currentStepData?.notesType?.map((type) => ({
-        myAction: "create",
-        recId: "",
-        notesType: type,
-        notes: values[type],
-        treatmentNo,
-        patientNo,
-      }));
-      // ?.filter((note) => {
-      //   console.log(`Filtering note:`, note); // Debug
-      //   return note?.notes?.trim() !== "" && !lastSavedNotes[note.notesType];
-      // });
-
-      if (updatedNotes?.length) {
+      console.log("button clicked 2", currentStepData);
+  
+      // Generate updated notes
+      const updatedNotes =
+        currentStepData?.notesType?.map((type) => ({
+          myAction: "create",
+          recId: "",
+          notesType: type,
+          notes: values[type], // Ensure values[type] exists
+          treatmentNo,
+          patientNo,
+        })) || []; // Ensure it doesn't become undefined
+  
+      console.log("button clicked 3", updatedNotes);
+  
+      if (updatedNotes.length > 0) {
+        console.log("button clicked 4", updatedNotes.length);
+  
+        // Ensure dispatch works correctly
         const results = await Promise.all(
-          updatedNotes.map((note) => dispatch(postPatientHistoryNotes(note)))
+          updatedNotes.map(async (note) => {
+            const response = await dispatch(postPatientHistoryNotes(note));
+            return response.payload || response; // Ensure proper response handling
+          })
         );
+  
+        console.log("button clicked 5", results);
+  
+        // Check for success
         if (results.every((res) => res === "success")) {
           message.success("Notes saved successfully!");
+  
+          // Ensure state updates properly
           setLastSavedNotes((prev) => ({
             ...prev,
             ...Object.fromEntries(
               updatedNotes.map((note) => [note.notesType, note.notes])
             ),
           }));
+  
           dispatch(getPatientHistorySlice(treatmentNo));
         } else {
           message.error("Failed to save some notes.");
         }
+      } else {
+        console.warn("No updated notes found, skipping API call.");
       }
-
+  
+      // Move to the next step
       if (currentStep === steps.length - 1) {
-        // Trigger the parent callback to move to the next tab if this is the last step
         moveToNextTab();
       } else {
-        // Move to the next step
         setCurrentStep((prev) => prev + 1);
       }
     } catch (err) {
-      console.log("some error", err);
+      console.error("Error occurred:", err);
     }
   };
+  
 
   const handlePrev = () => setCurrentStep((prev) => prev - 1);
   // console.log(currentStep, 'currentStep');

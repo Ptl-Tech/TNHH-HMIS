@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, message, Row, Select, Space } from "antd"
+import { Button, Col, Form, message, Row, Select, Space } from "antd"
 import TextArea from "antd/es/input/TextArea"
 import { useDispatch } from "react-redux";
 import { POST_DIETARY_INTAKE_FORM_LINE_FAILURE, POST_DIETARY_INTAKE_FORM_LINE_SUCCESS, postDietaryIntakeFormLineSlice } from "../../../actions/nurse-actions/postDietaryIntakeFormLineSlice";
@@ -80,7 +80,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
           loading={loadingIpLookupValues}
           options={filterIpLookupValues?.map((item) => ({
             value: item.Category,
-            label: item.Description,
+            label: item.Category,
           }))}
           allowClear
 
@@ -118,7 +118,7 @@ const DietaryIntakeFormData = ({ form, patientDetails, filterIpLookupValues, set
                 loading={loadingDietaryIntake}
                 disabled={loadingDietaryIntake}     
                 >
-                    Save MSE Form
+                    Save Dietary Intake
                 </Button>
                 <Button color="danger" variant="outlined" icon={<CloseOutlined />} onClick={() => setIsFormVisible(false)}
                 >

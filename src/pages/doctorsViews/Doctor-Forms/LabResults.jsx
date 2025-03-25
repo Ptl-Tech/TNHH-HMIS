@@ -40,6 +40,7 @@ const LabResults = () => {
   const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+  console.log('admission number', admissionNo)
 
 
   const dispatch = useDispatch();
@@ -87,24 +88,21 @@ const LabResults = () => {
   }, [dispatch, treatmentNo, admissionNo]);
 
   const handleLabRequest = async () => {
-    if (selectedRow && selectedRow.TreatmentNo) {
-      try {
-        const response = await dispatch(requestLabTest(selectedRow.TreatmentNo));
-        if (response) {
-          message.success(
-            `Requesting test for ${selectedRow.LaboratoryTestPackageName} with Laboratory No: ${response.laboratoryNo}`
-          );
-          // Refresh the patient lab test data
-          dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
-        } else {
-          message.error("Failed to request the lab test. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error requesting lab test:", error);
-        message.error("An error occurred while requesting the lab test.");
+    //fetch treatmentNo from the URL
+    try {
+      const response = await dispatch(requestLabTest(treatmentNo ?? admissionNo));
+      if (response) {
+        message.success(
+          `Requesting test for Laboratory No: ${response.laboratoryNo}`
+        );
+        // Refresh the patient lab test data
+        dispatch(getPatientLabTest(admissionNo ?? treatmentNo));
+      } else {
+        message.error("Failed to request the lab test. Please try again.");
       }
-    } else {
-      message.warning("Please select a lab test to proceed.");
+    } catch (error) {
+      console.error("Error requesting lab test:", error);
+      message.error("An error occurred while requesting the lab test.");
     }
   };
   

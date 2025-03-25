@@ -10,7 +10,7 @@ const EncounterSummeryCard = ({ patientDetails, loadingPatientDetail, otherPatie
         <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689', padding: "10px 16px" }}>
             <div className="inpatient-details-container-1">
                 <Typography.Text className="patient-name" style={{ fontWeight: 'bold', color: '#0f5689' }}>
-                Patient Name: {patientDetails?.PatientNames || data?.Names || 'N/A' }
+                Patient Name: {patientDetails?.PatientNames || data?.SearchName || 'N/A' }
                 </Typography.Text>
                 <Typography.Text className="patient-id" style={{ fontWeight: 'bold', color: '#0f5689' }}>
                     Patient Number : {patientDetails?.PatientNo || otherPatientDetails?.PatientNo||'N/A' }

@@ -15,8 +15,8 @@ const AdmissionRequests = () => {
 const columns = [
     {
         title: 'Admission No',
-        dataIndex: 'No',
-        key: 'No',
+        dataIndex: 'AdmissionNo',
+        key: 'AdmissionNo',
         fixed: 'left',
         width: 100
     },
@@ -27,18 +27,22 @@ const columns = [
     },
     {
         title: 'Patient Names',
-        dataIndex: 'Patient_Name',
-        key: 'Patient_Name',
+        dataIndex: 'PatientName',
+        key: 'PatientName',
         render: (_, record) => {
             return <Typography.Text style={{ color: '#0f5689' }}>
-                {record.Patient_Name}
+                {record.PatientName}
             </Typography.Text>
         }
     },
     {
         title: 'Date',
-        dataIndex: 'Date',
-        key: 'Date',
+        dataIndex: 'AdmissionDate',
+        key: 'AdmissionDate',
+        //formatted date to dd/mm/yyyy
+        render: (_, record) => {
+            return record.AdmissionDate.toLocaleString('fa-IR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
     },
     {
         title: 'Doctor',
@@ -48,8 +52,8 @@ const columns = [
     },
     {
         title: 'Admission Remarks',
-        dataIndex: 'Remarks',
-        key: 'Remarks',
+        dataIndex: 'AdmissionReason',
+        key: 'AdmissionReason',
         fixed: 'right',
         width: 150
     },
@@ -97,7 +101,7 @@ const [pagination, setPagination] = useState({
     const handleVerifyAdmission = () => {
         confirm({
             title: 'Confirm Verify Patient Admission',
-            content: `Are you sure you want to verify ${selectedRow[0]?.Patient_Name} admission ?`,
+            content: `Are you sure you want to verify ${selectedRow[0]?.PatientName} admission ?`,
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
@@ -116,13 +120,15 @@ const [pagination, setPagination] = useState({
         try {
             const result = await dispatch(
               postVerifyAdmissionSlice({
-                admissionNo: selectedRow[0]?.No,
+                admissionNo: selectedRow[0]?.AdmissionNo,
               })
             );
         
             if (result.type === POST_VERIFY_ADMISSION_SUCCESS) {
               message.success(
-                result.payload.message || `${selectedRow[0]?.Patient_Name} discharge initiated successfully!`
+                result.payload.message || `${selectedRow[0]?.PatientName} Admission request has been Verified Successfully!`,
+                5
+
               );
               dispatch(getPgAdmissionsPendingVerificationSlice());
               return Promise.resolve(); // Resolve the Promise to close the modal

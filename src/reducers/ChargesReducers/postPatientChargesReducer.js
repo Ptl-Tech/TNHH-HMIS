@@ -12,13 +12,17 @@ export const postPatientChargesReducer = (
   switch (action.type) {
     case POST_CHARGES_REQUEST:
       return { ...state, loading: true };
-      case POST_CHARGES_SUCCESS:
-        console.log("Charges posted successfully:", action.payload.status);
-        return { ...state, loading: false, success: true, data: action.payload };
-      
+
+    case POST_CHARGES_SUCCESS:
+      console.log("Charges posted successfully:", action.payload.status);
+      return { ...state, loading: false, success: true, data: action.payload };
+
+    case POST_CHARGES_FAIL:
       return { ...state, loading: false, error: action.payload };
+
     case POST_CHARGES_RESET:
       return { loading: false };
+
     default:
       return state;
   }

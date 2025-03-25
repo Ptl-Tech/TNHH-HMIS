@@ -1,7 +1,6 @@
-import { Button, Card, Divider, Table } from "antd";
+import { Button } from "antd";
 import { useLocation } from "react-router-dom";
 import useFetchPastDoctorVisitsHook from "../../hooks/useFetchPastDoctorVisitsHook";
-import { FilePdfOutlined } from "@ant-design/icons";
 import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
 import {
   VerticalAlignTopOutlined,
@@ -11,26 +10,42 @@ import {
   FileAddOutlined,
   DisconnectOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import VitalsTable from "./tables/triage-tables/VitalsTable";
+import { useDispatch, useSelector } from "react-redux";
+import { getVitalsLinesSlice } from "../../actions/triage-actions/getVitalsLinesSlice";
+import EncounterListTable from "./tables/nurse-tables/EncounterListTable";
+import Diagnosis from "../doctorsViews/Doctor-Forms/Diagnosis";
+import Medication from "../doctorsViews/Doctor-Forms/Medication";
+import LabResults from "../doctorsViews/Doctor-Forms/LabResults";
+import Imaging from "../doctorsViews/Doctor-Forms/Imaging";
+import ECTScan from "./nurse-care-plan/ECTScan";
 
 const TreatmentCardContent = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const patientDetails = location.state?.patientDetails;
   const { combinedListWithDoctors } = useFetchPastDoctorVisitsHook();
   const {
-    isButtonDisabled,
-    setIsButtonDisabled,
     selectedRowKey,
     rowSelection,
     selectedRow,
   } = useSetTableCheckBoxHook();
 
+  const { loadingVitalsLines, vitalsLines } = useSelector(
+    (state) => state.getVitalsLines
+  );
+
+  useEffect(() => {
+    dispatch(getVitalsLinesSlice(selectedRow[0]?.ObservationNo));
+  }, [dispatch, selectedRow]);
+
   const filteredList = combinedListWithDoctors.filter(
     (item) => item.PatientNo === patientDetails?.PatientNo
   );
 
-  const [selectedItem, setSelectedItem] = useState(<VitalsTable />);
+  const [selectedItem, setSelectedItem] = useState("Triage");
+  console.log("selected item", selectedItem);
   const [activeItem, setActiveItem] = useState("Triage");
 
   const menuItems = [
@@ -43,97 +58,75 @@ const TreatmentCardContent = () => {
   ];
 
   const handleOnClick = (item) => {
+    console.log("item", item.label);
     setActiveItem(item.label);
     switch (item.label) {
       case "Triage":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(
+          <VitalsTable
+            filterVitals={vitalsLines}
+            loadingInpatientVitals={loadingVitalsLines}
+          />
+        );
         break;
       case "Diagnosis":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(<Diagnosis />);
         break;
       case "Prescription":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(<Medication />);
         break;
       case "Laboratory":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(<LabResults />);
         break;
       case "Radiology":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(<Imaging />);
         break;
       case "ECT":
-        setSelectedItem(<VitalsTable />);
+        setSelectedItem(<ECTScan />);
         break;
       default:
         setSelectedItem(<VitalsTable />);
     }
   };
 
-  const columns = [
-    {
-      title: "Encounter Date",
-      dataIndex: "TreatmentDate",
-      key: "TreatmentDate",
-      fixed: "left",
-      width: 150,
-    },
-    {
-      title: "Treatment Number",
-      dataIndex: "TreatmentNo",
-      key: "TreatmentNo",
-    },
-    {
-      title: "Primary Doctor",
-      dataIndex: "DoctorsName",
-      key: "DoctorsName",
-    },
-    {
-      title: "Patient Type",
-      dataIndex: "TreatmentType",
-      key: "TreatmentType",
-    },
-    {
-      title: "Print Out",
-      dataIndex: "PrintOut",
-      key: "PrintOut",
-      fixed: "right",
-      width: 100,
-      render: (_, record) => (
-        <Button rel="noopener noreferrer" icon={<FilePdfOutlined />}>
-          Discharge summary
-        </Button>
-      ),
-    },
-  ];
   return (
     <div>
-      <Table
-        style={{ marginTop: "30px" }}
-        rowKey={"TreatmentNo"}
-        columns={columns}
-        dataSource={filteredList}
-        pagination={false}
+      <EncounterListTable
+        filteredList={filteredList}
         rowSelection={rowSelection}
       />
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          gap: "10px",
+          flexWrap: "wrap",
+          paddingTop: "30px",
+        }}
+      >
+        {menuItems.map((item, index) => (
+          <Button
+            disabled={!selectedRowKey}
+            key={index}
+            className={activeItem === item.label ? "active-button" : ""}
+            onClick={() => handleOnClick(item)}
+          >
+            {item.icon}
+            {item.label}
+          </Button>
+        ))}
+      </div>
 
-        <div
-          style={{ display: "flex", flex: 1, gap: "10px", flexWrap: "wrap", paddingTop: "30px" }}
-        >
-          {menuItems.map((item, index) => (
-            <Button
-              disabled={!selectedRowKey}
-              key={index}
-              className={activeItem === item.label ? "active-button" : ""}
-              onClick={() => handleOnClick(item)}
-            >
-              {item.icon}
-              {item.label}
-            </Button>
-          ))}
-        </div>
-        
-        <div className="patient-file-content">
-          {selectedItem === "Triage" ? <VitalsTable /> : selectedItem}
-        </div>
+      <div className="patient-file-content">
+        {selectedItem === "Triage" ? (
+          <VitalsTable
+            filterVitals={vitalsLines}
+            loadingInpatientVitals={loadingVitalsLines}
+          />
+        ) : (
+          selectedItem
+        )}
+      </div>
     </div>
   );
 };

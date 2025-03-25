@@ -571,6 +571,7 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
       config
     );
 
+
     // Check if a patient was found
     if (data && Object.keys(data).length > 0) {
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });

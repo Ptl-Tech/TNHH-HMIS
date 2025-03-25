@@ -8,7 +8,6 @@ const WardTransferTable = ({ getWards, loadingWards, currentWard }) => {
   const [size, setSize] = useState();
   const [record, setRecord] = useState(null);
 
-  console.log("wards", getWards);
   // remove the current ward from the ward list
   const filteredWards = useMemo(()=>{
     return getWards.filter((ward)=>(
@@ -72,6 +71,16 @@ const WardTransferTable = ({ getWards, loadingWards, currentWard }) => {
     },
   ];
 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: filteredWards?.length,
+  });
+
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+  };
+
   return (
     <div>
       <Table
@@ -79,9 +88,30 @@ const WardTransferTable = ({ getWards, loadingWards, currentWard }) => {
         rowKey={() => Math.random().toString(36).substr(2, 9)}
         dataSource={filteredWards}
         size="small"
-        pagination={false}
         bordered
         loading={loadingWards}
+        pagination={{
+          ...pagination,
+          total: filteredWards?.length,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          position: ["bottom", "right"],
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} items`,
+          onChange: (page, pageSize) =>
+            handleTableChange({
+              current: page,
+              pageSize,
+              total: pagination.total,
+            }),
+          onShowSizeChange: (current, size) =>
+            handleTableChange({
+              current,
+              pageSize: size,
+              total: pagination.total,
+            }),
+        }}
+        
       />
 
       <BedsDrawer

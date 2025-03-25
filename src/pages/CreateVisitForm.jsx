@@ -105,7 +105,6 @@ const CreateVisitForm = () => {
     schemeName: '',
   });
 
-  console.log({ patientData });
 
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [appointmentId, setAppointmentId] = useState(null);
@@ -179,7 +178,6 @@ const CreateVisitForm = () => {
       if (response) {
         const newAppointmentId = response;
 
-        console.log("Visit created with ID:", newAppointmentId);
         // message.success("Visit created successfully!");
         notification.success({
           message: (
@@ -202,7 +200,6 @@ const CreateVisitForm = () => {
         throw new Error('Failed to retrieve appointment ID');
       }
     } catch (error) {
-      console.error('Error creating visit:', error);
       message.error('Failed to create visit!');
     }
   };
@@ -221,7 +218,6 @@ const CreateVisitForm = () => {
     }
 
     try {
-      console.log('Dispatching patient with appointment ID:', appointmentId);
 
     const OBNo=  await dispatch(postTriageVisit({ appointmentNo: appointmentId }));
     if (OBNo) {
@@ -238,7 +234,6 @@ const CreateVisitForm = () => {
       navigate(-1 || "/reception/visitors-list");
     }
     } catch (postTriageVisitError) {
-      console.error('Error dispatching patient:', error);
       //display error message from postTriageVisitError
       message.error(postTriageVisitError, error);
     }
@@ -279,7 +274,6 @@ const CreateVisitForm = () => {
 
   const handleEditPatient = () => {
     if (typeof patientNo !== 'string') {
-      console.error('Invalid patientNo:', patientNo);
       return;
     }
 
@@ -303,7 +297,6 @@ const CreateVisitForm = () => {
           acc.push(curr);
         }
 
-        console.log({ acc });
         return acc;
       }, [])
       .join(' ');
@@ -488,12 +481,8 @@ const CreateVisitForm = () => {
                         placeholder="Select Insurance"
                         className="w-100"
                         value={
-                          newVisit.insuranceNo ||
-                          insurancePayload?.find(
-                            (insurance) =>
-                              insurance.No === existingPatient?.InsuranceNo,
-                          )?.No ||
-                          ''
+                          newVisit.insuranceNo || existingPatient?.InsuranceNo ||
+                          ""
                         }
                         onChange={(value) =>
                           handleInputChange('insuranceNo', value)

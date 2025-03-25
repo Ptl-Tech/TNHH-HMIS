@@ -1,125 +1,112 @@
-import { Button, Form, Input, Modal } from "antd"
-import { PlusOutlined, FolderViewOutlined, FileOutlined } from "@ant-design/icons"
-import { useState } from "react";
+import { Button, Form, Input, Modal } from "antd";
+import { PlusOutlined, FileOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import AddAllergiesTable from "../tables/nurse-tables/AddAllergiesTable";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
-import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
 
 const AddAllergies = () => {
+  const [form] = Form.useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const { rowSelection } = useSetTableCheckBoxHook();
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const { loadingGetAllergiesAndMedications, allergiesMedication } =
+    useSelector((state) => state.getAllergiesAndMedications);
+  const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
 
-        const [ form ] = Form.useForm();
-        const [isModalOpen, setIsModalOpen] = useState(false);
-        const { patientDetails } = useLocation().state;
-        const [isFormVisible, setIsFormVisible] = useState(false);
-const observationNumber = new URLSearchParams(window.location.search).get("AdmNo");
-        const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
-        const { combinedList, loadingAllergies, loadingTriageList } = useFetchAllergiesAndMedicationsHook();
-        const filterAllergies = combinedList?.filter(allergy => allergy.PatientNo === patientDetails?.Patient_No);
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
-        const handleCancel = () => {
-          setIsModalOpen(false);
-        };
+  const handleButtonVisibility = () => {
+    setIsFormVisible(!isFormVisible);
+  };
 
-        const handleButtonVisibility = () => {
-          setIsFormVisible(!isFormVisible);
-        }
+  useEffect(() => {
+    dispatch(getAllergiesAndMedicationsSlice(admissionNo));
+  }, [dispatch, admissionNo]);
 
-        const handleViewAllergies = () => {
-          if (selectedRow[0]) {
-            //set form fields
-            form.resetFields();
-            form.setFieldsValue({
-              complaints: selectedRow[0]?.Complaints,
-              foodAllergy: selectedRow[0]?.FoodAllergy,
-              drugAllergy: selectedRow[0]?.DrugAllergy,  
-            });
-            setIsModalOpen(true);
-          }
-        }
-
-    
   return (
     <div>
+      <NurseInnerHeader
+        icon={<FileOutlined />}
+        title="Allergies and Medications"
+      />
 
-        <NurseInnerHeader icon={<FileOutlined />} title="Allergies and Medications" />
+      {!isFormVisible && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            paddingBottom: "20px",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            type="primary"
+            onClick={handleButtonVisibility}
+            icon={<PlusOutlined />}
+          >
+            Add Allergies and Medications
+          </Button>
+        </div>
+      )}
 
-        
-          {
-            !isFormVisible && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
-              <Button type="primary" onClick={handleButtonVisibility} icon={<PlusOutlined />}>
-              Add Allergies and Medications
-              </Button>
-              {/* <Button type="primary" disabled={!selectedRowKey} onClick={handleViewAllergies}><FolderViewOutlined /> View Allergies and Medications</Button> */}
-              </div>
-            )
-          }
-          
-        
+      {isFormVisible && (
+        <AllergyAndMedication
+          setIsFormVisible={setIsFormVisible}
+          observationNumber={admissionNo}
+        />
+      )}
 
-        {
-          isFormVisible && (
-            <AllergyAndMedication setIsFormVisible={setIsFormVisible} observationNumber={observationNumber} />
-          )
-        }
+      {!isFormVisible && (
+        <AddAllergiesTable
+          rowSelection={rowSelection}
+          loadingGetAllergiesAndMedications={loadingGetAllergiesAndMedications}
+          allergiesMedication={allergiesMedication}
+        />
+      )}
 
-        {
-          !isFormVisible && (
-            <AddAllergiesTable rowSelection={rowSelection} filterAllergies={filterAllergies} loadingAllergies={loadingAllergies} loadingTriageList={loadingTriageList} />
-          )
-        }
-        
-
-        <Modal title="Add Allergies and Medications" 
+      <Modal
+        title="Add Allergies and Medications"
         open={isModalOpen}
         footer={[
           <Button key="cancel" color="danger" onClick={handleCancel}>
             Cancel
           </Button>,
         ]}
-        >
+      >
         <Form
-            layout="vertical" 
-            style={{ paddingTop: '10px'}} 
-            form={form}
-            autoComplete="off"
-            initialValues={{
-                complains: '',
-                foodAllergy: '',
-                drugAllergy: '',
-            }}
-            >
-            <Form.Item label="Complains" 
-                name='complains'
-                hasFeedback
-                >
-                <Input type='text' 
-                    
-                />
-            </Form.Item>  
-            <Form.Item label="Food Allergy"
-              name='foodAllergy'
-              hasFeedback
-            >
-            <Input type='text' 
-            />
-        </Form.Item>
-        <Form.Item label="Drug Allergy" 
-                name='drugAllergy'
-                hasFeedback
-            >
-            <Input type='text' 
-        
-            />
-        </Form.Item>
+          layout="vertical"
+          style={{ paddingTop: "10px" }}
+          form={form}
+          autoComplete="off"
+          initialValues={{
+            complains: "",
+            foodAllergy: "",
+            drugAllergy: "",
+          }}
+        >
+          <Form.Item label="Complains" name="complains" hasFeedback>
+            <Input type="text" />
+          </Form.Item>
+          <Form.Item label="Food Allergy" name="foodAllergy" hasFeedback>
+            <Input type="text" />
+          </Form.Item>
+          <Form.Item label="Drug Allergy" name="drugAllergy" hasFeedback>
+            <Input type="text" />
+          </Form.Item>
         </Form>
-        </Modal>
-
+      </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default AddAllergies
+export default AddAllergies;

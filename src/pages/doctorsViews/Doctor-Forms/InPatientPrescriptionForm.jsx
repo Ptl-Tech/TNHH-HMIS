@@ -23,7 +23,7 @@ import {
   import { useLocation } from "react-router-dom";
   import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
   import useAuth from "../../../hooks/useAuth";
-  import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
+  import { getInPatientQyPrescriptionLineSlice, getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
   import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
   
   const InPatientPrescriptionForm = ({ setShowForm }) => {
@@ -75,7 +75,7 @@ import {
       };
       setIsSubmitting(true); // Start the loading simulation
       await dispatch(postInPatientPrescriptionDetails(prescription))
-      dispatch(getQyPrescriptionLineSlice())
+      dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
       setShowForm(false)
   
     };

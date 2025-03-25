@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { UsergroupAddOutlined, FileDoneOutlined, CheckCircleOutlined } from '@ant-design/icons'; 
 import { FaUser } from "react-icons/fa6";
 import { getVisitorsList } from "../actions/visitorsActions";
+
 import { appmntList, listPatients } from "../actions/patientActions";
+import DashboardCard from "../pages/nurse-view/DashboardCard";
+import DashboardStatistics from "../pages/nurse-view/DashboardStatistics";
+import useAuth from "../hooks/useAuth";
+import { getPgAdmissionsPendingVerificationSlice } from "../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice";
 
 const ReceptionDashboard = () => {
   const { visitors } = useSelector(
@@ -16,12 +21,8 @@ const ReceptionDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const [currentVisitorsCount, setCurrentVisitorsCount] = useState(0);
-  const [activeAppmnts, setActiveAppmnts] = useState(0);
 
-  useEffect(() => {
-    dispatch(appmntList()); // Fetch appointment list
-  }, [dispatch]);
+  const [activeAppmnts, setActiveAppmnts] = useState(0);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0]; // Current date in YYYY-MM-DD format
@@ -31,11 +32,6 @@ const ReceptionDashboard = () => {
     });
     setActiveAppmnts(filteredAppointments.length); // Set the count of active appointments
   }, [appointments]);
-
-  useEffect(() => {
-    dispatch(getVisitorsList()); // Fetch visitors list
-    dispatch(listPatients()); // Fetch patients list
-  }, [dispatch]);
 
   // Calculate today's date
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -52,6 +48,22 @@ const ReceptionDashboard = () => {
     }
   }, [visitors, today]);
 
+  useEffect(() => {
+    dispatch(appmntList());
+    dispatch(listPatients());
+    dispatch(getVisitorsList());
+    dispatch(getPgAdmissionsPendingVerificationSlice());
+  }, [dispatch]);
+
+  // Compute counts for dashboard cards
+  const currentVisitorsCount =
+    visitors?.filter(
+      (visitor) =>
+        moment(visitor.CreatedDate).format("YYYY-MM-DD") === today &&
+        visitor.Status === "Entered"
+    ).length || 0;
+
+ 
   // Navigate to the visitor list page// General handler for card clicks to navigate to respective pages
   const handleCardClick = (route) => {
     navigate(route); // Navigate to the respective route based on the card clicked

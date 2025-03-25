@@ -51,6 +51,7 @@ import {
   DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL,
   DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET,
 } from "../actions/patientActions";
+
 export const patientCreateReducer = (state = { loading: false }, action) => {
   switch (action.type) {
     case PATIENT_REGISTER_REQUEST:
@@ -147,24 +148,6 @@ const initialTriageVisitCreateState = {
   data: null,
 };
 
-export const patientListReducer = (
-  state = { loading: false, patients: [] },
-  action
-) => {
-  switch (action.type) {
-    case PATIENT_LIST_REQUEST:
-      return { loading: true, patients: [] };
-    case PATIENT_LIST_SUCCESS:
-      return { loading: false, patients: action.payload };
-    case PATIENT_LIST_FAIL:
-      return { loading: false, error: action.payload };
-    case PATIENT_LIST_RESET:
-      return { patients: [] };
-    default:
-      return state;
-  }
-};
-
 export const patientTriageVisitCreateReducer = (
   state = initialTriageVisitCreateState,
   action
@@ -213,6 +196,24 @@ export const convertPatientReducer = (state = {}, action) => {
       return { loading: false, error: action.payload };
     case CONVERT_TO_PATIENT_RESET:
       return {};
+    default:
+      return state;
+  }
+};
+
+export const patientListReducer = (
+  state = { loading: false, patients: [], error: null }, 
+  action
+) => {
+  switch (action.type) {
+    case PATIENT_LIST_REQUEST:
+      return { ...state, loading: true, error: null }; // Reset error on request
+    case PATIENT_LIST_SUCCESS:
+      return { loading: false, patients: action.payload, error: null };
+    case PATIENT_LIST_FAIL:
+      return { loading: false, patients: [], error: action.payload };
+    case PATIENT_LIST_RESET:
+      return { loading: false, patients: [], error: null };
     default:
       return state;
   }
@@ -289,4 +290,4 @@ export const postDoctorTreatmentReducer = (state = {}, action) => {
     default:
       return state;
   }
-};
+}

@@ -57,6 +57,8 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
       };
     });
 
+    console.log('filtered data', filterCollapseData);
+
   const groupedData = filterCollapseData?.reduce((acc, item) => {
     acc[item.Notes_Type] = {
       Line_No: item.Line_No,
@@ -68,6 +70,7 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
     return acc;
   }, {});
 
+  console.log("grouped data", groupedData);
   const handleCollapseChange = (key) => {
     setActiveKey(key); // Store open collapse key
   };
