@@ -184,10 +184,14 @@ import { getQyInpatientProcessProceduresReducer } from './nurse-reducers/getQyIn
 import { postInpatientInjectionReducer } from './nurse-reducers/postInpatientInjectionReducer';
 import { getInpatientInjectionReducer } from './nurse-reducers/getInpatientInjectionReducer';
 import { getQyTreatmentDiagnosisLinesReducer } from './nurse-reducers/getQyTreatmentDiagnosisLinesReducer';
-import { getPgBedsDetailsReducer, getPgBedsReducer } from './nurse-reducers/getPgBedsReducer';
+import {
+  getPgBedsDetailsReducer,
+  getPgBedsReducer,
+} from './nurse-reducers/getPgBedsReducer';
 import { getPgWardsListReducer } from './nurse-reducers/getPgWardsListReducer';
 import { postAdmissionFormDetailsReducer } from './nurse-reducers/postAdmissionFormDetailsReducer';
 // import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
+
 import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
 import { QySecondaryDiagnosisSetupReducer } from "./doc-reducers/getSecondaryDiagnosisSetup";
 import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
@@ -204,8 +208,12 @@ import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreat
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 import { getInPatientQyPrescriptionLines, getQyPrescriptionLinesReducer, getTreatmentSheetLines, postTreatmentSheetLines } from "./doc-reducers/QyPrescriptionLinesReducer";
 import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest, getPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
+
+import { postPatientKetamineRequest } from '../actions/Doc-actions/postDoctorProcedures';
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
+import { dispatchWalkInLab } from '../actions/patientActions';
+
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
@@ -247,6 +255,11 @@ import { generateLabResultsReportReducer } from './lab-reducers/generateLabResul
 import { getSinglePatientReducer } from './reception-reducers/getSinglePatientReducer';
 import { createLabTestHeaderReducer } from './lab-reducers/createLabTestHeader';
 import { postLabTestLinesReducer } from './lab-reducers/postLabTestLinesReducer';
+
+import { updateLabTestLinesReducer } from './lab-reducers/updateLabTestLines';
+import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
+import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
+import getPharmacyRequestsAllReducer from './pharmacy-reducers/getPharmacyRequestsAllReducer';
 import { getSplitReceiptLinesReducer } from './ChargesReducers/getSplitReceiptLinesReducer';
 import { postReceiptSplitLineReducer } from './ChargesReducers/postReceiptSplitLinesReducer';
 import { getReceiptPageReducer } from './ChargesReducers/getReceiptPageReducer';
@@ -332,9 +345,9 @@ export const rootReducer = combineReducers({
   saveRefferalDetails: saveReferralDetailsReducer,
   requestRefferal: requestReferralReducer,
   postPrescription: savePrescriptionDetailsReducer,
-  postInPatientPrescription:saveInPatientPrescriptionDetails,
+  postInPatientPrescription: saveInPatientPrescriptionDetails,
   sendtoPharmacy: sendtoPharmacyReducer,
-  inpatientSentToPharmacy:inpatientSendToPharmacyReducer,
+  inpatientSentToPharmacy: inpatientSendToPharmacyReducer,
   saveSigns: saveSignsReducer,
   saveSyptoms: saveSyptomsReducer,
   patientLabTest: viewPatientLabTestReducer,
@@ -354,6 +367,20 @@ export const rootReducer = combineReducers({
   createLabTestHeader: createLabTestHeaderReducer,
   postLabRequestToDoctor: postLabRequestToDoctorReducer,
   generateLabResultsReport: generateLabResultsReportReducer,
+  updateLabTestLines: updateLabTestLinesReducer,
+  // ************************************* /
+
+  // pharmacy
+  postDrugIssuance: postDrugIssuanceReducer,
+  postPharmacyHeader: postPharmacyHeaderReducer,
+  getNewPharmacyList: getNewPharmacyRequestsReducer,
+  getPharmacyHistoryList: getPharmacyHistoryListReducer,
+  getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
+  getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
+  postArchivePrescription: postArchivePrescriptionReducer,
+  postPrescriptionQuantity: postPrescriptionQuantityReducer,
+  getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
+  getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
   // ************************************* /
 
   getSinglePatient: getSinglePatientReducer,
@@ -423,13 +450,6 @@ export const rootReducer = combineReducers({
   getAdmissionLines: getAdmissionLinesReducer,
   getDiagnosisLines: getDiagnosisLinesReducer,
   getReferralLines: getReferralLinesReducer,
-  getNewPharmacyList: getNewPharmacyRequestsReducer,
-  postDrugIssuance: postDrugIssuanceReducer,
-  postPrescriptionQuantity: postPrescriptionQuantityReducer,
-  postArchivePrescription: postArchivePrescriptionReducer,
-  getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
-  getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
-  getPharmacyHistoryList: getPharmacyHistoryListReducer,
   getPatientVisit: getPatientVisitReducer,
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
@@ -447,14 +467,16 @@ export const rootReducer = combineReducers({
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,
+
   postTreatmentSheet: postTreatmentSheetLines,
   getTreatmentSheet: getTreatmentSheetLines,
   getInPatientPrescriptionLine:getInPatientQyPrescriptionLines,
+
   postPatientETC: postPatientECTRequest,
   getPatientETC: getPatientECTRequest,
   postKetamine: postPatientKetamineReducer,
   getKetamine: getPatientKetamineRequest,
-  getPatientImplant:getPatientImplantRequest,
+  getPatientImplant: getPatientImplantRequest,
   postImplant: postPatientImplantRequest,
   checkInConsulation: postCheckInPatientConfirmReducer,
   markAsCompleted: postMarkAsCompletedReducer,
@@ -462,8 +484,8 @@ export const rootReducer = combineReducers({
   dispatchWalkInLab: dispatchWalkInLabReducer,
   dispatchWalkInPharmacy: dispatchWalkInPharmacyReducer,
   postPsychologyRequest: postPsychologyRequestReducer,
-  postNursingCarePlan:postNursingCarePlanReducer,
-  getNursingCarePlan:getNursingCarePlanReducer,
+  postNursingCarePlan: postNursingCarePlanReducer,
+  getNursingCarePlan: getNursingCarePlanReducer,
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,
@@ -482,11 +504,11 @@ export const rootReducer = combineReducers({
   getUnpostedCharges: getUnpostedChargesReducer,
   getPostedCharges: getpostedChargesReducer,
   deletePatientCharges: deletePatientChargesReducer,
+
   postSalesInvoice:postsalesInvoiceReducer,
   reopenPostedCharges:reopensalesInvoiceReducer,
   postRebates:postRebatesReducer,
   postDiscount:postDiscountReducer,
-
 
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,

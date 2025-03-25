@@ -32,6 +32,7 @@ import useAuth from '../hooks/useAuth';
 
 // routes
 import { labRoutes } from '../Routes/LabRoutes';
+import { pharmacyRoutes } from '../Routes/PharmacyRoutes';
 import { receptionRoutes } from '../Routes/ReceptionRoutes';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -505,24 +506,6 @@ const MainLayout = () => {
             icon: <UserOutlined style={{ color: '#fff' }} />,
           },
         ],
-      },
-    ];
-
-    const pharmacyRoutes = [
-      {
-        key: '/Pharmacy',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Dashboard',
-      },
-      {
-        key: '/Pharmacy/Pharmacy-OutPatient',
-        label: 'Pharmacy OutPatients',
-        icon: <TeamOutlined style={{ color: '#fff' }} />,
-      },
-      {
-        key: '/Pharmacy/Pharmacy-Inpatient',
-        label: 'Pharmacy In-Patient List',
-        icon: <UserSwitchOutlined style={{ color: '#fff' }} />,
       },
     ];
 

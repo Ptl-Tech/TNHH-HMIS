@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { SearchOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
+
 import { useEffect } from "react";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
@@ -24,6 +25,7 @@ import {
 } from "../../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
 const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
+
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const { loading: loadingPostTreatmentSheet } = useSelector(
@@ -39,6 +41,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
   const handleOnFinish = async (values) => {
     try {
       const { DrugNo, Dosage, Quantity, TreatmentRemarks } = values;
+
       const treatmentSheet = {
         myAction: "create",
         admissionNo,
@@ -61,6 +64,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         );
         setIsFormVisible(false);
         form.resetFields();
+
         dispatch(getTreatmentSheetLineSlice(admissionNo));
       } else if (response.type === POST_TREATMENT_SHEET_LINE_FAILURE) {
         message.error(
@@ -78,6 +82,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
   useEffect(() => {
     dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
   }, [dispatch, admissionNo]);
+
 
   return (
     <Form
@@ -125,7 +130,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                         </Select.Option>
                       ))
                   }
-                    
+
                 </Select>
               )}
             </Form.Item>
@@ -158,6 +163,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                 },
               ]}
             >
+
               <Input type="number" placeholder="Enter Quantity" />
             </Form.Item>
             {/* <Form.Item
