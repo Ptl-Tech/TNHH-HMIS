@@ -71,6 +71,7 @@ import EncounterSummery from "./pages/doctorsViews/EncounterSummery";
 import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PharmacyRoutes from './Routes/PharmacyRoutes';
+import PharmacyOutpatient from './pages/pharmacy-views/PharmacyOutpatient';
 
 function App() {
   return (
