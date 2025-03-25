@@ -1,9 +1,7 @@
 import {
   Button,
   Card,
-  Checkbox,
   Col,
-  Empty,
   Form,
   Input,
   message,
@@ -13,12 +11,13 @@ import {
 } from "antd";
 import { SearchOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import TextArea from "antd/es/input/TextArea";
-import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import {
+  getInPatientQyPrescriptionLineSlice,
   getTreatmentSheetLineSlice,
   POST_TREATMENT_SHEET_LINE_FAILURE,
   POST_TREATMENT_SHEET_LINE_SUCCESS,
@@ -26,20 +25,23 @@ import {
 } from "../../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
 const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
-  const [searchValue, setSearchValue] = useState("");
+
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
-  const { loadingItems, items } = useSelector((state) => state.getItems);
   const { loading: loadingPostTreatmentSheet } = useSelector(
     (state) => state.postTreatmentSheet
   );
+  const { loading:loadingPrescriptions, data:prescriptions } = useSelector(
+    (state) => state.getInPatientPrescriptionLine
+  );
+
+  console.log(prescriptions, 'prescription lines')
   const dispatch = useDispatch();
-  const handleSearch = (value) => {
-    setSearchValue(value);
-  };
+  
   const handleOnFinish = async (values) => {
     try {
-      const { DrugNo, Dosage, Quantity, IsIssued, TreatmentRemarks } = values;
+      const { DrugNo, Dosage, Quantity, TreatmentRemarks } = values;
+
       const treatmentSheet = {
         myAction: "create",
         admissionNo,
@@ -47,10 +49,10 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         drugNo: DrugNo,
         dosage: Dosage,
         quantity: Quantity,
-        issued: IsIssued,
+        issued: true,
         remarks: TreatmentRemarks,
         issuedDate: new Date().toISOString().split("T")[0],
-        issuedTime: new Date().toISOString().split("T")[1].split(".")[0],
+        issuedTime: new Date().toLocaleTimeString([], { hour12: false }),
       };
 
       const response = await dispatch(
@@ -61,6 +63,8 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
           response.payload.msg || "Treatment sheet line saved successfully."
         );
         setIsFormVisible(false);
+        form.resetFields();
+
         dispatch(getTreatmentSheetLineSlice(admissionNo));
       } else if (response.type === POST_TREATMENT_SHEET_LINE_FAILURE) {
         message.error(
@@ -76,8 +80,9 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
   };
 
   useEffect(() => {
-    dispatch(getItemsSlice());
-  }, [dispatch]);
+    dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
+  }, [dispatch, admissionNo]);
+
 
   return (
     <Form
@@ -88,7 +93,6 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         DrugNo: undefined,
         Dosage: "",
         Quantity: "",
-        IsIssued: false,
         TreatmentRemarks: "",
       }}
     >
@@ -107,31 +111,26 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
               ]}
               className="w-100 my-2"
             >
-              {items && (
+              {prescriptions && (
                 <Select
                   placeholder="Select Drug e.g Paracetamol"
                   showSearch
-                  loading={loadingItems}
+                  loading={loadingPrescriptions}
+                  
                   suffixIcon={<SearchOutlined />}
-                  onSearch={handleSearch}
                   filterOption={(input, option) =>
                     option.children.toLowerCase().includes(input.toLowerCase())
                   }
-                  notFoundContent={
-                    searchValue && items.length === 0 ? (
-                      <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="No drugs found"
-                      />
-                    ) : null
-                  }
+  
                 >
-                  {searchValue &&
-                    items.map((item) => (
-                      <Select.Option key={item.No} value={item.No}>
-                        {item.Description}
-                      </Select.Option>
-                    ))}
+                  {
+                      prescriptions.map((item) => (
+                        <Select.Option key={item.Drug_No} value={item.Drug_No}>
+                          {item.Drug_Name}
+                        </Select.Option>
+                      ))
+                  }
+
                 </Select>
               )}
             </Form.Item>
@@ -164,15 +163,16 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                 },
               ]}
             >
-              <Input type="number" />
+
+              <Input type="number" placeholder="Enter Quantity" />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label="Is issued"
               name="IsIssued"
               valuePropName="checked"
             >
               <Checkbox></Checkbox>
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item
               label="Treatment Remarks"
               name="TreatmentRemarks"
@@ -181,6 +181,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
               <TextArea
                 autoSize={{ minRows: 3, maxRows: 5 }}
                 name="TreatmentRemarks"
+                placeholder="Enter Treatment Sheet Remarks"
               />
             </Form.Item>
             <Form.Item>

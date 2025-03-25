@@ -208,10 +208,12 @@ import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreat
 import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
 import { getInPatientQyPrescriptionLines, getQyPrescriptionLinesReducer, getTreatmentSheetLines, postTreatmentSheetLines } from "./doc-reducers/QyPrescriptionLinesReducer";
 import { postPatientECTRequest, getPatientECTRequest, getPatientKetamineRequest, postPatientKetamineReducer, postPatientImplantRequest, getPatientImplantRequest } from "./doc-reducers/postDoctorProceduresReducers";
+
 import { postPatientKetamineRequest } from '../actions/Doc-actions/postDoctorProcedures';
 import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
 import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
 import { dispatchWalkInLab } from '../actions/patientActions';
+
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
