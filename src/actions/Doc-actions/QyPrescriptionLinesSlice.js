@@ -107,7 +107,7 @@ export const getInPatientQyPrescriptionLineSlice = (admissionNo) =>
           dispatch({ type: GET_TREATMENT_SHEET_LINE_REQUEST});
   
           console.log('code reached here', admissionNo)
-          const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTreatmentSheetLines&isList=true&query=$filter=Admission_No eq '${admissionNo}'`, config);
+          const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyTreatmentSheetLines&isList=true&query=$filter=AdmissionNo eq '${admissionNo}'`, config);
   
           dispatch({ type: GET_TREATMENT_SHEET_LINE_SUCCESS, payload: data });
   
