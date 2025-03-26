@@ -8,6 +8,9 @@ import {
   FaHouseMedical,
   FaPersonWalking,
   FaPersonWalkingArrowRight,
+  FaClockRotateLeft,
+  FaBoxArchive,
+  FaPrescription,
 } from 'react-icons/fa6';
 
 import PharmacyCard from '../pages/pharmacy-views/PharmacyCard';
@@ -17,12 +20,31 @@ import PharmacyDashboard from '../pages/pharmacy-views/PhamarcyDashboard';
 import PharmacyOutpatient from '../pages/pharmacy-views/PharmacyOutpatient';
 import PharmacyHistoryList from '../pages/pharmacy-views/PharmacyHistoryList';
 import PharmacyListReturnLines from '../pages/pharmacy-views/PharmacyListReturnLines';
+import PharmacyHistory from '../pages/pharmacy-views/PharmacyHistory.jsx';
+import PharmacyArchived from '../pages/pharmacy-views/PharmacyArchived.jsx';
 
 export const pharmacyRoutes = [
   {
     key: '/Pharmacy',
     icon: <FaHouseMedical style={{ color: '#fff' }} />,
     label: 'Dashboard',
+  },
+  {
+    key: '/Pharmacy/All-Records',
+    label: 'Pharmacy',
+    icon: <FaPrescription style={{ color: '#fff' }} />,
+    children: [
+      {
+        key: '/Pharmacy/History-Records?status=Completed',
+        label: 'Pharmacy History',
+        icon: <FaClockRotateLeft style={{ color: '#fff' }} />,
+      },
+      {
+        key: '/Pharmacy/Archived-Records?status=Cancelled',
+        label: 'Pharmacy Archive',
+        icon: <FaBoxArchive style={{ color: '#fff' }} />,
+      },
+    ],
   },
   {
     key: '/Pharmacy/Pharmacy-OutPatient',
@@ -51,6 +73,14 @@ export default function PharmacyRoutes() {
         <Route
           index
           element={<PharmacyDashboard />}
+        />
+        <Route
+          path="/Pharmacy/History-Records"
+          element={<PharmacyHistory />}
+        />
+        <Route
+          path="/Pharmacy/Archived-Records"
+          element={<PharmacyArchived />}
         />
         <Route
           path="/Pharmacy/Pharmacy-OutPatient"
