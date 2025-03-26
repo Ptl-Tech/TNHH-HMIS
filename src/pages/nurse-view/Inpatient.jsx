@@ -17,6 +17,7 @@ const Impatient = () => {
   const [searchAdmissionNumber, setSearchAdmissionNumber] = useState("");
   const doctorId = useAuth().userData.doctorID;
   const role  = useAuth().userData.departmentName;
+  const branch = localStorage?.getItem("branchCode")
 
   const navigate = useNavigate();
 
@@ -78,6 +79,16 @@ const Impatient = () => {
     }
     return combinedPatients;
   }, [combinedPatients, doctorId, role]);
+
+  // filter the patient based on the branch
+  const filterPatientBasedWithBranch = useMemo(() => {
+    if (branch) {
+      return filterPatientBasedWithDoctor?.filter(
+        (patient) => patient?.Branch === branch
+      );
+    }
+    return filterPatientBasedWithDoctor;
+  }, [filterPatientBasedWithDoctor, branch]);
   
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
@@ -92,7 +103,7 @@ const Impatient = () => {
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
       <NurseInnerHeader
-        filterInPatients={filterPatientBasedWithDoctor}
+        filterInPatients={filterPatientBasedWithBranch}
         title="Current Inpatients"
       />
 
@@ -106,7 +117,7 @@ const Impatient = () => {
         loadingAdmittedPatients={loadingAdmittedPatients}
         loading={loading}
         handleNavigate={handleNavigate}
-        filterInPatients={filterPatientBasedWithDoctor}
+        filterInPatients={filterPatientBasedWithBranch}
         searchName={searchName}
         searchPatientNumber={searchPatientNumber}
         searchAdmissionNumber={searchAdmissionNumber}

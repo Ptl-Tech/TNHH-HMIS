@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Spin } from "antd";
 
-const PDFViewer = ({ base64String }) => {
+const PDFViewer = ({ base64String, height="500px" }) => {
   const [loading, setLoading] = useState(true);
 
   if (!base64String) return null;
@@ -13,7 +13,7 @@ const PDFViewer = ({ base64String }) => {
   }, [base64String]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "500px" }}>
+    <div style={{ position: "relative", width: "100%", height }}>
       {/* Show Spinner while PDF is loading */}
       {loading && (
         <div
@@ -33,7 +33,7 @@ const PDFViewer = ({ base64String }) => {
       <iframe
         src={pdfSrc}
         width="100%"
-        height="500px"
+        height={height}
         title="PDF Viewer"
         onLoad={() => setLoading(false)} // Hide spinner when PDF loads
         style={{ display: loading ? "none" : "block" }}
