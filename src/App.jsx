@@ -391,15 +391,14 @@ function App() {
       {/* Lab routes */}
       {LabRoutes()}
       <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
-        <Route path="/Security" element={<MainLayout />}>
-          <Route index element={<VisitorForm />} />
-          <Route path="/Security/visitors-list" element={<SecVisitorList />} />
-          <Route
-            path="/Security/History-list"
-            element={<HistoryVisitorList />}
-          />
-        </Route>
-      </Route>
+  <Route path="/Security" element={<MainLayout />}>
+    {/* Set VisitorForm as the default (index) page */}
+    <Route index element={<VisitorForm />} />
+    <Route path="visitor-form/:visitorNo?" element={<VisitorForm />} />
+    <Route path="visitors-list" element={<SecVisitorList />} />
+    <Route path="history-list" element={<HistoryVisitorList />} />
+  </Route>
+</Route>
       {PharmacyRoutes()}
       <Route
         path="*"
