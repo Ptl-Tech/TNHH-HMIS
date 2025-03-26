@@ -185,6 +185,19 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
             {
               buttonType: 'default',
               data: {
+                disabled: 'Mark as Completed',
+                active: 'Mark as Completed',
+              },
+              style: {
+                display: 'inline',
+                width: 'fit-content',
+              },
+              onClick: (value) => handleMarkAsCompleted(value),
+              disabled: (value) => value === 'Completed' || loading,
+            },
+            {
+              buttonType: 'default',
+              data: {
                 disabled: 'Generate Report',
                 active: 'Generate Report',
               },
@@ -196,19 +209,6 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
               disabled: (value) =>
                 !(value === 'Completed' || value === 'Reviewed') ||
                 reportLoading,
-            },
-            {
-              buttonType: 'default',
-              data: {
-                disabled: 'Mark as Completed',
-                active: 'Mark as Completed',
-              },
-              style: {
-                display: 'inline',
-                width: 'fit-content',
-              },
-              onClick: (value) => handleMarkAsCompleted(value),
-              disabled: (value) => value === 'Completed' || loading,
             },
           ],
         },
