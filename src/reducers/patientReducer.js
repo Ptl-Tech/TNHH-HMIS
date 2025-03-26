@@ -50,6 +50,10 @@ import {
   DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS,
   DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL,
   DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET,
+  PATIENT_BY_ID_REQUEST,
+  PATIENT_BY_ID_SUCCESS,
+  PATIENT_BY_ID_FAIL,
+  PATIENT_BY_ID_RESET,
 } from "../actions/patientActions";
 
 export const patientCreateReducer = (state = { loading: false }, action) => {
@@ -214,6 +218,21 @@ export const patientListReducer = (
       return { loading: false, patients: [], error: action.payload };
     case PATIENT_LIST_RESET:
       return { loading: false, patients: [], error: null };
+    default:
+      return state;
+  }
+};
+
+export const patientByIdReducer = (state = { loading: false, patient: {} }, action) => {    
+  switch (action.type) {
+    case PATIENT_BY_ID_REQUEST:
+      return { loading: true, patient: {} };
+    case PATIENT_BY_ID_SUCCESS:
+      return { loading: false, patient: action.payload };
+    case PATIENT_BY_ID_FAIL:
+      return { loading: false, error: action.payload };
+    case PATIENT_BY_ID_RESET:
+      return { patient: {} };
     default:
       return state;
   }

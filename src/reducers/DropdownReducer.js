@@ -120,20 +120,24 @@ export const clinicsListReducer = (state = { clinics: [] }, action) => {
   }
 };
 
-export const getrelationshipOptionsReducer = (state = { data: [] }, action) => {
+export const getrelationshipOptionsReducer = (
+  state = { loading: false, data: [], error: null },
+  action
+) => {
   switch (action.type) {
     case KINS_LIST_REQUEST:
-      return { loading: true, data: [] };
+      return { ...state, loading: true, data: [] };
     case KINS_LIST_SUCCESS:
-      return { loading: false, data: action.payload };
+      return { ...state, loading: false, data: action.payload, error: null };
     case KINS_LIST_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     case KINS_LIST_RESET:
-      return { data: [] };
+      return { loading: false, data: [], error: null }; // Reset state
     default:
       return state;
   }
 };
+
 
 export const getInsuranceReducer = (state = { data: [] }, action) => {
   switch (action.type) {

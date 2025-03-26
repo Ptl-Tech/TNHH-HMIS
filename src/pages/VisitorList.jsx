@@ -1,418 +1,154 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Table,
-  Button,
-  Card,
-  Row,
-  Col,
-  Input,
-  Tag,
-  Typography,
-  message,
-  Modal,
-  Form,
-} from 'antd';
-import { ReloadOutlined, TeamOutlined } from '@ant-design/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { getVisitorsList } from '../actions/visitorsActions';
-import { convertPatient, listPatients } from '../actions/patientActions';
-import { useNavigate } from 'react-router-dom';
-import Loading from '../partials/nurse-partials/Loading';
-import dayjs from 'dayjs';
-import { convertKeysToCamelCase } from '../utils/helpers';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getVisitorsList } from "../actions/visitorsActions";
+import { listPatients, convertPatient } from "../actions/patientActions"; 
+import { Table, Skeleton, message, Button } from "antd";
+import dayjs from "dayjs";
+import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
+import { useNavigate } from "react-router-dom";
 
 const VisitorList = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { visitors: data } = useSelector((state) => state.visitorsList);
+  const { loading: loadingPatients, patients } = useSelector((state) => state.patientList);
 
-  const [searchParams, setSearchParams] = useState({
-    IdNumber: '',
-    VisitorName: '',
-    VisitorPhone: '',
-  });
   const [filteredVisitors, setFilteredVisitors] = useState([]);
-  const [filterLoading, setFilterLoading] = useState(false);
+  const [loadingFiltered, setLoadingFiltered] = useState(true);
   const [selectedVisitor, setSelectedVisitor] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const [searchName, setSearchName] = useState('');
-  const [searchPhone, setSearchPhone] = useState('');
-  const [searchIdNumber, setSearchIdNumber] = useState('');
-
-  const currentDate = dayjs().format('YYYY-MM-DD');
-
-  const { loading: visitorsLoading, visitors } = useSelector(
-    (state) => state.visitorsList,
-  );
-  const { loading: patientsLoading, patients } = useSelector(
-    (state) => state.patientList,
-  );
-  const { loading: convertPatientLoading } = useSelector(
-    (state) => state.convertPatient
-  );
-  
-  const loading = visitorsLoading || patientsLoading || filterLoading;
+  const [convertPatientModal, setConvertPatientModal] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [errormsg, setErrormsg] = useState(null);
 
   useEffect(() => {
     dispatch(getVisitorsList());
-    dispatch(listPatients());
+    dispatch(listPatients()); // Fetch all patients once
   }, [dispatch]);
 
-  //console where visitors are existing patients
-  if (
-    visitors?.IDNumber === patients?.IDNumber &&
-    visitors?.Status === 'Entered' &&
-    visitors?.InitiatedDate === currentDate
-  ) {
-    console.log('visitors are existing patients', visitors);
-  }
-
-  //filter the visitors based on date and status only
   useEffect(() => {
-    const filtered = visitors?.filter((visitor) => {
-      const filterCondition =
-        dayjs(currentDate).diff(visitor?.InitiatedDate, 'hour', true) <= 24;
-      visitor?.Status === 'Entered';
-
-      return filterCondition;
-    });
-
-    setFilteredVisitors(filtered);
-  }, [visitors, currentDate]);
-
-  const handleSearchChange = (e, field) => {
-    setSearchParams({ ...searchParams, [field]: e.target.value });
-  };
-
-  const getButtonText = (visitor) => {
-    // Check if the visitor is already a patient
-    const isPatient = patients?.some(
-      (patient) => patient.IDNumber === visitor.IDNumber,
-    );
-
-    if (isPatient) {
-      return 'Create Visit'; // Show 'Create Visit' if the visitor is a patient
-    } else {
-      return 'Convert to Patient'; // Show 'Convert to Patient' if the visitor is not yet a patient
+    if (!data || data.length === 0 || !patients) {
+      setLoadingFiltered(false);
+      return;
     }
-  };
 
-  const getWalkInButtonText = (visitor) => {
-    // Check if the visitor is already a patient
-    const isPatient = patients?.some(
-      (patient) => patient.IDNumber === visitor.IDNumber,
-    );
+    setLoadingFiltered(true);
 
-    if (isPatient && isPatient.Walkin) {
-      return "Create Walk In visit"; // Show 'Create Visit' if the visitor is a patient
-    }else if (isPatient && !isPatient.Walkin) {
-      return "Create Visit"; // Show 'Create Visit' if the visitor is a patient
-    } else {
-      return 'Register Walk In '; // Show 'Convert to Patient' if the visitor is not yet a patient
+    try {
+      const patientSet = new Set(patients.map((p) => p.IDNumber)); // Store patient IDs in a Set
+
+      const filteredList = data
+        .filter((visitor) => {
+          const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
+          const isEntered = visitor.Status === "Entered";
+          const isPatient = patientSet.has(visitor.IDNumber);
+          return isToday && isEntered && !isPatient;
+        })
+        .slice(0, 20); // Load only 20 visitors at a time
+
+      setFilteredVisitors(filteredList);
+    } catch (error) {
+      console.error("Error filtering visitors:", error);
+    } finally {
+      setLoadingFiltered(false);
     }
-  };
-
-  const handleVisitCreation = (visitor) => {
-    // Check if visitor is already a patient
-    const existingPatient = patients.find(
-      (patient) => patient.IDNumber === visitor.IDNumber,
-    );
-
-    if (existingPatient) {
-      // If found, create a new visit and navigate
-      message.success('Create a New Visit.');
-      navigate(`/reception/Add-Appointment/${existingPatient.PatientNo}`, {
-        state: { existingPatient },
-      });
-    } else {
-      // If not found, convert to patient
-      openModal(visitor);
-    }
-  };
-
-  const handleWalkInCreation = (visitor) => {
-    // Check if visitor is already a patient
-    const existingPatient = patients.find(
-      (patient) => patient.IDNumber === visitor.IDNumber,
-    );
-
-    if (existingPatient) {
-      navigate(
-        `/reception/visitors-list/dispatch-patient/${existingPatient.PatientNo}`,
-      );
-    } else {
-      // If not found, convert to patient
-      message.success('Create a New Patient.');
-      navigate('/reception/Register-walkin', {
-        state: { visitorData: visitor },
-      });
-    }
-  };
-
-  const openModal = (visitor) => {
-    setSelectedVisitor({
-      ...visitor,
-      FirstName: visitor.FirstName || '',
-      MiddleName: visitor.MiddleName || '',
-      LastName: visitor.LastName || '',
-    });
-    setIsModalVisible(true);
-  };
+  }, [data, patients]);
 
   const handleConvertToPatient = async () => {
     if (!selectedVisitor) return;
+    setLoadingStatus(true);
+    setErrormsg(null);
 
     try {
-      const patientNo = await dispatch(convertPatient(selectedVisitor.No));
-      console.log("PatientNo", patientNo);
+      const response = await dispatch(convertPatient(selectedVisitor.No));
 
-      if (patientNo) {
-        const existingPatient = patients.find(
-          (patient) => patient.PatientNo === patientNo,
-        );
-        if (existingPatient) {
-          message.success('Create New Patient Visit.', 5);
-          navigate(`/reception/Add-Appointment/${patientNo}`, {
-            state: { existingPatient },
-          });
-        } else {
-          message.success(`Patient Number: ${patientNo}`, 5);
-          navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
-            state: { visitorData: selectedVisitor, patientNumber: patientNo },
-          });
-        }
+      if (response) {
+        message.success(`Patient Number: ${response}`, 5);
+        navigate(`/reception/Patient-Registration/Patient?PatientNo=${response}`);
       } else {
-        message.warning('Unable to retrieve patient number.', 5);
+        message.error("Failed to retrieve patient number");
       }
+
+      dispatch(getVisitorsList()); // Refresh visitor list
+      setConvertPatientModal(false);
+      setSelectedVisitor(null);
     } catch (error) {
-      message.error('An error occurred while processing the request.', 5);
+      setErrormsg(error.message);
+    } finally {
+      setLoadingStatus(false);
     }
-    setIsModalVisible(false);
   };
 
   const columns = [
-    { title: 'Index', dataIndex: 'index', render: (_, __, index) => index + 1 },
-    { title: 'Visitor No', dataIndex: 'No' },
+    { title: "Index", dataIndex: "index", render: (_, __, index) => index + 1 },
     {
-      title: 'Visitor Name',
-      dataIndex: 'VisitorName',
-      filteredValue: searchName ? [searchName] : null,
-      onFilter: (value, record) =>
-        record?.VisitorName
-          ? record.VisitorName.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (_, visitor) =>
-        visitor.VisitorName?.trim()
-          ? visitor.VisitorName
-          : `${visitor.FirstName || ''} ${visitor.MiddleName || ''} ${
-              visitor.LastName || ''
-            }`.trim(),
+      title: "Visitor No",
+      dataIndex: "No",
+      render: (no) => <a href={`/visitor/${no}`}>{no}</a>,
     },
     {
-      title: 'ID Number',
-      dataIndex: 'IDNumber',
-      filteredValue: searchIdNumber ? [searchIdNumber] : null,
-      onFilter: (value, record) =>
-        record?.IDNumber
-          ? record.IDNumber.toLowerCase().includes(value.toLowerCase())
-          : false,
+      title: "Visitor Name",
+      dataIndex: "VisitorName",
+      render: (name) => (name ? name.toUpperCase() : "N/A"),
+    },
+    { title: "ID Number", dataIndex: "IDNumber" },
+    { title: "Phone Number", dataIndex: "PhoneNumber" },
+    {
+      title: "Date of Visit",
+      dataIndex: "InitiatedDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
     },
     {
-      title: 'Phone Number',
-      dataIndex: 'PhoneNumber',
-      filteredValue: searchPhone ? [searchPhone] : null,
-      onFilter: (value, record) =>
-        record?.PhoneNumber
-          ? record.PhoneNumber.toLowerCase().includes(value.toLowerCase())
-          : false,
-    },
-    {
-      title: 'Date of Visit',
-      dataIndex: 'InitiatedDate',
-      render: (date) => dayjs(date).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'Status',
-      render: (status) => (
-        <Tag color={status === 'Entered' ? 'red' : 'default'}>{status}</Tag>
-      ),
-    },
-    {
-      title: 'Action',
-      render: (_, visitor) => (
-        <div className="d-flex flex-column gap-3">
+      title: "Action",
+      dataIndex: "action",
+      render: (_, record) => (
+        <>
           <Button
-            type="primary"
-            onClick={() => handleVisitCreation(visitor)}
+            type="link"
+            onClick={() => {
+              setSelectedVisitor(record);
+              setConvertPatientModal(true);
+            }}
           >
-            {getButtonText(visitor)}
-          </Button>
+            Convert to Patient
+          </Button>{" "}
+          |{" "}
           <Button
-            type="default"
-            onClick={() => handleWalkInCreation(visitor)}
+            type="link"
+            onClick={() =>
+              navigate(`/reception/Register-walkin`, { state: { visitorData: record } })
+            }
           >
-            {getWalkInButtonText(visitor)}
+            Register Walk In
           </Button>
-        </div>
+        </>
       ),
     },
   ];
 
   return (
-    <div
-      className="card mt-4"
-      style={{ padding: '10px' }}
-    >
-      <div className="d-flex justify-content-between align-items-center m-4">
-        <h5>
-          <TeamOutlined style={{ marginRight: 8 }} />
-          Current Visitors List
-        </h5>
-        <Button
-          icon={<ReloadOutlined />}
-          type="primary"
-          onClick={() => dispatch(getVisitorsList())}
-        >
-          Refresh
-        </Button>
-      </div>
-      <Card
-        className="mb-4"
-        style={{ padding: '30px 10px' }}
-      >
-        <Row gutter={[16, 16]}>
-        <Col span={8}>
-            <Input.Search
-              placeholder="Visitor Name"
-              // value={searchParams.VisitorName}
-              allowClear
-              onChange={(value)=>setSearchName(value.target.value)}
-
-            />
-          </Col>
-          <Col span={8}>
-            <Input.Search
-              placeholder="ID Number"
-              // value={searchParams.IdNumber}
-              allowClear
-              onChange={(value)=>setSearchIdNumber(value.target.value)}
-            />
-          </Col>
-         
-          <Col span={8}>
-            <Input.Search
-              placeholder="Visitor Phone"
-              // value={searchParams.VisitorPhone}
-              allowClear
-              onChange={(value) => setSearchPhone(value.target.value)}
-            />
-          </Col>
-        </Row>
-      </Card>
-      {loading ? (
-        <Loading />
+    <div>
+      {loadingFiltered ? (
+        <Skeleton active paragraph={{ rows: 10 }} />
       ) : (
         <Table
-          columns={columns}
           dataSource={filteredVisitors}
-          bordered
+          loading={loadingFiltered}
+          rowKey="No"
+          columns={columns}
+          size="small"
         />
       )}
-      <Modal
-        title="Visitor Details"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        style={{ top: 20 }}
-        width={750}
-        footer={[
-          <Button
-            key="cancel"
-            onClick={() => setIsModalVisible(false)}
-          >
-            Cancel
-          </Button>,
-          <Button
-            key="convert"
-            type="primary"
-            disabled={!selectedVisitor || convertPatientLoading}
-            loading={convertPatientLoading}
-            onClick={handleConvertToPatient}
-          >
-            Convert to Patient
-          </Button>,
-        ]}
-      >
-        {selectedVisitor && (
-          <Form layout="vertical">
-            <Row gutter={16}>
-              <Col span={8}>
-                <Form.Item label="Visitor Number">
-                  <Input
-                    value={selectedVisitor.No}
-                    readOnly
-                    style={{ fontWeight: 'bold' }}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="First Name">
-                  <Input
-                    value={selectedVisitor.FirstName}
-                    readOnly
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="Middle Name">
-                  <Input
-                    value={selectedVisitor.MiddleName}
-                    readOnly
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="Last Name">
-                  <Input
-                    value={selectedVisitor.LastName}
-                    readOnly
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="Category">
-                  <Input
-                    value={selectedVisitor.VisitorCategory}
-                    readOnly
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label="Reason for Visit">
-                  <Input
-                    value={
-                      selectedVisitor.ReasonForVisit === '1'
-                        ? 'Medication'
-                        : 'Official Visit'
-                    }
-                    readOnly
-                  />
-                </Form.Item>
-              </Col>
-              {selectedVisitor.PersonToSee && (
-                <Col span={8}>
-                  <Form.Item label="Person to Visit">
-                    <Input
-                      value={selectedVisitor.PersonToSee}
-                      readOnly
-                    />
-                  </Form.Item>
-                </Col>
-              )}
-            </Row>
-          </Form>
-        )}
-      </Modal>
+
+      {selectedVisitor && (
+        <ConvertPatientModal
+          modalVisible={convertPatientModal}
+          setModalVisible={setConvertPatientModal}
+          confirmClearVisitor={handleConvertToPatient}
+          clearVisitorLoading={loadingStatus}
+          visitor={selectedVisitor}
+          errorMessage={errormsg}
+        />
+      )}
     </div>
   );
 };

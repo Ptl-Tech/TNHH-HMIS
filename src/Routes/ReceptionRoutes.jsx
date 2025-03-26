@@ -30,6 +30,7 @@ import ViewPatientsReceipts from "../pages/billing/ViewPatientsReceipts";
 import ConvertedPatients from "../pages/reception-views/ConvertedPatients";
 import DispatchedAppmnts from "../pages/reception-views/DispatchedAppmnts";
 import { DispatchWalkInPatient } from "../pages/reception-views/DispatchWalkInPatient";
+import DirectAdmission from "../pages/nurse-view/DirectAdmission";
 
 export const receptionRoutes = [
   {
@@ -165,6 +166,10 @@ export default function ReceptionRoutes() {
         <Route
           path="/reception/Patient-Charges/:patientNo"
           element={<ViewPatientsReceipts />}
+        />
+        <Route
+          path="/reception/patient-list/Direct-Admission/:PatientNo?"
+          element={<DirectAdmission />}
         />
       </Route>
     </Route>

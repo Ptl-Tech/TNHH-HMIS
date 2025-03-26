@@ -365,31 +365,31 @@ const MainLayout = () => {
     // Security Routes
     const securityRoutes = [
       {
-        key: '/Security',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Registration',
+        key: "/Security",
+        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+        label: "Registration",
       },
       {
-        type: 'divider',
+        type: "divider",
       },
-
       {
-        key: 'RegistrationGroup',
+        key: "RegistrationGroup",
         label: (
-          <span style={{ color: '#ac8342', fontWeight: 'medium' }}>
+          <span style={{ color: "#ac8342", fontWeight: "medium" }}>
             Registration
           </span>
         ),
-        type: 'group',
+        type: "group",
         children: [
           {
-            key: 'visitors-list',
-            label: 'Visitor List',
-            icon: <UserOutlined style={{ color: '#fff' }} />,
+            key: "/Security/visitors-list",
+            label: "Visitor List",
+            icon: <UserOutlined style={{ color: "#fff" }} />,
           },
         ],
       },
     ];
+    
 
     const radiologyRoutes = [
       {

@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ArrowUpOutlined } from '@ant-design/icons';
-import { Button, Col, Row, Select, Space, Spin } from 'antd';
+import { Col, Row, Select, Space, Spin, Typography } from 'antd';
 
 import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
 
 const PharmacyDashboard = () => {
+  const { Title } = Typography;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,9 +54,19 @@ const PharmacyDashboard = () => {
   return (
     <div style={{ display: 'grid', gap: '16px', padding: '10px 10px' }}>
       <Space
-        align="end"
-        style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
+        <Title
+          level={4}
+          style={{ marginBottom: '0' }}
+        >
+          Pharmacy Dashboard
+        </Title>
         <Select
           showSearch
           defaultValue={''}
@@ -81,11 +93,13 @@ const PharmacyDashboard = () => {
                   cursor: 'pointer',
                 }}
                 onClick={() =>
-                  navigate(
-                    `/Pharmacy/Pharmacy-${variant
-                      .split(' ')
-                      .join('')}?status=${status}`,
-                  )
+                  variant
+                    ? navigate(
+                        `/Pharmacy/Pharmacy-${variant
+                          .split(' ')
+                          .join('')}?status=${status}`,
+                      )
+                    : {}
                 }
               >
                 <div
@@ -103,7 +117,9 @@ const PharmacyDashboard = () => {
                     }}
                   >
                     {name}
-                    <ArrowUpOutlined style={{ transform: 'rotate(45deg)' }} />
+                    {variant && (
+                      <ArrowUpOutlined style={{ transform: 'rotate(45deg)' }} />
+                    )}
                   </div>
                   <span
                     level={8}
