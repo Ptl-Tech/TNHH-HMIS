@@ -78,7 +78,9 @@ const EditableCell = ({
   );
 };
 
-const PharmacyCard = ({ type }) => {
+const PharmacyCard = ({ type, title, hideSelector }) => {
+  console.log({ hideSelector });
+
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -86,9 +88,11 @@ const PharmacyCard = ({ type }) => {
 
   const [form] = Form.useForm();
 
-  const [Status, setStatus] = useState(searchParams.get('status') || '');
   const [editingKey, setEditingKey] = useState('');
   const [currentRequest, setCurrentRequest] = useState(null);
+  const [Status, setStatus] = useState(searchParams.get('status') || '');
+
+  const { Title } = Typography;
 
   const statuses = [
     { label: 'All', value: '' },
@@ -480,6 +484,12 @@ const PharmacyCard = ({ type }) => {
 
   return (
     <div style={{ display: 'grid', gap: '16px', padding: '16px 0' }}>
+      <Title
+        level={4}
+        style={{ color: '#0f5689', marginBottom: '0px' }}
+      >
+        {title}
+      </Title>
       <Space direction="horizontal">
         <Select
           showSearch
@@ -495,15 +505,17 @@ const PharmacyCard = ({ type }) => {
             value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
           }))}
         />
-        <Select
-          showSearch
-          options={statuses}
-          prefix={<Tag color="#ac8342">Status</Tag>}
-          placeholder="Status"
-          defaultValue={Status}
-          style={{ width: '400px' }}
-          onChange={handleStatusChange}
-        />
+        {!hideSelector && (
+          <Select
+            showSearch
+            options={statuses}
+            prefix={<Tag color="#ac8342">Status</Tag>}
+            placeholder="Status"
+            defaultValue={Status}
+            style={{ width: '200px' }}
+            onChange={handleStatusChange}
+          />
+        )}
       </Space>
       <Card
         style={{ background: '#00000006' }}
