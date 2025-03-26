@@ -269,6 +269,7 @@ import { getpostedChargesReducer } from "./ChargesReducers/getPostedChargesReduc
 import { deletePatientChargesReducer } from "./ChargesReducers/deletePatientChargesReducer";
 
 import getPharmacyHistoryListReducer from "./pharmacy-reducers/getPharmacyHistoryListReducer";
+import getPharmacyRequestsAllReducer from "./pharmacy-reducers/getPharmacyRequestsAllReducer";
 import { postsalesInvoiceReducer } from "./ChargesReducers/postSalesInvoiceReducer";
 import { reopensalesInvoiceReducer } from "./ChargesReducers/postreopenSalesInvoiceReducer";
 import { postTestRemarksReducer } from "./lab-reducers/postTestRemarksReducer";
@@ -290,6 +291,7 @@ import { saveKinsInformationReducer } from "./reception-reducers/save-patient-re
 import { saveAddressInformationReducer } from "./reception-reducers/save-patient-reducers/saveAddressInformatioNReducer";
 import { saveMarketingReducer } from "./reception-reducers/save-patient-reducers/saveMarketingReducer";
 import { saveBillingInformationReducer } from "./reception-reducers/save-patient-reducers/saveBillingInformationReducer";
+import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -409,11 +411,11 @@ export const rootReducer = combineReducers({
 
   // pharmacy
   postDrugIssuance: postDrugIssuanceReducer,
-  postPharmacyHeader: postPharmacyHeaderReducer,
+  // postPharmacyHeader: postPharmacyHeaderReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,
   getPharmacyHistoryList: getPharmacyHistoryListReducer,
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
-  getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
+  // getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
