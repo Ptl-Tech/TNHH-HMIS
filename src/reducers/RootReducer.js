@@ -76,7 +76,7 @@ import {
   treatmentListReducer,
 } from './doc-reducers/OutPatientReducers';
 import { getPatientListReducer } from './nurse-reducers/getPatientListReducer';
-import { getConsultationRoomListReducer } from './nurse-reducers/getConsultationRoomReducer';
+import { getConsultationReducer, getConsultationRoomListReducer } from './nurse-reducers/getConsultationRoomReducer';
 
 // lab
 import {
@@ -328,6 +328,7 @@ export const rootReducer = combineReducers({
   getPatientEncounters: getPatientEncounterListReducer,
   // end
   getConsultationRoom: getConsultationRoomListReducer,
+  getPatientConsultationList: getConsultationReducer,
   getPatient: PatientDeetsReducer,
   getSymptoms: QySymptomsSetupReducer,
   getSignsSetup: QySignsSetupReducer,

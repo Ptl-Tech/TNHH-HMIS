@@ -1,11 +1,16 @@
 
 import { Skeleton } from 'antd';
-const LoadingParagraphs = () => (
+import PropTypes from 'prop-types';
+const LoadingParagraphs = ( { paragraphs }) => (
   <Skeleton
     paragraph={{
-      rows: 4,
+      rows: paragraphs,
     }}
     active
   />
 );
 export default LoadingParagraphs;
+//props validation
+LoadingParagraphs.propTypes = {
+  paragraphs: PropTypes.number,
+};

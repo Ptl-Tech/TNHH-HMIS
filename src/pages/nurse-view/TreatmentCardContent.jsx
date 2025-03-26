@@ -1,132 +1,103 @@
-import { Button } from "antd";
+import { Card, Space, Tabs, Typography } from "antd";
 import { useLocation } from "react-router-dom";
-import useFetchPastDoctorVisitsHook from "../../hooks/useFetchPastDoctorVisitsHook";
-import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
-import {
-  VerticalAlignTopOutlined,
-  DeliveredProcedureOutlined,
-  ExperimentOutlined,
-  SnippetsOutlined,
-  FileAddOutlined,
-  DisconnectOutlined,
-} from "@ant-design/icons";
-import { useEffect, useState } from "react";
-import VitalsTable from "./tables/triage-tables/VitalsTable";
+import { DiffOutlined } from "@ant-design/icons";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getVitalsLinesSlice } from "../../actions/triage-actions/getVitalsLinesSlice";
 import EncounterListTable from "./tables/nurse-tables/EncounterListTable";
-import Diagnosis from "../doctorsViews/Doctor-Forms/Diagnosis";
-import Medication from "../doctorsViews/Doctor-Forms/Medication";
-import LabResults from "../doctorsViews/Doctor-Forms/LabResults";
-import Imaging from "../doctorsViews/Doctor-Forms/Imaging";
-import ECTScan from "./nurse-care-plan/ECTScan";
+import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { getConsultationSlice } from "../../actions/nurse-actions/getConsultationRoomSlice";
+import EncounterListInPatientTable from "./tables/nurse-tables/EncounterListInPatientTable";
 
 const TreatmentCardContent = () => {
   const location = useLocation();
   const dispatch = useDispatch();
-  const patientDetails = location.state?.patientDetails;
-  const { combinedListWithDoctors } = useFetchPastDoctorVisitsHook();
-  const {
-    selectedRowKey,
-    rowSelection,
-    selectedRow,
-  } = useSetTableCheckBoxHook();
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
-  const { loadingVitalsLines, vitalsLines } = useSelector(
-    (state) => state.getVitalsLines
+  const { loadingConsultationRoomList, consultationRoomList } = useSelector(
+    (state) => state.getPatientConsultationList
   );
 
-  useEffect(() => {
-    dispatch(getVitalsLinesSlice(selectedRow[0]?.ObservationNo));
-  }, [dispatch, selectedRow]);
-
-  const filteredList = combinedListWithDoctors.filter(
-    (item) => item.PatientNo === patientDetails?.PatientNo
+  const { triageWaitingList } = useSelector(
+    (state) => state.getTriageWaitingList
   );
 
-  const [selectedItem, setSelectedItem] = useState("Triage");
-  console.log("selected item", selectedItem);
-  const [activeItem, setActiveItem] = useState("Triage");
+  const filteredConsultationRooms = useMemo(
+    () => consultationRoomList.filter((room) => room?.Status === "Completed"),
+    [consultationRoomList]
+  );
 
-  const menuItems = [
-    { label: "Triage", icon: <SnippetsOutlined /> },
-    { label: "Diagnosis", icon: <FileAddOutlined /> },
-    { label: "Prescription", icon: <DisconnectOutlined /> },
-    { label: "Laboratory", icon: <ExperimentOutlined /> },
-    { label: "Radiology", icon: <DeliveredProcedureOutlined /> },
-    { label: "ECT", icon: <VerticalAlignTopOutlined /> },
+  const formattedTriageWaitingList = useMemo(() => {
+    return triageWaitingList?.map((patient) => ({
+      PatientNo: patient?.PatientNo,
+      SearchName: patient?.SearchName,
+    }));
+  }, [triageWaitingList]);
+
+  const combinedList = useMemo(() => {
+    return filteredConsultationRooms?.map((room) => {
+      const matchingPatient = formattedTriageWaitingList?.find(
+        (patient) => patient?.PatientNo === room?.PatientNo
+      );
+      return {
+        ...room,
+        PatientNo: room?.PatientNo,
+        SearchName: matchingPatient ? matchingPatient?.SearchName : null,
+      };
+    });
+  }, [filteredConsultationRooms, formattedTriageWaitingList]);
+
+  const items = [
+    {
+      key: "1",
+      label: "OutPatient Encounters",
+      children: (
+        <Card
+          style={{
+            padding: "10px 20px",
+            boxShadow: "10px 10px 10px 10px #e6e6e6",
+          }}
+        >
+          <EncounterListTable
+            filteredList={combinedList}
+            loadingConsultationRoomList={loadingConsultationRoomList}
+          />
+        </Card>
+      ),
+    },
+    {
+      key: "2",
+      label: "Inpatient Encounters",
+      children: (
+        <Card
+          style={{
+            padding: "10px 20px",
+            boxShadow: "10px 10px 10px 10px #e6e6e6",
+          }}
+        >
+          <EncounterListInPatientTable />
+        </Card>
+      ),
+    },
   ];
 
-  const handleOnClick = (item) => {
-    console.log("item", item.label);
-    setActiveItem(item.label);
-    switch (item.label) {
-      case "Triage":
-        setSelectedItem(
-          <VitalsTable
-            filterVitals={vitalsLines}
-            loadingInpatientVitals={loadingVitalsLines}
-          />
-        );
-        break;
-      case "Diagnosis":
-        setSelectedItem(<Diagnosis />);
-        break;
-      case "Prescription":
-        setSelectedItem(<Medication />);
-        break;
-      case "Laboratory":
-        setSelectedItem(<LabResults />);
-        break;
-      case "Radiology":
-        setSelectedItem(<Imaging />);
-        break;
-      case "ECT":
-        setSelectedItem(<ECTScan />);
-        break;
-      default:
-        setSelectedItem(<VitalsTable />);
-    }
-  };
+  useEffect(() => {
+    dispatch(getTriageWaitingList());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getConsultationSlice(patientNo));
+  }, [dispatch, patientNo]);
 
   return (
-    <div>
-      <EncounterListTable
-        filteredList={filteredList}
-        rowSelection={rowSelection}
-      />
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          gap: "10px",
-          flexWrap: "wrap",
-          paddingTop: "30px",
-        }}
-      >
-        {menuItems.map((item, index) => (
-          <Button
-            disabled={!selectedRowKey}
-            key={index}
-            className={activeItem === item.label ? "active-button" : ""}
-            onClick={() => handleOnClick(item)}
-          >
-            {item.icon}
-            {item.label}
-          </Button>
-        ))}
-      </div>
+    <div style={{ paddingTop: "30px" }}>
+      <Space className="inpatient-header">
+        <DiffOutlined />
+        <Typography.Text className="inpatient-header-text">
+          Past Encounter List
+        </Typography.Text>
+      </Space>
 
-      <div className="patient-file-content">
-        {selectedItem === "Triage" ? (
-          <VitalsTable
-            filterVitals={vitalsLines}
-            loadingInpatientVitals={loadingVitalsLines}
-          />
-        ) : (
-          selectedItem
-        )}
-      </div>
+      <Tabs defaultActiveKey="1" items={items} type="card" />
     </div>
   );
 };

@@ -18,6 +18,7 @@ const TreatmentsSheet = () => {
     (state) => state.getTreatmentSheet
   );
 
+  console.log(treatmentSheet, "treatment sheet");
   const handleButtonVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };

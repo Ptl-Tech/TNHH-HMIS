@@ -72,6 +72,7 @@ import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PharmacyRoutes from './Routes/PharmacyRoutes';
 import PharmacyOutpatient from './pages/pharmacy-views/PharmacyOutpatient';
+import EncounterSummeryDetails from "./pages/nurse-view/EncounterSummeryDetails";
 
 function App() {
   return (
@@ -92,6 +93,7 @@ function App() {
           />
           <Route path="Past-doctor-visit" element={<PastDoctorVisit />} />
           <Route path="Past-doctor-visit/Patient" element={<TreatmentCard />} />
+          <Route path="Past-doctor-visit/Encounter" element={<EncounterSummeryDetails />} />
 
           <Route path="Triage" element={<TriageList />} />
           <Route path="PendingTriageList" element={<TriageListPending />} />
@@ -231,6 +233,10 @@ function App() {
             element={<TreatmentCard />}
           />
           <Route
+            path="/Doctor/Past-doctor-visit/Encounter"
+            element={<EncounterSummeryDetails />}
+          />
+          <Route
             path="/Doctor/Inpatient/Read-nurse-notes"
             element={<ReadNurseNotes />}
           />
@@ -335,8 +341,8 @@ function App() {
             element={<ReadNurseNotes />}
           />
           <Route
-            path="/Psychology/Past-doctor-visit/Patient"
-            element={<TreatmentCard />}
+            path="/Psychology/Past-doctor-visit/Encounter"
+            element={<EncounterSummeryDetails />}
           />
           <Route
             path="/Psychology/Radiology-Patients"
