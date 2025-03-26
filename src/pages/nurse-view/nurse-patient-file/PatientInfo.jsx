@@ -1,7 +1,7 @@
 import { Card, Col, Row, Typography } from "antd"
 import { useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import Loading from "../../../partials/nurse-partials/Loading";
+import LoadingParagraphs from "../../../partials/nurse-partials/LoadingParagraphs";
 import { UserOutlined } from "@ant-design/icons";
 import { calculateAge } from "../../../utils/helpers";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
@@ -83,11 +83,11 @@ const patientSecondaryInfo = [
 
         {
           loadingPatientDetails ? (
-            <Loading />
+            <LoadingParagraphs paragraphs={10} />
           ):(
             <Row gutter={16} style={{ marginTop: '20px' }}>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
                     {patientPrimaryInfo.map((info, index) => (
                         <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                             <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>
@@ -97,7 +97,7 @@ const patientSecondaryInfo = [
                 </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689' }}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
                     {patientSecondaryInfo.map((info, index) => (
                         <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                             <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>

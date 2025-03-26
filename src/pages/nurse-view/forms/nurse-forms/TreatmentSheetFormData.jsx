@@ -55,8 +55,9 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         issuedTime: new Date().toLocaleTimeString([], { hour12: false }),
       };
 
+      console.log(treatmentSheet, "treatment sheet");
       const response = await dispatch(
-        postTreatmentSheetLineSlice(treatmentSheet)
+        postTreatmentSheetLineSlice()
       );
       if (response.type === POST_TREATMENT_SHEET_LINE_SUCCESS) {
         message.success(

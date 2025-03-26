@@ -110,50 +110,9 @@ const PastDoctorVisit = () => {
     const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
     const { data } = useSelector(state => state.getDoctorsList);
 
-    console.log('patient list', triageWaitingList)
 
     const dispatch = useDispatch();
 
-    
-    // const filteredConsultationRooms = useMemo(
-    //     () => consultationRoomList.filter(room => room?.Status === 'Completed'),
-    //     [consultationRoomList]
-    // );
-    
-    // const formattedTriageWaitingList = useMemo(() => {
-    //     return triageWaitingList?.map(patient => ({
-    //         PatientNo: patient?.PatientNo,
-    //         SearchName: patient?.SearchName,
-    //     }));
-    // }, [triageWaitingList]);
-    
-    // const formattedDoctorDetails = useMemo(() => {
-    //     return data?.map(doctor => ({
-    //         DoctorID: doctor?.DoctorID,
-    //         DoctorsName: doctor?.DoctorsName,
-    //     }));
-    // }, [data]);
-
-    // const combinedList = useMemo(() => {
-    //     return filteredConsultationRooms?.map(room => {
-    //         const matchingPatient = formattedTriageWaitingList?.find(patient => patient?.PatientNo === room?.PatientNo);
-    //         return {
-    //             ...room,
-    //             PatientNo: room?.PatientNo,
-    //             SearchName: matchingPatient ? matchingPatient?.SearchName : null,
-    //         };
-    //     });
-    // }, [filteredConsultationRooms, formattedTriageWaitingList]);
-    
-    // const combinedListWithDoctors = useMemo(() => {
-    //     return combinedList?.map(item => {
-    //         const matchingDoctor = formattedDoctorDetails?.find(doctor => doctor?.DoctorID === item?.DoctorID);
-    //         return {
-    //             ...item,
-    //             DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
-    //         };
-    //     });
-    // }, [combinedList, formattedDoctorDetails]);
 
     const filterPatients = useMemo(() => {
       return (params) => {

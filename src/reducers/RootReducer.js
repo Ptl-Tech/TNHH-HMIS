@@ -77,9 +77,10 @@ import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingL
 import {
   PatientDeetsReducer,
   treatmentListReducer,
-} from "./doc-reducers/OutPatientReducers";
-import { getPatientListReducer } from "./nurse-reducers/getPatientListReducer";
-import { getConsultationRoomListReducer } from "./nurse-reducers/getConsultationRoomReducer";
+} from './doc-reducers/OutPatientReducers';
+import { getPatientListReducer } from './nurse-reducers/getPatientListReducer';
+import { getConsultationReducer, getConsultationRoomListReducer } from './nurse-reducers/getConsultationRoomReducer';
+
 
 // lab
 import {
@@ -292,6 +293,8 @@ import { saveKinsInformationReducer } from "./reception-reducers/save-patient-re
 import { saveMarketingReducer } from "./reception-reducers/save-patient-reducers/saveMarketingReducer";
 import { saveBillingInformationReducer } from "./reception-reducers/save-patient-reducers/saveBillingInformationReducer";
 import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
+import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
+import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -367,6 +370,7 @@ export const rootReducer = combineReducers({
   getPatientEncounters: getPatientEncounterListReducer,
   // end
   getConsultationRoom: getConsultationRoomListReducer,
+  getPatientConsultationList: getConsultationReducer,
   getPatient: PatientDeetsReducer,
   getSymptoms: QySymptomsSetupReducer,
   getSignsSetup: QySignsSetupReducer,
@@ -411,11 +415,11 @@ export const rootReducer = combineReducers({
 
   // pharmacy
   postDrugIssuance: postDrugIssuanceReducer,
-  // postPharmacyHeader: postPharmacyHeaderReducer,
+  postPharmacyHeader: postPharmacyHeaderReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,
   getPharmacyHistoryList: getPharmacyHistoryListReducer,
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
-  // getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
+  getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,

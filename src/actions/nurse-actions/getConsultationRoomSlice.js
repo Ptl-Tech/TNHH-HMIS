@@ -10,10 +10,12 @@ export const GET_CONSULTATION_ROOM_DETAILS_REQUEST = 'GET_CONSULTATION_ROOM_DETA
 export const GET_CONSULTATION_ROOM_DETAILS_SUCCESS = 'GET_CONSULTATION_ROOM_DETAILS_SUCCESS';
 export const GET_CONSULTATION_ROOM_DETAILS_FAILURE = 'GET_CONSULTATION_ROOM_DETAILS_FAILURE';
 
+export const GET_CONSULTATION_REQUEST = 'GET_CONSULTATION_REQUEST';
+export const GET_CONSULTATION_SUCCESS = 'GET_CONSULTATION_SUCCESS';
+export const GET_CONSULTATION_FAILURE = 'GET_CONSULTATION_FAILURE';
 
 
 const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
-const EncounterListEndpoint = 'QyTreatmentHeaders';
 
 export const getConsultationRoomListSlice = (endpoint = '/data/odatafilter?webservice=QyTreatmentHeaders&isList=true') => 
   async (dispatch, getState) => {
@@ -63,3 +65,29 @@ export const getSingleConsultationSlice = (EncounterNo) => async(dispatch, getSt
         dispatch({ type: GET_CONSULTATION_ROOM_DETAILS_FAILURE, payload: errorMessage });
       }
 }
+
+// get consultation with patientNo
+export const getConsultationSlice = (patientNo) => async(dispatch, getState) => {
+  const config = configHelpers(getState);
+  try {
+      dispatch({ type: GET_CONSULTATION_REQUEST });    
+      // Perform the API request
+      console.log(patientNo, 'patient number');
+      const response = await axios.get(
+        `${API_URL}/data/odatafilter?webservice=QyTreatmentHeaders&isList=true&query=$filter=PatientNo eq '${patientNo}'`,
+        config
+      );
+      // console.log(response.data);
+  
+      dispatch({ type: GET_CONSULTATION_SUCCESS, payload: response.data });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to fetch Encounter Details";
+  
+      // Display error notification
+      message.error(errorMessage);
+  
+      dispatch({ type: GET_CONSULTATION_FAILURE, payload: errorMessage });
+    }
+}
+
