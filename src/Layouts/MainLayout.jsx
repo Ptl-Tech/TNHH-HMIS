@@ -3,7 +3,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   AppstoreOutlined,
   UserOutlined,
-  FileTextOutlined,
   CalendarOutlined,
   TeamOutlined,
   MenuUnfoldOutlined,
@@ -11,16 +10,9 @@ import {
   UserSwitchOutlined,
   FileAddOutlined,
   HistoryOutlined,
-  RadiusUprightOutlined,
-  ImportOutlined,
   MedicineBoxOutlined,
   ExperimentOutlined,
   RadarChartOutlined,
-  SolutionOutlined,
-  RetweetOutlined,
-  LayoutOutlined,
-  UserAddOutlined,
-  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import logo from '../assets/images/logo.png';
@@ -34,6 +26,7 @@ import useAuth from '../hooks/useAuth';
 import { labRoutes } from '../Routes/LabRoutes';
 import { pharmacyRoutes } from '../Routes/PharmacyRoutes';
 import { receptionRoutes } from '../Routes/ReceptionRoutes';
+import { nurseRoutes } from '../Routes/NurseRoutes';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -49,90 +42,6 @@ const MainLayout = () => {
   useEffect(() => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const department = userInfo?.userData?.departmentName;
-
-    const nurseRoutes = [
-      {
-        key: '/Nurse',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Dashboard',
-      },
-      {
-        icon: <FileTextOutlined style={{ color: '#fff' }} />,
-        label: 'Triage',
-        children: [
-          {
-            key: 'Triage',
-            label: 'Triage List',
-            icon: <FileTextOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <UsergroupAddOutlined style={{ color: '#fff' }} />,
-        label: 'Patients',
-        children: [
-          {
-            key: 'patient-list',
-            label: 'Patient Registration',
-            icon: <UserAddOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: 'Consultation-List',
-            label: 'Outpatients List',
-            icon: <UserAddOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: 'Inpatient',
-            label: 'Inpatients List',
-            icon: <UserAddOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <SolutionOutlined style={{ color: '#fff' }} />,
-        label: 'Admissions',
-        children: [
-          {
-            key: 'Admit-patient',
-            label: 'Admit Patient',
-            icon: <ImportOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <LayoutOutlined style={{ color: '#fff' }} />,
-        label: 'Ward Management',
-        children: [
-          {
-            key: 'Ward-management',
-            label: 'Manage Wards',
-            icon: <LayoutOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <RetweetOutlined style={{ color: '#fff' }} />,
-        label: 'Discharges',
-        children: [
-          {
-            key: 'Discharge-list',
-            label: 'Discharge Patient',
-            icon: <HistoryOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      {
-        icon: <RadiusUprightOutlined style={{ color: '#fff' }} />,
-        label: 'Past Doctor Visits',
-        children: [
-          {
-            key: 'Past-doctor-visit',
-            label: 'Past Doctor Visit List',
-            icon: <RadiusUprightOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-    ];
 
     // Define the menu items
     const doctorRoutes = [

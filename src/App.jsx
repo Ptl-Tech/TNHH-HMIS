@@ -2,8 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
 import PrivateRoute from './private/PrivateRoute';
-import PatientRegistration from './pages/PatientRegistration';
-import OutpatientList from './pages/OutpatientList';
 import ForgotPwd from './Auth/ForgotPwd';
 import ResetPwd from './Auth/ResetPwd';
 import ViewProfile from './Auth/ViewProfile';
@@ -11,27 +9,12 @@ import MainLayout from './Layouts/MainLayout';
 import ReceptionDashboard from './Dashboards/ReceptionDashboard';
 
 import VisitorForm from './pages/security-views/VisitorForm';
-
 import HistoryVisitorList from './pages/HistoryVisitorList';
-import AdmitPatient from './pages/nurse-view/forms/nurse-forms/AdmitPatient';
-import PatientCharges from './pages/nurse-view/PatientCharges';
-import ReleaseBed from './pages/nurse-view/ReleaseBed';
 import TransferBed from './pages/nurse-view/TransferBed ';
 import InpatientCard from './pages/nurse-view/InpatientCard';
 import TreatmentCard from './pages/nurse-view/TreatmentCard';
-
-// Nurse Department
-import Dashboard from "./pages/nurse-view/Dashboard";
 import PastDoctorVisit from "./pages/nurse-view/PastDoctorVisit";
-import TriageList from "./pages/nurse-view/TriageList";
-import ExaminePatientInTriage from "./pages/nurse-view/ExaminePatientInTriage";
-import TriageListPending from "./pages/nurse-view/TriageListPending";
-import TriageListClosed from "./pages/nurse-view/TriageListClosed";
-import AdmitPatients from "./pages/nurse-view/AdmitPatients";
-import WardManagement from "./pages/nurse-view/WardManagement";
 import Inpatient from "./pages/nurse-view/Inpatient";
-import WaitingList from "./pages/WaitingList";
-
 import NurseObservation from "./pages/NurseObservation";
 import NurseOutpatientList from "./pages/NurseOutpatientList";
 import BedManager from "./pages/BedManager";
@@ -68,11 +51,12 @@ import RadiologyDashboard from "./Dashboards/RadiologyDashboard";
 import ActiveInpatient from "./pages/billing/ActiveInpatient";
 import LabRoutes from "./Routes/LabRoutes";
 import EncounterSummery from "./pages/doctorsViews/EncounterSummery";
-import DirectAdmission from "./pages/nurse-view/DirectAdmission";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PharmacyRoutes from './Routes/PharmacyRoutes';
 import PharmacyOutpatient from './pages/pharmacy-views/PharmacyOutpatient';
 import EncounterSummeryDetails from "./pages/nurse-view/EncounterSummeryDetails";
+import NurseRoutes from './Routes/NurseRoutes';
+import PsychologyRoutes from './Routes/PsychologyRoutes';
 
 function App() {
   return (
@@ -82,78 +66,9 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPwd />} />
       <Route path="/reset-password" element={<ResetPwd />} />
       {ReceptionRoutes()}
-      <Route element={<PrivateRoute allowedDepartments={["Nurse"]} />}>
-        <Route path="/Nurse" element={<MainLayout />}>
-          <Route index element={<Dashboard />} />
-
-          {/* Routes */}
-          <Route
-            path="Patient-Registration"
-            element={<PatientRegistration />}
-          />
-          <Route path="Past-doctor-visit" element={<PastDoctorVisit />} />
-          <Route path="Past-doctor-visit/Patient" element={<TreatmentCard />} />
-          <Route path="Past-doctor-visit/Encounter" element={<EncounterSummeryDetails />} />
-
-          <Route path="Triage" element={<TriageList />} />
-          <Route path="PendingTriageList" element={<TriageListPending />} />
-          <Route path="ClosedTriageList" element={<TriageListClosed />} />
-          <Route path="Triage/Patient" element={<ExaminePatientInTriage />} />
-          <Route path="Triage-list" element={<WaitingList />} />
-          {/* <Route path="Patient-list" element={<Patientlist />} /> */}
-          {/* <Route path="New-Patients" element={<NewPatients />} /> */}
-
-          <Route path="Inpatient" element={<Inpatient />} />
-          <Route path="Consultation-List" element={<DoctorVisits />} />
-          <Route path="Admit-patient" element={<AdmitPatients />} />
-          <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
-          <Route path="Admit-patient/Charges" element={<PatientCharges />} />
-          <Route path="Ward-management" element={<WardManagement />} />
-          <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
-          <Route path="Discharge-list" element={<DischargeList />} />
-          <Route
-            path="Ward-management/Transfer-bed"
-            element={<TransferBed />}
-          />
-          <Route
-            path="Inpatient/Encounter"
-            element={<EncounterSummery />}
-          />
-          <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
-
-          <Route
-            path="PendingConsultationList"
-            element={<ConsultationRoomPatients />}
-          />
-          <Route path="ClosedConsultationList" element={<CloseList />} />
-
-          <Route path="OutPatients" element={<DoctorVisits />} />
-          <Route
-            path="Consultation-List/Patient"
-            element={<ConsultationRoomEvalutionCard />}
-          />
-          <Route
-            path="Consultation-List/Read-Doctor-Dotes"
-            element={<ReadDoctorNotes />}
-          />
-          <Route
-            path="Patient-list"
-            element={<OutpatientList />}
-          />
-          <Route
-            path="Patient-Registration/:PatientNo?"
-            element={<PatientRegistration />}
-          />
-          <Route
-            path="patient-list/Direct-Admission/:PatientNo?"
-            element={<DirectAdmission />}
-          />
-          <Route
-            path="view-profile"
-            element={<ViewProfile />}
-          />
-        </Route>
-      </Route>
+      {
+        NurseRoutes()
+      }
       <Route element={<PrivateRoute allowedDepartments={["Reception"]} />}>
         <Route path="/reception" element={<MainLayout />}>
           <Route index element={<ReceptionDashboard />} />
@@ -290,96 +205,9 @@ function App() {
         </Route>
       </Route>
 
-      <Route element={<PrivateRoute allowedDepartments={["Psychology"]} />}>
-        <Route path="/Psychology" element={<MainLayout />}>
-          <Route index element={<DoctorDashboard />} />
-          <Route
-            path="/Psychology/Consultation-List"
-            element={<DoctorVisits />}
-          />
-          <Route
-            path="/Psychology/ClosedConsultationList"
-            element={<CloseList />}
-          />
-          <Route
-            path="/Psychology/PendingConsultationList"
-            element={<ConsultationRoomPatients />}
-          />
-
-          <Route
-            path="/Psychology/Consultation-List/Patient"
-            element={<ConsultationRoomEvalutionCard />}
-          />
-          <Route path="/Psychology/Inpatient" element={<Inpatient />} />
-          <Route
-            path="/Psychology/Inpatient/Patient-card"
-            element={<InpatientCard />}
-          />
-          <Route path="/Psychology/Admissions" element={<DoctorAdmissions />} />
-          <Route
-            path="/Psychology/Discharge-list"
-            element={<DischargeList />}
-          />
-          <Route
-            path="/Psychology/Discharge-requests"
-            element={<DischargeRequests />}
-          />
-          <Route
-            path="/Psychology/Past-doctor-visit"
-            element={<PastDoctorVisit />}
-          />
-          <Route
-            path="/Psychology/Consultation-List/Encounter"
-            element={<EncounterSummery />}
-          />
-          <Route
-            path="/Psychology/Past-doctor-visit/Patient"
-            element={<TreatmentCard />}
-          />
-          <Route
-            path="/Psychology/Inpatient/Read-nurse-notes"
-            element={<ReadNurseNotes />}
-          />
-          <Route
-            path="/Psychology/Past-doctor-visit/Encounter"
-            element={<EncounterSummeryDetails />}
-          />
-          <Route
-            path="/Psychology/Radiology-Patients"
-            element={<RadiologyOutPatient />}
-          />
-          <Route
-            path="/Psychology/Approved-Admissions"
-            element={<VerifiedAdmission />}
-          />
-          <Route
-            path="/Psychology/Admitted-Patients"
-            element={<AdmittedPatients />}
-          />
-          <Route
-            path="/Psychology/Pharmacy-OutPatient"
-            element={<PharmacyOutpatient />}
-          />
-          <Route
-            path="/Psychology/Pharmacy-Inpatient"
-            element={<PharmacyInpatient />}
-          />
-          <Route path="/Psychology/Pharmacy-Card" element={<PharmacyCard />} />
-          <Route
-            path="/Psychology/Pharmacy-Returns"
-            element={<PharmacyListReturnLines />}
-          />
-          <Route
-            path="/Psychology/Pharmacy-History"
-            element={<PharmacyHistoryList />}
-          />
-          <Route
-            path="/Psychology/Consultation/Read-Doctor-Dotes"
-            element={<ReadDoctorNotes />}
-          />
-          <Route path="view-profile" element={<ViewProfile />} />
-        </Route>
-      </Route>
+      {
+        PsychologyRoutes()
+      }
 
       <Route element={<PrivateRoute allowedDepartments={["Radiology"]} />}>
         <Route path="/Radiology" element={<MainLayout />}>

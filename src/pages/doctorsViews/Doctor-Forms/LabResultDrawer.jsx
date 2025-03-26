@@ -1,7 +1,7 @@
-import { Button, Drawer, Space, Table } from "antd";
+import { Button, Drawer, Space } from "antd";
 import PropTypes from "prop-types";
-import { useState } from "react";
 import { PrinterOutlined } from "@ant-design/icons";
+import PDFViewer from "../../../components/PDFView";
 
 const LabResultDrawer = ({
   open,
@@ -9,32 +9,10 @@ const LabResultDrawer = ({
   size,
   record,
   handleViewResults,
-  procedure
+  procedure,
+  currentReportData
 }) => {
-  const [result, setResult] = useState([]);
 
-  const columns = [
-    {
-      title: "Test Name",
-      dataIndex: "TestName",
-      key: "TestName",
-    },
-    {
-      title: "Laboratory Number",
-      dataIndex: "LaboratoryNumber",
-      key: "LaboratoryNumber",
-    },
-    {
-      title: "Test Code",
-      dataIndex: "TestCode",
-      key: "TestCode",
-    },
-    {
-      title: "Result",
-      dataIndex: "Result",
-      key: "Result",
-    },
-  ];
   return (
     <Drawer
       title={`${procedure} Test Results for Patient ${record?.TreatmentNo}`}
@@ -63,7 +41,8 @@ const LabResultDrawer = ({
         </div>
       }
     >
-      <Table columns={columns} dataSource={result} />
+      <PDFViewer base64String={currentReportData?.base64} height="100%"/>
+
     </Drawer>
   );
 };
@@ -77,4 +56,5 @@ LabResultDrawer.propTypes = {
   record: PropTypes.object,
   handleViewResults: PropTypes.func,
   procedure: PropTypes.string,
+  currentReportData: PropTypes.array,
 };
