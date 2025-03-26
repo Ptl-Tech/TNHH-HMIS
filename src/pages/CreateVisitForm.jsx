@@ -283,7 +283,7 @@ const CreateVisitForm = () => {
         state: { patientDet: existingPatient },
       });
     } else {
-      navigate(`/reception/Patient-Registration?PatientNo=${patientNo}`, {
+      navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
         state: { patientDet: existingPatient },
       });
     }
@@ -332,7 +332,7 @@ const CreateVisitForm = () => {
             >
               Dispatch to Triage
             </Button>
-            <Button onClick={handleEditPatient}>Edit Patient</Button>
+            {/* <Button onClick={handleEditPatient}>Edit Patient</Button> */}
           </div>
         </div>
 
