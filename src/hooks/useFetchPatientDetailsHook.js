@@ -4,15 +4,16 @@ import { getPatientByNo } from "../actions/patientActions";
 
 const useFetchPatientDetailsHook = (patientNo) => {
   const dispatch = useDispatch();
-  const { loading:loadingPatientDetails, patients:patientDetails } = useSelector((state) => state.patientList) || {};
+  
+  const { loading: loadingPatientDetails, patients: patientDetails } = 
+    useSelector((state) => state.patientList) || {};
 
   useEffect(() => {
-    if (patientNo) {
-      dispatch(getPatientByNo(patientNo))
-    }
+    if (!patientNo) return; 
+    dispatch(getPatientByNo(patientNo));
   }, [dispatch, patientNo]);
 
   return { loadingPatientDetails, patientDetails };
-}
+};
 
-export default useFetchPatientDetailsHook
+export default useFetchPatientDetailsHook;

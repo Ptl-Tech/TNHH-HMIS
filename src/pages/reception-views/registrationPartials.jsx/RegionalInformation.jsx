@@ -73,7 +73,8 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
           : patientDetails?.Gender === "Male"
           ? 1
           : 0;
-
+const initialCountry=patientDetails?.Nationality ==="Kenya" ? "KE" :patientDetails.Nationality;
+setSelectedCountry(initialCountry);
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
@@ -178,7 +179,6 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
   }, [success, dispatch, patientDetails?.PatientNo]);
-  console.log(patientDetails);
 
   const handleSubmission = (values) => {
     const formattedData = {

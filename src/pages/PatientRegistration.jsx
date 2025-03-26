@@ -11,7 +11,11 @@ import {
   Dropdown,
   Button,
 } from "antd";
-import { ArrowLeftOutlined, MoreOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  MoreOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import useFetchPatientDetailsHook from "../hooks/useFetchPatientDetailsHook";
 import GeneralInformation from "./reception-views/registrationPartials.jsx/GeneralInformation";
 import NextofKinInformatiotion from "./reception-views/registrationPartials.jsx/NextofKinInformatiotion";
@@ -21,7 +25,7 @@ import MarketingInformation from "./reception-views/registrationPartials.jsx/Mar
 
 const PatientRegistration = () => {
   const location = useLocation();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loadingPatientDetails, patientDetails: data } =
     useFetchPatientDetailsHook(patientNo);
@@ -52,27 +56,39 @@ const PatientRegistration = () => {
     switch (key) {
       case "create_visit":
         // Navigate with proper query parameters
-        navigate(`/reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`, {
-          state: { existingPatient: patientDetails },
-        });
+        navigate(
+          `/reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`,
+          {
+            state: { existingPatient: patientDetails },
+          }
+        );
         break;
       case "request_admission":
-        console.log("Request Admission clicked");
+        navigate(
+          `/reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
+          {
+            state: { existingPatient: patientDetails },
+          }
+        );
         break;
-      case "bill_patient":
-        console.log("Bill Patient clicked");
-        break;
+      // case "bill_patient":
+      //   navigate(
+      //     `/reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
+      //     {
+      //       state: { existingPatient: patientDetails },
+      //     }
+      //   );
+      //   break;
       default:
         break;
     }
   };
-  
+
   const menu = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="create_visit">Create Visit</Menu.Item>
       <Menu.Item key="request_admission">Request Admission</Menu.Item>
-      <Menu.Item key="bill_patient">Bill Patient</Menu.Item>
-    
+      {/* <Menu.Item key="bill_patient">Bill Patient</Menu.Item> */}
     </Menu>
   );
 
@@ -85,15 +101,21 @@ const PatientRegistration = () => {
         width: "100%",
       }}
     >
-      <div className="d-flex justify-content-between align-items-center mb-2"> 
-  <Button type="link" onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>Go back </Button>
-  
-  <Dropdown overlay={menu} trigger={["click"]}>
-    <Button type="dashed" icon={<MoreOutlined />}>
-      <span className="ant-dropdown-link fw-bold">Actions</span>
-    </Button>  
-  </Dropdown>
-</div>
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <Button
+          type="link"
+          onClick={() => navigate(-1)}
+          icon={<ArrowLeftOutlined />}
+        >
+          Go back{" "}
+        </Button>
+
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Button type="dashed" icon={<MoreOutlined />}>
+            <span className="ant-dropdown-link fw-bold">Actions</span>
+          </Button>
+        </Dropdown>
+      </div>
 
       <div className="d-flex flex-column" style={{ width: "100%" }}>
         <Card
@@ -105,8 +127,6 @@ const PatientRegistration = () => {
             border: "2px solid #0f5689",
           }}
         >
-         
-
           {loadingPatientDetails ? (
             <Skeleton active paragraph={{ rows: 4 }} />
           ) : patientDetails ? (

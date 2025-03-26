@@ -593,6 +593,9 @@ export const getpatientById = (idNumber) => async (dispatch, getState) => {
   }
 };
 export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
+  if (!patientNo) {
+    return; 
+  }
   try {
     dispatch({ type: PATIENT_LIST_REQUEST });
 
