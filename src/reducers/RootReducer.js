@@ -295,6 +295,9 @@ import { saveBillingInformationReducer } from "./reception-reducers/save-patient
 import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
 import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
 import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
+import { createPatientVisitReducer } from "./reception-reducers/patientVisitReducers/createPatientVisitReducer";
+import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
+import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -323,7 +326,11 @@ export const rootReducer = combineReducers({
   subCountyWards: subCountWardsListReducer,
   clinics: clinicsListReducer,
   kinsRelationshipsList: getrelationshipOptionsReducer,
-  createTriageVisit: patientTriageVisitCreateReducer,
+
+  //patient visit reducers:-->>mercy
+  createVisit: createPatientVisitReducer,
+  getVisitById: getPatientVisitByIdReducer,
+
   patientList: patientListReducer,
   activePatients: activePatientsReducer,
   getPatientByNo: patientByNoReducer,
@@ -525,6 +532,9 @@ export const rootReducer = combineReducers({
   postPsychologyRequest: postPsychologyRequestReducer,
   postNursingCarePlan: postNursingCarePlanReducer,
   getNursingCarePlan: getNursingCarePlanReducer,
+
+  // charges reducers-->Mercy
+  getPatientCharges: getPatientChargesReducer ,
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,

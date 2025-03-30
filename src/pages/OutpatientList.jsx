@@ -162,7 +162,7 @@ const OutpatientList = () => {
                   type="link"
                   onClick={() =>
                     navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
-                      state: { existingPatient: record, previousPath: location.pathname },
+                      state: { patientNo: record.PatientNo, previousPath: location.pathname },
                     })
                   }
                 >
