@@ -51,10 +51,13 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
       const initialPaymentMode =
-      patientDetails?.PatientType === "Corporate" ? 1 :
-      patientDetails?.PatientType === "Cash" ? 2 : null;
-      
-    setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
+        patientDetails?.PatientType === "Corporate"
+          ? 1
+          : patientDetails?.PatientType === "Cash"
+          ? 2
+          : null;
+
+      setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
@@ -75,8 +78,12 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
         nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-        paymentMode: patientDetails?.PatientType === "Corporate" ? 1 :
-        patientDetails?.PatientType === "Cash" ? 2 : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
+        paymentMode:
+          patientDetails?.PatientType === "Corporate"
+            ? 1
+            : patientDetails?.PatientType === "Cash"
+            ? 2
+            : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
         insuranceName: patientDetails?.InsuranceName || "",
         insurancePrinicipalMemberName:
           patientDetails?.PrincipalMemberName || "",
@@ -116,11 +123,11 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
       nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
       nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-    paymentMode:values.paymentMode,
+      paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
         values.insuranceName || patientDetails?.InsuranceName || "",
-        insurancePrinicipalMemberName:
+      insurancePrinicipalMemberName:
         values.insurancePrinicipalMemberName ||
         patientDetails?.PrincipalMemberName ||
         "",
@@ -169,8 +176,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 onChange={(value) => setPaymentMethod(value)}
               >
                 <Select.Option value={2}>Cash</Select.Option>
-<Select.Option value={1}>Corporate</Select.Option>
-
+                <Select.Option value={1}>Corporate</Select.Option>
               </Select>
             </Form.Item>
           </Col>
@@ -292,7 +298,12 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
           </>
         )}
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save"}
           </Button>
         </Form.Item>

@@ -161,8 +161,8 @@ const OutpatientList = () => {
                   icon={<PlusOutlined />}
                   type="link"
                   onClick={() =>
-                    navigate(`/Reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
-                      state: { existingPatient: record, previousPath: location.pathname },
+                    navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
+                      state: { patientNo: record.PatientNo, previousPath: location.pathname },
                     })
                   }
                 >
