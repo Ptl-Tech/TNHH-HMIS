@@ -18,11 +18,11 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { Line } from "@ant-design/charts";
-import { lastSixMonthsTotalPatientsLineGraphConfig } from "../../constants/nurse-constants";
 import PropTypes from "prop-types";
 import moment from "moment";
+import LoadingParagraphs from "../../partials/nurse-partials/LoadingParagraphs";
 
-const DashboardStatistics = ({ userDetails, chartData }) => {
+const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => {
   const config = {
     data: chartData,
     xField: "date",
@@ -242,7 +242,13 @@ const DashboardStatistics = ({ userDetails, chartData }) => {
             </div>
             <Divider />
             <div>
-              <Line {...config} />
+              {
+                  loadingPatientList ? (
+                      <LoadingParagraphs paragraphs={10}/>
+                  ) : (
+                    <Line {...config} />
+                  )
+              }
             </div>
           </Card>
         </Col>
@@ -262,4 +268,5 @@ DashboardStatistics.propTypes = {
     }),
   }),
   chartData: PropTypes.array.isRequired,
+  loadingPatientList: PropTypes.bool,
 };
