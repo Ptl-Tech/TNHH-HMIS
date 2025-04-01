@@ -77,45 +77,53 @@ const useSignIn = () => {
         navigate('/Psychology');
       } else if (role === 'Radiology') {
         navigate('/Radiology');
+      } else if (role === 'Pharmacy') {
+        navigate('/Pharmacy');
       }
     }
   }, [verifyOtpSuccess, verifyOtpUserInfo, navigate]);
-// Store session start time in localStorage and set timeout
-useEffect(() => {
-  if (userInfo?.sessionToken) {
-    const sessionStart = Date.now();
-    localStorage.setItem('sessionStart', sessionStart);
 
-    const timeout = setTimeout(() => {
-      localStorage.removeItem('sessionStart'); // Clear session from localStorage
-      navigate('/'); // Redirect to login
-    }, SESSION_TIMEOUT);
+  // Store session start time in localStorage and set timeout
+  useEffect(() => {
+    if (userInfo?.sessionToken) {
+      const sessionStart = Date.now();
+      localStorage.setItem('sessionStart', sessionStart);
 
-    return () => clearTimeout(timeout); // Cleanup on unmount or logout
-  }
-}, [userInfo, navigate]);
-
-// Check if session expired on page reload
-useEffect(() => {
-  const storedSessionStart = localStorage.getItem('sessionStart');
-
-  if (storedSessionStart) {
-    const elapsedTime = Date.now() - parseInt(storedSessionStart, 10);
-    if (elapsedTime >= SESSION_TIMEOUT) {
-      localStorage.removeItem('sessionStart'); // Clear storage
-      navigate('/');
-    } else {
-      const remainingTime = SESSION_TIMEOUT - elapsedTime;
-      
       const timeout = setTimeout(() => {
-        localStorage.removeItem('sessionStart');
-        navigate('/');
-      }, remainingTime);
+        localStorage.removeItem('sessionStart'); // Clear session from localStorage
+        navigate('/'); // Redirect to login
+      }, SESSION_TIMEOUT);
 
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout); // Cleanup on unmount or logout
     }
-  }
-}, [navigate]);
+  }, [userInfo, navigate]);
+
+  // Check if session expired on page reload
+  useEffect(() => {
+    const storedSessionStart = localStorage.getItem('sessionStart');
+    
+    if (storedSessionStart) {
+      const elapsedTime = Date.now() - parseInt(storedSessionStart, 10);
+      if (elapsedTime >= SESSION_TIMEOUT) {
+        console.log('Session expired on reload. Redirecting to login...');
+        localStorage.removeItem('sessionStart'); // Clear storage
+        navigate('/');
+      } else {
+        const remainingTime = SESSION_TIMEOUT - elapsedTime;
+        console.log(
+          `Session resuming. Redirecting in ${remainingTime / 1000} seconds...`,
+        );
+
+        const timeout = setTimeout(() => {
+          console.log('Session expired. Logging out...');
+          localStorage.removeItem('sessionStart');
+          navigate('/');
+        }, remainingTime);
+
+        return () => clearTimeout(timeout);
+      }
+    }
+  }, [navigate]);
   return {
     staffNo,
     setStaffNo,

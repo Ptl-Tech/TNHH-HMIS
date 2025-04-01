@@ -18,7 +18,7 @@ import { listPatients } from '../actions/patientActions';
 import { convertKeysToCamelCase } from '../utils/helpers';
 
 const WalkInPatientList = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); 
   const navigate = useNavigate();
   const { patients } = useSelector((state) => state.patientList);
   const { selectedRow, selectedRowKey, rowSelection } =
@@ -119,7 +119,7 @@ const WalkInPatientList = () => {
               </Button>
             </Tooltip>
           ) : (
-            <Tooltip title="Create Visit">
+            <Tooltip title="Dispatch Patient">
               <Button
                 icon={<PlusOutlined />}
                 onClick={() =>

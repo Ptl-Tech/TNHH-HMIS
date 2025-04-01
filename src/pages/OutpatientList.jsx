@@ -34,13 +34,17 @@ const OutpatientList = () => {
 
   // get patient whose ActiveVisitNo ="" and CurrentAdmNo = ""
   const patientsToFilter = useMemo(() => {
-    const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
+    if (!patients || (Array.isArray(patients) && patients.length === 0)) {
+      return []; // Ensure it's always an array
+    }
   
+    const patientsArray = Array.isArray(patients) ? patients : Object.values(patients);
+    
     return role === "Nurse"
       ? patientsArray.filter((patient) => patient?.ActiveVisitNo === "" && patient?.CurrentAdmNo === "")
       : patientsArray;
   }, [role, patients]);
-
+  
 
   const [searchParams, setSearchParams] = useState({
     SearchName: '',
@@ -82,17 +86,22 @@ const OutpatientList = () => {
     });
   };
 
-const filterPatients = (params) => {
-  const { SearchName, patientId, patientNo } = params;
-  const filtered = patientsToFilter.filter((patient) => {
-    return (
-      (!SearchName || patient.SearchName.toLowerCase().includes(SearchName.toLowerCase())) &&
-      (!patientId || patient.IDNumber.includes(patientId)) &&
-      (!patientNo || patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase()))
-    );
-  });
-  setFilteredPatients(filtered);
-};
+  const filterPatients = (params) => {
+    const { SearchName, patientId, patientNo } = params;
+    
+    if (!Array.isArray(patientsToFilter)) return; // Ensure no filter on undefined data
+  
+    const filtered = patientsToFilter.filter((patient) => {
+      return (
+        (!SearchName || (patient?.SearchName && patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()))) &&
+        (!patientId || (patient?.IDNumber && patient.IDNumber.includes(patientId))) &&
+        (!patientNo || (patient?.PatientNo && patient.PatientNo.toLowerCase().includes(patientNo.toLowerCase())))
+      );
+    });
+  
+    setFilteredPatients(filtered);
+  };
+  
 
   const columns = [
     {
@@ -135,10 +144,10 @@ const filterPatients = (params) => {
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
           {role === "Reception" ? (
-            record.Activated ? (
-              <Tooltip title="View Details">
+           <>
+           <Tooltip title="View Details">
                 <Button
-                  type="primary"
+                  type="link"
                   icon={<EyeOutlined />}
                   onClick={() =>
                     navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
@@ -148,12 +157,9 @@ const filterPatients = (params) => {
                 >
                   View Details
                 </Button>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Create Visit">
-                <Button
+              <Button
                   icon={<PlusOutlined />}
-                  type="primary"
+                  type="link"
                   onClick={() =>
                     navigate(`/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`, {
                       state: { existingPatient: record, previousPath: location.pathname },
@@ -161,9 +167,8 @@ const filterPatients = (params) => {
                   }
                 >
                   Create Visit
-                </Button>
-              </Tooltip>
-            )
+                </Button>   </Tooltip>
+           </>
           ) : role === "Nurse" ? (
             <Tooltip title="Admit Patient">
               <Button

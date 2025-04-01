@@ -1,10 +1,25 @@
 import axios from "axios";
-import { USER_LOGIN_REQUEST, USER_LOGIN_SUCCESS, USER_LOGIN_FAIL, USER_LOGOUT, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, OTP_VERIFY_REQUEST, OTP_VERIFY_SUCCESS, OTP_VERIFY_FAIL, FORGOT_PWD_REQUEST, FORGOT_PWD_SUCCESS, FORGOT_PWD_FAIL, RESET_PWD_REQUEST, RESET_PWD_SUCCESS, RESET_PWD_FAIL } from "../constants/userConstants";
+import {
+  USER_LOGIN_REQUEST,
+  USER_LOGIN_SUCCESS,
+  USER_LOGIN_FAIL,
+  USER_LOGOUT,
+  USER_REGISTER_REQUEST,
+  USER_REGISTER_SUCCESS,
+  USER_REGISTER_FAIL,
+  OTP_VERIFY_REQUEST,
+  OTP_VERIFY_SUCCESS,
+  OTP_VERIFY_FAIL,
+  FORGOT_PWD_REQUEST,
+  FORGOT_PWD_SUCCESS,
+  FORGOT_PWD_FAIL,
+  RESET_PWD_REQUEST,
+  RESET_PWD_SUCCESS,
+  RESET_PWD_FAIL,
+} from "../constants/userConstants";
 import { message } from "antd";
 
-
-
-const API = "https://chiromo.potestastechnologies.net:8085/"
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 export const login = (staffNo, password) => async (dispatch) => {
   try {
@@ -24,19 +39,17 @@ export const login = (staffNo, password) => async (dispatch) => {
     // Dispatch success action
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
 
-    const responseData = {
-      status: data.status,
-      message: data.msg, // Assuming response.data contains the required information
-    };
-
-
     // Store user data in localStorage
     localStorage.setItem("userInfo", JSON.stringify(data));
     message.success(data.msg, 5);
   } catch (error) {
+    console.log({ error });
+
     // Extract error message
     const errorMessage =
-      error.response?.data?.message || error.response?.data?.errors || "An unknown error occurred";
+      error.response?.data?.message ||
+      error.response?.data?.errors ||
+      "An unknown error occurred";
 
 
 console.log("login error",error);
@@ -49,9 +62,9 @@ console.log("login error",error);
 
     // Display error message using Ant Design's message component
     message.error(errorMessage);
-    
   }
 };
+
 
 export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (dispatch) => {
   try {
@@ -82,28 +95,23 @@ export const verifyOtp = (staffNo, otpCode, sessionToken, branchCode) => async (
       staffNo: data.staffNo,
     };
 
-    localStorage.setItem("otpVerifyState", JSON.stringify(otpState));
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    localStorage.setItem("branchCode", extractedBranchCode); // Save extracted branch code
-
-  } catch (error) {
-    dispatch({
-      type: OTP_VERIFY_FAIL,
-      payload: error.response?.data?.errors || error.errors,
-    });
-    message.error(error.response?.data?.errors || error.errors);
-  }
-};
-
-
-
-
+      localStorage.setItem("otpVerifyState", JSON.stringify(otpState));
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      localStorage.setItem("branchCode", extractedBranchCode); // Save extracted branch code
+    } catch (error) {
+      dispatch({
+        type: OTP_VERIFY_FAIL,
+        payload: error.response?.data?.errors || error.errors,
+      });
+      message.error(error.response?.data?.errors || error.errors);
+    }
+  };
 
 export const logout = () => (dispatch) => {
   try {
     // Clear user data from localStorage
     localStorage.removeItem("userInfo");
-localStorage.removeItem("branchCode");
+    localStorage.removeItem("branchCode");
     // Dispatch logout action to update state
     dispatch({ type: USER_LOGOUT });
 
@@ -111,7 +119,6 @@ localStorage.removeItem("branchCode");
     message.error(error);
   }
 };
-
 
 //forgot password
 export const forgotPassword = (staffNo) => async (dispatch) => {
@@ -124,7 +131,7 @@ export const forgotPassword = (staffNo) => async (dispatch) => {
       config
     );
 
-    console.log('response from the server', data)
+    console.log("response from the server", data);
 
     dispatch({ type: FORGOT_PWD_SUCCESS, payload: data });
   } catch (errors) {
@@ -133,19 +140,19 @@ export const forgotPassword = (staffNo) => async (dispatch) => {
       payload: errors.response?.data?.message || errors.message,
     });
   }
-}
+};
 
 //reset password
 export const resetPassword = (formData) => async (dispatch) => {
   try {
     dispatch({ type: RESET_PWD_REQUEST });
-    
+
     const config = { headers: { "Content-Type": "application/json" } };
-    
+
     // Rename the destructured variable to avoid conflict with the formData parameter
     const { data: responseData } = await axios.post(
       `${API}Authentication/ResetPassword`,
-      formData,  // Use 'formData' to pass the data
+      formData, // Use 'formData' to pass the data
       config
     );
 
@@ -158,7 +165,6 @@ export const resetPassword = (formData) => async (dispatch) => {
     });
   }
 };
-
 
   export const register = (userData) => async (dispatch) => {
     try {

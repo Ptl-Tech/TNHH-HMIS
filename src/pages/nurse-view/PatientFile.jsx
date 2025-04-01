@@ -4,7 +4,6 @@ import PatientInfo from "./nurse-patient-file/PatientInfo";
 import NextOfKin from "./nurse-patient-file/NextOfKin";
 import PastDoctorNotes from "./nurse-patient-file/PastDoctorNotes";
 import NursingNotes from "./nurse-patient-file/NursingNotes";
-import TreatmentHistory from "./nurse-patient-file/TreatmentHistory";
 import Consumables from "./nurse-patient-file/Consumables";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";

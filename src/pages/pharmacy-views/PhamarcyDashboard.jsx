@@ -1,90 +1,162 @@
-import { useEffect } from "react";
-import { 
-  HourglassOutlined,
-  SafetyOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import useAuth from "../../hooks/useAuth";
-import moment from "moment"; 
-import DashboardCard from "../nurse-view/DashboardCard";
-import DashboardStatistics from "../nurse-view/DashboardStatistics"; 
-import { getNewPharmacyRequests } from "../../actions/pharmacy-actions/getNewPharmacyRequest";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { ArrowUpOutlined } from '@ant-design/icons';
+import { Col, Row, Select, Space, Spin, Typography } from 'antd';
+
+import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
 
 const PharmacyDashboard = () => {
-  const dispatch = useDispatch();
-  const userDetails = useAuth();  
-  
-    const {data: outPRequests } = useSelector(
-      (state) => state.getNewPharmacyList
-    );
-  
-  useEffect(() => {
-      dispatch(getNewPharmacyRequests());
-  }, [dispatch]);
+  const { Title } = Typography;
 
-  const cardData = [
-    {
-      title: "OP Pharmacy List",
-      value: outPRequests?.length,
-      subtitle: "Increase in 30 days",
-      icon: <HourglassOutlined />,
-      color: "#fff",
-      backgroundColor: "#0f5689",
-      link: "/Pharmacy/Pharmacy-OutPatient",
-    },
-    {
-      title: "IP Pharmacy List",
-      value: 0,
-      subtitle: "Increase in 30 days",
-      icon: <UserAddOutlined />,
-      color: "#000",
-      backgroundColor: "#b0afaf",
-      link: "/Pharmacy/Pharmacy-Inpatient",
-    },{
-      title: "Pharmacy Returns",
-      value: 0,  
-      subtitle: "Active Consultations",
-      icon: <SafetyOutlined />,
-      color: "#000",
-      backgroundColor: "#ac8342",
-      link: "/Pharmacy/Pharmacy-Returns",
-    },
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [variant, setVariant] = useState('');
+  const { data: pharmacyRequests, loading: pharmacyRequestsLoading } =
+    useSelector((state) => state.getPharmacyRequestsAll);
+
+  useEffect(() => {
+    dispatch(
+      getPharmacyRequestsAll({ type: variant.split(' ').join(''), status: '' }),
+    );
+  }, [dispatch, variant]);
+
+  const variants = [
+    { label: 'All', value: '' },
+    { label: 'Walk In', value: 'Walk In' },
+    { label: 'In Patient', value: 'In Patient' },
+    { label: 'Out Patient', value: 'Out Patient' },
   ];
 
-  // Helper function to count registrations by date
-  const countRegistrationsByDate = (patients) =>
-    patients.reduce((acc, patient) => {
-      const date = patient.PharmacyDate;
-      if (date !== "0001-01-01") {
-        acc[date] = (acc[date] || 0) + 1;
-      }
-      return acc;
-    }, {});
+  const statuses = [
+    { status: 'New', backgroundColor: '#ad4e0023', color: '#ad4e00' },
+    { status: 'Forwaded', backgroundColor: '#0060a323', color: '#0060a3' },
+    { status: 'Completed', backgroundColor: '#23780423', color: '#237804' },
+    { status: 'Cancelled', backgroundColor: '#ad4e0023', color: '#ad4e00' },
+  ];
 
-  // Registration counts for chart data
-  const outPatientCountsByDate = countRegistrationsByDate(outPRequests);
-  const inPatientCountsByDate = countRegistrationsByDate([]);
+  const viewableData = statuses.map(({ status, ...statusItem }) => ({
+    ...statusItem,
+    status,
+    name: `${status} Pharmacy Requests`,
+    number: pharmacyRequests.filter((request) =>
+      filterByStatus(request, status),
+    ).length,
+  }));
 
-  // Generate chart data for the last 30 days
-  const last30Days = Array.from({ length: 30 }, (_, i) =>
-    moment().subtract(i, "days").format("YYYY-MM-DD")
-  );
-  const chartData = last30Days.reverse().flatMap((date) => [
-    { date, type: "Outpatient", count: outPatientCountsByDate[date] || 0 },
-    { date, type: "Inpatient", count: inPatientCountsByDate[date] || 0 },
-  ]);
+  const handleVariantChange = (value) => {
+    console.log({ value, variant });
+    setVariant(value);
+  };
 
   return (
-    <div style={{ padding: "10px 10px" }}>
-      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-        {cardData.map((card, index) => (
-          <DashboardCard card={card} key={index} />
-        ))}
-      </div>
-      <DashboardStatistics userDetails={userDetails} chartData={chartData} />
+    <div style={{ display: 'grid', gap: '16px', padding: '10px 10px' }}>
+      <Space
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Title
+          level={4}
+          style={{ marginBottom: '0' }}
+        >
+          Pharmacy Dashboard
+        </Title>
+        <Select
+          showSearch
+          defaultValue={''}
+          options={variants}
+          style={{ width: '150px' }}
+          onChange={handleVariantChange}
+        />
+      </Space>
+      <Row gutter={[16, 16]}>
+        {viewableData.map(
+          ({ name, status, number, backgroundColor, color }) => (
+            <Col
+              xs={{ span: 24 }}
+              sm={{ span: 12 }}
+              md={{ span: 8 }}
+              lg={{ span: 6 }}
+              key={name}
+              className="gutter-row"
+            >
+              <div
+                className="card border"
+                style={{
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                }}
+                onClick={() =>
+                  variant
+                    ? navigate(
+                        `/Pharmacy/Pharmacy-${variant
+                          .split(' ')
+                          .join('')}?status=${status}`,
+                      )
+                    : {}
+                }
+              >
+                <div
+                  className="card-body gap-3"
+                  style={{ display: 'grid' }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      display: 'flex',
+                      fontSize: '15px',
+                      color: '#6f6f6f',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    {name}
+                    {variant && (
+                      <ArrowUpOutlined style={{ transform: 'rotate(45deg)' }} />
+                    )}
+                  </div>
+                  <span
+                    level={8}
+                    style={{ fontSize: '40px', color: '#3e3e3e' }}
+                  >
+                    {pharmacyRequestsLoading ? <Spin /> : number}
+                  </span>
+                  <div
+                    style={{
+                      textTransform: 'capitalize',
+                      fontWeight: 500,
+                      color: '#6f6f6f',
+                    }}
+                  >
+                    <small
+                      className="p-1"
+                      style={{
+                        backgroundColor,
+                        color,
+                        borderRadius: '3px',
+                      }}
+                    >
+                      {status}
+                    </small>{' '}
+                    <small>of {variant ? variant : 'All'}</small>
+                  </div>
+                </div>
+              </div>
+            </Col>
+          ),
+        )}
+      </Row>
     </div>
   );
 };
+
+export const filterByStatus = (labRequest, status) =>
+  status ? labRequest.Status === status : true;
 
 export default PharmacyDashboard;

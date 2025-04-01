@@ -11,9 +11,18 @@ import {
   POST_EDIT_PRESCRIPTION_SUCCESS,
   POST_EDIT_PRESCRIPTION_FAILURE,
   POST_EDIT_PRESCRIPTION_RESET,
-} from "../../actions/pharmacy-actions/postPharmacyAction";
+} from '../../actions/pharmacy-actions/postPharmacyAction';
 
-export const postPrescriptionQuantityReducer = (state = { loading: false }, action) => {
+const initialState = {
+  data: null,
+  error: null,
+  loading: false,
+};
+
+export const postPrescriptionQuantityReducer = (
+  state = initialState,
+  action,
+) => {
   switch (action.type) {
     case POST_EDIT_PRESCRIPTION_REQUEST:
       return { ...state, loading: true };
@@ -22,40 +31,40 @@ export const postPrescriptionQuantityReducer = (state = { loading: false }, acti
     case POST_EDIT_PRESCRIPTION_FAILURE:
       return { ...state, loading: false, error: action.payload };
     case POST_EDIT_PRESCRIPTION_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }
 };
 
-export const postDrugIssuanceReducer = (state = { loading: false }, action) => {
+export const postDrugIssuanceReducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_PHARMACY_DRUG_ISSUANCE_REQUEST:
       return { ...state, loading: true };
     case POST_PHARMACY_DRUG_ISSUANCE_SUCCESS:
-      return { ...state, loading: false, success: true, data: action.payload };
+      return { ...state, loading: false, data: action.payload };
     case POST_PHARMACY_DRUG_ISSUANCE_FAILURE:
       return { ...state, loading: false, error: action.payload };
     case POST_PHARMACY_DRUG_ISSUANCE_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }
 };
 
 export const postArchivePrescriptionReducer = (
-  state = { loading: false },
-  action
+  state = initialState,
+  action,
 ) => {
   switch (action.type) {
     case POST_ARCHIVE_PRESCRIPTION_REQUEST:
       return { ...state, loading: true };
     case POST_ARCHIVE_PRESCRIPTION_SUCCESS:
-      return { ...state, loading: false, success: true, data: action.payload };
+      return { ...state, loading: false, data: action.payload };
     case POST_ARCHIVE_PRESCRIPTION_FAILURE:
       return { ...state, loading: false, error: action.payload };
     case POST_ARCHIVE_PRESCRIPTION_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }

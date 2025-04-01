@@ -16,7 +16,7 @@ export const GENERATE_LAB_RESULTS_REPORT_SUCCESS =
 // Action to fetch radiology list
 export const generateLabResultsReport =
   (record) => async (dispatch, getState) => {
-    const { LaboratoryNo: laboratoryNo } = record || {};
+    const { LaboratoryNo, Lab_No } = record || {};
 
     try {
       dispatch({ type: GENERATE_LAB_RESULTS_REPORT_REQUEST });
@@ -38,12 +38,10 @@ export const generateLabResultsReport =
         },
       };
 
-      console.log({ laboratoryNo, record });
-
       // API request
       const { data } = await axios.post(
         `${API}Reports/LabResultsReport`,
-        { laboratoryNo },
+        { laboratoryNo : LaboratoryNo || Lab_No },
         config,
       );
 

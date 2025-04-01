@@ -1,136 +1,148 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
 import {
-  Table,
   Button,
-  Modal,
   Form,
-  Select,
-  TimePicker,
-  Input,
-  Tag,
-  Row,
-  Col,
   Card,
   Typography,
+  Input,
+  Row,
+  Col,
+  Table,
+  Tag,
   message,
+  Spin,
+  Skeleton,
 } from "antd";
-import { ReloadOutlined, TeamOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
-import { clearVisitor, getVisitorsList } from "../../actions/visitorsActions";
+import {
+  admitVisitor,
+  clearVisitor,
+  getVisitorsList,
+} from "../../actions/visitorsActions";
 import { useNavigate } from "react-router-dom";
-import { convertPatient, listPatients } from "../../actions/patientActions";
-import Loading from "../../partials/nurse-partials/Loading";
+import dayjs from "dayjs";
+import { ClearVisitorModal, AdmitVisitModal } from "./VisitorActionModals";
 
 const SecVisitorList = () => {
-  const navigate = useNavigate();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingVisitor, setEditingVisitor] = useState(null);
-  const [statusForm] = Form.useForm();
-  const [searchParams, setSearchParams] = useState({
-    IdNumber: "",
-    VisitorName: "",
-    VisitorPhone: "",
-  });
-
-  const currentDate = dayjs().format("YYYY-MM-DD");
-
-  const {
-    loading: visitorLoading,
-    error,
-    visitors,
-  } = useSelector((state) => state.visitorsList);
-  const {
-    loading: clearVisitorLoading,
-    error:clearVisitorError,
-    data,
-  } = useSelector((state) => state.clearVisitor);
- 
-  
-
-
+  const [form] = Form.useForm();
   const [filteredVisitors, setFilteredVisitors] = useState([]);
-  const { userInfo } = useSelector((state) => state.otpVerify);
-  const [showTable, setShowTable] = useState(
-    userInfo.userData.departmentName === "Reception" ? true : false
-  );
+  const [selectedVisitor, setSelectedVisitor] = useState(null);
+  const [admitModalVisible, setAdmitModalVisible] = useState(false);
+  const [clearModalVisible, setClearModalVisible] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [admitError, setAdmitError] = useState(null);
+  const [clearError, setClearError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false); // New state to track search
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const {
+    loading,
+    visitors = [],
+    error,
+  } = useSelector((state) => state.visitorsList);
 
   useEffect(() => {
     dispatch(getVisitorsList());
-    
   }, [dispatch]);
 
-  // Use useMemo to filter visitors based on search parameters
   useEffect(() => {
-    const filteredVisitorsMemo = () => {
-      return visitors.filter((visitor) => {
-        // Apply filtering conditions
-        const matchesSearchParams =
-          (!searchParams.VisitorName ||
-            visitor.VisitorName?.toLowerCase().includes(searchParams.VisitorName.toLowerCase())) &&
-          (!searchParams.IdNumber || visitor.IDNumber?.includes(searchParams.IdNumber)) &&
-          (!searchParams.VisitorPhone || visitor.PhoneNumber?.includes(searchParams.VisitorPhone));
-  
-     //   const isValidStatus = visitor.Status === "Entered" && visitor.Status !== "Cleared";
-  
-        const isCreatedToday = dayjs(visitor.InitiatedDate).isSame(currentDate, "day");
-  
-        // Return true if all conditions are met (only today's visitors)
-        return isCreatedToday  && matchesSearchParams;
+    if (visitors.length) {
+      setFilteredVisitors(
+        visitors.filter((v) => v.Status !== "Convert to Patient")
+      );
+    }
+  }, [visitors]);
+  const handleAdmitVisitor = async () => {
+    if (!selectedVisitor) return;
+    setLoadingStatus(true);
+    setAdmitError(null); // Reset error before attempting
+
+    try {
+      await dispatch(admitVisitor(selectedVisitor.No));
+      dispatch(getVisitorsList());
+      setAdmitModalVisible(false);
+      setSelectedVisitor(null);
+      message.success("Visitor admitted successfully.");
+      setHasSearched(false);
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message || "An unexpected error occurred.";
+      setAdmitError(errorMsg);
+      message.error(`Failed to admit visitor: ${errorMsg}`);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+
+  const handleClearVisitor = async () => {
+    if (!selectedVisitor) return;
+    setLoadingStatus(true);
+    setClearError(null); // Reset error before attempting
+
+    try {
+      const updatedStatus =
+      selectedVisitor.Status === "Cleared" ? "Entered" : "Converted to Patient";
+      await dispatch(clearVisitor(selectedVisitor.No, updatedStatus));
+      dispatch(getVisitorsList());
+      setClearModalVisible(false);
+      setSelectedVisitor(null);
+      message.success(`Visitor ${updatedStatus} successfully.`);
+      setHasSearched(false);
+
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.errors || "Failed to update visitor status.";
+      setClearError(errorMsg);
+      message.error(errorMsg);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
+ 
+  const handleSearch = () => {
+    
+    const values = form.getFieldsValue();
+    if(!values.IdNumber && !values.VisitorName && !values.VisitorPhone) {
+      setFilteredVisitors(visitors.filter((v) => v.Status !== "Convert to Patient"));
+      setHasSearched(false);
+      return;
+    }
+    const results = visitors.filter(
+      (v) =>
+        (!values.IdNumber || v.IDNumber.includes(values.IdNumber)) &&
+        (!values.VisitorName ||
+          (v.VisitorName &&
+            v.VisitorName.toLowerCase().includes(
+              values.VisitorName.toLowerCase()
+            ))) &&
+        (!values.VisitorPhone || v.PhoneNumber.includes(values.VisitorPhone)) &&
+        v.Status !== "Convert to Patient"
+    );
+
+    setFilteredVisitors(results);
+    setHasSearched(true); 
+  };
+
+  const handleActionClick = (visitor) => {
+    setSelectedVisitor(visitor);
+
+    if (visitor.Status === "Open") {
+      setAdmitModalVisible(true);
+    } else if (visitor.Status === "Entered") {
+      setClearModalVisible(true);
+    } else if (visitor.Status === "Cleared") {
+      navigate(`/Security/visitor-form/${visitor.No}`, {
+        replace: true,
+        state: { visitorData: visitor },
       });
-    };
-  
-    if (visitors?.length > 0) {
-      setFilteredVisitors(filteredVisitorsMemo());
-    }
-  }, [visitors, searchParams, currentDate]);
-  
 
-  const handleSearchChange = (e, field) => {
-    const value = e.target.value;
-    const updatedSearchParams = {
-      ...searchParams,
-      [field]: value,
-    };
-    setSearchParams(updatedSearchParams);
-
-    const isAnyFieldFilled =
-      updatedSearchParams.IdNumber ||
-      updatedSearchParams.VisitorName ||
-      updatedSearchParams.VisitorPhone;
-
-    // If any field is filled, show table and filter visitors
-    if (isAnyFieldFilled) {
-      setShowTable(true);
-      setFilteredVisitors(filteredVisitors); // Update the table with filtered visitors
-    } else if (!isAnyFieldFilled) {
-      setFilteredVisitors(filteredVisitors);
-      setShowTable(false); // Hide table if no search is applied
+      
     }
   };
 
-  // Define globally accessible function to determine button text
-
-  const handleClearVisitor = async (visitor) => {
-     // Set the visitor details to be edited in the modal
-     setEditingVisitor(visitor);
-
-     // Show the modal with the visitor's details
-     setModalVisible(true);
-  };
-
-  const confirmClearVisitor = async () => {
-    if (!editingVisitor) return;
-  
-     await dispatch(clearVisitor(editingVisitor.No)); // Dispatch clear action
-      message.success("Visitor cleared successfully", 5);
-      setModalVisible(false);
-      dispatch(getVisitorsList()); // Refresh visitor list
-  };
-
-  
   const columns = [
     {
       title: "Index",
@@ -138,8 +150,18 @@ const SecVisitorList = () => {
       key: "index",
       render: (_, __, index) => index + 1,
     },
-    { title: "Visitor No", dataIndex: "No", key: "No" },
-    { title: "Visitor Name", dataIndex: "VisitorName", key: "VisitorName" },
+    {
+      title: "Visitor No",
+      dataIndex: "No",
+      key: "No",
+      render: (no) => <a href={`/visitor/${no}`}>{no}</a>,
+    },
+    {
+      title: "Visitor Name",
+      dataIndex: "VisitorName",
+      key: "VisitorName",
+      render: (name) => (name ? name.toUpperCase() : "N/A"),
+    },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
     {
       title: "Purpose of Visit",
@@ -151,21 +173,16 @@ const SecVisitorList = () => {
       title: "Date of Visit",
       dataIndex: "CreatedDate",
       key: "CreatedDate",
-      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      render: (date) => (date ? dayjs(date).format("DD/MM/YYYY") : "N/A"),
     },
     {
       title: "Time In",
       dataIndex: "InitiatedByTime",
       key: "InitiatedByTime",
-      render: (time) => {
-        if (!time) return "Invalid Time";
-        const validTime = new Date(`1970-01-01T${time}`);
-        return validTime.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-      },
+      render: (time) =>
+        time
+          ? new Date(`1970-01-01T${time}`).toLocaleTimeString()
+          : "Invalid Time",
     },
     {
       title: "Status",
@@ -177,6 +194,7 @@ const SecVisitorList = () => {
           Entered: "red",
           Received: "blue",
           Cleared: "green",
+          Open: "purple",
         };
         return <Tag color={statusColors[status] || "default"}>{status}</Tag>;
       },
@@ -184,100 +202,117 @@ const SecVisitorList = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, visitor) => {
-        return (
-          <Button
-            onClick={() =>
-              handleClearVisitor(visitor)
-            }
-            type="primary"
-          >
-            {visitor.Status === "Cleared" ? "Check In Visitor" : "Clear Visitor"}
-          </Button>
-        );
-      },
-    }
-    
+      render: (_, visitor) => (
+        <Button
+          onClick={() => handleActionClick(visitor)}
+          type="primary"
+          disabled={loadingStatus}
+        >
+          {visitor.Status === "Cleared" ? "Create New Visit" : "Manage Visit"}
+        </Button>
+      ),
+    },
   ];
 
   return (
-    <div className="card mt-4">
+    <div>
       <div className="d-flex justify-content-between align-items-center w-100">
         <h5
           style={{
-            color: "#ac8342",
+            color: "#003F6D",
             textAlign: "center",
             padding: "10px",
             display: "flex",
             alignItems: "center",
           }}
         >
-          <TeamOutlined style={{ marginRight: 8 }} /> Visitor List
+          <TeamOutlined style={{ marginRight: 8 }} /> Visitors List
         </h5>
         <Button
           icon={<ReloadOutlined />}
           type="primary"
-          onClick={() => dispatch(getVisitorsList(filteredVisitors))}
-          style={{ marginRight: 16 }}
+          onClick={() => dispatch(getVisitorsList())}
         >
           Refresh
         </Button>
       </div>
-      <Card className="card-header mb-4 p-4">
-        <Typography.Text
-          style={{ color: "#003F6D", fontWeight: "bold", marginBottom: "16px" }}
-        >
-          Find Visitor Details by:
-        </Typography.Text>
-        <Row gutter={16} className="mt-2">
-          <Col span={6}>
-            <Input
-              placeholder="Id Number"
-              value={searchParams.IdNumber}
-              onChange={(e) => handleSearchChange(e, "IdNumber")}
-              allowClear
-            />
-          </Col>
-          <Col span={6}>
-            <Input
-              placeholder="Visitor Name"
-              value={searchParams.VisitorName}
-              onChange={(e) => handleSearchChange(e, "VisitorName")}
-              allowClear
-            />
-          </Col>
-          <Col span={6}>
-            <Input
-              placeholder="Visitor Phone"
-              value={searchParams.VisitorPhone}
-              onChange={(e) => handleSearchChange(e, "VisitorPhone")}
-              allowClear
-            />
-          </Col>
-        </Row>
-      </Card>
-      {
-        showTable && (
-          <Table
-            columns={columns}
-            dataSource={filteredVisitors}
-            pagination={{ pageSize: 10 }}
-            style={{ marginTop: "16px" }}
-          />
-        )
-      }
-      <Modal
-  title="Confirm Visitor Clearance"
-  visible={modalVisible}
-  onOk={confirmClearVisitor} // Call function when confirmed
-  onCancel={() => setModalVisible(false)}
-  okText="Yes, Clear"
-  cancelText="Cancel"
-  loading={clearVisitorLoading}
->
-  <p>Are you sure you want to clear visitor <strong>{editingVisitor?.VisitorName}</strong>?</p>
-</Modal>
 
+      {error && <Typography.Text type="danger">Error: {error}</Typography.Text>}
+
+      <Card className="card-header mb-4 p-4">
+        <Form layout="vertical" form={form} onValuesChange={handleSearch}>
+          <Row gutter={16} className="mt-2">
+            <Col span={6}>
+              <Form.Item name="IdNumber">
+                <Input placeholder="ID Number" allowClear />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name="VisitorName">
+                <Input placeholder="Visitor Name" allowClear />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name="VisitorPhone">
+                <Input placeholder="Visitor Phone" allowClear />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+
+       {hasSearched && (
+        <div className="card-header mb-4 p-4">
+          {loading ? (
+            <Skeleton active paragraph={{ rows: 10 }} />
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={filteredVisitors}
+              rowKey="No"
+              loading={loadingStatus}
+              size="middle"
+              pagination={{
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20"],
+                defaultPageSize: 10,
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {selectedVisitor && (
+        <AdmitVisitModal
+          visible={admitModalVisible}
+          visitor={selectedVisitor}
+          onClose={() => {
+            setAdmitModalVisible(false);
+            setSelectedVisitor(null);
+            setAdmitError(null);
+          }}
+          confirmAdmitVisitor={handleAdmitVisitor}
+          admitVisitorLoading={loadingStatus}
+          errorMessage={admitError}
+        />
+      )}
+
+      {selectedVisitor && (
+        <ClearVisitorModal
+          modalVisible={clearModalVisible}
+          setModalVisible={(visible) => {
+            setClearModalVisible(visible);
+            if (!visible) {
+              setSelectedVisitor(null);
+              setClearError(null);
+            }
+          }}
+          confirmClearVisitor={handleClearVisitor}
+          clearVisitorLoading={loadingStatus}
+          visitor={selectedVisitor}
+          errorMessage={clearError}
+        />
+      )}
     </div>
   );
 };

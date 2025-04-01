@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import useSetTablePagination from "../../../../hooks/useSetTablePagination"
 
 const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals }) => {
+
   const columns = [
     {
       title: 'Patient No',
@@ -58,7 +59,7 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals }) => 
       key: 'SP02',
       render: (_, record) => {
         return record.SP02 ? (
-          <span>{record.SP02} %</span>
+          <span>{record.SP02}</span>
         ) : (
           <span>0</span>
         )
@@ -175,7 +176,7 @@ const VitalsTable = ({ rowSelection, filterVitals, loadingInpatientVitals }) => 
 export default VitalsTable
 //props types validations
 VitalsTable.propTypes = {
-    rowSelection: PropTypes.object.isRequired,
+    rowSelection: PropTypes.object,
     filterVitals: PropTypes.array,
     loadingInpatientVitals: PropTypes.bool,
     loadingTriageList: PropTypes.bool

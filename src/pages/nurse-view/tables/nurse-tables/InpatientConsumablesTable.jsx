@@ -1,7 +1,6 @@
 import { Table, Typography } from "antd";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import Loading from "../../../../partials/nurse-partials/Loading";
 
 const InpatientConsumablesTable = ({ consumables, loadingGetPgOpenPatientConsumables }) => {
 

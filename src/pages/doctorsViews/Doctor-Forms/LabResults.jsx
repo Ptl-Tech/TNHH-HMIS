@@ -8,7 +8,7 @@ import {
   Select,
   message,
   Tag,
-  Modal
+  Modal,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,11 @@ import {
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
 import LabResultDrawer from "./LabResultDrawer";
+import {
+  GENERATE_LAB_RESULTS_REPORT_RESET,
+  GENERATE_LAB_RESULTS_REPORT_SUCCESS,
+  generateLabResultsReport,
+} from "../../../actions/lab-actions/generateLabResultsReport";
 
 const { Option } = Select;
 
@@ -38,9 +43,15 @@ const LabResults = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName
+  const role = useAuth().userData.departmentName;
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
 
+  const {
+    data: reportData,
+    loading: reportLoading,
+    error: reportError,
+  } = useSelector((state) => state.generateLabResultsReport);
+  const [currentReportData, setCurrentReportData] = useState(reportData);
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
@@ -54,6 +65,7 @@ const LabResults = () => {
   const { loading: loadingLabRequestPost } = useSelector(
     (state) => state.postLabRequest
   );
+
   const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
@@ -71,15 +83,44 @@ const LabResults = () => {
   const [size, setSize] = useState();
   const [record, setRecord] = useState(null);
 
-  const showLargeDrawer = (record) => {
-    setSize('large');
+  const showLargeDrawer = async (record) => {
+    setSize("large");
+    const labRequest = {
+      treatmentNo: treatmentNo ?? admissionNo,
+      laboratoryNo: record?.Lab_No,
+    };
+    console.log("lab request", labRequest);
+    await dispatch(generateLabResultsReport(record));
+
     setOpen(true);
+
     setRecord(record);
   };
 
   const onClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (reportData) {
+      message.success("Report generated successfully");
+      setCurrentReportData(reportData);
+      dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
+    }
+
+    if (reportLoading) {
+      message.info("Generating Report...");
+    }
+
+    if (reportError) {
+      message.warning(
+        Array.isArray(reportError?.errors)
+          ? reportError.errors[0]
+          : reportError.errors
+      );
+      dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
+    }
+  }, [reportData, reportLoading, reportError]);
 
   useEffect(() => {
     dispatch(getLabRequestSetup());
@@ -89,7 +130,9 @@ const LabResults = () => {
   const handleLabRequest = async () => {
     //fetch treatmentNo from the URL
     try {
-      const response = await dispatch(requestLabTest(treatmentNo));
+      const response = await dispatch(
+        requestLabTest(treatmentNo ?? admissionNo)
+      );
       if (response) {
         message.success(
           `Requesting test for Laboratory No: ${response.laboratoryNo}`
@@ -104,7 +147,6 @@ const LabResults = () => {
       message.error("An error occurred while requesting the lab test.");
     }
   };
-  
 
   const handleFieldChange = (field, value) => {
     setLabRequest((prev) => ({
@@ -112,7 +154,6 @@ const LabResults = () => {
       [field]: field === "dueDate" ? moment(value).format("YYYY-MM-DD") : value,
     }));
   };
-  
 
   const handleSave = () => {
     dispatch(postLabRequest(labRequest)).then((data) => {
@@ -205,15 +246,13 @@ const LabResults = () => {
         style={{ color: "#0F5689", marginBottom: "12px" }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
-        Laboratory Request 
+        Laboratory Request
       </Typography.Title>
-      
-      {
-        role === 'Doctor' &&
-        patientDetails?.Status !== "Completed" ? (
-          <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
-         <div className="d-flex justify-content-start align-items-center">
-         <Button
+
+      {role === "Doctor" && patientDetails?.Status !== "Completed" ? (
+        <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
+          <div className="d-flex justify-content-start align-items-center">
+            <Button
               type="primary"
               style={{
                 marginTop: "16px",
@@ -229,8 +268,8 @@ const LabResults = () => {
             >
               Request Test
             </Button>
-          
-          {/* <Popconfirm
+
+            {/* <Popconfirm
             title="Are you sure?"
             onConfirm={() => console.log(`Delete: ${record.key}`)}
           >
@@ -238,50 +277,48 @@ const LabResults = () => {
               Delete
             </Button>
           </Popconfirm> */}
-         </div>
+          </div>
           <div className="d-flex justify-content-end my-2">
-        <Button
-          type="primary"
-          onClick={() => setShowForm(!showForm)}
-          icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
-        >
-          {!showForm ? " New Request" : "View List"}
-        </Button>
-      </div>
+            <Button
+              type="primary"
+              onClick={() => setShowForm(!showForm)}
+              icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
+            >
+              {!showForm ? " New Request" : "View List"}
+            </Button>
+          </div>
         </div>
-        ) : (
-          null
-        )
-      }
-      
+      ) : null}
 
       {!showForm ? (
-          <>
-           <RowSelectionTable
-           columns={columns}
-           dataSource={patientLabTest}
-           onRowSelect={(row) => setSelectedRow(row)} // Update selected row
-           tableProps={{ scroll: { x: 600 } }} // Additional Table props
-         />
-         <Modal
-         title="Lab Test Results"
-         visible={modalVisible}
-         onCancel={() => setModalVisible(false)}
-         footer={null}
-         width={800}
-         bodyStyle={{ padding: "16px", textAlign: "center" }}
-       >
-         {noResultsMessage ? (
-           <Typography.Text type="danger">No Results to View</Typography.Text>
-         ) : (
-           <iframe
-             src={iframeSrc}
-             title="Lab Test Results"
-             style={{ width: "100%", height: "500px", border: "none" }}
-           />
-         )}
-       </Modal>
-          </>
+        <>
+          <RowSelectionTable
+            columns={columns}
+            dataSource={patientLabTest}
+            onRowSelect={(row) => setSelectedRow(row)} // Update selected row
+            tableProps={{ scroll: { x: 600 } }} // Additional Table props
+          />
+          <Modal
+            title="Lab Test Results"
+            visible={modalVisible}
+            onCancel={() => setModalVisible(false)}
+            footer={null}
+            width={800}
+            bodyStyle={{ padding: "16px", textAlign: "center" }}
+          >
+            {noResultsMessage ? (
+              <Typography.Text type="danger">
+                No Results to View
+              </Typography.Text>
+            ) : (
+              <iframe
+                src={iframeSrc}
+                title="Lab Test Results"
+                style={{ width: "100%", height: "500px", border: "none" }}
+              />
+            )}
+          </Modal>
+        </>
       ) : (
         <Form layout="vertical" autoComplete="off">
           <Row gutter={24}>
@@ -315,9 +352,11 @@ const LabResults = () => {
                   }
                   showSearch
                   filterOption={(input, option) =>
-                    option?.children?.toLowerCase().includes(input.toLowerCase())
+                    option?.children
+                      ?.toLowerCase()
+                      .includes(input.toLowerCase())
                   }
-                   size="large"
+                  size="large"
                 >
                   {labTestSetupData?.map((item) => (
                     <Option key={item.Code} value={item.Code}>
@@ -330,7 +369,6 @@ const LabResults = () => {
           </Row>
 
           <div className="my-2">
-           
             <Button
               type="primary"
               style={{
@@ -352,7 +390,14 @@ const LabResults = () => {
         </Form>
       )}
 
-      <LabResultDrawer onClose={onClose} open={open} size={size} record={record} handleViewResults={handleViewResults} procedure="Laboratory"/>
+      <LabResultDrawer
+        onClose={onClose}
+        open={open}
+        size={size}
+        record={record}
+        currentReportData={currentReportData}
+        procedure="Laboratory"
+      />
     </div>
   );
 };

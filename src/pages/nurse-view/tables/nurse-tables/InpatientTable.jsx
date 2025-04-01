@@ -18,6 +18,12 @@ const InpatientTable = ({
   const role = useAuth().userData.departmentName;
   const columns = [
     {
+      title: "#",
+      dataIndex: "key",
+      key: "key",
+      render: (text, record, index) => index + 1,
+    },
+    {
       title: "Adm No",
       dataIndex: "Admission_No",
       key: "Admission_No",
@@ -38,7 +44,7 @@ const InpatientTable = ({
           : false,
     },
     {
-      title: "Names",
+      title: "Patient Names",
       dataIndex: "PatientName",
       key: "PatientName",
       filteredValue: searchName ? [searchName] : null,
@@ -54,6 +60,11 @@ const InpatientTable = ({
           {record.PatientName}
         </a>
       ),
+    },
+    {
+      title: "Branch",
+      dataIndex: "Branch",
+      key: "Branch",
     },
     {
       title: "Adm Date",

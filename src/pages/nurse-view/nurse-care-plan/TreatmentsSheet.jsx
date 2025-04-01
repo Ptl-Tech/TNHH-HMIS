@@ -1,54 +1,71 @@
-import { Button } from "antd"
-import { PlusOutlined, FileOutlined, RotateRightOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { FileOutlined, PlusOutlined } from "@ant-design/icons";
 import TreatmentSheetTable from "../tables/nurse-tables/TreatmentSheetTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import { Button, Form } from "antd";
+import { useEffect, useState } from "react";
+import TreatmentSheetFormData from "../forms/nurse-forms/TreatmentSheetFormData";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getTreatmentSheetLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
 const TreatmentsSheet = () => {
-  const [selectedRowKey, setSelectedRowKey] = useState(null);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [selectedRow, setSelectedRow] = useState([]);
+  const [form] = Form.useForm();
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const location = useLocation();
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const dispatch = useDispatch();
+  const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
+    (state) => state.getTreatmentSheet
+  );
 
-  const rowSelection = {
-    selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRowKeys.length > 1) {
-        setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-        setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-      } else {
-        setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-        setSelectedRow(selectedRows); // Update the selected row
-      }
-      setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === 'Disabled User', // Disable specific rows if needed
-    }),
-};
+  console.log(treatmentSheet, "treatment sheet");
+  const handleButtonVisibility = () => {
+    setIsFormVisible(!isFormVisible);
+  };
 
-const handleSendToPharmacy = () => {
-  const selectedRecord = selectedRow[0];
-  console.log(selectedRecord);
-
-}
-const handleStopTreatment = () => {
-    const selectedRecord = selectedRow[0];
-    console.log(selectedRecord);
-}
+  useEffect(() => {
+    dispatch(getTreatmentSheetLineSlice(admissionNo));
+  }, [dispatch, admissionNo]);
 
   return (
     <div>
-         <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
+      <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px',  marginTop: '20px'}}>
-          <Button type="primary" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleSendToPharmacy()}><PlusOutlined /> Send to Pharmacy</Button>
-          <Button color="danger" variant="outlined" style={{ width: '100%' }} disabled={!selectedRowKey} onClick={()=>handleStopTreatment()}><RotateRightOutlined /> Stop Treatment</Button>
+      {!isFormVisible && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            paddingBottom: "20px",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            type="primary"
+            onClick={handleButtonVisibility}
+            icon={<PlusOutlined />}
+          >
+            Add Treatment Sheet
+          </Button>
         </div>
+      )}
 
-        <TreatmentSheetTable  rowSelection={rowSelection} />
+      {isFormVisible && (
+        <TreatmentSheetFormData
+          setIsFormVisible={setIsFormVisible}
+          form={form}
+        />
+      )}
 
+      {!isFormVisible && (
+        <TreatmentSheetTable
+          loadingTreatmentSheet={loadingTreatmentSheet}
+          treatmentSheet={treatmentSheet}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default TreatmentsSheet
+export default TreatmentsSheet;
