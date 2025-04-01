@@ -299,6 +299,7 @@ import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePha
 import { createPatientVisitReducer } from "./reception-reducers/patientVisitReducers/createPatientVisitReducer";
 import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
 import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
+import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -538,6 +539,7 @@ export const rootReducer = combineReducers({
 
   // charges reducers-->Mercy
   getPatientCharges: getPatientChargesReducer ,
+  getSingleBill:getSinglePatientBillReducer,
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,
