@@ -32,6 +32,7 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         receiptDate: moment(),
         amountReceived: "",
         coPay: false, // Default Co-Pay to false
+        isPartialPayment:false
       });
     }
   }, [visible, form]);
@@ -57,9 +58,10 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         transactionCode: values.transactionCode || "",  
         splitAmount: values.splitAmount || false,
         amountReceived: parseFloat(values.amountReceived),
+        isPartialPayment:false,
         coPay: values.coPay,
         ...(values.payMode === 7
-          ? { transactionCode: values.transactionCode, phoneNumber: values.phoneNumber }
+          ? { transactionCode: values.transactionCode, phoneNumber: values.phoneNumber, isPartialPayment:false }
           : {}),
       };
   

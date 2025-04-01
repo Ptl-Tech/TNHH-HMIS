@@ -228,7 +228,7 @@ const InpatientCash = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/Patient-Charges/Patient?PatientNo=${record.PatientNo}`,
+                `/reception/InPatient-Charges/Patient?PatientNo=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }
