@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Button, Drawer, Form, Input, Select, Skeleton } from "antd";
+import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../../actions/Charges-Actions/postCharges";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
+import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 
-const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) => {
+const AddChargesDrawer = ({
+  visible,
+  onClose,
+  activeVisitNo,
+  editingCharge,
+}) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { data: transactionList, loading: transactionListLoading } =
     useSelector((state) => state.getTransactionList);
-  const { charges: transactionCharges, loading: chargesLoading } =
-    useSelector((state) => state.getChargesSetup);
-  const { loading: addChargesLoading } = useSelector((state) => state.postPatientCharges);
+  const { charges: transactionCharges, loading: chargesLoading } = useSelector(
+    (state) => state.getChargesSetup
+  );
+  const { loading: addChargesLoading } = useSelector(
+    (state) => state.postPatientCharges
+  );
+  const {
+    loading: patientBillLoading,
+    error: patientBillError,
+    data: patientBillData,
+  } = useSelector((state) => state.getSingleBill);
 
   const [transactionType, setTransactionType] = useState(null);
   const [charges, setCharges] = useState([]);
@@ -82,8 +96,9 @@ const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) =>
     }
   };
 
-  const saveCharges = () => {
-    form.validateFields().then((values) => {
+  const saveCharges = async () => {
+    try {
+      const values = await form.validateFields();
       const payload = {
         myAction: editingCharge ? "edit" : "create",
         recId: editingCharge ? editingCharge.SystemId : "",
@@ -93,17 +108,18 @@ const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) =>
         quantity: values.Quantity,
         remarks: values.remarks,
       };
-
-      dispatch(postPatientCharges(payload));
-
-      setTimeout(() => {
-        dispatch(getPatientCharges(activeVisitNo));
-      }, 1000);
-      
+  
+      await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
+      dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
+      dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
+  
       onClose();
       form.resetFields();
-    });
+    } catch (error) {
+      console.error("Error saving charge:", error);
+    }
   };
+  
 
   return (
     <Drawer
@@ -114,28 +130,16 @@ const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) =>
       placement="right"
       maskClosable={false}
       footer={
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button onClick={onClose} size="large" block>
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            onClick={saveCharges}
-            size="large"
-            block
-            loading={addChargesLoading}
-            disabled={addChargesLoading}
-          >
-            {editingCharge ? "Update Charge" : "Add Charge"}
-          </Button>
-        </div>
+       null
       }
     >
       <Form layout="vertical" form={form}>
         <Form.Item
           name="transactionType"
           label="Transaction Type"
-          rules={[{ required: true, message: "Please select a transaction type!" }]}
+          rules={[
+            { required: true, message: "Please select a transaction type!" },
+          ]}
         >
           {transactionListLoading ? (
             <Skeleton.Input active />
@@ -148,7 +152,10 @@ const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) =>
               disabled={!!editingCharge} // Disable in edit mode
             >
               {transactionList?.map((item) => (
-                <Select.Option key={item.TransactionType} value={item.TransactionType}>
+                <Select.Option
+                  key={item.TransactionType}
+                  value={item.TransactionType}
+                >
                   {item.Description}
                 </Select.Option>
               ))}
@@ -174,17 +181,50 @@ const AddChargesDrawer = ({ visible, onClose, activeVisitNo, editingCharge }) =>
           )}
         </Form.Item>
 
-        <Form.Item name="Quantity" label="Quantity" rules={[{ required: true, message: "Please enter a quantity!" }]}>
-          <Input type="number" min={1} value={quantity} onChange={handleQuantityChange} />
+       <Row gutter={16}>
+        <Col span={12}>
+        <Form.Item
+          name="Quantity"
+          label="Quantity"
+          rules={[{ required: true, message: "Please enter a quantity!" }]}
+        >
+          <Input
+            type="number"
+            min={1}
+            value={quantity}
+            onChange={handleQuantityChange}
+          />
         </Form.Item>
+        </Col>
+        <Col span={12}>
 
         <Form.Item name="Amount" label="Total Amount">
-          <Input disabled style={{ textAlign: "left", fontWeight: "bold", color: "green" }} />
+          <Input
+            disabled
+            style={{ textAlign: "left", fontWeight: "bold", color: "green" }}
+          />
         </Form.Item>
 
+       </Col>
+       </Row>
         <Form.Item name="remarks" label="Remarks">
           <Input.TextArea rows={4} />
         </Form.Item>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button onClick={onClose} size="large" block>
+            Cancel
+          </Button>
+          <Button
+            type="primary"
+            onClick={saveCharges}
+            size="large"
+            block
+            loading={addChargesLoading}
+            disabled={addChargesLoading}
+          >
+            {editingCharge ? "Update Charge" : "Add Charge"}
+          </Button>
+        </div>
       </Form>
     </Drawer>
   );

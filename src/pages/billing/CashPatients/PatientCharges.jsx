@@ -5,6 +5,7 @@ import { Typography, Table, Spin, Alert, Button, Modal } from "antd";
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import AddChargesDrawer from "./AddChargesDrawer";
 import { deletePatientCharges } from "../../../actions/Charges-Actions/deleteCharges";
+import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 
 const { confirm } = Modal;
 
@@ -16,6 +17,12 @@ const PatientCharges = ({ activeVisitNo }) => {
  const { loading: deleteLoading } = useSelector(
     (state) => state.deletePatientCharges
   );
+    const {
+      loading: patientBillLoading,
+      error: patientBillError,
+      data: patientBillData,
+    } = useSelector((state) => state.getSingleBill);
+  
   const [visible, setVisible] = useState(false);
   const [editingCharge, setEditingCharge] = useState(null);
 
@@ -37,17 +44,17 @@ const PatientCharges = ({ activeVisitNo }) => {
     setVisible(true);
   };
 
-  // Handle Delete Charge with Confirmation
   const handleDeleteCharge = (record) => {
     const payload = {
       myAction: "delete",
       recId: record.SystemId,
-      visitNo: "string",
-      transactionType: "string",
-      charge: "string",
+      visitNo: activeVisitNo,  // Ensure visitNo is correctly passed
+      transactionType: record.Transaction_Type,
+      charge: record.Code,
       quantity: 0,
-      remarks: "string",
-    }
+      remarks: "Deleted charge",
+    };
+  
     confirm({
       title: "Are you sure you want to delete this charge?",
       icon: <ExclamationCircleOutlined />,
@@ -55,18 +62,23 @@ const PatientCharges = ({ activeVisitNo }) => {
       okText: "Yes, Delete",
       okType: "danger",
       cancelText: "No",
-      onOk() {
-        console.log("Deleting charge:", record);
-        dispatch(deletePatientCharges(payload)).then((status) => {
+      onOk: async () => {
+        try {
+          console.log("Deleting charge:", record);
+          const status = await dispatch(deletePatientCharges(payload));
+  
           if (status) {
-            dispatch(getPatientCharges(activeVisitNo));
+            await dispatch(getPatientCharges(activeVisitNo)); // Refresh charges
+            await dispatch(getSinglePatientBill(activeVisitNo)); // Refresh bill balance
           }
-        });
+        } catch (error) {
+          console.error("Error deleting charge:", error);
+        }
       },
       loading: deleteLoading,
-      
     });
   };
+  
 
   const columns = [
     {
