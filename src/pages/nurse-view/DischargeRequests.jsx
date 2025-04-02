@@ -1,7 +1,7 @@
-import { Button, Card, Input, Space, Table, Typography, Modal, message, Form, Select } from "antd";
+import { Button, Card, Input, Space, Table, Typography, Modal, message } from "antd";
 import { ProfileOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { getPgInpatientDischargeRequestsSlice } from "../../actions/nurse-actions/getPgInpatientDischargeRequestsSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
@@ -9,10 +9,7 @@ import { POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postI
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 
 const DischargeRequests = () => {
-  const [isDiagnosisModalVisible, setDiagnosisModalVisible] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState(null);
-  const [diagnosisData, setDiagnosisData] = useState([]);
-  const [form] = Form.useForm();
+ 
 
   const columns = [
     {
@@ -74,20 +71,24 @@ const DischargeRequests = () => {
   const { loading, data } = useSelector(state => state.getDoctorsList);
   const { confirm } = Modal;
 
-  const formattedDoctorDetails = data.map(doctor => {
-    return {
+  const formattedDoctorDetails = useMemo(() => 
+    data.map(doctor => ({
       DoctorID: doctor.DoctorID,
-      DoctorsName: doctor.DoctorsName,
-    }
-  });
+      DoctorsName: doctor.DoctorsName
+    })), 
+    [data] // Memoize based on data changes
+  );
 
-  const formattedPatientDischargeRequests = getInpatientDischargeRequest.map(discharge => {
-    const matchDoctorName = formattedDoctorDetails.find(doctor => doctor.DoctorID === discharge.Doctor);
-    return {
-      ...discharge,
-      DoctorName: matchDoctorName?.DoctorsName
-    }
-  });
+  const formattedPatientDischargeRequests = useMemo(() => 
+    getInpatientDischargeRequest.map(discharge => {
+      const matchDoctorName = formattedDoctorDetails.find(doctor => doctor.DoctorID === discharge.Doctor);
+      return {
+        ...discharge,
+        DoctorName: matchDoctorName?.DoctorsName
+      };
+    }), 
+    [getInpatientDischargeRequest, formattedDoctorDetails] // Dependencies
+  );
 
   const { pagination, handleTableChange } = useSetTablePagination(formattedPatientDischargeRequests);
 
@@ -121,8 +122,6 @@ const DischargeRequests = () => {
           result.payload.message || `${record?.Search_Name} discharge initiated successfully!`
         );
         dispatch(getPgInpatientDischargeRequestsSlice());
-        setSelectedPatient(record);
-        setDiagnosisModalVisible(true);
         return Promise.resolve(); // Resolve the Promise to close the modal
       } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
         message.error(
@@ -136,32 +135,15 @@ const DischargeRequests = () => {
     }
   }
 
-  const handleAddDiagnosis = (values) => {
-    // Handle adding primary/secondary diagnosis and remarks
-    console.log("Final Diagnosis Added:", values);
-    // Add logic to save the diagnosis data
-  }
-
-  const diagnosisColumns = [
-    { title: 'Diagnosis Type', dataIndex: 'diagnosisType', key: 'diagnosisType' },
-    { title: 'Diagnosis', dataIndex: 'diagnosis', key: 'diagnosis' },
-    { title: 'Remarks', dataIndex: 'remarks', key: 'remarks' },
-  ];
-
-  const handleCancelDiagnosisModal = () => {
-    setDiagnosisModalVisible(false);
-    setSelectedPatient(null);
-  }
-
   useEffect(() => {
     dispatch(getPgInpatientDischargeRequestsSlice());
   }, [dispatch]);
 
   useEffect(() => {
-    if (!data.length) {
+    if (!data?.length) {
       dispatch(listDoctors());
     }
-  }, [dispatch, data.length]);
+  }, [dispatch, data?.length]);
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
@@ -204,38 +186,6 @@ const DischargeRequests = () => {
         />
       )}
 
-      {/* Diagnosis Modal */}
-      <Modal
-        title={<Card.Header>{selectedPatient?.Search_Name}'s Details</Card.Header>}
-        visible={isDiagnosisModalVisible}
-        onCancel={handleCancelDiagnosisModal}
-        footer={null}
-        width={800}
-      >
-        <Form form={form} onFinish={handleAddDiagnosis}>
-          <Form.Item name="primaryDiagnosis" label="Primary Diagnosis" rules={[{ required: true, message: 'Please input the primary diagnosis!' }]}>
-            <Input placeholder="Enter Primary Diagnosis" />
-          </Form.Item>
-
-          <Form.Item name="secondaryDiagnosis" label="Secondary Diagnosis">
-            <Input placeholder="Enter Secondary Diagnosis" />
-          </Form.Item>
-
-          <Form.Item name="remarks" label="Final Remarks">
-            <Input.TextArea placeholder="Enter remarks" rows={4} />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit">Add Diagnosis</Button>
-        </Form>
-
-        <Table
-          columns={diagnosisColumns}
-          dataSource={diagnosisData}
-          rowKey="diagnosisType"
-          pagination={false}
-          style={{ marginTop: '20px' }}
-        />
-      </Modal>
     </div>
   );
 };
