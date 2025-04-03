@@ -152,7 +152,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       title: "Past Psychiatric and Medical History",
       content: (
         <>
-          <Form.Item name="20" label="Medical" rules={[{ required: true }]}>
+          <Form.Item name="20" label="Past Medical History" rules={[{ required: true }]}>
             <TextArea
               placeholder="Enter past medical notes..."
               autoSize={{ minRows: 4 }}
@@ -170,8 +170,8 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           </Form.Item>
           <Form.Item
             name="23"
-            label="Obstetric & Gynecology"
-            rules={[{ required: true }]}
+            label="Past Obstetric & Gynecology Notes"
+            // rules={[{ required: true }]}
           >
             <TextArea
               placeholder="Enter past Obstetric & Gynecology notes..."
