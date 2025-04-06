@@ -12,16 +12,20 @@ import {
   DollarOutlined,
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
-import PatientCharges from "./PatientCharges";
 import SplitReceipt from "../SplitReceipt";
-import PaymentSection from "./PaymentSection";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
-import MpesaPayment from "./MpesaPayment";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
-import PatientReceiptLines from "./PatientReceiptLines";
-import PrintReceipt from "./PrintReceipt";
-const ReceiptPatient = () => {
+import PatientCharges from "../CashPatients/PatientCharges";
+import MpesaPayment from "../CashPatients/MpesaPayment";
+import InsurancePaymentSection from "./InsurancePaymentSection";
+import AllocateRebates from "../AllocateRebates";
+import AllocateDiscount from "../AllocateDiscount";
+import { PrintFinalInvoice, PrintInterimInvoice } from "./InvoicePrinting";
+import { postGenerateInvoice } from "../../../actions/Charges-Actions/postGenerateInvoice";
+import ReopenCharges from "./ReopenCharges";
+import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
+const InvoicePatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,15 +33,9 @@ const ReceiptPatient = () => {
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
-  const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
-    (state) => state.getReceiptLines
+  const { loading: generateInvoiceLoading, error: generateInvoiceError, data : generateInvoice } = useSelector(
+    (state) => state.generateInvoice
   );
-  const {
-    loading: postReceiptLoading,
-    error: postReceiptError,
-    data: postReceiptData,
-  } = useSelector((state) => state.processReceipt);
-
   const { loadingPatientVisitDetails, patientVisitDetails } =
     useFetchPatientVisitDetailsHook(activeVisitNo);
   const {
@@ -45,65 +43,74 @@ const ReceiptPatient = () => {
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
+ const { loading: postSalesInvoiceLoading } = useSelector(
+    (state) => state.postSalesInvoice
+  );
 
   //states
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const [RebatesModal, setRebatesModal] = useState(false);
+  const [DiscountModal, setDiscountModal] = useState(false);
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
-      dispatch(getReceiptLines(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-    setReceiptModalVisible(false);
+    setRebatesModal(false);
+    setDiscountModal(false);
   };
 
-  const showReceiptModal = () => {
-    setReceiptModalVisible(true);
+  const handlegenerateInvoice = async () => {
+    const payload = {
+      patientNo: patientVisitDetails?.PatientNo,
+    };
+    await dispatch(postGenerateInvoice(payload)).then((status) => {
+      if (status) {
+      dispatch(getPatientCharges(activeVisitNo));
+    }
+    });
   };
 
   const handlePaymentProcessing = async () => {
-    if (!Array.isArray(receiptLines) || receiptLines.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
       return;
     }
 
-    const lastReceipt = receiptLines[receiptLines.length - 1];
+    const lastInvoice = data[data.length - 1];
 
     const payload = {
-      recId: "",
       patientNo: patientVisitDetails?.PatientNo,
-      receiptNo: lastReceipt?.No,
+      invoiceNo: lastInvoice?.Invoice_Number,
     };
 
-    try {
-      const status = await dispatch(postReceipt(payload));
-
-      if (status === "success") {
-        // setIsModalVisible(false);
-        // Optionally refresh receiptLines
-        dispatch(getReceiptLines(activeVisitNo));
-        dispatch(getSinglePatientBill(activeVisitNo));
+    await dispatch(postsalesInvoice(payload)).then((status) => {
+      // Assuming a successful post returns data; adjust the check per your API response.
+      if (status && status == "success") {
+        dispatch(getPatientCharges(activeVisitNo));
       }
-    } catch (error) {
-      console.error("Error processing receipt:", error);
-    }
+    });
   };
 
   // Actions menu
   const menu = (
     <Menu
       onClick={({ key }) => {
-        if (key === "visit_action") {
-          showReceiptModal(); // Show receipt modal
+        if (key === "rebates_action") {
+          setRebatesModal(true); // Show receipt modal
+        } else if (key === "discount_action") {
+          setDiscountModal(true);
         }
       }}
     >
-      <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
+      <Menu.Item key="visit_action">
+        <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
+      </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="request_admission">Waive Charge</Menu.Item>
+      <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
+      <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>
+
+      {/* <Menu.Item key="request_admission">Waive Charges</Menu.Item> */}
     </Menu>
   );
 
@@ -181,19 +188,17 @@ const ReceiptPatient = () => {
 
             {/* Receipt no section */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Receipt No:
-              <span style={{ fontWeight: "semibold", color: "blue" }}>
-                {" "}
-                {Array.isArray(receiptLines) && receiptLines.length > 0
-                  ? receiptLines[receiptLines.length - 1].No
+              Invoice No:              <span style={{ fontWeight: "semibold", color: "blue" }}>
+              {Array.isArray(data) && data.length > 0
+                  ? data[data.length - 1].Invoice_Number
                   : "N/A"}
-              </span>
+                                </span>
+
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Date:{" "}
-              {Array.isArray(receiptLines) && receiptLines.length > 0
+              Date:{" "}{Array.isArray(data) && data.length > 0
                 ? new Date(
-                    receiptLines[receiptLines.length - 1].Date
+                    data[data.length - 1].Date
                   ).toLocaleDateString("en-GB", {
                     weekday: "short", // Optional, for day of the week
                     year: "numeric",
@@ -205,19 +210,20 @@ const ReceiptPatient = () => {
           </div>
         </Card>
         <div className="d-flex justify-content-end gap-3 my-3">
-          <PrintReceipt receiptNo={Array.isArray(receiptLines) && receiptLines.length > 0
-                  ? receiptLines[receiptLines.length - 1].No
-                  : "N/A"} />
-         
-          {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
-            MPESA Payment
-          </Button> */}
+          <Button type="primary" onClick={handlegenerateInvoice} loading={generateInvoiceLoading} disabled={generateInvoiceLoading}>Generate Invoice</Button>
+          <ReopenCharges patientNo={patientVisitDetails?.PatientNo} activeVisitNo={activeVisitNo} />
+          <PrintInterimInvoice
+            patientNo={patientVisitDetails?.PatientNo}
+            activeVisitNo={activeVisitNo}
+          />
         </div>
         <PatientCharges activeVisitNo={activeVisitNo} />
         <div className="row gap-3 gap-md-0">
           {/* Left Side (Split Receipt) */}
           <div className="col-12 col-md-8">
-            <PaymentSection patientNo={patientVisitDetails?.PatientNo} />
+            <InsurancePaymentSection
+              patientNo={patientVisitDetails?.PatientNo}
+            />
           </div>
 
           {/* Right Side (Amount Details + Buttons) */}
@@ -232,13 +238,12 @@ const ReceiptPatient = () => {
                   <p className="fw-bold">Total Paid:</p>
                   <p className="text-success fw-bold">
                     KSh{" "}
-                    {Array.isArray(receiptLines) && receiptLines.length > 0
-                      ? receiptLines[receiptLines.length - 1]?.Amount?.toFixed(
+                    {Array.isArray(data) && data.length > 0
+                      ? data[data.length - 1]?.Amount?.toFixed(
                           2
                         ) || "0.00"
                       : "0.00"}
-                  </p>
-                </div>
+                  </p>                </div>
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Discount:</p>
                   <p>KSh {data?.Discount?.toFixed(2) || "0.00"}</p>
@@ -255,24 +260,20 @@ const ReceiptPatient = () => {
                 <Button type="default" danger>
                   Discard
                 </Button>
-                <Button
-                  type="primary"
-                  onClick={handlePaymentProcessing}
-                  disabled={postReceiptLoading}
-                  loading={postReceiptLoading}
-                >
-                  Process Payment
+                <Button type="primary" onClick={handlePaymentProcessing} loading={postSalesInvoiceLoading} disabled={postSalesInvoiceLoading}>
+                  Process Invoice
                 </Button>
               </div>
-              <MpesaPayment
-                visible={isModalVisible}
+
+              <AllocateRebates
+                visible={RebatesModal}
                 onClose={handleCancel}
-                activeVisitNo={activeVisitNo}
+                patientNo={patientVisitDetails?.PatientNo}
               />
-              <PatientReceiptLines
-                activeVisitNo={activeVisitNo}
-                visible={receiptModalVisible}
+              <AllocateDiscount
+                visible={DiscountModal}
                 onClose={handleCancel}
+                patientNo={patientVisitDetails?.PatientNo}
               />
             </Card>
           </div>
@@ -282,4 +283,4 @@ const ReceiptPatient = () => {
   );
 };
 
-export default ReceiptPatient;
+export default InvoicePatient;

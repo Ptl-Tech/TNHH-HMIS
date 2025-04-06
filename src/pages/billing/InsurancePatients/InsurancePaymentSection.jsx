@@ -1,5 +1,15 @@
-import { Form, Card, Select, Row, Col, Input, Button } from "antd";
-import React, { useState } from "react";
+import {
+  Form,
+  Card,
+  Select,
+  Row,
+  Col,
+  Input,
+  Button,
+  Checkbox,
+  message,
+} from "antd";
+import React, { useEffect, useState } from "react";
 import {
   PlusOutlined,
   MinusCircleOutlined,
@@ -10,8 +20,9 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { useLocation } from "react-router-dom";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
+import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 
-const PaymentSection = ({ patientNo }) => {
+const InsurancePaymentSection = ({ patientNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -21,17 +32,23 @@ const PaymentSection = ({ patientNo }) => {
   const { loading: processReceiptLoading } = useSelector(
     (state) => state.savePayment
   );
-  const { loading: receiptLinesLoading ,data: receiptLines  } = useSelector(
+  const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
     (state) => state.getReceiptLines
   );
-    const {
-      loading: patientBillLoading,
-      error: patientBillError,
-      data: patientBillData,
-    } = useSelector((state) => state.getSingleBill);
-  
+  const {
+    loading: patientBillLoading,
+    error: patientBillError,
+    data: patientBillData,
+  } = useSelector((state) => state.getSingleBill);
+
   const [splitAmount, setSplitAmount] = useState(false);
-  
+
+  useEffect(() => {
+    if (activeVisitNo) {
+      dispatch(getSinglePatientBill(activeVisitNo));
+    }
+  }, [dispatch, activeVisitNo]);
+
   const handlePaymentTypeChange = (index, value) => {
     setPaymentTypes((prev) => ({
       ...prev,
@@ -43,9 +60,10 @@ const PaymentSection = ({ patientNo }) => {
     if (!values.payments || values.payments.length === 0) {
       return;
     }
-
+  
     const isSplitAmount = values.payments.length > 1;
-
+    let successCount = 0;
+  
     for (const payment of values.payments) {
       const payload = {
         myAction: "create",
@@ -55,10 +73,10 @@ const PaymentSection = ({ patientNo }) => {
         depositDate: moment().format("YYYY-MM-DD"),
         payMode: payment.payMode,
         transactionCode: payment.transactionCode || "",
-        splitAmount: isSplitAmount, // set true only if >1 payment method
-        amountReceived: parseFloat(payment.amountReceived),
-        isPartialPayment: false,
-        coPay: false,
+        splitAmount: isSplitAmount,
+        amountReceived: parseFloat(Number(payment.amountReceived).toFixed(2)),
+        isPartialPayment: payment.isPartialPayment || false,
+        coPay: payment.coPay || false,
         ...(payment.payMode === 7
           ? {
               transactionCode: payment.transactionCode,
@@ -66,15 +84,24 @@ const PaymentSection = ({ patientNo }) => {
             }
           : {}),
       };
-
+  
       const receiptNo = await dispatch(postReceiptHeader(payload));
-      dispatch(getReceiptLines(activeVisitNo));
-
-
+  
+      if (receiptNo) {
+        successCount++;
+        dispatch(getReceiptLines(activeVisitNo));
+      } else {
+        message.error("Failed to save one of the payments. Please try again.");
+      }
     }
-    console.log("Receipt :", receiptLines);
-
+  
+    if (successCount > 0) {
+      message.success(`${successCount} payment(s) saved successfully.`);
+      form.resetFields();
+      setPaymentTypes({});
+    }
   };
+  
 
   return (
     <div>
@@ -170,6 +197,42 @@ const PaymentSection = ({ patientNo }) => {
                             }}
                           />
                         </Col>
+                        <Row gutter={16}>
+                          <Col span={24}>
+                            {patientBillData[0]?.CurrentAdmNo ? (
+                              <Form.Item
+                                {...restField}
+                                name={[name, "isPartialPayment"]}
+                                //   label="Partial Payment"
+                                valuePropName="checked"
+                                style={{
+                                  marginTop: 16,
+                                  width: "100%",
+                                  paddingLeft: "10px",
+                                }}
+                              >
+                                <Checkbox
+                                  style={{ width: "100%", textAlign: "left" }}
+                                >
+                                  Partial Payment
+                                </Checkbox>
+                              </Form.Item>
+                            ) : (
+                              <Form.Item
+                                {...restField}
+                                name={[name, "coPay"]}
+                                valuePropName="checked"
+                                style={{
+                                  marginTop: 16,
+                                  width: "100%",
+                                  paddingLeft: "10px",
+                                }}
+                              >
+                                <Checkbox>Co-Pay</Checkbox>
+                              </Form.Item>
+                            )}
+                          </Col>
+                        </Row>
                       </Row>
 
                       {paymentType === 7 && (
@@ -267,4 +330,4 @@ const PaymentSection = ({ patientNo }) => {
   );
 };
 
-export default PaymentSection;
+export default InsurancePaymentSection;

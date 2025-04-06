@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
-import { listPatients, convertPatient } from "../actions/patientActions"; 
-import { Table, Skeleton, message, Button } from "antd";
+import { listPatients, convertPatient } from "../actions/patientActions";
+import { Table, Skeleton, message, Button, Input, Space } from "antd";
 import dayjs from "dayjs";
 import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
 import { useNavigate } from "react-router-dom";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 
 const VisitorList = () => {
   const dispatch = useDispatch();
@@ -14,18 +15,28 @@ const VisitorList = () => {
   const { loading: loadingPatients, patients } = useSelector((state) => state.patientList);
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
+  const [displayedVisitors, setDisplayedVisitors] = useState([]);
   const [loadingFiltered, setLoadingFiltered] = useState(true);
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const [convertPatientModal, setConvertPatientModal] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [errormsg, setErrormsg] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     dispatch(getVisitorsList());
-    dispatch(listPatients()); // Fetch all patients once
+    dispatch(listPatients());
   }, [dispatch]);
 
   useEffect(() => {
+    filterVisitors();
+  }, [data, patients]);
+
+  useEffect(() => {
+    applySearchFilter();
+  }, [searchTerm, filteredVisitors]);
+
+  const filterVisitors = () => {
     if (!data || data.length === 0 || !patients) {
       setLoadingFiltered(false);
       return;
@@ -34,16 +45,14 @@ const VisitorList = () => {
     setLoadingFiltered(true);
 
     try {
-      const patientSet = new Set(patients.map((p) => p.IDNumber)); // Store patient IDs in a Set
-
+      const patientSet = new Set(patients.map((p) => p.IDNumber));
       const filteredList = data
         .filter((visitor) => {
           const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
           const isEntered = visitor.Status === "Entered";
           const isPatient = patientSet.has(visitor.IDNumber);
           return isToday && isEntered && !isPatient;
-        })
-        .slice(0, 20); // Load only 20 visitors at a time
+        });
 
       setFilteredVisitors(filteredList);
     } catch (error) {
@@ -51,7 +60,20 @@ const VisitorList = () => {
     } finally {
       setLoadingFiltered(false);
     }
-  }, [data, patients]);
+  };
+
+  const applySearchFilter = () => {
+    if (!searchTerm) {
+      setDisplayedVisitors(filteredVisitors.slice(0, 20)); // Initial load
+    } else {
+      const filtered = filteredVisitors.filter((visitor) =>
+        `${visitor.VisitorName ?? ""} ${visitor.IDNumber ?? ""}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+      setDisplayedVisitors(filtered);
+    }
+  };
 
   const handleConvertToPatient = async () => {
     if (!selectedVisitor) return;
@@ -68,7 +90,7 @@ const VisitorList = () => {
         message.error("Failed to retrieve patient number");
       }
 
-      dispatch(getVisitorsList()); // Refresh visitor list
+      dispatch(getVisitorsList());
       setConvertPatientModal(false);
       setSelectedVisitor(null);
     } catch (error) {
@@ -76,6 +98,11 @@ const VisitorList = () => {
     } finally {
       setLoadingStatus(false);
     }
+  };
+
+  const handleRefresh = () => {
+    setSearchTerm("");
+    dispatch(getVisitorsList());
   };
 
   const columns = [
@@ -127,15 +154,29 @@ const VisitorList = () => {
 
   return (
     <div>
+      <Space style={{ marginBottom: 16 }}>
+        <Input
+          placeholder="Search by name or ID number"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          prefix={<SearchOutlined />}
+          allowClear
+          style={{ width: 300 }}
+        />
+        <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={loadingFiltered}>
+          Refresh
+        </Button>
+      </Space>
+
       {loadingFiltered ? (
         <Skeleton active paragraph={{ rows: 10 }} />
       ) : (
         <Table
-          dataSource={filteredVisitors}
-          loading={loadingFiltered}
+          dataSource={displayedVisitors}
           rowKey="No"
           columns={columns}
           size="small"
+          pagination={{ pageSize: 10 }}
         />
       )}
 

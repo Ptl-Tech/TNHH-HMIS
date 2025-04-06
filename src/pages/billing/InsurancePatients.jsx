@@ -1,10 +1,12 @@
-import { Table, Typography, Spin, Input } from 'antd';
+import { Table, Typography, Spin, Input, Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getBillingList } from '../../actions/Charges-Actions/getBillingList';
 
 const InsurancePatients = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // React Router navigation
   const { loading, patients } = useSelector((state) => state.getBillingList);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -12,8 +14,7 @@ const InsurancePatients = () => {
   const pageSize = 25; // Number of patients per page
 
   useEffect(() => {
-    dispatch(getBillingList());
-
+    dispatch(getBillingList()); // Fetch data only once
   }, [dispatch]);
 
   // Process patient list: filter inactive patients
@@ -28,6 +29,12 @@ const InsurancePatients = () => {
       patient.Names.toLowerCase().includes(searchText.toLowerCase()) || 
       patient.PatientNo.toLowerCase().includes(searchText.toLowerCase())
     );
+
+  // Navigate to view charges page with patient ID
+  const handleViewCharges = (patientId) => {
+    navigate(`/reception/CorporatePatient-Charges?PatientNo=${patientId}`);
+  };
+  
 
   const columns = [
     {
@@ -54,6 +61,15 @@ const InsurancePatients = () => {
       title: 'Balance',
       dataIndex: 'Balance',
       key: 'Balance',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
+          View Charges
+        </Button>
+      ),
     },
   ];
 

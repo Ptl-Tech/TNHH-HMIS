@@ -237,9 +237,8 @@ import { dispatchWalkInLab } from '../actions/patientActions';
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
-import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderReducer";
+import { savePaymentReducer } from "./ChargesReducers/savePaymentReducer";
 import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
-import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
 import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
 import { postPatientChargesReducer } from "./ChargesReducers/postPatientChargesReducer";
 import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
@@ -300,6 +299,7 @@ import { createPatientVisitReducer } from "./reception-reducers/patientVisitRedu
 import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
 import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
 import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
+import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -543,8 +543,8 @@ export const rootReducer = combineReducers({
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,
-  postReceipt: postReceiptHeaderReducer,
-  processReceipt: postReceiptReducer,
+  savePayment: savePaymentReducer,
+  processReceipt: postReceiptHeaderReducer,
   printInvoice: postPrintInvoiceReducer,
   printReceipt: printReceiptReducer,
   getTransactionList: getTransactionListReducer,
