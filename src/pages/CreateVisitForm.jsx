@@ -8,6 +8,7 @@ import {
   Col,
   Dropdown,
   Menu,
+  message,
   Row,
   Skeleton,
   Table,
@@ -22,17 +23,19 @@ import {
 import CreateVisitDrawer from "./createVisit/CreateVisitDrawer";
 import useFetchPatientVisitDetailsHook from "../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./billing/CashPatients/PatientCharges";
+import { postTriageVisit } from "../actions/patientActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const CreateVisitForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch=useDispatch();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
-
+  
   const [view, setView] = useState(false);
   const [patientData, setPatientData] = useState(null);
   const [visitData, setVisitData] = useState(null);
   const [activeVisitNo, setActiveVisitNo] = useState(null);
-
   // Fetch patient details
   const { loadingPatientDetails, patientDetails } =
     useFetchPatientDetailsHook(patientNo);
@@ -40,6 +43,10 @@ const CreateVisitForm = () => {
   // Fetch visit details only when activeVisitNo is set
   const { loadingPatientVisitDetails, patientVisitDetails } =
     useFetchPatientVisitDetailsHook(activeVisitNo);
+
+ const { loading: postVisitLoading, success: postVisitSuccess, data : postVisitdata } = useSelector(
+    (state) => state.postTriageVisit
+  );
 
   // Set active visit number when patient details update
   useEffect(() => {
@@ -67,8 +74,9 @@ const CreateVisitForm = () => {
   // Handle visit update
   const handleViewDetailsUpdate = (newVisitNo) => {
     setActiveVisitNo(newVisitNo);
-    console.log("handleViewDetailsUpdate called with newVisitNo:", newVisitNo);
   };
+
+ 
 
   //if we have a visit number, fetch the visit details and patient details again
   useEffect(() => {
@@ -77,13 +85,28 @@ const CreateVisitForm = () => {
     } else {
       setVisitData(null);
       setPatientData(null);
-      setActiveVisitNo(null);
     }
   }, [activeVisitNo, patientVisitDetails]);
 
   // Close modal
   const handleClose = () => {
     setView(false);
+  };
+  const handleDispatchtoTriage=() => {
+    if(!activeVisitNo){
+      return
+    };
+    // Logic for dispatching to triage
+    if (activeVisitNo) {
+      const payload={
+        appointmentNo:activeVisitNo,
+      }
+      dispatch(postTriageVisit(payload));
+      if(postVisitSuccess){
+       message.success(`Visit ${postVisitdata} dispatched to triage successfully`);
+      }
+    }
+  
   };
 
   // Actions menu
@@ -92,7 +115,10 @@ const CreateVisitForm = () => {
       <Menu.Item key="visit_action">
         {activeVisitNo ? "View Visit Details" : "Create Visit"}
       </Menu.Item>
+      <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>Dispatch to Triage</Menu.Item>
+
       <Menu.Item key="request_admission">Request Admission</Menu.Item>
+
     </Menu>
   );
 
@@ -259,24 +285,9 @@ const CreateVisitForm = () => {
         >
           <div className="row mt-3">
             <div className="col-12">
-             <PatientCharges activeVisitNo={activeVisitNo} />
+            <PatientCharges activeVisitNo={activeVisitNo || ""} />
             </div>
-            <div className="col-12 mt-3">
-              <Typography.Text
-                strong
-                underline
-                style={{ fontSize: "16px", color: "#0f5689" }}
-              >
-                Patient Procedure Request
-              </Typography.Text>
-              <Table
-                bordered
-                style={{
-                  marginTop: "10px",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-              />
-            </div>
+           
           </div>
         </Card>
       </div>

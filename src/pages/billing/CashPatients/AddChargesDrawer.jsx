@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col} from "antd";
+import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col, DatePicker} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../../actions/Charges-Actions/postCharges";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
+import moment from "moment";
 
 const AddChargesDrawer = ({
   visible,
@@ -33,6 +34,12 @@ const AddChargesDrawer = ({
   const [charges, setCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+useEffect(() => {
+  if (activeVisitNo) {
+    dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
+  }
+}, [dispatch, activeVisitNo]);
 
   useEffect(() => {
     if (visible) {
@@ -95,6 +102,7 @@ const AddChargesDrawer = ({
       form.setFieldsValue({ Amount: "KES 0.00" });
     }
   };
+console.log("Selected patientdata:", patientBillData);
 
   const saveCharges = async () => {
     try {
@@ -107,7 +115,9 @@ const AddChargesDrawer = ({
         charge: selectedCharge.Code,
         quantity: values.Quantity,
         remarks: values.remarks,
+        creationDate: values.creationDate?.format("YYYY-MM-DD") || moment().format("YYYY-MM-DD"),
       };
+      
   
       await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
       dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
@@ -206,6 +216,18 @@ const AddChargesDrawer = ({
         </Form.Item>
 
        </Col>
+       </Row>
+       <Row gutter={16}>
+       {patientBillData[0]?.CurrentAdmNo && (
+  <Form.Item
+    name="creationDate"
+    label="Creation Date"
+    rules={[{ required: true, message: "Please select the creation date!" }]}
+    style={{ width: "100%" }}
+  >
+    <DatePicker style={{ width: "100%" }} />
+  </Form.Item>
+)}
        </Row>
         <Form.Item name="remarks" label="Remarks">
           <Input.TextArea rows={4} />

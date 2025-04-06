@@ -166,7 +166,7 @@ const OutpatientList = () => {
                     })
                   }
                 >
-                  Create Visit
+                  Patient Visit
                 </Button>   </Tooltip>
            </>
           ) : role === "Nurse" ? (

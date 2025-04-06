@@ -6,6 +6,7 @@ import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-de
 import AddChargesDrawer from "./AddChargesDrawer";
 import { deletePatientCharges } from "../../../actions/Charges-Actions/deleteCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
+import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 
 const { confirm } = Modal;
 
@@ -29,9 +30,12 @@ const PatientCharges = ({ activeVisitNo }) => {
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getPatientCharges(activeVisitNo));
+    } else {
+      // Clear or reset data when activeVisitNo is empty
+      dispatch({ type: 'CLEAR_PATIENT_CHARGES' });  // Assuming you have a Redux action for clearing data
     }
   }, [dispatch, activeVisitNo]);
-
+  
   // Handle Add Charge
   const handleAddChargeView = () => {
     setEditingCharge(null); // Ensure the form is empty for new entries
@@ -78,7 +82,8 @@ const PatientCharges = ({ activeVisitNo }) => {
       loading: deleteLoading,
     });
   };
-  
+  const filteredData = activeVisitNo && data ? data.filter(item => item.Transaction_Type !== "ZRECEIPT") : [];
+ 
 
   const columns = [
     {
@@ -119,12 +124,12 @@ const PatientCharges = ({ activeVisitNo }) => {
               padding: "5px 10px",
               borderRadius: "5px",
               fontWeight: "bold",
-              color: posted ? "#fff" : "#ff4d4f",
-              background: posted ? "#52c41a" : "#fff5f5",
-              border: posted ? "none" : "1px solid #ff4d4f",
+              color: posted ? "#52c41a" : "#ff4d4f",
+              background: posted ? "none" : "none",
+              border: posted ? "none" : "none",
             }}
           >
-            {posted ? "Paid" : "Pending"}
+            {posted ? "Posted" : "Pending"}
           </span>
         ),
       },
@@ -185,7 +190,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             type="error"
             showIcon
           />
-        ) : data?.length === 0 ? (
+        ) : !activeVisitNo || filteredData?.length === 0 ? (
           <p style={{ textAlign: "center", color: "#888" }}>
             No billing records found.
           </p>
@@ -194,7 +199,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             bordered
             style={{ marginTop: "10px", borderRadius: "8px" }}
             columns={columns}
-            dataSource={data}
+            dataSource={filteredData}
             size="small"
             pagination={{ pageSize: 5 }}
           />
@@ -205,7 +210,7 @@ const PatientCharges = ({ activeVisitNo }) => {
       <AddChargesDrawer
         visible={visible}
         onClose={() => setVisible(false)}
-        activeVisitNo={activeVisitNo}
+        activeVisitNo={activeVisitNo || ""}
         editingCharge={editingCharge} // Pass selected charge for editing
       />
     </div>

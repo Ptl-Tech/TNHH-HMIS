@@ -50,9 +50,10 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             : patientDetails?.Gender === "Female"
             ? 2
             : 0,
-        dateOfBirth: patientDetails.DateOfBirth
-          ? moment(patientDetails.DateOfBirth, "YYYY-MM-DD")
-          : null,
+            dateOfBirth: patientDetails.DateOfBirth
+            ? moment(patientDetails.DateOfBirth).startOf("day")
+            : null,
+          
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
         nationality: patientDetails?.nationality || "",
@@ -94,9 +95,10 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           : values.gender === 2
           ? "Female"
           : "",
-      dob: values.dateOfBirth
-        ? values.dateOfBirth.format("YYYY-MM-DD")
-        : patientDetails?.DateOfBirth || "",
+          dob: values.dateOfBirth
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : patientDetails?.DateOfBirth || "",
+        
       nationality: patientDetails?.nationality || "",
       county: patientDetails?.county || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
@@ -208,7 +210,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
                 <Input
                   value={
                     form.getFieldValue("dateOfBirth")
-                      ? moment(form.getFieldValue("dateOfBirth")).format("dd/MM/yyyy")
+                      ? form.getFieldValue("dateOfBirth").format("YYYY-MM-DD")
                       : ""
                   }
                   onClick={() => setIsEditingDOB(true)}
