@@ -51,10 +51,12 @@ import { IoReceiptOutline } from "react-icons/io5";
 import SplitReceipt from "./SplitReceipt";
 import { postReceiptHeader } from "../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
+import PartialPayment from "./PartialPayment";
+import InPatientsAddCharges from "./InpatientAddCharges";
 
 const { Title, Text } = Typography;
 
-const ViewPatientsReceipts = () => {
+const InPatientReceipts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const patientNo = new URLSearchParams(useLocation().search).get("PatientNo");
@@ -96,6 +98,7 @@ const ViewPatientsReceipts = () => {
   const [selectedpatientNo, setSelectedPatientNo] = useState("");
   const [selectedPatientAmount, setSelectedPatientAmount] = useState("");
   const [selectedRecId, setSelectedRecId] = useState("");
+  const[showPartialModal,setShowPartialModal]=useState(false);
   const [ReverseChargeModalVisible, setReverseChargeModalVisible] =
     useState(false);
   const [pdfBase64, setPdfBase64] = useState("");
@@ -169,6 +172,7 @@ const ViewPatientsReceipts = () => {
     setShowPaymentModal(false);
     setReverseChargeModalVisible(false);
     setViewReceipts(false);
+    setShowPartialModal(false);
     setOpen(false);
   };
 
@@ -232,6 +236,12 @@ const ViewPatientsReceipts = () => {
 
   const handlePaymentModal = () => {
     setShowPaymentModal(true);
+    setSelectedPatientNo(patientData?.PatientNo);
+    setSelectedPatientAmount(patientData?.Balance || balance);
+  };
+  
+  const handlePartialPaymentModal = () => {
+    setShowPartialModal(true);
     setSelectedPatientNo(patientData?.PatientNo);
     setSelectedPatientAmount(patientData?.Balance || balance);
   };
@@ -380,7 +390,14 @@ const ViewPatientsReceipts = () => {
           </Col>
           <Col span={12} className="mt-3 text-end">
             <Space justify="end" align="end">
-            
+            <Button
+                type="default"
+                size="medium"
+                icon={<IoReceiptOutline />}
+                onClick={handlePartialPaymentModal}
+              >
+                Initiate Partial Payment
+              </Button>
               <Button
                 type="default"
                 size="medium"
@@ -500,7 +517,7 @@ const ViewPatientsReceipts = () => {
         </Row>
       </Card>
 
-      <AddCharges
+      <InPatientsAddCharges
         visible={isModalVisible}
         onClose={handleClose}
         visitNo={appointmentNo}
@@ -525,6 +542,14 @@ const ViewPatientsReceipts = () => {
         onClose={() => setViewReceipts(false)}
         visitNo={appointmentNo}
       />
+      <PartialPayment
+        visible={showPartialModal}
+        onClose={handleClose}
+        patientNo={selectedpatientNo}
+        amount={balance}
+        onReceiptedNo={setReceiptNo}
+      />
+
       <SplitReceipt
         open={open}
         receiptNo={receiptNo}
@@ -547,4 +572,4 @@ const ViewPatientsReceipts = () => {
   );
 };
 
-export default ViewPatientsReceipts;
+export default InPatientReceipts;

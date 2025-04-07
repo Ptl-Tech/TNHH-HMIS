@@ -172,7 +172,7 @@ const ActiveInpatient = () => {
 
   const handleViewPatientReceips = (record) => {
     navigate(
-      `/reception/Patient-Receipts/Patient?VisitNo=${record?.AppointmentNo}`
+      `/reception/InPatient-Charges/?VisitNo=${record?.AppointmentNo}`
     );
   };
 
