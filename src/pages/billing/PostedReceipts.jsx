@@ -132,7 +132,7 @@ const PostedReceipts = () => {
   // Navigate to View Receipt page
   const handleViewPatientReceipts = (record) => {
     //navigate with record in state
-    navigate(`/reception/Patient-Receipts/Patient?ReceiptNo=${record?.receiptNo}`,{
+    navigate(`/Reception/Patient-Receipts/Patient?ReceiptNo=${record?.receiptNo}`,{
       state:{patientData:record}
     });
   };

@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 
-import { Table } from 'antd';
+import { Table, Tag } from 'antd';
 
 import TestMenu from '../Menus/TestMenu';
 import { createLabTestHeader } from '../../../actions/lab-actions/createLabTestHeader';
@@ -32,6 +32,14 @@ const DispatchesTable = ({ data, handleOpenLab, loading }) => {
       title: 'Request Number',
       key: 'RequestNo',
       dataIndex: 'RequestNo',
+      render: (data, record) => {
+        return (
+          <div className="d-flex align-items-center gap-3">
+            <Tag color="blue">{record.RequestType}</Tag>
+            {data}
+          </div>
+        );
+      },
     },
     {
       title: 'Status',
@@ -43,9 +51,11 @@ const DispatchesTable = ({ data, handleOpenLab, loading }) => {
       key: 'RequestNo',
       dataIndex: 'RequestNo',
       render: (data, record) => {
-        return dayjs(
-          `${record?.LaboratoryDate} ${record?.LaboratoryTime}`,
-        ).format('MMMM D, YYYY h:mm A');
+        console.log({ data });
+
+        return dayjs(`${record?.CreationDate} ${record?.CreationTime}`).format(
+          'MMMM D, YYYY h:mm A',
+        );
       },
     },
     {

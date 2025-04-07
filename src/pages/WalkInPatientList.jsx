@@ -1,89 +1,47 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { PlusOutlined, EyeOutlined, TeamOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Col,
-  Input,
-  Row,
-  Space,
-  Table,
-  Tooltip,
-  Typography,
-} from 'antd';
-import useSetTableCheckBoxHook from '../hooks/useSetTableCheckBoxHook';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { FaPersonWalking } from 'react-icons/fa6';
+import { PlusOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Divider, Input, Table, Tooltip } from 'antd';
+
 import { listPatients } from '../actions/patientActions';
-import { convertKeysToCamelCase } from '../utils/helpers';
 
 const WalkInPatientList = () => {
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { patients } = useSelector((state) => state.patientList);
-  const { selectedRow, selectedRowKey, rowSelection } =
-    useSetTableCheckBoxHook();
-
-  const [searchParams, setSearchParams] = useState({
-    SearchName: '',
-    patientId: '',
-    patientNo: '',
-  });
-  const [filteredPatients, setFilteredPatients] = useState([]);
-  const [showList, setShowList] = useState(false);
+  const { patients, loading: loadingPatients } = useSelector(
+    (state) => state.patientList,
+  );
+  const [searchParams, setSearchParams] = useState('');
+  const [filteredPatients, setFilteredPatients] = useState([...patients]);
 
   useEffect(() => {
-    dispatch(listPatients());
-  }, [dispatch]);
-
-  // Initial filtering: show only non-inpatients whose PatientNo starts with "WLK_"
-  useEffect(() => {
-    if (patients?.length > 0) {
-      setFilteredPatients(
-        patients.filter(
-          (patient) =>
-            !patient.Inpatient && patient.PatientNo.startsWith('WLK_'),
-        ),
-      );
-    }
+    patients.length
+      ? setFilteredPatients(patients)
+      : dispatch(listPatients('Walkin', true));
   }, [patients]);
 
-  const handleSearchChange = (e, field) => {
+  const handleSearchChange = (e) => {
     const value = e.target.value;
-    setSearchParams((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
-    setShowList(true);
-    filterPatients({ ...searchParams, [field]: value });
+    setSearchParams(value);
+    filterPatients(value);
   };
 
-  // This filtering always enforces that only walk-in patients (WLK_ prefix) are returned.
-  const filterPatients = (params) => {
-    const { SearchName, patientId, patientNo } = params;
+  console.log({ filteredPatients });
+
+  const filterPatients = (value) => {
     const filtered = patients.filter((patient) => {
       return (
-        !patient.Inpatient &&
-        patient.PatientNo.startsWith('WLK_') && // Always include only walk-in patients
-        patient.SearchName.toLowerCase().includes(SearchName.toLowerCase()) &&
-        patient.IDNumber.includes(patientId) &&
-        patient.PatientNo.includes(patientNo)
+        patient.SearchName.toLowerCase().includes(value.toLowerCase()) ||
+        patient.IDNumber.includes(value)
       );
     });
     setFilteredPatients(filtered);
   };
 
-  const handleDispatch = () => {
-    // Implement dispatch functionality as needed.
-  };
-
   const columns = [
-    {
-      title: 'Patient No',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
-      sorter: (a, b) => a.PatientNo.localeCompare(b.PatientNo),
-    },
     {
       title: 'Patient Name',
       dataIndex: 'SearchName',
@@ -91,7 +49,6 @@ const WalkInPatientList = () => {
       sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
     },
     { title: 'Gender', dataIndex: 'Gender', key: 'Gender' },
-    { title: 'Patient Type', dataIndex: 'PatientType', key: 'PatientType' },
     { title: 'ID Number', dataIndex: 'IDNumber', key: 'IDNumber' },
     {
       title: 'Date Registered',
@@ -106,29 +63,31 @@ const WalkInPatientList = () => {
       render: (_, record) => (
         <div style={{ display: 'flex', gap: '8px' }}>
           {record.Activated ? (
+            // So that we can view them we don't need to create a visit
             <Tooltip title="View Details">
               <Button
                 icon={<EyeOutlined />}
                 onClick={() =>
-                  navigate('/reception/Register-walkin', {
-                    state: { patientDet: record },
-                  })
+                  navigate(
+                    `/Reception/Walkin-Patient-List/${record.ActiveVisitNo}`,
+                  )
                 }
               >
-                View Details
+                Dispatch Client
               </Button>
             </Tooltip>
           ) : (
+            // So that we can create a visit for them
             <Tooltip title="Dispatch Patient">
               <Button
                 icon={<PlusOutlined />}
                 onClick={() =>
                   navigate(
-                    `/reception/visitors-list/Dispatch-Patient/${record.PatientNo}`,
+                    `/Reception/Walkin-Patient-List/Walk-In-Create-Visit?PatientNo=${record.PatientNo}`,
                   )
                 }
               >
-                Dispatch Patient
+                Create Visit
               </Button>
             </Tooltip>
           )}
@@ -139,96 +98,75 @@ const WalkInPatientList = () => {
 
   return (
     <div>
-      <h4 className="text-center p-3 text-dark">
-        <TeamOutlined style={{ marginRight: '8px', fontSize: '24px' }} />
-        Walk-in Patient List
-      </h4>
-      <div className="d-flex justify-content-between">
-        <Button
-          type="primary"
-          onClick={() => navigate('/reception/Register-walkin')}
-          style={{ marginBottom: '20px' }}
+      <div className="d-grid justify-content-start gap-4 py-3">
+        <div
+          className="d-flex gap-2 align-items-center"
+          style={{ position: 'relative' }}
         >
-          Register New Walk-in Patient
-        </Button>
-      </div>
-      <Card className="card-header mb-4 mt-4 p-4">
-        <Typography.Text
-          style={{
-            color: '#003F6D',
-            fontWeight: 'bold',
-            marginBottom: '16px',
-          }}
-        >
-          Find Patient Details by:
-        </Typography.Text>
-        <Row
-          gutter={16}
-          className="mt-2"
-        >
-          <Col span={6}>
-            <Input
-              placeholder="Patient Name"
-              value={searchParams.SearchName}
-              onChange={(e) => handleSearchChange(e, 'SearchName')}
-              allowClear
-            />
-          </Col>
-          <Col span={6}>
-            <Input
-              placeholder="Patient ID"
-              value={searchParams.patientId}
-              onChange={(e) => handleSearchChange(e, 'patientId')}
-              allowClear
-            />
-          </Col>
-          <Col span={6}>
-            <Input
-              placeholder="Patient No"
-              value={searchParams.patientNo}
-              onChange={(e) => handleSearchChange(e, 'patientNo')}
-              allowClear
-            />
-          </Col>
-        </Row>
-      </Card>
-      {showList && (
-        <div className="mt-4">
-          <Space
-            className="admit-patient-button-container"
-            style={{ marginBottom: 16 }}
+          <span
+            style={{
+              height: '100%',
+              borderRadius: '2px',
+              border: '1px solid #1c77b0',
+            }}
+          ></span>
+          <FaPersonWalking style={{ color: '#1c77b0', fontSize: '20px' }} />
+          <h5 style={{ color: '#1c77b0', margin: 0 }}>Walk-in Patient List</h5>
+        </div>
+        <p style={{ color: '#6d6d6d', margin: 0, fontSize: '15px' }}>
+          Register a new Walk-In Patient or Search an Existing Patient.
+        </p>
+        <div className="d-flex align-items-center gap-3">
+          <Button
+            type="primary"
+            onClick={() => navigate('/Reception/Register-walkin')}
           >
-            <Button
-              type="primary"
-              disabled={!selectedRowKey}
-              onClick={handleDispatch}
+            Register New Walk-in Patient
+          </Button>
+          <div
+            className="d-flex align-items-center position-relative"
+            style={{ height: '100%' }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                inset: '0',
+                left: '50%',
+                right: '50%',
+                borderRight: '1px solid #d1d1d1',
+                zIndex: 0,
+              }}
+            />
+            <span
+              style={{
+                color: '#6d6d6d',
+                fontSize: '12px',
+                background: '#fff',
+                borderRadius: '50%',
+                zIndex: 1,
+              }}
             >
-              <PlusOutlined /> Dispatch to Pharmacy
-            </Button>
-            <Button
-              type="primary"
-              disabled={!selectedRowKey}
-              onClick={handleDispatch}
-            >
-              <PlusOutlined /> Dispatch to Lab
-            </Button>
-            <Button
-              type="primary"
-              disabled={!selectedRowKey}
-              onClick={handleDispatch}
-            >
-              <PlusOutlined /> Dispatch to Radiology
-            </Button>
-          </Space>
-          <Table
-            rowKey="PatientNo"
-            columns={columns}
-            rowSelection={rowSelection}
-            dataSource={filteredPatients}
-            pagination={{ pageSize: 10 }}
+              OR
+            </span>
+          </div>
+          <Input
+            allowClear
+            placeholder="Search by Name OR ID"
+            value={searchParams.SearchName}
+            onChange={(e) => handleSearchChange(e)}
           />
         </div>
-      )}
+      </div>
+      <Divider />
+      <div className="mt-4">
+        <Table
+          rowKey="PatientNo"
+          columns={columns}
+          loading={loadingPatients}
+          dataSource={filteredPatients}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
     </div>
   );
 };

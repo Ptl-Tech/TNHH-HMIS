@@ -408,7 +408,7 @@ export const branchesList = (patient) => async (dispatch, getState) => {
     console.log("patient: ", patient);
 
     const response = await aaxios.post(
-      `${API}Reception/PatientRegistration`,
+      `${API}reception/PatientRegistration`,
       patient,
       config
     );

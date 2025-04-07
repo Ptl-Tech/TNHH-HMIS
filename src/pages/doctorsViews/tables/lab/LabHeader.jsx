@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, Typography, Row, Col, message, Modal } from 'antd';
 import moment from 'moment';
+import { Button, Typography, Row, Col, message, Modal } from 'antd';
 
 import PDFViewer from '../../../../components/PDFView';
 import {
   POST_LAB_TO_DOCTOR_RESET,
   submitLabRequestToDoctor,
 } from '../../../../actions/lab-actions/postLabRequestToDoctor';
-import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
   generateLabResultsReport,
 } from '../../../../actions/lab-actions/generateLabResultsReport';
+import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
+
 
 const LabHeader = ({ patientData, patientLabRecord }) => {
   const dispatch = useDispatch();

@@ -2,98 +2,113 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import InfoRow from './Tables/InfoRow';
-import DispatchesTable from './Tables/DispatchTable';
 import { Button, Col, Divider, message, Row, Typography } from 'antd';
-import LaboratoryDispatchDrawer from './Drawers/LaboratoryDispatchDrawer';
 
+import InfoRow from './Tables/InfoRow';
+import {
+  GET_LAB_REQUEST_RESET,
+  getLabRequest,
+} from '../../actions/lab-actions/getLabRequest';
 import {
   POST_LAB_TEST_LINES_RESET,
   postLabTestLines,
 } from '../../actions/lab-actions/postLabTestLines';
+import DispatchesTable from './Tables/DispatchTable';
 import {
   POST_LAB_TEST_LINES_UPDATE_RESET,
   updateLabTestLines,
 } from '../../actions/lab-actions/updateLabTestLines';
+import {
+  createLabTestHeader,
+  POST_LAB_HEADER_RESET,
+} from '../../actions/lab-actions/createLabTestHeader';
+import {
+  POST_PHARMACY_HEADER_RESET,
+  postPharmacyHeader,
+} from '../../actions/pharmacy-actions/postPharmacyHeader';
 import Loading from '../../partials/nurse-partials/Loading';
-import { createTriageVisit } from '../../actions/patientActions';
-import { TRIAGE_VISIT_RESET } from '../../constants/patientConstants';
-import { getLabRequest } from '../../actions/lab-actions/getLabRequest';
+import LaboratoryDispatchDrawer from './Drawers/LaboratoryDispatchDrawer';
 import { getSinglePatient } from '../../actions/reception-actions/getSinglePatient';
-import { createLabTestHeader } from '../../actions/lab-actions/createLabTestHeader';
-import { POST_LAB_HEADER_RESET } from '../../actions/lab-actions/createLabTestHeader';
-import { postPharmacyHeader } from '../../actions/pharmacy-actions/postPharmacyHeader';
+import { getNewPharmacyRequests } from '../../actions/pharmacy-actions/getNewPharmacyRequest';
 
 export const DispatchWalkInPatient = () => {
   const { pathname } = useLocation();
 
-  const patientId = pathname.split('/').splice(-1, 1)[0];
+  const ActiveVisitNo = pathname.split('/').splice(-1, 1)[0];
   const [openLabDispatch, setOpenLabDispatch] = useState(false);
-
-  const { data: postLabTesLinesData, error: postLabTesLinesError } =
-    useSelector((state) => state.postLabTestLines);
 
   // These clinics are as they are described in the backend
   const clinics = ['LAB', 'PHARMACY', 'PSYCHIATRIST', 'PSYCHOLOGIST'];
 
   const dispatch = useDispatch();
 
+  const [currentLabKeys, setCurrentLabKeys] = useState([]);
+  const [currentLabRecord, setCurrentLabRecord] = useState(null);
+
   const { data: existingPatient } = useSelector(
     (state) => state.getSinglePatient,
   );
-  const [currentLabKeys, setCurrentLabKeys] = useState([]);
-  const [currentLabRecord, setCurrentLabRecord] = useState(null);
-  const [currentPharmacyRecord, setCurrentPharmacyRecord] = useState(null);
-
-  const {
-    loading: visitLoading,
-    error: visitError,
-    success: visitSuccess,
-    data: visitPayload,
-  } = useSelector((state) => state.createTriageVisit);
+  const { data: postLabTestLinesData, error: postLabTestLinesError } =
+    useSelector((state) => state.postLabTestLines);
   const {
     data: labTestHeaderData,
     loading: labTestHeaderLoading,
     error: labTestHeaderError,
   } = useSelector((state) => state.createLabTestHeader);
   const {
+    data: pharamcyHeaderData,
+    loading: pharmacyHeaderLoading,
+    error: pharamcyHeaderError,
+  } = useSelector((state) => state.postPharmacyHeader);
+  const {
     data: labHeaderData,
     error: labHeaderError,
     loading: labHeaderLoading,
   } = useSelector((state) => state.getLabRequest);
+  const {
+    data: pharmacyListData,
+    error: pharmacyListError,
+    loading: pharmacyListLoading,
+  } = useSelector((state) => state.getNewPharmacyList);
   const {
     data: updateLabTestLinesData,
     error: updateLabTestLinesError,
     loading: updateLabTestLinesLoading,
   } = useSelector((state) => state.updateLabTestLines);
 
-  // handles getting the lab request that exists
+  console.log({ pharmacyListData });
+
+  // handles getting the lab request that exists and the pharmacyRequest that exists
   useEffect(() => {
-    if (existingPatient?.ActiveVisitNo || labTestHeaderData) {
-      dispatch(getLabRequest('LinkNo', existingPatient?.ActiveVisitNo));
-    }
-  }, [existingPatient?.ActiveVisitNo, labTestHeaderData]);
+    // We are resetting so that we can get fresh requests
+    dispatch({ type: GET_LAB_REQUEST_RESET });
 
-  // handles creating the visit
+    dispatch(getLabRequest('LinkNo', existingPatient?.ActiveVisitNo));
+
+    dispatch(getNewPharmacyRequests('PatientNo', existingPatient?.PatientNo));
+    if (existingPatient?.ActiveVisitNo !== ActiveVisitNo) {
+      dispatch(getSinglePatient('ActiveVisitNo', ActiveVisitNo));
+    }
+  }, [existingPatient, labTestHeaderData, ActiveVisitNo]);
+
+  // 1. This function creates a lab header
+  const handleLabSubmit = async (keys) => {
+    setCurrentLabKeys(keys);
+
+    const dataToSubmit = {
+      myAction: 'create',
+      cashSale: false,
+      visitNo: existingPatient.ActiveVisitNo,
+      patientNo: existingPatient?.PatientNo,
+      status: 0, //0 means NEW
+    };
+
+    dispatch(createLabTestHeader(dataToSubmit));
+  };
+
+  // 2. handles what happens after creating the lab header data
   useEffect(() => {
-    if (!existingPatient || patientId !== existingPatient.PatientNo) {
-      dispatch(getSinglePatient(patientId));
-    }
-
-    if (visitError || visitSuccess) dispatch({ type: TRIAGE_VISIT_RESET });
-
-    if (visitLoading) message.info('Creating a visit and creating a request.');
-
-    if (visitSuccess) {
-      createLabHeader();
-    }
-
-    if (visitError)
-      message.error('Patient visit could not be created. Please try again');
-  }, [existingPatient, visitSuccess, visitError]);
-
-  // handles creating the lab header
-  useEffect(() => {
+    // we add lab test lines
     if (labTestHeaderData) {
       const { status, laboratoryNo } = labTestHeaderData;
       addLabTestLines(laboratoryNo);
@@ -111,21 +126,58 @@ export const DispatchWalkInPatient = () => {
     }
   }, [labTestHeaderError, labTestHeaderLoading, labTestHeaderData]);
 
-  // handles creating the lab test lines
+  // 2. Handles what happens after creating the pharmacy header data
   useEffect(() => {
-    if (postLabTesLinesData) {
+    // if we were successful
+    if (pharamcyHeaderData) {
+      dispatch(getNewPharmacyRequests('PatientNo', existingPatient?.PatientNo));
+      dispatch({ type: POST_PHARMACY_HEADER_RESET });
+      message.success('Pharmacy header posted successfully');
+    }
+
+    if (pharmacyHeaderLoading) {
+      message.info('Posting the pharmacy header');
+    }
+
+    if (pharamcyHeaderError) {
+      console.log({ pharamcyHeaderError });
+      dispatch({ type: POST_PHARMACY_HEADER_RESET });
+      message.error('Pharmacy header could not be posted');
+    }
+  }, [pharamcyHeaderData, pharamcyHeaderError, pharmacyHeaderLoading]);
+
+  // 3. handles adding the lab test lines
+  const addLabTestLines = (laboratoryNo) => {
+    dispatch(
+      postLabTestLines(
+        laboratoryNo,
+        currentLabKeys.map(({ Code }) => ({
+          labTestCode: Code,
+          specimenCode: '',
+          unitOfMeasure: '',
+        })),
+      ),
+    );
+    setOpenLabDispatch(false);
+  };
+
+  // 4. handles what happens after the creation of the lab test lines
+  useEffect(() => {
+    if (postLabTestLinesData) {
       message.success('The request has been dispatched successfully');
       dispatch({ type: POST_LAB_HEADER_RESET });
       dispatch({ type: POST_LAB_TEST_LINES_RESET });
+
+      getLabRequest('LinkNo', existingPatient.ActiveVisitNo);
     }
 
-    if (postLabTesLinesError) {
+    if (postLabTestLinesError) {
       message.error('Something went wrong while creating the lab test lines');
       dispatch({ type: POST_LAB_TEST_LINES_RESET });
     }
-  }, [postLabTesLinesData, postLabTesLinesError]);
+  }, [postLabTestLinesData, postLabTestLinesError]);
 
-  // handles updating the lab test lines
+  // handles confirming the update of the lab test line
   useEffect(() => {
     if (updateLabTestLinesData?.status === 'success') {
       message.success('The test lines have been updated successfully');
@@ -146,41 +198,12 @@ export const DispatchWalkInPatient = () => {
     updateLabTestLinesLoading,
   ]);
 
-  const addLabTestLines = (laboratoryNo) => {
-    dispatch(
-      postLabTestLines(
-        laboratoryNo,
-        currentLabKeys.map(({ Code }) => ({
-          labTestCode: Code,
-          specimenCode: '',
-          unitOfMeasure: '',
-        })),
-      ),
-    );
-    setOpenLabDispatch(false);
-  };
-
-  const createLabHeader = () => {
-    // after creatnig the visit if it did not exist, then we need to create the lab header
-    const dataToSubmit = {
-      myAction: 'create',
-      cashSale: false,
-      visitNo: existingPatient.ActiveVisitNo,
-      patientNo: existingPatient.PatientNo,
-      status: 0, //0 means NEW
-    };
-
-    dispatch(createLabTestHeader(dataToSubmit));
-  };
-
   const handleOpenLab = (recordNo) => {
     setOpenLabDispatch(true);
     if (recordNo) setCurrentLabRecord(recordNo);
   };
 
   const handleEdit = async (initialKeys, currentKeys) => {
-    console.log({ initialKeys });
-
     const itemsToDelete = initialKeys
       .filter(
         (key) =>
@@ -214,44 +237,16 @@ export const DispatchWalkInPatient = () => {
     dispatch(updateLabTestLines([...itemsToAdd, ...itemsToDelete]));
   };
 
-  const handleLabSubmit = async (keys) => {
-    setCurrentLabKeys(keys);
-
-    // first create a visit so that we can have an appointment no AKA a visit no. only if we did not have it
-    if (!existingPatient.ActiveVisitNo) {
-      const {
-        PatientNo,
-        PatientType,
-        InsuranceNo,
-        InsuranceName,
-        PrincipalMemberName,
-        Principal,
-        MembershipNo,
-        SchemeName,
-      } = existingPatient;
-
-      const dataToCreateVisit = {
-        patientNo: PatientNo,
-        clinic: clinics[0],
-        doctor: '',
-        paymentMode: PatientType === 'Cash' ? 0 : 1,
-        insuranceNo: InsuranceNo,
-        insuranceName: InsuranceName,
-        insurancePrincipalMemberName: PrincipalMemberName || '',
-        isPrincipleMember: Principal,
-        membershipNo: MembershipNo,
-        schemeName: SchemeName,
-      };
-
-      dispatch(createTriageVisit(dataToCreateVisit));
-    } else {
-      // we want to call the function that creates a lab header
-      createLabHeader();
-    }
-  };
-
   const handleDispatchPharmacy = () => {
-    // TODO: Create Pharmacy Header by prepping the data
+    dispatch(
+      postPharmacyHeader({
+        myAction: 'create',
+        cashSale: false,
+        patientNo: existingPatient?.PatientNo,
+        transactionType: '',
+        inPatient: false,
+      }),
+    );
   };
 
   const rowData = [
@@ -336,7 +331,7 @@ export const DispatchWalkInPatient = () => {
                 width: 'fit-content',
               },
               onClick: () => handleDispatchPharmacy(),
-              disabled: (value) => false,
+              disabled: (value) => !!pharmacyListData.length,
             },
           ],
         },
@@ -363,8 +358,16 @@ export const DispatchWalkInPatient = () => {
     { key: 'CreationTime', value: labHeaderData?.LaboratoryTime },
   ];
 
+  const newPharmacyHeaderValues = [
+    { key: 'RequestType', value: 'PHARMACY' },
+    { key: 'RequestNo', value: pharmacyListData[0]?.PharmacyNo },
+    { key: 'CreationDate', value: pharmacyListData[0]?.PharmacyDate },
+    { key: 'CreationTime', value: pharmacyListData[0]?.PharmacyTime },
+  ];
+
   const tableData = [
     getArrayItem(labHeaderData, newLabHeaderDataValues),
+    getArrayItem(pharmacyListData[0], newPharmacyHeaderValues),
   ].reduce((acc, curr) => {
     return curr ? [...acc, curr] : acc;
   }, []);
@@ -375,7 +378,7 @@ export const DispatchWalkInPatient = () => {
         {cellData.type === 'content' ? (
           <InfoRow
             key={index}
-            cellData={cellData}
+            cellData={{ ...cellData }}
             patientData={existingPatient}
           />
         ) : cellData.type === 'buttons' ? (
@@ -438,6 +441,7 @@ export const DispatchWalkInPatient = () => {
                     cellData,
                     `$
               {index}${idx}`,
+                    !!existingPatient?.ActiveVisitNo,
                   ),
                 )}
               </Col>

@@ -3,30 +3,23 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   AppstoreOutlined,
   UserOutlined,
-  CalendarOutlined,
-  TeamOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  UserSwitchOutlined,
-  FileAddOutlined,
-  HistoryOutlined,
-  MedicineBoxOutlined,
-  ExperimentOutlined,
-  RadarChartOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, Button, theme } from 'antd';
 import logo from '../assets/images/logo.png';
 import smallLogo from '../assets/images/smallLogo.png';
 import Signout from '../Auth/Signout';
-import { FaUserFriends } from 'react-icons/fa';
 import DynamicBreadcrumb from './DynamicBreadcrumb';
 import useAuth from '../hooks/useAuth';
 
 // routes
 import { labRoutes } from '../Routes/LabRoutes';
+import { nurseRoutes } from '../Routes/NurseRoutes';
+import { doctorRoutes } from '../Routes/DoctorRoutes';
 import { pharmacyRoutes } from '../Routes/PharmacyRoutes';
 import { receptionRoutes } from '../Routes/ReceptionRoutes';
-import { nurseRoutes } from '../Routes/NurseRoutes';
+import { psychologyRoutes } from '../Routes/PsychologyRoutes';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -43,353 +36,33 @@ const MainLayout = () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const department = userInfo?.userData?.departmentName;
 
-    // Define the menu items
-    const doctorRoutes = [
-      {
-        key: '/Doctor',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Dashboard',
-      },
-
-      {
-        key: 'patient-list',
-        icon: <FaUserFriends style={{ color: '#fff' }} />,
-        label: 'Patients',
-        children: [
-          {
-            key: '/Doctor/Consultation-List',
-            label: 'OutPatients',
-            icon: <TeamOutlined style={{ color: '#fff' }} />,
-          },
-          ...(role === 'Doctor'
-            ? [
-                {
-                  key: '/Doctor/Inpatient',
-                  label: 'In-Patient List',
-                  icon: <UserSwitchOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Doctor/Admissions',
-                  label: 'Admissions',
-                  icon: <FileAddOutlined style={{ color: '#fff' }} />,
-                },
-              ]
-            : []),
-          {
-            key: '/Doctor/Past-doctor-visit',
-            label: 'Past Doctor Visits',
-            icon: <HistoryOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-
-      // {
-      //   key: "/doctors/appointments",
-      //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //   label: "Appointments",
-      //   children: [
-      //     {
-      //       key: "/reception/appointments/list",
-      //       label: "Appointments",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "upcoming-appointments",
-      //       label: "Upcoming Appointments",
-      //       icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
-      //     },
-      //   ],
-      // },
-      {
-        key: '/doctor/discharge',
-        icon: <MedicineBoxOutlined style={{ color: '#fff' }} />,
-        label: 'Discharge List',
-        children: [
-          {
-            key: '/Doctor/Discharge-requests',
-            label: 'Discharge Requests',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-          {
-            key: '/Doctor/Discharge-list',
-            label: 'Discharges List',
-            icon: <CalendarOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-      ...(role === 'Doctor'
-        ? [
-            {
-              key: '/doctor/radiology',
-              icon: <RadarChartOutlined style={{ color: '#fff' }} />,
-              label: 'Radiology',
-              children: [
-                {
-                  key: '/Doctor/Radiology-Patients',
-                  label: 'Radiology List OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                // {
-                //   key: "radiology-inpatient",
-                //   label: "Radiology List InPatient",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "radiology-walkin",
-                //   label: "Walk-in Radiology",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "radiology-history",
-                //   label: "Radiology History",
-                //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
-                // },
-              ],
-            },
-
-            {
-              key: '/doctor/lab',
-              icon: <ExperimentOutlined style={{ color: '#fff' }} />,
-              label: 'Lab',
-              children: [
-                {
-                  key: '/Doctor/Lab-Patients',
-                  label: 'Laoratory OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                // {
-                //   key: "lab-inpatient",
-                //   label: "Lab List InPatient",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "lab-history",
-                //   label: "Lab History",
-                //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
-                // },
-              ],
-            },
-            {
-              key: '/doctor/pharmacy',
-              icon: <MedicineBoxOutlined style={{ color: '#fff' }} />,
-              label: 'Pharmacy',
-              children: [
-                {
-                  key: '/Doctor/Pharmacy-Dashboard',
-                  label: 'Dashboard',
-                  icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Doctor/Pharmacy-OutPatient',
-                  label: 'Pharmacy List OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Doctor/Pharmacy-Inpatient',
-                  label: 'Pharmacy List InPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-
-                {
-                  key: '/Doctor/Pharmacy-Returns',
-                  label: 'Pharmacy List Returns',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Doctor/Pharmacy-History',
-                  label: 'Pharmacy History',
-                  icon: <HistoryOutlined style={{ color: '#fff' }} />,
-                },
-              ],
-            },
-          ]
-        : []),
-    ];
-
-    const psychologyRoutes = [
-      {
-        key: '/Psychology',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Dashboard',
-      },
-
-      {
-        key: 'patient-list',
-        icon: <FaUserFriends style={{ color: '#fff' }} />,
-        label: 'Patients',
-        children: [
-          {
-            key: '/Psychology/Consultation-List',
-            label: 'OutPatients',
-            icon: <TeamOutlined style={{ color: '#fff' }} />,
-          },
-          ...(role === 'Psychology'
-            ? [
-                {
-                  key: '/Psychology/Inpatient',
-                  label: 'In-Patient List',
-                  icon: <UserSwitchOutlined style={{ color: '#fff' }} />,
-                },
-                // {
-                //   key: "/Psychology/Admissions",
-                //   label: "Admissions",
-                //   icon: <FileAddOutlined style={{ color: "#fff" }} />,
-                // },
-              ]
-            : []),
-          {
-            key: '/Psychology/Past-doctor-visit',
-            label: 'Past Doctor Visits',
-            icon: <HistoryOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-
-      // {
-      //   key: "/doctors/appointments",
-      //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //   label: "Appointments",
-      //   children: [
-      //     {
-      //       key: "/reception/appointments/list",
-      //       label: "Appointments",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "upcoming-appointments",
-      //       label: "Upcoming Appointments",
-      //       icon: <ClockCircleOutlined style={{ color: "#fff" }} />,
-      //     },
-      //   ],
-      // },
-      // {
-      //   key: "/psychology/discharge",
-      //   icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
-      //   label: "Discharge List",
-      //   children: [
-      //     {
-      //       key: "/Psychology/Discharge-requests",
-      //       label: "Discharge Requests",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //     {
-      //       key: "/Psychology/Discharge-list",
-      //       label: "Discharges List",
-      //       icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      //     },
-      //   ],
-      // },
-      ...(role === 'Doctor'
-        ? [
-            {
-              key: '/doctor/radiology',
-              icon: <RadarChartOutlined style={{ color: '#fff' }} />,
-              label: 'Radiology',
-              children: [
-                {
-                  key: '/Psychology/Radiology-Patients',
-                  label: 'Radiology List OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                // {
-                //   key: "radiology-inpatient",
-                //   label: "Radiology List InPatient",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "radiology-walkin",
-                //   label: "Walk-in Radiology",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "radiology-history",
-                //   label: "Radiology History",
-                //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
-                // },
-              ],
-            },
-
-            {
-              key: '/doctor/lab',
-              icon: <ExperimentOutlined style={{ color: '#fff' }} />,
-              label: 'Lab',
-              children: [
-                {
-                  key: '/Psychology/Lab-Patients',
-                  label: 'Labortory OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                // {
-                //   key: "lab-inpatient",
-                //   label: "Lab List InPatient",
-                //   icon: <CalendarOutlined style={{ color: "#fff" }} />,
-                // },
-                // {
-                //   key: "lab-history",
-                //   label: "Lab History",
-                //   icon: <HistoryOutlined style={{ color: "#fff" }} />,
-                // },
-              ],
-            },
-            {
-              key: '/doctor/pharmacy',
-              icon: <MedicineBoxOutlined style={{ color: '#fff' }} />,
-              label: 'Pharmacy',
-              children: [
-                {
-                  key: '/Psychology/Pharmacy-OutPatient',
-                  label: 'Pharmacy List OutPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Psychology/Pharmacy-Inpatient',
-                  label: 'Pharmacy List InPatient',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-
-                {
-                  key: '/Psychology/Pharmacy-Returns',
-                  label: 'Pharmacy List Returns',
-                  icon: <CalendarOutlined style={{ color: '#fff' }} />,
-                },
-                {
-                  key: '/Psychology/Pharmacy-History',
-                  label: 'Pharmacy History',
-                  icon: <HistoryOutlined style={{ color: '#fff' }} />,
-                },
-              ],
-            },
-          ]
-        : []),
-    ];
     // Security Routes
     const securityRoutes = [
       {
-        key: "/Security",
-        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-        label: "Registration",
+        key: '/Security',
+        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
+        label: 'Registration',
       },
       {
-        type: "divider",
+        type: 'divider',
       },
       {
-        key: "RegistrationGroup",
+        key: 'RegistrationGroup',
         label: (
-          <span style={{ color: "#ac8342", fontWeight: "medium" }}>
+          <span style={{ color: '#ac8342', fontWeight: 'medium' }}>
             Registration
           </span>
         ),
-        type: "group",
+        type: 'group',
         children: [
           {
-            key: "/Security/visitors-list",
-            label: "Visitor List",
-            icon: <UserOutlined style={{ color: "#fff" }} />,
+            key: '/Security/visitors-list',
+            label: 'Visitor List',
+            icon: <UserOutlined style={{ color: '#fff' }} />,
           },
         ],
       },
     ];
-    
 
     const radiologyRoutes = [
       {
@@ -424,13 +97,13 @@ const MainLayout = () => {
     } else if (department === 'Nurse') {
       setMenuItems(nurseRoutes);
     } else if (department === 'Doctor') {
-      setMenuItems(doctorRoutes);
+      setMenuItems(doctorRoutes(role));
     } else if (department === 'Laboratory') {
       setMenuItems(labRoutes);
     } else if (department === 'Security') {
       setMenuItems(securityRoutes);
     } else if (department === 'Psychology') {
-      setMenuItems(psychologyRoutes);
+      setMenuItems(psychologyRoutes(role));
     } else if (department === 'Radiology') {
       setMenuItems(radiologyRoutes);
     } else if (department === 'Pharmacy') {
@@ -460,7 +133,10 @@ const MainLayout = () => {
 
   return (
     <Layout>
-      <Header className="headerstyle">
+      <Header
+        className="headerstyle"
+        style={{ zIndex: '999' }}
+      >
         <div className="d-flex justify-content-center pt-2">
           <div className="demo-logo-vertical">
             {collapsed ? (

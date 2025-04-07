@@ -231,7 +231,7 @@ const CreateVisitForm = () => {
         showProgress: true,
       });
     
-      navigate(-1 || "/reception/visitors-list");
+      navigate(-1 || "/Reception/visitors-list");
     }
     } catch (postTriageVisitError) {
       //display error message from postTriageVisitError
@@ -279,11 +279,11 @@ const CreateVisitForm = () => {
 
     // Fetch patientNo starts with WLK navigate to walk-in registration else navigate to outpatient registration with patient data
     if (patientNo.startsWith('WLK')) {
-      navigate(`/reception/Register-walkin?PatientNo=${patientNo}`, {
+      navigate(`/Reception/Register-walkin?PatientNo=${patientNo}`, {
         state: { patientDet: existingPatient },
       });
     } else {
-      navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
+      navigate(`/Reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
         state: { patientDet: existingPatient },
       });
     }

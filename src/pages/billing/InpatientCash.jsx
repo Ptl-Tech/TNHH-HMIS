@@ -119,7 +119,7 @@ const InpatientCash = () => {
 
   const handleViewPatientReceips = (record) => {
     navigate(
-      `/reception/Patient-Charges/Patient?PatientNo=${record?.PatientNo}`,
+      `/Reception/Patient-Charges/Patient?PatientNo=${record?.PatientNo}`,
       { state: { patientData: record } }
     );
   };
@@ -133,7 +133,7 @@ const InpatientCash = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/invoice/Patient?Patient=${record.PatientNo}`,
+                `/Reception/invoice/Patient?Patient=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }
@@ -228,7 +228,7 @@ const InpatientCash = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/Patient-Charges/Patient?PatientNo=${record.PatientNo}`,
+                `/Reception/Patient-Charges/Patient?PatientNo=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }

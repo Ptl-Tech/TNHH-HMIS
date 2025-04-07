@@ -110,7 +110,7 @@ const ActiveAppmnts = () => {
         message.error(
           'Please ensure Patient Type and Special Clinics are filled before dispatching.',
         );
-        navigate(`/reception/Add-Appointment/${appointmentId}`, {
+        navigate(`/Reception/Add-Appointment/${appointmentId}`, {
           state: { existingPatient: visitDetails },
         });
       }

@@ -255,7 +255,7 @@ const WalkinRegistration = () => {
 
         // redirect them to dispatch the walk in
         const patientId = response.patientNo;
-        navigate(`/reception/visitors-list/Dispatch-Patient/${patientId}`);
+        navigate(`/Reception/visitors-list/Dispatch-Patient/${patientId}`);
       } else {
         message.error('Failed to save patient data. Please try again.');
       }

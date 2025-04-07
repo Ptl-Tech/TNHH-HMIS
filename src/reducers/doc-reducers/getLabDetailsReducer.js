@@ -5,16 +5,22 @@ import {
   REQUEST_LAB_DETAILS_SUCCESS,
 } from '../../actions/Doc-actions/getLabRequestDetails';
 
-export const getLabDetailsReducer = (state = { data: [] }, action) => {
+const initialState = {
+  data: [],
+  error: null,
+  loading: false,
+};
+
+export const getLabDetailsReducer = (state = initialState, action) => {
   switch (action.type) {
     case REQUEST_LAB_DETAILS:
-      return { loading: true, data: [] };
+      return { ...state, loading: true };
     case REQUEST_LAB_DETAILS_SUCCESS:
-      return { loading: false, data: action.payload };
+      return { ...state, loading: false, data: action.payload };
     case REQUEST_LAB_DETAILS_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     case REQUEST_LAB_DETAILS_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }

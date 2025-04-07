@@ -1,4 +1,4 @@
-import { Typography } from "antd";
+import { Typography } from 'antd';
 
 const InfoRow = ({ cellData, patientData }) => {
   const { data, highlighted } = cellData;
@@ -6,7 +6,7 @@ const InfoRow = ({ cellData, patientData }) => {
   if (!patientData) return;
 
   let color = 'gray';
-  let value = patientData[data.value];
+  let value =patientData[data.value];
 
   if (highlighted)
     color = typeof highlighted === 'string' ? highlighted : highlighted(value);

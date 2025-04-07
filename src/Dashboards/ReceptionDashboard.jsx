@@ -1,17 +1,20 @@
+import useAuth from '../hooks/useAuth';
 import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import moment from 'moment';
+
 import {
   UserOutlined,
   HourglassOutlined,
   SafetyOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
+
 import { listPatients } from '../actions/patientActions';
 import { getVisitorsList } from '../actions/visitorsActions';
 import DashboardCard from '../pages/nurse-view/DashboardCard';
 import DashboardStatistics from '../pages/nurse-view/DashboardStatistics';
-import useAuth from '../hooks/useAuth';
 import { getPgAdmissionsPendingVerificationSlice } from '../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice';
 
 const ReceptionDashboard = () => {
@@ -55,7 +58,7 @@ const ReceptionDashboard = () => {
       icon: <HourglassOutlined />,
       color: '#fff',
       backgroundColor: '#0f5689',
-      link: '/reception/visitors-list',
+      link: '/Reception/visitors-list',
     },
     {
       title: 'Active Visits List',
@@ -64,7 +67,7 @@ const ReceptionDashboard = () => {
       icon: <SafetyOutlined />,
       color: '#000',
       backgroundColor: '#ac8342',
-      link: '/reception/appointments/Dispatched',
+      link: '/Reception/appointments/Dispatched',
     },
     {
       title: 'Walk-In Consultations',
@@ -73,7 +76,7 @@ const ReceptionDashboard = () => {
       icon: <UserOutlined />,
       color: '#000',
       backgroundColor: '#5c85d6',
-      link: '/reception/Walkin-patient-list',
+      link: '/Reception/Walkin-Patient-List',
     },
     {
       title: 'Admission Requests',
@@ -82,7 +85,7 @@ const ReceptionDashboard = () => {
       icon: <UserAddOutlined />,
       color: '#000',
       backgroundColor: '#b0afaf',
-      link: '/reception/admission-requests',
+      link: '/Reception/admission-requests',
     },
   ];
 

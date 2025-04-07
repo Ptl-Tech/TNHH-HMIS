@@ -18,7 +18,7 @@ const DynamicBreadcrumb = ({ collapsed }) => {
   // Define dynamic dashboard URLs based on roles
   const dashboardUrls = {
     Nurse: "/Nurse",
-    Reception: "/reception",
+    Reception: "",
     Doctor: "/Doctor",
     Security: "/Security",
     //add more roles here    

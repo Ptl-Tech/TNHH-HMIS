@@ -172,7 +172,7 @@ const ActiveOutPatients = () => {
 
   const handleViewPatientReceips = (record) => {
     navigate(
-      `/reception/Patient-Receipts/Patient?VisitNo=${record?.AppointmentNo}`
+      `/Reception/Patient-Receipts/Patient?VisitNo=${record?.AppointmentNo}`
     );
   };
 
@@ -185,7 +185,7 @@ const ActiveOutPatients = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
+                `/Reception/invoice/Patient?PatientNo=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }
