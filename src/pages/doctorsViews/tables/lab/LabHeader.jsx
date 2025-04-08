@@ -93,7 +93,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
         return '#ad4e00';
       case 'Voided':
         return '#ad4e00';
-      case 'Forwaded':
+      case 'Forwarded':
         return '#0060a3';
       case 'Review':
         return '#006d75';

@@ -29,7 +29,7 @@ import {
 import Loading from '../../partials/nurse-partials/Loading';
 import LaboratoryDispatchDrawer from './Drawers/LaboratoryDispatchDrawer';
 import { getSinglePatient } from '../../actions/reception-actions/getSinglePatient';
-import { getNewPharmacyRequests } from '../../actions/pharmacy-actions/getNewPharmacyRequest';
+import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
 
 export const DispatchWalkInPatient = () => {
   const { pathname } = useLocation();
@@ -66,17 +66,17 @@ export const DispatchWalkInPatient = () => {
     loading: labHeaderLoading,
   } = useSelector((state) => state.getLabRequest);
   const {
-    data: pharmacyListData,
-    error: pharmacyListError,
-    loading: pharmacyListLoading,
-  } = useSelector((state) => state.getNewPharmacyList);
+    data: pharmacyRecord,
+    error: pharmacyRecordError,
+    loading: pharmacyRecordLoading,
+  } = useSelector((state) => state.getSinglePharmacyRecord);
   const {
     data: updateLabTestLinesData,
     error: updateLabTestLinesError,
     loading: updateLabTestLinesLoading,
   } = useSelector((state) => state.updateLabTestLines);
 
-  console.log({ pharmacyListData });
+  console.log({ pharmacyRecord });
 
   // handles getting the lab request that exists and the pharmacyRequest that exists
   useEffect(() => {
@@ -85,7 +85,7 @@ export const DispatchWalkInPatient = () => {
 
     dispatch(getLabRequest('LinkNo', existingPatient?.ActiveVisitNo));
 
-    dispatch(getNewPharmacyRequests('PatientNo', existingPatient?.PatientNo));
+    dispatch(getSinglePharmacyRecord('Patient_No', existingPatient?.PatientNo));
     if (existingPatient?.ActiveVisitNo !== ActiveVisitNo) {
       dispatch(getSinglePatient('ActiveVisitNo', ActiveVisitNo));
     }
@@ -130,7 +130,9 @@ export const DispatchWalkInPatient = () => {
   useEffect(() => {
     // if we were successful
     if (pharamcyHeaderData) {
-      dispatch(getNewPharmacyRequests('PatientNo', existingPatient?.PatientNo));
+      dispatch(
+        getSinglePharmacyRecord('Patient_No', existingPatient?.PatientNo),
+      );
       dispatch({ type: POST_PHARMACY_HEADER_RESET });
       message.success('Pharmacy header posted successfully');
     }
@@ -331,7 +333,7 @@ export const DispatchWalkInPatient = () => {
                 width: 'fit-content',
               },
               onClick: () => handleDispatchPharmacy(),
-              disabled: (value) => !!pharmacyListData.length,
+              disabled: (value) => !!pharmacyRecord,
             },
           ],
         },
@@ -356,18 +358,20 @@ export const DispatchWalkInPatient = () => {
     { key: 'RequestNo', value: labHeaderData?.LaboratoryNo },
     { key: 'CreationDate', value: labHeaderData?.LaboratoryDate },
     { key: 'CreationTime', value: labHeaderData?.LaboratoryTime },
+    { key: 'PatientNo', value: labHeaderData?.PatientNo },
   ];
 
   const newPharmacyHeaderValues = [
     { key: 'RequestType', value: 'PHARMACY' },
-    { key: 'RequestNo', value: pharmacyListData[0]?.PharmacyNo },
-    { key: 'CreationDate', value: pharmacyListData[0]?.PharmacyDate },
-    { key: 'CreationTime', value: pharmacyListData[0]?.PharmacyTime },
+    { key: 'RequestNo', value: pharmacyRecord?.Pharmacy_No },
+    { key: 'CreationDate', value: pharmacyRecord?.Pharmacy_Date },
+    { key: 'CreationTime', value: pharmacyRecord?.Pharmacy_Time },
+    { key: 'PatientNo', value: pharmacyRecord?.Patient_No },
   ];
 
   const tableData = [
     getArrayItem(labHeaderData, newLabHeaderDataValues),
-    getArrayItem(pharmacyListData[0], newPharmacyHeaderValues),
+    getArrayItem(pharmacyRecord, newPharmacyHeaderValues),
   ].reduce((acc, curr) => {
     return curr ? [...acc, curr] : acc;
   }, []);

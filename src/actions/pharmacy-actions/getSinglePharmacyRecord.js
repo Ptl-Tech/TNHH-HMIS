@@ -12,7 +12,13 @@ export const GET_SINGLE_PHARMACY_RECORD_RESET =
   'GET_SINGLE_PHARMACY_RECORD_RESET';
 
 export const getSinglePharmacyRecord =
-  (pharmacyNo) => async (dispatch, getState) => {
+  (parameterType, paramterValue) => async (dispatch, getState) => {
+    const finalParameterValue =
+      typeof paramterValue === 'boolean' ? paramterValue : `'${paramterValue}'`;
+    const query =
+      parameterType && paramterValue
+        ? `&query=$filter=${parameterType} eq ${finalParameterValue}`
+        : '';
     try {
       dispatch({ type: GET_SINGLE_PHARMACY_RECORD });
 
@@ -30,10 +36,9 @@ export const getSinglePharmacyRecord =
         },
       };
 
-      const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=false&query=$filter=Pharmacy_No eq '${pharmacyNo}'`,
-        config,
-      );
+      const finalQuery = `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=false${query}`;
+      
+      const response = await axios.get(finalQuery, config);
 
       if (response.data === '') {
         return message.error(

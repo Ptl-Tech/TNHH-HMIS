@@ -21,7 +21,7 @@ const WalkInPatientList = () => {
     patients.length
       ? setFilteredPatients(patients)
       : dispatch(listPatients('Walkin', true));
-  }, [patients]);
+  }, []);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

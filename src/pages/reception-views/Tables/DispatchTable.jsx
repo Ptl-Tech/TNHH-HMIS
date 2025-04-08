@@ -1,10 +1,12 @@
 import { useDispatch } from 'react-redux';
 
+import dayjs from 'dayjs';
 import { Table, Tag } from 'antd';
 
 import TestMenu from '../Menus/TestMenu';
+
 import { createLabTestHeader } from '../../../actions/lab-actions/createLabTestHeader';
-import dayjs from 'dayjs';
+import { postPharmacyHeader } from '../../../actions/pharmacy-actions/postPharmacyHeader';
 
 const DispatchesTable = ({ data, handleOpenLab, loading }) => {
   const dispatch = useDispatch();
@@ -14,17 +16,40 @@ const DispatchesTable = ({ data, handleOpenLab, loading }) => {
   };
 
   // handle forwading the lab request to it's department
-  const handleForwardRequest = ({ SystemId, Cash_Sale, LinkNo, PatientNo }) => {
-    dispatch(
-      createLabTestHeader({
-        myAction: 'edit',
-        recId: SystemId,
-        cashSale: Cash_Sale,
-        visitNo: LinkNo,
-        patientNo: PatientNo,
-        status: 1,
-      }),
-    );
+  const handleForwardRequest = ({
+    SystemId,
+    Cash_Sale,
+    LinkNo,
+    PatientNo,
+    RequestNo,
+    RequestType,
+  }) => {
+    if (RequestType === 'PHARMACY') {
+      dispatch(
+        postPharmacyHeader({
+          myAction: 'edit',
+          recId: SystemId,
+          pharmacyNo: RequestNo,
+          cashSale: false,
+          patientNo: PatientNo,
+          transactionType: '',
+          inPatient: false,
+        }),
+      );
+    }
+
+    if (RequestType === 'LAB') {
+      dispatch(
+        createLabTestHeader({
+          myAction: 'edit',
+          recId: SystemId,
+          cashSale: Cash_Sale,
+          visitNo: LinkNo,
+          patientNo: PatientNo,
+          status: 1,
+        }),
+      );
+    }
   };
 
   const columns = [

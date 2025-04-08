@@ -33,8 +33,8 @@ const generateQuery = ({ type, status }) => {
     case 'New':
       query += "Status eq 'New'";
       break;
-    case 'Forwaded':
-      query += "Status eq 'Forwaded'";
+    case 'Forwarded':
+      query += "Status eq 'Forwarded'";
       break;
     case 'Completed':
       query += "Status eq 'Completed'";
