@@ -12,7 +12,6 @@ const API_URL =
 
 export const createLabTestHeader =
   (labHeaderData) => async (dispatch, getState) => {
-    console.log({ labHeaderData });
 
     try {
       dispatch({ type: POST_LAB_HEADER_REQUEST });

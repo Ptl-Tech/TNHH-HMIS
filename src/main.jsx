@@ -14,7 +14,6 @@ createRoot(document.getElementById('root')).render(
         theme={{
           token: {
             colorPrimary: '#0060a3',
-            colorBorder: '#62c1db',
             colorPrimaryBg: '#0060a3',
             // Keeping colorIcon as is
             colorIcon: '#FAFAFA',
@@ -35,9 +34,9 @@ createRoot(document.getElementById('root')).render(
               headerCellHoverBg: '#ac8342',
               headerCellHoverColor: '#ffffff',
               headerCellHoverBorder: '#ac8342',
-              rowSelectedBg: "rgba(172, 131, 66, 0.6)",
-              rowHoverBg: "rgba(172, 131, 66, 0.6)",
-            }
+              rowSelectedBg: 'rgba(172, 131, 66, 0.6)',
+              rowHoverBg: 'rgba(172, 131, 66, 0.6)',
+            },
           },
         }}
       >

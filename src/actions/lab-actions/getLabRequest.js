@@ -11,8 +11,10 @@ export const GET_LAB_REQUEST_SUCCESS = 'GET_LAB_REQUEST_SUCCESS';
 
 // Action to fetch radiology list
 export const getLabRequest =
-  (parameter, labNo) => async (dispatch, getState) => {
-    console.log({ labNo });
+  (parameterType, parameterValue) => async (dispatch, getState) => {
+    console.log({ labNo: parameterValue });
+
+    if (!parameterValue) return;
 
     try {
       dispatch({ type: GET_LAB_REQUEST_REQUEST });
@@ -34,16 +36,17 @@ export const getLabRequest =
         },
       };
 
+      const query = `${API}data/odatafilter?webservice=PgLaboratoryTestHeaders&isList=false&query=$filter=${parameterType} eq '${parameterValue}'`;
+
+      console.log({ query });
+
       // API request
-      const { data } = await axios.get(
-        `${API}data/odatafilter?webservice=PgLaboratoryTestHeaders&query=$filter=${parameter} eq '${labNo}'`,
-        config,
-      );
+      const { data } = await axios.get(query, config);
 
       // Dispatch success action with the fetched data
       dispatch({
         type: GET_LAB_REQUEST_SUCCESS,
-        payload: data[0],
+        payload: data,
       });
 
       return data; // Optionally return the data
@@ -51,6 +54,8 @@ export const getLabRequest =
       // Extract and handle errors properly
       const errorMessage =
         error.response?.data?.message || error.message || 'An error occurred';
+
+      console.log({ errorMessage });
 
       dispatch({
         type: GET_LAB_REQUEST_FAIL,

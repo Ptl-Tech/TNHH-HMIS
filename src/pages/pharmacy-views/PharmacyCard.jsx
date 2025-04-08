@@ -97,7 +97,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const statuses = [
     { label: 'All', value: '' },
     { label: 'New', value: 'New' },
-    { label: 'Forwaded', value: 'Forwaded' },
+    { label: 'Forwarded', value: 'Forwarded' },
     { label: 'Completed', value: 'Completed' },
     { label: 'Cancelled', value: 'Cancelled' },
   ];
@@ -266,7 +266,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       postArchivePrescriptionData?.status === 'success' ||
       postPharmacyLineData
     ) {
-      dispatch(getSinglePharmacyRecord(currentRequest));
+      dispatch(getSinglePharmacyRecord('Pharmacy_No', currentRequest));
       if (postArchivePrescriptionData)
         dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
       if (postDrugIssuanceData)

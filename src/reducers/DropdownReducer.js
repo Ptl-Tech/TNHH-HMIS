@@ -138,17 +138,22 @@ export const getrelationshipOptionsReducer = (
   }
 };
 
+const initialInsuranceState = {
+  data: [],
+  loading: false,
+  error: null,
+}
 
-export const getInsuranceReducer = (state = { data: [] }, action) => {
+export const getInsuranceReducer = (state = initialInsuranceState, action) => {
   switch (action.type) {
     case INSURANCE_LIST_REQUEST:
-      return { loading: true, data: [] };
+      return { ...state, loading: true };
     case INSURANCE_LIST_SUCCESS:
-      return { loading: false, data: action.payload };
+      return { ...state, loading: false, data: action.payload };
     case INSURANCE_LIST_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     case INSURANCE_LIST_RESET:
-      return { data: [] };
+      return initialInsuranceState;
     default:
       return state;
   }

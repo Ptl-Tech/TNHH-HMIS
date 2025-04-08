@@ -57,7 +57,7 @@ const PatientRegistration = () => {
       case "create_visit":
         // Navigate with proper query parameters
         navigate(
-          `/reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`,
+          `/Reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }
@@ -65,7 +65,7 @@ const PatientRegistration = () => {
         break;
       case "request_admission":
         navigate(
-          `/reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
+          `/Reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }
@@ -73,7 +73,7 @@ const PatientRegistration = () => {
         break;
       // case "bill_patient":
       //   navigate(
-      //     `/reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
+      //     `/Reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
       //     {
       //       state: { existingPatient: patientDetails },
       //     }

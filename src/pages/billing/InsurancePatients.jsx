@@ -122,7 +122,7 @@ const InsurancePatients = () => {
 
   const handleViewPatientReceips = (record) => {
     navigate(
-      `/reception/invoice/Patient?PatientNo=${record?.PatientNo}`,
+      `/Reception/invoice/Patient?PatientNo=${record?.PatientNo}`,
 {      state: { patientData: record },
 }    );
   };
@@ -136,7 +136,7 @@ const InsurancePatients = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/invoice/Patient?Patient=${record.PatientNo}`,
+                `/Reception/invoice/Patient?Patient=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }
@@ -232,7 +232,7 @@ const InsurancePatients = () => {
             icon={<EyeOutlined />}
             onClick={() =>
               navigate(
-                `/reception/invoice/Patient?PatientNo=${record.PatientNo}`,
+                `/Reception/invoice/Patient?PatientNo=${record.PatientNo}`,
                 {
                   state: { patientData: record },
                 }
