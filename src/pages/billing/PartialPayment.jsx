@@ -12,7 +12,7 @@ import { postReceipt } from "../../actions/Charges-Actions/postReceipt";
 
 const { Option } = Select;
 
-const ProcessPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) => {
+const PartialPayment = ({ visible, onClose, patientNo, amount, onReceiptedNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -58,10 +58,10 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         transactionCode: values.transactionCode || "",  
         splitAmount: values.splitAmount || false,
         amountReceived: parseFloat(values.amountReceived),
-        isPartialPayment:false,
-        coPay: values.coPay,
+        coPay:false,
+        isPartialPayment: values.isPartialPayment,
         ...(values.payMode === 7
-          ? { transactionCode: values.transactionCode, phoneNumber: values.phoneNumber, isPartialPayment:false }  
+          ? { transactionCode: values.transactionCode, phoneNumber: values.phoneNumber , isPartialPayment: values.isPartialPayment}
           : {}),
       };
   
@@ -72,23 +72,19 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         if (newReceiptNo) {
           // setReceiptNo(newReceiptNo);
           onReceiptedNo(newReceiptNo);
-          // if (patientDetails?.PatientType !== "Cash") {
-          //   const receipt = {
-          //     recId: "",
-          //     patientNo: patientNo,
-          //     receiptNo: newReceiptNo,
-          //   };
+          if (patientDetails?.PatientType !== "Cash") {
+            const receipt = {
+              recId: "",
+              patientNo: patientNo,
+              receiptNo: newReceiptNo,
+            };
   
-          //   // Post the receipt if the patient is NOT Cash
-          //   const status = await dispatch(postReceipt(receipt));
-  
-          //   if (status === "success") {
-          //     message.success("Receipt posted successfully");
-          //     onReceiptedNo(newReceiptNo);
-          //   } else {
-          //     throw new Error("Failed to process receipt");
-          //   }
-          // }
+            // Post the receipt if the patient is NOT Cash
+            // const status = await dispatch(postReceipt(receipt));
+            message.success("Payment posted successfully");
+
+          
+          }
         }
   
         // Regardless of patient type, reset form and close modal
@@ -107,7 +103,7 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
     <Modal
       title={
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span>Generate Payment</span>
+          <span>Partial Payment</span>
           <CloseOutlined onClick={onClose} style={{ marginRight: 10, fontSize: 16 }} />
         </div>
       }
@@ -191,18 +187,18 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
         )}
 
         {/* Co-Pay Checkbox (Always Visible) */}
-       {/* {patientDetails && patientDetails?.PatientType !== "Cash" && (
+       {patientDetails && patientDetails?.PatientType !== "Cash" && (
            <Row gutter={16}>
            <Col span={12}>
-             <Form.Item name="coPay" valuePropName="checked">
-               <Checkbox>Co-Pay</Checkbox>
+             <Form.Item name="isPartialPayment" valuePropName="checked" rules={[{ required: true, message: "Please select Co-Pay!" }]}>
+               <Checkbox>Initiate Partial Payment</Checkbox>
              </Form.Item>
            </Col>
           
          </Row>
  
         )
-       } */}
+       }
         <Row>
           <Col span={24}>
             <Button type="primary" size="large" style={{ width: "100%" }}  onClick={handleOk}>
@@ -215,4 +211,4 @@ const patientDetails=useFetchPatientDetailsHook(patientNumber );
   );
 };
 
-export default ProcessPayment;
+export default PartialPayment;

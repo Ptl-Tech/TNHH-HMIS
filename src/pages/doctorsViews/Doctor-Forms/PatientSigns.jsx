@@ -152,7 +152,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       title: "Past Psychiatric and Medical History",
       content: (
         <>
-          <Form.Item name="20" label="Medical" rules={[{ required: true }]}>
+          <Form.Item name="20" label="Past Medical History" rules={[{ required: true }]}>
             <TextArea
               placeholder="Enter past medical notes..."
               autoSize={{ minRows: 4 }}
@@ -170,8 +170,8 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
           </Form.Item>
           <Form.Item
             name="23"
-            label="Obstetric & Gynecology"
-            rules={[{ required: true }]}
+            label="Past Obstetric & Gynecology Notes"
+            // rules={[{ required: true }]}
           >
             <TextArea
               placeholder="Enter past Obstetric & Gynecology notes..."
@@ -250,8 +250,7 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       
       // Ensure correct step data
       const currentStepData = steps[currentStep];
-      console.log("button clicked 2", currentStepData);
-  
+    
       // Generate updated notes
       const updatedNotes =
         currentStepData?.notesType?.map((type) => ({
@@ -266,7 +265,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
       console.log("button clicked 3", updatedNotes);
   
       if (updatedNotes.length > 0) {
-        console.log("button clicked 4", updatedNotes.length);
   
         // Ensure dispatch works correctly
         const results = await Promise.all(
@@ -275,8 +273,6 @@ const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
             return response.payload || response; // Ensure proper response handling
           })
         );
-  
-        console.log("button clicked 5", results);
   
         // Check for success
         if (results.every((res) => res === "success")) {

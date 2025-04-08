@@ -42,6 +42,19 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
     { value: "23", label: "Gynecology" },
   ];
 
+  const labelMappings = {
+    "Chief Complaints": "Presentation by Patient",
+    "Allegations": "Presentation by Family",
+    "History of Presenting Complaint": "History of Presenting Illness",
+    "Past Psychiatric and Medical History": "Past Psychiatric History",
+    "Family History": "Family History",
+    "Personal History": "Personal History",
+    "Forensic History": "Forensic History",
+    "Premorbid Personality": "Premorbid Personality",
+    "Gynecology": "Obstetric & Gynecology",
+    "Medical": "Past Medical and Surgical History",
+  };
+
   // Filter data based on predefined notesType labels
   // const filterCollapseData = data.filter((item) =>
   //   notesType.map((note) => note.label).includes(item.Notes_Type)
@@ -115,7 +128,7 @@ const PatientHistoryNotesTable = ({ data, patientDetails, loadingHistory }) => {
   const collapseItems = Object.entries(groupedData).map(
     ([notesType, noteData], index) => ({
       key: index + 1, // Ensure unique keys
-      label: notesType,
+      label: labelMappings[notesType] || notesType,
       children: (
         <div>
           {editing[notesType] ? (
