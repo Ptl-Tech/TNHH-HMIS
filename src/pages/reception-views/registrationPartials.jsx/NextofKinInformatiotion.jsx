@@ -101,8 +101,8 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           ? "Female"
           : "",
       dob: patientDetails?.DateOfBirth || "", // Ensure valid date format
-      nationality: patientDetails?.nationality || "",
-      county: patientDetails?.county || "",
+      nationality: patientDetails?.Nationality || "",
+      county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: patientDetails?.IDNumber || "",
       phoneNumber: patientDetails?.TelephoneNo1 || "",
       paymentMode:
@@ -115,24 +115,25 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           : 0,
       nextOfKinRelationship:
         values.nextOfKinRelationship ||
-        patientDetails?.nextOfKinRelationship ||
+        patientDetails?.NextofkinRelationship ||
         "",
       nextOfKinFullName:
-        values.nextOfKinFullName || patientDetails?.nextOfkinFullName || "",
+        values.nextOfKinFullName || patientDetails?.NextOfkinFullName || "",
       nextOfKinPhoneNo:
-        values.nextOfKinPhoneNo || patientDetails?.nextOfKinPhoneNo || "",
-      insuranceNo: patientDetails?.insuranceNo || "",
-      insuranceName: patientDetails?.insuranceName || "",
+        values.nextOfKinPhoneNo || patientDetails?.NextOfKinPhoneNo || "",
+      insuranceNo: patientDetails?.InsuranceNo || "",
+      insuranceName: patientDetails?.InsuranceName || "",
       insurancePrinicipalMemberName:
-        patientDetails?.insurancePrinicipalMemberName || "",
+        patientDetails?.PrincipalMemberName || "",
       isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.membershipNo || "",
-      schemeName: patientDetails?.schemeName || "",
-      howYouKnewABoutUs: patientDetails?.howYouKnewABoutUs || "",
-      subcounty: patientDetails?.subcounty || "",
-      email: patientDetails?.email || "",
-      residence: patientDetails?.PlaceofBirthVillage || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
+      membershipNo: patientDetails?.MembershipNo || "",
+      schemeName: patientDetails?.SchemeName || "",
+      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+      subcounty: patientDetails?.SubCountyName || "",
+        email: patientDetails?.Email || "",
+        residence: patientDetails?.PlaceofBirthVillage || "",
+        countyWard: patientDetails?.Ward || "",
+        patientStatus: patientDetails?.PatientStatus || 0,
     };
 
     // Dispatch the saveKinDetails action with the formatted data

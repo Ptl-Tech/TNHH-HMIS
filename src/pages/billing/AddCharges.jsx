@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Row, Col, Input, Typography, Button, Select, Table, message } from "antd";
+import {
+  Modal,
+  Form,
+  Row,
+  Col,
+  Input,
+  Typography,
+  Button,
+  Select,
+  Table,
+  message,
+} from "antd";
 import { IoCloseOutline } from "react-icons/io5";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; // For Edit and Delete icons
 import { useDispatch, useSelector } from "react-redux";
@@ -11,14 +22,27 @@ import ProcessPayment from "./ProcessPayment";
 
 const { Text } = Typography;
 
-const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount, patientNo,refreshTable }) => {
+const AddCharges = ({
+  visible,
+  onClose,
+  myAction,
+  recId,
+  visitNo,
+  setTotalAmount,
+  patientNo,
+  refreshTable,
+}) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
   const { data } = useSelector((state) => state.getTransactionList);
   const { charges } = useSelector((state) => state.getChargesSetup);
-  const { loading:addChargesLoading } = useSelector((state) => state.postPatientCharges);
-  const { loading: chargesLoading, data: chargesList } = useSelector((state) => state.getUnpostedCharges);
+  const { loading: addChargesLoading } = useSelector(
+    (state) => state.postPatientCharges
+  );
+  const { loading: chargesLoading, data: chargesList } = useSelector(
+    (state) => state.getUnpostedCharges
+  );
 
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
   const [filteredCharges, setFilteredCharges] = useState([]);
@@ -28,7 +52,9 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   const [amount, setAmount] = useState(0); // Default amount
   useEffect(() => {
     if (chargesList) {
-      setLocalChargesList(chargesList.filter(item => item.Transaction_Type !== "ZRECEIPT"));
+      setLocalChargesList(
+        chargesList.filter((item) => item.Transaction_Type !== "ZRECEIPT")
+      );
     }
   }, [chargesList]);
 
@@ -40,7 +66,6 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
     form.resetFields(); // Reset form fields, including the amount
     onClose();
   };
-  
 
   useEffect(() => {
     if (visitNo) {
@@ -55,19 +80,21 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
 
   const handleTransactionTypeChange = (value) => {
     setSelectedTransactionType(value);
-    setFilteredCharges(charges.filter((item) => item.Transaction_Type === value));
+    setFilteredCharges(
+      charges.filter((item) => item.Transaction_Type === value)
+    );
     setSelectedCharge(null);
   };
 
   const handleChargeTypeChange = (value) => {
     const charge = charges.find((item) => item.Description === value);
     setSelectedCharge(charge || null);
-  
+
     if (charge) {
       setAmount(charge.Amount * quantity); // Update amount when charge changes
     }
   };
-  
+
   const handleQuantityChange = (e) => {
     const qty = e.target.value;
     setQuantity(qty);
@@ -89,23 +116,18 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       creationDate: new Date().toISOString().split("T")[0],
       patientNo: patientNo,
     };
-  await  dispatch(postPatientCharges(payload));
-  setLocalChargesList([]); // Clear table data on modal close
-  setSelectedCharge(null); // Reset selected charge
-  setSelectedTransactionType(null); // Reset selected transaction type
-  setFilteredCharges([]); // Clear filtered charges
-  form.resetFields(); // Reset form fields, including the amount
-  setAmount(0);
-  onClose();
-   //simulate delay time to show loading when refreshing table
+    await dispatch(postPatientCharges(payload));
+    setLocalChargesList([]); // Clear table data on modal close
+    setSelectedCharge(null); // Reset selected charge
+    setSelectedTransactionType(null); // Reset selected transaction type
+    setFilteredCharges([]); // Clear filtered charges
+    form.resetFields(); // Reset form fields, including the amount
+    setAmount(0);
+    onClose();
+    //simulate delay time to show loading when refreshing table
     setTimeout(() => {
       refreshTable();
-      
     }, 1000);
-    
-
-      
-   
   };
 
   const handleDeleteCharge = (chargeId) => {
@@ -121,7 +143,11 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   const columns = [
     { title: "Patient No", dataIndex: "Patient_No", key: "Patient_No" },
     { title: "Date", dataIndex: "Date", key: "Date" },
-    { title: "Transaction Type", dataIndex: "Transaction_Type", key: "Transaction_Type" },
+    {
+      title: "Transaction Type",
+      dataIndex: "Transaction_Type",
+      key: "Transaction_Type",
+    },
     { title: "Code", dataIndex: "Code", key: "Code" },
     { title: "Description", dataIndex: "Description", key: "Description" },
     { title: "Quantity", dataIndex: "Quantity", key: "Quantity" },
@@ -132,18 +158,18 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
       key: "action",
       render: (_, record) => (
         <div>
-          <Button 
-            onClick={() => handleEditCharge(record.Code)} 
-            icon={<FaEdit />} 
-            type="primary" 
-            size="small" 
-            style={{ marginRight: 8 }} 
+          <Button
+            onClick={() => handleEditCharge(record.Code)}
+            icon={<FaEdit />}
+            type="primary"
+            size="small"
+            style={{ marginRight: 8 }}
           />
-          <Button 
-            onClick={() => handleDeleteCharge(record.Code)} 
-            icon={<FaTrashAlt />} 
-            type="danger" 
-            size="small" 
+          <Button
+            onClick={() => handleDeleteCharge(record.Code)}
+            icon={<FaTrashAlt />}
+            type="danger"
+            size="small"
           />
         </div>
       ),
@@ -151,7 +177,9 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
   ];
 
   // Sort the localChargesList by Date (latest first)
-  const sortedChargesList = [...localChargesList].sort((a, b) => b.AuxiliaryIndex1 - a.AuxiliaryIndex1);
+  const sortedChargesList = [...localChargesList].sort(
+    (a, b) => b.AuxiliaryIndex1 - a.AuxiliaryIndex1
+  );
 
   return (
     <Modal
@@ -173,15 +201,20 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             <Form.Item
               label="Service Name"
               name="transactionType"
-              rules={[{ required: true, message: "Please enter charge name!" }]}>
+              rules={[{ required: true, message: "Please enter charge name!" }]}
+            >
               <Select
                 placeholder="Select Service"
                 size="large"
                 showSearch
                 optionFilterProp="children"
-                onChange={handleTransactionTypeChange}>
+                onChange={handleTransactionTypeChange}
+              >
                 {data?.map((item) => (
-                  <Select.Option key={item.TransactionType} value={item.TransactionType}>
+                  <Select.Option
+                    key={item.TransactionType}
+                    value={item.TransactionType}
+                  >
                     {item.TransactionType}
                   </Select.Option>
                 ))}
@@ -192,13 +225,15 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             <Form.Item
               label="Charge Name"
               name="charge"
-              rules={[{ required: true, message: "Please enter charge name!" }]}>
+              rules={[{ required: true, message: "Please enter charge name!" }]}
+            >
               <Select
                 placeholder="Select Charge"
                 size="large"
                 showSearch
                 optionFilterProp="children"
-                onChange={handleChargeTypeChange}>
+                onChange={handleChargeTypeChange}
+              >
                 {filteredCharges?.map((item) => (
                   <Select.Option key={item.Code} value={item.Description}>
                     {item.Description}
@@ -208,31 +243,45 @@ const AddCharges = ({ visible, onClose, myAction, recId, visitNo, setTotalAmount
             </Form.Item>
           </Col>
           <Col span={6}>
-  <Form.Item label="Quantity" name="quantity" rules={[{ required: true, message: "Please enter quantity!" }]}>
-    <Input size="large" type="number" value={quantity} onChange={handleQuantityChange} />
-  </Form.Item>
-</Col>
+            <Form.Item
+              label="Quantity"
+              name="quantity"
+              rules={[{ required: true, message: "Please enter quantity!" }]}
+            >
+              <Input
+                size="large"
+                type="number"
+                value={quantity}
+                onChange={handleQuantityChange}
+              />
+            </Form.Item>
+          </Col>
 
-<Col span={6}>
-  <Form.Item label="Amount">
-    <Input size="large" type="number" value={amount} readOnly />
-  </Form.Item>
-</Col>
-
+          <Col span={6}>
+            <Form.Item label="Amount">
+              <Input size="large" type="number" value={amount} readOnly />
+            </Form.Item>
+          </Col>
         </Row>
 
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Remarks" name="remarks" >
+            <Form.Item label="Remarks" name="remarks">
               <Input.TextArea size="large" />
             </Form.Item>
           </Col>
         </Row>
         <div className="d-flex justify-content-end align-items-center gap-3">
-          <Button type="primary" htmlType="submit" loading={addChargesLoading} disabled={addChargesLoading} >Save</Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={addChargesLoading}
+            disabled={addChargesLoading}
+          >
+            Save
+          </Button>
         </div>
       </Form>
-      
     </Modal>
   );
 };

@@ -10,6 +10,7 @@ import {
   PrinterOutlined,
   WalletTwoTone,
   DollarOutlined,
+  CloseOutlined
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
@@ -21,6 +22,7 @@ import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLine
 import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
 import PatientReceiptLines from "./PatientReceiptLines";
 import PrintReceipt from "./PrintReceipt";
+import ClosePatientBill from "../ClosePatientBill";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -133,9 +135,12 @@ const ReceiptPatient = () => {
       <div className="d-flex flex-column">
         <Card
           title={
-            <div className="d-flex align-items-center gap-2">
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center gap-2">
               <UserOutlined />
               <span>Patient Details</span>
+            </div>
+            <ClosePatientBill />
             </div>
           }
           className="mb-3"
@@ -154,7 +159,7 @@ const ReceiptPatient = () => {
           >
             {/* First row */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient Name: {patientVisitDetails?.SearchNames}
+              Patient Name: <span className="fw-bold">{patientVisitDetails?.SearchNames.toUpperCase()}</span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Gender: {patientVisitDetails?.Gender}

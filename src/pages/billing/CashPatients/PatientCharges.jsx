@@ -175,7 +175,7 @@ const PatientCharges = ({ activeVisitNo }) => {
         <span style={{ fontSize: "14px", color: "#888", fontStyle: "italic" }}>Items to billed</span>
 
        </div>
-        <Button type="primary" onClick={handleAddChargeView}>
+        <Button type="primary" onClick={handleAddChargeView} disabled={!activeVisitNo}>
           Add Charge
         </Button>
       </div>
