@@ -34,6 +34,7 @@ const DispatchesTable = ({ data, handleOpenLab, loading }) => {
           patientNo: PatientNo,
           transactionType: '',
           inPatient: false,
+          status: 1,
         }),
       );
     }

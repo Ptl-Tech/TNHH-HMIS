@@ -145,19 +145,28 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     try {
       const row = await form.validateFields();
       const { SystemId, Pharmacy_No, No, UnitPrice } = record;
-      const { Dosage, Duration_Days, Frequency, Quantity } = row;
+      const {
+        Dosage,
+        Duration_Days,
+        Frequency,
+        Quantity,
+        Take = 0,
+        remarks = '',
+      } = row;
 
       dispatch(
         postPrescriptionQuantity({
           myAction: 'edit',
           recId: SystemId,
-          Pharmacy_No,
+          pharmacyNo: Pharmacy_No,
           quantity: Quantity,
+          take: Take,
           drugNo: No,
-          Duration_Days,
-          Frequency,
-          Dosage,
+          noOfDays: Duration_Days,
+          frequency: Frequency,
+          dosage: Dosage,
           TotalAmount: Math.round(UnitPrice * Quantity),
+          remarks,
         }),
       );
 
@@ -338,13 +347,14 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       title: 'Unit Price',
       dataIndex: 'UnitPrice',
       key: 'UnitPrice',
+      render: (value) => value.toLocaleString(),
     },
     {
       title: 'Total Price',
       dataIndex: 'TotalPrice',
       key: 'TotalPrice',
       render: (value, record) => {
-        return Math.round(record.UnitPrice * record.Quantity);
+        return Math.round(record.UnitPrice * record.Quantity).toLocaleString();
       },
     },
     {
