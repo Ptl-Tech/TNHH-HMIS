@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu } from "antd";
+import { Button, Dropdown, Card, Menu, message } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -25,6 +25,7 @@ import { PrintFinalInvoice, PrintInterimInvoice } from "./InvoicePrinting";
 import { postGenerateInvoice } from "../../../actions/Charges-Actions/postGenerateInvoice";
 import ReopenCharges from "./ReopenCharges";
 import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
+import ClosePatientBill from "../ClosePatientBill";
 const InvoicePatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -33,9 +34,11 @@ const InvoicePatient = () => {
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
-  const { loading: generateInvoiceLoading, error: generateInvoiceError, data : generateInvoice } = useSelector(
-    (state) => state.generateInvoice
-  );
+  const {
+    loading: generateInvoiceLoading,
+    error: generateInvoiceError,
+    data: generateInvoice,
+  } = useSelector((state) => state.generateInvoice);
   const { loadingPatientVisitDetails, patientVisitDetails } =
     useFetchPatientVisitDetailsHook(activeVisitNo);
   const {
@@ -43,7 +46,7 @@ const InvoicePatient = () => {
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
- const { loading: postSalesInvoiceLoading } = useSelector(
+  const { loading: postSalesInvoiceLoading } = useSelector(
     (state) => state.postSalesInvoice
   );
 
@@ -67,8 +70,10 @@ const InvoicePatient = () => {
     };
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
-      dispatch(getPatientCharges(activeVisitNo));
-    }
+        console.log("statues", status);
+        message.success(`Invoice generated ${status}fully`, 5);
+        dispatch(getPatientCharges(activeVisitNo));
+      }
     });
   };
 
@@ -87,6 +92,7 @@ const InvoicePatient = () => {
     await dispatch(postsalesInvoice(payload)).then((status) => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
+        message.success("Invoice Posted successfully", 5 );
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -140,9 +146,12 @@ const InvoicePatient = () => {
       <div className="d-flex flex-column">
         <Card
           title={
-            <div className="d-flex align-items-center gap-2">
-              <UserOutlined />
-              <span>Patient Details</span>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center gap-2">
+                <UserOutlined />
+                <span>Patient Details</span>
+              </div>
+              <ClosePatientBill />
             </div>
           }
           className="mb-3"
@@ -188,30 +197,42 @@ const InvoicePatient = () => {
 
             {/* Receipt no section */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Invoice No:              <span style={{ fontWeight: "semibold", color: "blue" }}>
-              {Array.isArray(data) && data.length > 0
+              Invoice No:{" "}
+              <span style={{ fontWeight: "semibold", color: "blue" }}>
+                {Array.isArray(data) && data.length > 0
                   ? data[data.length - 1].Invoice_Number
                   : "N/A"}
-                                </span>
-
+              </span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Date:{" "}{Array.isArray(data) && data.length > 0
-                ? new Date(
-                    data[data.length - 1].Date
-                  ).toLocaleDateString("en-GB", {
-                    weekday: "short", // Optional, for day of the week
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
+              Date:{" "}
+              {Array.isArray(data) && data.length > 0
+                ? new Date(data[data.length - 1].Date).toLocaleDateString(
+                    "en-GB",
+                    {
+                      weekday: "short", // Optional, for day of the week
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }
+                  )
                 : "N/A"}
             </p>
           </div>
         </Card>
         <div className="d-flex justify-content-end gap-3 my-3">
-          <Button type="primary" onClick={handlegenerateInvoice} loading={generateInvoiceLoading} disabled={generateInvoiceLoading}>Generate Invoice</Button>
-          <ReopenCharges patientNo={patientVisitDetails?.PatientNo} activeVisitNo={activeVisitNo} />
+          <Button
+            type="primary"
+            onClick={handlegenerateInvoice}
+            loading={generateInvoiceLoading}
+            disabled={generateInvoiceLoading}
+          >
+            Generate Invoice
+          </Button>
+          <ReopenCharges
+            patientNo={patientVisitDetails?.PatientNo}
+            activeVisitNo={activeVisitNo}
+          />
           <PrintInterimInvoice
             patientNo={patientVisitDetails?.PatientNo}
             activeVisitNo={activeVisitNo}
@@ -239,11 +260,10 @@ const InvoicePatient = () => {
                   <p className="text-success fw-bold">
                     KSh{" "}
                     {Array.isArray(data) && data.length > 0
-                      ? data[data.length - 1]?.Amount?.toFixed(
-                          2
-                        ) || "0.00"
+                      ? data[data.length - 1]?.Amount?.toFixed(2) || "0.00"
                       : "0.00"}
-                  </p>                </div>
+                  </p>{" "}
+                </div>
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Discount:</p>
                   <p>KSh {data?.Discount?.toFixed(2) || "0.00"}</p>
@@ -260,7 +280,12 @@ const InvoicePatient = () => {
                 <Button type="default" danger>
                   Discard
                 </Button>
-                <Button type="primary" onClick={handlePaymentProcessing} loading={postSalesInvoiceLoading} disabled={postSalesInvoiceLoading}>
+                <Button
+                  type="primary"
+                  onClick={handlePaymentProcessing}
+                  loading={postSalesInvoiceLoading}
+                  disabled={postSalesInvoiceLoading}
+                >
                   Process Invoice
                 </Button>
               </div>

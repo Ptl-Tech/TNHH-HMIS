@@ -39,21 +39,11 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
 
     // Extract and validate the response data
     const { status } = response.data;
-    if (status === "success") {
-      // Dispatch success action
-      dispatch({
-        type: POST_GENERATE_INVOICE_SUCCESS,
-        payload: { status },
-      });
-
-      // Display success message
-      message.success(`Invoice generated: ${status}fully.`);
-
-      // Return the CHARGES number
-      return status;
-    } else {
-      throw new Error("Invalid response format or missing CHARGESNo.");
-    }
+    dispatch({
+      type: POST_GENERATE_INVOICE_SUCCESS,
+      payload: { status },
+    });
+    return status;
   } catch (error) {
     const errorMessage = error.response?.data?.errors || error.message || "An error occurred.";
     

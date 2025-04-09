@@ -20,6 +20,7 @@ import {
 import { useLocation } from "react-router-dom";
 import { createPatientVisitRequest } from "../../actions/reception-actions/patient-visit-actions/createPatientVisit";
 import { showNotification } from "../../components/Notification";
+import useFetchPatientVisitDetailsHook from "../../hooks/useFetchPatientVisitDetailsHook";
 
 const CreateVisitDrawer = ({
   visible,
@@ -33,6 +34,7 @@ const CreateVisitDrawer = ({
   const location = useLocation();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
+
   const [paymentMethod, setPaymentMethod] = useState(0);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [visitData, setVisitData] = useState(initialVisitData || null);
@@ -41,14 +43,14 @@ const CreateVisitDrawer = ({
   const { loading: insuranceLoading, data: insurancePayload } = useSelector(
     (state) => state.getInsurance
   );
-
   const {
     loading: visitLoading,
     error: visitError,
     success: visitSuccess,
     data: visitPayload,
   } = useSelector((state) => state.createVisit);
-
+  const { loadingPatientVisitDetails, patientVisitDetails } =
+    useFetchPatientVisitDetailsHook(visitPayload?.AppointmentNo || "");
   useEffect(() => {
     if (!patientNo) {
      setVisitData(null);
@@ -70,6 +72,10 @@ const CreateVisitDrawer = ({
         paymentMethod: initialVisitData.SettlementType === "Cash" ? 2 : 1,
         insuranceNo: initialVisitData.InsuranceNo || "",
         membershipNo: initialVisitData.InsuranceMemberNo || "",
+        schemeName: initialVisitData.SchemeName || "",
+        insuranceName: initialVisitData.InsuranceName || "",
+        insurancePrinicpalMemberName:
+          initialVisitData.PrinicipalMemberName || "",
       });
 
       setPaymentMethod(initialVisitData.SettlementType === "Cash" ? 2 : 1); // Ensure payment method is updated
@@ -161,7 +167,7 @@ const CreateVisitDrawer = ({
             });
       console.log(visitPayload);
             onUpdateVisit(visitPayload.appointmentNo);
-      
+      useFetchPatientVisitDetailsHook(visitPayload.AppointmentNo || "");
             onClose();
             
           }

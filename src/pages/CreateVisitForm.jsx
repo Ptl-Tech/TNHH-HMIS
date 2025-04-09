@@ -109,6 +109,10 @@ const CreateVisitForm = () => {
   
   };
 
+  const handleDirectAdmission=()=>{
+    navigate(`/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
+  }
+
   // Actions menu
   const menu = (
     <Menu onClick={({ key }) => key === "visit_action" && setView(true)}>
@@ -117,7 +121,7 @@ const CreateVisitForm = () => {
       </Menu.Item>
       <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>Dispatch to Triage</Menu.Item>
 
-      <Menu.Item key="request_admission">Request Admission</Menu.Item>
+      <Menu.Item key="request_admission" onClick={handleDirectAdmission}>Request Admission</Menu.Item>
 
     </Menu>
   );

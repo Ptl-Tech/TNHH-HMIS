@@ -299,6 +299,7 @@ import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitRed
 import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
 import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
 import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
+import { postClosingBillReducer } from "./ChargesReducers/postClosingBillReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -559,6 +560,7 @@ export const rootReducer = combineReducers({
   reopenPostedCharges: reopensalesInvoiceReducer,
   postRebates: postRebatesReducer,
   postDiscount: postDiscountReducer,
+  closePatientBill: postClosingBillReducer,
 
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,

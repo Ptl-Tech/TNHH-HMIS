@@ -37,23 +37,21 @@ const VisitorList = () => {
   }, [searchTerm, filteredVisitors]);
 
   const filterVisitors = () => {
-    if (!data || data.length === 0 || !patients) {
-      setLoadingFiltered(false);
+    if (!data || data.length === 0 || !patients || patients.length === 0) {
       return;
     }
-
+  
     setLoadingFiltered(true);
-
+  
     try {
       const patientSet = new Set(patients.map((p) => p.IDNumber));
-      const filteredList = data
-        .filter((visitor) => {
-          const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
-          const isEntered = visitor.Status === "Entered";
-          const isPatient = patientSet.has(visitor.IDNumber);
-          return isToday && isEntered && !isPatient;
-        });
-
+      const filteredList = data.filter((visitor) => {
+        const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
+        const isEntered = visitor.Status === "Entered";
+        const isPatient = patientSet.has(visitor.IDNumber);
+        return isToday && isEntered && !isPatient;
+      });
+  
       setFilteredVisitors(filteredList);
     } catch (error) {
       console.error("Error filtering visitors:", error);
@@ -61,6 +59,7 @@ const VisitorList = () => {
       setLoadingFiltered(false);
     }
   };
+  ;
 
   const applySearchFilter = () => {
     if (!searchTerm) {
