@@ -67,14 +67,15 @@ export const getSingleConsultationSlice = (EncounterNo) => async(dispatch, getSt
 }
 
 // get consultation with patientNo
-export const getConsultationSlice = (patientNo) => async(dispatch, getState) => {
+export const getConsultationSlice = (patientNo, status) => async(dispatch, getState) => {
   const config = configHelpers(getState);
   try {
       dispatch({ type: GET_CONSULTATION_REQUEST });    
       // Perform the API request
       console.log(patientNo, 'patient number');
       const response = await axios.get(
-        `${API_URL}/data/odatafilter?webservice=QyTreatmentHeaders&isList=true&query=$filter=PatientNo eq '${patientNo}'`,
+        `${API_URL}/data/odatafilter?webservice=QyTreatmentHeaders&isList=true&query=$filter=PatientNo eq '${patientNo}' and Status eq '${status}'`
+        ,
         config
       );
       // console.log(response.data);

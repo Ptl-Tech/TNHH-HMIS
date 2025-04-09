@@ -41,6 +41,7 @@ import {
   HistoryOutlined,
   RadiusUprightOutlined,
 } from "@ant-design/icons";
+import Consumables from "../pages/nurse-view/nurse-patient-file/Consumables";
 
 export const nurseRoutes = [
   {
@@ -156,6 +157,7 @@ export default function NurseRoutes() {
         <Route path="Ward-management" element={<WardManagement />} />
         <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
         <Route path="Discharge-list" element={<DischargeList />} />
+        <Route path="Discharge-list/Posted-Consumables" element={<Consumables />} />
         <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
         <Route path="Inpatient/Encounter" element={<EncounterSummery />} />
         <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
