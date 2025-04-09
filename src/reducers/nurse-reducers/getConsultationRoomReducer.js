@@ -7,7 +7,7 @@ import {
     GET_CONSULTATION_ROOM_DETAILS_FAILURE,
     GET_CONSULTATION_REQUEST,
     GET_CONSULTATION_SUCCESS,
-    GET_CONSULTATION_FAILURE 
+    GET_CONSULTATION_FAILURE,
 } from "../../actions/nurse-actions/getConsultationRoomSlice";
 
 const initialState = {
