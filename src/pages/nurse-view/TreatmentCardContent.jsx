@@ -7,6 +7,7 @@ import EncounterListTable from "./tables/nurse-tables/EncounterListTable";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import { getConsultationSlice } from "../../actions/nurse-actions/getConsultationRoomSlice";
 import EncounterListInPatientTable from "./tables/nurse-tables/EncounterListInPatientTable";
+import { getQyAdmissionsDischargedListSlice } from "../../actions/nurse-actions/getPgInpatientDischargeListSlice";
 
 const TreatmentCardContent = () => {
   const location = useLocation();
@@ -16,15 +17,13 @@ const TreatmentCardContent = () => {
   const { loadingConsultationRoomList, consultationRoomList } = useSelector(
     (state) => state.getPatientConsultationList
   );
+const { loading: loadingInpatientEncounters, data:inpatientEncounters } = useSelector((state) => state.getInpatientPastEncounters) || {};
+
 
   const { triageWaitingList } = useSelector(
     (state) => state.getTriageWaitingList
   );
 
-  const filteredConsultationRooms = useMemo(
-    () => consultationRoomList.filter((room) => room?.Status === "Completed"),
-    [consultationRoomList]
-  );
 
   const formattedTriageWaitingList = useMemo(() => {
     return triageWaitingList?.map((patient) => ({
@@ -34,7 +33,7 @@ const TreatmentCardContent = () => {
   }, [triageWaitingList]);
 
   const combinedList = useMemo(() => {
-    return filteredConsultationRooms?.map((room) => {
+    return consultationRoomList?.map((room) => {
       const matchingPatient = formattedTriageWaitingList?.find(
         (patient) => patient?.PatientNo === room?.PatientNo
       );
@@ -44,7 +43,20 @@ const TreatmentCardContent = () => {
         SearchName: matchingPatient ? matchingPatient?.SearchName : null,
       };
     });
-  }, [filteredConsultationRooms, formattedTriageWaitingList]);
+  }, [consultationRoomList, formattedTriageWaitingList]);
+
+  const combinedInpatientList = useMemo(() => {
+    return inpatientEncounters?.map((room) => {
+      const matchingPatient = formattedTriageWaitingList?.find(
+        (patient) => patient?.PatientNo === room?.patientNo
+      );
+      return {
+        ...room,
+        PatientNo: room?.patientNo,
+        SearchName: matchingPatient ? matchingPatient?.SearchName : null,
+      };
+    });
+  }, [inpatientEncounters, formattedTriageWaitingList]);
 
   const items = [
     {
@@ -74,7 +86,11 @@ const TreatmentCardContent = () => {
             boxShadow: "10px 10px 10px 10px #e6e6e6",
           }}
         >
-          <EncounterListInPatientTable />
+          <EncounterListInPatientTable 
+            filteredList={combinedInpatientList}
+            loadingConsultationRoomList={loadingInpatientEncounters}
+            patientNo={patientNo}
+          />
         </Card>
       ),
     },
@@ -85,7 +101,13 @@ const TreatmentCardContent = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getConsultationSlice(patientNo));
+    dispatch(getConsultationSlice(patientNo, 'Completed'));
+  }, [dispatch, patientNo]);
+
+  useEffect(() => {
+    if (patientNo) {
+      dispatch(getQyAdmissionsDischargedListSlice(patientNo));
+    }
   }, [dispatch, patientNo]);
 
   return (

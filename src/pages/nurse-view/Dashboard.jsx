@@ -29,21 +29,31 @@ const Dashboard = () => {
 
   const { data } = useSelector((state) => state.getDoctorsList);
   const { triageList } = useSelector((state) => state.getTriageList) || {};
-  const openTriageList = Array.isArray(triageList)
-    ? triageList.filter((item) => item.Status === "New")
-    : [];
+  const openTriageList = useMemo(() => {
+    return Array.isArray(triageList)
+      ? triageList.filter((item) => item.Status === "New")
+      : [];
+  }, [triageList]);
 
-  const pendingTriageList = Array.isArray(triageList)
-    ? triageList.filter((item) => item.Status === "Pending")
-    : [];
+  const pendingTriageList = useMemo(() => {
+    return Array.isArray(triageList)
+      ? triageList.filter((item) => item.Status === "Pending")
+      : [];
+  }, [triageList]);
 
   const { loadingPatientList, allPatientLList } =
     useSelector((state) => state.getPatientList) || {};
 
-  const filterInPatients =
-    allPatientLList.filter((item) => item.Inpatient === true) || {};
-  const filterOutPatients =
-    allPatientLList.filter((item) => item.Inpatient === false) || {};
+    const filterInPatients = useMemo(() => {
+      return Array.isArray(allPatientLList)
+        ? allPatientLList.filter((item) => item.Inpatient === true)
+        : [];
+    }, [allPatientLList]);
+    const filterOutPatients = useMemo(() => {
+      return Array.isArray(allPatientLList)
+        ? allPatientLList.filter((item) => item.Inpatient === false)
+        : [];
+    }, [allPatientLList]);
 
   const { admittedPatients } =
     useSelector((state) => state.getPgAdmissionsAdmitted) || {};
@@ -55,15 +65,20 @@ const Dashboard = () => {
     }));
   }, [data]);
 
-  const combinedPatients = admittedPatients?.map((patient) => {
-    const matchingDoctor = formattedDoctorDetails?.find(
-      (doctor) => patient?.Doctor === doctor?.DoctorID
-    );
-    return {
-      ...patient,
-      DoctorsName: matchingDoctor ? matchingDoctor?.DoctorsName : null,
-    };
-  });
+  const combinedPatients = useMemo(() => {
+    if (!Array.isArray(admittedPatients) || !Array.isArray(formattedDoctorDetails)) return [];
+  
+    return admittedPatients.map((patient) => {
+      const matchingDoctor = formattedDoctorDetails.find(
+        (doctor) => patient?.Doctor === doctor?.DoctorID
+      );
+  
+      return {
+        ...patient,
+        DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
+      };
+    });
+  }, [admittedPatients, formattedDoctorDetails]);
 
   // Sample data for the cards
   const cardData = [

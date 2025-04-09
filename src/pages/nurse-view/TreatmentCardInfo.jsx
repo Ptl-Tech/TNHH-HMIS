@@ -77,13 +77,24 @@ const TreatmentCardInfo = () => {
           }}
         >
           <div className="patient-hospital-number-container">
-            <h5
+            
+              {
+            patientDetails.TreatmentNo ? (
+              <h5
               style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
-            >
-              Treatment Number
-            </h5>
+              >
+                Treatment Number
+                </h5>
+            ) : (
+              <h5
+              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              >
+                Admission Number
+                </h5>
+            )
+            }
             <Typography.Text key={patientDetails?.TreatmentDate}>
-              {patientDetails?.TreatmentNo|| "N/A"}
+              {patientDetails?.TreatmentNo || patientDetails?.admissionNo || "N/A"}
             </Typography.Text>
           </div>
           <div className="patient-hospital-number-container">
@@ -120,7 +131,7 @@ const TreatmentCardInfo = () => {
             className="patient-id"
             style={{ fontWeight: "bold", color: "#0f5689" }}
           >
-            Admitted by Doctor : {patientDetails?.DoctorsName || "N/A"}
+            Admitted by Doctor : {patientDetails?.DoctorsName || patientDetails?.doctorsName ||"N/A"}
           </Typography.Text>
         </div>
 
@@ -132,27 +143,49 @@ const TreatmentCardInfo = () => {
           }}
         >
           <div className="patient-hospital-number-container">
-            <h5
+            {
+            patientDetails.TreatmentDate ? (
+              <h5
               style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
             >
               Treatment Date
             </h5>
+            ) : (
+              <h5
+              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+            >
+              Discharge Date
+            </h5>
+            )
+            }
             <Typography.Text key={patientDetails?.TreatmentDate}>
               {moment(patientDetails?.TreatmentDate).isValid() &&
               patientDetails?.TreatmentDate !== invalidDate
                 ? moment(patientDetails?.TreatmentDate).format(
                     "dddd, MMMM Do, YYYY"
                   )
-                : "N/A"}
+                : moment(patientDetails?.dischargeDate).format(
+                  "dddd, MMMM Do, YYYY"
+                )} 
             </Typography.Text>
           </div>
 
           <div style={{ marginTop: "10px" }}>
-            <h5
+            {
+            patientDetails.TreatmentDate ? (
+              <h5
               style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
             >
               Treatment Time
             </h5>
+            ) :(
+              <h5
+              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+            >
+              Discharge Time
+            </h5>
+            )
+            }
             <Typography.Text key={patientDetails?.TreatmentTime}>
               {moment(
                 patientDetails?.TreatmentTime,
@@ -162,19 +195,33 @@ const TreatmentCardInfo = () => {
                 ? moment(patientDetails?.TreatmentTime, "HH:mm:ss.SSS").format(
                     "HH:mm:ss A"
                   )
-                : "N/A"}
+                : 
+                moment(patientDetails?.dischargeTime, "HH:mm:ss.SSS").format(
+                  "HH:mm:ss A"
+                )
+                }
             </Typography.Text>
           </div>
         </div>
 
         <div className="inpatient-details-container-2">
           <div className="patient-hospital-number-container">
-            <h5
+            {
+            patientDetails.Status ? (
+              <h5
               style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
             >
               Treatment Status
             </h5>
-            <Tag color={patientDetails?.Status === "Completed" ? "green" : "red"}>{patientDetails?.Status}</Tag>
+            ) : (
+              <h5
+              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+            >
+              Discharge Status
+            </h5>
+            )
+            }
+            <Tag color={patientDetails?.Status === "Completed" || patientDetails?.status === "Discharged" ? "green" : "red"}>{patientDetails?.Status || patientDetails?.status}</Tag>
           </div>
         </div>
       </Card>
