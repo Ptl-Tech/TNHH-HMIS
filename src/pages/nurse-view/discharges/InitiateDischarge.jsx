@@ -51,7 +51,7 @@ const InitiateDischarge = ({ handleInitiateDischarge }) => {
                 bordered
                 dataSource={medicalInfo}
                 renderItem={(item) => (
-                  <List.Item>
+                  <List.Item key={item.label}>
                     <Text strong>{item.label}:</Text> <Text> {item.value}</Text>
                   </List.Item>
                 )}
@@ -65,7 +65,7 @@ const InitiateDischarge = ({ handleInitiateDischarge }) => {
                 bordered
                 size="small"
                 renderItem={(item) => (
-                  <List.Item>
+                  <List.Item key={item.label}>
                     <Checkbox checked={item.checked} disabled>
                       {item.label}
                     </Checkbox>
