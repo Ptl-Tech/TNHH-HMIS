@@ -219,22 +219,24 @@ const SplitPayments = ({
             </Col>
 
             <Col span={12}>
-  <Form.Item
-    name="amountReceived"
-    label="Amount Received"
-    rules={[
-      { required: true, message: "Please enter the amount received" },
-      {
-        pattern: /^[0-9]*(\.[0-9]{1,2})?$/,
-        message: "Enter a valid amount",
-      },
-    ]}
-  >
-    <Input type="number" placeholder="Enter amount" />
-  </Form.Item>
-  {amountError && <div style={{ color: "red" }}>{amountError}</div>}
-</Col>
-
+              <Form.Item
+                name="amountReceived"
+                label="Amount Received"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter the amount received",
+                  },
+                  {
+                    pattern: /^[0-9]*(\.[0-9]{1,2})?$/,
+                    message: "Enter a valid amount",
+                  },
+                ]}
+              >
+                <Input type="number" placeholder="Enter amount" />
+              </Form.Item>
+              {amountError && <div style={{ color: "red" }}>{amountError}</div>}
+            </Col>
           </Row>
 
           {selectedPaymentType === 7 && (
