@@ -127,6 +127,7 @@ const ReceiptPatient = () => {
   );
 
   return (
+   <>
     <div
       style={{
         display: "flex",
@@ -161,79 +162,79 @@ const ReceiptPatient = () => {
             </div>
           }
           className="mb-3"
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(6, auto)",
-              gridTemplateRows: "auto auto", // Two rows
-              gap: "12px 20px",
-              fontSize: "14px",
-              fontWeight: "400",
-              color: "black",
-              padding: "10px",
-            }}
-          >
-            {/* First row */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient Name:{" "}
-              <span className="fw-bold">
-                {patientVisitDetails?.SearchNames.toUpperCase()}
-              </span>
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Gender: {patientVisitDetails?.Gender}
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Age in Years: {patientVisitDetails?.AgeinYears}
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient ID: {patientVisitDetails?.PatientNo}
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Visit Type: {patientVisitDetails?.AppointmentType}
-            </p>
+        ><div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(6, auto)",
+          gridTemplateRows: "auto auto", // Two rows
+          gap: "12px 20px",
+          fontSize: "14px",
+          fontWeight: "400",
+          color: "black",
+          padding: "10px",
+        }}
+      >
+        {/* First row */}
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Patient Name:{" "}
+          <span className="fw-bold">
+            {patientVisitDetails?.SearchNames.toUpperCase()}
+          </span>
+        </p>
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Gender: {patientVisitDetails?.Gender}
+        </p>
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Age in Years: {patientVisitDetails?.AgeinYears}
+        </p>
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Patient ID: {patientVisitDetails?.PatientNo}
+        </p>
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Visit Type: {patientVisitDetails?.AppointmentType}
+        </p>
 
-            {/* Second row */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Payment Mode: {patientVisitDetails?.SettlementType}
-            </p>
+        {/* Second row */}
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Payment Mode: {patientVisitDetails?.SettlementType}
+        </p>
 
-            <p className="text-primary" style={{ gridColumn: "span 2" }}>
-              <DollarOutlined /> Bill Balance: KSh{" "}
-              {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-            </p>
+        <p className="text-primary" style={{ gridColumn: "span 2" }}>
+          <DollarOutlined /> Bill Balance: KSh{" "}
+          {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+        </p>
 
-            {/* Receipt no section */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Receipt No:
-              <span style={{ fontWeight: "semibold", color: "blue" }}>
-                {" "}
-                {Array.isArray(receiptLines) && receiptLines.length > 0
-                  ? receiptLines[receiptLines.length - 1].No
-                  : "N/A"}
-              </span>
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Date:{" "}
-              {Array.isArray(receiptLines) && receiptLines.length > 0
-                ? new Date(
-                    receiptLines[receiptLines.length - 1].Date
-                  ).toLocaleDateString("en-GB", {
-                    weekday: "short", // Optional, for day of the week
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : "N/A"}
-            </p>
-          </div>
+        {/* Receipt no section */}
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Receipt No:
+          <span style={{ fontWeight: "semibold", color: "blue" }}>
+            {" "}
+            {Array.isArray(receiptLines) && receiptLines.length > 0
+              ? receiptLines[receiptLines.length - 1].No
+              : "N/A"}
+          </span>
+        </p>
+        <p className="mb-0" style={{ gridColumn: "span 2" }}>
+          Date:{" "}
+          {Array.isArray(receiptLines) && receiptLines.length > 0
+            ? new Date(
+                receiptLines[receiptLines.length - 1].Date
+              ).toLocaleDateString("en-GB", {
+                weekday: "short", // Optional, for day of the week
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "N/A"}
+        </p>
+      </div>
+          
         </Card>
         <div className="d-flex justify-content-end gap-3 my-3">
           <PrintReceipt
             receiptNo={
-              Array.isArray(receiptLines) && receiptLines.length > 0
-                ? receiptLines[receiptLines.length - 1].No
+              Array.isArray(receiptLines) && receiptLines?.length > 0
+                ? receiptLines[receiptLines?.length - 1]?.No
                 : "N/A"
             }
           />
@@ -242,7 +243,7 @@ const ReceiptPatient = () => {
             MPESA Payment
           </Button> */}
         </div>
-        <PatientCharges activeVisitNo={activeVisitNo} />
+        {/* <PatientCharges activeVisitNo={activeVisitNo} /> */}
         <div className="row gap-3 gap-md-0">
           {/* Left Side (Split Receipt) */}
           <div className="col-12 col-md-8">
@@ -250,11 +251,11 @@ const ReceiptPatient = () => {
           </div>
 
           {/* Right Side (Amount Details + Buttons) */}
-          <div className="col-12 col-md-4">
+           <div className="col-12 col-md-4">
             <Card className="shadow-sm p-3">
               <div className="d-flex flex-column gap-2">
                 <div className="d-flex justify-content-between">
-                  <p className="fw-bold">Total Amount:</p>
+                  <p className="fw-bold">Total Amount Paid :</p>
                   <p>
                     KSh{" "}
                     {Array.isArray(receiptHeader) && receiptHeader.length > 0
@@ -265,7 +266,7 @@ const ReceiptPatient = () => {
                   </p>
                 </div>
                 <div className="d-flex justify-content-between">
-                  <p className="fw-bold">Total Paid:</p>
+                  <p className="fw-bold">Amount Received:</p>
                   <p className="text-success fw-bold">
                     KSh{" "}
                     {Array.isArray(receiptHeader) && receiptHeader.length > 0
@@ -323,10 +324,11 @@ const ReceiptPatient = () => {
                 amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               />
             </Card>
-          </div>
+          </div> 
         </div>
       </div>
     </div>
+   </>
   );
 };
 

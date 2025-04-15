@@ -14,7 +14,7 @@ const PaymentSection = ({ patientNo }) => {
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
 
   const [paymentType, setPaymentType] = useState(null);
-const[paymentSavingLoading, setPaymentSavingLoading] = useState(null);
+const[paymentSavingLoading, setPaymentSavingLoading] = useState(false);
   const { loading: processReceiptLoading } = useSelector(
     (state) => state.savePayment
   );
