@@ -32,7 +32,7 @@ const InsurancePatients = () => {
 
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    navigate(`/reception/CorporatePatient-Charges?PatientNo=${patientId}`);
+    navigate(`/Reception/CorporatePatient-Charges?PatientNo=${patientId}`);
   };
   
 
