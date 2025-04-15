@@ -1,7 +1,6 @@
 import { Button, Divider, message, Modal } from "antd";
 import { useState } from "react";
 import Summery from "./discharges/Summery";
-import DischargeMedication from "./discharges/DischargeMedication";
 import SickOff from "./discharges/SickOff";
 import { useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -17,6 +16,7 @@ import {
   UserAddOutlined,
 } from "@ant-design/icons";
 import InitiateDischarge from "./discharges/InitiateDischarge";
+import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 
 const Discharges = () => {
   const role = useAuth().userData.departmentName;
@@ -93,7 +93,7 @@ const Discharges = () => {
         setSelectedItem(<Summery />);
         break;
       case "Discharge Medication":
-        setSelectedItem(<DischargeMedication />);
+        setSelectedItem(<InpatientMedication />);
         break;
       case "Sick Off":
         setSelectedItem(<SickOff />);
