@@ -26,6 +26,7 @@ import { postGenerateInvoice } from "../../../actions/Charges-Actions/postGenera
 import ReopenCharges from "./ReopenCharges";
 import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
 import ClosePatientBill from "../ClosePatientBill";
+import SplitPayments from "../CashPatients/SplitPayments";
 const InvoicePatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -39,6 +40,10 @@ const InvoicePatient = () => {
     error: generateInvoiceError,
     data: generateInvoice,
   } = useSelector((state) => state.generateInvoice);
+ const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
+    (state) => state.getReceiptLines
+  );
+
   const { loadingPatientVisitDetails, patientVisitDetails } =
     useFetchPatientVisitDetailsHook(activeVisitNo);
   const {
@@ -53,15 +58,19 @@ const InvoicePatient = () => {
   //states
   const [RebatesModal, setRebatesModal] = useState(false);
   const [DiscountModal, setDiscountModal] = useState(false);
+  const [splitAmountModal, setSplitAmountModal] = useState(false);
+
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
+      dispatch(getReceiptLines(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
   const handleCancel = () => {
     setRebatesModal(false);
     setDiscountModal(false);
+    setSplitAmountModal(false);
   };
 
   const handlegenerateInvoice = async () => {
@@ -92,7 +101,7 @@ const InvoicePatient = () => {
     await dispatch(postsalesInvoice(payload)).then((status) => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
-        message.success("Invoice Posted successfully", 5 );
+        message.success("Invoice Posted successfully", 5);
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -106,6 +115,8 @@ const InvoicePatient = () => {
           setRebatesModal(true); // Show receipt modal
         } else if (key === "discount_action") {
           setDiscountModal(true);
+        } else if (key === "split_amount") {
+          setSplitAmountModal(true);
         }
       }}
     >
@@ -113,6 +124,8 @@ const InvoicePatient = () => {
         <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
       </Menu.Item>
       <Menu.Divider />
+      <Menu.Item key="split_amount">Initiate Split Payment</Menu.Item>
+
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>
 
@@ -299,6 +312,17 @@ const InvoicePatient = () => {
                 visible={DiscountModal}
                 onClose={handleCancel}
                 patientNo={patientVisitDetails?.PatientNo}
+              />
+              <SplitPayments
+                receiptNo={
+                  Array.isArray(receiptLines) && receiptLines.length > 0
+                    ? receiptLines[receiptLines.length - 1].No
+                    : "N/A"
+                }
+                open={splitAmountModal}
+                onCancel={handleCancel}
+                activeVisitNo={activeVisitNo || ""}
+                amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               />
             </Card>
           </div>

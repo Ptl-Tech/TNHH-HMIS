@@ -4,16 +4,17 @@ import { Skeleton, Button, Table, Modal } from "antd";
 import { PrinterOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import PrintReceipt from "./PrintReceipt";
+import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 
 const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
   const dispatch = useDispatch();
-  const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
-    (state) => state.getReceiptLines
-  );
+ 
+    const { data: receiptHeader, loading } = useSelector((state) => state.getReceiptPage);
+  
 
   useEffect(() => {
     if (activeVisitNo) {
-      dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
@@ -28,27 +29,25 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
       dataIndex: "No",
       key: "No",
     },
-    {
-      title: "Transaction Name",
-      dataIndex: "TransactionName",
-      key: "TransactionName",
-    },
+    // {
+    //   title: "Transaction Type",
+    //   dataIndex: "Status",
+    //   key: "Status",
+    // },
     {
       title: "Amount",
-      dataIndex: "Amount",
-      key: "Amount",
-      render: (amount) => `KSh ${amount.toFixed(2)}`,
+      dataIndex: "Total_Amount",
+      key: "Total_Amount",
+      render: (Total_Amount) => `KSh ${Total_Amount.toFixed(2)}`,
     },
     {
-      title: "Pay Mode",
-      dataIndex: "PayMode",
-      key: "PayMode",
+      title: "Amount Paid",
+      dataIndex: "Amount_Recieved",
+      key: "Amount_Recieved",
+      render: (Amount_Recieved) => `KSh ${Amount_Recieved.toFixed(2)}`,
+
     },
-    {
-      title: "Date",
-      dataIndex: "Date",
-      key: "Date",
-    },
+   
     {
       title: "Actions",
       key: "actions",
@@ -60,24 +59,24 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
 
   return (
     <Modal
-      title="Receipt Lines"
+      title="Patient Receipts"
       visible={visible}
       onCancel={onClose}
       footer={null}
       width={800}
       style={{ top: 5, zIndex: 1000 }}
     >
-      {receiptLinesLoading ? (
+      {loading ? (
         <Skeleton active />
       ) : (
         <Table
-          dataSource={receiptLines}
+          dataSource={receiptHeader}
           columns={columns}
           size="small"
           bordered
           rowKey="SystemId"
           pagination={
-            receiptLines.length > 10 ? { pageSize: 10 } : false
+            receiptHeader.length > 10 ? { pageSize: 10 } : false
           } // Optional, if you don't want pagination
         />
       )}

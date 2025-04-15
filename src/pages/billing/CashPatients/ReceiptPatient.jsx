@@ -10,7 +10,7 @@ import {
   PrinterOutlined,
   WalletTwoTone,
   DollarOutlined,
-  CloseOutlined
+  CloseOutlined,
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
@@ -23,11 +23,13 @@ import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
 import PatientReceiptLines from "./PatientReceiptLines";
 import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
+import SplitPayments from "./SplitPayments";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
+
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
@@ -40,6 +42,7 @@ const ReceiptPatient = () => {
     data: postReceiptData,
   } = useSelector((state) => state.processReceipt);
 
+  // hooks
   const { loadingPatientVisitDetails, patientVisitDetails } =
     useFetchPatientVisitDetailsHook(activeVisitNo);
   const {
@@ -51,6 +54,9 @@ const ReceiptPatient = () => {
   //states
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const [splitAmountModal, setSplitAmountModal] = useState(false);
+ 
+  
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
@@ -61,10 +67,16 @@ const ReceiptPatient = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
+    setSplitAmountModal(false);
   };
 
   const showReceiptModal = () => {
     setReceiptModalVisible(true);
+  };
+
+  const InitiateSplitPayment = () => {
+    setSplitAmountModal(true);
+    //setreceiptNo("")
   };
 
   const handlePaymentProcessing = async () => {
@@ -100,10 +112,14 @@ const ReceiptPatient = () => {
       onClick={({ key }) => {
         if (key === "visit_action") {
           showReceiptModal(); // Show receipt modal
+        } else if (key === "split_amount") {
+          InitiateSplitPayment();
         }
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
+      <Menu.Item key="split_amount">Initiate Split Payment</Menu.Item>
+
       <Menu.Divider />
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
     </Menu>
@@ -137,10 +153,10 @@ const ReceiptPatient = () => {
           title={
             <div className="d-flex justify-content-between align-items-center">
               <div className="d-flex align-items-center gap-2">
-              <UserOutlined />
-              <span>Patient Details</span>
-            </div>
-            <ClosePatientBill />
+                <UserOutlined />
+                <span>Patient Details</span>
+              </div>
+              <ClosePatientBill />
             </div>
           }
           className="mb-3"
@@ -159,7 +175,10 @@ const ReceiptPatient = () => {
           >
             {/* First row */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient Name: <span className="fw-bold">{patientVisitDetails?.SearchNames.toUpperCase()}</span>
+              Patient Name:{" "}
+              <span className="fw-bold">
+                {patientVisitDetails?.SearchNames.toUpperCase()}
+              </span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Gender: {patientVisitDetails?.Gender}
@@ -210,10 +229,14 @@ const ReceiptPatient = () => {
           </div>
         </Card>
         <div className="d-flex justify-content-end gap-3 my-3">
-          <PrintReceipt receiptNo={Array.isArray(receiptLines) && receiptLines.length > 0
-                  ? receiptLines[receiptLines.length - 1].No
-                  : "N/A"} />
-         
+          <PrintReceipt
+            receiptNo={
+              Array.isArray(receiptLines) && receiptLines.length > 0
+                ? receiptLines[receiptLines.length - 1].No
+                : "N/A"
+            }
+          />
+
           {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
@@ -266,7 +289,7 @@ const ReceiptPatient = () => {
                   disabled={postReceiptLoading}
                   loading={postReceiptLoading}
                 >
-                  Process Payment
+                  Post Receipt
                 </Button>
               </div>
               <MpesaPayment
@@ -278,6 +301,17 @@ const ReceiptPatient = () => {
                 activeVisitNo={activeVisitNo}
                 visible={receiptModalVisible}
                 onClose={handleCancel}
+              />
+              <SplitPayments
+              receiptNo={
+                Array.isArray(receiptLines) && receiptLines.length > 0
+                  ? receiptLines[receiptLines.length - 1].No
+                  : "N/A"
+              }
+                open={splitAmountModal}
+                onCancel={handleCancel}
+                activeVisitNo={activeVisitNo || ""}
+                amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               />
             </Card>
           </div>
