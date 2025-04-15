@@ -124,7 +124,7 @@ const InvoicePatient = () => {
         <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="split_amount">Initiate Split Payment</Menu.Item>
+      <Menu.Item key="split_amount">Split Payment</Menu.Item>
 
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>

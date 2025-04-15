@@ -135,7 +135,7 @@ setPaymentSavingLoading(true)
         )}
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={processReceiptLoading}>
+          <Button type="primary" htmlType="submit" loading={paymentSavingLoading}>
             Save Payment
           </Button>
           <Button

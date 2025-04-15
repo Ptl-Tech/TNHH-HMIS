@@ -119,7 +119,7 @@ const ReceiptPatient = () => {
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
-      <Menu.Item key="split_amount">Initiate Split Payment</Menu.Item>
+      <Menu.Item key="split_amount">Split Payment</Menu.Item>
 
       <Menu.Divider />
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
