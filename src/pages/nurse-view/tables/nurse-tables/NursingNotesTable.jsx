@@ -21,7 +21,6 @@ const NursingNotesTable = ({
   const showModal = (record) => {
     setIsModalOpen(true);
     setSelectedRecord(record);
-    console.log("Selected Record", record);
   };
   const handleOk = () => {
     setIsModalOpen(false);
@@ -88,7 +87,7 @@ const NursingNotesTable = ({
       fixed: "right",
       width: 100,
       render: (_, record) => (
-        <Button style={{ color: "#0f5689" }} onClick={()=> showModal(record)}>
+        <Button style={{ color: "#0f5689" }} onClick={() => showModal(record)}>
           <FolderViewOutlined /> View
         </Button>
       ),
@@ -148,11 +147,15 @@ const NursingNotesTable = ({
         title="Read Notes"
         open={isModalOpen}
         onCancel={handleCancel}
-        footer={
-          <Button onClick={handleCancel}>Cancel</Button>
-        }
+        footer={<Button onClick={handleCancel}>Cancel</Button>}
       >
-        <div style={{ border: "1px solid gray", padding: "10px", borderRadius: "5px" }}>
+        <div
+          style={{
+            border: "1px solid gray",
+            padding: "10px",
+            borderRadius: "5px",
+          }}
+        >
           {renderNotes(selectedRecord?.Notes)}
         </div>
       </Modal>

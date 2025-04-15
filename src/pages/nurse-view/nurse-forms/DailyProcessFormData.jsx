@@ -1,117 +1,93 @@
-import { Button, Col, Form, Input, message, Row, Space } from "antd"
-import TextArea from "antd/es/input/TextArea"
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-import { POST_DAILY_PROCEDURE_OR_PROCESS_FAILURE, POST_DAILY_PROCEDURE_OR_PROCESS_SUCCESS, postDailyProcedureOrProcessSlice } from "../../../actions/nurse-actions/postDailyProcedureOrProcessSlice";
-import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
+import { Button, Form, Space } from "antd";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
+import { Editor } from "react-draft-wysiwyg";
 
-const DailyProcessFormData = ({ setIsDailyProcessFormVisible }) => {
-    const [ form ] = Form.useForm();
-    const { patientDetails } = useLocation().state;
-    const dispatch = useDispatch();
-    const { loadingDailyProcedure } = useSelector((state) => state.postDailyProcedureOrProcess);
-    const queryParams = new URLSearchParams(location.search);
-    const AdmNo = queryParams.get("AdmNo");
-
-    const handleOnFinish = async (values) => {
-        try {
-          
-          // Construct the visitor data
-          const visitorData = {
-            myAction: "create",
-            raceId: "",
-            processCode: "someid",
-            admissionNo: patientDetails?.CurrentAdmNo || AdmNo,
-            processDescription: 'Progress Notes',
-            remarks: values.remarks
-          }; 
-          // Dispatch function to handle API call and feedback
-          const dispatchDailyProcessData = async (data) => {
-            await dispatch(postDailyProcedureOrProcessSlice(data))
-              .then((result) => {
-                if (result.type === POST_DAILY_PROCEDURE_OR_PROCESS_SUCCESS) {
-                  message.success(`Daily Process added successfully!`);
-                  dispatch(getQyInpatientProcessProceduresSlice());
-                  setIsDailyProcessFormVisible(false);
-                } else if (result.type === POST_DAILY_PROCEDURE_OR_PROCESS_FAILURE) {
-                  message.error(result.payload.message || "Internal server error, please try again later.");
-                }
-              })
-              .then(() => {
-                form.resetFields();
-              })
-              .catch((err) => {
-                message.error(err.message || "Internal server error, please try again later.");
-              });
-          };
-      
-          // Call the function
-          await dispatchDailyProcessData(visitorData);
-      
-        } catch (error) {
-          message.error(error.message || "An unexpected error occurred.");
-        }
-      };
-
-
+const DailyProcessFormData = ({
+  setIsDailyProcessFormVisible,
+  form,
+  handleEditorChange,
+  editorState,
+  handleOnFinish,
+  loadingGetIpProcedure,
+}) => {
+  const location = useLocation();
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   return (
-    <>    
-        <Form
-            layout="vertical" 
-            style={{ paddingTop: '10px'}} 
-            form={form}
-            onFinish={handleOnFinish}
-            autoComplete="off"
-            initialValues={{
-                processDescription: '',
-                remarks: '',
+    <>
+      <Form
+        layout="vertical"
+        style={{ paddingTop: "10px" }}
+        form={form}
+        onFinish={handleOnFinish}
+        autoComplete="off"
+        initialValues={{
+          admissionNo: admissionNo,
+          remarks: "",
+        }}
+      >
+        <Form.Item
+          label="Progress Remarks"
+          name="remarks"
+          rules={[
+            {
+              required: true,
+              message: "Please enter the daily progress remarks!",
+            },
+          ]}
+        >
+          <Editor
+            editorState={editorState}
+            onEditorStateChange={handleEditorChange}
+            toolbar={{
+              options: ["inline", "blockType", "list", "textAlign", "history"],
             }}
+            editorStyle={{
+              border: "1px solid #f0f0f0",
+              padding: "5px",
+              minHeight: "200px",
+            }}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Space>
+            <Button
+              type="primary"
+              htmlType="submit"
+              icon={<SaveOutlined />}
+              loading={loadingGetIpProcedure}
+              disabled={
+                !editorState.getCurrentContent().hasText() ||
+                loadingGetIpProcedure
+              }
             >
-            {/* <Row gutter={[16, 16]}>
-                <Col span={24}>
-                    <Form.Item label="Progress Description" name="processDescription"
-                    rules={[{ required: true, message: 'Please select a time!' }]}
-                    hasFeedback
-                    >
-                    <Input type='text' placeholder="Progress description" 
-
-                    />
-                    </Form.Item>
-                </Col>
-            </Row> */}
-            <Row gutter={[16, 16]}>
-                <Col span={24}>
-                    <Form.Item label="Progress Remarks" name="remarks"
-                    >
-                    <TextArea type='text' placeholder="Enter progress remarks" autoSize={{ minRows: 10, maxRows: 25 }} />
-                    </Form.Item>
-                </Col>
-            </Row>
-            <Form.Item>
-                <Space>
-                    <Button type="primary" htmlType="submit" icon={<SaveOutlined />}
-                        loading={loadingDailyProcedure}
-                        disabled={loadingDailyProcedure}
-                    >
-                        Post Daily Progress
-                    </Button>
-                    <Button color="danger" variant="outlined" icon={<CloseOutlined />} onClick={() => setIsDailyProcessFormVisible(false)}
-                    >
-                        Cancel
-                    </Button>
-                </Space>
-                
-            </Form.Item>
-        </Form>
+              Post Daily Progress
+            </Button>
+            <Button
+              color="danger"
+              variant="outlined"
+              icon={<CloseOutlined />}
+              onClick={() => setIsDailyProcessFormVisible(false)}
+            >
+              Cancel
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
     </>
-  )
-}
+  );
+};
 
-export default DailyProcessFormData
+export default DailyProcessFormData;
 // props validation
 
 DailyProcessFormData.propTypes = {
-    setIsDailyProcessFormVisible: PropTypes.bool.isRequired,
+  setIsDailyProcessFormVisible: PropTypes.bool,
+  form: PropTypes.object,
+  handleEditorChange: PropTypes.func,
+  editorState: PropTypes.object,
+  handleOnFinish: PropTypes.func,
+  loadingGetIpProcedure: PropTypes.bool,
+  setLoadingDailyProcedure: PropTypes.func,
 };
