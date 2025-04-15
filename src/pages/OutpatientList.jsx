@@ -150,7 +150,7 @@ const OutpatientList = () => {
                   type="link"
                   icon={<EyeOutlined />}
                   onClick={() =>
-                    navigate(`/reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
+                    navigate(`/Reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`, {
                       state: { patientDet: record },
                     })
                   }
@@ -200,7 +200,7 @@ const OutpatientList = () => {
           type="primary"
           onClick={() => {
             if (role === "Reception") {
-              navigate("/reception/Patient-Registration");
+              navigate("/Reception/Patient-Registration");
             } else if (role === "Nurse") {
               navigate("/Nurse/Patient-Registration");
             }

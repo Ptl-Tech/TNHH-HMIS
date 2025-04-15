@@ -95,7 +95,7 @@ const ConvertedPatients = () => {
         );
         if (existingPatient) {
           message.success("Create new Appointment.", 5);
-          navigate(`/reception/Add-Appointment/${patientNo}`, {
+          navigate(`/Reception/Add-Appointment/${patientNo}`, {
             state: { existingPatient },
           });
         } else {
@@ -103,7 +103,7 @@ const ConvertedPatients = () => {
             "Patient not found. Please register the patient first.",
             5
           );
-          navigate(`/reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
+          navigate(`/Reception/Patient-Registration/Patient?PatientNo=${patientNo}`, {
             state: { visitorData: visitor },
           });
         }

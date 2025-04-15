@@ -290,13 +290,13 @@ const DischargeList = () => {
             >
               <DeliveredProcedureOutlined /> Release Bed
             </Button>
-            <Button
+            {/* <Button
               type="primary"
               disabled={!selectedRowKey}
               onClick={handlePostedConsumables}
             >
               <ExperimentOutlined /> Posted Consumables
-            </Button>
+            </Button> */}
           </Space>
         </div>
       </Card>

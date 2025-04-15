@@ -23,7 +23,7 @@ import LaboratoryEvaluationCard from '../pages/doctorsViews/tables/lab/Laborator
 
 const statuses = [
   { name: 'New', icon: <PlusCircleOutlined /> },
-  { name: 'Forwaded', icon: <SendOutlined /> },
+  { name: 'Forwarded', icon: <SendOutlined /> },
   {
     name: 'Review',
     icon: <QuestionCircleOutlined style={{ color: '#fff' }} />,

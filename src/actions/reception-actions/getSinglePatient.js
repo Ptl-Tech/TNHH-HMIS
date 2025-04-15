@@ -10,52 +10,55 @@ export const GET_SINGLE_PATIENT_REQUEST = 'GET_SINGLE_PATIENT_REQUEST';
 export const GET_SINGLE_PATIENT_SUCCESS = 'GET_SINGLE_PATIENT_SUCCESS';
 
 // Action to fetch single patient
-export const getSinglePatient = (patietNo) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: GET_SINGLE_PATIENT_REQUEST });
+export const getSinglePatient =
+  (parameterName, parameterValue) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: GET_SINGLE_PATIENT_REQUEST });
 
-    const {
-      otpVerify: { userInfo },
-    } = getState();
+      const {
+        otpVerify: { userInfo },
+      } = getState();
 
-    // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem('branchCode') || '';
+      // Ensure `branchCode` is correctly fetched from localStorage
+      const branchCode = localStorage.getItem('branchCode') || '';
 
-    // Set up the request configuration with headers
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo?.userData?.no || '',
-        sessionToken: userInfo?.userData?.portalSessionToken || '',
-        branchCode,
-      },
-    };
+      // Set up the request configuration with headers
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          staffNo: userInfo?.userData?.no || '',
+          sessionToken: userInfo?.userData?.portalSessionToken || '',
+          branchCode,
+        },
+      };
 
-    // API request
-    const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patietNo}'`,
-      config,
-    );
+      // API request
+      const { data } = await axios.get(
+        `${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=${parameterName} eq '${parameterValue}'`,
+        config,
+      );
 
-    console.log({ data });
+      console.log({ data });
 
-    // Dispatch success action with the fetched data
-    dispatch({
-      type: GET_SINGLE_PATIENT_SUCCESS,
-      payload: data,
-    });
-  } catch (error) {
-    // Extract and handle errors properly
-    const errorMessage =
-      error.response?.data?.message || error.message || 'An error occurred';
+      // Dispatch success action with the fetched data
+      dispatch({
+        type: GET_SINGLE_PATIENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      console.error({ error });
 
-    dispatch({
-      type: GET_SINGLE_PATIENT_FAIL,
-      payload: errorMessage,
-    });
+      // Extract and handle errors properly
+      const errorMessage =
+        error.response?.data?.message || error.message || 'An error occurred';
 
-    message.error(errorMessage, 5); // Display the error message to the user
+      dispatch({
+        type: GET_SINGLE_PATIENT_FAIL,
+        payload: errorMessage,
+      });
 
-    throw error; // Rethrow the error if needed
-  }
-};
+      message.error(errorMessage, 5); // Display the error message to the user
+
+      throw error; // Rethrow the error if needed
+    }
+  };

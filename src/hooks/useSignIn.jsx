@@ -64,7 +64,7 @@ const useSignIn = () => {
 
       const role = verifyOtpUserInfo?.userData.departmentName;
       if (role === 'Reception') {
-        navigate('/reception');
+        navigate('/Reception');
       } else if (role === 'Doctor') {
         navigate('/Doctor');
       } else if (role === 'Laboratory') {

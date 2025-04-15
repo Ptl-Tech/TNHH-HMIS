@@ -1,7 +1,7 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-import { Dropdown, Modal } from "antd";
-import { AiOutlineMore } from "react-icons/ai";
+import { Dropdown, Modal } from 'antd';
+import { AiOutlineMore } from 'react-icons/ai';
 
 const TestMenu = ({ record, handleEditRequest, handleForwardRequest }) => {
   const [modal, contextHolder] = Modal.useModal();
@@ -18,6 +18,13 @@ const TestMenu = ({ record, handleEditRequest, handleForwardRequest }) => {
       </>
     ),
   };
+
+  const chooseItems =
+    record.RequestType === 'LAB'
+      ? [1, 2]
+      : record.RequestType === 'PHARMACY'
+      ? [2]
+      : [];
 
   const items = [
     {
@@ -46,7 +53,11 @@ const TestMenu = ({ record, handleEditRequest, handleForwardRequest }) => {
 
   return (
     <Dropdown
-      menu={{ items }}
+      menu={{
+        items: items.filter((item) =>
+          chooseItems.find((choosableItem) => choosableItem == item.key),
+        ),
+      }}
       placement="bottomRight"
       arrow={{ pointAtCenter: true }}
     >

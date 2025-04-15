@@ -46,7 +46,7 @@ const user = userDetails.userData.departmentName
       width: 100,
       render: (_, record) => (
         <Button icon={<FilePdfOutlined />} onClick={() => handleOnClick(record)}>
-          Discharge summary
+          Encounter Summary
         </Button>
       ),
     },

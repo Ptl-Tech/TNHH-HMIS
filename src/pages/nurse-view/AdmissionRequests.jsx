@@ -1,218 +1,248 @@
-import { Button, Card, message, Modal, Space, Table, Typography } from "antd"
-import { ProfileOutlined, FileExclamationOutlined, PrinterOutlined, CheckSquareOutlined } from "@ant-design/icons"
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { getPgAdmissionsPendingVerificationSlice } from "../../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice";
-import { listDoctors } from "../../actions/DropdownListActions";
-import Loading from "../../partials/nurse-partials/Loading";
-import SearchFilters from "./SearchFilters";
-import { exportToExcel, printToPDF } from "../../utils/helpers";
-import { POST_VERIFY_ADMISSION_FAILURE, POST_VERIFY_ADMISSION_SUCCESS, postVerifyAdmissionSlice } from "../../actions/nurse-actions/postVerifyAdmissionSlice";
-import useSetTableCheckBoxHook from "../../hooks/useSetTableCheckBoxHook";
+import { Button, Card, message, Modal, Space, Table, Typography } from 'antd';
+import { ProfileOutlined, CheckSquareOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { getPgAdmissionsPendingVerificationSlice } from '../../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice';
+import { listDoctors } from '../../actions/DropdownListActions';
+import Loading from '../../partials/nurse-partials/Loading';
+import SearchFilters from './SearchFilters';
+import {
+  POST_VERIFY_ADMISSION_FAILURE,
+  POST_VERIFY_ADMISSION_SUCCESS,
+  postVerifyAdmissionSlice,
+} from '../../actions/nurse-actions/postVerifyAdmissionSlice';
+import useSetTableCheckBoxHook from '../../hooks/useSetTableCheckBoxHook';
 
 const AdmissionRequests = () => {
-
-const columns = [
+  const columns = [
     {
-        title: 'Admission No',
-        dataIndex: 'AdmissionNo',
-        key: 'AdmissionNo',
-        fixed: 'left',
-        width: 100
+      title: 'Admission No',
+      dataIndex: 'AdmissionNo',
+      key: 'AdmissionNo',
+      fixed: 'left',
+      width: 100,
     },
     {
-        title: 'Patient No',
-        dataIndex: 'PatientNo',
-        key: 'PatientNo',
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
     },
     {
-        title: 'Patient Names',
-        dataIndex: 'PatientName',
-        key: 'PatientName',
-        render: (_, record) => {
-            return <Typography.Text style={{ color: '#0f5689' }}>
-                {record.PatientName}
-            </Typography.Text>
-        }
+      title: 'Patient Names',
+      dataIndex: 'PatientName',
+      key: 'PatientName',
+      render: (_, record) => {
+        return (
+          <Typography.Text style={{ color: '#0f5689' }}>
+            {record.PatientName}
+          </Typography.Text>
+        );
+      },
     },
     {
-        title: 'Date',
-        dataIndex: 'AdmissionDate',
-        key: 'AdmissionDate',
-        //formatted date to dd/mm/yyyy
-        render: (_, record) => {
-            return record.AdmissionDate.toLocaleString('fa-IR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-    },
-    {
-        title: 'Doctor',
-        dataIndex: 'DoctorName',
-        key: 'DoctorName',
-       
-    },
-    {
-        title: 'Admission Remarks',
-        dataIndex: 'AdmissionReason',
-        key: 'AdmissionReason',
-        fixed: 'right',
-        width: 150
-    },
-];
-
-
-const { confirm } = Modal;
-
-const {loadingPendingAdmissionVerification, pendingAdmissionVerification} = useSelector(state => state.getPgAdmissionsPendingVerification);
-
-const { loading, data } = useSelector(state => state.getDoctorsList);
-const { selectedRow, selectedRowKey, rowSelection } = useSetTableCheckBoxHook();
-
-const dispatch = useDispatch();
-
-
-const formattedDoctorDetails = data.map(doctor => {
-    return {
-        DoctorID: doctor.DoctorID,
-        DoctorsName: doctor.DoctorsName,
-    }
-});
-
-const formattedList = pendingAdmissionVerification.map(discharge => {
-    const matchDoctorName = formattedDoctorDetails.find(doctor => doctor.DoctorID === discharge.Doctor);
-    return {
-        ...discharge,
-        DoctorName: matchDoctorName?.DoctorsName
-    }
-    
-});
-
-
-const [pagination, setPagination] = useState({
-            current: 1,
-            pageSize: 10,
-            total: formattedList?.length,
+      title: 'Date',
+      dataIndex: 'AdmissionDate',
+      key: 'AdmissionDate',
+      //formatted date to dd/mm/yyyy
+      render: (_, record) => {
+        return record.AdmissionDate.toLocaleString('fa-IR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
         });
-              
-    const handleTableChange = (newPagination) => {
-        setPagination(newPagination); // Update pagination settings
+      },
+    },
+    {
+      title: 'Doctor',
+      dataIndex: 'DoctorName',
+      key: 'DoctorName',
+    },
+    {
+      title: 'Admission Remarks',
+      dataIndex: 'AdmissionReason',
+      key: 'AdmissionReason',
+      fixed: 'right',
+      width: 150,
+    },
+  ];
+
+  const { confirm } = Modal;
+
+  const { loadingPendingAdmissionVerification, pendingAdmissionVerification } =
+    useSelector((state) => state.getPgAdmissionsPendingVerification);
+
+  const { loading, data } = useSelector((state) => state.getDoctorsList);
+  const { selectedRow, selectedRowKey, rowSelection } =
+    useSetTableCheckBoxHook();
+
+  const dispatch = useDispatch();
+
+  const formattedDoctorDetails = data?.map((doctor) => {
+    return {
+      DoctorID: doctor.DoctorID,
+      DoctorsName: doctor.DoctorsName,
     };
+  });
 
+  const formattedList = pendingAdmissionVerification.map((discharge) => {
+    const matchDoctorName = formattedDoctorDetails.find(
+      (doctor) => doctor.DoctorID === discharge.Doctor,
+    );
+    return {
+      ...discharge,
+      DoctorName: matchDoctorName?.DoctorsName,
+    };
+  });
 
-    const handleVerifyAdmission = () => {
-        confirm({
-            title: 'Confirm Verify Patient Admission',
-            content: `Are you sure you want to verify ${selectedRow[0]?.PatientName} admission ?`,
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk(){
-                return new Promise((resolve, reject) => {
-                    handleVerifyPatientAdmissionAction()
-                    .then(resolve) // Resolve the modal when successful
-                    .catch(reject); // Reject on failure
-                });
-            },
-        })
-    }
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: formattedList?.length,
+  });
 
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination); // Update pagination settings
+  };
 
-    const handleVerifyPatientAdmissionAction = async () => {
-        try {
-            const result = await dispatch(
-              postVerifyAdmissionSlice({
-                admissionNo: selectedRow[0]?.AdmissionNo,
-              })
-            );
-        
-            if (result.type === POST_VERIFY_ADMISSION_SUCCESS) {
-              message.success(
-                result.payload.message || `${selectedRow[0]?.PatientName} Admission request has been Verified Successfully!`,
-                5
+  const handleVerifyAdmission = () => {
+    confirm({
+      title: 'Confirm Verify Patient Admission',
+      content: `Are you sure you want to verify ${selectedRow[0]?.PatientName} admission ?`,
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk() {
+        return new Promise((resolve, reject) => {
+          handleVerifyPatientAdmissionAction()
+            .then(resolve) // Resolve the modal when successful
+            .catch(reject); // Reject on failure
+        });
+      },
+    });
+  };
 
-              );
-              dispatch(getPgAdmissionsPendingVerificationSlice());
-              return Promise.resolve(); // Resolve the Promise to close the modal
-            } else if (result.type === POST_VERIFY_ADMISSION_FAILURE) {
-              message.error(
-                result.payload.message || 'An error occurred while verifying patient admission, please try again.'
-              );
-              return Promise.reject(); // Reject the Promise to keep the modal open
-            }
-          } catch (error) {
-            message.error(error.message || 'Unexpected error occurred');
-            return Promise.reject(); // Reject on unexpected errors
-          }
-    }
+  const handleVerifyPatientAdmissionAction = async () => {
+    try {
+      const result = await dispatch(
+        postVerifyAdmissionSlice({
+          admissionNo: selectedRow[0]?.AdmissionNo,
+        }),
+      );
 
-
-useEffect(() => {
-    if(!pendingAdmissionVerification?.length){
+      if (result.type === POST_VERIFY_ADMISSION_SUCCESS) {
+        message.success(
+          result.payload.message ||
+            `${selectedRow[0]?.PatientName} Admission request has been Verified Successfully!`,
+          5,
+        );
         dispatch(getPgAdmissionsPendingVerificationSlice());
+        return Promise.resolve(); // Resolve the Promise to close the modal
+      } else if (result.type === POST_VERIFY_ADMISSION_FAILURE) {
+        message.error(
+          result.payload.message ||
+            'An error occurred while verifying patient admission, please try again.',
+        );
+        return Promise.reject(); // Reject the Promise to keep the modal open
+      }
+    } catch (error) {
+      message.error(error.message || 'Unexpected error occurred');
+      return Promise.reject(); // Reject on unexpected errors
     }
-}, [dispatch, pendingAdmissionVerification?.length]);
+  };
 
- useEffect(() => {
-        if(!data.length) {
-            dispatch(listDoctors());
-        }
-    }, [dispatch, data.length]);
+  useEffect(() => {
+    if (!pendingAdmissionVerification?.length) {
+      dispatch(getPgAdmissionsPendingVerificationSlice());
+    }
+  }, [dispatch, pendingAdmissionVerification?.length]);
+
+  useEffect(() => {
+    if (!data?.length) {
+      dispatch(listDoctors());
+    }
+  }, [dispatch, data?.length]);
 
   return (
     <div style={{ margin: '20px 10px 10px 10px' }}>
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '10px', position: 'relative'}}>
-            <ProfileOutlined />
-            <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px'}}>
-                Admission Requests
-            </Typography.Text>
-          </Space>
+      <Space
+        style={{
+          color: '#0f5689',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          paddingBottom: '10px',
+          position: 'relative',
+        }}
+      >
+        <ProfileOutlined />
+        <Typography.Text
+          style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px' }}
+        >
+          Admission Requests
+        </Typography.Text>
+      </Space>
 
-          <SearchFilters />
+      <SearchFilters />
 
-        <Card className="admit-patient-card-container">
+      <Card className="admit-patient-card-container">
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Space className="admit-patient-button-container">
-                <Button type="primary" disabled={!selectedRowKey} onClick={handleVerifyAdmission}><CheckSquareOutlined />
-                    Verify Patient Admission
-                </Button>
-            </Space>
-            {/* <Space className="admit-patient-button-container">
+          <Space className="admit-patient-button-container">
+            <Button
+              type="primary"
+              disabled={!selectedRowKey}
+              onClick={handleVerifyAdmission}
+            >
+              <CheckSquareOutlined />
+              Verify Patient Admission
+            </Button>
+          </Space>
+          {/* <Space className="admit-patient-button-container">
                 <Button type="primary" onClick={()=>exportToExcel(formattedList, 'Admission request success list', 'admission-request-success-list.xlsx')}><FileExclamationOutlined /> Export Excel</Button>
                 <Button type="primary" onClick={()=>printToPDF(formattedList, 'Admission request success list')}><PrinterOutlined /> Print PDF</Button>
             </Space> */}
         </div>
-        </Card>
+      </Card>
 
-
-          {
-              loadingPendingAdmissionVerification || loading ? (
-                    <Loading />
-                ) : (
-                    <Table 
-                    rowKey="SystemId"
-                    scroll={{ x: 'max-content' }}
-                    rowSelection={rowSelection}
-                    columns={columns} 
-                    dataSource={formattedList} 
-                    className="admit-patient-table"
-                    bordered size='middle' 
-                    pagination={{
-                    ...pagination,
-                    total: formattedList?.length,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    position: ['bottom', 'right'],
-                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                    onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
-                    onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
-                    style: {
-                        marginTop: '30px',
-                    }
-                    }}
-                />
-              )
-          }
+      {loadingPendingAdmissionVerification || loading ? (
+        <Loading />
+      ) : (
+        <Table
+          rowKey="SystemId"
+          scroll={{ x: 'max-content' }}
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={formattedList}
+          className="admit-patient-table"
+          bordered
+          size="middle"
+          pagination={{
+            ...pagination,
+            total: formattedList?.length,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ['bottom', 'right'],
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) =>
+              handleTableChange({
+                current: page,
+                pageSize,
+                total: pagination.total,
+              }),
+            onShowSizeChange: (current, size) =>
+              handleTableChange({
+                current,
+                pageSize: size,
+                total: pagination.total,
+              }),
+            style: {
+              marginTop: '30px',
+            },
+          }}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default AdmissionRequests
+export default AdmissionRequests;

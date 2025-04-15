@@ -173,7 +173,7 @@ import { postPatientDoctorAdmissionReducer } from "./nurse-reducers/postPatientD
 import { postRequestPatientAdmissionReducer } from "./nurse-reducers/postRequestPatientAdmissionReducer";
 import { getPgAdmissionsVerifiedReducer } from "./nurse-reducers/getPgAdmissionsVerifiedReducer";
 import { getPgInpatientDischargeRequestsReducer } from "./nurse-reducers/getPgInpatientDischargeRequestsReducer";
-import { getPgInpatientDischargeListReducer } from "./nurse-reducers/getPgInpatientDischargeListReducer";
+import { getPgInpatientDischargeListReducer, getQyAdmissionsDischargedListReducer } from "./nurse-reducers/getPgInpatientDischargeListReducer";
 import { getPgOpenPatientConsumablesReducer } from "./nurse-reducers/getPgOpenPatientConsumablesReducer";
 import { postInitiateDischargeReducer } from "./nurse-reducers/postInitiateDischargeReducer";
 import { postPostDischargeReducer } from "./nurse-reducers/postPostDischargeReducer";
@@ -370,6 +370,7 @@ export const rootReducer = combineReducers({
   getItemUnits: getItemUnitsOfMeasureReducer,
   postDressings: postDressingsReducer,
   getDressing: getDressingReducer,
+  getInpatientPastEncounters: getQyAdmissionsDischargedListReducer,
   dispatchToDoctor: postDispatchToDoctorReducer,
   checkInPatient: postCheckInPatientReducer,
   appmntList: appmntListReducer,

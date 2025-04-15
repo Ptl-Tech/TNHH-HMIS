@@ -163,7 +163,6 @@ const LaboratoryDispatchDrawer = ({
   ];
 
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log({ newSelectedRowKeys });
     setSelectedRowKeys(newSelectedRowKeys);
   };
 

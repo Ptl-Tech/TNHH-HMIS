@@ -25,7 +25,6 @@ const InpatientMedication = () => {
     (state) => state.getInPatientPrescriptionLine
   );
 
-  console.log('prescriptions', prescriptions)
   const role = useAuth().userData.departmentName;
 
   const { loading: pharmacyPosting } = useSelector(

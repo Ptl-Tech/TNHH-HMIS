@@ -10,6 +10,7 @@ import {
   Select,
   Table,
   message,
+  DatePicker,
 } from "antd";
 import { IoCloseOutline } from "react-icons/io5";
 import { FaEdit, FaTrashAlt } from "react-icons/fa"; // For Edit and Delete icons
@@ -19,10 +20,11 @@ import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
 import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
 import ProcessPayment from "./ProcessPayment";
+import moment from "moment";
 
 const { Text } = Typography;
 
-const AddCharges = ({
+const InPatientsAddCharges = ({
   visible,
   onClose,
   myAction,
@@ -197,7 +199,7 @@ const AddCharges = ({
     >
       <Form form={form} layout="vertical" onFinish={handleAddCharge}>
         <Row gutter={16}>
-          <Col span={6}>
+          <Col span={12}>
             <Form.Item
               label="Service Name"
               name="transactionType"
@@ -221,7 +223,7 @@ const AddCharges = ({
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={12}>
             <Form.Item
               label="Charge Name"
               name="charge"
@@ -242,7 +244,19 @@ const AddCharges = ({
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6}>
+        </Row>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="Date"
+              name="creationDate"
+              rules={[{ required: true, message: "Please enter date!" }]}
+              width={"100%"}
+            >
+              <DatePicker size="large"  style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
             <Form.Item
               label="Quantity"
               name="quantity"
@@ -257,7 +271,7 @@ const AddCharges = ({
             </Form.Item>
           </Col>
 
-          <Col span={6}>
+          <Col span={8}>
             <Form.Item label="Amount">
               <Input size="large" type="number" value={amount} readOnly />
             </Form.Item>
@@ -286,4 +300,4 @@ const AddCharges = ({
   );
 };
 
-export default AddCharges;
+export default InPatientsAddCharges;

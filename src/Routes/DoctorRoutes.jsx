@@ -3,12 +3,13 @@ import { Route } from 'react-router-dom';
 import {
   AppstoreOutlined,
   CalendarOutlined,
-  TeamOutlined,
-  UserSwitchOutlined,
+  ExperimentOutlined,
+  FileAddOutlined,
   HistoryOutlined,
   MedicineBoxOutlined,
-  ExperimentOutlined,
   RadarChartOutlined,
+  TeamOutlined,
+  UserSwitchOutlined,
 } from '@ant-design/icons';
 import { FaUserFriends } from 'react-icons/fa';
 
@@ -17,8 +18,8 @@ import MainLayout from '../Layouts/MainLayout';
 import PrivateRoute from '../private/PrivateRoute';
 import Inpatient from '../pages/nurse-view/Inpatient';
 import ReadDoctorNotes from '../pages/ReadDoctorNotes';
-import DoctorVisits from '../pages/doctorsViews/DoctorVisits';
 import TreatmentCard from '../pages/nurse-view/TreatmentCard';
+import DoctorVisits from '../pages/doctorsViews/DoctorVisits';
 import InpatientCard from '../pages/nurse-view/InpatientCard';
 import DischargeList from '../pages/nurse-view/DischargeList';
 import ReadNurseNotes from '../pages/nurse-view/ReadNurseNotes';
@@ -27,6 +28,7 @@ import PastDoctorVisit from '../pages/nurse-view/PastDoctorVisit';
 import DoctorDashboard from '../pages/doctorsViews/DoctorDashboard';
 import EncounterSummery from '../pages/doctorsViews/EncounterSummery';
 import DischargeRequests from '../pages/nurse-view/DischargeRequests';
+import PhamarcyDashboard from '../pages/pharmacy-views/PhamarcyDashboard';
 import CloseList from '../pages/doctorsViews/tables/ClosedDocctorVisits';
 import PharmacyInpatient from '../pages/pharmacy-views/PharmacyInpatient';
 import PharmacyOutpatient from '../pages/pharmacy-views/PharmacyOutpatient';
@@ -36,40 +38,61 @@ import PharmacyListReturnLines from '../pages/pharmacy-views/PharmacyListReturnL
 import AdmittedPatients from '../pages/doctorsViews/DocAdmission-views/AdmittedPatients';
 import DoctorAdmissions from '../pages/doctorsViews/DocAdmission-views/DoctorAdmissions';
 import VerifiedAdmission from '../pages/doctorsViews/DocAdmission-views/VerifiedAdmission';
-import RadiologyOutPatient from '../pages/doctorsViews/tables/Radiology/RadiologyOutPatient';
 import ConsultationRoomPatients from '../pages/doctorsViews/tables/ConsultationRoomPatients';
+import RadiologyOutPatient from '../pages/doctorsViews/tables/Radiology/RadiologyOutPatient';
 import ConsultationRoomEvalutionCard from '../pages/doctorsViews/ConsultationRoomEvalutionCard';
 
-export const psychologyRoutes = (role) => [
+export const doctorRoutes = (role) => [
   {
-    key: '/Psychology',
+    key: '/Doctor',
     icon: <AppstoreOutlined style={{ color: '#fff' }} />,
     label: 'Dashboard',
   },
-
   {
     key: 'patient-list',
     icon: <FaUserFriends style={{ color: '#fff' }} />,
     label: 'Patients',
     children: [
       {
-        key: '/Psychology/Consultation-List',
+        key: '/Doctor/Consultation-List',
         label: 'OutPatients',
         icon: <TeamOutlined style={{ color: '#fff' }} />,
       },
-      ...(role === 'Psychology'
+      ...(role === 'Doctor'
         ? [
             {
-              key: '/Psychology/Inpatient',
+              key: '/Doctor/Inpatient',
               label: 'In-Patient List',
               icon: <UserSwitchOutlined style={{ color: '#fff' }} />,
+            },
+            {
+              key: '/Doctor/Admissions',
+              label: 'Admissions',
+              icon: <FileAddOutlined style={{ color: '#fff' }} />,
             },
           ]
         : []),
       {
-        key: '/Psychology/Past-doctor-visit',
+        key: '/Doctor/Past-doctor-visit',
         label: 'Past Doctor Visits',
         icon: <HistoryOutlined style={{ color: '#fff' }} />,
+      },
+    ],
+  },
+  {
+    key: '/doctor/discharge',
+    icon: <MedicineBoxOutlined style={{ color: '#fff' }} />,
+    label: 'Discharge List',
+    children: [
+      {
+        key: '/Doctor/Discharge-requests',
+        label: 'Discharge Requests',
+        icon: <CalendarOutlined style={{ color: '#fff' }} />,
+      },
+      {
+        key: '/Doctor/Discharge-list',
+        label: 'Discharges List',
+        icon: <CalendarOutlined style={{ color: '#fff' }} />,
       },
     ],
   },
@@ -81,21 +104,20 @@ export const psychologyRoutes = (role) => [
           label: 'Radiology',
           children: [
             {
-              key: '/Psychology/Radiology-Patients',
+              key: '/Doctor/Radiology-Patients',
               label: 'Radiology List OutPatient',
               icon: <CalendarOutlined style={{ color: '#fff' }} />,
             },
           ],
         },
-
         {
           key: '/doctor/lab',
           icon: <ExperimentOutlined style={{ color: '#fff' }} />,
           label: 'Lab',
           children: [
             {
-              key: '/Psychology/Lab-Patients',
-              label: 'Labortory OutPatient',
+              key: '/Doctor/Lab-Patients',
+              label: 'Laoratory OutPatient',
               icon: <CalendarOutlined style={{ color: '#fff' }} />,
             },
           ],
@@ -106,23 +128,28 @@ export const psychologyRoutes = (role) => [
           label: 'Pharmacy',
           children: [
             {
-              key: '/Psychology/Pharmacy-OutPatient',
+              key: '/Doctor/Pharmacy-Dashboard',
+              label: 'Dashboard',
+              icon: <AppstoreOutlined style={{ color: '#fff' }} />,
+            },
+            {
+              key: '/Doctor/Pharmacy-OutPatient',
               label: 'Pharmacy List OutPatient',
               icon: <CalendarOutlined style={{ color: '#fff' }} />,
             },
             {
-              key: '/Psychology/Pharmacy-Inpatient',
+              key: '/Doctor/Pharmacy-Inpatient',
               label: 'Pharmacy List InPatient',
               icon: <CalendarOutlined style={{ color: '#fff' }} />,
             },
 
             {
-              key: '/Psychology/Pharmacy-Returns',
+              key: '/Doctor/Pharmacy-Returns',
               label: 'Pharmacy List Returns',
               icon: <CalendarOutlined style={{ color: '#fff' }} />,
             },
             {
-              key: '/Psychology/Pharmacy-History',
+              key: '/Doctor/Pharmacy-History',
               label: 'Pharmacy History',
               icon: <HistoryOutlined style={{ color: '#fff' }} />,
             },
@@ -132,11 +159,11 @@ export const psychologyRoutes = (role) => [
     : []),
 ];
 
-export default function PsychologyRoutes() {
+export default function DoctorRoutes() {
   return (
-    <Route element={<PrivateRoute allowedDepartments={['Psychology']} />}>
+    <Route element={<PrivateRoute allowedDepartments={['Doctor']} />}>
       <Route
-        path="/Psychology"
+        path="/Doctor"
         element={<MainLayout />}
       >
         <Route
@@ -144,97 +171,106 @@ export default function PsychologyRoutes() {
           element={<DoctorDashboard />}
         />
         <Route
-          path="/Psychology/Consultation-List"
+          path="/Doctor/Consultation-List"
           element={<DoctorVisits />}
         />
         <Route
-          path="/Psychology/ClosedConsultationList"
+          path="/Doctor/ClosedConsultationList"
           element={<CloseList />}
         />
         <Route
-          path="/Psychology/PendingConsultationList"
+          path="/Doctor/PendingConsultationList"
           element={<ConsultationRoomPatients />}
         />
 
         <Route
-          path="/Psychology/Consultation-List/Patient"
+          path="/Doctor/Consultation-List/Patient"
           element={<ConsultationRoomEvalutionCard />}
         />
         <Route
-          path="/Psychology/Inpatient"
+          path="/Doctor/Inpatient"
           element={<Inpatient />}
         />
         <Route
-          path="/Psychology/Inpatient/Patient-card"
+          path="/Doctor/Inpatient/Patient-card"
           element={<InpatientCard />}
         />
         <Route
-          path="/Psychology/Admissions"
+          path="/Doctor/Admissions"
           element={<DoctorAdmissions />}
         />
         <Route
-          path="/Psychology/Discharge-list"
+          path="/Doctor/Discharge-list"
           element={<DischargeList />}
         />
         <Route
-          path="/Psychology/Discharge-requests"
+          path="/Doctor/Discharge-requests"
           element={<DischargeRequests />}
         />
         <Route
-          path="/Psychology/Past-doctor-visit"
+          path="/Doctor/Past-doctor-visit"
           element={<PastDoctorVisit />}
         />
         <Route
-          path="/Psychology/Consultation-List/Encounter"
-          element={<EncounterSummery />}
-        />
-        <Route
-          path="/Psychology/Past-doctor-visit/Patient"
+          path="/Doctor/Past-doctor-visit/Patient"
           element={<TreatmentCard />}
         />
         <Route
-          path="/Psychology/Inpatient/Read-nurse-notes"
-          element={<ReadNurseNotes />}
-        />
-        <Route
-          path="/Psychology/Past-doctor-visit/Encounter"
+          path="/Doctor/Past-doctor-visit/Encounter"
           element={<EncounterSummeryDetails />}
         />
         <Route
-          path="/Psychology/Radiology-Patients"
-          element={<RadiologyOutPatient />}
+          path="/Doctor/Inpatient/Read-nurse-notes"
+          element={<ReadNurseNotes />}
         />
         <Route
-          path="/Psychology/Approved-Admissions"
+          path="/Doctor/Past-doctor-visit/Patient"
+          element={<TreatmentCard />}
+        />
+        <Route
+          path="/Doctor/Radiology-Patients"
+          element={<RadiologyOutPatient />}
+        />
+
+        <Route
+          path="/Doctor/Approved-Admissions"
           element={<VerifiedAdmission />}
         />
         <Route
-          path="/Psychology/Admitted-Patients"
+          path="/Doctor/Admitted-Patients"
           element={<AdmittedPatients />}
         />
         <Route
-          path="/Psychology/Pharmacy-OutPatient"
+          path="/Doctor/Pharmacy-Dashboard"
+          element={<PhamarcyDashboard />}
+        />
+        <Route
+          path="/Doctor/Pharmacy-OutPatient"
           element={<PharmacyOutpatient />}
         />
         <Route
-          path="/Psychology/Pharmacy-Inpatient"
+          path="/Doctor/Pharmacy-Inpatient"
           element={<PharmacyInpatient />}
         />
         <Route
-          path="/Psychology/Pharmacy-Card"
+          path="/Doctor/Pharmacy-Card"
           element={<PharmacyCard />}
         />
         <Route
-          path="/Psychology/Pharmacy-Returns"
+          path="/Doctor/Pharmacy-Returns"
           element={<PharmacyListReturnLines />}
         />
         <Route
-          path="/Psychology/Pharmacy-History"
+          path="/Doctor/Pharmacy-History"
           element={<PharmacyHistoryList />}
         />
         <Route
-          path="/Psychology/Consultation/Read-Doctor-Dotes"
+          path="/Doctor/Consultation/Read-Doctor-Dotes"
           element={<ReadDoctorNotes />}
+        />
+        <Route
+          path="/Doctor/Consultation-List/Encounter"
+          element={<EncounterSummery />}
         />
         <Route
           path="view-profile"

@@ -21,7 +21,7 @@ const Signout = () => {
       navigate('/login'); // Navigate to login page
     } else if (e.key === 'view-profile' && userDetails) {
      
-      navigate('/reception/view-profile');
+      navigate('/Reception/view-profile');
     }
   };
 

@@ -38,7 +38,7 @@ export const saveKinsInformation = (formData, navigate) => async (dispatch, getS
     };
 
     const response = await axios.post(
-      `${API}Reception/PatientRegistration`,
+      `${API}reception/PatientRegistration`,
       formattedData,
       config
     );
