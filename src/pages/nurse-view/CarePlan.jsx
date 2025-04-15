@@ -38,9 +38,6 @@ const CarePlan = () => {
       case "Vitals":
         setSelectedItem(<Vitals />);
         break;
-      case "Nursing Rounds":
-        setSelectedItem(<DailyProcess />);
-        break;
       case "Diagnosis":
         setSelectedItem(<Diagnosis />);
         break;
@@ -88,7 +85,7 @@ const CarePlan = () => {
   const menuItems = [
     { label: "Allergies and Medications", icon: <FileOutlined /> },
     { label: "Vitals", icon: <FileMarkdownOutlined /> },
-    ...(role === "Doctor"
+    ...(role === "Doctor" || role === "Nurse"
       ? [{ label: "Daily Ward Rounds", icon: <FileOutlined /> }]
       : []),
     { label: "Diagnosis", icon: <MedicineBoxOutlined /> },
