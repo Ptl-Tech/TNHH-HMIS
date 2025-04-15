@@ -264,10 +264,10 @@ const InvoicePatient = () => {
           <div className="col-12 col-md-4">
             <Card className="shadow-sm p-3">
               <div className="d-flex flex-column gap-2">
-                <div className="d-flex justify-content-between">
+                {/* <div className="d-flex justify-content-between">
                   <p className="fw-bold">Total Amount:</p>
                   <p>KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}</p>
-                </div>
+                </div> */}
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Total Paid:</p>
                   <p className="text-success fw-bold">
@@ -277,10 +277,10 @@ const InvoicePatient = () => {
                       : "0.00"}
                   </p>{" "}
                 </div>
-                <div className="d-flex justify-content-between">
+                {/* <div className="d-flex justify-content-between">
                   <p className="fw-bold">Discount:</p>
                   <p>KSh {data?.Discount?.toFixed(2) || "0.00"}</p>
-                </div>
+                </div> */}
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Balance:</p>
                   <p className="text-danger">

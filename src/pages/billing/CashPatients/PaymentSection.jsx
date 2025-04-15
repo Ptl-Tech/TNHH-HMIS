@@ -5,6 +5,7 @@ import moment from "moment";
 import { useLocation } from "react-router-dom";
 import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
+import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 
 const PaymentSection = ({ patientNo }) => {
   const [form] = Form.useForm();
@@ -18,6 +19,7 @@ const[paymentSavingLoading, setPaymentSavingLoading] = useState(null);
     (state) => state.savePayment
   );
   const { data: receiptLines } = useSelector((state) => state.getReceiptLines);
+  const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
 
   const handleSavePayment = async (values) => {
    try {
@@ -42,7 +44,7 @@ setPaymentSavingLoading(true)
     await dispatch(postReceiptHeader(payload));
     setPaymentSavingLoading(false)
     message.success("Payment saved successfully", 5);
-    dispatch(getReceiptLines(activeVisitNo));
+    dispatch(getReceiptPage(activeVisitNo));
    } catch (error) {
     setPaymentSavingLoading(false);
     message.error("Failed to save payment");

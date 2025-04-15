@@ -1,29 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Typography, Table, Spin, Alert, Button, Modal } from "antd";
-import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import {
+  Typography,
+  Table,
+  Spin,
+  Alert,
+  Button,
+  Modal,
+  Tabs,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
+
 import AddChargesDrawer from "./AddChargesDrawer";
+import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { deletePatientCharges } from "../../../actions/Charges-Actions/deleteCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
-import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 
 const { confirm } = Modal;
+const { TabPane } = Tabs;
 
 const PatientCharges = ({ activeVisitNo }) => {
   const dispatch = useDispatch();
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
- const { loading: deleteLoading } = useSelector(
+  const { loading: deleteLoading } = useSelector(
     (state) => state.deletePatientCharges
   );
-    const {
-      loading: patientBillLoading,
-      error: patientBillError,
-      data: patientBillData,
-    } = useSelector((state) => state.getSingleBill);
-  
+
   const [visible, setVisible] = useState(false);
   const [editingCharge, setEditingCharge] = useState(null);
 
@@ -31,20 +39,17 @@ const PatientCharges = ({ activeVisitNo }) => {
     if (activeVisitNo) {
       dispatch(getPatientCharges(activeVisitNo));
     } else {
-      // Clear or reset data when activeVisitNo is empty
-      dispatch({ type: 'CLEAR_PATIENT_CHARGES' });  // Assuming you have a Redux action for clearing data
+      dispatch({ type: "CLEAR_PATIENT_CHARGES" });
     }
   }, [dispatch, activeVisitNo]);
-  
-  // Handle Add Charge
+
   const handleAddChargeView = () => {
-    setEditingCharge(null); // Ensure the form is empty for new entries
+    setEditingCharge(null);
     setVisible(true);
   };
 
-  // Handle Edit Charge
   const handleEditCharge = (record) => {
-    setEditingCharge(record); // Pass selected row data to drawer
+    setEditingCharge(record);
     setVisible(true);
   };
 
@@ -52,13 +57,13 @@ const PatientCharges = ({ activeVisitNo }) => {
     const payload = {
       myAction: "delete",
       recId: record.SystemId,
-      visitNo: activeVisitNo,  // Ensure visitNo is correctly passed
+      visitNo: activeVisitNo,
       transactionType: record.Transaction_Type,
       charge: record.Code,
       quantity: 0,
       remarks: "Deleted charge",
     };
-  
+
     confirm({
       title: "Are you sure you want to delete this charge?",
       icon: <ExclamationCircleOutlined />,
@@ -68,12 +73,10 @@ const PatientCharges = ({ activeVisitNo }) => {
       cancelText: "No",
       onOk: async () => {
         try {
-          console.log("Deleting charge:", record);
           const status = await dispatch(deletePatientCharges(payload));
-  
           if (status) {
-            await dispatch(getPatientCharges(activeVisitNo)); // Refresh charges
-            await dispatch(getSinglePatientBill(activeVisitNo)); // Refresh bill balance
+            await dispatch(getPatientCharges(activeVisitNo));
+            await dispatch(getSinglePatientBill(activeVisitNo));
           }
         } catch (error) {
           console.error("Error deleting charge:", error);
@@ -82,8 +85,13 @@ const PatientCharges = ({ activeVisitNo }) => {
       loading: deleteLoading,
     });
   };
-  const filteredData = activeVisitNo && data ? data.filter(item => item.Transaction_Type !== "ZRECEIPT") : [];
- 
+
+  const filteredData = activeVisitNo && data
+    ? data.filter(item => item.Transaction_Type !== "ZRECEIPT")
+    : [];
+
+  const pendingCharges = filteredData.filter(charge => !charge.Posted);
+  const postedCharges = filteredData.filter(charge => charge.Posted);
 
   const columns = [
     {
@@ -107,7 +115,6 @@ const PatientCharges = ({ activeVisitNo }) => {
       key: "Total_Amount",
       render: (amount) => `KES ${amount.toFixed(2)}`,
     },
-
     {
       title: "Amount Paid",
       dataIndex: "Amount_Paid",
@@ -115,25 +122,15 @@ const PatientCharges = ({ activeVisitNo }) => {
       render: (amount) => `KES ${amount.toFixed(2)}`,
     },
     {
-        title: "Status",
-        dataIndex: "Posted",
-        key: "Posted",
-        render: (posted) => (
-          <span
-            style={{
-              padding: "5px 10px",
-              borderRadius: "5px",
-              fontWeight: "bold",
-              color: posted ? "#52c41a" : "#ff4d4f",
-              background: posted ? "none" : "none",
-              border: posted ? "none" : "none",
-            }}
-          >
-            {posted ? "Posted" : "Pending"}
-          </span>
-        ),
-      },
-      
+      title: "Status",
+      dataIndex: "Posted",
+      key: "Posted",
+      render: (posted) => (
+        <span style={{ fontWeight: "bold", color: posted ? "#52c41a" : "#ff4d4f" }}>
+          {posted ? "Posted" : "Pending"}
+        </span>
+      ),
+    },
     {
       title: "Action",
       key: "action",
@@ -145,6 +142,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             icon={<EditOutlined />}
             style={{ marginRight: 8 }}
             onClick={() => handleEditCharge(record)}
+            disabled={record.Posted}
           >
             Edit
           </Button>
@@ -153,6 +151,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             size="small"
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteCharge(record)}
+            disabled={record.Posted}
           >
             Delete
           </Button>
@@ -161,57 +160,87 @@ const PatientCharges = ({ activeVisitNo }) => {
     },
   ];
 
+  const renderTable = (dataSource) => {
+    const isPosted = dataSource.every(charge => charge.Posted);
+  
+    const dynamicColumns = columns.filter(col => col.key !== "action");
+  
+    const columnsToRender = isPosted ? dynamicColumns : columns;
+  
+    return (
+      <Table
+        bordered
+        style={{ marginTop: "10px", borderRadius: "8px" }}
+        columns={columnsToRender}
+        dataSource={dataSource}
+        size="small"
+        pagination={{ pageSize: 5 }}
+        rowKey="SystemId"
+      />
+    );
+  };
+  
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
-       <div className="d-flex flex-column">
-       <Typography.Text
-          strong
-          underline
-          style={{ fontSize: "18px", color: "#0f5689", marginBottom: "12px" }}
+        <div className="d-flex flex-column">
+          <Typography.Text
+            strong
+            underline
+            style={{ fontSize: "18px", color: "#0f5689", marginBottom: "12px" }}
+          >
+            Line Items
+          </Typography.Text>
+          <span style={{ fontSize: "14px", color: "#888", fontStyle: "italic" }}>
+            Items to be billed
+          </span>
+        </div>
+        <Button
+          type="primary"
+          onClick={handleAddChargeView}
+          disabled={!activeVisitNo}
         >
-          Line Items
-        </Typography.Text>
-        <span style={{ fontSize: "14px", color: "#888", fontStyle: "italic" }}>Items to billed</span>
-
-       </div>
-        <Button type="primary" onClick={handleAddChargeView} disabled={!activeVisitNo}>
           Add Charge
         </Button>
       </div>
 
-      <div>
-        {loading ? (
-          <Spin size="large" style={{ display: "block", margin: "20px auto" }} />
-        ) : error ? (
-          <Alert
-            message="Error loading patient charges"
-            description={error}
-            type="error"
-            showIcon
-          />
-        ) : !activeVisitNo || filteredData?.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888" }}>
-            No billing records found.
-          </p>
-        ) : (
-          <Table
-            bordered
-            style={{ marginTop: "10px", borderRadius: "8px" }}
-            columns={columns}
-            dataSource={filteredData}
-            size="small"
-            pagination={{ pageSize: 5 }}
-          />
-        )}
-      </div>
+      {loading ? (
+        <Spin size="large" style={{ display: "block", margin: "20px auto" }} />
+      ) : error ? (
+        <Alert
+          message="Error loading patient charges"
+          description={error}
+          type="error"
+          showIcon
+        />
+      ) : (
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Pending Charges" key="1">
+            {pendingCharges.length === 0 ? (
+              <p style={{ textAlign: "center", color: "#888" }}>
+                No pending charges.
+              </p>
+            ) : (
+              renderTable(pendingCharges)
+            )}
+          </TabPane>
+          <TabPane tab="Posted Charges" key="2">
+            {postedCharges.length === 0 ? (
+              <p style={{ textAlign: "center", color: "#888" }}>
+                No posted charges.
+              </p>
+            ) : (
+              renderTable(postedCharges)
+            )}
+          </TabPane>
+        </Tabs>
+      )}
 
-      {/* Drawer for Adding & Editing Charges */}
       <AddChargesDrawer
         visible={visible}
         onClose={() => setVisible(false)}
         activeVisitNo={activeVisitNo || ""}
-        editingCharge={editingCharge} // Pass selected charge for editing
+        editingCharge={editingCharge}
       />
     </div>
   );

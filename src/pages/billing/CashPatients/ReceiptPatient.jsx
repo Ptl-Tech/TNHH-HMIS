@@ -36,6 +36,8 @@ const ReceiptPatient = () => {
   const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
     (state) => state.getReceiptLines
   );
+  const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
+
   const {
     loading: postReceiptLoading,
     error: postReceiptError,
@@ -55,8 +57,7 @@ const ReceiptPatient = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
- 
-  
+
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
@@ -254,28 +255,36 @@ const ReceiptPatient = () => {
               <div className="d-flex flex-column gap-2">
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Total Amount:</p>
-                  <p>KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}</p>
+                  <p>
+                    KSh{" "}
+                    {Array.isArray(receiptHeader) && receiptHeader.length > 0
+                      ? receiptHeader[
+                          receiptHeader.length - 1
+                        ]?.Total_Amount?.toFixed(2) || "0.00"
+                      : "0.00"}
+                  </p>
                 </div>
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Total Paid:</p>
                   <p className="text-success fw-bold">
                     KSh{" "}
-                    {Array.isArray(receiptLines) && receiptLines.length > 0
-                      ? receiptLines[receiptLines.length - 1]?.Amount?.toFixed(
-                          2
-                        ) || "0.00"
+                    {Array.isArray(receiptHeader) && receiptHeader.length > 0
+                      ? receiptHeader[
+                          receiptHeader.length - 1
+                        ]?.Amount_Recieved?.toFixed(2) || "0.00"
                       : "0.00"}
                   </p>
                 </div>
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Discount:</p>
-                  <p>KSh {data?.Discount?.toFixed(2) || "0.00"}</p>
+                  <p>KSh {patientBillData?.Discount?.toFixed(2) || "0.00"}</p>
                 </div>
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Balance:</p>
                   <p className="text-danger">
-                    KSh {data?.Balance?.toFixed(2) || "0.00"}
+                    KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
                   </p>
+
                 </div>
               </div>
 
@@ -303,11 +312,11 @@ const ReceiptPatient = () => {
                 onClose={handleCancel}
               />
               <SplitPayments
-              receiptNo={
-                Array.isArray(receiptLines) && receiptLines.length > 0
-                  ? receiptLines[receiptLines.length - 1].No
-                  : "N/A"
-              }
+                receiptNo={
+                  Array.isArray(receiptLines) && receiptLines.length > 0
+                    ? receiptLines[receiptLines.length - 1].No
+                    : "N/A"
+                }
                 open={splitAmountModal}
                 onCancel={handleCancel}
                 activeVisitNo={activeVisitNo || ""}

@@ -233,23 +233,7 @@ const CreateVisitDrawer = ({
       onClose={onClose}
       open={visible}
       maskClosable={false}
-      footer={
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button onClick={onClose}  size="large" block>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            type="primary"
-            size="large"
-            block
-            disabled={visitLoading}
-            loading={visitLoading}
-          >
-            Save Visit
-          </Button>
-        </div>
-      }
+      footer={null}
     >
       <Form
         form={form}
@@ -344,7 +328,21 @@ const CreateVisitDrawer = ({
             </Form.Item>
           </>
         )}
-
+ <div style={{ display: "flex", justifyContent: "space-between", marginBottom:"26px" }}>
+          <Button onClick={onClose}  size="large" block>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            type="primary"
+            size="large"
+            block
+            disabled={visitLoading}
+            loading={visitLoading}
+          >
+            Save Visit
+          </Button>
+        </div>
       </Form>
     </Drawer>
   );
