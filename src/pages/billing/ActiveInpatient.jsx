@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import InpatientCash from "./InpatientCash";
 import InpatientCorporate from "./InpatientCorporate";
 
-const ActiveOutPatients = () => {
+const ActiveInpatient = () => {
   const [activeComponent, setActiveComponent] = useState("cash");
 
   return (
@@ -50,4 +50,4 @@ const ActiveOutPatients = () => {
   );
 };
 
-export default ActiveOutPatients;
+export default ActiveInpatient;
