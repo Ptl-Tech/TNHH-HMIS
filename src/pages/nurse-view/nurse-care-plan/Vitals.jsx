@@ -13,6 +13,7 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { getSinglePatientAllVitalsLines } from "../../../actions/triage-actions/getVitalsLinesSlice";
+import useAuth from "../../../hooks/useAuth";
 
 const Vitals = () => {
   const [form] = Form.useForm();
@@ -24,6 +25,7 @@ const Vitals = () => {
   const queryParams = new URLSearchParams(location.search);
   const AdmNo = queryParams.get("AdmNo");
   const PatientNo = queryParams.get("PatientNo");
+  const role = useAuth().userData.departmentName;
 
   const { loading: loadingInpatientVitals, data: filterInpatientVitals } =
     useSelector((state) => state.getPatientVitals);
@@ -68,14 +70,12 @@ const Vitals = () => {
         title="Inpatient Vitals"
       />
 
-      {!isVitalFormVisible && (
+      {!isVitalFormVisible && role === "Nurse" && role === "Doctor" && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "20px",
-            paddingBottom: "20px",
-            marginTop: "20px",
           }}
         >
           <Button

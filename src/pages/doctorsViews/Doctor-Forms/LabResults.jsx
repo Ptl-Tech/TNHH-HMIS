@@ -89,7 +89,7 @@ const LabResults = () => {
       treatmentNo: treatmentNo ?? admissionNo,
       laboratoryNo: record?.Lab_No,
     };
-    console.log("lab request", labRequest);
+    console.log("lab request number", labRequest);
     await dispatch(generateLabResultsReport(record));
 
     setOpen(true);
@@ -227,15 +227,21 @@ const LabResults = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => showLargeDrawer(record)}
-          icon={<FileTextOutlined />}
-        >
-          View Results
-        </Button>
-      ),
+      render: (_, record) => {
+        if (record.Lab_No === "") {
+          return <Tag color="red">Result not yet Ready</Tag>;
+        } else {
+          return (
+            <Button
+              type="primary"
+              onClick={() => showLargeDrawer(record)}
+              disabled={record.Status !== "Completed"}
+            >
+              View Results
+            </Button>
+          );
+        }
+      },
     },
   ];
 
