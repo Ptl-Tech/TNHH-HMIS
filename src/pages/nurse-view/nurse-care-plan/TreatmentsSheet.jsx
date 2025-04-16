@@ -15,10 +15,11 @@ const TreatmentsSheet = () => {
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
   const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
-    (state) => state.getTreatmentSheet
+    (state) => state.getTreatmentSheet || {}
   );
 
-  console.log(treatmentSheet, "treatment sheet");
+  console.log("treatmentSheet", treatmentSheet);
+
   const handleButtonVisibility = () => {
     setIsFormVisible(!isFormVisible);
   };
@@ -37,7 +38,6 @@ const TreatmentsSheet = () => {
             display: "flex",
             alignItems: "center",
             gap: "20px",
-            paddingBottom: "20px",
             marginTop: "20px",
           }}
         >
