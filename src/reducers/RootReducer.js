@@ -129,7 +129,7 @@ import { postAdmissionCancellationReducer } from "./doc-reducers/Admission/cance
 import { getRadiologyListReducer } from "./doc-reducers/getRadiologyListReducers";
 import { getRadiologyDetailsReducer } from "./doc-reducers/getRadiologyDetailsReducers";
 import { getVerifiedAdmissionsReducer } from "./doc-reducers/Admission/getVerifiedAdmissionsReducer";
-import { getAdmittedPatientsReducer } from "./doc-reducers/Admission/getAdmittedPatients";
+import { getAdmittedPatientsReducer, getAdmittedSinglePatientsReducer } from "./doc-reducers/Admission/getAdmittedPatients";
 import {
   getDischargeListReducer,
   getDischargeRequestListReducer,
@@ -187,7 +187,7 @@ import {
 import { getPgAdmissionPendingVerificationReducer } from "./nurse-reducers/getPgAdmissionsPendingVerificationReducer";
 import { postVerifyAdmissionReducer } from "./nurse-reducers/postVerifyAdmissionReducer";
 import { postCancelAdmissionReducer } from "./nurse-reducers/postCancelAdmissionReducer";
-import { getInpatientAllergiesReducer } from "./nurse-reducers/getInPatientAllergiesReducer";
+import { getInpatientAllergiesReducer, getSingleInpatientAllergies } from "./nurse-reducers/getInPatientAllergiesReducer";
 import { getInpatientVitalsReducer } from "./nurse-reducers/getInpatientVitalsReducer";
 import { postDailyProcedureOrProcessReducer } from "./nurse-reducers/postDailyProcedureOrProcessReducer";
 import { getQyInpatientProcessProceduresReducer } from "./nurse-reducers/getQyInpatientProcessProceduresReducer";
@@ -362,6 +362,8 @@ export const rootReducer = combineReducers({
   getVitalsLines: getVitalsLinesReducer,
   getPatientVitals: getSinglePatientAllVitalsLinesReducer,
   getPatientVital: getPatientVitalsLinesReducer,
+  getSinglePatientAllergies: getSingleInpatientAllergies,
+  getSingleAdmittedPatient: getAdmittedSinglePatientsReducer,
   postAllergiesMedication: postAllergiesMedicationReducer,
   getAllergiesAndMedications: getAllergiesAndMedicationReducer,
   postInjections: postInjectionsReducer,
@@ -539,8 +541,8 @@ export const rootReducer = combineReducers({
   getNursingCarePlan: getNursingCarePlanReducer,
 
   // charges reducers-->Mercy
-  getPatientCharges: getPatientChargesReducer ,
-  getSingleBill:getSinglePatientBillReducer,
+  getPatientCharges: getPatientChargesReducer,
+  getSingleBill: getSinglePatientBillReducer,
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,

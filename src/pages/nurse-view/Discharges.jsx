@@ -21,14 +21,12 @@ import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 const Discharges = () => {
   const role = useAuth().userData.departmentName;
   const [selectedItem, setSelectedItem] = useState(
-    role === "Doctor" ? "Initiate Discharge" : "Summary"
+    "Summary" // Default component
   );
   const dispatch = useDispatch();
   const { patientDetails } = useLocation().state;
   const { confirm } = Modal;
-  const [activeItem, setActiveItem] = useState(() =>
-    role === "Nurse" ? "Summary" : "Initiate Discharge"
-  );
+  const [activeItem, setActiveItem] = useState("Summary");
 
   const handleInitiateDischargeAction = async () => {
     try {
@@ -107,13 +105,14 @@ const Discharges = () => {
     }
   };
   const menuItems = [
-    ...(role === "Nurse"
-      ? []
-      : [{ label: "Initiate Discharge", icon: <FileOutlined /> }]),
     { label: "Summary", icon: <FileOutlined /> },
     { label: "Discharge Medication", icon: <FileMarkdownOutlined /> },
     { label: "Sick Off", icon: <UserAddOutlined /> },
+    ...(role === "Nurse"
+      ? []
+      : [{ label: "Initiate Discharge", icon: <FileOutlined /> }]), // move to the end
   ];
+
   return (
     <>
       <div
@@ -145,13 +144,7 @@ const Discharges = () => {
 
       <Divider />
       <div className="patient-file-content">
-        {selectedItem === "Initiate Discharge" ? (
-          <InitiateDischarge
-            handleInitiateDischarge={handleInitiateDischarge}
-          />
-        ) : (
-          selectedItem
-        )}
+        {selectedItem === "Summary" ? <Summery /> : selectedItem}
       </div>
     </>
   );
