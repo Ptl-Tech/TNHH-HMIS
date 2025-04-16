@@ -94,9 +94,10 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
       }}
     >
       <Row gutter={[16, 16]}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card style={{ padding: "20px" }}>
             <Form.Item
+              label="Select Drug Name"
               name="DrugNo"
               hasFeedback
               rules={[
