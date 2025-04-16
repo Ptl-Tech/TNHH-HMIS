@@ -5,7 +5,7 @@ import {
   POST_RECEIPT_SUCCESS,
 } from "../../actions/Charges-Actions/postReceipt";
 
-export const postReceiptReducer = (state = { loading: false }, action) => {
+export const postReceiptHeaderReducer = (state = { loading: false }, action) => {
   switch (action.type) {
     case POST_RECEIPT_REQUEST:
       return { ...state, loading: true };

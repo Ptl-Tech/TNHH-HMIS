@@ -5,7 +5,7 @@ import {
   POST_RECEIPT_HEADER_SUCCESS,
 } from "../../actions/Charges-Actions/postReceiptHeader";
 
-export const postReceiptHeaderReducer = (
+export const savePaymentReducer = (
   state = { loading: false },
   action
 ) => {

@@ -12,7 +12,6 @@ export const GET_BILLING_LIST_RESET = "GET_BILLING_LIST_RESET";
 // Action to fetch billing list
 export const getBillingList = () => async (dispatch, getState) => {
   try {
-    // Dispatch initial request action
     dispatch({ type: GET_BILLING_LIST_REQUEST });
 
     const {
@@ -22,7 +21,6 @@ export const getBillingList = () => async (dispatch, getState) => {
     // Retrieve branch code from localStorage or fallback to empty string
     const branchCode = localStorage.getItem("branchCode") || "";
 
-    // Configure request headers
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -32,33 +30,32 @@ export const getBillingList = () => async (dispatch, getState) => {
       },
     };
 
-    // Make API request to fetch billing list
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=PgPatientsList`, // Adjusted endpoint for billing list
+      `${API}data/odatafilter?webservice=PgPatientsList`,
       config
     );
 
-    // Dispatch success action with data
+    // Filter response to match the branchCode
+    const filteredData = data?.filter(
+      (patient) => patient.Global_Dimension_1_Code === branchCode
+    );
+
     dispatch({
       type: GET_BILLING_LIST_SUCCESS,
-      payload: data,
+      payload: filteredData,
     });
 
-    return data; // Return the data for any further usage
+    return filteredData; // Return only filtered data
   } catch (error) {
-    // Handle and extract error messages
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
 
-    // Dispatch failure action with error message
     dispatch({
       type: GET_BILLING_LIST_FAIL,
       payload: errorMessage,
     });
 
-    // Display error message to the user
     message.error(errorMessage, 5);
-
-    throw error; // Rethrow error for further handling if necessary
+    throw error;
   }
 };

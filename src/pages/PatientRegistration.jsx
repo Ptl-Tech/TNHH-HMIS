@@ -57,7 +57,7 @@ const PatientRegistration = () => {
       case "create_visit":
         // Navigate with proper query parameters
         navigate(
-          `/Reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`,
+          `/reception/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }

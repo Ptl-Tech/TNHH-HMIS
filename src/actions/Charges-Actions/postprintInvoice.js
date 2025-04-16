@@ -23,7 +23,6 @@ export const postPrintInvoice = (patientNo) => async (dispatch, getState) => {
       otpVerify: { userInfo },
     } = getState();
 
-    patientNo = {patientNo: patientNo};
 
     const response = await axios.post(
       `${API_URL}/Reports/InsuranceInvoiceReport`,

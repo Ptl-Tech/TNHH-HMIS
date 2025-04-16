@@ -311,47 +311,7 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
   }
 };
 
-// export const postTriageVisit = (patient) => async (dispatch, getState) => {
-//   try {
-//     dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
 
-//     const {
-//       otpVerify: { userInfo },
-//   } = getState();
-//  // Fetch branchCode from localStorage
-//  const branchCode = localStorage.getItem("branchCode");
-
-//     const config = {
-//       headers: {
-//         "Content-Type": "application/json",
-//         staffNo: userInfo.userData.no, // Add staffNo as a custom header
-//         sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-//         branchCode: branchCode
-//       },
-//     };
-
-//     const { data } = await axios.post(
-//       `${API}reception/DispatchToTriage`,
-//       patient,
-//       config
-//     );
-
-//     // // Extract response details, including appointment data
-//     // const responseData = {
-//     //   status: data.status,
-//     //   appointmentNo: data.appointmentNo, // Assuming this is part of the response
-//     //   appointmentData: data.appointment, // The detailed appointment information
-//     // };
-
-//     // Dispatch success action
-//     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: responseData });
-
-//     // Return appointment data for further use
-//     // return responseData.appointmentNo; // Return the full appointment data
-//   } catch (error) {
-//     dispatch({ type: POST_TRIAGE_VISIT_FAIL, payload: error.message });
-//   }
-// };
 
 export const postTriageVisit = (visitData) => async (dispatch, getState) => {
   try {

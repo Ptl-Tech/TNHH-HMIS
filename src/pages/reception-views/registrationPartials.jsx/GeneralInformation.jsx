@@ -50,28 +50,27 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             : patientDetails?.Gender === "Female"
             ? 2
             : 0,
-        dateOfBirth: patientDetails.DateOfBirth
-          ? moment(patientDetails.DateOfBirth, "YYYY-MM-DD")
-          : null,
+        dateOfBirth: patientDetails?.DateOfBirth ? moment(patientDetails.DateOfBirth) : null,          
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
-        nationality: patientDetails?.nationality || "",
+        nationality: patientDetails?.Nationality || "",
         county: patientDetails?.county || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
         nextOfKinPhoneNo: patientDetails?.nextOfKinPhoneNo || "",
-        insuranceNo: patientDetails?.insuranceNo || "",
-        insuranceName: patientDetails?.insuranceName || "",
+        insuranceNo: patientDetails?.InsuranceNo || "",
+        insuranceName: patientDetails?.InsuranceName || "",
         insurancePrinicipalMemberName:
-          patientDetails?.insurancePrinicipalMemberName || "",
+          patientDetails?.PrincipalMemberName || "",
         isPrincipleMember: patientDetails?.isPrincipleMember || false,
-        membershipNo: patientDetails?.membershipNo || "",
-        schemeName: patientDetails?.schemeName || "",
-        howYouKnewABoutUs: patientDetails?.howYouKnewABoutUs || "",
-        subcounty: patientDetails?.subcounty || "",
+        membershipNo: patientDetails?.MembershipNo || "",
+        schemeName: patientDetails?.SchemeName || "",
+        howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+        subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
-        residence: patientDetails?.residence || "",
-        patientStatus: patientDetails?.patientStatus || 0,
+        residence: patientDetails?.PlaceofBirthVillage || "",
+        countyWard: patientDetails?.Ward || "",
+        patientStatus: patientDetails?.PatientStatus || 0,
       });
     }
   }, [patientDetails, form]);
@@ -94,29 +93,31 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           : values.gender === 2
           ? "Female"
           : "",
-      dob: values.dateOfBirth
-        ? values.dateOfBirth.format("YYYY-MM-DD")
-        : patientDetails?.DateOfBirth || "",
-      nationality: patientDetails?.nationality || "",
-      county: patientDetails?.county || "",
+          dob: values.dateOfBirth
+          ? values.dateOfBirth.format("YYYY-MM-DD")
+          : patientDetails?.DateOfBirth || "",
+        
+      nationality: patientDetails?.Nationality || "",
+      county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
       phoneNumber: values.phoneNumber || "",
       paymentMode: patientDetails?.paymentMode || 0,
-      nextOfKinRelationship: patientDetails?.nextOfKinRelationship || "",
-      nextOfKinFullName: patientDetails?.nextOfKinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-      insuranceNo: patientDetails?.insuranceNo || "",
-      insuranceName: patientDetails?.insuranceName || "",
+      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
+      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
+      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
+      insuranceNo: patientDetails?.InsuranceNo || "",
+      insuranceName: patientDetails?.InsuranceName || "",
       insurancePrinicipalMemberName:
         patientDetails?.insurancePrinicipalMemberName || "",
-      isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.membershipNo || "",
-      schemeName: patientDetails?.schemeName || "",
-      howYouKnewABoutUs: patientDetails?.howYouKnewABoutUs || "",
-      subcounty: patientDetails?.subcounty || "",
-      email: values.email || patientDetails?.Email || "",
-      residence: patientDetails?.residence || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
+        isPrincipleMember: patientDetails?.isPrincipleMember || false,
+        membershipNo: patientDetails?.MembershipNo || "",
+        schemeName: patientDetails?.SchemeName || "",
+        howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+        subcounty: patientDetails?.SubCountyName || "",
+          email: patientDetails?.Email || "",
+          residence: patientDetails?.PlaceofBirthVillage || "",
+          countyWard: patientDetails?.Ward || "",
+          patientStatus:  0,
     };
 
     dispatch(saveGeneralInformation(formattedData));
@@ -142,7 +143,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       )}
       {success && (
         <Alert
-          message={success || "Data saved successfully"}
+          message={"Data saved successfully"}
           type="success"
           showIcon
           closeText="Close"
@@ -198,23 +199,11 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
                 { required: true, message: "Please enter date of birth" },
               ]}
             >
-              {isEditingDOB ? (
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="YYYY-MM-DD"
-                  onChange={() => setIsEditingDOB(false)}
-                />
-              ) : (
-                <Input
-                  value={
-                    form.getFieldValue("dateOfBirth")
-                      ? moment(form.getFieldValue("dateOfBirth")).format("dd/MM/yyyy")
-                      : ""
-                  }
-                  onClick={() => setIsEditingDOB(true)}
-                  readOnly
-                />
-              )}
+              <DatePicker
+  style={{ width: "100%" }}
+  format="DD/MM/YYYY"
+/>
+
             </Form.Item>
           </Col>
           <Col span={8}>
@@ -235,7 +224,6 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
               name="phoneNumber"
               rules={[
                 { required: true, message: "Please enter phone number" },
-                { pattern: /^[0-9]{10}$/, message: "Invalid phone number" },
               ]}
             >
               <Input placeholder="Enter Phone Number" />

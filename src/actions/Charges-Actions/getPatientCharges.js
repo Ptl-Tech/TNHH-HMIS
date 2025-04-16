@@ -3,14 +3,14 @@ import { message } from "antd"; // Import Ant Design message for error handling
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
-export const REQUEST_RECEIPT_LINES = "REQUEST_RECEIPT_LINES";
-export const REQUEST_RECEIPT_LINES_SUCCESS = "REQUEST_RECEIPT_LINES_SUCCESS";
-export const REQUEST_RECEIPT_LINES_FAIL = "REQUEST_RECEIPT_LINES_FAIL";
-export const REQUEST_RECEIPT_LINES_RESET = "REQUEST_RECEIPT_LINES_RESET";
+export const REQUEST_PATIENT_CHARGES = "REQUEST_PATIENT_CHARGES";
+export const REQUEST_PATIENT_CHARGES_SUCCESS = "REQUEST_PATIENT_CHARGES_SUCCESS";
+export const REQUEST_PATIENT_CHARGES_FAIL = "REQUEST_PATIENT_CHARGES_FAIL";
+export const REQUEST_PATIENT_CHARGES_RESET = "REQUEST_PATIENT_CHARGES_RESET";
 
-export const getReceiptLines = (visitNo) => async (dispatch, getState) => {
+export const getPatientCharges = (appointmentNo) => async (dispatch, getState) => {
   try {
-    dispatch({ type: REQUEST_RECEIPT_LINES });
+    dispatch({ type: REQUEST_PATIENT_CHARGES });
 
     const {
       otpVerify: { userInfo },
@@ -32,11 +32,11 @@ export const getReceiptLines = (visitNo) => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgReceiptLines&isList=true&query=$filter=TellerID eq '${visitNo}'`,
+      `${API}data/odatafilter?webservice=QyPatientCharges&isList=true&query=$filter=Visit_No eq '${appointmentNo}'`,
       config
     );
 
-    dispatch({ type: REQUEST_RECEIPT_LINES_SUCCESS, payload: response.data });
+    dispatch({ type: REQUEST_PATIENT_CHARGES_SUCCESS, payload: response.data });
   } catch (error) {
     const errorMessage =
       error.response?.data?.message || error.message || "Failed to fetch receipt lines";
@@ -44,6 +44,6 @@ export const getReceiptLines = (visitNo) => async (dispatch, getState) => {
     // Display error message using Ant Design's message component
     message.error(errorMessage);
 
-    dispatch({ type: REQUEST_RECEIPT_LINES_FAIL, payload: errorMessage });
+    dispatch({ type: REQUEST_PATIENT_CHARGES_FAIL, payload: errorMessage });
   }
 };

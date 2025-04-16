@@ -237,9 +237,8 @@ import { dispatchWalkInLab } from '../actions/patientActions';
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
 import { getReceiptPgHeadersReducer } from "./doc-reducers/getReceiptPgHeadersReducer";
 import { getReceiptLinesReducer } from "./ChargesReducers/getReceiptLinesReducer";
-import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptHeaderReducer";
+import { savePaymentReducer } from "./ChargesReducers/savePaymentReducer";
 import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
-import { postReceiptReducer } from "./ChargesReducers/postReceiptReducer";
 import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
 import { postPatientChargesReducer } from "./ChargesReducers/postPatientChargesReducer";
 import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
@@ -296,6 +295,12 @@ import { saveBillingInformationReducer } from "./reception-reducers/save-patient
 import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
 import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
 import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
+import { createPatientVisitReducer } from "./reception-reducers/patientVisitReducers/createPatientVisitReducer";
+import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
+import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
+import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
+import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
+import { postClosingBillReducer } from "./ChargesReducers/postClosingBillReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -324,7 +329,11 @@ export const rootReducer = combineReducers({
   subCountyWards: subCountWardsListReducer,
   clinics: clinicsListReducer,
   kinsRelationshipsList: getrelationshipOptionsReducer,
-  createTriageVisit: patientTriageVisitCreateReducer,
+
+  //patient visit reducers:-->>mercy
+  createVisit: createPatientVisitReducer,
+  getVisitById: getPatientVisitByIdReducer,
+
   patientList: patientListReducer,
   activePatients: activePatientsReducer,
   getPatientByNo: patientByNoReducer,
@@ -528,11 +537,15 @@ export const rootReducer = combineReducers({
   postPsychologyRequest: postPsychologyRequestReducer,
   postNursingCarePlan: postNursingCarePlanReducer,
   getNursingCarePlan: getNursingCarePlanReducer,
+
+  // charges reducers-->Mercy
+  getPatientCharges: getPatientChargesReducer ,
+  getSingleBill:getSinglePatientBillReducer,
   getReceiptHeaders: getReceiptPgHeadersReducer,
   getReceiptLines: getReceiptLinesReducer,
   getReceiptHeaderLines: getReceiptHeaderReducer,
-  postReceipt: postReceiptHeaderReducer,
-  processReceipt: postReceiptReducer,
+  savePayment: savePaymentReducer,
+  processReceipt: postReceiptHeaderReducer,
   printInvoice: postPrintInvoiceReducer,
   printReceipt: printReceiptReducer,
   getTransactionList: getTransactionListReducer,
@@ -550,6 +563,7 @@ export const rootReducer = combineReducers({
   reopenPostedCharges: reopensalesInvoiceReducer,
   postRebates: postRebatesReducer,
   postDiscount: postDiscountReducer,
+  closePatientBill: postClosingBillReducer,
 
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,
