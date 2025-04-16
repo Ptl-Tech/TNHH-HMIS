@@ -10,10 +10,32 @@ import {
   Col,
 } from "antd";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getSingleInpatientAllergiesSlice } from "../../../actions/nurse-actions/getInpatientAllergiesSlice";
+import { useLocation } from "react-router-dom";
+import { getDiagnosisLines } from "../../../actions/Doc-actions/getDiagnosisLines";
+import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
 
 const { Title, Text } = Typography;
 
 const InitiateDischarge = ({ handleInitiateDischarge }) => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const { loadingAllergies, allergies } = useSelector(
+    (state) => state.getSinglePatientAllergies
+  );
+  const { loading: loadingDiagnosisLines, data: diagnosisLines } = useSelector(
+    (state) => state.getDiagnosisLines
+  );
+
+  const { loading: loadingPatient, admissions: admittedPatient } = useSelector(
+    (state) => state.getSingleAdmittedPatient
+  );
+
+  console.log(diagnosisLines, "DiagnosisLines");
+  console.log(admittedPatient, "admittedPatient");
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const medicalInfo = [
     { label: "Primary Diagnosis", value: "Pneumonia" },
     { label: "Reason for Admission", value: "Acute respiratory distress" },
@@ -30,13 +52,26 @@ const InitiateDischarge = ({ handleInitiateDischarge }) => {
     { label: "Patient family informed", checked: true },
   ];
 
-  const alerts = ["Patient allergic to Penicillin"];
+  const [allergiesList, setAllergiesList] = useState([]);
+  useEffect(() => {
+    const foodAllergies = allergies
+      .filter((item) => item.DrugAllergy)
+      .map((item) => item.DrugAllergy);
+    setAllergiesList(foodAllergies);
+  }, [allergies]);
+
+  useEffect(() => {
+    dispatch(getSingleInpatientAllergiesSlice(admissionNo));
+    dispatch(getDiagnosisLines(admissionNo));
+    dispatch(getAdmittedSinglePatient(admissionNo));
+  }, [dispatch, admissionNo]);
 
   return (
     <div>
-      {alerts.length > 0 && (
+      {allergiesList.length > 0 && <Title level={5}>Drug Allergies</Title>}
+      {allergiesList.length > 0 && (
         <div style={{ marginBottom: "20px" }}>
-          {alerts.map((alert, index) => (
+          {allergiesList.map((alert, index) => (
             <Alert key={index} message={alert} type="warning" showIcon />
           ))}
         </div>
