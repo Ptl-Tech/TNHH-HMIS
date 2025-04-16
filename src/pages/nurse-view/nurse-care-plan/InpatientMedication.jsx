@@ -1,4 +1,3 @@
-
 import { Button, message, Typography } from "antd";
 import InpatientPrescriptionForm from "../../doctorsViews/Doctor-Forms/InPatientPrescriptionForm";
 import {
@@ -21,7 +20,7 @@ const InpatientMedication = () => {
   const admissionNo = queryParams.get("AdmNo");
   const getLocation = useLocation();
   const patientDetails = getLocation.state?.patientDetails;
-  const { loading:loadingPrescriptions, data:prescriptions } = useSelector(
+  const { loading: loadingPrescriptions, data: prescriptions } = useSelector(
     (state) => state.getInPatientPrescriptionLine
   );
 
@@ -32,13 +31,14 @@ const InpatientMedication = () => {
   );
   const handleSendToPharmacy = async () => {
     const result = await dispatch(InpatientSendToPharmacy(admissionNo));
-    if(result.status === 'success'){
-        message.success(result.msg || 'Prescription sent to pharmacy successfully');
-        dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
-    }else if(result.status === 'failed'){
-        message.error(result.msg || 'Failed to send prescription to pharmacy');
+    if (result.status === "success") {
+      message.success(
+        result.msg || "Prescription sent to pharmacy successfully"
+      );
+      dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
+    } else if (result.status === "failed") {
+      message.error(result.msg || "Failed to send prescription to pharmacy");
     }
-    
   };
 
   useEffect(() => {
@@ -60,12 +60,10 @@ const InpatientMedication = () => {
             Patient Prescription
           </Typography.Title>
         </div>
-        {(role === "Doctor" || role === "Psychology") &&
-          patientDetails?.Status !== "Completed" && (
-            <div style={{ display: "flex", gap: "10px" }}>
-                {
-                    !showForm && (
-                        <Button
+        {role === "Doctor" && patientDetails?.Status !== "Completed" && (
+          <div style={{ display: "flex", gap: "10px" }}>
+            {!showForm && (
+              <Button
                 type="primary"
                 icon={<SendOutlined />}
                 loading={pharmacyPosting}
@@ -74,24 +72,22 @@ const InpatientMedication = () => {
               >
                 Send to Pharmacy
               </Button>
-                    )
-                }
-              
+            )}
 
-              <Button
-                type="primary"
-                onClick={() => setShowForm(!showForm)}
-                icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
-              >
-                {!showForm ? " New Prescription" : "View Prescriptions"}
-              </Button>
-            </div>
-          )}
+            <Button
+              type="primary"
+              onClick={() => setShowForm(!showForm)}
+              icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+            >
+              {!showForm ? " New Prescription" : "View Prescriptions"}
+            </Button>
+          </div>
+        )}
       </div>
 
       {!showForm ? (
         <InPatientPrescriptionTable
-          filteredPrescriptions={prescriptions }
+          filteredPrescriptions={prescriptions}
           loadingPrescriptions={loadingPrescriptions}
         />
       ) : (
