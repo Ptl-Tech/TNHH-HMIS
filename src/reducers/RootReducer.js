@@ -219,6 +219,7 @@ import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAd
 import {
   getInPatientQyPrescriptionLines,
   getQyPrescriptionLinesReducer,
+  getTreatmentSheetLines,
 } from "./doc-reducers/QyPrescriptionLinesReducer";
 import {
   postPatientECTRequest,
@@ -288,7 +289,7 @@ import { getReceiptPageReducer } from "./ChargesReducers/getReceiptPageReducer";
 import { postRebatesReducer } from "./ChargesReducers/postRebatesReducer";
 import { postDiscountReducer } from "./ChargesReducers/postPatientDiscount";
 import { saveGeneralInformationReducer } from "./reception-reducers/save-patient-reducers/saveGeneralInformationReducer";
-import {saveAddressInformationReducer} from "./reception-reducers/save-patient-reducers/saveAddressInformationReducer";
+import { saveAddressInformationReducer } from "./reception-reducers/save-patient-reducers/saveAddressInformationReducer";
 import { saveKinsInformationReducer } from "./reception-reducers/save-patient-reducers/saveKinsInformationReducer";
 import { saveMarketingReducer } from "./reception-reducers/save-patient-reducers/saveMarketingReducer";
 import { saveBillingInformationReducer } from "./reception-reducers/save-patient-reducers/saveBillingInformationReducer";
@@ -310,10 +311,10 @@ export const rootReducer = combineReducers({
   //patient registration reducers:-->>mercy
   patientbyId: patientByIdReducer,
   savegeneralInfo: saveGeneralInformationReducer,
-  saveKinsInfo:saveKinsInformationReducer,
-  saveBillingInfo:saveBillingInformationReducer,
+  saveKinsInfo: saveKinsInformationReducer,
+  saveBillingInfo: saveBillingInformationReducer,
   saveAddressInfo: saveAddressInformationReducer,
-  saveMarketingInfo:saveMarketingReducer,
+  saveMarketingInfo: saveMarketingReducer,
 
   createPatient: patientCreateReducer,
   convertPatient: convertPatientReducer,
@@ -511,6 +512,7 @@ export const rootReducer = combineReducers({
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,
+  getTreatmentSheet: getTreatmentSheetLines,
   getInPatientPrescriptionLine: getInPatientQyPrescriptionLines,
   postPatientETC: postPatientECTRequest,
   getPatientETC: getPatientECTRequest,
