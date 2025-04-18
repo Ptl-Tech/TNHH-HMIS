@@ -1,58 +1,64 @@
-import { Button, Space, Table } from "antd"
-import { FolderViewOutlined } from "@ant-design/icons"
+import { Table } from "antd";
 import PropTypes from "prop-types";
 
-const DischargeSummeryTable = ({ showModal }) => {
-    const columns = [   
-       
-        {
-            title: 'Investigation Done',
-            dataIndex: 'investigationDone',
-            key: 'investigationDone',
-        },
-        {
-            title: 'Management',
-            dataIndex: 'management',
-            key: 'management',
-        },
-        {
-            title: 'Final Diagnosis',
-            dataIndex: 'finalDiagnosis',
-            key: 'finalDiagnosis',
-        },
-        {
-            title: 'Review Date',
-            dataIndex: 'reviewDate',
-            key: 'reviewDate',
-        },
-        {
-            title: 'Actions',
-            dataIndex: 'actions',
-            key: 'actions',
-            render: (_, record) => (
-                <Space>
-                    <Button color="primary"
-                    onClick={() => showModal(record)}
-                    ><FolderViewOutlined /> View</Button>
-                </Space>
-            ),
-        }
-    ];
+const DischargeSummeryTable = ({ summaryData, loadingGetDischargeSummary }) => {
+  console.log("Summary Data:", summaryData);
+  const columns = [
+    {
+      title: "Discharge Code",
+      dataIndex: "Discharge_Code",
+      key: "Discharge_Code",
+    },
+    {
+      title: "Summary Type",
+      dataIndex: "Type",
+      key: "Type",
+    },
+    {
+      title: "Description",
+      dataIndex: "Description",
+      key: "Description",
+    },
+    {
+      title: "Action",
+      dataIndex: "Action",
+      key: "Action",
+      render: (text, record) => {
+        return (
+          <span
+            style={{
+              color: "red",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              console.log("Clicked on Action", record);
+            }}
+          >
+            Remove
+          </span>
+        );
+      },
+    },
+  ];
 
   return (
-    <div style={{ paddingTop: '10px' }}>
-    <Table 
-    
-       columns={columns} 
-       className="admit-patient-table"
-    />
-
+    <div style={{ paddingTop: "10px" }}>
+      <Table
+        columns={columns}
+        size="small"
+        bordered
+        rowKey={(record) => record.SystemId}
+        className="admit-patient-table"
+        dataSource={summaryData}
+        loading={loadingGetDischargeSummary}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default DischargeSummeryTable
+export default DischargeSummeryTable;
 // props validation
 DischargeSummeryTable.propTypes = {
-    showModal: PropTypes.func.isRequired,
-}
+  summaryData: PropTypes.array,
+  loadingGetDischargeSummary: PropTypes.bool,
+};

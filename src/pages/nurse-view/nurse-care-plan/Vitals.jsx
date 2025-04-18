@@ -70,7 +70,7 @@ const Vitals = () => {
         title="Inpatient Vitals"
       />
 
-      {!isVitalFormVisible && role === "Nurse" && role === "Doctor" && (
+      {(role === "Doctor" || (role === "Nurse" && !isVitalFormVisible)) && (
         <div
           style={{
             display: "flex",
