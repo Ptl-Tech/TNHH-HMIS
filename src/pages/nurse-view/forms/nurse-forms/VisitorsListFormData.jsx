@@ -120,20 +120,7 @@ const VisitorsListFormData = ({
                 label="ID Number"
                 name="idNumber"
                 hasFeedback
-                rules={[
-                  { required: true, message: "ID Number is required" },
-                  {
-                    validator: (_, value) => {
-                      const regex = /^\d{8}$/;
-                      if (!value || regex.test(value)) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        "ID Number should contains digits and 8 digits long"
-                      );
-                    },
-                  },
-                ]}
+                rules={[{ required: true, message: "ID Number is required" }]}
               >
                 <Input placeholder="ID Number" type="text" />
               </Form.Item>

@@ -175,7 +175,7 @@ import { getPgAdmissionsVerifiedReducer } from "./nurse-reducers/getPgAdmissions
 import { getPgInpatientDischargeRequestsReducer } from "./nurse-reducers/getPgInpatientDischargeRequestsReducer";
 import { getPgInpatientDischargeListReducer, getQyAdmissionsDischargedListReducer } from "./nurse-reducers/getPgInpatientDischargeListReducer";
 import { getPgOpenPatientConsumablesReducer } from "./nurse-reducers/getPgOpenPatientConsumablesReducer";
-import { postInitiateDischargeReducer } from "./nurse-reducers/postInitiateDischargeReducer";
+import { getQyDischargeSummaryReducer, postDischargeSummaryReducer, postInitiateDischargeReducer } from "./nurse-reducers/postInitiateDischargeReducer";
 import { postPostDischargeReducer } from "./nurse-reducers/postPostDischargeReducer";
 import { postCancelDischargeReducer } from "./nurse-reducers/postCancelDischargeReducer";
 import {
@@ -463,7 +463,9 @@ export const rootReducer = combineReducers({
   getPgInpatientDischargeList: getPgInpatientDischargeListReducer,
   getPgOpenPatientConsumables: getPgOpenPatientConsumablesReducer,
   postInitiateDischarge: postInitiateDischargeReducer,
+  postDischargeSummary: postDischargeSummaryReducer,
   postPostDischarge: postPostDischargeReducer,
+  getQyDischargeSummary: getQyDischargeSummaryReducer,
   postCancelDischarge: postCancelDischargeReducer,
   postReleaseBed: postReleaseBedReducer,
   postBedTransfer: postBedTransferLineReducer,

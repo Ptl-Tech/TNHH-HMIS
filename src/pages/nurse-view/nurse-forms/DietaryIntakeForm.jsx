@@ -15,7 +15,11 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import DietaryIntakeFormData from "./DietaryIntakeFormData";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import useAuth from "../../../hooks/useAuth";
-import { POST_DIETARY_INTAKE_FORM_LINE_FAILURE, POST_DIETARY_INTAKE_FORM_LINE_SUCCESS, postDietaryIntakeFormLineSlice } from "../../../actions/nurse-actions/postDietaryIntakeFormLineSlice";
+import {
+  POST_DIETARY_INTAKE_FORM_LINE_FAILURE,
+  POST_DIETARY_INTAKE_FORM_LINE_SUCCESS,
+  postDietaryIntakeFormLineSlice,
+} from "../../../actions/nurse-actions/postDietaryIntakeFormLineSlice";
 
 const DietaryIntakeForm = () => {
   const { selectedRowKey, rowSelection, selectedRow } =
@@ -37,7 +41,8 @@ const DietaryIntakeForm = () => {
     (state) => state.postDietaryIntakeFormLine
   );
 
-  console.log("ip forms", ipLookupValues);
+  console.log("Lookup values", ipLookupValues[0]?.Description);
+
   const handleViewForm = () => {
     if (selectedRow[0]) {
       form.resetFields();
@@ -65,23 +70,15 @@ const DietaryIntakeForm = () => {
       LineNo,
       myAction: "edit",
     };
-    console.log('Form data', formattedData);
-    await dispatch(
-      postDietaryIntakeFormLineSlice(
-        formattedData
-      )
-    )
+    await dispatch(postDietaryIntakeFormLineSlice(formattedData))
       .then((result) => {
         if (result.type === POST_DIETARY_INTAKE_FORM_LINE_SUCCESS) {
-          message.success(
-            `Records updated successfully!`
-          );
+          message.success(`Records updated successfully!`);
           dispatch(getQyDietaryFormLinesSlice(patientDetails?.Admission_No));
           setIsModalOpen(false);
         } else if (result.type === POST_DIETARY_INTAKE_FORM_LINE_FAILURE) {
           message.error(
-            result.payload.message ||
-              "Internal server error, please try again."
+            result.payload.message || "Internal server error, please try again."
           );
           setIsModalOpen(false);
         }
@@ -97,13 +94,8 @@ const DietaryIntakeForm = () => {
   };
 
   useEffect(() => {
-    if (!ipLookupValues?.length) {
-      dispatch(getQyIpLookupValuesSlice("Dietary Intake Form"));
-    }
-  }, [dispatch, ipLookupValues]);
-
-  useEffect(() => {
     dispatch(getQyDietaryFormLinesSlice(patientDetails?.Admission_No));
+    dispatch(getQyIpLookupValuesSlice("Dietary Intake Form"));
   }, [dispatch, patientDetails?.Admission_No]);
 
   return (
@@ -187,17 +179,16 @@ const DietaryIntakeForm = () => {
           }}
         >
           <Form.Item label="Category" name="category">
-          <Select 
-          placeholder="Select a category"
-          showSearch
-          loading={loadingIpLookupValues}
-          options={ipLookupValues?.map((item) => ({
-            value: item.Category,
-            label: item.Category
-          }))}
-          allowClear
-
-          />
+            <Select
+              placeholder="Select a category"
+              showSearch
+              loading={loadingIpLookupValues}
+              options={ipLookupValues?.map((item) => ({
+                value: item?.Category,
+                label: item?.Description,
+              }))}
+              allowClear
+            />
           </Form.Item>
 
           <Form.Item label="Comments" name="comments">

@@ -1,12 +1,16 @@
-
 import { Table } from "antd";
 import PropTypes from "prop-types";
 
-const RowSelectionTable = ({ columns, dataSource, tableProps }) => {
-
+const RowSelectionTable = ({
+  columns,
+  dataSource,
+  tableProps,
+  loadingPatientLabTest,
+}) => {
   return (
     <Table
       bordered
+      loading={loadingPatientLabTest}
       size="small"
       columns={columns}
       dataSource={dataSource}
@@ -29,4 +33,5 @@ RowSelectionTable.propTypes = {
   dataSource: PropTypes.array,
   onRowSelect: PropTypes.func,
   tableProps: PropTypes.object,
+  loadingPatientLabTest: PropTypes.bool,
 };
