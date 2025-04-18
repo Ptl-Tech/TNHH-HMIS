@@ -107,3 +107,49 @@ export const postInpatientDischarge = (admissionNo) => async (dispatch, getState
     throw error;
   }
 };
+
+export const postDischargeSummary = (admissionNo) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: POST_INPATIENT_DISCHARGE });
+
+    const {
+      otpVerify: { userInfo },
+    } = getState();
+    const branchCode = localStorage.getItem("branchCode");
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: userInfo.userData.no,
+        sessionToken: userInfo.userData.portalSessionToken,
+        branchCode: branchCode,
+      },
+    };
+
+    const response = await axios.post(
+      `${API}Inpatient/PostDischarge`,
+      { admissionNo },
+      config
+    );
+
+    const responseData = {
+      status: response.data.status,
+      data: response.data,
+    };
+
+    dispatch({
+      type: POST_INPATIENT_DISCHARGE_SUCCESS,
+      payload: responseData,
+    });
+
+    return responseData.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+    dispatch({
+      type: POST_INPATIENT_DISCHARGE_FAIL,
+      payload: errorMessage,
+    });
+    message.error(errorMessage);
+    throw error;
+  }
+};
