@@ -8,8 +8,9 @@ import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 const InpatientCardInfo = ({ patientDetail }) => {
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
-  
-  const { loadingPatientDetails, patientDetails} = useFetchPatientDetailsHook(patientNo);
+
+  const { loadingPatientDetails, patientDetails } =
+    useFetchPatientDetailsHook(patientNo);
 
   const invalidDate = "0001-01-01"; // Define the "invalid" date
 
@@ -146,49 +147,9 @@ const InpatientCardInfo = ({ patientDetail }) => {
                 {patientDetail?.Ward || "N/A"}, {patientDetail?.Bed || "N/A"}
               </Typography.Text>
             </div>
-
-            {/* <Divider type="vertical" style={{ height: '40px' }} />
-
-                        <div className="patient-age-gender-container">
-                            <Typography.Text className="hospital-number-header" >
-                                Bed
-                            </Typography.Text>
-                            <Typography.Text key={patientDetails?.Bed}>
-                                {patientDetails?.Bed || 'N/A'}
-                            </Typography.Text>
-                        </div> */}
           </div>
         </Card>
       </div>
-
-      {/* <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689', marginBottom: '20px' }}>
-                <Row gutter={16}>
-                    {[
-                        { label: 'Admitting Doctor', key: 'DoctorsName' },
-                        { label: 'Admission Date', key: 'Admission_Date' },
-                        { label: 'Expected Discharge Date', key: 'Expected_Date_of_Discharge' },
-                        { label: 'Ward Name', key: 'Ward' },
-                        { label: 'Bed Number', key: 'Bed' },
-                        { label: 'Discharge Coming In', key: '' }, // Special case without a key
-                    ].map((field, index) => (
-                        <Col span={4} key={index}>
-                            <Typography.Text
-                                className="patient-name"
-                                style={{ fontWeight: 'bold', color: '#0f5689', display: 'block' }}
-                            >
-                                {field.label}
-                            </Typography.Text>
-                            {field.key ? (
-                                <Typography.Text className="patient-name" style={{ marginTop: '10px', display: 'block' }}>
-                                    {patientDetails?.[field.key] || 'N/A'}
-                                </Typography.Text>
-                            ) : null}
-
-                        </Col>
-                    ))}
-                </Row>
-
-            </Card> */}
     </>
   );
 };
