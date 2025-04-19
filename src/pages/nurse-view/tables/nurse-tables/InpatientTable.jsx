@@ -95,11 +95,11 @@ const InpatientTable = ({
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
         ), // Renders nothing for roles other than Nurse
     },
-    // {
-    //   title: "Room",
-    //   dataIndex: "Ward_Room",
-    //   key: "Ward_Room",
-    // },
+    {
+      title: "Room",
+      dataIndex: "Ward_Room",
+      key: "Ward_Room",
+    },
     {
       title: "Bed",
       dataIndex: "Bed",
@@ -149,8 +149,8 @@ const InpatientTable = ({
             break;
         }
         return color ? <Tag color={color}>{coding}</Tag> : null;
-      }
-    }
+      },
+    },
   ];
   const [pagination, setPagination] = useState({
     current: 1,

@@ -2,7 +2,6 @@ import { Table } from "antd";
 import PropTypes from "prop-types";
 
 const DischargeSummeryTable = ({ summaryData, loadingGetDischargeSummary }) => {
-  console.log("Summary Data:", summaryData);
   const columns = [
     {
       title: "Discharge Code",
@@ -42,7 +41,7 @@ const DischargeSummeryTable = ({ summaryData, loadingGetDischargeSummary }) => {
   ];
 
   return (
-    <div style={{ paddingTop: "10px" }}>
+    <div>
       <Table
         columns={columns}
         size="small"
