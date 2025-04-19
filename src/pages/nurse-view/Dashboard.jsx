@@ -18,6 +18,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const userDetails = useAuth(); // Use the custom hook to get user info
+  const branchCode = localStorage.getItem("branchCode");
 
   useEffect(() => {
     dispatch(getTriageList());
@@ -44,16 +45,16 @@ const Dashboard = () => {
   const { loadingPatientList, allPatientLList } =
     useSelector((state) => state.getPatientList) || {};
 
-    const filterInPatients = useMemo(() => {
-      return Array.isArray(allPatientLList)
-        ? allPatientLList.filter((item) => item.Inpatient === true)
-        : [];
-    }, [allPatientLList]);
-    const filterOutPatients = useMemo(() => {
-      return Array.isArray(allPatientLList)
-        ? allPatientLList.filter((item) => item.Inpatient === false)
-        : [];
-    }, [allPatientLList]);
+  const filterInPatients = useMemo(() => {
+    return Array.isArray(allPatientLList)
+      ? allPatientLList.filter((item) => item.Inpatient === true)
+      : [];
+  }, [allPatientLList]);
+  const filterOutPatients = useMemo(() => {
+    return Array.isArray(allPatientLList)
+      ? allPatientLList.filter((item) => item.Inpatient === false)
+      : [];
+  }, [allPatientLList]);
 
   const { admittedPatients } =
     useSelector((state) => state.getPgAdmissionsAdmitted) || {};
@@ -66,19 +67,30 @@ const Dashboard = () => {
   }, [data]);
 
   const combinedPatients = useMemo(() => {
-    if (!Array.isArray(admittedPatients) || !Array.isArray(formattedDoctorDetails)) return [];
-  
+    if (
+      !Array.isArray(admittedPatients) ||
+      !Array.isArray(formattedDoctorDetails)
+    )
+      return [];
+
     return admittedPatients.map((patient) => {
       const matchingDoctor = formattedDoctorDetails.find(
         (doctor) => patient?.Doctor === doctor?.DoctorID
       );
-  
+
       return {
         ...patient,
         DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
       };
     });
   }, [admittedPatients, formattedDoctorDetails]);
+
+  // filter combinedPatients by branchCode
+  const filteredCombinedPatients = useMemo(() => {
+    return combinedPatients?.filter((patient) => {
+      return patient?.Branch === branchCode;
+    });
+  }, [combinedPatients, branchCode]);
 
   // Sample data for the cards
   const cardData = [
@@ -111,7 +123,7 @@ const Dashboard = () => {
     },
     {
       title: "In patients",
-      value: combinedPatients?.length,
+      value: filteredCombinedPatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
       color: "#000", // You can set the color here

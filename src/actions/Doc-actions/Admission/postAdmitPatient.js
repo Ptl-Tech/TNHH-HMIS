@@ -13,7 +13,6 @@ export const POST_PATIENT_ADMISSION_RESET = "POST_PATIENT_ADMISSION_RESET";
 
 // Action to POST patient admission
 export const postPatientAdmission = (admissionNo) => async (dispatch, getState) => {
-  console.log('admission number', admissionNo)
   try {
     // Dispatch the POST start action
     dispatch({ type: POST_PATIENT_ADMISSION });
@@ -37,7 +36,7 @@ export const postPatientAdmission = (admissionNo) => async (dispatch, getState) 
     // Corrected POST body structure
     const response = await axios.post(
       `${API}Admission/AdmitPatient`, // Endpoint for POSTing admission
-      
+
       admissionNo
       ,
       config
@@ -58,10 +57,10 @@ export const postPatientAdmission = (admissionNo) => async (dispatch, getState) 
     }, 2000);
 
     // Return the patient ID for further use
-    return responseData.data; 
+    return responseData.data;
 
   } catch (error) {
-  
+
     setTimeout(() => {
       dispatch({
         type: POST_PATIENT_ADMISSION_FAIL,
@@ -70,8 +69,8 @@ export const postPatientAdmission = (admissionNo) => async (dispatch, getState) 
       message.error(error.response?.data?.errors || error.errors);
     }, 1200);
 
-   
-  
+
+
 
     // Rethrow error for any additional handling
     throw error;
