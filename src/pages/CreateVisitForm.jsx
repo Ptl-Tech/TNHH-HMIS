@@ -25,6 +25,7 @@ import useFetchPatientVisitDetailsHook from "../hooks/useFetchPatientVisitDetail
 import PatientCharges from "./billing/CashPatients/PatientCharges";
 import { postTriageVisit } from "../actions/patientActions";
 import { useDispatch, useSelector } from "react-redux";
+import { getPatientVisitByNo } from "../actions/reception-actions/patient-visit-actions/getPatientVisitByNo";
 
 const CreateVisitForm = () => {
   const location = useLocation();
@@ -33,71 +34,54 @@ const CreateVisitForm = () => {
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   
   const [view, setView] = useState(false);
-  const [patientData, setPatientData] = useState(null);
   const [visitData, setVisitData] = useState(null);
   const [activeVisitNo, setActiveVisitNo] = useState(null);
   // Fetch patient details
-  const { loadingPatientDetails, patientDetails } =
+  const { loadingPatientDetails, patientDetails, refetchDetails } =
     useFetchPatientDetailsHook(patientNo);
-  console.log(patientDetails);
   // Fetch visit details only when activeVisitNo is set
-  const { loadingPatientVisitDetails, patientVisitDetails } =
-    useFetchPatientVisitDetailsHook(activeVisitNo);
+  // const { loadingPatientVisitDetails, patientVisitDetails } =
+  //   useFetchPatientVisitDetailsHook(patientDetails.ActiveVisitNo || "" );
 
+  // Select the visit details from Redux
+  const { loadingPatientVisitDetails, error, data: patientVisitDetails } = 
+    useSelector((state) => state.getVisitById);
  const { loading: postVisitLoading, success: postVisitSuccess, data : postVisitdata } = useSelector(
     (state) => state.postTriageVisit
   );
-
-  // Set active visit number when patient details update
-  useEffect(() => {
-    if (patientDetails?.ActiveVisitNo) {
-      setActiveVisitNo(patientDetails.ActiveVisitNo);
-    }
-  }, [patientDetails]);
-
-  // Merge patient and visit details, ensuring fresh data
-  useEffect(() => {
+useEffect(() => {
     if (patientDetails) {
-      setPatientData(patientDetails); // Ensure patientData is always set
-    }
-
-    if (patientDetails?.Activated && patientDetails?.ActiveVisitNo) {
-      setVisitData({
-        ...patientDetails,
-        ...patientVisitDetails,
-      });
+      if (patientDetails.Activated ) {
+        setActiveVisitNo(patientDetails.ActiveVisitNo);
+        setVisitData(patientVisitDetails);
+      } else {
+        setActiveVisitNo(null);
+      } 
     } else {
-      setVisitData(null); // Reset visit data if no active visit
+      setActiveVisitNo(null);
     }
-  }, [patientNo, patientDetails, patientVisitDetails]);
+  }, [patientDetails, dispatch, patientVisitDetails]);
 
-  // Handle visit update
-  const handleViewDetailsUpdate = (newVisitNo) => {
-    setActiveVisitNo(newVisitNo);
-  };
-
- 
-
-  //if we have a visit number, fetch the visit details and patient details again
   useEffect(() => {
-    if (activeVisitNo) {
-      setVisitData(patientVisitDetails);
-    } else {
-      setVisitData(null);
-      setPatientData(null);
+   if (activeVisitNo) {
+      dispatch(getPatientVisitByNo(activeVisitNo));
     }
-  }, [activeVisitNo, patientVisitDetails]);
+  }, [activeVisitNo, dispatch]);
+
+  
+console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
 
   // Close modal
   const handleClose = () => {
     setView(false);
   };
   const handleDispatchtoTriage=() => {
-    if(!activeVisitNo){
+    if(!patientDetails?.Activated){
       return
     };
     // Logic for dispatching to triage
-    if (activeVisitNo) {
+    if (patientDetails.ActiveVisitNo) {
+      setActiveVisitNo(patientDetails.ActiveVisitNo);
       const payload={
         appointmentNo:activeVisitNo,
       }
@@ -112,12 +96,17 @@ const CreateVisitForm = () => {
   const handleDirectAdmission=()=>{
     navigate(`/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
   }
-
+//conole log visitno
+  console.log("activeVisitNo", activeVisitNo);
+  console.log("patientDetails", patientDetails.ActiveVisitNo);
+  console.log("patientDetails", patientDetails);
+  console.log("patientVisitDetails", patientVisitDetails);
+  console.log("visitData", visitData);
   // Actions menu
   const menu = (
     <Menu onClick={({ key }) => key === "visit_action" && setView(true)}>
       <Menu.Item key="visit_action">
-        {activeVisitNo ? "View Visit Details" : "Create Visit"}
+        {patientDetails.Activated && patientDetails.ActiveVisitNo ? "View Visit Details" : "Create Visit"}
       </Menu.Item>
       <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>Dispatch to Triage</Menu.Item>
 
@@ -162,7 +151,7 @@ const CreateVisitForm = () => {
         >
           {loadingPatientDetails || loadingPatientVisitDetails ? (
             <Skeleton active paragraph={{ rows: 4 }} />
-          ) : patientData ? (
+          ) : patientDetails ? (
             <Row align="middle" gutter={16}>
               <Col flex="100px">
                 <Avatar size={80} src={"profile"} icon={<UserOutlined />} />
@@ -178,13 +167,13 @@ const CreateVisitForm = () => {
                   }}
                 >
                   <span>
-                    <b>Patient No:</b> {patientData.PatientNo}
+                    <b>Patient No:</b> {patientDetails.PatientNo}
                   </span>
                   <span>
-                    <b>Name:</b> {patientData.SearchName}
+                    <b>Name:</b> {patientDetails.SearchName}
                   </span>
                   <span>
-                    <b>ID No:</b> {patientData.IDNumber}
+                    <b>ID No:</b> {patientDetails.IDNumber}
                   </span>
                   {/* <span>
                     <b>Status:</b>
@@ -209,10 +198,10 @@ const CreateVisitForm = () => {
                   </span> */}
 
                   <span>
-                    <b>Gender:</b> {patientData.Gender}
+                    <b>Gender:</b> {patientDetails.Gender}
                   </span>
                   <span>
-                    <b>Patient Type:</b> {patientData.PatientType}
+                    <b>Patient Type:</b> {patientDetails.PatientType}
                   </span>
                   <span>
                     <b>Visit Date:</b> {visitData?.AppointmentDate}
@@ -241,7 +230,7 @@ const CreateVisitForm = () => {
                       >
                         {visitData.Status}
                       </Tag>
-                    ) : patientData?.Activated ? (
+                    ) : patientDetails?.Activated ? (
                       <Tag
                         color="green"
                         style={{
@@ -299,8 +288,8 @@ const CreateVisitForm = () => {
       <CreateVisitDrawer
         visible={view}
         onClose={handleClose}
-        visitData={visitData}
-        onUpdateVisit={handleViewDetailsUpdate}
+       // visitData={visitData}
+      //  onUpdateVisit={handleViewDetailsUpdate}
       />
     </div>
   );
