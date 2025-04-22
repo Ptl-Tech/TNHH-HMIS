@@ -20,6 +20,7 @@ import { getPatientByNo } from "../../../actions/patientActions";
 const BillingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch(); // Declare the dispatch function
   const [form] = Form.useForm();
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [isPrincipleMember, setIsPrincipleMember] = useState(false);
 
@@ -38,7 +39,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   } = useSelector((state) => state.getInsurance);
 
   useEffect(() => {
-    dispatch(listInsuranceOptions()); // Dispatch the action to fetch insurance options
+    dispatch(listInsuranceOptions());
   }, [dispatch]);
 
   useEffect(() => {
@@ -58,11 +59,13 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
           : patientDetails?.PatientType === "Cash"
           ? 2
           : null;
-          const isPrincipal = patientDetails?.Principal || false;
-          setIsPrincipleMember(isPrincipal);
-      
-          const fullName = `${patientDetails?.Surname || ""} ${patientDetails?.MiddleName || ""} ${patientDetails?.LastName || ""}`.trim();
-      
+      const isPrincipal = patientDetails?.Principal || false;
+      setIsPrincipleMember(isPrincipal);
+
+      const fullName = `${patientDetails?.Surname || ""} ${
+        patientDetails?.MiddleName || ""
+      } ${patientDetails?.LastName || ""}`.trim();
+
       setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
 
       form.setFieldsValue({
@@ -104,13 +107,13 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.PatientStatus || 0,
       });
     }
   }, [patientDetails, form]);
 
   const handleSubmission = (values) => {
-    console.log("Form Values:", values);
+    setFormSubmitted(true);
+
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -137,7 +140,10 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
         values.insuranceName || patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName: values.insurancePrinicipalMemberName||patientDetails?.PrincipalMemberName || "",
+      insurancePrinicipalMemberName:
+        values.insurancePrinicipalMemberName ||
+        patientDetails?.PrincipalMemberName ||
+        "",
       isPrincipleMember:
         values.isPrincipleMember || patientDetails.isPrincipleMember || false,
       membershipNo: values.membershipNo || patientDetails?.MembershipNo || "",
@@ -146,7 +152,6 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
       subcounty: patientDetails?.SubCountyName || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
     };
 
     // Dispatch to save or update patient data
@@ -162,22 +167,28 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       <Typography.Title level={5} underline>
         Billing Information
       </Typography.Title>
-      {error && (
+      {error && formSubmitted && (
         <Alert
           message={error}
           type="error"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_ERROR" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_ERROR" });
+          }}
         />
       )}
-      {success && (
+      {success && formSubmitted && (
         <Alert
           message="Patient Billing data saved successfully!"
           type="success"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_SUCCESS" });
+          }}
         />
       )}
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
@@ -306,34 +317,36 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-              <Form.Item
-  label="Is Patient Principal Member"
-  name="isPrincipleMember"
-  valuePropName="checked"
->
-  <Switch
-    checkedChildren="Yes"
-    unCheckedChildren="No"
-    checked={isPrincipleMember}
-    onChange={(value) => {
-      setIsPrincipleMember(value);
+                <Form.Item
+                  label="Is Patient Principal Member"
+                  name="isPrincipleMember"
+                  valuePropName="checked"
+                >
+                  <Switch
+                    checkedChildren="Yes"
+                    unCheckedChildren="No"
+                    checked={isPrincipleMember}
+                    onChange={(value) => {
+                      setIsPrincipleMember(value);
 
-      if (value) {
-        // Patient is principal — set their full name
-        const fullName = `${patientDetails?.Surname || ""} ${patientDetails?.MiddleName || ""} ${patientDetails?.LastName || ""}`.trim();
-        form.setFieldsValue({
-          insurancePrinicipalMemberName: fullName,
-        });
-      } else {
-        // Patient is NOT principal — show principal name from DB
-        form.setFieldsValue({
-          insurancePrinicipalMemberName: patientDetails?.PrincipalMemberName || "",
-        });
-      }
-    }}
-  />
-</Form.Item>
-
+                      if (value) {
+                        // Patient is principal — set their full name
+                        const fullName = `${patientDetails?.Surname || ""} ${
+                          patientDetails?.MiddleName || ""
+                        } ${patientDetails?.LastName || ""}`.trim();
+                        form.setFieldsValue({
+                          insurancePrinicipalMemberName: fullName,
+                        });
+                      } else {
+                        // Patient is NOT principal — show principal name from DB
+                        form.setFieldsValue({
+                          insurancePrinicipalMemberName:
+                            patientDetails?.PrincipalMemberName || "",
+                        });
+                      }
+                    }}
+                  />
+                </Form.Item>
               </Col>
             </Row>
           </>

@@ -181,7 +181,12 @@ console.log("Selected patientdata:", patientBillData);
           {chargesLoading ? (
             <Skeleton.Input active />
           ) : (
-            <Select onChange={handleChargeSelect} disabled={!!editingCharge}>
+            <Select onChange={handleChargeSelect} disabled={!!editingCharge}   showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            allowClear>
               {charges.map((charge) => (
                 <Select.Option key={charge.Code} value={charge.Code}>
                   {charge.Description}
