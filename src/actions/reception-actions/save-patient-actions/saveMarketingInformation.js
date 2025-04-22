@@ -52,6 +52,6 @@ export const saveMarketingInformation = (formData, navigate) => async (dispatch,
       payload: error.response?.data?.errors || "An error occurred while saving.",
     });
 
-    throw new Error(error.response?.data?.errors || "An error occurred while saving.");
+    throw error;
   }
 }

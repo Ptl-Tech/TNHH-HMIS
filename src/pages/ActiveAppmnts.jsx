@@ -114,17 +114,17 @@ const ActiveAppmnts = () => {
           state: { existingPatient: visitDetails },
         });
       }
-
+const payload={
+  appointmentNo:appointmentId
+}
       // Dispatch Triage Visit
-      await dispatch(postTriageVisit(appointmentId));
-      message.success('Patient has been dispatched successfully!');
-
+      await dispatch(postTriageVisit(payload));
+    
       // Remove dispatched patient from the filtered list
       setFilteredPatients((prev) =>
         prev.filter((patient) => patient.AppointmentNo !== appointmentId),
       );
     } catch (error) {
-      console.error('Error dispatching patient:', error);
       message.error('Failed to dispatch patient!');
     }
   };
@@ -156,6 +156,16 @@ const ActiveAppmnts = () => {
       title: 'Appointment No', // Using AppointmentNo as key
       dataIndex: 'AppointmentNo',
       key: 'AppointmentNo',
+      render: (text, record) => {
+        return (
+          <span
+            className="fw-bold"
+            style={{ color: "#1890ff", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       title: 'Appointment Date',
@@ -202,16 +212,26 @@ const ActiveAppmnts = () => {
       dataIndex: 'VisitType',
       key: 'VisitType',
     },
+    // {
+    //   title: 'Waiting At',
+    //   dataIndex: 'WaitingAt',
+    //   key: 'WaitingAt',
+    // },
     {
-      title: 'Waiting At',
-      dataIndex: 'WaitingAt',
-      key: 'WaitingAt',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'Status',
-      key: 'Status',
-    },
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (text, record) => {
+        return (
+          <span
+            className="fw-bold"
+            style={{ color: "red", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
+    }
   ];
 
   const startIdx = (pagination.current - 1) * pagination.pageSize;
@@ -276,9 +296,9 @@ const ActiveAppmnts = () => {
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys),
           }}
-          rowClassName={(record) =>
-            record.Status === 'New' ? 'row-warning' : ''
-          }
+          // rowClassName={(record) =>
+          //   record.Status === 'New' ? 'row-warning' : ''
+          // }
           pagination={false}
           bordered
           size="small"

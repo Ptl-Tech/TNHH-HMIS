@@ -109,7 +109,7 @@ const VisitorList = () => {
     {
       title: "Visitor No",
       dataIndex: "No",
-      render: (no) => <a href={`/visitor/${no}`}>{no}</a>,
+      render: (no) => <span className="font-bold text-primary">{no}</span>,
     },
     {
       title: "Visitor Name",

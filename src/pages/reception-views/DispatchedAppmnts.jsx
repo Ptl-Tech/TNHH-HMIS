@@ -34,12 +34,13 @@ const DispatchedAppmnts = () => {
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const todayPatients = patients?.filter(
-      (patient) => patient.AppointmentDate === today
+    const todayDispatchedPatients = patients?.filter(
+      (patient) =>
+        patient.AppointmentDate === today && patient.Status === "Dispatched"
     );
-    setFilteredPatients(todayPatients);
+    setFilteredPatients(todayDispatchedPatients);
   }, [patients]);
-
+  
   const handleSearchChange = (e, key) => {
     const value = e.target.value;
     setSearchParams((prev) => ({ ...prev, [key]: value }));
@@ -137,11 +138,11 @@ const DispatchedAppmnts = () => {
       dataIndex: "PatientType",
       key: "PatientType",
     },
-    {
-      title: "Waiting At",
-      dataIndex: "WaitingAt",
-      key: "WaitingAt",
-    },
+    // {
+    //   title: "Waiting At",
+    //   dataIndex: "WaitingAt",
+    //   key: "WaitingAt",
+    // },
     {
       title: "Status",
       dataIndex: "Status",
@@ -215,7 +216,7 @@ const DispatchedAppmnts = () => {
         }))}
         pagination={false}
         bordered
-        size="medium"
+        size="small"
       />
       <Pagination
         total={filteredPatients?.length}
