@@ -77,7 +77,6 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.patientStatus || 0,
       });
     }
   }, [patientDetails, form]);
@@ -133,7 +132,6 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.PatientStatus || 0,
     };
 
     // Dispatch the saveKinDetails action with the formatted data

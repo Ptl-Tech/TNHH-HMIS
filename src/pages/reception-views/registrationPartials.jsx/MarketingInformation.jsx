@@ -1,5 +1,5 @@
-import { Button, Col, Form, Input, Row, Select, Typography } from "antd";
-import React, { useEffect } from "react";
+import { Alert, Button, Col, Form, Input, Row, Select, Typography } from "antd";
+import React, { useEffect,useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { marketingStrategies } from "../../../actions/DropdownListActions";
 import { saveMarketingInformation } from "../../../actions/reception-actions/save-patient-actions/saveMarketingInformation";
@@ -9,6 +9,8 @@ import { getPatientByNo } from "../../../actions/patientActions";
 const MarketingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
   const { loading, success, error } = useSelector(
     (state) => state.saveMarketingInfo
   );
@@ -18,7 +20,8 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
     success: marketingStrategiesSuccess,
     data: marketingStrategiesPayload,
   } = useSelector((state) => state.marketingList);
-  const { loading:loadingPatientDetails, patients:data } = useSelector((state) => state.patientList) || {};
+  const { loading: loadingPatientDetails, patients: data } =
+    useSelector((state) => state.patientList) || {};
 
   useEffect(() => {
     form.setFieldsValue(patientDetails);
@@ -27,14 +30,11 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     dispatch(marketingStrategies());
   }, [success, form]);
-      useEffect(() => {
-        if (success && patientDetails?.PatientNo) {
-          dispatch(getPatientByNo(patientDetails?.PatientNo));
-        }
-    
-      }, [success, dispatch, patientDetails?.PatientNo]);
-    
-  
+  useEffect(() => {
+    if (success && patientDetails?.PatientNo) {
+      dispatch(getPatientByNo(patientDetails?.PatientNo));
+    }
+  }, [success, dispatch, patientDetails?.PatientNo]);
 
   useEffect(() => {
     if (patientDetails) {
@@ -59,8 +59,12 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
         nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-        paymentMode: patientDetails?.PatientType === "Corporate" ? 1 :
-        patientDetails?.PatientType === "Cash" ? 2 : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
+        paymentMode:
+          patientDetails?.PatientType === "Corporate"
+            ? 1
+            : patientDetails?.PatientType === "Cash"
+            ? 2
+            : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
         insuranceName: patientDetails?.InsuranceName || "",
         insurancePrinicipalMemberName:
           patientDetails?.PrincipalMemberName || "",
@@ -72,13 +76,12 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.patientStatus || 0,
       });
     }
   }, [patientDetails, form]);
 
-
   const handleSubmission = (values) => {
+    setFormSubmitted(true);
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -99,16 +102,15 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
       idNumber: patientDetails.IDNumber || "", // Accessing idNumber from the values
       phoneNumber: patientDetails?.TelephoneNo1 || "",
       paymentMode:
-        patientDetails?.PatientType === "Corporate"
-          ? 1
-          : patientDetails?.PatientType === "Cash"
-          ? 2
-          : patientDetails?.PatientType
-          ? patientDetails.PatientType
-          : 0,
+      patientDetails?.PatientType === "Corporate"
+        ? 1
+        : patientDetails?.PatientType === "Cash"
+        ? 2
+        : patientDetails?.PatientType || 0,
+    
       nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
-        nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
+      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
       insuranceNo: patientDetails?.InsuranceNo || "",
       insuranceName: patientDetails?.InsuranceName || "",
       insurancePrinicipalMemberName: patientDetails?.PrincipalMemberName || "",
@@ -120,7 +122,6 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
       subcounty: patientDetails?.SubCountyName || "",
       email: patientDetails?.Email || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
     };
 
     // Dispatch to save or update patient data
@@ -133,27 +134,32 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
       <Typography.Title level={5} underline>
         Marketing Information
       </Typography.Title>
+       {error && formSubmitted && (
+              <Alert
+                message={error}
+                type="error"
+                showIcon
+                closeText="Close"
+                onClose={() => {
+                  setFormSubmitted(false); 
+                  dispatch({ type: "CLEAR_ERROR" });
+                }}
+              />
+            )}
+      {success && formSubmitted && (
+  <Alert
+    message="Marketing information saved successfully!"
+    type="success"
+    showIcon
+    closeText="Close"
+    onClose={() => {
+      setFormSubmitted(false); 
+      dispatch({ type: "CLEAR_SUCCESS" });
+    }}
+  />
+)}
+
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
-        {/* <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  type: "email",
-                  message: "The input is not a valid E-mail!",
-                },
-                {
-                  required: true,
-                  message: "Please input your E-mail!",
-                },
-              ]}
-            >
-              <Input type="email" />
-            </Form.Item>
-          </Col>
-        </Row> */}
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
