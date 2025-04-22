@@ -603,7 +603,7 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } else {
       dispatch({ type: PATIENT_LIST_FAIL, payload: 'Patient not found' });
-      message.warning('No patient found with the provided patient number.', 5);
+   //   message.warning('No patient found with the provided patient number.', 5);
     }
   } catch (error) {
     dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
