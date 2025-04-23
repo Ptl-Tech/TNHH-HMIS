@@ -203,15 +203,15 @@ export default function ReceptionRoutes() {
           element={<InPatientReceipts />}
         />
          <Route
-          path="/reception/CashPatient-Charges/:PatientNo?"
+          path="/Reception/CashPatient-Charges/:PatientNo?"
           element={<ReceiptPatient />}
         />
          <Route
-          path="/reception/CorporatePatient-Charges/:PatientNo?"
+          path="/Reception/CorporatePatient-Charges/:PatientNo?"
           element={<InvoicePatient />}
         />
          <Route
-          path="/reception/CorporatePatient-Charges/:PatientNo?"
+          path="/Reception/CorporatePatient-Charges/:PatientNo?"
           element={<InvoicePatient />}
         />
         <Route
