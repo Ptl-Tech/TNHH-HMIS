@@ -390,27 +390,27 @@ export const listPatients =
         otpVerify: { userInfo },
       } = getState();
 
-      // Fetch branchCode from localStorage
-      const branchCode = localStorage.getItem('branchCode');
+    // Fetch branchCode from localStorage
+    const branchCode = localStorage.getItem('branchCode');
 
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-          branchCode: branchCode, // Include branchCode in headers
-        },
-      };
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        staffNo: userInfo.userData.no, // Add staffNo as a custom header
+        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        branchCode: branchCode, // Include branchCode in headers
+      },
+    };
 
       const { data } = await axios.get(
         `${API}data/odatafilter?webservice=QyPatients${filters}`,
         config,
       );
 
-      // Filter the patients by branchCode matching GlobalDimension1Code
-      const filteredData = data.filter(
-        (patient) => patient.GlobalDimension1Code === branchCode,
-      );
+    // Filter the patients by branchCode matching GlobalDimension1Code
+    const filteredData = data.filter(
+      (patient) => patient.GlobalDimension1Code === branchCode,
+    );
 
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });
     } catch (error) {
@@ -450,6 +450,8 @@ export const appmntList = () => async (dispatch, getState) => {
 
     dispatch({ type: APPMNT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {
+    console.log({ error });
+
     dispatch({ type: APPMNT_LIST_FAIL, payload: error.message });
   }
 };
