@@ -11,7 +11,7 @@ const useFetchPatientVisitDetailsHook = (appmntId) => {
  const { loadingPatientDetails, patientDetails } =
     useFetchPatientDetailsHook(patientNo);
 
-    const [visitNo, setVisitNo] = React.useState(null);
+    const [visitNo, setVisitNo] = React.useState(appmntId || null);
     //check if current visit is same as the one with patient details and set visitNo
     React.useEffect(() => {
       if (patientDetails && patientDetails.ActiveVisitNo) {

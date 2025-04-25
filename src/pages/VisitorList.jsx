@@ -127,6 +127,8 @@ const VisitorList = () => {
       title: "Action",
       dataIndex: "action",
       render: (_, record) => (
+
+        
         <>
           <Button
             type="link"
@@ -139,7 +141,7 @@ const VisitorList = () => {
           </Button>{" "}
           |{" "}
           <Button
-            type="link"
+            type="link" 
             onClick={() =>
               navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
             }

@@ -76,7 +76,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
@@ -131,7 +131,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
       subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
     };
 
     // Dispatch the saveKinDetails action with the formatted data
@@ -185,7 +185,11 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           {loading ? (
             <Skeleton.Input active style={{ width: "100%" }} />
           ) : (
-            <Select placeholder="Select Relationship" showSearch>
+            <Select placeholder="Select Relationship" showSearch allowClear 
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            >
               {data && data.length > 0 ? (
                 data.map((relationship) => (
                   <Select.Option

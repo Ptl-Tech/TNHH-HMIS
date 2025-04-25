@@ -28,7 +28,7 @@ const PatientRegistration = () => {
   const navigate = useNavigate();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loadingPatientDetails, patientDetails: data } =
-    useFetchPatientDetailsHook(patientNo);
+    useFetchPatientDetailsHook(patientNo || null);
   const [patientDetails, setPatientDetails] = useState(null);
   const [updated, setUpdated] = useState(false);
 

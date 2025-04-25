@@ -301,6 +301,7 @@ import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesRed
 import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
 import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
 import { postClosingBillReducer } from "./ChargesReducers/postClosingBillReducer";
+import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -563,6 +564,7 @@ export const rootReducer = combineReducers({
   getUnpostedCharges: getUnpostedChargesReducer,
   getPostedCharges: getpostedChargesReducer,
   deletePatientCharges: deletePatientChargesReducer,
+  deleteSplitLine:deleteReceiptSplitLineReducer,
   postSalesInvoice: postsalesInvoiceReducer,
   reopenPostedCharges: reopensalesInvoiceReducer,
   postRebates: postRebatesReducer,

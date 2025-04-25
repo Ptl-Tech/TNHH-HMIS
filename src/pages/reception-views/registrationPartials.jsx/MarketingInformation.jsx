@@ -75,7 +75,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
@@ -122,6 +122,8 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
       subcounty: patientDetails?.SubCountyName || "",
       email: patientDetails?.Email || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
+      countyWard: patientDetails?.CountyWardName || "",
+
     };
 
     // Dispatch to save or update patient data

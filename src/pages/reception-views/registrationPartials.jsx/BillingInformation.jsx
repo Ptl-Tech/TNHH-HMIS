@@ -87,7 +87,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         county: patientDetails?.PlaceofBirthDistrict || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
         paymentMode:
           patientDetails?.PatientType === "Corporate"
             ? 1
@@ -106,7 +106,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
@@ -135,7 +135,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       county: patientDetails?.PlaceofBirthDistrict || "",
       nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
       nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
       paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
@@ -152,6 +152,8 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
       subcounty: patientDetails?.SubCountyName || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
+      countyWard: patientDetails?.CountyWardName || "",
+
     };
 
     // Dispatch to save or update patient data

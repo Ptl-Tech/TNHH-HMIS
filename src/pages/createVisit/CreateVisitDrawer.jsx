@@ -254,7 +254,9 @@ const CreateVisitDrawer = ({
             </Select>
           </Form.Item>
           <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
-            <Select>
+            <Select onChange={(value) => form.setFieldsValue({ doctor: value })} showSearch allowClear filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }> 
               {filteredDoctors?.map((doc) => (
                 <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
                   {doc.DoctorsName}

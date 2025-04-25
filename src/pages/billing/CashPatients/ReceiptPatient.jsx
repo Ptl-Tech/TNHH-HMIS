@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { act, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
@@ -24,6 +24,7 @@ import PatientReceiptLines from "./PatientReceiptLines";
 import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
+import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -62,6 +63,7 @@ const ReceiptPatient = () => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
       dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
@@ -134,12 +136,15 @@ const ReceiptPatient = () => {
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
+<Menu.Item key="close_bill" disabled={loadingPatientVisitDetails}>
+<ClosePatientBill />
 
+</Menu.Item>
       <Menu.Divider />
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
     </Menu>
   );
-
+console.log("Patient Bill Data:", activeVisitNo);
   return (
     <>
       <div
@@ -172,7 +177,6 @@ const ReceiptPatient = () => {
                   <UserOutlined />
                   <span>Patient Details</span>
                 </div>
-                <ClosePatientBill />
               </div>
             }
             className="mb-3"
@@ -193,7 +197,7 @@ const ReceiptPatient = () => {
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient Name:{" "}
                 <span className="fw-bold">
-                  {patientVisitDetails?.SearchNames.toUpperCase()}
+                  {patientVisitDetails?.Names.toUpperCase()}
                 </span>
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
@@ -332,14 +336,15 @@ const ReceiptPatient = () => {
                 />
                 <SplitPayments
                   receiptNo={
-                    Array.isArray(receiptLines) && receiptLines.length > 0
-                      ? receiptLines[receiptLines.length - 1].No
+                    Array.isArray(receiptHeader) && receiptHeader.length > 0
+                      ? receiptHeader[receiptHeader.length - 1].No
                       : "N/A"
                   }
                   open={splitAmountModal}
                   onCancel={handleCancel}
                   activeVisitNo={activeVisitNo || ""}
                   amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                  patientNo={patientVisitDetails?.PatientNo}
                 />
               </Card>
             </div>
