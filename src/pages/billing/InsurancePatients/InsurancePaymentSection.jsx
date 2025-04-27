@@ -185,10 +185,10 @@ const handleReceiptPost = async () => {
                     required: true,
                     message: "Phone number is required for MPESA",
                   },
-                  {
-                    pattern: /^07\d{8}$/,
-                    message: "Enter a valid Kenyan phone (e.g. 0712345678)",
-                  },
+                  // {
+                  //   pattern: /^07\d{8}$/,
+                  //   message: "Enter a valid Kenyan phone (e.g. 0712345678)",
+                  // },
                 ]}
               >
                 <Input placeholder="0712345678" />
