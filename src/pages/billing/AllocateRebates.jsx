@@ -9,11 +9,17 @@ import moment from "moment";
 const AllocateRebates = ({ onClose, visible, patientNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading } = useSelector((state) => state.postRebates);
   const {
     data: insurancePayload,
   } = useSelector((state) => state.getInsurance);
-  const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
+
+    const {
+      loading: patientBillLoading,
+      error: patientBillError,
+      data: patientBillData,
+    } = useSelector((state) => state.getSingleBill);
   const [rebatesData, setRebatesData] = useState({
     patientNo: patientNo || "",
     rebateAmount: 0,
