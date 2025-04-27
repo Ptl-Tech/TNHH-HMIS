@@ -26,6 +26,7 @@ import PatientCharges from "./billing/CashPatients/PatientCharges";
 import { postTriageVisit } from "../actions/patientActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientVisitByNo } from "../actions/reception-actions/patient-visit-actions/getPatientVisitByNo";
+import { getPatientCharges } from "../actions/Charges-Actions/getPatientCharges";
 
 const CreateVisitForm = () => {
   const location = useLocation();
@@ -36,6 +37,7 @@ const CreateVisitForm = () => {
   const [view, setView] = useState(false);
   const [visitData, setVisitData] = useState(null);
   const [activeVisitNo, setActiveVisitNo] = useState(null);
+  const [dispatchingtotriage, setDispatchingtotriage] = useState(false);
   // Fetch patient details
   const { loadingPatientDetails, patientDetails, refetchDetails } =
     useFetchPatientDetailsHook(patientNo);
@@ -46,9 +48,12 @@ const CreateVisitForm = () => {
   // Select the visit details from Redux
   const { loadingPatientVisitDetails, error, data: patientVisitDetails } = 
     useSelector((state) => state.getVisitById);
- const { loading: postVisitLoading, success: postVisitSuccess, data : postVisitdata } = useSelector(
+ const { loading: postVisitLoading, success: postVisitSuccess, error: postVisitError, data : postVisitdata } = useSelector(
     (state) => state.postTriageVisit
   );
+   const { loading, error: patientChargesError, data } = useSelector(
+      (state) => state.getPatientCharges
+    );
 useEffect(() => {
     if (patientDetails) {
       if (patientDetails.Activated ) {
@@ -65,9 +70,19 @@ useEffect(() => {
   useEffect(() => {
    if (activeVisitNo) {
       dispatch(getPatientVisitByNo(activeVisitNo));
+      dispatch(getPatientCharges(activeVisitNo));
     }
   }, [activeVisitNo, dispatch]);
 
+
+useEffect(() => {
+  if(dispatchingtotriage && postVisitSuccess){
+   
+    dispatch(getPatientCharges(activeVisitNo));
+   }else if (dispatchingtotriage && postVisitError) {
+    message.error(`Error dispatching visit to triage: ${postVisitError}`);    
+  }
+  }, [postVisitSuccess, postVisitdata,dispatchingtotriage, postVisitError,dispatch]);
   
 console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
 
@@ -75,7 +90,7 @@ console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
   const handleClose = () => {
     setView(false);
   };
-  const handleDispatchtoTriage=() => {
+  const handleDispatchtoTriage=async() => {
     if(!patientDetails?.Activated){
       return
     };
@@ -85,10 +100,8 @@ console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
       const payload={
         appointmentNo:activeVisitNo,
       }
-      dispatch(postTriageVisit(payload));
-      if(postVisitSuccess){
-       message.success(`Visit ${postVisitdata} dispatched to triage successfully`);
-      }
+      await dispatch(postTriageVisit(payload));
+      setDispatchingtotriage(true);
     }
   
   };

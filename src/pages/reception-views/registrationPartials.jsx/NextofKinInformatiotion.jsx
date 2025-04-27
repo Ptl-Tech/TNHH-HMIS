@@ -9,7 +9,7 @@ import {
   Button,
   Alert,
 } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listKinsRelationships } from "../../../actions/DropdownListActions";
 import { saveKinsInformation } from "../../../actions/reception-actions/save-patient-actions/saveKinsInformation";
@@ -18,7 +18,9 @@ import { getPatientByNo } from "../../../actions/patientActions";
 
 const NextofKinInformation = ({ patientDetails, onUpdate }) => {
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
+    const[dispatchingInfo,setDispatchingInfo]=useState(false)
+
   const { loading, success, error, data } = useSelector(
     (state) => state.kinsRelationshipsList
   );
@@ -35,10 +37,10 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (savingSuccess || patientDetails?.PatientNo) {
+    if (dispatchingInfo && savingSuccess || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails.PatientNo));
     }
-  }, [savingSuccess, dispatch, patientDetails?.PatientNo]);
+  }, [dispatchingInfo, savingSuccess, dispatch, patientDetails?.PatientNo]);
 
   useEffect(() => {
     if (patientDetails) {
@@ -136,6 +138,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
 
     // Dispatch the saveKinDetails action with the formatted data
     dispatch(saveKinsInformation(formattedData));
+    setDispatchingInfo(true); // 
     //update with fetch patient details from hook
     onUpdate(dataPatient);
   };

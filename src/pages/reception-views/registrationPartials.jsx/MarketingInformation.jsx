@@ -10,7 +10,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [formSubmitted, setFormSubmitted] = useState(false);
-
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
   const { loading, success, error } = useSelector(
     (state) => state.saveMarketingInfo
   );
@@ -30,11 +30,12 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     dispatch(marketingStrategies());
   }, [success, form]);
+
   useEffect(() => {
-    if (success && patientDetails?.PatientNo) {
+    if (dispatchingInfo && success && patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
-  }, [success, dispatch, patientDetails?.PatientNo]);
+  }, [success, dispatchingInfo, dispatch, patientDetails?.PatientNo]);
 
   useEffect(() => {
     if (patientDetails) {
@@ -128,6 +129,7 @@ const MarketingInformation = ({ patientDetails, onUpdate }) => {
 
     // Dispatch to save or update patient data
     dispatch(saveMarketingInformation(formattedData));
+    setDispatchingInfo(true)
     onUpdate(data);
   };
 

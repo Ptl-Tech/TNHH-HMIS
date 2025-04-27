@@ -16,6 +16,9 @@ import { useLocation } from "react-router-dom";
 import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
+import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
+import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
+import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 
 const InsurancePaymentSection = ({ patientNo }) => {
   const [form] = Form.useForm();
@@ -32,11 +35,16 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading: receiptLinesLoading } = useSelector(
     (state) => state.getReceiptLines
   );
+    const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
+  
   const { data: patientBillData } = useSelector((state) => state.getSingleBill);
-
+  const { loading, error, data } = useSelector(
+    (state) => state.getPatientCharges
+  );
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
@@ -77,16 +85,41 @@ const InsurancePaymentSection = ({ patientNo }) => {
     setsaveloading(true);
     const receiptNo = await dispatch(postReceiptHeader(payload));
     setsaveloading(false);
+    getReceiptPage(activeVisitNo);
     if (receiptNo) {
       message.success(`Payment saved successfully.`, 5);
       setPaymentType(null);
-      dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
+
     } else {
       setsaveloading(false);
       message.error("Failed to save the payment. Please try again.");
     }
   };
+const handleReceiptPost = async () => {
+  if(!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
+    return;
+  }
 
+  const lastReceipt = receiptHeader[receiptHeader.length - 1];
+  const payload = {
+    recId: lastReceipt.SystemId,
+    patientNo: patientNo,
+    receiptNo: lastReceipt.No
+  };
+
+  try{
+    const status= await dispatch(postReceipt(payload));
+    if(status){
+      message.success("Receipt posted successfully.");
+      dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getSinglePatientBill(activeVisitNo));
+      getPatientCharges(activeVisitNo);
+    }
+  }catch(error){
+    message.error("Failed to post receipt. Please try again.");
+  }
+};
   // New handleClear function to reset the form fields when the Clear button is clicked
   const handleClear = () => {
     form.resetFields(); // This will clear all fields in the form
@@ -196,15 +229,43 @@ const InsurancePaymentSection = ({ patientNo }) => {
           </Col>
         </Row>
 
-        <Button type="primary" htmlType="submit" loading={saveloading}>
-          Submit Payment
-        </Button>
-        <Button
+      <Row gutter={16}> 
+        <Col span={12}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={saveloading}
+              disabled={saveloading || processReceiptLoading}
+            >
+              Save Payment
+            </Button>
+          </Col>
+          <Col span={12}>
+         
+          <Button
           onClick={handleClear} // Clear button will only reset the fields
           style={{ marginLeft: 8 }}
         >
           Clear
         </Button>
+          </Col>
+        </Row>
+
+        {receiptHeader && receiptHeader.length > 0 && (
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Col span={24}>
+              <Button
+                type="primary"
+                onClick={handleReceiptPost}
+                loading={saveloading || receiptLinesLoading}
+                disabled={saveloading || receiptLinesLoading}
+              >
+                Post Receipt
+              </Button>
+            </Col>
+          </Row>
+        )}
+     
       </Form>
     </Card>
   );

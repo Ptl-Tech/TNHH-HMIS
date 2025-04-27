@@ -39,6 +39,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   const [filteredSubCounties, setFilteredSubCounties] = useState([]);
   const [filteredWards, setFilteredWards] = useState([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading, success, error } = useSelector(
     (state) => state.saveAddressInfo
@@ -179,10 +180,10 @@ console.log("daotient", patientDetails);
   }, [selectedSubCounty]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
-  }, [success, dispatch, patientDetails?.PatientNo]);
+  }, [success,dispatchingInfo, dispatch, patientDetails?.PatientNo]);
 
   const handleSubmission = (values) => {
     setFormSubmitted(true);

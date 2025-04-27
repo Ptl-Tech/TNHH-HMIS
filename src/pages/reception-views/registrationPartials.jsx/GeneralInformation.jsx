@@ -29,13 +29,14 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   useEffect(() => {
-    if (success && data?.patientNo) {
+    if (dispatchingInfo && success && data?.patientNo) {
       setPatientNo(data.patientNo);
       dispatch(getPatientByNo(data.patientNo)); // Fetch new details
     }
-  }, [success, data, dispatch]);
+  }, [dispatchingInfo, success, data, dispatch]);
 
   // Update form values when patientDetails change
   useEffect(() => {
@@ -118,7 +119,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     };
 
     dispatch(saveGeneralInformation(formattedData));
-
+    setDispatchingInfo(true);
     onUpdate(data);
   };
 

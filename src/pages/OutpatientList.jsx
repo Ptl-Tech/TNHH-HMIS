@@ -6,6 +6,7 @@ import {
   EyeOutlined,
   TeamOutlined,
   DisconnectOutlined,
+  DownOutlined
 } from "@ant-design/icons";
 
 import {
@@ -17,6 +18,7 @@ import {
   Table,
   Tooltip,
   Typography,
+  Dropdown, Menu
 } from "antd";
 import { listPatients } from "../actions/patientActions";
 import useAuth from "../hooks/useAuth";
@@ -151,28 +153,30 @@ const OutpatientList = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px" }}>
-          {role === "Reception" ? (
-            <>
-              <Tooltip title="View Details">
-                <Button
-                  type="link"
-                  icon={<EyeOutlined />}
+      render: (_, record) => {
+        const menuItems = [];
+    
+        if (role === "Reception") {
+          menuItems.push(
+            {
+              key: "view",
+              label: (
+                <div
                   onClick={() =>
                     navigate(
                       `/Reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`,
-                      {
-                        state: { patientDet: record },
-                      }
+                      { state: { patientDet: record } }
                     )
                   }
                 >
-                  View Details
-                </Button>
-                <Button
-                  icon={<PlusOutlined />}
-                  type="link"
+                  <EyeOutlined /> View Details
+                </div>
+              ),
+            },
+            {
+              key: "visit",
+              label: (
+                <div
                   onClick={() =>
                     navigate(
                       `/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`,
@@ -185,31 +189,40 @@ const OutpatientList = () => {
                     )
                   }
                 >
-                  Visit Card
-                </Button>{" "}
-              </Tooltip>
-            </>
-          ) : role === "Nurse" ? (
-            <Tooltip title="Admit Patient">
-              <Button
-                icon={<DisconnectOutlined />}
-                type="primary"
+                  <PlusOutlined /> Visit Card
+                </div>
+              ),
+            }
+          );
+        } else if (role === "Nurse") {
+          menuItems.push({
+            key: "admit",
+            label: (
+              <div
                 onClick={() =>
                   navigate(
                     `/Nurse/patient-list/Direct-Admission?PatientNo=${record.PatientNo}`,
-                    {
-                      state: { patientDetails: record },
-                    }
+                    { state: { patientDetails: record } }
                   )
                 }
               >
-                Admit Patient
-              </Button>
-            </Tooltip>
-          ) : null}
-        </div>
-      ),
-    },
+                <DisconnectOutlined /> Admit Patient
+              </div>
+            ),
+          });
+        }
+    
+        return (
+          <Dropdown
+            menu={{ items: menuItems }}
+            placement="bottomLeft"
+            trigger={["click"]}
+          >
+            <Button type="primary" size="small">Actions<DownOutlined /></Button>
+          </Dropdown>
+        );
+      },
+    }
   ];
 
   return (

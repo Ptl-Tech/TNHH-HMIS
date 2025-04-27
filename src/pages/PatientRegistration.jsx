@@ -38,7 +38,7 @@ const PatientRegistration = () => {
     } else {
       setPatientDetails(null);
     }
-  }, [data]);
+  }, [data, patientNo]);
 
   // Reset state if patientNo changes
   useEffect(() => {

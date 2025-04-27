@@ -23,6 +23,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [isPrincipleMember, setIsPrincipleMember] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading: loadingPatientDetails, patients: data } =
     useSelector((state) => state.patientList) || {};
@@ -43,7 +44,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
   }, [success, dispatch, patientDetails?.PatientNo]);
@@ -158,6 +159,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
 
     // Dispatch to save or update patient data
     dispatch(saveBillingInformation(formattedData));
+    setDispatchingInfo(true); // Set dispatching state to true
     onUpdate(data);
 
     //clear success state after submission

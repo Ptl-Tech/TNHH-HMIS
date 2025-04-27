@@ -32,7 +32,7 @@ const InpatientCash = () => {
 
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    navigate(`/Reception/CashPatient-Charges?PatientNo=${patientId}`);
+    navigate(`/Reception/InPatient-Charges?PatientNo=${patientId}`);
   };
 
   const columns = [
@@ -60,12 +60,21 @@ const InpatientCash = () => {
       title: 'Balance',
       dataIndex: 'Balance',
       key: 'Balance',
-    },
+      render: (Balance) => {
+        const isZero = Balance === 0.00 || Balance === 'KSH 0.00';
+        const balanceValue = parseFloat(Balance.replace(/[^0-9.-]+/g, '')); // Extract numeric value from string
+        return (
+          <span style={{ color: isZero ? 'green' : 'red', fontWeight: 'bold' }}>
+            {isZero ? 'KSH 0.00' : `KSH ${balanceValue.toFixed(2)}`}
+          </span>
+        );
+      },
+    },    
     {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <Button type="link" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
+        <Button type="primary" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
           View Charges
         </Button>
       ),

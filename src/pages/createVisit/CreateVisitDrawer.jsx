@@ -35,6 +35,7 @@ const CreateVisitDrawer = ({
   const location = useLocation();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
+  const[dispatchVisit, setDispatchVisit] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(0);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [visitData, setVisitData] = useState(null);
@@ -145,13 +146,13 @@ const CreateVisitDrawer = ({
   }, [paymentMethod, dispatch]);
 
   useEffect(() => {
-    if (visitError) {
+    if (dispatchVisit && visitError) {
       showNotification("error", "Error", visitError);
     }
-    if (visitSuccess) {
+    if (dispatchVisit && visitSuccess) {
       showNotification("success", "Success", "Visit created successfully");
     }
-  }, [visitError, visitSuccess]);
+  }, [visitError, dispatchVisit, visitSuccess]);
 
   const handleClinicChange = (value) => {
     form.setFieldsValue({ clinic: value.toUpperCase() });
@@ -185,8 +186,9 @@ const CreateVisitDrawer = ({
       };
 
       await dispatch(createPatientVisitRequest(payload));
-      refetchDetails(); // Refetch patient details after creating visit
-      onClose(); // Close the drawer after submission
+      setDispatchVisit(true);
+      refetchDetails(); 
+      onClose(); 
     } catch (error) {
       console.log("Validation Failed or Dispatch Error:", error);
     }

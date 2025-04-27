@@ -38,6 +38,8 @@ import { DispatchWalkInPatient } from "../pages/reception-views/DispatchWalkInPa
 import InPatientReceipts from "../pages/billing/InpatientReceipt";
 import ReceiptPatient from "../pages/billing/CashPatients/ReceiptPatient";
 import InvoicePatient from "../pages/billing/InsurancePatients/InvoicePatient";
+import ReceiptInpatient from "../pages/billing/CashPatients/ReceiptInpatient";
+import InvoiceInpatient from "../pages/billing/InsurancePatients/InvoiceInpatient";
 
 export const receptionRoutes = [
   {
@@ -196,8 +198,12 @@ export default function ReceptionRoutes() {
           element={<InvoicePatient />}
         />
         <Route
-          path="/Reception/InPatient-Charges/:patientNo"
-          element={<InPatientReceipts />}
+          path="/Reception/InPatient-Charges"
+          element={<ReceiptInpatient />}
+        />
+         <Route
+          path="/Reception/Corporate-Inpatient-Charges"
+          element={<InvoiceInpatient />}
         />
         <Route
           path="/Reception/patient-list/Direct-Admission/:PatientNo?"
