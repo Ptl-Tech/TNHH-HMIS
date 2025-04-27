@@ -20,12 +20,6 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
     insuaranceCode: "",
   });
 
-  useEffect(() => {
-    const urlPatientNo = new URLSearchParams(window.location.search).get("PatientNo");
-    if (urlPatientNo) {
-      setRebatesData((prev) => ({ ...prev, patientNo: urlPatientNo }));
-    }
-  }, []);
 
   useEffect(() => {
     dispatch(listInsuranceOptions());
@@ -46,7 +40,8 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
   };
 
   const handleSubmitRebates = () => {
-    dispatch(postRebates(rebatesData));
+   
+    dispatch(postRebates(payload));
   };
 
   return (
