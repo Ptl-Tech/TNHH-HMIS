@@ -12,7 +12,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
   const {
     data: insurancePayload,
   } = useSelector((state) => state.getInsurance);
-
+  const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const [rebatesData, setRebatesData] = useState({
     patientNo: patientNo || "",
     rebateAmount: 0,
@@ -41,6 +41,9 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
 
   const handleSubmitRebates = () => {
     dispatch(postRebates(rebatesData));
+          dispatch(getSinglePatientBill(activeVisitNo));
+    onClose(); // Close the modal after submission
+    form.resetFields();
   };
 
   return (
