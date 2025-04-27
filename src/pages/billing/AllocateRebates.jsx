@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { listInsuranceOptions } from "../../actions/DropdownListActions";
 import { postRebates } from "../../actions/Charges-Actions/postRebates";
 import moment from "moment";
+import { getSinglePatientBill } from "../../actions/Charges-Actions/getSinglePatientBill";
 
 const AllocateRebates = ({ onClose, visible, patientNo }) => {
   const [form] = Form.useForm();
