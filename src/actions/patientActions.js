@@ -450,6 +450,8 @@ export const appmntList = () => async (dispatch, getState) => {
 
     dispatch({ type: APPMNT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {
+    console.log({ error });
+
     dispatch({ type: APPMNT_LIST_FAIL, payload: error.message });
   }
 };
