@@ -7,6 +7,7 @@ import { postRebates } from "../../actions/Charges-Actions/postRebates";
 import moment from "moment";
 
 const AllocateRebates = ({ onClose, visible, patientNo }) => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.postRebates);
   const {
@@ -39,9 +40,9 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
     }));
   };
 
-  const handleSubmitRebates = () => {
-    dispatch(postRebates(rebatesData));
-          dispatch(getSinglePatientBill(activeVisitNo));
+  const handleSubmitRebates =async () => {
+ await  dispatch(postRebates(rebatesData));
+       await   dispatch(getSinglePatientBill(activeVisitNo));
     onClose(); // Close the modal after submission
     form.resetFields();
   };
@@ -60,7 +61,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
       width={600}
       footer={null}
     >
-      <Form layout="vertical" onFinish={handleSubmitRebates}>
+      <Form layout="vertical" onFinish={handleSubmitRebates} form={form}>
         {/* Allocation Amount */}
         <Form.Item
           label="Allocation Amount"
