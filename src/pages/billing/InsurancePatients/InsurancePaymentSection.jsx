@@ -257,7 +257,7 @@ const handleReceiptPost = async () => {
               <Button
                 type="primary"
                 onClick={handleReceiptPost}
-                loading={saveloading || receiptLinesLoading}
+                loading={saveloading }
                 disabled={saveloading || receiptLinesLoading}
               >
                 Post Receipt

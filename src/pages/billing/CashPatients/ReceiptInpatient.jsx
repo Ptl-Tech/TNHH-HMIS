@@ -25,6 +25,7 @@ import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
+import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -270,7 +271,7 @@ const ReceiptInpatient = () => {
           <div className="row gap-3 gap-md-0">
             {/* Left Side (Split Receipt) */}
             <div className="col-12 col-md-8">
-              <PaymentSection patientNo={patientVisitDetails?.PatientNo} />
+              <InsurancePaymentSection patientNo={patientBillData[0]?.PatientNo} />
             </div>
 
             {/* Right Side (Amount Details + Buttons) */}
