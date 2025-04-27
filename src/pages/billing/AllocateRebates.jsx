@@ -40,8 +40,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
   };
 
   const handleSubmitRebates = () => {
-   
-    dispatch(postRebates(payload));
+    dispatch(postRebates(rebatesData));
   };
 
   return (
