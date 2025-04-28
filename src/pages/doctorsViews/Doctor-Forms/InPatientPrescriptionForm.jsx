@@ -26,6 +26,7 @@ import {
   getQyPrescriptionLineSlice,
 } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
+import { prescriptionDoseTypes } from "../../../constants/DropDownConstants";
 
 const InPatientPrescriptionForm = ({ setShowForm }) => {
   const location = useLocation();
@@ -60,7 +61,8 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
   }, [dispatch]);
 
   const onFinish = async (values) => {
-    const { PrescriptionRemarks, DrugNo, quantity } = values;
+    const { PrescriptionRemarks, DrugNo, prescriptionDose, dosage, duration } =
+      values;
 
     const prescription = {
       myAction: "create",
@@ -68,7 +70,9 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
       staffNo,
       recId: "",
       drug: DrugNo,
-      quantityIssued: quantity,
+      duration,
+      dosage,
+      prescriptionDose,
       remarks: PrescriptionRemarks,
     };
     setIsSubmitting(true); // Start the loading simulation
@@ -118,7 +122,9 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
                 Prescriptions: {
                   PrescriptionRemarks: "",
                   DrugNo: "",
-                  quantity: "",
+                  prescriptionDose: undefined,
+                  dosage: undefined,
+                  duration: "",
                   admissionNo: admissionNo, // Keep treatmentNo in initial values
                 },
               }}
@@ -167,21 +173,59 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
               </Form.Item>
               <div className="d-block d-flex align-items-center justify-content-between gap-2">
                 <Form.Item
-                  label="Quantity issued"
-                  name="quantity"
+                  label="Duration (No of Days)"
+                  name="duration"
                   hasFeedback
-                  placeholder="Enter Quantity issued e.g 1"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter quantity issued",
-                    },
-                  ]}
                   className="w-100"
                 >
-                  <Input type="number" name="quantity" className="w-100" />
+                  <Input
+                    type="number"
+                    className="w-100"
+                    placeholder="Enter Duration eg 3 days"
+                  />
                 </Form.Item>
               </div>
+
+              <div className="d-block d-flex align-items-center justify-content-between gap-2">
+                <Form.Item
+                  label="Dosage (eg 2 tablets)"
+                  name="dosage"
+                  hasFeedback
+                  className="w-100"
+                >
+                  <Input
+                    type="number"
+                    name="quantity"
+                    className="w-100"
+                    placeholder="Enter Dosage eg 2 tablets"
+                  />
+                </Form.Item>
+              </div>
+
+              <Form.Item
+                label="Prescription Dose"
+                name="prescriptionDose"
+                hasFeedback
+                className="w-100"
+              >
+                <Select
+                  placeholder="Select Prescription Dose"
+                  className="w-100"
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {prescriptionDoseTypes &&
+                    prescriptionDoseTypes.map((item) => (
+                      <Select.Option key={item.value} value={item.value}>
+                        {item.label}
+                      </Select.Option>
+                    ))}
+                </Select>
+              </Form.Item>
 
               <Form.Item
                 label="Prescription Remarks"
