@@ -25,19 +25,17 @@ import {
 } from "../../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
 const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
-
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const { loading: loadingPostTreatmentSheet } = useSelector(
-    (state) => state.postTreatmentSheet
+    (state) => state.postTreatmentSheet || {}
   );
-  const { loading:loadingPrescriptions, data:prescriptions } = useSelector(
-    (state) => state.getInPatientPrescriptionLine
+  const { loading: loadingPrescriptions, data: prescriptions } = useSelector(
+    (state) => state.getInPatientPrescriptionLine || {}
   );
 
-  console.log(prescriptions, 'prescription lines')
   const dispatch = useDispatch();
-  
+
   const handleOnFinish = async (values) => {
     try {
       const { DrugNo, Dosage, Quantity, TreatmentRemarks } = values;
@@ -55,9 +53,8 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         issuedTime: new Date().toLocaleTimeString([], { hour12: false }),
       };
 
-      console.log(treatmentSheet, "treatment sheet");
       const response = await dispatch(
-        postTreatmentSheetLineSlice()
+        postTreatmentSheetLineSlice(treatmentSheet)
       );
       if (response.type === POST_TREATMENT_SHEET_LINE_SUCCESS) {
         message.success(
@@ -84,7 +81,6 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
     dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
   }, [dispatch, admissionNo]);
 
-
   return (
     <Form
       layout="vertical"
@@ -98,10 +94,10 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
       }}
     >
       <Row gutter={[16, 16]}>
-        <Col span={12}>
+        <Col xs={24} md={12}>
           <Card style={{ padding: "20px" }}>
             <Form.Item
-              label="Search Drug Name"
+              label="Select Drug Name"
               name="DrugNo"
               hasFeedback
               rules={[
@@ -117,21 +113,16 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                   placeholder="Select Drug e.g Paracetamol"
                   showSearch
                   loading={loadingPrescriptions}
-                  
                   suffixIcon={<SearchOutlined />}
                   filterOption={(input, option) =>
                     option.children.toLowerCase().includes(input.toLowerCase())
                   }
-  
                 >
-                  {
-                      prescriptions.map((item) => (
-                        <Select.Option key={item.Drug_No} value={item.Drug_No}>
-                          {item.Drug_Name}
-                        </Select.Option>
-                      ))
-                  }
-
+                  {prescriptions.map((item) => (
+                    <Select.Option key={item.Drug_No} value={item.Drug_No}>
+                      {item.Drug_Name}
+                    </Select.Option>
+                  ))}
                 </Select>
               )}
             </Form.Item>
@@ -164,7 +155,6 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                 },
               ]}
             >
-
               <Input type="number" placeholder="Enter Quantity" />
             </Form.Item>
             {/* <Form.Item

@@ -32,7 +32,7 @@ const PharmacyDashboard = () => {
 
   const statuses = [
     { status: 'New', backgroundColor: '#ad4e0023', color: '#ad4e00' },
-    { status: 'Forwaded', backgroundColor: '#0060a323', color: '#0060a3' },
+    { status: 'Forwarded', backgroundColor: '#0060a323', color: '#0060a3' },
     { status: 'Completed', backgroundColor: '#23780423', color: '#237804' },
     { status: 'Cancelled', backgroundColor: '#ad4e0023', color: '#ad4e00' },
   ];

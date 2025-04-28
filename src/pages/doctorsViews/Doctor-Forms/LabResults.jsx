@@ -1,14 +1,15 @@
 import {
   Form,
-  DatePicker,
-  Row,
-  Col,
   Button,
   Typography,
   Select,
   message,
   Tag,
   Modal,
+  Card,
+  Input,
+  Alert,
+  notification,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,21 +20,20 @@ import {
   requestLabTest,
 } from "../../../actions/Doc-actions/requestLabTest";
 import { useLocation } from "react-router-dom";
-import moment from "moment";
 import {
   FileTextOutlined,
-  SaveOutlined,
   PlusOutlined,
   OrderedListOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
 import useAuth from "../../../hooks/useAuth";
 import LabResultDrawer from "./LabResultDrawer";
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
-  GENERATE_LAB_RESULTS_REPORT_SUCCESS,
   generateLabResultsReport,
 } from "../../../actions/lab-actions/generateLabResultsReport";
+import moment from "moment";
 
 const { Option } = Select;
 
@@ -45,6 +45,10 @@ const LabResults = () => {
   const admissionNo = queryParams.get("AdmNo");
   const role = useAuth().userData.departmentName;
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+  const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
+  const [labRequests, setLabRequests] = useState([]); // Track lab requests
+  const [error, setError] = useState(null);
+  const [form] = Form.useForm(); // AntD form instance
 
   const {
     data: reportData,
@@ -66,7 +70,9 @@ const LabResults = () => {
     (state) => state.postLabRequest
   );
 
-  const { data: patientLabTest } = useSelector((state) => state.patientLabTest);
+  const { loading: loadingPatientLabTest, data: patientLabTest } = useSelector(
+    (state) => state.patientLabTest
+  );
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
@@ -89,7 +95,7 @@ const LabResults = () => {
       treatmentNo: treatmentNo ?? admissionNo,
       laboratoryNo: record?.Lab_No,
     };
-    console.log("lab request", labRequest);
+    console.log("lab request number", labRequest);
     await dispatch(generateLabResultsReport(record));
 
     setOpen(true);
@@ -97,6 +103,36 @@ const LabResults = () => {
     setRecord(record);
   };
 
+  const handleTestPackageChange = (name, value, option) => {
+    setSelectedTestPackage({ code: value, name: option.children });
+  };
+
+  const handleAddLabRequest = () => {
+    if (!selectedTestPackage) {
+      setError("Please select a test package");
+      return;
+    }
+
+    // Avoid duplicates
+    const alreadyAdded = labRequests.find(
+      (r) => r.code === selectedTestPackage.code
+    );
+    if (alreadyAdded) {
+      setError("This test package is already added");
+      return;
+    }
+
+    setLabRequests((prev) => [...prev, selectedTestPackage]);
+
+    // Reset select input and error
+    setSelectedTestPackage(null);
+    form.setFieldsValue({ testPackageCode: undefined }); // Reset AntD form field
+    setError(null);
+  };
+
+  const handleRemoveLabTest = (code) => {
+    setLabRequests(labRequests.filter((item) => item.code !== code));
+  };
   const onClose = () => {
     setOpen(false);
   };
@@ -120,7 +156,7 @@ const LabResults = () => {
       );
       dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
     }
-  }, [reportData, reportLoading, reportError]);
+  }, [reportData, reportLoading, reportError, dispatch]);
 
   useEffect(() => {
     dispatch(getLabRequestSetup());
@@ -148,29 +184,44 @@ const LabResults = () => {
     }
   };
 
-  const handleFieldChange = (field, value) => {
-    setLabRequest((prev) => ({
-      ...prev,
-      [field]: field === "dueDate" ? moment(value).format("YYYY-MM-DD") : value,
-    }));
-  };
+  const handleSave = async () => {
+    if (labRequests.length === 0) return;
 
-  const handleSave = () => {
-    dispatch(postLabRequest(labRequest)).then((data) => {
-      if (data.status === "success") message.success(data.status);
-      dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
-      showForm(false);
-    });
-  };
-  const handleViewResults = (record) => {
-    if (record.Results) {
-      setIframeSrc(record.Results); // Assuming `Results` contains the iframe source URL.
-      setNoResultsMessage(false);
-    } else {
-      setNoResultsMessage(true);
+    let allSuccessful = true;
+
+    for (const item of labRequests) {
+      const payload = {
+        ...labRequest,
+        testPackageCode: item.code,
+        dueDate: moment().format("YYYY-MM-DD"),
+      };
+
+      try {
+        const response = await dispatch(postLabRequest(payload));
+
+        if (response.status === "success") {
+          notification.success({
+            message: "Lab request saved!",
+            description: `Lab request ${item.code} saved successfully.`,
+          });
+        } else {
+          allSuccessful = false;
+          message.error(`Failed to save lab request ${item.code}.`);
+        }
+      } catch (error) {
+        allSuccessful = false;
+        console.error(`Error saving ${item.code}:`, error);
+        message.error(`Error saving lab request ${item.code}`);
+      }
     }
-    setModalVisible(true);
-    setOpen(false);
+
+    // Only refresh and reset if all were successful
+    if (allSuccessful) {
+      dispatch(getPatientLabTest(treatmentNo ?? admissionNo));
+      setLabRequests([]);
+      setSelectedTestPackage(null);
+      setShowForm(false);
+    }
   };
 
   const columns = [
@@ -219,23 +270,24 @@ const LabResults = () => {
         return <Tag color={color}>{status}</Tag>;
       },
     },
-    // {
-    //   title: "Results",
-    //   dataIndex: "Results",
-    //   key: "Results",
-    // },
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => showLargeDrawer(record)}
-          icon={<FileTextOutlined />}
-        >
-          View Results
-        </Button>
-      ),
+      render: (_, record) => {
+        if (record.Lab_No === "") {
+          return <Tag color="red">Result not yet Ready</Tag>;
+        } else {
+          return (
+            <Button
+              type="primary"
+              onClick={() => showLargeDrawer(record)}
+              disabled={record.Status !== "Completed"}
+            >
+              View Results
+            </Button>
+          );
+        }
+      },
     },
   ];
 
@@ -250,37 +302,35 @@ const LabResults = () => {
       </Typography.Title>
 
       {role === "Doctor" && patientDetails?.Status !== "Completed" ? (
-        <div className="d-block d-md-flex justify-content-between align-items-center gap-3 my-3">
+        <div className="d-block d-md-flex align-items-center gap-3 my-3">
           <div className="d-flex justify-content-start align-items-center">
+            {!showForm && (
+              <Button
+                type="primary"
+                style={{
+                  marginTop: "16px",
+                  marginBottom: "16px",
+                  marginRight: "16px",
+                  float: "right",
+                  width: "150px",
+                }}
+                icon={<FileTextOutlined />}
+                onClick={handleLabRequest}
+                loading={loadingLabRequest}
+                disabled={!patientLabTest.length} // Disable if no rows are selected
+              >
+                Request Test
+              </Button>
+            )}
+
             <Button
               type="primary"
               style={{
                 marginTop: "16px",
                 marginBottom: "16px",
                 marginRight: "16px",
-                float: "right",
                 width: "150px",
               }}
-              icon={<FileTextOutlined />}
-              onClick={handleLabRequest}
-              loading={loadingLabRequest}
-              disabled={!selectedRow}
-            >
-              Request Test
-            </Button>
-
-            {/* <Popconfirm
-            title="Are you sure?"
-            onConfirm={() => console.log(`Delete: ${record.key}`)}
-          >
-            <Button type="default" icon={<DeleteOutlined />} danger>
-              Delete
-            </Button>
-          </Popconfirm> */}
-          </div>
-          <div className="d-flex justify-content-end my-2">
-            <Button
-              type="primary"
               onClick={() => setShowForm(!showForm)}
               icon={showForm ? <OrderedListOutlined /> : <PlusOutlined />}
             >
@@ -290,9 +340,12 @@ const LabResults = () => {
         </div>
       ) : null}
 
+      {error && <Alert message={error} type="warning" showIcon closable />}
+
       {!showForm ? (
         <>
           <RowSelectionTable
+            loadingPatientLabTest={loadingPatientLabTest}
             columns={columns}
             dataSource={patientLabTest}
             onRowSelect={(row) => setSelectedRow(row)} // Update selected row
@@ -320,73 +373,105 @@ const LabResults = () => {
           </Modal>
         </>
       ) : (
-        <Form layout="vertical" autoComplete="off">
-          <Row gutter={24}>
-            <Col span={12}>
-              <Form.Item
-                name="dueDate"
-                label="Due Date"
-                rules={[{ required: true }]}
-                style={{ width: "100%" }}
+        <Form layout="vertical" autoComplete="off" form={form}>
+          <div className="d-flex justify-content-between align-items-center gap-3 my-3">
+            <Form.Item
+              name="testPackageCode"
+              label="Test Package Code"
+              rules={[{ required: true }]}
+              style={{ flex: 1 }} // 💡 Apply flex here
+            >
+              <Select
+                placeholder="Select Test Package Code"
+                onChange={(value, option) =>
+                  handleTestPackageChange("testPackageCode", value, option)
+                }
+                showSearch
+                filterOption={(input, option) =>
+                  option?.children?.toLowerCase().includes(input.toLowerCase())
+                }
+                size="large"
               >
-                <DatePicker
-                  // format="YYYY-MM-DD"
-                  value={moment().format("YYYY-MM-DD")} // Set the current date
-                  style={{ width: "100%" }}
-                  onChange={(date) => handleFieldChange("dueDate", date)}
-                  inputReadOnly // Make the input readonly
-                  size="large"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="testPackageCode"
-                label="Test Package Code"
-                rules={[{ required: true }]}
-              >
-                <Select
-                  placeholder="Select Test Package Code"
-                  onChange={(value) =>
-                    handleFieldChange("testPackageCode", value)
-                  }
-                  showSearch
-                  filterOption={(input, option) =>
-                    option?.children
-                      ?.toLowerCase()
-                      .includes(input.toLowerCase())
-                  }
-                  size="large"
-                >
-                  {labTestSetupData?.map((item) => (
-                    <Option key={item.Code} value={item.Code}>
-                      {item.Description}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
+                {labTestSetupData?.map((item) => (
+                  <Option key={item.Code} value={item.Code}>
+                    {item.Description}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
 
-          <div className="my-2">
             <Button
               type="primary"
-              style={{
-                marginTop: "16px",
-                marginBottom: "16px",
-                marginRight: "16px",
-                float: "right",
-                width: "150px",
-              }}
-              icon={<SaveOutlined />}
-              onClick={handleSave}
-              loading={loadingLabRequestPost}
+              size="large"
+              icon={<PlusOutlined />}
+              onClick={handleAddLabRequest}
+              disabled={!selectedTestPackage}
             >
-              {labRequest.myAction === "create"
-                ? "Add Lab Request"
-                : "Update Lab Request"}
+              Add Lab Test
             </Button>
           </div>
+          {labRequests.length > 0 && (
+            <Card>
+              <div
+                style={{
+                  display: "flex",
+                  fontWeight: "bold",
+                  padding: "8px 0",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
+                <div style={{ flex: "1" }}>#</div>
+                <div style={{ flex: "3" }}>Lab test Code</div>
+                <div style={{ flex: "4" }}>Lab Test Name</div>
+                <div style={{ flex: "2" }}>Action</div>
+              </div>
+              {labRequests.map((item, index) => (
+                <div
+                  key={item.code}
+                  style={{
+                    display: "flex",
+                    padding: "8px 0",
+                    borderBottom: "1px solid #f0f0f0",
+                    alignItems: "center",
+                    gap: "16px",
+                  }}
+                >
+                  <div style={{ flex: "1" }}>{index + 1}</div>
+                  <div style={{ flex: "3" }}>
+                    <Input value={item.code} disabled />
+                  </div>
+                  <div style={{ flex: "4" }}>
+                    <Input value={item.name} disabled />
+                  </div>
+                  <div style={{ flex: "2" }}>
+                    <Button
+                      type="text"
+                      danger
+                      onClick={() => handleRemoveLabTest(item.code)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </Card>
+          )}
+
+          {labRequests.length > 0 && (
+            <div className="my-2">
+              <Button
+                type="primary"
+                style={{
+                  marginTop: "16px",
+                }}
+                icon={<SaveOutlined />}
+                onClick={handleSave}
+                loading={loadingLabRequestPost}
+              >
+                Save Lab Request
+              </Button>
+            </div>
+          )}
         </Form>
       )}
 

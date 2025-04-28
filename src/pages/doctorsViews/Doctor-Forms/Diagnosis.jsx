@@ -11,10 +11,7 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  FileTextOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { FileTextOutlined, PlusOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getdiagnosisSetup } from "../../../actions/Doc-actions/qyDiagnosisSetup";
 import { postDiagnosisRequest } from "../../../actions/Doc-actions/postDiagnosis";
@@ -35,7 +32,7 @@ const Diagnosis = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
-  console.log('treatment number', admissionNo);
+  console.log("treatment number", admissionNo);
   const patientNo = queryParams.get("PatientNo");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -78,8 +75,8 @@ const Diagnosis = () => {
   useEffect(() => {
     if (treatmentNo) {
       dispatch(getDiagnosisLines(treatmentNo));
-    }else if(admissionNo){
-    dispatch(getDiagnosisLines(admissionNo));
+    } else if (admissionNo) {
+      dispatch(getDiagnosisLines(admissionNo));
     }
   }, [dispatch, treatmentNo, admissionNo]);
 
@@ -97,10 +94,9 @@ const Diagnosis = () => {
   const handleClose = () => {
     setIsModalVisible(false); // Close the modal by updating state
     //reset the diagnosis list
-    if (activeTab === "1"){
+    if (activeTab === "1") {
       setProvisionDiagnosisList([]);
-    }
-    else if (activeTab === "2") {
+    } else if (activeTab === "2") {
       setPrimaryDiagnosisList([]);
     } else if (activeTab === "3") {
       setSecondaryDiagnosisList([]);
@@ -118,7 +114,7 @@ const Diagnosis = () => {
         notesType: "11",
         notes: plainTextContent,
       };
-      console.log('payload', payload);
+      console.log("payload", payload);
       const success = dispatch(postPatientHistoryNotes(payload));
       if (success) {
         message.success("Notes saved successfully");
@@ -126,7 +122,7 @@ const Diagnosis = () => {
     });
   };
   const handleAddDiagnosis = (type) => {
-    console.log('clicked', type);
+    console.log("clicked", type);
     if (diagnosisInput !== "") {
       const newDiagnosis = {
         diagnosisCode: diagnosisInput,
@@ -136,8 +132,7 @@ const Diagnosis = () => {
       };
       if (type === 1) {
         setProvisionDiagnosisList((prevList) => [...prevList, newDiagnosis]);
-      }
-      else if (type === 2) {
+      } else if (type === 2) {
         setPrimaryDiagnosisList((prevList) => [...prevList, newDiagnosis]);
       } else if (type === 3) {
         setSecondaryDiagnosisList((prevList) => [...prevList, newDiagnosis]);
@@ -153,8 +148,7 @@ const Diagnosis = () => {
       updatedList = [...provisionDiagnosisList];
       updatedList[index][field] = value;
       setProvisionDiagnosisList(updatedList);
-    }
-    else if (type === 2) {
+    } else if (type === 2) {
       updatedList = [...primaryDiagnosisList];
       updatedList[index][field] = value;
       setPrimaryDiagnosisList(updatedList);
@@ -170,8 +164,7 @@ const Diagnosis = () => {
       setProvisionDiagnosisList(
         provisionDiagnosisList.filter((_, i) => i !== index)
       );
-    }
-    else if (type === 2) {
+    } else if (type === 2) {
       setPrimaryDiagnosisList(
         primaryDiagnosisList.filter((_, i) => i !== index)
       );
@@ -198,13 +191,13 @@ const Diagnosis = () => {
     let success = true; // Tracks overall success
 
     try {
-      console.log('active tab', activeTab)
+      console.log("active tab", activeTab);
       const diagnosisList =
         activeTab === "1"
-        ? lastUnsavedProvisionDiagnosis
-        : activeTab === "2"
-        ? lastUnSavedPrimaryDiagnosis
-        : lastUnSavedSecondaryDiagnosis;
+          ? lastUnsavedProvisionDiagnosis
+          : activeTab === "2"
+          ? lastUnSavedPrimaryDiagnosis
+          : lastUnSavedSecondaryDiagnosis;
 
       // Process diagnoses based on active tab
       for (let diagnosis of diagnosisList) {
@@ -217,8 +210,7 @@ const Diagnosis = () => {
           remarks: diagnosis.remarks,
         };
 
-
-        console.log('diagnosisData', diagnosisData)
+        console.log("diagnosisData", diagnosisData);
 
         const response = await dispatch(postDiagnosisRequest(diagnosisData));
 
@@ -234,8 +226,7 @@ const Diagnosis = () => {
           //reset the diagnosis list
           if (activeTab === "1") {
             setProvisionDiagnosisList([]);
-          }
-          else if (activeTab === "2") {
+          } else if (activeTab === "2") {
             setPrimaryDiagnosisList([]);
           } else if (activeTab === "3") {
             setSecondaryDiagnosisList([]);
@@ -290,8 +281,7 @@ const Diagnosis = () => {
         Diagnosis Lines
       </Typography.Title>
 
-      {(role === "Doctor" || role === "Psychology") &&
-        patientDetails?.Status !== "Completed" && (
+      {role === "Doctor" && patientDetails?.Status !== "Completed" && (
         <Row gutter={24}>
           <Col span={24}>
             <Button

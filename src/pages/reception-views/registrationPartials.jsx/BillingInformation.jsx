@@ -20,7 +20,10 @@ import { getPatientByNo } from "../../../actions/patientActions";
 const BillingInformation = ({ patientDetails, onUpdate }) => {
   const dispatch = useDispatch(); // Declare the dispatch function
   const [form] = Form.useForm();
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const [isPrincipleMember, setIsPrincipleMember] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading: loadingPatientDetails, patients: data } =
     useSelector((state) => state.patientList) || {};
@@ -37,24 +40,35 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   } = useSelector((state) => state.getInsurance);
 
   useEffect(() => {
-    dispatch(listInsuranceOptions()); // Dispatch the action to fetch insurance options
+    dispatch(listInsuranceOptions());
   }, [dispatch]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
   }, [success, dispatch, patientDetails?.PatientNo]);
+
   console.log(patientDetails);
 
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
       const initialPaymentMode =
-      patientDetails?.PatientType === "Corporate" ? 1 :
-      patientDetails?.PatientType === "Cash" ? 2 : null;
-      
-    setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
+        patientDetails?.PatientType === "Corporate"
+          ? 1
+          : patientDetails?.PatientType === "Cash"
+          ? 2
+          : null;
+      const isPrincipal = patientDetails?.Principal || false;
+      setIsPrincipleMember(isPrincipal);
+
+      const fullName = `${patientDetails?.Surname || ""} ${
+        patientDetails?.MiddleName || ""
+      } ${patientDetails?.LastName || ""}`.trim();
+
+      setPaymentMethod(initialPaymentMode); // Set state for conditional rendering
+
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
@@ -74,26 +88,33 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         county: patientDetails?.PlaceofBirthDistrict || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-        paymentMode: patientDetails?.PatientType === "Corporate" ? 1 :
-        patientDetails?.PatientType === "Cash" ? 2 : 1, // Ensure integer assignment        insuranceNo: patientDetails?.InsuranceNo || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
+        paymentMode:
+          patientDetails?.PatientType === "Corporate"
+            ? 1
+            : patientDetails?.PatientType === "Cash"
+            ? 2
+            : 2,
         insuranceName: patientDetails?.InsuranceName || "",
-        insurancePrinicipalMemberName:
-          patientDetails?.PrincipalMemberName || "",
-        isPrincipleMember: patientDetails?.Principal || false,
+        isPrincipleMember: isPrincipal,
+        insurancePrinicipalMemberName: isPrincipal
+          ? fullName
+          : patientDetails?.PrincipalMemberName || "",
+        insuranceNo: patientDetails?.InsuranceNo || "",
         membershipNo: patientDetails?.MembershipNo || "",
         schemeName: patientDetails?.SchemeName || "",
         howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.patientStatus || 0,
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
 
   const handleSubmission = (values) => {
+    setFormSubmitted(true);
+
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -115,28 +136,34 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       county: patientDetails?.PlaceofBirthDistrict || "",
       nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
       nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-    paymentMode:values.paymentMode,
+      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
+      paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
         values.insuranceName || patientDetails?.InsuranceName || "",
-        insurancePrinicipalMemberName:
+      insurancePrinicipalMemberName:
         values.insurancePrinicipalMemberName ||
         patientDetails?.PrincipalMemberName ||
         "",
       isPrincipleMember:
-        values.isPrincipleMember || patientDetails?.Principal || false,
+        values.isPrincipleMember || patientDetails.isPrincipleMember || false,
       membershipNo: values.membershipNo || patientDetails?.MembershipNo || "",
       schemeName: values.schemeName || patientDetails?.SchemeName || "",
+      email: patientDetails?.Email || "",
       howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
       subcounty: patientDetails?.SubCountyName || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
+      countyWard: patientDetails?.CountyWardName || "",
+
     };
 
     // Dispatch to save or update patient data
     dispatch(saveBillingInformation(formattedData));
+    setDispatchingInfo(true); // Set dispatching state to true
     onUpdate(data);
+
+    //clear success state after submission
+    dispatch({ type: "CLEAR_SUCCESS" });
   };
 
   return (
@@ -144,14 +171,28 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       <Typography.Title level={5} underline>
         Billing Information
       </Typography.Title>
-      {error && <Alert message={error} type="error" showIcon />}
-      {success && (
+      {error && formSubmitted && (
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          closeText="Close"
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_ERROR" });
+          }}
+        />
+      )}
+      {success && formSubmitted && (
         <Alert
           message="Patient Billing data saved successfully!"
           type="success"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_SUCCESS" });
+          }}
         />
       )}
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
@@ -169,8 +210,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 onChange={(value) => setPaymentMethod(value)}
               >
                 <Select.Option value={2}>Cash</Select.Option>
-<Select.Option value={1}>Corporate</Select.Option>
-
+                <Select.Option value={1}>Corporate</Select.Option>
               </Select>
             </Form.Item>
           </Col>
@@ -224,7 +264,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 style={{ display: "none" }}
               >
                 {/* Disabled input field to display the selected insurance number */}
-                <Input disabled value={form.getFieldValue("insuranceNo")} />
+                <Input disabled />
               </Form.Item>
             </Col>
           )}
@@ -271,7 +311,11 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                     },
                   ]}
                 >
-                  <Input placeholder="Enter principal member name" />
+                  <Input
+                    placeholder="Enter principal member name"
+                    disabled={isPrincipleMember}
+                    className="fw-bold"
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -281,18 +325,43 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                   label="Is Patient Principal Member"
                   name="isPrincipleMember"
                   valuePropName="checked"
-                  rules={[
-                    { required: true, message: "Please select an option!" },
-                  ]}
                 >
-                  <Switch checkedChildren="Yes" unCheckedChildren="No" />
+                  <Switch
+                    checkedChildren="Yes"
+                    unCheckedChildren="No"
+                    checked={isPrincipleMember}
+                    onChange={(value) => {
+                      setIsPrincipleMember(value);
+
+                      if (value) {
+                        // Patient is principal — set their full name
+                        const fullName = `${patientDetails?.Surname || ""} ${
+                          patientDetails?.MiddleName || ""
+                        } ${patientDetails?.LastName || ""}`.trim();
+                        form.setFieldsValue({
+                          insurancePrinicipalMemberName: fullName,
+                        });
+                      } else {
+                        // Patient is NOT principal — show principal name from DB
+                        form.setFieldsValue({
+                          insurancePrinicipalMemberName:
+                            patientDetails?.PrincipalMemberName || "",
+                        });
+                      }
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
           </>
         )}
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
             {loading ? "Saving..." : "Save"}
           </Button>
         </Form.Item>

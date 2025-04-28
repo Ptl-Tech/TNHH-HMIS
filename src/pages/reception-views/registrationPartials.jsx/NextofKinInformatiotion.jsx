@@ -9,7 +9,7 @@ import {
   Button,
   Alert,
 } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listKinsRelationships } from "../../../actions/DropdownListActions";
 import { saveKinsInformation } from "../../../actions/reception-actions/save-patient-actions/saveKinsInformation";
@@ -18,7 +18,9 @@ import { getPatientByNo } from "../../../actions/patientActions";
 
 const NextofKinInformation = ({ patientDetails, onUpdate }) => {
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
+    const[dispatchingInfo,setDispatchingInfo]=useState(false)
+
   const { loading, success, error, data } = useSelector(
     (state) => state.kinsRelationshipsList
   );
@@ -35,10 +37,10 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (savingSuccess || patientDetails?.PatientNo) {
+    if (dispatchingInfo && savingSuccess || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails.PatientNo));
     }
-  }, [savingSuccess, dispatch, patientDetails?.PatientNo]);
+  }, [dispatchingInfo, savingSuccess, dispatch, patientDetails?.PatientNo]);
 
   useEffect(() => {
     if (patientDetails) {
@@ -76,8 +78,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
-        patientStatus: patientDetails?.patientStatus || 0,
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
@@ -101,8 +102,8 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           ? "Female"
           : "",
       dob: patientDetails?.DateOfBirth || "", // Ensure valid date format
-      nationality: patientDetails?.nationality || "",
-      county: patientDetails?.county || "",
+      nationality: patientDetails?.Nationality || "",
+      county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: patientDetails?.IDNumber || "",
       phoneNumber: patientDetails?.TelephoneNo1 || "",
       paymentMode:
@@ -115,28 +116,29 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           : 0,
       nextOfKinRelationship:
         values.nextOfKinRelationship ||
-        patientDetails?.nextOfKinRelationship ||
+        patientDetails?.NextofkinRelationship ||
         "",
       nextOfKinFullName:
-        values.nextOfKinFullName || patientDetails?.nextOfkinFullName || "",
+        values.nextOfKinFullName || patientDetails?.NextOfkinFullName || "",
       nextOfKinPhoneNo:
-        values.nextOfKinPhoneNo || patientDetails?.nextOfKinPhoneNo || "",
-      insuranceNo: patientDetails?.insuranceNo || "",
-      insuranceName: patientDetails?.insuranceName || "",
+        values.nextOfKinPhoneNo || patientDetails?.NextOfKinPhoneNo || "",
+      insuranceNo: patientDetails?.InsuranceNo || "",
+      insuranceName: patientDetails?.InsuranceName || "",
       insurancePrinicipalMemberName:
-        patientDetails?.insurancePrinicipalMemberName || "",
+        patientDetails?.PrincipalMemberName || "",
       isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.membershipNo || "",
-      schemeName: patientDetails?.schemeName || "",
-      howYouKnewABoutUs: patientDetails?.howYouKnewABoutUs || "",
-      subcounty: patientDetails?.subcounty || "",
-      email: patientDetails?.email || "",
-      residence: patientDetails?.PlaceofBirthVillage || "",
-      patientStatus: patientDetails?.patientStatus || 0, // Default status to 0
+      membershipNo: patientDetails?.MembershipNo || "",
+      schemeName: patientDetails?.SchemeName || "",
+      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+      subcounty: patientDetails?.SubCountyName || "",
+        email: patientDetails?.Email || "",
+        residence: patientDetails?.PlaceofBirthVillage || "",
+        countyWard: patientDetails?.CountyWardName || "",
     };
 
     // Dispatch the saveKinDetails action with the formatted data
     dispatch(saveKinsInformation(formattedData));
+    setDispatchingInfo(true); // 
     //update with fetch patient details from hook
     onUpdate(dataPatient);
   };
@@ -186,7 +188,11 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           {loading ? (
             <Skeleton.Input active style={{ width: "100%" }} />
           ) : (
-            <Select placeholder="Select Relationship" showSearch>
+            <Select placeholder="Select Relationship" showSearch allowClear 
+            filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }
+            >
               {data && data.length > 0 ? (
                 data.map((relationship) => (
                   <Select.Option

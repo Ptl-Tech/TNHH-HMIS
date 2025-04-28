@@ -1,4 +1,9 @@
-import { REQUEST_RECEIPT_LINES_RESET, REQUEST_RECEIPT_LINES, REQUEST_RECEIPT_LINES_SUCCESS, REQUEST_RECEIPT_LINES_FAIL } from "../../actions/Charges-Actions/getReceiptLines";
+import {
+  REQUEST_RECEIPT_LINES_RESET,
+  REQUEST_RECEIPT_LINES,
+  REQUEST_RECEIPT_LINES_SUCCESS,
+  REQUEST_RECEIPT_LINES_FAIL,
+} from "../../actions/Charges-Actions/getReceiptLines";
 
 export const getReceiptLinesReducer = (state = { data: [] }, action) => {
   switch (action.type) {

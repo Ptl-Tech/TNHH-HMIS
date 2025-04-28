@@ -8,6 +8,7 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
+import useAuth from "../../../hooks/useAuth";
 
 const AddAllergies = () => {
   const [form] = Form.useForm();
@@ -19,6 +20,7 @@ const AddAllergies = () => {
   const { loadingGetAllergiesAndMedications, allergiesMedication } =
     useSelector((state) => state.getAllergiesAndMedications);
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
+  const role = useAuth().userData.departmentName;
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -39,25 +41,26 @@ const AddAllergies = () => {
         title="Allergies and Medications"
       />
 
-      {!isFormVisible && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            paddingBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          <Button
-            type="primary"
-            onClick={handleButtonVisibility}
-            icon={<PlusOutlined />}
+      {(!isFormVisible && role === "Nurse") ||
+        (role === "Doctor" && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              paddingBottom: "20px",
+              marginTop: "20px",
+            }}
           >
-            Add Allergies and Medications
-          </Button>
-        </div>
-      )}
+            <Button
+              type="primary"
+              onClick={handleButtonVisibility}
+              icon={<PlusOutlined />}
+            >
+              Add Allergies and Medications
+            </Button>
+          </div>
+        ))}
 
       {isFormVisible && (
         <AllergyAndMedication

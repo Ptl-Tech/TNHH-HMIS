@@ -53,6 +53,7 @@ const NursingNotes = () => {
       "content",
       JSON.stringify(convertToRaw(state.getCurrentContent()))
     );
+    form.validateFields(["content"]);
   };
 
   const handleOnFinish = async () => {

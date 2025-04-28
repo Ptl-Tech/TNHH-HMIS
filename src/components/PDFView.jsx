@@ -14,23 +14,8 @@ const PDFViewer = ({ base64String, height="500px" }) => {
 
   return (
     <div style={{ position: "relative", width: "100%", height }}>
-      {/* Show Spinner while PDF is loading */}
-      {loading && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 1,
-          }}
-        >
-          <Spin size="large" />
-        </div>
-      )}
-
-      {/* PDF Viewer */}
-      <iframe
+       {/* PDF Viewer */}
+       <iframe
         src={pdfSrc}
         width="100%"
         height={height}
@@ -38,6 +23,8 @@ const PDFViewer = ({ base64String, height="500px" }) => {
         onLoad={() => setLoading(false)} // Hide spinner when PDF loads
         style={{ display: loading ? "none" : "block" }}
       />
+
+     
     </div>
   );
 };

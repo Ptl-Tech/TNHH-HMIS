@@ -1,130 +1,70 @@
-import { Button, DatePicker, Form, Modal } from "antd"
-import { PlusOutlined, FileOutlined, FolderViewOutlined } from "@ant-design/icons"
-import { useState } from "react";
-import TextArea from "antd/es/input/TextArea";
-import DischargeSummeryTable from "../tables/nurse-tables/DischargeSummeryTable";
+import { Button, Form } from "antd";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import { BorderlessTableOutlined, PlusOutlined } from "@ant-design/icons";
 import useAuth from "../../../hooks/useAuth";
+import { useEffect, useState } from "react";
+import DischargeSummeryTable from "../tables/nurse-tables/DischargeSummeryTable";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import DischargeSummaryFormData from "../nurse-forms/DischargeSummaryFormData";
+import { getDischargeSummary } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 
 const Summery = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const role = useAuth().userData.departmentName
-    const showModal = () => {
-      setIsModalOpen(true);
-    };
-    const handleOk = () => {
-      setIsModalOpen(false);
-    };
-    const handleCancel = () => {
-      setIsModalOpen(false);
-    };
-  
-    const [ form ] = Form.useForm();
+  const role = useAuth().userData.departmentName;
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const location = useLocation();
+  const patientDetails = location.state?.patientDetails;
+  const [isViewing, setIsViewing] = useState(false);
+  const queryParams = new URLSearchParams(location.search);
+  const admissionNo = queryParams.get("AdmNo");
+
+  const { loading: loadingGetDischargeSummary, data: summaryData } =
+    useSelector((state) => state.getQyDischargeSummary);
+
+  const handleButtonVisibility = () => {
+    setIsViewing(false);
+    setIsFormVisible(!isFormVisible);
+  };
+
+  useEffect(() => {
+    dispatch(getDischargeSummary(admissionNo));
+  }, [dispatch, admissionNo]);
+
   return (
-    <div>
+    <>
+      <NurseInnerHeader
+        icon={<BorderlessTableOutlined />}
+        title="Discharge Summary"
+      />
 
-        <NurseInnerHeader icon={<FileOutlined/>} title="Discharge Summary" />
+      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        {!isFormVisible && role === "Doctor" && (
+          <>
+            <Button type="primary" onClick={handleButtonVisibility}>
+              <PlusOutlined /> Discharge Summary
+            </Button>
+          </>
+        )}
+      </div>
 
-        {
-            role === 'Doctor' ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', paddingBottom: '20px'}}>
-                <Button type="primary" style={{ width: '50%' }} onClick={()=>showModal()}><PlusOutlined /> Add Discharge Summary
-                </Button>
-                <Button color="default" variant="outlined" style={{ width: '50%' }}><FolderViewOutlined />
-                Preview Discharge Summary
-                </Button>
-                </div>
-            ) : (
-                null
-            )
-        }
+      {isFormVisible && (
+        <DischargeSummaryFormData
+          setIsFormVisible={setIsFormVisible}
+          form={form}
+          patientDetails={patientDetails}
+          isViewing={isViewing}
+        />
+      )}
 
-        <DischargeSummeryTable showModal={showModal}/>
-
-
-        <Modal title="Charge Summary" 
-          open={isModalOpen} 
-          onOk={handleOk} 
-          onCancel={handleCancel}
-          okText="Save Discharge Summary"
-        >
-            <Form
-            
-            layout="vertical" 
-                style={{ paddingTop: '10px'}} 
-                form={form}
-            >
-          
-            <Form.Item 
-                label="Investigations Done" 
-                name="investigationsDone"
-                rules={[
-                {
-                    validator: (_, value) => {
-                        if (value && value.length > 150) {
-                        return Promise.reject(new Error('Investigations done cannot exceed 150 characters!'));
-                        }
-                        return Promise.resolve();
-                    },
-                }
-                ]}
-                >
-                <TextArea placeholder="Enter investigations done"
-                    rows={2}
-                />
-            </Form.Item>
-
-            <Form.Item 
-                label="Management" 
-                name="management"
-                rules={[
-                {
-                    validator: (_, value) => {
-                        if (value && value.length > 150) {
-                        return Promise.reject(new Error('Management cannot exceed 150 characters!'));
-                        }
-                        return Promise.resolve();
-                    },
-                }
-                ]}
-                >
-                <TextArea placeholder="Enter management"
-                    rows={2}
-                />
-            </Form.Item>
-
-            <Form.Item 
-                label="Discharge instructions / Treatments" 
-                name="dischargeInstructionsTreatments"
-                rules={[
-                {
-                    validator: (_, value) => {
-                        if (value && value.length > 150) {
-                        return Promise.reject(new Error('Discharge instructions cannot exceed 150 characters!'));
-                        }
-                        return Promise.resolve();
-                    },
-                }
-                ]}
-                >
-                <TextArea placeholder="Enter discharge instructions"
-                    rows={2}
-                />
-            </Form.Item>
-
-
-            <Form.Item 
-                label="Review Date" 
-                name="reviewDate"
-                >
-                <DatePicker placeholder="Review Date" style={{ width: '100%' }} />
-            </Form.Item>
-
-            </Form>
-        </Modal>
-
-    </div>
-  )
-}
-
-export default Summery
+      {!isFormVisible && (
+        <DischargeSummeryTable
+          summaryData={summaryData}
+          loadingGetDischargeSummary={loadingGetDischargeSummary}
+        />
+      )}
+    </>
+  );
+};
+export default Summery;

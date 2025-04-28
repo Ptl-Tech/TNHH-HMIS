@@ -18,8 +18,8 @@ const RadiologyDashboard = () => {
   const newRadiologyRequests = data.filter(
     (dataItem) => dataItem.Status === 'New',
   );
-  const forwadedRadiologyRequests = data.filter(
-    (dataItem) => dataItem.Status === 'Forwaded',
+  const forwardedRadiologyRequests = data.filter(
+    (dataItem) => dataItem.Status === 'Forwarded',
   );
   const completedRadiologyRequests = data.filter(
     (dataItem) => dataItem.Status === 'Completed',
@@ -54,7 +54,7 @@ const RadiologyDashboard = () => {
               </div>
             </div>
           </div>
-          {/* forwaded radiology requests */}
+          {/* forwarded radiology requests */}
           <div className="col col-12 col-md-3">
             <div
               className="card"
@@ -66,7 +66,7 @@ const RadiologyDashboard = () => {
                   <FaUser style={{ marginRight: 8 }} />
                   Forwarded Radiology Requests
                 </div>
-                <p className="text-white">{forwadedRadiologyRequests.length}</p>
+                <p className="text-white">{forwardedRadiologyRequests.length}</p>
               </div>
             </div>
           </div>

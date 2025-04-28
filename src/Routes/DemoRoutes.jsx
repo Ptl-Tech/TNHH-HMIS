@@ -61,56 +61,56 @@ const DemoRoutes = [
         label: 'Dashboard',
       },
       {
-        key: '/reception/visitors-list',
+        key: '/Reception/visitors-list',
         icon: <UserOutlined style={{ color: '#fff' }} />,
         label: 'Visitors',
       },
       {
-        key: '/reception/patient-list',
+        key: '/Reception/patient-list',
         icon: <FaUserGroup style={{ color: '#fff' }} />,
         label: 'Patient List',
         children: [
           {
-            key: '/reception/Patient-list',
+            key: '/Reception/Patient-list',
             label: 'OutPatient List',
             icon: <FileTextOutlined style={{ color: '#fff' }} />,
           },
           {
-            key: '/reception/converted-patients',
+            key: '/Reception/converted-patients',
             label: 'Converted Patients',
             icon: <UserOutlined style={{ color: '#fff' }} />,
           },
         ],
       },
       {
-        key: '/reception/appointments',
+        key: '/Reception/appointments',
         icon: <CalendarOutlined style={{ color: '#fff' }} />,
         label: 'Appointments',
         children: [
           {
-            key: '/reception/appointments/list',
+            key: '/Reception/appointments/list',
             label: ' New Appointments',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
           {
-            key: '/reception/appointments/Dispatched',
+            key: '/Reception/appointments/Dispatched',
             label: 'Dispatched List',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
         ],
       },
       {
-        key: '/reception/billing',
+        key: '/Reception/billing',
         icon: <BiCoinStack style={{ color: '#fff' }} />,
         label: 'Billing',
         children: [
           {
-            key: '/reception/cash-List',
+            key: '/Reception/cash-List',
             label: 'Cash Patients',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },
           {
-            key: '/reception/insurance-List',
+            key: '/Reception/insurance-List',
             label: 'Insurance Patients',
             icon: <CalendarOutlined style={{ color: '#fff' }} />,
           },

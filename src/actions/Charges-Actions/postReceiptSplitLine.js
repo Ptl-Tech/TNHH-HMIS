@@ -8,7 +8,7 @@ export const POST_RECEIPT_SPLIT_LINE_SUCCESS = "POST_RECEIPT_SPLIT_LINE_SUCCESS"
 export const POST_RECEIPT_SPLIT_LINE_FAIL = "POST_RECEIPT_SPLIT_LINE_FAIL";
 export const POST_RECEIPT_SPLIT_LINE_RESET = "POST_RECEIPT_SPLIT_LINE_RESET";
 
-export const postReceiptSplitLine = (data) => async (dispatch, getState) => {
+export const  postReceiptSplitLine = (data) => async (dispatch, getState) => {
   try {
     dispatch({ type: POST_RECEIPT_SPLIT_LINE_REQUEST });
 

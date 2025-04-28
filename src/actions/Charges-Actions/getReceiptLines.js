@@ -8,7 +8,7 @@ export const REQUEST_RECEIPT_LINES_SUCCESS = "REQUEST_RECEIPT_LINES_SUCCESS";
 export const REQUEST_RECEIPT_LINES_FAIL = "REQUEST_RECEIPT_LINES_FAIL";
 export const REQUEST_RECEIPT_LINES_RESET = "REQUEST_RECEIPT_LINES_RESET";
 
-export const getReceiptLines = (receiptNo) => async (dispatch, getState) => {
+export const getReceiptLines = (visitNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_RECEIPT_LINES });
 
@@ -32,7 +32,7 @@ export const getReceiptLines = (receiptNo) => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-      `${API}data/odatafilter?webservice=PgReceiptLines&isList=true&query=$filter=No eq '${receiptNo}'`,
+      `${API}data/odatafilter?webservice=PgReceiptLines&isList=true&query=$filter=TellerID eq '${visitNo}'`,
       config
     );
 

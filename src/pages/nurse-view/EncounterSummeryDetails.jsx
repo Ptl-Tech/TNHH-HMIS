@@ -18,6 +18,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getSinglePatientAllVitalsLines } from "../../actions/triage-actions/getVitalsLinesSlice";
 import { useLocation } from "react-router-dom";
+import InpatientMedication from "./nurse-care-plan/InpatientMedication";
+import Ketamine from "../doctorsViews/Doctor-Forms/Ketamine";
+import PatientSigns from "../doctorsViews/Doctor-Forms/PatientSigns";
+import PhysicalExamination from "../doctorsViews/DocAdmission-views/PhysicalExamintaion";
+import PatientSymptoms from "../doctorsViews/Doctor-Forms/PatientSyptoms";
+import PastMedicalHistory from "../doctorsViews/Doctor-Forms/PastMedicalHistory";
+import FourPsForm from "../doctorsViews/Doctor-Forms/FourPsForm";
 
 const EncounterSummeryDetails = () => {
   const [activeItem, setActiveItem] = useState("Triage");
@@ -25,6 +32,7 @@ const EncounterSummeryDetails = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const patientDetails = location.state?.patientDetails;
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
 
   console.log("Patient number", patientDetails?.PatientNo)
 
@@ -39,6 +47,14 @@ const EncounterSummeryDetails = () => {
     { label: "Laboratory", icon: <ExperimentOutlined /> },
     { label: "Radiology", icon: <DeliveredProcedureOutlined /> },
     { label: "ECT", icon: <VerticalAlignTopOutlined /> },
+    { label: "Ketamine", icon: <DeliveredProcedureOutlined /> },
+    // { label: "Patient History Notes", icon: <PatientSigns /> },
+    // { label: "Physical Examination", icon: <PhysicalExamination /> },
+    // { label: "Mental Status Exam", icon: <PatientSymptoms /> },
+    // { label: "Past Medical History", icon: <PastMedicalHistory /> },
+    // { label: "Diagnosis Formulation", icon: <Diagnosis /> },
+    // { label: "Aetiology", icon: <FourPsForm /> },
+
   ];
 
   const handleOnClick = (item) => {
@@ -56,7 +72,7 @@ const EncounterSummeryDetails = () => {
         setSelectedItem(<Diagnosis />);
         break;
       case "Prescription":
-        setSelectedItem(<Medication />);
+        setSelectedItem(admissionNo != null ? <InpatientMedication /> : <Medication />);
         break;
       case "Laboratory":
         setSelectedItem(<LabResults />);
@@ -66,6 +82,30 @@ const EncounterSummeryDetails = () => {
         break;
       case "ECT":
         setSelectedItem(<ECTScan />);
+        break;
+      case "Ketamine":
+        setSelectedItem(<Ketamine />);
+        break;
+      case "Patient History Notes":
+        selectedItem(<PatientSigns />);
+        break;
+      case "Physical Examination":
+        setSelectedItem(<PhysicalExamination />);
+        break;
+      case "Mental Status Exam":
+        setSelectedItem(<PatientSymptoms />);
+        break;
+      case "Past Medical History":
+        setSelectedItem(<PastMedicalHistory />);
+        break;
+      case "Diagnosis Formulation":
+        setSelectedItem(<Diagnosis />);
+        break;
+      case "Aetiology":
+        setSelectedItem(<FourPsForm />);
+        break;
+      case "Medication":
+        setSelectedItem(<Medication />);
         break;
       default:
         setSelectedItem(<VitalsTable />);

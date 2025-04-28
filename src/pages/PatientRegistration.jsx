@@ -28,7 +28,7 @@ const PatientRegistration = () => {
   const navigate = useNavigate();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loadingPatientDetails, patientDetails: data } =
-    useFetchPatientDetailsHook(patientNo);
+    useFetchPatientDetailsHook(patientNo || null);
   const [patientDetails, setPatientDetails] = useState(null);
   const [updated, setUpdated] = useState(false);
 
@@ -38,7 +38,7 @@ const PatientRegistration = () => {
     } else {
       setPatientDetails(null);
     }
-  }, [data]);
+  }, [data, patientNo]);
 
   // Reset state if patientNo changes
   useEffect(() => {
@@ -57,7 +57,7 @@ const PatientRegistration = () => {
       case "create_visit":
         // Navigate with proper query parameters
         navigate(
-          `/reception/Add-Appointment?patientNo=${patientDetails.PatientNo}`,
+          `/reception/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }
@@ -65,7 +65,7 @@ const PatientRegistration = () => {
         break;
       case "request_admission":
         navigate(
-          `/reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
+          `/Reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }
@@ -73,7 +73,7 @@ const PatientRegistration = () => {
         break;
       // case "bill_patient":
       //   navigate(
-      //     `/reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
+      //     `/Reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
       //     {
       //       state: { existingPatient: patientDetails },
       //     }

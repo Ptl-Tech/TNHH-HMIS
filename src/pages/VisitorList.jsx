@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
-import { listPatients, convertPatient } from "../actions/patientActions"; 
-import { Table, Skeleton, message, Button } from "antd";
+import { listPatients, convertPatient } from "../actions/patientActions";
+import { Table, Skeleton, message, Button, Input, Space,Dropdown, Menu } from "antd";
 import dayjs from "dayjs";
 import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
 import { useNavigate } from "react-router-dom";
+import { ReloadOutlined, SearchOutlined,DownOutlined } from "@ant-design/icons";
 
 const VisitorList = () => {
   const dispatch = useDispatch();
@@ -14,44 +15,64 @@ const VisitorList = () => {
   const { loading: loadingPatients, patients } = useSelector((state) => state.patientList);
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
+  const [displayedVisitors, setDisplayedVisitors] = useState([]);
   const [loadingFiltered, setLoadingFiltered] = useState(true);
   const [selectedVisitor, setSelectedVisitor] = useState(null);
   const [convertPatientModal, setConvertPatientModal] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState(false);
   const [errormsg, setErrormsg] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     dispatch(getVisitorsList());
-    dispatch(listPatients()); // Fetch all patients once
+    dispatch(listPatients());
   }, [dispatch]);
 
   useEffect(() => {
-    if (!data || data.length === 0 || !patients) {
-      setLoadingFiltered(false);
+    filterVisitors();
+  }, [data, patients]);
+
+  useEffect(() => {
+    applySearchFilter();
+  }, [searchTerm, filteredVisitors]);
+
+  const filterVisitors = () => {
+    if (!data || data.length === 0 || !patients || patients.length === 0) {
       return;
     }
-
+  
     setLoadingFiltered(true);
-
+  
     try {
-      const patientSet = new Set(patients.map((p) => p.IDNumber)); // Store patient IDs in a Set
-
-      const filteredList = data
-        .filter((visitor) => {
-          const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
-          const isEntered = visitor.Status === "Entered";
-          const isPatient = patientSet.has(visitor.IDNumber);
-          return isToday && isEntered && !isPatient;
-        })
-        .slice(0, 20); // Load only 20 visitors at a time
-
+      const patientSet = new Set(patients.map((p) => p.IDNumber));
+      const filteredList = data.filter((visitor) => {
+        const isToday = dayjs(visitor.InitiatedDate).isSame(dayjs(), "day");
+        const isEntered = visitor.Status === "Entered";
+        const isPatient = patientSet.has(visitor.IDNumber);
+        return isToday && isEntered && !isPatient;
+      });
+  
       setFilteredVisitors(filteredList);
     } catch (error) {
       console.error("Error filtering visitors:", error);
     } finally {
       setLoadingFiltered(false);
     }
-  }, [data, patients]);
+  };
+  ;
+
+  const applySearchFilter = () => {
+    if (!searchTerm) {
+      setDisplayedVisitors(filteredVisitors.slice(0, 20)); // Initial load
+    } else {
+      const filtered = filteredVisitors.filter((visitor) =>
+        `${visitor.VisitorName ?? ""} ${visitor.IDNumber ?? ""}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+      setDisplayedVisitors(filtered);
+    }
+  };
 
   const handleConvertToPatient = async () => {
     if (!selectedVisitor) return;
@@ -63,12 +84,12 @@ const VisitorList = () => {
 
       if (response) {
         message.success(`Patient Number: ${response}`, 5);
-        navigate(`/reception/Patient-Registration/Patient?PatientNo=${response}`);
+        navigate(`/Reception/Patient-Registration/Patient?PatientNo=${response}`);
       } else {
         message.error("Failed to retrieve patient number");
       }
 
-      dispatch(getVisitorsList()); // Refresh visitor list
+      dispatch(getVisitorsList());
       setConvertPatientModal(false);
       setSelectedVisitor(null);
     } catch (error) {
@@ -78,17 +99,22 @@ const VisitorList = () => {
     }
   };
 
+  const handleRefresh = () => {
+    setSearchTerm("");
+    dispatch(getVisitorsList());
+  };
+
   const columns = [
     { title: "Index", dataIndex: "index", render: (_, __, index) => index + 1 },
     {
       title: "Visitor No",
       dataIndex: "No",
-      render: (no) => <a href={`/visitor/${no}`}>{no}</a>,
+      render: (no) => <span className="fw-bold text-dark">{no}</span>,
     },
     {
       title: "Visitor Name",
       dataIndex: "VisitorName",
-      render: (name) => (name ? name.toUpperCase() : "N/A"),
+      render: (name) => <span className="fw-bold text-dark">{name}</span>,
     },
     { title: "ID Number", dataIndex: "IDNumber" },
     { title: "Phone Number", dataIndex: "PhoneNumber" },
@@ -100,42 +126,65 @@ const VisitorList = () => {
     {
       title: "Action",
       dataIndex: "action",
-      render: (_, record) => (
-        <>
-          <Button
-            type="link"
-            onClick={() => {
-              setSelectedVisitor(record);
-              setConvertPatientModal(true);
-            }}
-          >
-            Convert to Patient
-          </Button>{" "}
-          |{" "}
-          <Button
-            type="link"
-            onClick={() =>
-              navigate(`/reception/Register-walkin`, { state: { visitorData: record } })
-            }
-          >
-            Register Walk In
-          </Button>
-        </>
-      ),
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+            <Menu.Item
+              key="convert"
+              onClick={() => {
+                setSelectedVisitor(record);
+                setConvertPatientModal(true);
+              }}
+            >
+              Convert to Patient
+            </Menu.Item>
+            <Menu.Item
+              key="register"
+              onClick={() =>
+                navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
+              }
+            >
+              Register Walk In
+            </Menu.Item>
+          </Menu>
+        );
+  
+        return (
+          <Dropdown overlay={menu}>
+            <Button type="primary" size="small" >
+              Actions <DownOutlined />
+            </Button>
+          </Dropdown>
+        );
+      },
     },
   ];
 
   return (
     <div>
+      <Space style={{ marginBottom: 16 }}>
+        <Input
+          placeholder="Search by name or ID number"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          prefix={<SearchOutlined />}
+          allowClear
+          style={{ width: 300 }}
+        />
+        <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={loadingFiltered}>
+          Refresh
+        </Button>
+      </Space>
+
       {loadingFiltered ? (
         <Skeleton active paragraph={{ rows: 10 }} />
       ) : (
         <Table
-          dataSource={filteredVisitors}
-          loading={loadingFiltered}
+          dataSource={displayedVisitors}
           rowKey="No"
           columns={columns}
           size="small"
+          pagination={{ pageSize: 10 }}
         />
       )}
 
