@@ -1,11 +1,11 @@
-import { combineReducers } from "@reduxjs/toolkit";
+import { combineReducers } from '@reduxjs/toolkit';
 import {
   otpVerifyReducer,
   userLoginReducer,
   userRegisterReducer,
   forgotPwdReducer,
   resetPwdReducer,
-} from "./userReducer";
+} from './userReducer';
 import {
   activePatientsReducer,
   appmntListReducer,
@@ -21,7 +21,7 @@ import {
   postDoctorTreatmentReducer,
   postPatientVitalsReducer,
   postTriageVisitReducer,
-} from "./patientReducer";
+} from './patientReducer';
 import {
   countiesListReducer,
   countriesListReducer,
@@ -41,46 +41,48 @@ import {
   QyDiagnosisTestsSetupReducer,
   getemployeeDetailsReducer,
   QyLocationsListReducer,
-} from "./DropdownReducer";
-import { triageWaitingListReducer } from "./TriageReducers";
+} from './DropdownReducer';
+import { triageWaitingListReducer } from './TriageReducers';
 import {
   admitVisitorReducer,
   clearVisitorReducer,
   visitorByIdReducer,
   visitorCreateReducer,
   visitorListReducer,
-} from "./visitorsReducer";
-import { updateTriageListVitalsReducer } from "./triage-reducers/updateTriageListVitalsReducer";
-import { getTriageListReducer } from "./triage-reducers/getTriageListReducer";
+} from './visitorsReducer';
+import { updateTriageListVitalsReducer } from './triage-reducers/updateTriageListVitalsReducer';
+import { getTriageListReducer } from './triage-reducers/getTriageListReducer';
 
 // Triage reducers
-import { getPatientDetailsReducer } from "./triage-reducers/getPatientDetailsReducer";
-import { getTriageListDetailsReducer } from "./triage-reducers/getTriageListDetailsReducer";
-import { postTriageListVitalsReducer } from "./triage-reducers/postTriageListVitalsReducer";
+import { getPatientDetailsReducer } from './triage-reducers/getPatientDetailsReducer';
+import { getTriageListDetailsReducer } from './triage-reducers/getTriageListDetailsReducer';
+import { postTriageListVitalsReducer } from './triage-reducers/postTriageListVitalsReducer';
 import {
   getPatientVitalsLinesReducer,
   getVitalsLinesReducer,
   getSinglePatientAllVitalsLinesReducer,
-} from "./triage-reducers/getVitalsLinesReducer";
-import { postAllergiesMedicationReducer } from "./triage-reducers/postAllergiesMedicationReducer";
-import { getAllergiesAndMedicationReducer } from "./triage-reducers/getAllergiesAndMedicationReducer";
-import { postInjectionsReducer } from "./triage-reducers/postInjectionsReducer";
-import { getInjectionNumberReducer } from "./triage-reducers/getInjectionNumberReducer";
-import { getStoreRequisitionHeadersReducer } from "./triage-reducers/getStoreRequisitionHeadersReducer";
-import { getItemsReducer } from "./triage-reducers/getItemsReducer";
-import { postDressingsReducer } from "./triage-reducers/postDressingsReducer";
-import { getDressingReducer } from "./triage-reducers/getDressingReducer";
-import { getItemUnitsOfMeasureReducer } from "./triage-reducers/getItemUnitsOfMeasureReducer";
-import { postDispatchToDoctorReducer } from "./triage-reducers/postDispatchToDoctorReducer";
-import { postCheckInPatientReducer } from "./triage-reducers/postCheckInPatientReducer";
-import { getTriageWaitingListReducer } from "./triage-reducers/getTriageWaitingListReducer";
+} from './triage-reducers/getVitalsLinesReducer';
+import { postAllergiesMedicationReducer } from './triage-reducers/postAllergiesMedicationReducer';
+import { getAllergiesAndMedicationReducer } from './triage-reducers/getAllergiesAndMedicationReducer';
+import { postInjectionsReducer } from './triage-reducers/postInjectionsReducer';
+import { getInjectionNumberReducer } from './triage-reducers/getInjectionNumberReducer';
+import { getStoreRequisitionHeadersReducer } from './triage-reducers/getStoreRequisitionHeadersReducer';
+import { getItemsReducer } from './triage-reducers/getItemsReducer';
+import { postDressingsReducer } from './triage-reducers/postDressingsReducer';
+import { getDressingReducer } from './triage-reducers/getDressingReducer';
+import { getItemUnitsOfMeasureReducer } from './triage-reducers/getItemUnitsOfMeasureReducer';
+import { postDispatchToDoctorReducer } from './triage-reducers/postDispatchToDoctorReducer';
+import { postCheckInPatientReducer } from './triage-reducers/postCheckInPatientReducer';
+import { getTriageWaitingListReducer } from './triage-reducers/getTriageWaitingListReducer';
 import {
   PatientDeetsReducer,
   treatmentListReducer,
 } from './doc-reducers/OutPatientReducers';
 import { getPatientListReducer } from './nurse-reducers/getPatientListReducer';
-import { getConsultationReducer, getConsultationRoomListReducer } from './nurse-reducers/getConsultationRoomReducer';
-
+import {
+  getConsultationReducer,
+  getConsultationRoomListReducer,
+} from './nurse-reducers/getConsultationRoomReducer';
 
 // lab
 import {
@@ -88,31 +90,31 @@ import {
   postLabReducer,
   requestLabTestReducer,
   viewPatientLabTestReducer,
-} from "./doc-reducers/labRequestReducer";
-import { getLabDetailsReducer } from "./doc-reducers/getLabDetailsReducer";
+} from './doc-reducers/labRequestReducer';
+import { getLabDetailsReducer } from './doc-reducers/getLabDetailsReducer';
 
 import {
   postRadiologyReducer,
   requestRadiologyReducer,
   viewPatientRadiologyReducer,
-} from "./doc-reducers/radiologyRequestReducer";
-import { postDiagnosisReducer } from "./doc-reducers/diagnosisRequestReducer";
-import { saveAdmissionDetails } from "../actions/Doc-actions/postAdmissionRequest";
+} from './doc-reducers/radiologyRequestReducer';
+import { postDiagnosisReducer } from './doc-reducers/diagnosisRequestReducer';
+import { saveAdmissionDetails } from '../actions/Doc-actions/postAdmissionRequest';
 import {
   requestAdmissionReducer,
   saveAdmissionDetailsReducer,
-} from "./doc-reducers/admissionRequestReducers";
+} from './doc-reducers/admissionRequestReducers';
 import {
   requestReferralReducer,
   saveReferralDetailsReducer,
-} from "./doc-reducers/referralRequestReducer";
+} from './doc-reducers/referralRequestReducer';
 import {
   inpatientSendToPharmacyReducer,
   saveInPatientPrescriptionDetails,
   savePrescriptionDetailsReducer,
   sendtoPharmacyReducer,
-} from "./doc-reducers/prescriptionRequestReducer";
-import { sendtoPharmacy } from "../actions/Doc-actions/postPrescription";
+} from './doc-reducers/prescriptionRequestReducer';
+import { sendtoPharmacy } from '../actions/Doc-actions/postPrescription';
 import {
   saveSignsReducer,
   saveSyptomsReducer,
@@ -148,26 +150,26 @@ import {
   postArchivePrescriptionReducer,
   postDrugIssuanceReducer,
   postPrescriptionQuantityReducer,
-} from "./pharmacy-reducers/postPharmacyReducers";
+} from './pharmacy-reducers/postPharmacyReducers';
 import {
   getPatientPharmacyReturnLinesReducer,
   getPharmacyReturnLinesListReducer,
-} from "./pharmacy-reducers/getPharmacyReturnLinesReducer";
-import { getChargesSetupReducer } from "./ChargesReducers/getChargesSetupReducer";
-import { getSpecificInjectionReducer } from "./triage-reducers/getSpecificInjectionReducer";
-import { getVisitorsListReducer } from "./nurse-reducers/getVisitorsListReducer";
-import { postSuicidalFormReducer } from "./nurse-reducers/postSuicidalFormReducer";
-import { getSuicidalFormReducer } from "./nurse-reducers/getSuicidalFormReducer";
-import { postMentalExaminationFormReducer } from "./nurse-reducers/postMentalExaminationFormReducer";
-import { getMentalExaminationFormReducer } from "./nurse-reducers/getMentalExaminationFormReducer";
-import { getQyIpLookupValuesReducer } from "./nurse-reducers/getQyIPLookupValuesReducer";
-import { postDietaryIntakeFormLineReducer } from "./nurse-reducers/postDietaryIntakeFormLineReducer";
-import { getQyDietaryFormLineReducer } from "./nurse-reducers/getQyIPDietaryFormLinesReducer";
-import { postJacksonVisualFormReducer } from "./nurse-reducers/postJacksonVisualFormReducer";
-import { getJacksonVisualFormReducer } from "./nurse-reducers/getJacksonVisualFormReducer";
-import { postNurseAdmissionNotesReducer } from "./nurse-reducers/postNurseAdmissionNotesReducer";
-import { getNurseAdmissionNotesReducer } from "./nurse-reducers/getNurseAdmissionNotesReducer";
-import { getPgTreatmentDoctorNotesReducer } from "./nurse-reducers/getPgTreatmentDoctorsNotesReducer";
+} from './pharmacy-reducers/getPharmacyReturnLinesReducer';
+import { getChargesSetupReducer } from './ChargesReducers/getChargesSetupReducer';
+import { getSpecificInjectionReducer } from './triage-reducers/getSpecificInjectionReducer';
+import { getVisitorsListReducer } from './nurse-reducers/getVisitorsListReducer';
+import { postSuicidalFormReducer } from './nurse-reducers/postSuicidalFormReducer';
+import { getSuicidalFormReducer } from './nurse-reducers/getSuicidalFormReducer';
+import { postMentalExaminationFormReducer } from './nurse-reducers/postMentalExaminationFormReducer';
+import { getMentalExaminationFormReducer } from './nurse-reducers/getMentalExaminationFormReducer';
+import { getQyIpLookupValuesReducer } from './nurse-reducers/getQyIPLookupValuesReducer';
+import { postDietaryIntakeFormLineReducer } from './nurse-reducers/postDietaryIntakeFormLineReducer';
+import { getQyDietaryFormLineReducer } from './nurse-reducers/getQyIPDietaryFormLinesReducer';
+import { postJacksonVisualFormReducer } from './nurse-reducers/postJacksonVisualFormReducer';
+import { getJacksonVisualFormReducer } from './nurse-reducers/getJacksonVisualFormReducer';
+import { postNurseAdmissionNotesReducer } from './nurse-reducers/postNurseAdmissionNotesReducer';
+import { getNurseAdmissionNotesReducer } from './nurse-reducers/getNurseAdmissionNotesReducer';
+import { getPgTreatmentDoctorNotesReducer } from './nurse-reducers/getPgTreatmentDoctorsNotesReducer';
 // import { getPatientConsumablesReducer } from "./nurse-reducers/getPatientConsumablesReducer";
 import { getQyLocationsReducer } from "./nurse-reducers/getQyLocationsReducer";
 import { postPatientConsumablesReducer } from "./nurse-reducers/postPatientConsumablesReducer";
@@ -199,25 +201,25 @@ import { getQyTreatmentDiagnosisLinesReducer } from "./nurse-reducers/getQyTreat
 import {
   getPgBedsDetailsReducer,
   getPgBedsReducer,
-} from "./nurse-reducers/getPgBedsReducer";
-import { getPgWardsListReducer } from "./nurse-reducers/getPgWardsListReducer";
-import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionFormDetailsReducer";
+} from './nurse-reducers/getPgBedsReducer';
+import { getPgWardsListReducer } from './nurse-reducers/getPgWardsListReducer';
+import { postAdmissionFormDetailsReducer } from './nurse-reducers/postAdmissionFormDetailsReducer';
 // import { postPatientAdmissionReducer } from "./doc-reducers/Admission/postAdmitPatientReducer";
 
-import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
-import { QySecondaryDiagnosisSetupReducer } from "./doc-reducers/getSecondaryDiagnosisSetup";
-import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
-import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
-import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
-import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
-import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
-import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
-import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
-import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
-import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
-import { getPatientMSENotesReducer } from "./doc-reducers/getPatientMSELinesReducer";
-import { getPatientTreamentDiagnosisLinesReducer } from "./doc-reducers/getTreatmentDiagnosisLineReducer";
-import { getAdmissionsAdmittedReducer } from "./nurse-reducers/getPgAdmissionsAdmittedReducer";
+import { getPatientVisitReducer } from './doc-reducers/getPatientVisitDetails';
+import { QySecondaryDiagnosisSetupReducer } from './doc-reducers/getSecondaryDiagnosisSetup';
+import { postInterimInvoiceReducer } from './ChargesReducers/postInterimInvoiceReducer';
+import { getQyUrgencyColorCodingSetupReducer } from './nurse-reducers/getQyUrgencyColorCodingSetupReducer';
+import { getPgWardRoomsSetupReducer } from './nurse-reducers/getPgWardRoomsSetupReducer';
+import { postVisitorListReducer } from './nurse-reducers/postVisitorListReducer';
+import { postDoctorNotesReducer } from './doc-reducers/postDoctorNotesReducer';
+import { getBillingListReducer } from './ChargesReducers/getBillingListReducer';
+import { postPatientHistoryNotesReducer } from './doc-reducers/postPatientHistoryNotesReducer';
+import { getPatientHistoryNotes } from './doc-reducers/getPatientHistoryReducer';
+import { postMSENotesReducer } from './doc-reducers/postMSEFormReducer';
+import { getPatientMSENotesReducer } from './doc-reducers/getPatientMSELinesReducer';
+import { getPatientTreamentDiagnosisLinesReducer } from './doc-reducers/getTreatmentDiagnosisLineReducer';
+import { getAdmissionsAdmittedReducer } from './nurse-reducers/getPgAdmissionsAdmittedReducer';
 import {
   getInPatientQyPrescriptionLines,
   getQyPrescriptionLinesReducer,
@@ -230,10 +232,10 @@ import {
   postPatientKetamineReducer,
   postPatientImplantRequest,
   getPatientImplantRequest,
-} from "./doc-reducers/postDoctorProceduresReducers";
-import { postPatientKetamineRequest } from "../actions/Doc-actions/postDoctorProcedures";
-import { postCheckInPatientConfirmReducer } from "./doc-reducers/postCheckinPatientReducer";
-import { postMarkAsCompletedReducer } from "./doc-reducers/postMarkAsCompleted";
+} from './doc-reducers/postDoctorProceduresReducers';
+import { postPatientKetamineRequest } from '../actions/Doc-actions/postDoctorProcedures';
+import { postCheckInPatientConfirmReducer } from './doc-reducers/postCheckinPatientReducer';
+import { postMarkAsCompletedReducer } from './doc-reducers/postMarkAsCompleted';
 import { dispatchWalkInLab } from '../actions/patientActions';
 
 import { postPsychologyRequestReducer } from "./doc-reducers/psychologyReducers";
@@ -247,29 +249,29 @@ import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoic
 import {
   getNursingCarePlanReducer,
   postNursingCarePlanReducer,
-} from "./nurse-reducers/postNursingCarePlanFormReducer";
+} from './nurse-reducers/postNursingCarePlanFormReducer';
 import {
   forwardRadiologyResultsReducer,
   getSingleRadiologyDetailsReducer,
   postRadiologyResultsReducer,
-} from "./radiology-reducer/radiologyReducer";
-import { getChargesLinesReducer } from "./ChargesReducers/getChargesLines";
-import { postPrintInvoiceReducer } from "./ChargesReducers/postPrintInvoice";
+} from './radiology-reducer/radiologyReducer';
+import { getChargesLinesReducer } from './ChargesReducers/getChargesLines';
+import { postPrintInvoiceReducer } from './ChargesReducers/postPrintInvoice';
 
-import { postLabSampleReducer } from "./lab-reducers/postLabSampleReducer";
-import { postLabTestResultsReducer } from "./lab-reducers/postLabTestResultsReducer";
-import { getLabTestResultsReducer } from "./lab-reducers/getLabTestResultsReducer";
-import { printReceiptReducer } from "./ChargesReducers/printReceiptReducer";
-import { postReverseChargeReducer } from "./ChargesReducers/postReverseChargeReducer";
+import { postLabSampleReducer } from './lab-reducers/postLabSampleReducer';
+import { postLabTestResultsReducer } from './lab-reducers/postLabTestResultsReducer';
+import { getLabTestResultsReducer } from './lab-reducers/getLabTestResultsReducer';
+import { printReceiptReducer } from './ChargesReducers/printReceiptReducer';
+import { postReverseChargeReducer } from './ChargesReducers/postReverseChargeReducer';
 import {
   getPatientReceiptsHeadersReducer,
   getPatientReceiptsReducer,
-} from "./ChargesReducers/getPatientReceiptsReducer";
-import { getPatientEncounterListReducer } from "./doc-reducers/pastDoctorNotesEncounterReducers";
-import { getUnpostedChargesReducer } from "./ChargesReducers/getUnpostedChargesReducer";
+} from './ChargesReducers/getPatientReceiptsReducer';
+import { getPatientEncounterListReducer } from './doc-reducers/pastDoctorNotesEncounterReducers';
+import { getUnpostedChargesReducer } from './ChargesReducers/getUnpostedChargesReducer';
 // import { getPostedCharges } from '../actions/Charges-Actions/getPostedReceipts';
-import { getpostedChargesReducer } from "./ChargesReducers/getPostedChargesReducer";
-import { deletePatientChargesReducer } from "./ChargesReducers/deletePatientChargesReducer";
+import { getpostedChargesReducer } from './ChargesReducers/getPostedChargesReducer';
+import { deletePatientChargesReducer } from './ChargesReducers/deletePatientChargesReducer';
 
 import getPharmacyHistoryListReducer from "./pharmacy-reducers/getPharmacyHistoryListReducer";
 import getPharmacyRequestsAllReducer from "./pharmacy-reducers/getPharmacyRequestsAllReducer";
@@ -297,12 +299,14 @@ import { saveBillingInformationReducer } from "./reception-reducers/save-patient
 import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
 import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
 import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
+import { postPharmacyAppointmentReducer } from './reception-reducers/postPharmacyAppointmentReducer';
 import { createPatientVisitReducer } from "./reception-reducers/patientVisitReducers/createPatientVisitReducer";
 import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
 import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
 import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
 import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
 import { postClosingBillReducer } from "./ChargesReducers/postClosingBillReducer";
+import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -435,6 +439,7 @@ export const rootReducer = combineReducers({
   getPharmacyHistoryList: getPharmacyHistoryListReducer,
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
   getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
+  postPharmacyAppointment: postPharmacyAppointmentReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
@@ -567,6 +572,7 @@ export const rootReducer = combineReducers({
   getUnpostedCharges: getUnpostedChargesReducer,
   getPostedCharges: getpostedChargesReducer,
   deletePatientCharges: deletePatientChargesReducer,
+  deleteSplitLine: deleteReceiptSplitLineReducer,
   postSalesInvoice: postsalesInvoiceReducer,
   reopenPostedCharges: reopensalesInvoiceReducer,
   postRebates: postRebatesReducer,

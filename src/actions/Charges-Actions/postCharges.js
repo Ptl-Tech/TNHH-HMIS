@@ -39,7 +39,7 @@ export const postPatientCharges = (charges) => async (dispatch, getState) => {
         payload: response.data,
       });
 
-      message.success(`Patient Charges posted successfully.`);
+      message.success(`Patient Charges saved successfully.`);
 
       // Return status for use in the view method
     } 

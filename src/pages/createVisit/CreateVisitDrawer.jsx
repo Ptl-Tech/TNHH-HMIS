@@ -21,12 +21,13 @@ import { useLocation } from "react-router-dom";
 import { createPatientVisitRequest } from "../../actions/reception-actions/patient-visit-actions/createPatientVisit";
 import { showNotification } from "../../components/Notification";
 import useFetchPatientVisitDetailsHook from "../../hooks/useFetchPatientVisitDetailsHook";
+import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const CreateVisitDrawer = ({
   visible,
   onClose,
-  visitData: initialVisitData,
-  onUpdateVisit,
+  // visitData: initialVisitData,
+  // onUpdateVisit,
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -34,10 +35,10 @@ const CreateVisitDrawer = ({
   const location = useLocation();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
-
+  const[dispatchVisit, setDispatchVisit] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(0);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [visitData, setVisitData] = useState(initialVisitData || null);
+  const [visitData, setVisitData] = useState(null);
   const { clinics } = useSelector((state) => state.clinics);
   const { data: doctors } = useSelector((state) => state.getDoctorsList);
   const { loading: insuranceLoading, data: insurancePayload } = useSelector(
@@ -49,47 +50,89 @@ const CreateVisitDrawer = ({
     success: visitSuccess,
     data: visitPayload,
   } = useSelector((state) => state.createVisit);
-  const { loadingPatientVisitDetails, patientVisitDetails } =
-    useFetchPatientVisitDetailsHook(visitPayload?.AppointmentNo || "");
+  const { loadingPatientDetails, patientDetails, refetchDetails } =
+    useFetchPatientDetailsHook(patientNo);
+  const [activeVisitNo, setActiveVisitNo] = useState(null);
   useEffect(() => {
-    if (!patientNo) {
-     setVisitData(null);
+    if (
+      patientDetails &&
+      patientDetails.Activated &&
+      patientDetails.ActiveVisitNo
+    ) {
+      setActiveVisitNo(patientDetails.ActiveVisitNo);
+      setVisitData(null);
+    } else if (patientDetails && !patientDetails.Activated) {
+      setActiveVisitNo(null);
+      form.resetFields();
+      setVisitData(null);
+    }
+  }, [patientDetails, form]);
+
+  const {
+    loading,
+    error,
+    patientVisitDetails: initialVisitData,
+  } = useFetchPatientVisitDetailsHook(activeVisitNo);
+
+  useEffect(() => {
+    if (patientDetails && patientDetails.ActiveVisitNo) {
+      if (initialVisitData) {
+        setVisitData(initialVisitData);
+        setPaymentMethod(patientDetails?.PatientType == "Corporate" ? 1 : 2);
+
+        form.setFieldsValue({
+          clinic: initialVisitData?.SpecialClinics,
+          doctor: initialVisitData?.DoctorsName,
+          paymentMode: patientDetails?.PatientType,
+          insuranceNo: patientDetails?.InsuranceNo,
+          insuranceName: patientDetails?.InsuranceName,
+          insurancePrinicipalMemberName:
+            patientDetails?.PrincipalMemberName ||
+            patientDetails.DepandantPrincipleMember,
+          isPrincipleMember: patientDetails?.Principal,
+          membershipNo: patientDetails?.MembershipNo,
+          schemeName: patientDetails?.SchemeName,
+        });
+      } else {
+        setVisitData(null);
+        form.resetFields();
+      }
     } else {
-      setVisitData(initialVisitData);
+      setVisitData(null);
     }
-  }, [initialVisitData, setVisitData]);
-
+  }, [initialVisitData, form, patientDetails]);
   useEffect(() => {
-    if (initialVisitData) {
-      setVisitData((prev) => ({
-        ...prev,
-        ...initialVisitData,
-      }));
-
-      form.setFieldsValue({
-        clinic: initialVisitData.SpecialClinics,
-        doctor: initialVisitData.DoctorsName,
-        paymentMethod: initialVisitData.SettlementType === "Cash" ? 2 : 1,
-        insuranceNo: initialVisitData.InsuranceNo || "",
-        membershipNo: initialVisitData.InsuranceMemberNo || "",
-        schemeName: initialVisitData.SchemeName || "",
-        insuranceName: initialVisitData.InsuranceName || "",
-        insurancePrinicpalMemberName:
-          initialVisitData.PrinicipalMemberName || "",
-      });
-
-      setPaymentMethod(initialVisitData.SettlementType === "Cash" ? 2 : 1); // Ensure payment method is updated
-
-      // Ensure title details are correctly set
-      setVisitData((prev) => ({
-        ...prev,
-        appointmentNo: initialVisitData.AppointmentNo || "",
-        visitType: initialVisitData.VisitType || "",
-        specialClinics: initialVisitData.SpecialClinics || "",
-        status: initialVisitData.Status || "",
-      }));
+    if (patientDetails?.PatientType === "Corporate") {
+      setPaymentMethod(1);
+    } else if(patientDetails?.PatientType === "Cash") {
+      setPaymentMethod(2);
     }
-  }, [initialVisitData, form, setVisitData, setPaymentMethod]);
+  }, [patientDetails]);
+  useEffect(() => {
+    if (patientDetails?.PatientType === "Corporate" && initialVisitData) {
+      form.setFieldsValue({
+        paymentMode: paymentMethod,
+        insuranceNo: patientDetails.InsuranceNo,
+        insuranceName: patientDetails.InsuranceName,
+        insurancePrinicipalMemberName:
+          patientDetails.PrincipalMemberName ||
+          patientDetails.DepandantPrincipleMember,
+        isPrincipleMember: patientDetails.Principal,
+        membershipNo: patientDetails.MembershipNo,
+        schemeName: patientDetails.SchemeName,
+      });
+    } else {
+      form.setFieldsValue({
+        paymentMode: paymentMethod,
+        insuranceNo: "",
+        insuranceName: "",
+        insurancePrinicipalMemberName: "",
+        isPrincipleMember: false,
+        membershipNo: "",
+        schemeName: "",
+      });
+    }
+  }, [patientDetails, initialVisitData, form]);
 
   useEffect(() => {
     dispatch(listClinics());
@@ -102,13 +145,14 @@ const CreateVisitDrawer = ({
     }
   }, [paymentMethod, dispatch]);
 
-//   const handleClose = () => {
-//     form.resetFields();
-//     onClose();
-//     setVisitData(null);
-//     setPaymentMethod(0);
-//     setFilteredDoctors([]);
-//   };
+  useEffect(() => {
+    if (dispatchVisit && visitError) {
+      showNotification("error", "Error", visitError);
+    }
+    if (dispatchVisit && visitSuccess) {
+      showNotification("success", "Success", "Visit created successfully");
+    }
+  }, [visitError, dispatchVisit, visitSuccess]);
 
   const handleClinicChange = (value) => {
     form.setFieldsValue({ clinic: value.toUpperCase() });
@@ -123,66 +167,33 @@ const CreateVisitDrawer = ({
     setFilteredDoctors(filtered);
   };
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const payload = {
-          patientNo,
-          clinic: values.clinic,
-          doctor: values.doctor,
-          paymentMode: values.paymentMode,
-          insuranceNo: values.insuranceNo || "",
-          insuranceName: values.insuranceName || "",
-          insurancePrinicipalMemberName:
-            values.insurancePrinicipalMemberName || "",
-          isPrincipleMember: values.isPrincipleMember || false,
-          membershipNo: values.membershipNo || "",
-          schemeName: values.schemeName || "",
-        };
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
 
-        dispatch(createPatientVisitRequest(payload));
-        if (visitSuccess) {
-            showNotification(
-              "success",
-              "Visit Created",
-              `Visit ID: ${visitPayload.appointmentNo}`
-            );
-            console.log(visitPayload.AppointmentNo);
-            setVisitData((prev) => ({
-              ...prev,
-              ...visitPayload,
-            }));
-      
-            form.setFieldsValue({
-              clinic: visitPayload.SpecialClinics || "",
-              doctor: visitPayload.DoctorsName || "",
-              paymentMethod: visitPayload.PatientType === "Cash" ? 2 : 1,
-              insuranceNo: visitPayload.InsuranceNo || "",
-              membershipNo: visitPayload.InsuranceMemberNo || "",
-              appointmentNo: visitPayload.appointmentNo || "",
-              VisitType: visitPayload.appointment?.visitType || "",
-              SpecialClinics: visitPayload.appointment?.specialClinics || "",
-              Status: visitPayload.appointment?.status || "",
-            });
-      console.log(visitPayload);
-            onUpdateVisit(visitPayload.appointmentNo);
-      useFetchPatientVisitDetailsHook(visitPayload.AppointmentNo || "");
-            onClose();
-            
-          }
-      
-          if (visitError) {
-            showNotification("error", "Visit Creation Failed", visitError);
-            setVisitData(null);
-          }
-      
-          console.log(visitSuccess, visitError, visitPayload);
-      })
-      .catch((errorInfo) => {
-        console.log("Validation Failed:", errorInfo);
-      });
+      const payload = {
+        patientNo,
+        clinic: values.clinic,
+        doctor: values.doctor,
+        paymentMode: values.paymentMode,
+        insuranceNo: values.insuranceNo || "",
+        insuranceName: values.insuranceName || "",
+        insurancePrinicipalMemberName:
+          values.insurancePrinicipalMemberName || "",
+        isPrincipleMember: values.isPrincipleMember || false,
+        membershipNo: values.membershipNo || "",
+        schemeName: values.schemeName || "",
+      };
+
+      await dispatch(createPatientVisitRequest(payload));
+      setDispatchVisit(true);
+      refetchDetails(); 
+      onClose(); 
+    } catch (error) {
+      console.log("Validation Failed or Dispatch Error:", error);
+    }
   };
+
   return (
     <Drawer
       title={
@@ -196,33 +207,25 @@ const CreateVisitDrawer = ({
             <Col span={12}>
               <Typography.Text strong>Visit No: </Typography.Text>
               <Typography.Text style={{ fontWeight: "bold", color: "blue" }}>
-                {visitData?.appointment?.appointmentNo ||
-                  visitData?.appointmentNo ||
-                  ""}
+                {visitData?.AppointmentNo || ""}
               </Typography.Text>
             </Col>
             <Col span={12}>
               <Typography.Text strong>Visit Type: </Typography.Text>
-              <Typography.Text>
-                {visitData?.appointment?.visitType ||
-                  visitData?.VisitType ||
-                  ""}
-              </Typography.Text>
+              <Typography.Text>{visitData?.VisitType || ""}</Typography.Text>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Typography.Text strong>Clinic: </Typography.Text>
               <Typography.Text>
-                {visitData?.appointment?.specialClinics ||
-                  visitData?.SpecialClinics ||
-                  ""}
+                {visitData?.SpecialClinics || ""}
               </Typography.Text>
             </Col>
             <Col span={12}>
               <Typography.Text strong>Status: </Typography.Text>
               <Typography.Text style={{ fontWeight: "bold", color: "green" }}>
-                {visitData?.appointment?.status || visitData?.Status || ""}
+                {visitData?.Status || ""}
               </Typography.Text>
             </Col>
           </Row>
@@ -235,115 +238,124 @@ const CreateVisitDrawer = ({
       maskClosable={false}
       footer={null}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={visitData}
-      >
-        <Form.Item name="clinic" label="Clinic" rules={[{ required: true }]}>
-          <Select onChange={handleClinicChange}>
-            {clinics?.map((item) => (
-              <Select.Option key={item.No} value={item.No}>
-                {item.Description.charAt(0).toUpperCase() +
-                  item.Description.slice(1).toLowerCase()}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
-          <Select>
-            {filteredDoctors?.map((doc) => (
-              <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
-                {doc.DoctorsName}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="paymentMode"
-          label="Payment Method"
-          rules={[{ required: true }]}
+      <Spin size="large" tip="Creating Visit..." spinning={visitLoading}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={visitData}
         >
-          <Select onChange={setPaymentMethod}>
-            <Select.Option value={2}>Cash</Select.Option>
-            <Select.Option value={1}>Insurance</Select.Option>
-          </Select>
-        </Form.Item>
-        {paymentMethod === 1 && (
-          <>
-            <Form.Item name="insuranceName" label="Insurance Name">
-              <Select
-                disabled={insuranceLoading}
-                placeholder="Select Insurance"
-                showSearch
-                loading={insuranceLoading ? <Spin size="small" /> : null}
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
-                }
-                notFoundContent={
-                  insuranceLoading ? <Spin size="small" /> : null
-                }
-                allowClear
-                onChange={(value, option) => {
-                  form.setFieldsValue({
-                    insuranceNo: value,
-                    insuranceName: option.children,
-                  });
-                }}
-              >
-                {insurancePayload?.map((item) => (
-                  <Select.Option key={item.No} value={item.No}>
-                    {item.Name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="insuranceNo"
-              label="Insurance No"
-              style={{ display: "none" }}
-            >
-              <Input disabled />
-            </Form.Item>
-            <Form.Item
-              name="insurancePrinicipalMemberName"
-              label="Principal Member Name"
-            >
-              <Input />
-            </Form.Item>
-             <Form.Item
-                              label="Is Patient Principal Member"
-                              name="isPrincipleMember"
-                              valuePropName="checked"
-                              
-                            >
-                              <Switch checkedChildren="Yes" unCheckedChildren="No" />
-                            </Form.Item>
-            <Form.Item name="membershipNo" label="Membership No">
-              <Input />
-            </Form.Item>
-            <Form.Item name="schemeName" label="Scheme Name">
-              <Input />
-            </Form.Item>
-          </>
-        )}
- <div style={{ display: "flex", justifyContent: "space-between", marginBottom:"26px" }}>
-          <Button onClick={onClose}  size="large" block>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            type="primary"
-            size="large"
-            block
-            disabled={visitLoading}
-            loading={visitLoading}
+          <Form.Item name="clinic" label="Clinic" rules={[{ required: true }]}>
+            <Select onChange={handleClinicChange}>
+              {clinics?.map((item) => (
+                <Select.Option key={item.No} value={item.No}>
+                  {item.Description.charAt(0).toUpperCase() +
+                    item.Description.slice(1).toLowerCase()}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="doctor" label="Doctor" rules={[{ required: true }]}>
+            <Select onChange={(value) => form.setFieldsValue({ doctor: value })} showSearch allowClear filterOption={(input, option) =>
+              option.children.toLowerCase().includes(input.toLowerCase())
+            }> 
+              {filteredDoctors?.map((doc) => (
+                <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                  {doc.DoctorsName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="paymentMode"
+            label="Payment Method"
+            rules={[{ required: true }]}
           >
-            Save Visit
-          </Button>
-        </div>
-      </Form>
+            <Select onChange={setPaymentMethod}>
+              <Select.Option value={2}>Cash</Select.Option>
+              <Select.Option value={1}>Insurance</Select.Option>
+            </Select>
+          </Form.Item>
+          {paymentMethod === 1 && (
+            <>
+              <Form.Item name="insuranceName" label="Insurance Name">
+                <Select
+                  disabled={insuranceLoading}
+                  placeholder="Select Insurance"
+                  showSearch
+                  loading={insuranceLoading ? <Spin size="small" /> : null}
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
+                  notFoundContent={
+                    insuranceLoading ? <Spin size="small" /> : null
+                  }
+                  allowClear
+                  onChange={(value, option) => {
+                    form.setFieldsValue({
+                      insuranceNo: value,
+                      insuranceName: option.children,
+                    });
+                  }}
+                >
+                  {insurancePayload?.map((item) => (
+                    <Select.Option key={item.No} value={item.No}>
+                      {item.Name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="insuranceNo"
+                label="Insurance No"
+                style={{ display: "none" }}
+              >
+                <Input disabled />
+              </Form.Item>
+              <Form.Item
+                name="insurancePrinicipalMemberName"
+                label="Principal Member Name"
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Is Patient Principal Member"
+                name="isPrincipleMember"
+                valuePropName="checked"
+              >
+                <Switch checkedChildren="Yes" unCheckedChildren="No" />
+              </Form.Item>
+              <Form.Item name="membershipNo" label="Membership No">
+                <Input />
+              </Form.Item>
+              <Form.Item name="schemeName" label="Scheme Name">
+                <Input />
+              </Form.Item>
+            </>
+          )}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "26px",
+            }}
+          >
+            <Button onClick={onClose} size="large" block>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              type="primary"
+              size="large"
+              block
+              disabled={visitLoading}
+              loading={visitLoading}
+            >
+              Save Visit
+            </Button>
+          </div>
+        </Form>
+      </Spin>
     </Drawer>
   );
 };

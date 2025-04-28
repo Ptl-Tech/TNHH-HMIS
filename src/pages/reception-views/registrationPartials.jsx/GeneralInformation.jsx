@@ -28,29 +28,34 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     useSelector((state) => state.patientList) || {};
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   useEffect(() => {
-    if (success && data?.patientNo) {
+    if (dispatchingInfo && success && data?.patientNo) {
       setPatientNo(data.patientNo);
-      dispatch(getPatientByNo(data.patientNo)); // Fetch new patient details
+      dispatch(getPatientByNo(data.patientNo)); // Fetch new details
     }
-  }, [success, data, dispatch]);
+  }, [dispatchingInfo, success, data, dispatch]);
 
   // Update form values when patientDetails change
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
+      const genderValue =
+      patientDetails?.Gender === "Female"
+        ? 2
+        : patientDetails?.Gender === "Male"
+        ? 1
+        : 0;
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
         lastName: patientDetails?.LastName || "",
-        gender:
-          patientDetails?.Gender === "Male"
-            ? 1
-            : patientDetails?.Gender === "Female"
-            ? 2
-            : 0,
-        dateOfBirth: patientDetails?.DateOfBirth ? moment(patientDetails.DateOfBirth) : null,          
+      gender:genderValue,
+        dateOfBirth: patientDetails?.DateOfBirth
+          ? moment(patientDetails.DateOfBirth)
+          : null,
         idNumber: patientDetails?.IDNumber || "",
         phoneNumber: patientDetails?.TelephoneNo1 || "",
         nationality: patientDetails?.Nationality || "",
@@ -69,13 +74,15 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
         patientStatus: patientDetails?.PatientStatus || 0,
       });
     }
   }, [patientDetails, form]);
 
   const handleSubmission = (values) => {
+    setFormSubmitted(true);
+
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -83,20 +90,11 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         values.firstName || patientDetails?.Surname?.split(" ")[0] || "",
       middleName: values.middleName || patientDetails?.MiddleName || "",
       lastName: values.lastName || patientDetails?.LastName || "",
-      gender:
-        values.gender || patientDetails?.Gender === "Male"
-          ? 1
-          : patientDetails?.Gender === "Female"
-          ? 2
-          : values.gender === 1
-          ? "Male"
-          : values.gender === 2
-          ? "Female"
-          : "",
-          dob: values.dateOfBirth
-          ? values.dateOfBirth.format("YYYY-MM-DD")
-          : patientDetails?.DateOfBirth || "",
-        
+     gender: values.gender || patientDetails?.Gender || 0,
+      dob: values.dateOfBirth
+        ? values.dateOfBirth.format("YYYY-MM-DD")
+        : patientDetails?.DateOfBirth || "",
+
       nationality: patientDetails?.Nationality || "",
       county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
@@ -109,19 +107,19 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       insuranceName: patientDetails?.InsuranceName || "",
       insurancePrinicipalMemberName:
         patientDetails?.insurancePrinicipalMemberName || "",
-        isPrincipleMember: patientDetails?.isPrincipleMember || false,
-        membershipNo: patientDetails?.MembershipNo || "",
-        schemeName: patientDetails?.SchemeName || "",
-        howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-        subcounty: patientDetails?.SubCountyName || "",
-          email: patientDetails?.Email || "",
-          residence: patientDetails?.PlaceofBirthVillage || "",
-          countyWard: patientDetails?.Ward || "",
-          patientStatus:  0,
+      isPrincipleMember: patientDetails?.isPrincipleMember || false,
+      membershipNo: patientDetails?.MembershipNo || "",
+      schemeName: patientDetails?.SchemeName || "",
+      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+      subcounty: patientDetails?.SubCountyName || "",
+      email: values.email || patientDetails?.Email || "",
+      residence: patientDetails?.PlaceofBirthVillage || "",
+      countyWard: patientDetails?.CountyWardName || "",
+      patientStatus: 0,
     };
 
     dispatch(saveGeneralInformation(formattedData));
-
+    setDispatchingInfo(true);
     onUpdate(data);
   };
 
@@ -132,23 +130,28 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       </Typography.Title>
 
       {/* Display alerts for errors and success messages */}
-      {error && (
+      {error && formSubmitted && (
         <Alert
           message={error}
           type="error"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_ERROR" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_ERROR" });
+          }}
         />
       )}
-      {success && (
+      {success && formSubmitted && (
         <Alert
           message={"Data saved successfully"}
           type="success"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
-        />
+          onClose={() => {
+            setFormSubmitted(false); 
+            dispatch({ type: "CLEAR_SUCCESS" });
+          }}        />
       )}
 
       <Form layout="vertical" form={form} onFinish={handleSubmission}>
@@ -159,12 +162,12 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
               name="firstName"
               rules={[{ required: true, message: "Please enter first name" }]}
             >
-              <Input placeholder="Enter First Name" />
+              <Input placeholder="Enter First Name" autoComplete="off" />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item label="Middle Name" name="middleName">
-              <Input placeholder="Enter Middle Name" />
+              <Input placeholder="Enter Middle Name" autoComplete="off" />
             </Form.Item>
           </Col>
           <Col span={8}>
@@ -173,7 +176,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
               name="lastName"
               rules={[{ required: true, message: "Please enter last name" }]}
             >
-              <Input placeholder="Enter Last Name" />
+              <Input placeholder="Enter Last Name" autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>
@@ -199,32 +202,23 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
                 { required: true, message: "Please enter date of birth" },
               ]}
             >
-              <DatePicker
-  style={{ width: "100%" }}
-  format="DD/MM/YYYY"
-/>
-
+              <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item
               label="ID Number"
               name="idNumber"
-              rules={[
-                { required: true, message: "Please enter ID number" },
-                // { pattern: /^[0-9]{12}$/, message: "Invalid ID number" },
-              ]}
+              rules={[{ required: true, message: "Please enter ID number" }]}
             >
-              <Input placeholder="Enter ID Number" />
+              <Input placeholder="Enter ID Number" autoComplete="off" />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item
               label="Phone Number"
               name="phoneNumber"
-              rules={[
-                { required: true, message: "Please enter phone number" },
-              ]}
+              rules={[{ required: true, message: "Please enter phone number" }]}
             >
               <Input placeholder="Enter Phone Number" />
             </Form.Item>
@@ -233,7 +227,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         <Row>
           <Col span={8}>
             <Form.Item label="Email" name="email">
-              <Input placeholder="Enter Email" />
+              <Input placeholder="Enter Email" autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>

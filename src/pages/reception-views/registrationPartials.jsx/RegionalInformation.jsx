@@ -38,6 +38,8 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
 
   const [filteredSubCounties, setFilteredSubCounties] = useState([]);
   const [filteredWards, setFilteredWards] = useState([]);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading, success, error } = useSelector(
     (state) => state.saveAddressInfo
@@ -65,16 +67,19 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
 
   useEffect(() => {
     if (patientDetails) {
-      form.resetFields(); // Reset fields to avoid stale state
-
+      form.resetFields();
+console.log("daotient", patientDetails);
       const genderValue =
         patientDetails?.Gender === "Female"
           ? 2
           : patientDetails?.Gender === "Male"
           ? 1
           : 0;
-const initialCountry=patientDetails?.Nationality ==="Kenya" ? "KE" :patientDetails.Nationality;
-setSelectedCountry(initialCountry);
+      const initialCountry =
+        patientDetails?.Nationality === "Kenya"
+          ? "KE"
+          : patientDetails.Nationality;
+      setSelectedCountry(initialCountry);
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
@@ -100,7 +105,7 @@ setSelectedCountry(initialCountry);
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
         patientStatus: patientDetails?.patientStatus || 0,
       });
     }
@@ -175,12 +180,14 @@ setSelectedCountry(initialCountry);
   }, [selectedSubCounty]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
-  }, [success, dispatch, patientDetails?.PatientNo]);
+  }, [success,dispatchingInfo, dispatch, patientDetails?.PatientNo]);
 
   const handleSubmission = (values) => {
+    setFormSubmitted(true);
+
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
@@ -201,7 +208,7 @@ setSelectedCountry(initialCountry);
       subcounty: selectedSubCounty || patientDetails?.SubCountyName || "",
       countyWard:
         selectedCountry === "KE"
-          ? selectedWard || patientDetails?.PlaceofBirthVillage || ""
+          ? selectedWard || patientDetails?.CountyWardName || ""
           : "",
       idNumber: patientDetails.IDNumber || "",
       phoneNumber: patientDetails?.TelephoneNo1 || "",
@@ -239,48 +246,54 @@ setSelectedCountry(initialCountry);
       <Typography.Text level={5} underline>
         Regional Information
       </Typography.Text>
-      {error && (
+      {error && formSubmitted && (
         <Alert
           message={error}
           type="error"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_ERROR" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_ERROR" });
+          }}
         />
       )}
-      {success && (
+      {success && formSubmitted && (
         <Alert
           message="Information saved successfully!"
           type="success"
           showIcon
           closeText="Close"
-          onClose={() => dispatch({ type: "CLEAR_SUCCESS" })}
+          onClose={() => {
+            setFormSubmitted(false);
+            dispatch({ type: "CLEAR_SUCCESS" });
+          }}
         />
       )}
 
       <Form form={form} layout="vertical" onFinish={handleSubmission}>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Select Nationality" name="nationality" rules={[{ required: true, message: 'Please select a nationality' }]}>
+            <Form.Item
+              label="Select Nationality"
+              name="nationality"
+              rules={[
+                { required: true, message: "Please select a nationality" },
+              ]}
+            >
               {loadingCountries ? (
                 <Skeleton.Input active size="small" style={{ width: "100%" }} />
               ) : (
                 <Select
-                  showSearch
                   placeholder="Select Nationality"
                   onChange={handleNationalityChange}
                   value={selectedCountry}
+                  showSearch
                   optionFilterProp="children"
                   filterOption={(input, option) =>
-                    option?.children
-                      ?.toLowerCase()
-                      .includes(input.toLowerCase())
+                    option.children.toUpperCase().includes(input.toUpperCase())
                   }
-                  filterSort={(optionA, optionB) =>
-                    optionA?.children
-                      ?.toLowerCase()
-                      .localeCompare(optionB?.children?.toLowerCase())
-                  }
+                  allowClear
                 >
                   {countries?.map((country) => (
                     <Option key={country.Code} value={country.Code}>
@@ -292,7 +305,7 @@ setSelectedCountry(initialCountry);
             </Form.Item>
           </Col>
 
-          {selectedCountry === "KE"   && (
+          {selectedCountry === "KE" && (
             <>
               <Col span={12}>
                 <Form.Item label="Select County" name="county">
@@ -305,6 +318,13 @@ setSelectedCountry(initialCountry);
                   ) : (
                     <Select
                       showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      allowClear
                       placeholder="Select County"
                       value={selectedCounty}
                       onChange={handleCountyChange}
@@ -330,6 +350,13 @@ setSelectedCountry(initialCountry);
                   ) : (
                     <Select
                       showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      allowClear
                       placeholder="Select SubCounty"
                       value={selectedSubCounty}
                       onChange={handleSubCountyChange}
@@ -358,6 +385,13 @@ setSelectedCountry(initialCountry);
                   ) : (
                     <Select
                       showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option.children
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      allowClear
                       placeholder="Select Ward"
                       value={selectedWard}
                       onChange={setSelectedWard}
@@ -378,15 +412,22 @@ setSelectedCountry(initialCountry);
         {/* Residence field (visible regardless of nationality) */}
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Residence" name="residence"  rules={[
-                { required: true, message: "Residence is required!" },
-              ]}>
+            <Form.Item
+              label="Residence"
+              name="residence"
+              rules={[{ required: true, message: "Residence is required!" }]}
+            >
               <Input placeholder="Residence" />
             </Form.Item>
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
             {loading ? "Submitting..." : "Submit"}
           </Button>
         </Form.Item>

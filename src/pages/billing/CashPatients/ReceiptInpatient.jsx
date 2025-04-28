@@ -25,7 +25,8 @@ import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
-const ReceiptPatient = () => {
+import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
+const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -138,14 +139,13 @@ const ReceiptPatient = () => {
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
- <Menu.Item key="request_admission">Waive Charge</Menu.Item>
+      <Menu.Item key="request_admission">Waive Charge</Menu.Item>
       <Menu.Divider />     
       <Menu.Item key="close_bill">
         <ClosePatientBill/>
       </Menu.Item>
     </Menu>
   );
-console.log("Patient Bill Data:", activeVisitNo);
   return (
     <>
       <div
@@ -198,25 +198,30 @@ console.log("Patient Bill Data:", activeVisitNo);
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient Name:{" "}
                 <span className="fw-bold">
-                  {patientVisitDetails?.Names.toUpperCase()}
+                  {patientBillData[0]?.Names}
                 </span>
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Gender: {patientVisitDetails?.Gender}
+                Gender: {patientBillData[0]?.Gender}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Age in Years: {patientVisitDetails?.AgeinYears}
+                Age in Years:{" "}
+                {` (${Math.floor(
+                    (Date.now() - new Date(patientBillData[0]?.DateOfBirth
+                    ).getTime()) /
+                    (1000 * 60 * 60 * 24 * 365.25)
+                    )} years)`}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Patient ID: {patientVisitDetails?.PatientNo}
+                Patient ID: {patientBillData[0]?.PatientNo}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientVisitDetails?.AppointmentType}
+                Visit Type: {patientBillData[0]?.Inpatient ? "Inpatient" : "N/a"}
               </p>
 
               {/* Second row */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Payment Mode: {patientVisitDetails?.SettlementType}
+                Payment Mode: {patientBillData[0]?.PatientType}
               </p>
 
               <p className="text-primary" style={{ gridColumn: "span 2" }}>
@@ -234,7 +239,7 @@ console.log("Patient Bill Data:", activeVisitNo);
                     : "N/A"}
                 </span>
               </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+              {/* <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Date:{" "}
                 {Array.isArray(receiptLines) && receiptLines.length > 0
                   ? new Date(
@@ -246,7 +251,7 @@ console.log("Patient Bill Data:", activeVisitNo);
                       day: "numeric",
                     })
                   : "N/A"}
-              </p>
+              </p> */}
             </div>
           </Card>
           <div className="d-flex justify-content-end gap-3 my-3">
@@ -266,7 +271,7 @@ console.log("Patient Bill Data:", activeVisitNo);
           <div className="row gap-3 gap-md-0">
             {/* Left Side (Split Receipt) */}
             <div className="col-12 col-md-8">
-              <PaymentSection patientNo={patientVisitDetails?.PatientNo} />
+              <InsurancePaymentSection patientNo={patientBillData[0]?.PatientNo} />
             </div>
 
             {/* Right Side (Amount Details + Buttons) */}
@@ -345,7 +350,7 @@ console.log("Patient Bill Data:", activeVisitNo);
                   onCancel={handleCancel}
                   activeVisitNo={activeVisitNo || ""}
                   amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-                  patientNo={patientVisitDetails?.PatientNo}
+                  patientNo={patientBillData[0]?.PatientNo}
                 />
               </Card>
             </div>
@@ -356,4 +361,4 @@ console.log("Patient Bill Data:", activeVisitNo);
   );
 };
 
-export default ReceiptPatient;
+export default ReceiptInpatient;

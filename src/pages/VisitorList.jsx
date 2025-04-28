@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
 import { listPatients, convertPatient } from "../actions/patientActions";
-import { Table, Skeleton, message, Button, Input, Space } from "antd";
+import { Table, Skeleton, message, Button, Input, Space,Dropdown, Menu } from "antd";
 import dayjs from "dayjs";
 import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
 import { useNavigate } from "react-router-dom";
-import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { ReloadOutlined, SearchOutlined,DownOutlined } from "@ant-design/icons";
 
 const VisitorList = () => {
   const dispatch = useDispatch();
@@ -109,12 +109,12 @@ const VisitorList = () => {
     {
       title: "Visitor No",
       dataIndex: "No",
-      render: (no) => <a href={`/visitor/${no}`}>{no}</a>,
+      render: (no) => <span className="fw-bold text-dark">{no}</span>,
     },
     {
       title: "Visitor Name",
       dataIndex: "VisitorName",
-      render: (name) => (name ? name.toUpperCase() : "N/A"),
+      render: (name) => <span className="fw-bold text-dark">{name}</span>,
     },
     { title: "ID Number", dataIndex: "IDNumber" },
     { title: "Phone Number", dataIndex: "PhoneNumber" },
@@ -126,28 +126,37 @@ const VisitorList = () => {
     {
       title: "Action",
       dataIndex: "action",
-      render: (_, record) => (
-        <>
-          <Button
-            type="link"
-            onClick={() => {
-              setSelectedVisitor(record);
-              setConvertPatientModal(true);
-            }}
-          >
-            Convert to Patient
-          </Button>{" "}
-          |{" "}
-          <Button
-            type="link"
-            onClick={() =>
-              navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
-            }
-          >
-            Register Walk In
-          </Button>
-        </>
-      ),
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+            <Menu.Item
+              key="convert"
+              onClick={() => {
+                setSelectedVisitor(record);
+                setConvertPatientModal(true);
+              }}
+            >
+              Convert to Patient
+            </Menu.Item>
+            <Menu.Item
+              key="register"
+              onClick={() =>
+                navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
+              }
+            >
+              Register Walk In
+            </Menu.Item>
+          </Menu>
+        );
+  
+        return (
+          <Dropdown overlay={menu}>
+            <Button type="primary" size="small" >
+              Actions <DownOutlined />
+            </Button>
+          </Dropdown>
+        );
+      },
     },
   ];
 

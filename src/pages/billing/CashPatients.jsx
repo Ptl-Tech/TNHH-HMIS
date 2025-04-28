@@ -61,12 +61,21 @@ const CashPatients = () => {
       title: 'Balance',
       dataIndex: 'Balance',
       key: 'Balance',
-    },
+      render: (Balance) => {
+        const isZero = Balance === 0.00 || Balance === 'KSH 0.00';
+        const balanceValue = parseFloat(Balance.replace(/[^0-9.-]+/g, '')); // Extract numeric value from string
+        return (
+          <span style={{ color: isZero ? 'green' : 'red', fontWeight: 'bold' }}>
+            {isZero ? 'KSH 0.00' : `KSH ${balanceValue.toFixed(2)}`}
+          </span>
+        );
+      },
+    },    
     {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <Button type="link" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
+        <Button type="primary" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
           View Charges
         </Button>
       ),
