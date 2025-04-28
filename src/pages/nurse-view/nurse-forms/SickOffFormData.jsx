@@ -1,14 +1,70 @@
-import { Button, Col, DatePicker, Form, Input, Row, Space } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  message,
+  notification,
+  Row,
+  Space,
+} from "antd";
 import PropTypes from "prop-types";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
+import dayjs from "dayjs";
+import { useDispatch } from "react-redux";
+import {
+  POST_PATIENT_SICK_OFF_FAIL,
+  POST_PATIENT_SICK_OFF_SUCCESS,
+  postSickOff,
+  getSickOff,
+} from "../../../actions/Doc-actions/Admission/postInitiateDischarge";
 
-const SickOffFormData = ({
-  form,
-  handleOnFinish,
-  isViewing,
-  setIsFormVisible,
-}) => {
+const SickOffFormData = ({ isViewing, setIsFormVisible, admissionNo }) => {
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+
+  const handleOnFinish = async (values) => {
+    const { sickOffDays, startDate, remarks } = values;
+    const sickOffData = {
+      myAction: "create",
+      inPatient: true,
+      documentNo: admissionNo,
+      offDutyDays: parseInt(sickOffDays),
+      startDate: startDate.format("YYYY-MM-DD"),
+      offDutyComments: remarks,
+    };
+
+    // console.log("Sick Off Data", sickOffData);
+
+    await dispatch(postSickOff(sickOffData))
+      .then((response) => {
+        if (response.status === "success") {
+          form.resetFields();
+          setIsFormVisible(false);
+          notification.success({
+            message: "Sick Off Created Successfully",
+          });
+          dispatch(getSickOff(admissionNo));
+        } else if (response.type === POST_PATIENT_SICK_OFF_FAIL) {
+          form.resetFields();
+          setIsFormVisible(false);
+          notification.error({
+            message: "Sick Off Creation Failed",
+          });
+        }
+      })
+      .then(() => {
+        form.resetFields();
+        setIsFormVisible(false);
+      })
+      .catch((error) => {
+        notification.error({
+          message: error.message || "An error occurred",
+        });
+      });
+  };
   const handleResetForm = () => {
     form.resetFields();
     setIsFormVisible(false);
@@ -20,58 +76,50 @@ const SickOffFormData = ({
       style={{ paddingTop: "10px" }}
       onFinish={handleOnFinish}
       initialValues={{
-        offDays: "",
-        lightOffDays: "",
-        management: "",
-        sickOffStartDay: "",
-        sickOffEndDay: "",
-        nextAppointmentDate: "",
+        startDate: "",
+        sickOffDays: "",
         remarks: "",
       }}
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
-          <Form.Item label="Off Duty Days" name="offDays" hasFeedback>
-            <Input placeholder="Off Duty Days" type="number" />
+          <Form.Item
+            label="Sick off Start Date"
+            name="startDate"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "Please select sick off start date!",
+              },
+            ]}
+          >
+            <DatePicker
+              placeholder="Sick off Start Date"
+              style={{ width: "100%" }}
+              disabledDate={(current) => {
+                // Disable dates before today
+                return current && current < dayjs().startOf("day");
+              }}
+            />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item label="Light Duty Days" name="lightOffDays" hasFeedback>
-            <Input placeholder="Light Duty Days" type="number" />
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
           <Form.Item
-            label="Sick off Start Day"
-            name="sickOffStartDay"
+            label="Sick off Number of Days"
+            name="sickOffDays"
+            rules={[
+              {
+                required: true,
+                message: "Please enter number of sick off days!",
+              },
+            ]}
             hasFeedback
           >
-            <DatePicker
-              placeholder="Sick off Start Day"
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-        </Col>
-        <Col xs={24} md={8}>
-          <Form.Item label="Sick off End Day" name="sickOffEndDay" hasFeedback>
-            <DatePicker
-              placeholder="Sick off End Day"
-              disabled
-              style={{ width: "100%" }}
-            />
-          </Form.Item>
-        </Col>
-        <Col xs={24} md={8}>
-          <Form.Item
-            label="Next Appointment Date"
-            name="nextAppointmentDate"
-            hasFeedback
-          >
-            <DatePicker
-              placeholder="Next Appointment Date"
-              disabled
+            <Input
+              placeholder="Sick off number of days"
+              type="number"
+              min={0}
               style={{ width: "100%" }}
             />
           </Form.Item>
@@ -85,9 +133,9 @@ const SickOffFormData = ({
             rules={[
               {
                 validator: (_, value) => {
-                  if (value && value.length > 200) {
+                  if (value && value.length > 500) {
                     return Promise.reject(
-                      new Error("Remarks cannot exceed 200 characters!")
+                      new Error("Remarks cannot exceed 500 characters!")
                     );
                   }
                   return Promise.resolve();
@@ -123,9 +171,8 @@ const SickOffFormData = ({
 export default SickOffFormData;
 // props validation
 SickOffFormData.propTypes = {
-  form: PropTypes.object,
-  handleOnFinish: PropTypes.func,
   isViewing: PropTypes.bool,
   setIsFormVisible: PropTypes.func,
   setIsViewing: PropTypes.func,
+  admissionNo: PropTypes.string,
 };

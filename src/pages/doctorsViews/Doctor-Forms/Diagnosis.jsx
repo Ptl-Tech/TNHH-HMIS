@@ -32,7 +32,6 @@ const Diagnosis = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
-  console.log("treatment number", admissionNo);
   const patientNo = queryParams.get("PatientNo");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -281,7 +280,8 @@ const Diagnosis = () => {
         Diagnosis Lines
       </Typography.Title>
 
-      {role === "Doctor" && patientDetails?.Status !== "Completed" && (
+      {(role === "Doctor" ||
+        (role === "Psychology" && patientDetails?.Status !== "Completed")) && (
         <Row gutter={24}>
           <Col span={24}>
             <Button

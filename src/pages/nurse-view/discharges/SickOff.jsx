@@ -1,14 +1,12 @@
 import { Button, Form } from "antd";
-import {
-  PlusOutlined,
-  UserAddOutlined,
-  FolderViewOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import SickOffTable from "../tables/nurse-tables/SickOffTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import useAuth from "../../../hooks/useAuth";
 import SickOffFormData from "../nurse-forms/SickOffFormData";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const SickOff = () => {
   const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -17,8 +15,14 @@ const SickOff = () => {
   const role = useAuth().userData.departmentName;
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
+  const location = useLocation();
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
 
   const [form] = Form.useForm();
+
+  const { loading: loadingSickOff, data: getSickOff } = useSelector(
+    (state) => state.getSickOff
+  );
 
   const rowSelection = {
     selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
@@ -35,11 +39,6 @@ const SickOff = () => {
     getCheckboxProps: (record) => ({
       disabled: record.name === "Disabled User", // Disable specific rows if needed
     }),
-  };
-
-  const handleOnClick = () => {
-    const record = selectedRow[0];
-    console.log(record);
   };
 
   const handleButtonVisibility = () => {
@@ -62,15 +61,6 @@ const SickOff = () => {
           <Button type="primary" onClick={handleButtonVisibility}>
             <PlusOutlined /> Add Sick Off
           </Button>
-          <Button
-            color="default"
-            variant="outlined"
-            disabled={!selectedRowKey}
-            onClick={() => handleOnClick()}
-          >
-            <FolderViewOutlined />
-            Print Sick Off
-          </Button>
         </div>
       )}
 
@@ -79,11 +69,17 @@ const SickOff = () => {
           setIsFormVisible={setIsFormVisible}
           form={form}
           isViewing={isViewing}
+          admissionNo={admissionNo}
         />
       )}
 
       {!isFormVisible && (
-        <SickOffTable rowSelection={rowSelection} form={form} />
+        <SickOffTable
+          rowSelection={rowSelection}
+          form={form}
+          loadingSickOff={loadingSickOff}
+          getSickOff={getSickOff}
+        />
       )}
     </div>
   );

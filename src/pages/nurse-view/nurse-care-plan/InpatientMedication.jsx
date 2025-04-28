@@ -60,7 +60,8 @@ const InpatientMedication = () => {
             Patient Prescription
           </Typography.Title>
         </div>
-        {role === "Doctor" && patientDetails?.Status !== "Completed" && (
+        {(role === "Doctor" ||
+          (role === "Nurse" && patientDetails?.Status !== "Completed")) && (
           <div style={{ display: "flex", gap: "10px" }}>
             {!showForm && (
               <Button
