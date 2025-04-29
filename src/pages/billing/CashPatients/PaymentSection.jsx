@@ -78,16 +78,8 @@ setPaymentSavingLoading(true)
                 showSearch
                 onChange={(value) => setPaymentType(value)}
               >
-                <Select.Option value={1}>Cash</Select.Option>
-                <Select.Option value={2}>Cheque</Select.Option>
-                <Select.Option value={3}>EFT</Select.Option>
-                <Select.Option value={4}>Deposit Slip</Select.Option>
-                <Select.Option value={5}>Banker's Cheque</Select.Option>
-                <Select.Option value={6}>RTGS</Select.Option>
                 <Select.Option value={7}>MPESA</Select.Option>
-                <Select.Option value={8}>PayPal</Select.Option>
-                <Select.Option value={9}>Cheque</Select.Option>
-                <Select.Option value={10}>PDQ</Select.Option>
+                <Select.Option value={9}>PDQ</Select.Option>
               </Select>
             </Form.Item>
           </Col>
