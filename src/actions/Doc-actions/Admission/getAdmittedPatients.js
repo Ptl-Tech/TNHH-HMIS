@@ -1,5 +1,5 @@
 import axios from "axios";
-import { message } from "antd"; // Ensure Ant Design's message is imported
+import { message, notification } from "antd"; // Ensure Ant Design's message is imported
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
@@ -72,34 +72,42 @@ export const getAdmittedPatients = () => async (dispatch, getState) => {
   }
 };
 
-export const getAdmittedSinglePatient = (admissionNo) => async (dispatch, getState) => {
+export const getAdmittedSinglePatient = (admissionNo, treatmentNo) => async (dispatch, getState) => {
   try {
-    // Dispatch the VERIFY start action
+    // Guard: Ensure at least one identifier is provided
+    if (!admissionNo && !treatmentNo) {
+      notification.error({
+        message: "Please provide either Admission No or Treatment No.",
+        duration: 2,
+      })
+    }
+
     dispatch({ type: GET_VERIFIED_SINGLE_ADMITTED_PATIENTS_REQUEST });
 
-    // Get user info and branch code from state and local storage
     const {
       otpVerify: { userInfo },
     } = getState();
     const branchCode = localStorage.getItem("branchCode");
 
-    // Configure headers for the VERIFY
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no, // Custom header with staff number
-        sessionToken: userInfo?.userData?.portalSessionToken, // Bearer token for session
-        branchCode, // Branch code from local storage
+        staffNo: userInfo?.userData?.no,
+        sessionToken: userInfo?.userData?.portalSessionToken,
+        branchCode,
       },
     };
 
-    // Make the GET request
+    // Determine which column and value to filter by
+    const filterColumn = admissionNo ? 'Admission_No' : 'Treatment_No';
+    const filterValue = admissionNo || treatmentNo;
+
+    // Construct dynamic URL
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=PgAdmissionsAdmitted&isList=true&query=$filter=Admission_No eq '${admissionNo}'`,
+      `${API}data/odatafilter?webservice=PgAdmissionsAdmitted&isList=true&query=$filter=${filterColumn} eq '${filterValue}'`,
       config
     );
 
-    // Dispatch success action after a small delay
     setTimeout(() => {
       dispatch({
         type: GET_VERIFIED_SINGLE_ADMITTED_PATIENTS_SUCCESS,
@@ -107,10 +115,8 @@ export const getAdmittedSinglePatient = (admissionNo) => async (dispatch, getSta
       });
     }, 2000);
 
-    // Return the response data for further use
     return data;
   } catch (error) {
-    // Handle the error and dispatch failure action
     setTimeout(() => {
       const errorMessage =
         error.response?.data?.message ||
@@ -122,9 +128,11 @@ export const getAdmittedSinglePatient = (admissionNo) => async (dispatch, getSta
         payload: errorMessage,
       });
       message.error(errorMessage);
-    }, 1200);
+    }, 120
+    );
 
-    // Rethrow error for any additional handling
     throw error;
   }
 };
+
+

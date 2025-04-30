@@ -1,12 +1,13 @@
 import { Button, Form } from "antd";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SickOffTable from "../tables/nurse-tables/SickOffTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import useAuth from "../../../hooks/useAuth";
 import SickOffFormData from "../nurse-forms/SickOffFormData";
 import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
 
 const SickOff = () => {
   const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -17,11 +18,13 @@ const SickOff = () => {
   const [isViewing, setIsViewing] = useState(false);
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+  const dispatch = useDispatch();
 
   const [form] = Form.useForm();
 
-  const { loading: loadingSickOff, data: getSickOff } = useSelector(
-    (state) => state.getSickOff
+  const { loading: loadingSickOff, admissions: getSickOffData } = useSelector(
+    (state) => state.getSingleAdmittedPatient
   );
 
   const rowSelection = {
@@ -45,6 +48,10 @@ const SickOff = () => {
     setIsViewing(false);
     setIsFormVisible(!isFormVisible);
   };
+
+  useEffect(() => {
+    dispatch(getAdmittedSinglePatient(admissionNo, treatmentNo));
+  }, [admissionNo, treatmentNo, dispatch]);
 
   return (
     <div>
@@ -70,6 +77,7 @@ const SickOff = () => {
           form={form}
           isViewing={isViewing}
           admissionNo={admissionNo}
+          treatmentNo={treatmentNo}
         />
       )}
 
@@ -78,7 +86,7 @@ const SickOff = () => {
           rowSelection={rowSelection}
           form={form}
           loadingSickOff={loadingSickOff}
-          getSickOff={getSickOff}
+          getSickOff={getSickOffData}
         />
       )}
     </div>

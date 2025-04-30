@@ -138,7 +138,6 @@ import {
 } from "./doc-reducers/Admission/getDischargeListReducer";
 import { getPendingAdmissionListReducer } from "./doc-reducers/Admission/getPendingAdmissionListReducer";
 import {
-  getSickOffReducer,
   postInpatientDischargeReducer,
   postSickOffReducer,
 } from "./doc-reducers/Admission/postInpatientDischarge";
@@ -471,7 +470,6 @@ export const rootReducer = combineReducers({
   getPgOpenPatientConsumables: getPgOpenPatientConsumablesReducer,
   postInitiateDischarge: postInitiateDischargeReducer,
   postSickOff: postSickOffReducer,
-  getSickOff: getSickOffReducer,
   postDischargeSummary: postDischargeSummaryReducer,
   postPostDischarge: postPostDischargeReducer,
   getQyDischargeSummary: getQyDischargeSummaryReducer,
