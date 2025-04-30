@@ -1,32 +1,42 @@
-import { Table } from "antd";
+import { Button, Table } from "antd";
 import PropTypes from "prop-types";
+import { PrinterOutlined } from "@ant-design/icons";
 
 const SickOffTable = ({ rowSelection, loadingSickOff, getSickOff }) => {
   const columns = [
     {
       title: "Admission No",
-      dataIndex: "admissionNo",
-      key: "admissionNo",
+      dataIndex: "Admission_No",
+      key: "Admission_No",
     },
     {
       title: "Sick off Start Day",
-      dataIndex: "sickOffStartDay",
-      key: "sickOffStartDay",
+      dataIndex: "Sick_Off_Start_Date",
+      key: "Sick_Off_Start_Date",
     },
     {
       title: "Sick off No of Days",
-      dataIndex: "sickOffDays",
-      key: "sickOffDays",
+      dataIndex: "Off_Duty_Days",
+      key: "Off_Duty_Days",
     },
     {
       title: "Remarks",
-      dataIndex: "remarks",
-      key: "remarks",
+      dataIndex: "Off_Duty_Comments",
+      key: "Off_Duty_Comments",
     },
     {
       title: "Action",
       dataIndex: "action",
       key: "action",
+      render: (_, record) => (
+        <Button
+          icon={<PrinterOutlined />}
+          type="primary"
+          // onClick={() => handlePrint(record)}
+        >
+          Print
+        </Button>
+      ),
     },
   ];
 
@@ -35,6 +45,7 @@ const SickOffTable = ({ rowSelection, loadingSickOff, getSickOff }) => {
       <Table
         loading={loadingSickOff}
         columns={columns}
+        dataSource={getSickOff}
         className="admit-patient-table"
         rowSelection={rowSelection}
       />

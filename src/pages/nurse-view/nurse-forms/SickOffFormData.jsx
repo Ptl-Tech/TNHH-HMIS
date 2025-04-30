@@ -4,7 +4,6 @@ import {
   DatePicker,
   Form,
   Input,
-  message,
   notification,
   Row,
   Space,
@@ -13,24 +12,30 @@ import PropTypes from "prop-types";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   POST_PATIENT_SICK_OFF_FAIL,
-  POST_PATIENT_SICK_OFF_SUCCESS,
   postSickOff,
-  getSickOff,
 } from "../../../actions/Doc-actions/Admission/postInitiateDischarge";
+import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
 
-const SickOffFormData = ({ isViewing, setIsFormVisible, admissionNo }) => {
+const SickOffFormData = ({
+  isViewing,
+  setIsFormVisible,
+  admissionNo,
+  treatmentNo,
+}) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+
+  const { loading: loadingSickOff } = useSelector((state) => state.postSickOff);
 
   const handleOnFinish = async (values) => {
     const { sickOffDays, startDate, remarks } = values;
     const sickOffData = {
       myAction: "create",
-      inPatient: true,
-      documentNo: admissionNo,
+      inPatient: !!admissionNo,
+      documentNo: admissionNo ?? treatmentNo,
       offDutyDays: parseInt(sickOffDays),
       startDate: startDate.format("YYYY-MM-DD"),
       offDutyComments: remarks,
@@ -46,7 +51,7 @@ const SickOffFormData = ({ isViewing, setIsFormVisible, admissionNo }) => {
           notification.success({
             message: "Sick Off Created Successfully",
           });
-          dispatch(getSickOff(admissionNo));
+          dispatch(getAdmittedSinglePatient(admissionNo));
         } else if (response.type === POST_PATIENT_SICK_OFF_FAIL) {
           form.resetFields();
           setIsFormVisible(false);
@@ -69,6 +74,7 @@ const SickOffFormData = ({ isViewing, setIsFormVisible, admissionNo }) => {
     form.resetFields();
     setIsFormVisible(false);
   };
+
   return (
     <Form
       form={form}
@@ -150,7 +156,13 @@ const SickOffFormData = ({ isViewing, setIsFormVisible, admissionNo }) => {
       <Form.Item>
         <Space>
           {isViewing ? null : (
-            <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              icon={<SaveOutlined />}
+              loading={loadingSickOff}
+              disabled={loadingSickOff}
+            >
               Save Sick Off
             </Button>
           )}
@@ -175,4 +187,5 @@ SickOffFormData.propTypes = {
   setIsFormVisible: PropTypes.func,
   setIsViewing: PropTypes.func,
   admissionNo: PropTypes.string,
+  treatmentNo: PropTypes.string,
 };
