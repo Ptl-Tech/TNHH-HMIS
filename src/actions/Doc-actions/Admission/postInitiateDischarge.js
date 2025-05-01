@@ -165,6 +165,7 @@ export const postDischargeSummary = (admissionNo) => async (dispatch, getState) 
 };
 
 export const postSickOff = (formData) => async (dispatch, getState) => {
+
   try {
     dispatch({ type: POST_PATIENT_SICK_OFF });
 

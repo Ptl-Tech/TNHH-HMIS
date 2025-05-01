@@ -73,10 +73,11 @@ export const getAdmittedPatients = () => async (dispatch, getState) => {
 };
 
 export const getAdmittedSinglePatient = (admissionNo, treatmentNo) => async (dispatch, getState) => {
+
   try {
     // Guard: Ensure at least one identifier is provided
     if (!admissionNo && !treatmentNo) {
-      notification.error({
+      return notification.error({
         message: "Please provide either Admission No or Treatment No.",
         duration: 2,
       })
@@ -98,13 +99,15 @@ export const getAdmittedSinglePatient = (admissionNo, treatmentNo) => async (dis
       },
     };
 
-    // Determine which column and value to filter by
-    const filterColumn = admissionNo ? 'Admission_No' : 'Treatment_No';
+    // Determine which column and value to filter by QyTreatmentHeaders
+
+    const endPoint = admissionNo ? 'PgAdmissionsAdmitted' : 'QyTreatmentHeaders';
+    const filterColumn = admissionNo ? 'Admission_No' : 'TreatmentNo';
     const filterValue = admissionNo || treatmentNo;
 
     // Construct dynamic URL
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=PgAdmissionsAdmitted&isList=true&query=$filter=${filterColumn} eq '${filterValue}'`,
+      `${API}data/odatafilter?webservice=${endPoint}&isList=true&query=$filter=${filterColumn} eq '${filterValue}'`,
       config
     );
 

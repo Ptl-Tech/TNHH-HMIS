@@ -2,8 +2,15 @@ import { Button, Table } from "antd";
 import PropTypes from "prop-types";
 import { PrinterOutlined } from "@ant-design/icons";
 
-const SickOffTable = ({ rowSelection, loadingSickOff, getSickOff }) => {
-  const columns = [
+const SickOffTable = ({
+  rowSelection,
+  loadingSickOff,
+  getSickOff,
+  admissionNo,
+}) => {
+  const isAdmission = !!admissionNo;
+
+  const admissionColumns = [
     {
       title: "Admission No",
       dataIndex: "Admission_No",
@@ -29,11 +36,40 @@ const SickOffTable = ({ rowSelection, loadingSickOff, getSickOff }) => {
       dataIndex: "action",
       key: "action",
       render: (_, record) => (
-        <Button
-          icon={<PrinterOutlined />}
-          type="primary"
-          // onClick={() => handlePrint(record)}
-        >
+        <Button icon={<PrinterOutlined />} type="primary">
+          Print
+        </Button>
+      ),
+    },
+  ];
+
+  const treatmentColumns = [
+    {
+      title: "Treatment No",
+      dataIndex: "TreatmentNo",
+      key: "TreatmentNo",
+    },
+    {
+      title: "Sick off Start Day",
+      dataIndex: "SickOffStartDate",
+      key: "SickOffStartDate",
+    },
+    {
+      title: "Sick off No of Days",
+      dataIndex: "OffDutyDays",
+      key: "OffDutyDays",
+    },
+    {
+      title: "Remarks",
+      dataIndex: "OffDutyComments",
+      key: "OffDutyComments",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      render: (_, record) => (
+        <Button icon={<PrinterOutlined />} type="primary">
           Print
         </Button>
       ),
@@ -44,7 +80,7 @@ const SickOffTable = ({ rowSelection, loadingSickOff, getSickOff }) => {
     <div style={{ paddingTop: "10px" }}>
       <Table
         loading={loadingSickOff}
-        columns={columns}
+        columns={isAdmission ? admissionColumns : treatmentColumns}
         dataSource={getSickOff}
         className="admit-patient-table"
         rowSelection={rowSelection}
@@ -60,4 +96,5 @@ SickOffTable.propTypes = {
   rowSelection: PropTypes.object,
   loadingSickOff: PropTypes.bool,
   getSickOff: PropTypes.array,
+  admissionNo: PropTypes.string,
 };
