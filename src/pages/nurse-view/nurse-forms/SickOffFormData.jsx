@@ -51,7 +51,7 @@ const SickOffFormData = ({
           notification.success({
             message: "Sick Off Created Successfully",
           });
-          dispatch(getAdmittedSinglePatient(admissionNo));
+          dispatch(getAdmittedSinglePatient(admissionNo, treatmentNo));
         } else if (response.type === POST_PATIENT_SICK_OFF_FAIL) {
           form.resetFields();
           setIsFormVisible(false);

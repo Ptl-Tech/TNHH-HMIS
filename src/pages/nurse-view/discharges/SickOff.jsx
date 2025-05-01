@@ -19,6 +19,7 @@ const SickOff = () => {
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
@@ -83,6 +84,7 @@ const SickOff = () => {
 
       {!isFormVisible && (
         <SickOffTable
+          admissionNo={admissionNo}
           rowSelection={rowSelection}
           form={form}
           loadingSickOff={loadingSickOff}
