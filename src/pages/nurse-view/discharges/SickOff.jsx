@@ -1,14 +1,13 @@
 import { Button, Form } from "antd";
-import {
-  PlusOutlined,
-  UserAddOutlined,
-  FolderViewOutlined,
-} from "@ant-design/icons";
-import { useState } from "react";
+import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 import SickOffTable from "../tables/nurse-tables/SickOffTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import useAuth from "../../../hooks/useAuth";
 import SickOffFormData from "../nurse-forms/SickOffFormData";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
 
 const SickOff = () => {
   const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -17,8 +16,17 @@ const SickOff = () => {
   const role = useAuth().userData.departmentName;
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
+  const location = useLocation();
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+
+  const dispatch = useDispatch();
 
   const [form] = Form.useForm();
+
+  const { loading: loadingSickOff, admissions: getSickOffData } = useSelector(
+    (state) => state.getSingleAdmittedPatient
+  );
 
   const rowSelection = {
     selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
@@ -37,15 +45,14 @@ const SickOff = () => {
     }),
   };
 
-  const handleOnClick = () => {
-    const record = selectedRow[0];
-    console.log(record);
-  };
-
   const handleButtonVisibility = () => {
     setIsViewing(false);
     setIsFormVisible(!isFormVisible);
   };
+
+  useEffect(() => {
+    dispatch(getAdmittedSinglePatient(admissionNo, treatmentNo));
+  }, [admissionNo, treatmentNo, dispatch]);
 
   return (
     <div>
@@ -62,15 +69,6 @@ const SickOff = () => {
           <Button type="primary" onClick={handleButtonVisibility}>
             <PlusOutlined /> Add Sick Off
           </Button>
-          <Button
-            color="default"
-            variant="outlined"
-            disabled={!selectedRowKey}
-            onClick={() => handleOnClick()}
-          >
-            <FolderViewOutlined />
-            Print Sick Off
-          </Button>
         </div>
       )}
 
@@ -79,11 +77,19 @@ const SickOff = () => {
           setIsFormVisible={setIsFormVisible}
           form={form}
           isViewing={isViewing}
+          admissionNo={admissionNo}
+          treatmentNo={treatmentNo}
         />
       )}
 
       {!isFormVisible && (
-        <SickOffTable rowSelection={rowSelection} form={form} />
+        <SickOffTable
+          admissionNo={admissionNo}
+          rowSelection={rowSelection}
+          form={form}
+          loadingSickOff={loadingSickOff}
+          getSickOff={getSickOffData}
+        />
       )}
     </div>
   );
