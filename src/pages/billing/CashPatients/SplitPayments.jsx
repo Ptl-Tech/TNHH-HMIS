@@ -74,7 +74,6 @@ const [deleteLoading, setDeleteLoading] = useState(false);
       dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
-console.log("receipt lines", receiptNo);
   const handleDeleteSplitLine =async (record) => {
     const recID = record.SystemId; 
     const payload = {
@@ -87,7 +86,6 @@ console.log("receipt lines", receiptNo);
       amount: 0,
     };
     const status = await dispatch(deleteReceiptSplitLine(payload));
-    console.log("delete status", status);
     if (status) {
       message.success("Payment deleted successfully", 10);
       dispatch(getSplitReceiptLines(receiptNo));
@@ -133,7 +131,6 @@ console.log("receipt lines", receiptNo);
   );
   const remainingAmount = parseFloat(amount) - totalSplitAmount;
   const lastReceipt = receiptHeader?.[receiptHeader.length - 1];
-  console.log("last receipt", receiptHeader);
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
@@ -167,7 +164,6 @@ console.log("receipt lines", receiptNo);
       form.resetFields();
       setAmountError("");
     } catch (errorInfo) {
-      console.log("Validation Failed:", errorInfo);
       message.error(error || "Failed to save payment", 10);
     }
   };

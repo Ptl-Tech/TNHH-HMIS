@@ -68,8 +68,7 @@ const ReceiptInpatient = () => {
     }
    
   }, [dispatch, activeVisitNo]);
-  console.log("Active Visit No:", activeVisitNo);
-  console.log("Patient Bill Data:", patientBillData);
+
   const handleCancel = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
@@ -98,8 +97,7 @@ const ReceiptInpatient = () => {
   };
 
   const handlePaymentProcessing = async () => {
-    console.log("Processing payment...");
-    console.log("Receipt Lines:", receiptLines);
+
     if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
       return;
     }
@@ -108,7 +106,7 @@ const ReceiptInpatient = () => {
 
     const payload = {
       recId: "",
-      patientNo: patientVisitDetails?.PatientNo,
+      patientNo: patientBillData[0]?.PatientNo,
       receiptNo: lastReceipt?.No,
     };
 
@@ -122,7 +120,7 @@ const ReceiptInpatient = () => {
         dispatch(getSinglePatientBill(activeVisitNo));
       }
     } catch (error) {
-      console.error("Error processing receipt:", error);
+      message.error("Failed to post receipt. Please try again.");
     }
   };
 

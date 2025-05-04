@@ -314,7 +314,7 @@ const InvoiceInpatient = () => {
                   loading={postSalesInvoiceLoading}
                   disabled={postSalesInvoiceLoading}
                 >
-                  Process Invoice
+                  Post Invoice
                 </Button>
               </div>
 

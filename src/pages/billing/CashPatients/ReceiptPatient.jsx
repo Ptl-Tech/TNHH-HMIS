@@ -97,8 +97,7 @@ const ReceiptPatient = () => {
   };
 
   const handlePaymentProcessing = async () => {
-    console.log("Processing payment...");
-    console.log("Receipt Lines:", receiptLines);
+    
     if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
       return;
     }

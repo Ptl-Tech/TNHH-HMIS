@@ -115,12 +115,12 @@ const PatientCharges = ({ activeVisitNo }) => {
       key: "Total_Amount",
       render: (amount) => `KES ${amount.toFixed(2)}`,
     },
-    {
-      title: "Amount Paid",
-      dataIndex: "Amount_Paid",
-      key: "Amount_Paid",
-      render: (amount) => `KES ${amount.toFixed(2)}`,
-    },
+    // {
+    //   title: "Amount Paid",
+    //   dataIndex: "Amount_Paid",
+    //   key: "Amount_Paid",
+    //   render: (amount) => `KES ${amount.toFixed(2)}`,
+    // },
     {
       title: "Status",
       dataIndex: "Posted",

@@ -51,7 +51,6 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const handlePaymentTypeChange = (value) => {
     setPaymentType(value);
   };
-
   const handleSavePayment = async (values) => {
     const {
       payMode,
@@ -209,21 +208,21 @@ const handleReceiptPost = async () => {
 
         <Row gutter={16}>
           <Col span={24}>
-            {patientBillData[0]?.CurrentAdmNo ? (
-              <Form.Item
-                name="isPartialPayment"
-                valuePropName="checked"
-                style={{ marginTop: 16 }}
-              >
-                <Checkbox>Partial Payment</Checkbox>
-              </Form.Item>
-            ) : (
-              <Form.Item
+            {patientBillData[0]?.Inpatient  && patientBillData[0].PatientType !== "Cash"? (
+             <Form.Item
                 name="coPay"
                 valuePropName="checked"
                 style={{ marginTop: 16 }}
               >
                 <Checkbox>Co-Pay</Checkbox>
+              </Form.Item>
+            ) : (
+               <Form.Item
+                name="isPartialPayment"
+                valuePropName="checked"
+                style={{ marginTop: 16 }}
+              >
+                <Checkbox>Partial Payment</Checkbox>
               </Form.Item>
             )}
           </Col>

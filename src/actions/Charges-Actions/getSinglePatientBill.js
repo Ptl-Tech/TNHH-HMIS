@@ -37,7 +37,6 @@ export const getSinglePatientBill =
         config
       );
     //   dispatch({ type: GET_SINGLE_PATIENT_BILL_SUCCESS, payload: data });
-console.log(data);
 //if it is an object ensure it is an array
       if (typeof data === "object" && !Array.isArray(data)) {
         const dataArray = [data];
