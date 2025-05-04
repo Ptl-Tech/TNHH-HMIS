@@ -135,13 +135,16 @@ import { getAdmittedPatientsReducer, getAdmittedSinglePatientsReducer } from "./
 import {
   getDischargeListReducer,
   getDischargeRequestListReducer,
-} from './doc-reducers/Admission/getDischargeListReducer';
-import { getPendingAdmissionListReducer } from './doc-reducers/Admission/getPendingAdmissionListReducer';
-import { postInpatientDischargeReducer } from './doc-reducers/Admission/postInpatientDischarge';
-import { getAdmissionLinesReducer } from './doc-reducers/Admission/getAdmissionLinesReducer';
-import { getDiagnosisLinesReducer } from './doc-reducers/getDiagnosisLinesReducer';
-import { getReferralLinesReducer } from './doc-reducers/getReferralLinesReducer';
-import { getNewPharmacyRequestsReducer } from './pharmacy-reducers/getNewPharmacyRequests';
+} from "./doc-reducers/Admission/getDischargeListReducer";
+import { getPendingAdmissionListReducer } from "./doc-reducers/Admission/getPendingAdmissionListReducer";
+import {
+  postInpatientDischargeReducer,
+  postSickOffReducer,
+} from "./doc-reducers/Admission/postInpatientDischarge";
+import { getAdmissionLinesReducer } from "./doc-reducers/Admission/getAdmissionLinesReducer";
+import { getDiagnosisLinesReducer } from "./doc-reducers/getDiagnosisLinesReducer";
+import { getReferralLinesReducer } from "./doc-reducers/getReferralLinesReducer";
+import { getNewPharmacyRequestsReducer } from "./pharmacy-reducers/getNewPharmacyRequests";
 import {
   postArchivePrescriptionReducer,
   postDrugIssuanceReducer,
@@ -466,6 +469,7 @@ export const rootReducer = combineReducers({
   getPgInpatientDischargeList: getPgInpatientDischargeListReducer,
   getPgOpenPatientConsumables: getPgOpenPatientConsumablesReducer,
   postInitiateDischarge: postInitiateDischargeReducer,
+  postSickOff: postSickOffReducer,
   postDischargeSummary: postDischargeSummaryReducer,
   postPostDischarge: postPostDischargeReducer,
   getQyDischargeSummary: getQyDischargeSummaryReducer,
@@ -566,7 +570,7 @@ export const rootReducer = combineReducers({
   getUnpostedCharges: getUnpostedChargesReducer,
   getPostedCharges: getpostedChargesReducer,
   deletePatientCharges: deletePatientChargesReducer,
-  deleteSplitLine:deleteReceiptSplitLineReducer,
+  deleteSplitLine: deleteReceiptSplitLineReducer,
   postSalesInvoice: postsalesInvoiceReducer,
   reopenPostedCharges: reopensalesInvoiceReducer,
   postRebates: postRebatesReducer,

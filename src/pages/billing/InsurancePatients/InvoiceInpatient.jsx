@@ -79,11 +79,10 @@ const InvoiceInpatient = () => {
   };
   const handlegenerateInvoice = async () => {
     const payload = {
-      patientNo: patientVisitDetails?.PatientNo,
+      patientNo: patientBillData[0]?.PatientNo,
     };
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
-        console.log("statues", status);
         message.success(`Invoice generated ${status}fully`, 5);
         dispatch(getPatientCharges(activeVisitNo));
       }
@@ -96,9 +95,8 @@ const InvoiceInpatient = () => {
     }
 
     const lastInvoice = data[data.length - 1];
-
     const payload = {
-      patientNo: patientVisitDetails?.PatientNo,
+      patientNo: patientBillData[0]?.PatientNo,
       invoiceNo: lastInvoice?.Invoice_Number,
     };
 
@@ -129,7 +127,7 @@ const InvoiceInpatient = () => {
       }}
     >
       <Menu.Item key="visit_action">
-        <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
+        <PrintFinalInvoice patientNo={patientBillData[0]?.PatientNo} />
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="split_amount">Split Payment</Menu.Item>

@@ -1,149 +1,198 @@
-import { Button, Table } from 'antd'
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import TriageSummeryCard from './TriageSummeryCard';
-import Loading from '../../partials/nurse-partials/Loading'
-import { getTriageList } from '../../actions/triage-actions/getTriageListSlice';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
-import { useLocation } from 'react-router-dom';
-import FilterTriageList from '../../partials/nurse-partials/FilterTriageList';
+import { Button, Table } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import TriageSummeryCard from "./TriageSummeryCard";
+import Loading from "../../partials/nurse-partials/Loading";
+import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
+import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
+import { useLocation } from "react-router-dom";
+import FilterTriageList from "../../partials/nurse-partials/FilterTriageList";
 
 const TriageListClosed = () => {
-
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [searchName, setSearchName] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
-  const [searchObservationNumber, setSearchObservationNumber] = useState('')
+  const [searchName, setSearchName] = useState("");
+  const [searchPatientNumber, setSearchPatientNumber] = useState("");
+  const [searchObservationNumber, setSearchObservationNumber] = useState("");
 
-  const {loadingTriageList, triageList} = useSelector((state) => state.getTriageList) || {};
+  const { loadingTriageList, triageList } =
+    useSelector((state) => state.getTriageList) || {};
   // const openTriageList = triageList.filter((item)=>item.Status==='New') || {};
 
-  const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
-  
-  
-  const openTriageList = triageList.filter((item) => item.Status === 'Closed');
+  const { loadingWaitingList, triageWaitingList } = useSelector(
+    (state) => state.getTriageWaitingList
+  );
 
-  const formattedTriageWaitingList = triageWaitingList.map(patient => {
+  const { loading: loadingDoctors, data } = useSelector(
+    (state) => state.getDoctorsList
+  );
+
+  const openTriageList = triageList.filter((item) => item.Status === "Closed");
+
+  const formattedDoctorDetails = useMemo(() => {
+    return data?.map((doctor) => ({
+      DoctorID: doctor?.DoctorID,
+      DoctorsName: doctor?.DoctorsName,
+    }));
+  }, [data]);
+
+  const formattedTriageWaitingList = triageWaitingList.map((patient) => {
     return {
-        PatientNo: patient.PatientNo,
-        SearchName: patient.SearchName,
-    }
-  });
-
-    const combinedList = openTriageList.map(room => {
-    const matchingPatient = formattedTriageWaitingList.find(patient => patient.PatientNo === room.PatientNo);
-
-    return {
-        ...room, 
-        PatientNo: room.PatientNo,
-        SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
+      PatientNo: patient.PatientNo,
+      SearchName: patient.SearchName,
     };
   });
 
+  const combinedList = openTriageList.map((room) => {
+    const matchingPatient = formattedTriageWaitingList.find(
+      (patient) => patient.PatientNo === room.PatientNo
+    );
+
+    const matchingDoctor = formattedDoctorDetails.find(
+      (doctor) => doctor.DoctorID === room.Doctor
+    );
+
+    return {
+      ...room,
+      PatientNo: room.PatientNo,
+      SearchName: matchingPatient ? matchingPatient.SearchName : null, // Add SearchName if patient exists
+      DoctorName: matchingDoctor ? matchingDoctor.DoctorsName : null, // Add Doctor's Name if doctor exists
+    };
+  });
 
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: combinedList.length,
-});
+  });
 
-const handleTableChange = (newPagination) => {
+  const handleTableChange = (newPagination) => {
     setPagination(newPagination); // Update pagination settings
-};
+  };
 
   useEffect(() => {
-        dispatch(getTriageList());
-}, [dispatch]);
-
+    dispatch(getTriageList());
+  }, [dispatch]);
 
   useEffect(() => {
-      dispatch(getTriageWaitingList());
+    dispatch(getTriageWaitingList());
   }, [dispatch]);
 
   const waitingListColumns = [
     {
-      title: 'Observation No',
-      dataIndex: 'ObservationNo',
-      key: 'ObservationNo',
+      title: "Observation No",
+      dataIndex: "ObservationNo",
+      key: "ObservationNo",
       filteredValue: searchObservationNumber ? [searchObservationNumber] : null,
       onFilter: (value, record) =>
-        record?.ObservationNo ?
-        record.ObservationNo.toLowerCase().includes(value.toLowerCase()) : false,
+        record?.ObservationNo
+          ? record.ObservationNo.toLowerCase().includes(value.toLowerCase())
+          : false,
     },
     {
-      title: 'Patient Number',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
+      title: "Patient Number",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
-        record?.PatientNo ?
-        record.PatientNo.toLowerCase().includes(value.toLowerCase()) : false,
+        record?.PatientNo
+          ? record.PatientNo.toLowerCase().includes(value.toLowerCase())
+          : false,
     },
     {
-      title: 'Patient Name',
-      dataIndex: 'SearchName',
-      key: 'SearchName',
+      title: "Patient Name",
+      dataIndex: "SearchName",
+      key: "SearchName",
       filteredValue: searchName ? [searchName] : null,
       onFilter: (value, record) =>
-        record?.SearchName ?
-        record.SearchName.toLowerCase().includes(value.toLowerCase()) : false,
-      render: (name) => (
-        <div style={{ color: '#0f5689' }}>
-          {name}
-        </div>
-      )
+        record?.SearchName
+          ? record.SearchName.toLowerCase().includes(value.toLowerCase())
+          : false,
+      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
     },
-    
+
     {
-      title: 'Observation Date',
-      dataIndex: 'ObservationDate',
-      key: 'ObservationDate',
-    },  
+      title: "Doctor Name",
+      dataIndex: "DoctorName",
+      key: "DoctorName",
+      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
+      filters: formattedDoctorDetails.map((doctor) => ({
+        text: doctor.DoctorsName,
+        value: doctor.DoctorsName,
+      })),
+    },
+
     {
-      title: 'Status',
-      dataIndex: 'Status',
-      key: 'Status',
+      title: "Observation Date",
+      dataIndex: "ObservationDate",
+      key: "ObservationDate",
+      sorter: (a, b) =>
+        new Date(b.ObservationDate) - new Date(a.ObservationDate),
+      defaultSortOrder: "ascend",
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
       width: 200,
-      render: () => <Button color="danger" variant="outlined">Closed</Button>
+      render: () => (
+        <Button color="danger" variant="outlined">
+          Closed
+        </Button>
+      ),
     },
   ];
- 
+
   return (
-      <div style={{ padding: '10px 10px' }}>
-          <TriageSummeryCard waitingPatient={combinedList} currentPath={currentPath} openTriageList={openTriageList}/>
+    <div style={{ padding: "10px 10px" }}>
+      <TriageSummeryCard
+        waitingPatient={combinedList}
+        currentPath={currentPath}
+        openTriageList={openTriageList}
+      />
 
-          <FilterTriageList setSearchName={setSearchName} setSearchPatientNumber={setSearchPatientNumber} setSearchObservationNumber={setSearchObservationNumber}/>
-          
+      <FilterTriageList
+        setSearchName={setSearchName}
+        setSearchPatientNumber={setSearchPatientNumber}
+        setSearchObservationNumber={setSearchObservationNumber}
+      />
 
-          {
-            loadingTriageList || loadingWaitingList ? 
-            (
-              <Loading />
-            )
-            :
-            (
-                <Table columns={waitingListColumns} 
-                dataSource={combinedList} 
-                bordered size='middle' 
-                pagination={{
-                  ...pagination,
-                  showSizeChanger: true,
-                  showQuickJumper: true,
-                  position: ['bottom', 'right'],
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                  onChange: (page, pageSize) => handleTableChange({ current: page, pageSize, total: pagination.total }),
-                  onShowSizeChange: (current, size) => handleTableChange({ current, pageSize: size, total: pagination.total }),
-                  style: {
-                      marginTop: '30px',
-                  }
-              }}
-                />
-            )
-          }
-      </div>
-  )
-}
+      {loadingTriageList || loadingWaitingList ? (
+        <Loading />
+      ) : (
+        <Table
+          columns={waitingListColumns}
+          dataSource={combinedList}
+          bordered
+          size="middle"
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            position: ["bottom", "right"],
+            showTotal: (total, range) =>
+              `${range[0]}-${range[1]} of ${total} items`,
+            onChange: (page, pageSize) =>
+              handleTableChange({
+                current: page,
+                pageSize,
+                total: pagination.total,
+              }),
+            onShowSizeChange: (current, size) =>
+              handleTableChange({
+                current,
+                pageSize: size,
+                total: pagination.total,
+              }),
+            style: {
+              marginTop: "30px",
+            },
+          }}
+        />
+      )}
+    </div>
+  );
+};
 
-export default TriageListClosed
+export default TriageListClosed;

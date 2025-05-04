@@ -32,6 +32,7 @@ const InsurancePatients = () => {
 
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
+    console.log('Patient ID:', patientId); // Log the patient ID for debugging
     navigate(`/Reception/Corporate-Inpatient-Charges?PatientNo=${patientId}`);
 
   };
