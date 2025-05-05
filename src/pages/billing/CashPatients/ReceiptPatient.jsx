@@ -2,7 +2,7 @@ import React, { act, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu } from "antd";
+import { Button, Dropdown, Card, Menu, message } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -67,8 +67,7 @@ const ReceiptPatient = () => {
     }
    
   }, [dispatch, activeVisitNo]);
-  console.log("Active Visit No:", activeVisitNo);
-  console.log("Patient Bill Data:", patientBillData);
+
   const handleCancel = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
@@ -120,7 +119,7 @@ const ReceiptPatient = () => {
         dispatch(getSinglePatientBill(activeVisitNo));
       }
     } catch (error) {
-      console.error("Error processing receipt:", error);
+      message.error("Failed to post receipt. Please try again.");
     }
   };
 
@@ -144,7 +143,6 @@ const ReceiptPatient = () => {
       </Menu.Item>
     </Menu>
   );
-console.log("Patient Bill Data:", activeVisitNo);
   return (
     <>
       <div
