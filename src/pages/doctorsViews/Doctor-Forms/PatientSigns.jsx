@@ -1,354 +1,620 @@
-import { useEffect, useState, useMemo } from "react";
-import { Button, Steps, Form, Input, Typography, message } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { FileOutlined } from "@ant-design/icons";
-import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
-import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
-import PatientHistoryNotesTable from "../tables/PatientHistoryNotesTable";
-import useAuth from "../../../hooks/useAuth";
-import { useLocation } from "react-router-dom";
-import Loading from "../../../partials/nurse-partials/Loading";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-const { TextArea } = Input;
-const { Step } = Steps;
+import {
+  Card,
+  Form,
+  Tabs,
+  Space,
+  Radio,
+  Input,
+  Button,
+  message,
+  Collapse,
+  Checkbox,
+} from 'antd';
 
-const PatientSigns = ({ treatmentNo, patientNo, moveToNextTab }) => {
-  const role = useAuth().userData.departmentName;
-  const location = useLocation();
-  const patientDetails = location.state?.patientDetails;
-  const { loading: saveNotesLoading } = useSelector(
-    (state) => state.postPatientHistory
-  );
-  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+import {
+  saveDoctorNotes,
+  SAVE_DOCTOR_NOTES_RESET,
+} from '../../../actions/Doc-actions/saveDoctorNotes';
+import {
+  buildFormStructure,
+  buildSelectedItemsTree,
+} from '../../../utils/doctorNotesTree';
+import { IoFileTrayOutline } from 'react-icons/io5';
+import { getDoctorsNotesData } from '../../../actions/Doc-actions/getDoctorsNotesData';
 
-  const notesType = [
-    { value: "1", label: "Chief Complaints" },
-    { value: "2", label: "Allegations" },
-    { value: "3", label: "History of Presenting Complaint" },
-    { value: "4", label: "Past Psychiatric and Medical History" },
-    { value: "5", label: "Family History" },
-    { value: "6", label: "Personal History" },
-    { value: "7", label: "Forensic History" },
-    { value: "8", label: "Premorbid Personality" },
-    { value: "9", label: "Medical" },
-    { value: "10", label: "Gynecology" },
-  ];
-
-  const filterCollapseData = data.filter((item) =>
-    notesType.map((note) => note.label).includes(item.Notes_Type)
-  );
-
-  const allNotesPresent = notesType.every((note) =>
-    filterCollapseData.some((item) => item.Notes_Type === note.label)
-  );
-  const [currentStep, setCurrentStep] = useState(0);
-  const [form] = Form.useForm();
+const PatientSigns = ({ treatmentNo, filter }) => {
   const dispatch = useDispatch();
 
-  // Fetch patient history notes
-  useEffect(() => {
-    if (treatmentNo) {
-      dispatch(getPatientHistorySlice(treatmentNo));
-    }
-  }, [dispatch, treatmentNo]);
-
-  // Extract initial values for the form
-  const initialValues = useMemo(
-    () => ({
-      1:
-        data.filter((note) => note.Notes_Type === "Chief Complaints").at(-1)
-          ?.Notes || "",
-      2:
-        data.filter((note) => note.Notes_Type === "Allegations").at(-1)
-          ?.Notes || "",
-      3:
-        data
-          .filter(
-            (note) => note.Notes_Type === "History of Presenting Complaint"
-          )
-          .at(-1)?.Notes || "",
-      5:
-        data
-          .filter(
-            (note) => note.Notes_Type === "Past Psychiatric and Medical History"
-          )
-          .at(-1)?.Notes || "",
-      6:
-        data.filter((note) => note.Notes_Type === "Family History").at(-1)
-          ?.Notes || "",
-      7:
-        data.filter((note) => note.Notes_Type === "Personal History").at(-1)
-          ?.Notes || "",
-      8:
-        data.filter((note) => note.Notes_Type === "Forensic History").at(-1)
-          ?.Notes || "",
-      9:
-        data
-          .filter((note) => note.Notes_Type === "Premorbid Personality")
-          .at(-1)?.Notes || "",
-      20:
-        data.filter((note) => note.Notes_Type === "Medical History").at(-1)?.Notes ||
-        "",
-      23:
-        data.filter((note) => note.Notes_Type === "Gynecology").at(-1)?.Notes ||
-        "",
-    }),
-    [data]
+  const { data: getDoctorNotesData } = useSelector(
+    (state) => state.getDoctorsNotesData,
   );
+  const { data: saveDoctorNotesData, error: saveDoctorNotesError } =
+    useSelector((state) => state.saveDoctorNotes);
+  const { sections, sectionCategories, formItems } = getDoctorNotesData || {};
 
-  //tracking last saved notes
-  const [lastSavedNotes, setLastSavedNotes] = useState(initialValues);
-
-  // Initialize form fields with initial values
-  useEffect(() => {
-    form.setFieldsValue(initialValues);
-  }, [initialValues, form]);
-
-  const steps = [
-    {
-      key: "1",
-      title: "Chief Complaints & Allegations",
-      content: (
-        <>
-          <Form.Item
-            name="1"
-            label="Presentation by Patient "
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter presentation by patient..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-          <Form.Item name="2" label="Presentation by Family" rules={[{ required: true }]}>
-            <TextArea
-              placeholder="Enter presentation by family..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-        </>
-      ),
-      notesType: ["1", "2"],
-    },
-    {
-      key: "2",
-      title: "History of Presenting Illness",
-      content: (
-        <Form.Item
-          name="3"
-          label="History of Presenting Illness"
-          rules={[{ required: true }]}
-        >
-          <TextArea
-            placeholder="Describe the illness..."
-            autoSize={{ minRows: 4 }}
-          />
-        </Form.Item>
-      ),
-      notesType: ["3"],
-    },
-    {
-      key: "3",
-      title: "Past Psychiatric and Medical History",
-      content: (
-        <>
-          <Form.Item name="20" label="Past Medical History" rules={[{ required: true }]}>
-            <TextArea
-              placeholder="Enter past medical notes..."
-              autoSize={{ minRows: 4 }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="5"
-            label="Past Psychiatric History"
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter past psychiatric History..."
-              autoSize={{ minRows: 4 }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="23"
-            label="Past Obstetric & Gynecology Notes"
-            // rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter past Obstetric & Gynecology notes..."
-              autoSize={{ minRows: 4 }}
-            />
-          </Form.Item>
-        </>
-      ),
-      notesType: ["5", "20", "23"],
-    },
-    {
-      key: "4",
-      title: "Family & Personal History",
-      content: (
-        <>
-          <Form.Item
-            name="6"
-            label="Family History"
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter family history..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="7"
-            label="Personal History"
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter personal history..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-        </>
-      ),
-      notesType: ["6", "7"],
-    },
-    {
-      key: "5",
-      title: "Forensic & Premorbid Personality",
-      content: (
-        <>
-          <Form.Item
-            name="8"
-            label="Forensic History"
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Enter forensic history..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="9"
-            label="Premorbid Personality"
-            rules={[{ required: true }]}
-          >
-            <TextArea
-              placeholder="Describe premorbid personality..."
-              autoSize={{ minRows: 3 }}
-            />
-          </Form.Item>
-        </>
-      ),
-      notesType: ["8", "9"],
-    },
-  ];
-
-  const handleNext = async () => {
-    console.log("button clicked 1");
-    try {
-      // Ensure latest form values are retrieved
-      const values = await form.validateFields();
-      
-      // Ensure correct step data
-      const currentStepData = steps[currentStep];
-    
-      // Generate updated notes
-      const updatedNotes =
-        currentStepData?.notesType?.map((type) => ({
-          myAction: "create",
-          recId: "",
-          notesType: type,
-          notes: values[type], // Ensure values[type] exists
-          treatmentNo,
-          patientNo,
-        })) || []; // Ensure it doesn't become undefined
-  
-      console.log("button clicked 3", updatedNotes);
-  
-      if (updatedNotes.length > 0) {
-  
-        // Ensure dispatch works correctly
-        const results = await Promise.all(
-          updatedNotes.map(async (note) => {
-            const response = await dispatch(postPatientHistoryNotes(note));
-            return response.payload || response; // Ensure proper response handling
-          })
+  const filterSections = (filter) => {
+    var returnValue = [];
+    switch (filter) {
+      case 'PH':
+        returnValue = sections.filter(
+          ({ Form_Type }) => Form_Type === 'Patient History',
         );
-  
-        // Check for success
-        if (results.every((res) => res === "success")) {
-          message.success("Notes saved successfully!");
-  
-          // Ensure state updates properly
-          setLastSavedNotes((prev) => ({
-            ...prev,
-            ...Object.fromEntries(
-              updatedNotes.map((note) => [note.notesType, note.notes])
-            ),
-          }));
-  
-          dispatch(getPatientHistorySlice(treatmentNo));
-        } else {
-          message.error("Failed to save some notes.");
-        }
-      } else {
-        console.warn("No updated notes found, skipping API call.");
-      }
-  
-      // Move to the next step
-      if (currentStep === steps.length - 1) {
-        moveToNextTab();
-      } else {
-        setCurrentStep((prev) => prev + 1);
-      }
-    } catch (err) {
-      console.error("Error occurred:", err);
+        break;
+      case 'MSE':
+        returnValue = sections.filter(({ Form_Type }) => Form_Type === 'MSE');
+        break;
+      case 'PE':
+        returnValue = sections.filter(
+          ({ Form_Type }) => Form_Type === 'Physical Exam',
+        );
+        break;
+      default:
+        returnValue = sections;
+        break;
     }
+
+    return returnValue;
   };
-  
 
-  const handlePrev = () => setCurrentStep((prev) => prev - 1);
-  // console.log(currentStep, 'currentStep');
+  const tree = Object.keys(getDoctorNotesData).length
+    ? buildFormStructure(filterSections(filter), sectionCategories, formItems)
+    : null;
 
-  if (!patientDetails) return <Loading />;
+  const selectedTreeReport = tree
+    ? buildSelectedItemsTree(
+        filterSections(filter),
+        sectionCategories,
+        formItems,
+      )
+    : null;
+
+  // loading the doctor notes data to add
+  useEffect(() => {
+    dispatch(getDoctorsNotesData({ treatmentNo }));
+  }, [treatmentNo, dispatch, saveDoctorNotesData]);
+
+  // tracking when the adding of data has failed
+  useEffect(() => {
+    if (saveDoctorNotesError) {
+      console.log({ saveDoctorNotesError });
+
+      message.error(saveDoctorNotesError);
+      dispatch({ type: SAVE_DOCTOR_NOTES_RESET });
+    }
+  }, [saveDoctorNotesError]);
 
   return (
-    <div className="mt-4">
-      <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
-        <FileOutlined /> Patient History Notes
-      </Typography.Text>
-      {(role === "Doctor" || role === "Psychology") &&
-        !allNotesPresent &&
-        patientDetails?.Status !== "Completed" && (
-          <>
-            <Steps
-              current={currentStep}
-              size="small"
-              style={{ marginBottom: 24 }}
-            >
-              {steps.map((step) => (
-                <Step key={step.key} title={step.title} />
-              ))}
-            </Steps>
-            <Form form={form} layout="vertical">
-              {steps[currentStep].content}
-              <div className="steps-action">
-                {currentStep > 0 && (
-                  <Button onClick={handlePrev}>Previous</Button>
-                )}
-                <Button
-                  type="primary"
-                  loading={saveNotesLoading}
-                  onClick={handleNext}
-                >
-                  {currentStep === steps.length - 1 ? "Finish" : "Next"}
-                </Button>
-              </div>
-            </Form>
-          </>
-        )}
+    <Tabs
+      size="small"
+      tabPosition="left"
+      items={tree?.map(
+        ({ Section_Name: label, Section_ID: key, categories }) => {
+          const matchingResultsSection = selectedTreeReport.find(
+            (section) => section.Section_ID === key,
+          );
 
-      <PatientHistoryNotesTable data={data} patientDetails={patientDetails} loadingHistory={loadingHistory}/>
+          return {
+            label,
+            key,
+            children: (
+              <Space
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '4fr 5fr',
+                  alignItems: 'stretch',
+                }}
+              >
+                <Categories
+                  categories={categories}
+                  treatmentNo={treatmentNo}
+                />
+                <Card
+                  size="small"
+                  type="inner"
+                  style={{ minHeight: '500px', height: '100%' }}
+                  title={
+                    <h6
+                      className="pt-2"
+                      style={{ color: '#0f5689' }}
+                    >
+                      {label} Preview Report
+                    </h6>
+                  }
+                >
+                  <div>
+                    {!!matchingResultsSection && (
+                      <CategoriesReport
+                        categories={matchingResultsSection.categories}
+                      />
+                    )}
+                  </div>
+                </Card>
+              </Space>
+            ),
+          };
+        },
+      )}
+    />
+  );
+};
+
+const Categories = ({ categories, treatmentNo }) => {
+  function renderFormItems(formItems) {
+    const { Input_Type } = formItems[0] || {};
+
+    switch (Input_Type) {
+      case 'radio':
+        return (
+          <RadioInputs
+            formItems={formItems}
+            treatmentNo={treatmentNo}
+          />
+        );
+      case 'checkbox':
+        return (
+          <CheckboxInputs
+            formItems={formItems}
+            treatmentNo={treatmentNo}
+          />
+        );
+      default:
+        break;
+    }
+  }
+
+  return (
+    <div
+      style={{
+        border: '1px solid #f0f0f0',
+        borderRadius: '8px',
+        overflow: 'clip',
+      }}
+    >
+      <Collapse
+        size="small"
+        accordion
+        bordered={false}
+        items={categories.map(
+          (
+            {
+              Category_Name: label,
+              Category_ID: key,
+              formItems,
+              subCategories,
+            },
+            index,
+          ) => ({
+            key,
+            label,
+            style: {
+              border: 'none',
+            },
+            styles: {
+              body: {
+                background: 'white',
+              },
+              header: {
+                borderBottom:
+                  index === categories.length - 1 && categories.length !== 1
+                    ? 'none'
+                    : '1px solid #f0f0f0',
+              },
+            },
+            children: (
+              <Space direction="vertical">
+                {subCategories && subCategories.length > 0 && (
+                  <Categories
+                    treatmentNo={treatmentNo}
+                    categories={subCategories}
+                  />
+                )}
+                {formItems && renderFormItems(formItems)}
+              </Space>
+            ),
+          }),
+        )}
+      />
     </div>
+  );
+};
+
+const CategoriesReport = ({ categories }) => {
+  function renderFormItemsReport(formItems) {
+    const { Input_Type } = formItems[0] || {};
+
+    switch (Input_Type) {
+      case 'radio':
+        return <RadioInputsReport formItems={formItems} />;
+      case 'checkbox':
+        return <CheckboxInputsReport formItems={formItems} />;
+      default:
+        break;
+    }
+  }
+
+  if (!categories?.length) {
+    return (
+      <div className="">
+        <IoFileTrayOutline />
+      </div>
+    );
+  }
+
+  return categories.map(
+    (
+      { Category_Name, subCategories, formItems, Parent_Category_ID },
+      index,
+    ) => (
+      <div
+        style={{
+          padding: `${Parent_Category_ID ? '0px' : '16px'} 0px 0px 16px`,
+          borderTop: `${
+            Parent_Category_ID || index === 0 ? '' : '1px dashed #dadada'
+          }`,
+        }}
+      >
+        <h6 style={{ color: '#0f5689' }}>{Category_Name}</h6>
+        {formItems && renderFormItemsReport(formItems)}
+        {subCategories && subCategories.length > 0 && (
+          <CategoriesReport categories={subCategories} />
+        )}
+      </div>
+    ),
+  );
+};
+
+const RadioInputsReport = ({ formItems }) => {
+  const selectedItem = formItems.find(({ IsSelected }) => IsSelected);
+  const { Other_Specify, Item_Name, Item_ID } = selectedItem;
+  return (
+    <ul style={{ listStyle: 'none', display: 'grid', gap: '4px' }}>
+      <li
+        key={Item_ID}
+        style={{ position: 'relative', fontSize: '14px' }}
+      >
+        <span style={{ position: 'absolute', left: '-16px', top: '0px' }}>
+          &ndash;
+        </span>
+        <span>{Other_Specify || Item_Name}</span>
+      </li>
+    </ul>
+  );
+};
+
+const CheckboxInputsReport = ({ formItems }) => {
+  const selectedItems = formItems.filter(({ IsSelected }) => IsSelected);
+
+  return (
+    <ul style={{ listStyle: 'none', display: 'grid' }}>
+      {selectedItems.map(({ Other_Specify, Item_Name, Item_ID }) => (
+        <li
+          key={Item_ID}
+          style={{ position: 'relative', fontSize: '14px' }}
+        >
+          <span style={{ position: 'absolute', left: '-16px', top: '0px' }}>
+            &ndash;
+          </span>
+          <span>{Other_Specify || Item_Name}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const RadioInputs = ({ formItems, treatmentNo }) => {
+  const RadioGroup = Radio.Group;
+
+  const dispatch = useDispatch();
+
+  const [editing, setEditing] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(
+    formItems.find(({ IsSelected }) => IsSelected)?.Item_ID,
+  );
+
+  const onChange = (e, valueToReset) => {
+    // getting the current value
+    const value = e.target.value;
+
+    // updating the state
+    setSelectedItem((prevItem) => {
+      console.log({ value, prevItem });
+
+      // removing the previous item from the database
+      if (prevItem) {
+        dispatch(
+          saveDoctorNotes({
+            myAction: 'edit',
+            encounterNo: treatmentNo,
+            itemId: prevItem,
+            isSelected: false,
+            specifiedText: '',
+          }),
+        );
+      }
+
+      // save the added item to the database
+      // if they are same, then it should be removed
+      if (valueToReset && prevItem === valueToReset) {
+        dispatch(
+          saveDoctorNotes({
+            itemId: valueToReset,
+            myAction: 'edit',
+            isSelected: false,
+            specifiedText: '',
+            encounterNo: treatmentNo,
+          }),
+        );
+      } else {
+        dispatch(
+          saveDoctorNotes({
+            itemId: value,
+            myAction: 'edit',
+            isSelected: true,
+            specifiedText: '',
+            encounterNo: treatmentNo,
+          }),
+        );
+      }
+      // set the state finally
+      return prevItem === value ? null : value;
+    });
+  };
+
+  return (
+    <RadioGroup
+      style={{ display: 'grid', gap: 8 }}
+      value={selectedItem}
+      onChange={onChange}
+      options={formItems.map(
+        ({
+          Is_Text_Item,
+          Item_ID: value,
+          Item_Name: label,
+          Other_Specify,
+        }) => ({
+          label: Is_Text_Item ? (
+            selectedItem === value ? (
+              editing ? (
+                <InputForm
+                  treatmentNo={treatmentNo}
+                  formItem={{ Other_Specify, Item_ID: value }}
+                  setEditing={setEditing}
+                />
+              ) : (
+                <Space>
+                  <div
+                    className="d-flex gap-2"
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    <span style={{ color: '#0f5689' }}>Added value:</span>
+                    <span>{Other_Specify}</span>
+                  </div>
+
+                  <Button
+                    style={{ padding: '0px 2px', height: 'fit-content' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditing(true);
+                    }}
+                  >
+                    Edit the values
+                  </Button>
+                  <Button
+                    variant="text"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onChange(e, selectedItem);
+                    }}
+                    style={{
+                      textDecoration: 'underline',
+                      padding: '0px',
+                      border: 'none',
+                      boxShadow: 'none',
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Space>
+              )
+            ) : (
+              label
+            )
+          ) : (
+            <span style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <span>{label}</span>
+              {selectedItem === value && (
+                <Button
+                  variant="text"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onChange(e, selectedItem);
+                  }}
+                  style={{
+                    textDecoration: 'underline',
+                    padding: '0px',
+                    border: 'none',
+                    boxShadow: 'none',
+                  }}
+                >
+                  Reset
+                </Button>
+              )}
+            </span>
+          ),
+          value,
+        }),
+      )}
+    />
+  );
+};
+
+const CheckboxInputs = ({ formItems, treatmentNo }) => {
+  const CheckboxGroup = Checkbox.Group;
+
+  const dispatch = useDispatch();
+
+  const [editing, setEditing] = useState(false);
+  const [selectedValues, setSelectedValues] = useState(
+    formItems
+      .filter((selectedValue) => selectedValue.IsSelected)
+      .map(({ Item_ID }) => Item_ID),
+  );
+
+  const onChange = (newValues) => {
+    // updating the state
+    setSelectedValues((formerValues) => {
+      // getting the removed item
+      const removedItem = formerValues.findIndex(
+        (formerValue) => !newValues.includes(formerValue),
+      );
+      // getting the added item
+      const addedItem = newValues.find(
+        (newValue) => !formerValues.includes(newValue),
+      );
+
+      if (removedItem >= 0) {
+        // delete an item from the database
+        dispatch(
+          saveDoctorNotes({
+            myAction: 'edit',
+            encounterNo: treatmentNo,
+            itemId: formerValues[removedItem],
+            isSelected: false,
+            specifiedText: '',
+          }),
+        );
+      } else if (addedItem) {
+        // add an item to the database
+        dispatch(
+          saveDoctorNotes({
+            myAction: 'edit',
+            encounterNo: treatmentNo,
+            itemId: addedItem,
+            isSelected: true,
+            specifiedText: '',
+          }),
+        );
+      }
+
+      return newValues;
+    });
+  };
+
+  return (
+    <CheckboxGroup
+      onChange={onChange}
+      value={selectedValues}
+      style={{ display: 'grid', gap: 8 }}
+      options={formItems.map(
+        ({
+          Is_Text_Item,
+          Item_ID: value,
+          Item_Name: label,
+          Other_Specify,
+        }) => ({
+          label: Is_Text_Item ? (
+            selectedValues.includes(value) ? (
+              editing ? (
+                <InputForm
+                  treatmentNo={treatmentNo}
+                  formItem={{ Other_Specify, Item_ID: value }}
+                  setEditing={setEditing}
+                />
+              ) : (
+                <Space>
+                  <div
+                    className="d-flex gap-2"
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    <span style={{ color: '#0f5689' }}>Added value:</span>
+                    <span>{Other_Specify}</span>
+                  </div>
+
+                  <Button
+                    style={{ padding: '0px 2px', height: 'fit-content' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEditing(true);
+                    }}
+                  >
+                    Edit the values
+                  </Button>
+                </Space>
+              )
+            ) : (
+              label
+            )
+          ) : (
+            label
+          ),
+          value,
+        }),
+      )}
+    />
+  );
+};
+
+const InputForm = ({ treatmentNo, formItem, setEditing }) => {
+  const { Other_Specify, Item_ID } = formItem;
+  const dispatch = useDispatch();
+
+  const FormItem = Form.Item;
+
+  const onFinish = (values) => {
+    const { other: textValue, value } = values;
+
+    setEditing(false);
+    dispatch(
+      saveDoctorNotes({
+        myAction: 'edit',
+        encounterNo: treatmentNo,
+        itemId: value,
+        isSelected: true,
+        specifiedText: textValue,
+      }),
+    );
+  };
+
+  return (
+    <Form
+      name="basic"
+      variant={'filled'}
+      onFinish={onFinish}
+      autoComplete="off"
+      initialValues={{ other: Other_Specify, value: Item_ID }}
+    >
+      <Space>
+        <FormItem
+          style={{ padding: 0, margin: 0 }}
+          label="Other (Specify Value)"
+          name="other"
+          rules={[
+            {
+              required: true,
+              message: 'Please input the other value',
+            },
+          ]}
+        >
+          <Input />
+        </FormItem>
+        <FormItem
+          label={null}
+          name="value"
+          style={{ height: 0, padding: 0, margin: 0 }}
+        >
+          <Input type={'hidden'} />
+        </FormItem>
+        <FormItem
+          label={null}
+          style={{ padding: 0, margin: 0 }}
+        >
+          <Button htmlType="submit">Submit</Button>
+        </FormItem>
+      </Space>
+    </Form>
   );
 };
 

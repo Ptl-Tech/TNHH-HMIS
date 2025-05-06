@@ -11,6 +11,7 @@ export const getColorByWaitingTime = (observationDateTime) => {
     return 'red';
   }
 };
+
 export const getColorByWaitingTreatmentTime = (treatmentDateTime) => {
   const currentTime = dayjs(); // Current date-time
   const treatmentTimeParsed = dayjs(treatmentDateTime); // Parse the observation date-time
