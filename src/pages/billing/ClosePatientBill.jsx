@@ -40,12 +40,14 @@ const ClosePatientBill = () => {
   return (
     <div>
       <Button
-        type="default"
-        icon={<CloseOutlined />}
+     //   type="text"
+        //icon={<CloseOutlined />}
         onClick={() => setVisible(true)}
         disabled={loadingPatientVisitDetails}
+        danger
+        block
       >
-        Close Bill
+        Finalize Bill
       </Button>
 
       <Modal

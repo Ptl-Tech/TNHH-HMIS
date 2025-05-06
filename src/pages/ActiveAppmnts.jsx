@@ -87,6 +87,17 @@ const ActiveAppmnts = () => {
       key: 'AppointmentNo',
       title: 'Appointment Number',
       dataIndex: 'AppointmentNo',
+      key: 'AppointmentNo',
+      render: (text, record) => {
+        return (
+          <span
+            className="fw-bold"
+            style={{ color: "#1890ff", cursor: "pointer" }}
+          >
+            {text.toUpperCase()}
+          </span>
+        );
+      },
     },
     {
       key: 'AppointmentDate',

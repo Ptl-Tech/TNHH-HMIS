@@ -23,6 +23,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [isPrincipleMember, setIsPrincipleMember] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading: loadingPatientDetails, patients: data } =
     useSelector((state) => state.patientList) || {};
@@ -43,7 +44,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
   }, [success, dispatch, patientDetails?.PatientNo]);
@@ -87,7 +88,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         county: patientDetails?.PlaceofBirthDistrict || "",
         nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
         nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-        nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+        nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
         paymentMode:
           patientDetails?.PatientType === "Corporate"
             ? 1
@@ -106,7 +107,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
       });
     }
   }, [patientDetails, form]);
@@ -135,7 +136,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       county: patientDetails?.PlaceofBirthDistrict || "",
       nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
       nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
+      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
       paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
@@ -152,10 +153,13 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
       howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
       subcounty: patientDetails?.SubCountyName || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
+      countyWard: patientDetails?.CountyWardName || "",
+
     };
 
     // Dispatch to save or update patient data
     dispatch(saveBillingInformation(formattedData));
+    setDispatchingInfo(true); // Set dispatching state to true
     onUpdate(data);
 
     //clear success state after submission

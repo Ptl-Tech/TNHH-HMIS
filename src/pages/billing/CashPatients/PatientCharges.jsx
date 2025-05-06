@@ -79,7 +79,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             await dispatch(getSinglePatientBill(activeVisitNo));
           }
         } catch (error) {
-          console.error("Error deleting charge:", error);
+          message.error("Error deleting charge. Please try again.");
         }
       },
       loading: deleteLoading,
@@ -114,13 +114,18 @@ const PatientCharges = ({ activeVisitNo }) => {
       dataIndex: "Total_Amount",
       key: "Total_Amount",
       render: (amount) => `KES ${amount.toFixed(2)}`,
+    },{
+      title: "Date",
+      dataIndex: "Date",
+      key: "Date",
+      render: (date) => new Date(date).toLocaleDateString("en-GB"),
     },
-    {
-      title: "Amount Paid",
-      dataIndex: "Amount_Paid",
-      key: "Amount_Paid",
-      render: (amount) => `KES ${amount.toFixed(2)}`,
-    },
+    // {
+    //   title: "Amount Paid",
+    //   dataIndex: "Amount_Paid",
+    //   key: "Amount_Paid",
+    //   render: (amount) => `KES ${amount.toFixed(2)}`,
+    // },
     {
       title: "Status",
       dataIndex: "Posted",
@@ -159,7 +164,6 @@ const PatientCharges = ({ activeVisitNo }) => {
       ),
     },
   ];
-
   const renderTable = (dataSource) => {
     const isPosted = dataSource.every(charge => charge.Posted);
   
@@ -176,6 +180,8 @@ const PatientCharges = ({ activeVisitNo }) => {
         size="small"
         pagination={{ pageSize: 5 }}
         rowKey="SystemId"
+        locale={{ emptyText: "No charges found" }} 
+
       />
     );
   };
@@ -215,25 +221,14 @@ const PatientCharges = ({ activeVisitNo }) => {
         />
       ) : (
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Pending Charges" key="1">
-            {pendingCharges.length === 0 ? (
-              <p style={{ textAlign: "center", color: "#888" }}>
-                No pending charges.
-              </p>
-            ) : (
-              renderTable(pendingCharges)
-            )}
-          </TabPane>
-          <TabPane tab="Posted Charges" key="2">
-            {postedCharges.length === 0 ? (
-              <p style={{ textAlign: "center", color: "#888" }}>
-                No posted charges.
-              </p>
-            ) : (
-              renderTable(postedCharges)
-            )}
-          </TabPane>
-        </Tabs>
+  <TabPane tab="Pending Charges" key="1">
+    {renderTable(pendingCharges)}
+  </TabPane>
+  <TabPane tab="Posted Charges" key="2">
+    {renderTable(postedCharges)}
+  </TabPane>
+</Tabs>
+
       )}
 
       <AddChargesDrawer

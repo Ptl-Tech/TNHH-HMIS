@@ -5,14 +5,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { listInsuranceOptions } from "../../actions/DropdownListActions";
 import { postRebates } from "../../actions/Charges-Actions/postRebates";
 import moment from "moment";
+import { getSinglePatientBill } from "../../actions/Charges-Actions/getSinglePatientBill";
 
 const AllocateRebates = ({ onClose, visible, patientNo }) => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading } = useSelector((state) => state.postRebates);
   const {
     data: insurancePayload,
   } = useSelector((state) => state.getInsurance);
 
+    const {
+      loading: patientBillLoading,
+      error: patientBillError,
+      data: patientBillData,
+    } = useSelector((state) => state.getSingleBill);
   const [rebatesData, setRebatesData] = useState({
     patientNo: patientNo || "",
     rebateAmount: 0,
@@ -20,12 +28,6 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
     insuaranceCode: "",
   });
 
-  useEffect(() => {
-    const urlPatientNo = new URLSearchParams(window.location.search).get("PatientNo");
-    if (urlPatientNo) {
-      setRebatesData((prev) => ({ ...prev, patientNo: urlPatientNo }));
-    }
-  }, []);
 
   useEffect(() => {
     dispatch(listInsuranceOptions());
@@ -45,8 +47,11 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
     }));
   };
 
-  const handleSubmitRebates = () => {
-    dispatch(postRebates(rebatesData));
+  const handleSubmitRebates =async () => {
+ await  dispatch(postRebates(rebatesData));
+       await   dispatch(getSinglePatientBill(activeVisitNo));
+    onClose(); // Close the modal after submission
+    form.resetFields();
   };
 
   return (
@@ -63,7 +68,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
       width={600}
       footer={null}
     >
-      <Form layout="vertical" onFinish={handleSubmitRebates}>
+      <Form layout="vertical" onFinish={handleSubmitRebates} form={form}>
         {/* Allocation Amount */}
         <Form.Item
           label="Allocation Amount"

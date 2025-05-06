@@ -29,28 +29,30 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   useEffect(() => {
-    if (success && data?.patientNo) {
+    if (dispatchingInfo && success && data?.patientNo) {
       setPatientNo(data.patientNo);
-      dispatch(getPatientByNo(data.patientNo)); // Fetch new patient details
+      dispatch(getPatientByNo(data.patientNo)); // Fetch new details
     }
-  }, [success, data, dispatch]);
+  }, [dispatchingInfo, success, data, dispatch]);
 
   // Update form values when patientDetails change
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
+      const genderValue =
+      patientDetails?.Gender === "Female"
+        ? 2
+        : patientDetails?.Gender === "Male"
+        ? 1
+        : 0;
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
         lastName: patientDetails?.LastName || "",
-        gender:
-          patientDetails?.Gender === "Male"
-            ? 1
-            : patientDetails?.Gender === "Female"
-            ? 2
-            : 0,
+      gender:genderValue,
         dateOfBirth: patientDetails?.DateOfBirth
           ? moment(patientDetails.DateOfBirth)
           : null,
@@ -72,7 +74,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
         patientStatus: patientDetails?.PatientStatus || 0,
       });
     }
@@ -88,16 +90,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         values.firstName || patientDetails?.Surname?.split(" ")[0] || "",
       middleName: values.middleName || patientDetails?.MiddleName || "",
       lastName: values.lastName || patientDetails?.LastName || "",
-      gender:
-        values.gender || patientDetails?.Gender === "Male"
-          ? 1
-          : patientDetails?.Gender === "Female"
-          ? 2
-          : values.gender === 1
-          ? "Male"
-          : values.gender === 2
-          ? "Female"
-          : "",
+     gender: values.gender || patientDetails?.Gender || 0,
       dob: values.dateOfBirth
         ? values.dateOfBirth.format("YYYY-MM-DD")
         : patientDetails?.DateOfBirth || "",
@@ -121,12 +114,12 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       subcounty: patientDetails?.SubCountyName || "",
       email: values.email || patientDetails?.Email || "",
       residence: patientDetails?.PlaceofBirthVillage || "",
-      countyWard: patientDetails?.Ward || "",
+      countyWard: patientDetails?.CountyWardName || "",
       patientStatus: 0,
     };
 
     dispatch(saveGeneralInformation(formattedData));
-
+    setDispatchingInfo(true);
     onUpdate(data);
   };
 

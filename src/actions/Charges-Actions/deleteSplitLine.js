@@ -3,14 +3,14 @@ import axios from "axios";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
-export const POST_RECEIPT_SPLIT_LINE_REQUEST = "POST_RECEIPT_SPLIT_LINE_REQUEST";
-export const POST_RECEIPT_SPLIT_LINE_SUCCESS = "POST_RECEIPT_SPLIT_LINE_SUCCESS";
-export const POST_RECEIPT_SPLIT_LINE_FAIL = "POST_RECEIPT_SPLIT_LINE_FAIL";
-export const POST_RECEIPT_SPLIT_LINE_RESET = "POST_RECEIPT_SPLIT_LINE_RESET";
+export const DELETE_RECEIPT_SPLIT_LINE_REQUEST = "DELETE_RECEIPT_SPLIT_LINE_REQUEST";
+export const DELETE_RECEIPT_SPLIT_LINE_SUCCESS = "DELETE_RECEIPT_SPLIT_LINE_SUCCESS";
+export const DELETE_RECEIPT_SPLIT_LINE_FAIL = "DELETE_RECEIPT_SPLIT_LINE_FAIL";
+export const DELETE_RECEIPT_SPLIT_LINE_RESET = "DELETE_RECEIPT_SPLIT_LINE_RESET";
 
-export const  postReceiptSplitLine = (data) => async (dispatch, getState) => {
+export const deleteReceiptSplitLine = (data) => async (dispatch, getState) => {
   try {
-    dispatch({ type: POST_RECEIPT_SPLIT_LINE_REQUEST });
+    dispatch({ type: DELETE_RECEIPT_SPLIT_LINE_REQUEST });
 
     // Get user information and branch code from state and localStorage
     const {
@@ -35,7 +35,7 @@ export const  postReceiptSplitLine = (data) => async (dispatch, getState) => {
     branchCode: branchCode,
    }
 
-    // Make the POST request to the server
+    // Make the DELETE request to the server
     const response = await axios.post(
       `${API}GeneralProcesses/ReceiptSplitLine`,
       splitData,
@@ -47,7 +47,7 @@ export const  postReceiptSplitLine = (data) => async (dispatch, getState) => {
     if (status === "success") {
       // Dispatch success action
       dispatch({
-        type: POST_RECEIPT_SPLIT_LINE_SUCCESS,
+        type: DELETE_RECEIPT_SPLIT_LINE_SUCCESS,
         payload: { status },
       });
       // Display success message
@@ -63,7 +63,7 @@ export const  postReceiptSplitLine = (data) => async (dispatch, getState) => {
     
     // Dispatch failure action
     dispatch({
-      type: POST_RECEIPT_SPLIT_LINE_FAIL,
+      type: DELETE_RECEIPT_SPLIT_LINE_FAIL,
       payload: errorMessage,
     });
 

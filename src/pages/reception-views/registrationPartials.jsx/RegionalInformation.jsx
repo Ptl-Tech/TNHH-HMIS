@@ -39,6 +39,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   const [filteredSubCounties, setFilteredSubCounties] = useState([]);
   const [filteredWards, setFilteredWards] = useState([]);
   const [formSubmitted, setFormSubmitted] = useState(false);
+const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
   const { loading, success, error } = useSelector(
     (state) => state.saveAddressInfo
@@ -67,7 +68,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   useEffect(() => {
     if (patientDetails) {
       form.resetFields();
-
+console.log("daotient", patientDetails);
       const genderValue =
         patientDetails?.Gender === "Female"
           ? 2
@@ -104,7 +105,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
         subcounty: patientDetails?.SubCountyName || "",
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.Ward || "",
+        countyWard: patientDetails?.CountyWardName || "",
         patientStatus: patientDetails?.patientStatus || 0,
       });
     }
@@ -179,10 +180,10 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
   }, [selectedSubCounty]);
 
   useEffect(() => {
-    if (success || patientDetails?.PatientNo) {
+    if (dispatchingInfo && success || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
-  }, [success, dispatch, patientDetails?.PatientNo]);
+  }, [success,dispatchingInfo, dispatch, patientDetails?.PatientNo]);
 
   const handleSubmission = (values) => {
     setFormSubmitted(true);
@@ -207,7 +208,7 @@ const RegionalInformation = ({ patientDetails, onUpdate }) => {
       subcounty: selectedSubCounty || patientDetails?.SubCountyName || "",
       countyWard:
         selectedCountry === "KE"
-          ? selectedWard || patientDetails?.PlaceofBirthVillage || ""
+          ? selectedWard || patientDetails?.CountyWardName || ""
           : "",
       idNumber: patientDetails.IDNumber || "",
       phoneNumber: patientDetails?.TelephoneNo1 || "",

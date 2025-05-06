@@ -16,6 +16,9 @@ import { useLocation } from "react-router-dom";
 import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
+import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
+import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
+import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 
 const InsurancePaymentSection = ({ patientNo }) => {
   const [form] = Form.useForm();
@@ -32,18 +35,22 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading: receiptLinesLoading } = useSelector(
     (state) => state.getReceiptLines
   );
+    const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
+  
   const { data: patientBillData } = useSelector((state) => state.getSingleBill);
-
+  const { loading, error, data } = useSelector(
+    (state) => state.getPatientCharges
+  );
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
 
   const handlePaymentTypeChange = (value) => {
     setPaymentType(value);
   };
-
   const handleSavePayment = async (values) => {
     const {
       payMode,
@@ -77,16 +84,41 @@ const InsurancePaymentSection = ({ patientNo }) => {
     setsaveloading(true);
     const receiptNo = await dispatch(postReceiptHeader(payload));
     setsaveloading(false);
+    getReceiptPage(activeVisitNo);
     if (receiptNo) {
       message.success(`Payment saved successfully.`, 5);
       setPaymentType(null);
-      dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getReceiptPage(activeVisitNo));
+
     } else {
       setsaveloading(false);
       message.error("Failed to save the payment. Please try again.");
     }
   };
+const handleReceiptPost = async () => {
+  if(!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
+    return;
+  }
 
+  const lastReceipt = receiptHeader[receiptHeader.length - 1];
+  const payload = {
+    recId: lastReceipt.SystemId,
+    patientNo: patientNo,
+    receiptNo: lastReceipt.No
+  };
+
+  try{
+    const status= await dispatch(postReceipt(payload));
+    if(status){
+      message.success("Receipt posted successfully.");
+      dispatch(getReceiptLines(activeVisitNo));
+      dispatch(getSinglePatientBill(activeVisitNo));
+      getPatientCharges(activeVisitNo);
+    }
+  }catch(error){
+    message.error("Failed to post receipt. Please try again.");
+  }
+};
   // New handleClear function to reset the form fields when the Clear button is clicked
   const handleClear = () => {
     form.resetFields(); // This will clear all fields in the form
@@ -115,17 +147,17 @@ const InsurancePaymentSection = ({ patientNo }) => {
                 allowClear
                 showSearch
                 onChange={handlePaymentTypeChange}
+                filterOption={(input, option) =>
+                  option.children
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                optionFilterProp="children"
               >
-                <Select.Option value={1}>Cash</Select.Option>
-                <Select.Option value={2}>Cheque</Select.Option>
-                <Select.Option value={3}>EFT</Select.Option>
-                <Select.Option value={4}>Deposit Slip</Select.Option>
-                <Select.Option value={5}>Banker's Cheque</Select.Option>
-                <Select.Option value={6}>RTGS</Select.Option>
+              
                 <Select.Option value={7}>MPESA</Select.Option>
-                <Select.Option value={8}>PayPal</Select.Option>
-                <Select.Option value={9}>Cheque</Select.Option>
-                <Select.Option value={10}>PDQ</Select.Option>
+                
+                <Select.Option value={9}>PDQ</Select.Option>
               </Select>
             </Form.Item>
           </Col>
@@ -152,10 +184,10 @@ const InsurancePaymentSection = ({ patientNo }) => {
                     required: true,
                     message: "Phone number is required for MPESA",
                   },
-                  {
-                    pattern: /^07\d{8}$/,
-                    message: "Enter a valid Kenyan phone (e.g. 0712345678)",
-                  },
+                  // {
+                  //   pattern: /^07\d{8}$/,
+                  //   message: "Enter a valid Kenyan phone (e.g. 0712345678)",
+                  // },
                 ]}
               >
                 <Input placeholder="0712345678" />
@@ -176,35 +208,63 @@ const InsurancePaymentSection = ({ patientNo }) => {
 
         <Row gutter={16}>
           <Col span={24}>
-            {patientBillData[0]?.CurrentAdmNo ? (
-              <Form.Item
-                name="isPartialPayment"
-                valuePropName="checked"
-                style={{ marginTop: 16 }}
-              >
-                <Checkbox>Partial Payment</Checkbox>
-              </Form.Item>
-            ) : (
-              <Form.Item
+            {patientBillData[0]?.Inpatient  && patientBillData[0].PatientType !== "Cash"? (
+             <Form.Item
                 name="coPay"
                 valuePropName="checked"
                 style={{ marginTop: 16 }}
               >
                 <Checkbox>Co-Pay</Checkbox>
               </Form.Item>
+            ) : (
+               <Form.Item
+                name="isPartialPayment"
+                valuePropName="checked"
+                style={{ marginTop: 16 }}
+              >
+                <Checkbox>Partial Payment</Checkbox>
+              </Form.Item>
             )}
           </Col>
         </Row>
 
-        <Button type="primary" htmlType="submit" loading={saveloading}>
-          Submit Payment
-        </Button>
-        <Button
+      <Row gutter={16}> 
+        <Col span={12}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={saveloading}
+              disabled={saveloading || processReceiptLoading}
+            >
+              Save Payment
+            </Button>
+          </Col>
+          <Col span={12}>
+         
+          <Button
           onClick={handleClear} // Clear button will only reset the fields
           style={{ marginLeft: 8 }}
         >
           Clear
         </Button>
+          </Col>
+        </Row>
+
+        {receiptHeader && receiptHeader.length > 0 && (
+          <Row gutter={16} style={{ marginTop: 16 }}>
+            <Col span={24}>
+              <Button
+                type="primary"
+                onClick={handleReceiptPost}
+                loading={saveloading }
+                disabled={saveloading || receiptLinesLoading}
+              >
+                Post Receipt
+              </Button>
+            </Col>
+          </Row>
+        )}
+     
       </Form>
     </Card>
   );

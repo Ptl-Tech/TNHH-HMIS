@@ -28,7 +28,7 @@ import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvo
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
-const InvoicePatient = () => {
+const InvoiceInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const InvoicePatient = () => {
     error: generateInvoiceError,
     data: generateInvoice,
   } = useSelector((state) => state.generateInvoice);
- const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
+  const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
     (state) => state.getReceiptLines
   );
 
@@ -79,11 +79,10 @@ const InvoicePatient = () => {
   };
   const handlegenerateInvoice = async () => {
     const payload = {
-      patientNo: patientVisitDetails?.PatientNo,
+      patientNo: patientBillData[0]?.PatientNo,
     };
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
-        console.log("statues", status);
         message.success(`Invoice generated ${status}fully`, 5);
         dispatch(getPatientCharges(activeVisitNo));
       }
@@ -96,9 +95,8 @@ const InvoicePatient = () => {
     }
 
     const lastInvoice = data[data.length - 1];
-
     const payload = {
-      patientNo: patientVisitDetails?.PatientNo,
+      patientNo: patientBillData[0]?.PatientNo,
       invoiceNo: lastInvoice?.Invoice_Number,
     };
 
@@ -121,7 +119,7 @@ const InvoicePatient = () => {
           setDiscountModal(true);
         } else if (key === "split_amount") {
           setSplitAmountModal(true);
-        }else if (key === "receipt_action") {
+        } else if (key === "receipt_action") {
           showReceiptModal();
         } else if (key === "visit_action") {
           // Handle other actions here
@@ -129,7 +127,7 @@ const InvoicePatient = () => {
       }}
     >
       <Menu.Item key="visit_action">
-        <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
+        <PrintFinalInvoice patientNo={patientBillData[0]?.PatientNo} />
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
@@ -194,25 +192,31 @@ const InvoicePatient = () => {
           >
             {/* First row */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient Name: {patientVisitDetails?.SearchNames}
+              Patient Name:{" "}
+              <span className="fw-bold">{patientBillData[0]?.Names}</span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Gender: {patientVisitDetails?.Gender}
+              Gender: {patientBillData[0]?.Gender}
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Age in Years: {patientVisitDetails?.AgeinYears}
+              Age in Years:{" "}
+              {` (${Math.floor(
+                (Date.now() -
+                  new Date(patientBillData[0]?.DateOfBirth).getTime()) /
+                  (1000 * 60 * 60 * 24 * 365.25)
+              )} years)`}
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient ID: {patientVisitDetails?.PatientNo}
+              Patient ID: <span className="fw-bold">{patientBillData[0]?.CurrentAdmNo}</span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Visit Type: {patientVisitDetails?.AppointmentType}
-            </p>
+                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold">Inpatient</span> : <span className="fw-bold">Outpatient</span>}
+              </p>
 
-            {/* Second row */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Payment Mode: {patientVisitDetails?.SettlementType}
-            </p>
+              {/* Second row */}
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Payment Mode: {patientBillData[0]?.PatientType}
+              </p>
 
             <p className="text-primary" style={{ gridColumn: "span 2" }}>
               <DollarOutlined /> Bill Balance: KSh{" "}
@@ -254,11 +258,11 @@ const InvoicePatient = () => {
             Generate Invoice
           </Button>
           <ReopenCharges
-            patientNo={patientVisitDetails?.PatientNo}
+            patientNo={patientBillData[0]?.PatientNo}
             activeVisitNo={activeVisitNo}
           />
           <PrintInterimInvoice
-            patientNo={patientVisitDetails?.PatientNo}
+            patientNo={patientBillData[0]?.PatientNo}
             activeVisitNo={activeVisitNo}
           />
         </div>
@@ -267,7 +271,7 @@ const InvoicePatient = () => {
           {/* Left Side (Split Receipt) */}
           <div className="col-12 col-md-8">
             <InsurancePaymentSection
-              patientNo={patientVisitDetails?.PatientNo}
+              patientNo={patientBillData[0]?.PatientNo}
             />
           </div>
 
@@ -310,19 +314,19 @@ const InvoicePatient = () => {
                   loading={postSalesInvoiceLoading}
                   disabled={postSalesInvoiceLoading}
                 >
-                  Process Invoice
+                  Post Invoice
                 </Button>
               </div>
 
               <AllocateRebates
                 visible={RebatesModal}
                 onClose={handleCancel}
-                patientNo={patientVisitDetails?.PatientNo}
+                patientNo={patientBillData[0]?.PatientNo}
               />
               <AllocateDiscount
                 visible={DiscountModal}
                 onClose={handleCancel}
-                patientNo={patientVisitDetails?.PatientNo}
+                patientNo={patientBillData[0]?.PatientNo}
               />
               <SplitPayments
                 receiptNo={
@@ -336,9 +340,9 @@ const InvoicePatient = () => {
                 amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               />
               <PatientReceiptLines
-              activeVisitNo={activeVisitNo}
-              visible={receiptModalVisible}
-              onClose={() => setReceiptModalVisible(false)}
+                activeVisitNo={activeVisitNo}
+                visible={receiptModalVisible}
+                onClose={() => setReceiptModalVisible(false)}
               />
             </Card>
           </div>
@@ -348,4 +352,4 @@ const InvoicePatient = () => {
   );
 };
 
-export default InvoicePatient;
+export default InvoiceInpatient;

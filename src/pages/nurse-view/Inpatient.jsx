@@ -16,8 +16,8 @@ const Impatient = () => {
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
   const [searchAdmissionNumber, setSearchAdmissionNumber] = useState("");
   const doctorId = useAuth().userData.doctorID;
-  const role  = useAuth().userData.departmentName;
-  const branch = localStorage?.getItem("branchCode")
+  const role = useAuth().userData.departmentName;
+  const branch = localStorage?.getItem("branchCode");
 
   const navigate = useNavigate();
 
@@ -49,8 +49,7 @@ const Impatient = () => {
   const { loadingAdmittedPatients, admittedPatients } =
     useSelector((state) => state.getPgAdmissionsAdmitted) || {};
 
-  console.log('admitted patients', admittedPatients);
-// get the list of doctors
+  // get the list of doctors
   const formattedDoctorDetails = useMemo(() => {
     return data?.map((doctor) => ({
       DoctorID: doctor?.DoctorID,
@@ -60,7 +59,7 @@ const Impatient = () => {
 
   const combinedPatients = useMemo(() => {
     if (!admittedPatients || !formattedDoctorDetails) return [];
-  
+
     return admittedPatients.map((patient) => {
       const matchingDoctor = formattedDoctorDetails.find(
         (doctor) => patient?.Doctor === doctor?.DoctorID
@@ -75,7 +74,9 @@ const Impatient = () => {
   // filter the patient based on the doctor
   const filterPatientBasedWithDoctor = useMemo(() => {
     if (role === "Doctor") {
-      return combinedPatients?.filter((patient) => patient?.Doctor === doctorId);
+      return combinedPatients?.filter(
+        (patient) => patient?.Doctor === doctorId
+      );
     }
     return combinedPatients;
   }, [combinedPatients, doctorId, role]);
@@ -89,7 +90,7 @@ const Impatient = () => {
     }
     return filterPatientBasedWithDoctor;
   }, [filterPatientBasedWithDoctor, branch]);
-  
+
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
   }, [dispatch]);

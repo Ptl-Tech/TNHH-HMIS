@@ -18,6 +18,7 @@ import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage"
 import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import moment from "moment";
+import { deleteReceiptSplitLine } from "../../../actions/Charges-Actions/deleteSplitLine";
 
 const { Option } = Select;
 
@@ -27,12 +28,13 @@ const SplitPayments = ({
   receiptNo,
   amount,
   activeVisitNo,
+  patientNo
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [selectedPaymentType, setSelectedPaymentType] = useState(null);
   const [amountError, setAmountError] = useState("");
-
+const [deleteLoading, setDeleteLoading] = useState(false);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
   const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
     (state) => state.getReceiptLines
@@ -45,6 +47,14 @@ const SplitPayments = ({
     error,
     success,
   } = useSelector((state) => state.postSplitReceipt);
+  
+  const {
+    loading: deleteSplitLineLoading,
+    error :deleteSplitLineError,
+    success: deleteSplitLineSuccess,
+  } = useSelector((state) => state.deleteSplitLine);
+ 
+
   useEffect(() => {
     if (open) {
       form.resetFields();
@@ -64,6 +74,25 @@ const SplitPayments = ({
       dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
+  const handleDeleteSplitLine =async (record) => {
+    const recID = record.SystemId; 
+    const payload = {
+      myAction: "delete",
+      recId: recID,
+      receiptNo: receiptNo,
+      payMode: 0,
+      bankAccountNo: "",
+      transactionNo: record.TransactionNo || "N/A",
+      amount: 0,
+    };
+    const status = await dispatch(deleteReceiptSplitLine(payload));
+    if (status) {
+      message.success("Payment deleted successfully", 10);
+      dispatch(getSplitReceiptLines(receiptNo));
+    } else {
+      message.error("Failed to delete payment", 10);
+    }
+  };
 
   const columns = [
     { title: "Receipt No.", dataIndex: "ReceiptNo", key: "ReceiptNo" },
@@ -80,6 +109,20 @@ const SplitPayments = ({
       key: "Amount",
       render: (value) => `Ksh ${value.toFixed(2)}`,
     },
+    {
+      title:"Action",
+      key:"action",
+      render:(_, record) => (
+        <Button
+          type="text"
+          icon={<DeleteFilled />}
+        onClick={() => handleDeleteSplitLine(record)}
+          style={{ color: "red" }}
+          danger
+          loading={deleteSplitLineLoading}
+        />
+      )
+    }
   ];
 
   const totalSplitAmount = data?.reduce(
@@ -88,7 +131,6 @@ const SplitPayments = ({
   );
   const remainingAmount = parseFloat(amount) - totalSplitAmount;
   const lastReceipt = receiptHeader?.[receiptHeader.length - 1];
-  console.log("last receipt", lastReceipt);
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
@@ -122,29 +164,28 @@ const SplitPayments = ({
       form.resetFields();
       setAmountError("");
     } catch (errorInfo) {
-      console.log("Validation Failed:", errorInfo);
       message.error(error || "Failed to save payment", 10);
     }
   };
   const handleProcessReceipt = async () => {
-    if (!lastReceipt || lastReceipt.length === 0) {
-      message.error(
-        "The patient has no receipt to process. Kindly contact the administrator to have this issue resolved!",
-        10
-      );
-      return;
-    }
+    // if (!lastReceipt || receiptNo === "") {
+    //   message.error(
+    //     "The patient has no receipt to process. Kindly contact the administrator to have this issue resolved!",
+    //     10
+    //   );
+    //   return;
+    // }
 
     const payloads = data.map((data) => ({
       myAction: "edit",
       recId: lastReceipt?.SystemId,
-      patientNo: lastReceipt?.Patient_No,
+      patientNo: patientNo || "",
       receiptDate: moment(lastReceipt?.Date_Posted).format("YYYY-MM-DD"),
       depositDate: moment(lastReceipt?.Document_Date).format("YYYY-MM-DD"),
       payMode: 0,
       amountReceived: 0,
       coPay: false,
-      transactionCode: "",
+      transactionCode: data.TransactionNo,
       splitAmount: true,
       isPartialPayment: false,
     }));
@@ -203,17 +244,15 @@ const SplitPayments = ({
                   allowClear
                   showSearch
                   onChange={(value) => setSelectedPaymentType(value)}
+                  filterOption={(input, option) =>
+                    option.children
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
                 >
-                  <Option value={1}>Cash</Option>
-                  <Option value={2}>Cheque</Option>
-                  <Option value={3}>EFT</Option>
-                  <Option value={4}>Deposit Slip</Option>
-                  <Option value={5}>Banker's Cheque</Option>
-                  <Option value={6}>RTGS</Option>
-                  <Option value={7}>MPESA</Option>
-                  <Option value={8}>PayPal</Option>
-                  <Option value={9}>Cheque</Option>
-                  <Option value={10}>PDQ</Option>
+             
+                  <Option value={7}>MPESA</Option>                
+                  <Option value={9}>PDQ</Option>
                 </Select>
               </Form.Item>
             </Col>

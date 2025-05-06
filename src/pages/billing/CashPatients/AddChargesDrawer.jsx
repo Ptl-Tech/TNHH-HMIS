@@ -102,7 +102,6 @@ useEffect(() => {
       form.setFieldsValue({ Amount: "KES 0.00" });
     }
   };
-console.log("Selected patientdata:", patientBillData);
 
   const saveCharges = async () => {
     try {
@@ -126,7 +125,7 @@ console.log("Selected patientdata:", patientBillData);
       onClose();
       form.resetFields();
     } catch (error) {
-      console.error("Error saving charge:", error);
+      message.error("Failed to save charges. Please try again.", error);
     }
   };
   
