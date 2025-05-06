@@ -307,6 +307,7 @@ import { postReceiptHeaderReducer } from './ChargesReducers/postReceiptReducer';
 import { postClosingBillReducer } from './ChargesReducers/postClosingBillReducer';
 import { getDoctorsNotesDataReducer } from './doc-reducers/getDoctorsNotesDataReducer';
 import { saveDoctorNotesReducer } from './doc-reducers/saveDoctorNotesReducer';
+import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
