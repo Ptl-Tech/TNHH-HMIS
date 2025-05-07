@@ -26,6 +26,7 @@ import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
+import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();

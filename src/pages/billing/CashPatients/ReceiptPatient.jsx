@@ -25,6 +25,7 @@ import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
+import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
