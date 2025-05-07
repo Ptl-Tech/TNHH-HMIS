@@ -254,7 +254,10 @@ const ReceiptPatient = () => {
                   : "N/A"
               }
             />
-
+ <PrintInterimInvoice
+            patientNo={patientVisitDetails?.PatientNo}
+            activeVisitNo={activeVisitNo}
+          />
             {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
