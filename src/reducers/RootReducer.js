@@ -299,12 +299,14 @@ import { updateLabTestLinesReducer } from "./lab-reducers/updateLabTestLines";
 import { postPharmacyHeaderReducer } from './pharmacy-reducers/postPharmacyHeader';
 import { getSinglePharmacyRecordReducer } from './pharmacy-reducers/getSinglePharmacyRecord';
 import { postPharmacyAppointmentReducer } from './reception-reducers/postPharmacyAppointmentReducer';
-import { createPatientVisitReducer } from "./reception-reducers/patientVisitReducers/createPatientVisitReducer";
-import { getPatientVisitByIdReducer } from "./reception-reducers/patientVisitReducers/getPatientVisitByIdReducer";
-import { getPatientChargesReducer } from "./ChargesReducers/getPatientChargesReducer";
-import { getSinglePatientBillReducer } from "./ChargesReducers/getSinglePatientBillReducer";
-import { postReceiptHeaderReducer } from "./ChargesReducers/postReceiptReducer";
-import { postClosingBillReducer } from "./ChargesReducers/postClosingBillReducer";
+import { createPatientVisitReducer } from './reception-reducers/patientVisitReducers/createPatientVisitReducer';
+import { getPatientVisitByIdReducer } from './reception-reducers/patientVisitReducers/getPatientVisitByIdReducer';
+import { getPatientChargesReducer } from './ChargesReducers/getPatientChargesReducer';
+import { getSinglePatientBillReducer } from './ChargesReducers/getSinglePatientBillReducer';
+import { postReceiptHeaderReducer } from './ChargesReducers/postReceiptReducer';
+import { postClosingBillReducer } from './ChargesReducers/postClosingBillReducer';
+import { getDoctorsNotesDataReducer } from './doc-reducers/getDoctorsNotesDataReducer';
+import { saveDoctorNotesReducer } from './doc-reducers/saveDoctorNotesReducer';
 import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
 
 export const rootReducer = combineReducers({
@@ -384,6 +386,8 @@ export const rootReducer = combineReducers({
   appmntList: appmntListReducer,
   docTreatmentList: treatmentListReducer,
   getPatientList: getPatientListReducer,
+  getDoctorsNotesData: getDoctorsNotesDataReducer,
+  saveDoctorNotes: saveDoctorNotesReducer,
   // past encounters
   getPatientEncounters: getPatientEncounterListReducer,
   // end

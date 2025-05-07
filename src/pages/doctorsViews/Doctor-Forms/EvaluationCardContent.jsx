@@ -31,7 +31,6 @@ const EvaluationCardContent = ({
               />
             </Tabs.TabPane>
           )}
-
           <Tabs.TabPane tab="Consultation Room " key="3">
             <ConsultationroomDetails
               treatmentNo={treatmentNo}
@@ -50,7 +49,6 @@ const EvaluationCardContent = ({
               </Tabs.TabPane>
             </>
           )}
-
           {(role === "Doctor" || role === "Nurse") && (
             <>
               <Tabs.TabPane tab="Procedures" key="4">
@@ -58,11 +56,6 @@ const EvaluationCardContent = ({
               </Tabs.TabPane>{" "}
             </>
           )}
-
-          {/* <Tabs.TabPane tab="Doctor Forms" key="6">
-            <DocForms />
-          </Tabs.TabPane> */}
-
           {role === "Doctor" && patientDetail?.Status !== "Completed" && (
             <>
               <Tabs.TabPane tab="Admission & Referral" key="7">

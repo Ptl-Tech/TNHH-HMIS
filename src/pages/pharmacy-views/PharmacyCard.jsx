@@ -79,8 +79,6 @@ const EditableCell = ({
 };
 
 const PharmacyCard = ({ type, title, hideSelector }) => {
-  console.log({ hideSelector });
-
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -93,6 +91,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const [Status, setStatus] = useState(searchParams.get('status') || '');
 
   const { Title } = Typography;
+  const TableSummaryRow = Table.Summary.Row;
+  const TableSummaryCell = Table.Summary.Cell;
 
   const statuses = [
     { label: 'All', value: '' },
@@ -145,19 +145,28 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     try {
       const row = await form.validateFields();
       const { SystemId, Pharmacy_No, No, UnitPrice } = record;
-      const { Dosage, Duration_Days, Frequency, Quantity } = row;
+      const {
+        Dosage,
+        Duration_Days,
+        Frequency,
+        Quantity,
+        Take = 0,
+        remarks = '',
+      } = row;
 
       dispatch(
         postPrescriptionQuantity({
           myAction: 'edit',
           recId: SystemId,
-          Pharmacy_No,
+          pharmacyNo: Pharmacy_No,
           quantity: Quantity,
+          take: Take,
           drugNo: No,
-          Duration_Days,
-          Frequency,
-          Dosage,
+          noOfDays: Duration_Days,
+          frequency: Frequency,
+          dosage: Dosage,
           TotalAmount: Math.round(UnitPrice * Quantity),
+          remarks,
         }),
       );
 
@@ -338,13 +347,14 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       title: 'Unit Price',
       dataIndex: 'UnitPrice',
       key: 'UnitPrice',
+      render: (value) => value.toLocaleString(),
     },
     {
       title: 'Total Price',
       dataIndex: 'TotalPrice',
       key: 'TotalPrice',
       render: (value, record) => {
-        return Math.round(record.UnitPrice * record.Quantity);
+        return Math.round(record.UnitPrice * record.Quantity).toLocaleString();
       },
     },
     {
@@ -433,10 +443,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       {
         name: 'Date',
         value: 'Pharmacy_Date',
-      },
-      {
-        name: 'Total Price',
-        value: 'Visit_Total',
         noBorder: true,
       },
     ],
@@ -459,7 +465,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       },
       {
         name: 'Remarks',
-        value: 'Link_Type',
+        value: 'Remarks',
+        noBorder: true,
       },
     ],
   ];
@@ -556,7 +563,16 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                     }}
                   >
                     <Text strong>{name} :</Text>
-                    {` ${pharmacyRecord ? pharmacyRecord[value] : ''}`}
+                    {` ${
+                      pharmacyRecord
+                        ? value === 'Link_Type' &&
+                          pharmacyRecord[value] === 'DOCTOR'
+                          ? `${pharmacyRecord[value]} (${
+                              pharmacyRecord['Doctor_Name'] || 'From Reception'
+                            })`
+                          : pharmacyRecord[value]
+                        : ''
+                    }`}
                   </Row>
                 ))}
               </Col>
@@ -619,9 +635,41 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                 size="small"
                 pagination={false}
                 columns={mergedColumns}
-                style={{ padding: '16px' }}
+                style={{
+                  padding: '16px',
+                }}
                 dataSource={[...pharmacyLineData]}
                 loading={pharmacyLineDataLoading || postPharmacyLineLoading}
+                summary={(pageData) => {
+                  console.log({ pageData });
+                  const totalValue = pageData.reduce(
+                    (acc, { Quantity, UnitPrice }) =>
+                      (acc += Quantity * UnitPrice),
+                    0,
+                  );
+
+                  return (
+                    <TableSummaryRow>
+                      <TableSummaryCell
+                        index={0}
+                        colSpan={7}
+                      />
+                      <TableSummaryCell index={0}>
+                        <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                          Total
+                        </Text>
+                      </TableSummaryCell>
+                      <TableSummaryCell index={1}>
+                        <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                          {new Intl.NumberFormat('en-US').format(
+                            Math.round(totalValue),
+                          )}
+                        </Text>
+                      </TableSummaryCell>
+                      <TableSummaryCell index={2} />
+                    </TableSummaryRow>
+                  );
+                }}
               />
             </Form>
           </Card>

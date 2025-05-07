@@ -188,6 +188,8 @@ export default function ReceptionRoutes() {
         />
         <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
         <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} />
+        <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
+        <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} />
         <Route
           path="/Reception/CashPatient-Charges"
           element={<ReceiptPatient />}
