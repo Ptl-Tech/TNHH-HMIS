@@ -13,7 +13,7 @@ export const getItemsSlice = () => async (dispatch, getState) => {
     const config = configHelpers(getState);
     try {
         dispatch({ type: GET_ITEMS_REQUEST });
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyItems&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/Inventory/InventoryList`, config);
 
         dispatch({ type: GET_ITEMS_SUCCESS, payload: data });
 

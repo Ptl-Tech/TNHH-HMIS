@@ -41,7 +41,7 @@ export const pharmacyRoutes = [
       },
       {
         key: '/Pharmacy/Archived-Records?status=Cancelled',
-        label: 'Pharmacy Archive',
+        label: 'Cancelled Prescriptions',
         icon: <FaBoxArchive style={{ color: '#fff' }} />,
       },
     ],

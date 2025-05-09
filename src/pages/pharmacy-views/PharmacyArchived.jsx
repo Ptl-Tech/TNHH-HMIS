@@ -5,7 +5,7 @@ const PharmacyArchived = () => {
     <PharmacyCard
       type=""
       hideSelector
-      title="Pharmacy Archive"
+      title="Cancelled Prescriptions"
     />
   );
 };
