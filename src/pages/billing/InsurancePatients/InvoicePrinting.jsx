@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Button, Spin, Modal } from "antd";
+import { Button, Spin, Modal, message } from "antd";
 import { IoPrintOutline } from "react-icons/io5";
 import PDFViewer from "../../../components/PDFView";
 import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
-import { postPrintInvoice } from "../../../actions/Charges-Actions/postprintInvoice";
+import { postPrintInvoice,PRINT_INVOICE_RESET } from "../../../actions/Charges-Actions/postprintInvoice";
 
 export const PrintInterimInvoice = ({ activeVisitNo, patientNo }) => {
   const dispatch = useDispatch();
@@ -22,15 +22,13 @@ export const PrintInterimInvoice = ({ activeVisitNo, patientNo }) => {
     dispatch(postInterimInvoice(data))
       .then((response) => {
         setBase64(response.data.base64);
-        setLoading(false); // End loading state after receiving the data
-        // Open the result in a new tab or wide modal
-        setIsModalVisible(true); // For modal option
-        // Uncomment below line to open in a new tab
+        setLoading(false); 
+        setIsModalVisible(true); 
         // window.open('data:application/pdf;base64,' + response.data.base64);
       })
       .catch((error) => {
         setLoading(false); // Stop loading in case of error
-        console.error("Error fetching receipt:", error);
+        message.error("Error fetching receipt:", error);
       });
   };
 
@@ -154,6 +152,9 @@ export const PrintFinalInvoice = ({  patientNo }) => {
           destroyOnClose
           style={{ maxWidth: "80%" , top: 5}}
           bodyStyle={{ overflow: "auto" }}
+         afterClose={() => {
+                 dispatch({ type: PRINT_INVOICE_RESET }); 
+               }}
         >
           {base64 && <PDFViewer base64String={base64} />}
         </Modal>

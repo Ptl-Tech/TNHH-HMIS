@@ -5,7 +5,14 @@ import {
   POST_REBATES_SUCCESS,
 } from "../../actions/Charges-Actions/postRebates";
 
-export const postRebatesReducer = (state = { loading: false }, action) => {
+const initialState = {
+  loading: false,
+  success: false,
+  error: null,
+  data: null,
+};
+
+export const postRebatesReducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_REBATES_REQUEST:
       return { ...state, loading: true };
@@ -14,7 +21,7 @@ export const postRebatesReducer = (state = { loading: false }, action) => {
     case POST_REBATES_FAIL:
       return { ...state, loading: false, error: action.payload };
     case POST_REBATES_RESET:
-      return { loading: false };
+      return { ...initialState }; 
     default:
       return state;
   }

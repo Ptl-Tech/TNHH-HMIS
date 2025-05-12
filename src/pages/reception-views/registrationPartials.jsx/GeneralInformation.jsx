@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { saveGeneralInformation } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
+import { saveGeneralInformation, SAVE_GENERAL_INFORMATION_RESET } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { getPatientByNo } from "../../../actions/patientActions";
 import { useState } from "react";
@@ -79,6 +79,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
       });
     }
   }, [patientDetails, form]);
+ 
 
   const handleSubmission = (values) => {
     setFormSubmitted(true);
@@ -122,7 +123,22 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
     setDispatchingInfo(true);
     onUpdate(data);
   };
+  useEffect(()=>{
+    if(data){
+      const status = data.status;
+      if (status === "success") {
+        setDispatchingInfo(false);
+        setFormSubmitted(false);
+      }
+      dispatch({ type: SAVE_GENERAL_INFORMATION_RESET });
+    }
 
+    if(error){
+      setDispatchingInfo(false);
+      setFormSubmitted(false);
+      dispatch({ type: SAVE_GENERAL_INFORMATION_RESET });
+    }
+  }, [error, data, dispatch]);
   return (
     <div>
       <Typography.Title level={5} underline>
