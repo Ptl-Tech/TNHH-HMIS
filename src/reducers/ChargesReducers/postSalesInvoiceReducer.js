@@ -5,7 +5,15 @@ import {
   POST_SALES_INVOICE_SUCCESS,
 } from "../../actions/Charges-Actions/postSalesInvoice";
 
-export const postsalesInvoiceReducer = (state = { loading: false }, action) => {
+// Full initial state
+const initialState = {
+  loading: false,
+  success: false,
+  error: null,
+  data: null,
+};
+
+export const postsalesInvoiceReducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_SALES_INVOICE_REQUEST:
       return { ...state, loading: true };
@@ -14,7 +22,7 @@ export const postsalesInvoiceReducer = (state = { loading: false }, action) => {
     case POST_SALES_INVOICE_FAIL:
       return { ...state, loading: false, error: action.payload };
     case POST_SALES_INVOICE_RESET:
-      return { loading: false };
+      return { ...initialState }; 
     default:
       return state;
   }

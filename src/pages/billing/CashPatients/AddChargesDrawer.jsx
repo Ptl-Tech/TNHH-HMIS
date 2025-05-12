@@ -3,7 +3,7 @@ import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col, DatePicker} fr
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../../actions/Charges-Actions/ChargesSetup";
-import { postPatientCharges } from "../../../actions/Charges-Actions/postCharges";
+import { postPatientCharges,POST_CHARGES_RESET } from "../../../actions/Charges-Actions/postCharges";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import moment from "moment";
@@ -21,7 +21,7 @@ const AddChargesDrawer = ({
   const { charges: transactionCharges, loading: chargesLoading } = useSelector(
     (state) => state.getChargesSetup
   );
-  const { loading: addChargesLoading } = useSelector(
+  const { loading: addChargesLoading, error:addChargesError, success: addChargesSuccess } = useSelector(
     (state) => state.postPatientCharges
   );
   const {
@@ -80,6 +80,21 @@ useEffect(() => {
       form.setFieldsValue({ chargeType: null, Amount: "" });
     }
   }, [transactionCharges, transactionType, form]);
+
+  useEffect(() => {
+    if (addChargesSuccess) {
+      form.resetFields(); // Reset form fields after successful submission
+      dispatch({type: POST_CHARGES_RESET}); // Reset success state
+      onClose(); // Close the drawer
+    }
+  }, [addChargesSuccess, form, dispatch, onClose]);
+
+  useEffect(() => {
+    if (addChargesError) {
+      message.error(addChargesError); // Show error message
+      dispatch({type: POST_CHARGES_RESET}); // Reset error state
+    }
+  }, [addChargesError, dispatch]);
 
   const handleChargeSelect = (chargeCode) => {
     const charge = charges.find((item) => item.Code === chargeCode);

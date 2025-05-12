@@ -22,9 +22,9 @@ import InsurancePaymentSection from "./InsurancePaymentSection";
 import AllocateRebates from "../AllocateRebates";
 import AllocateDiscount from "../AllocateDiscount";
 import { PrintFinalInvoice, PrintInterimInvoice } from "./InvoicePrinting";
-import { postGenerateInvoice } from "../../../actions/Charges-Actions/postGenerateInvoice";
+import { postGenerateInvoice,POST_GENERATE_INVOICE_RESET } from "../../../actions/Charges-Actions/postGenerateInvoice";
 import ReopenCharges from "./ReopenCharges";
-import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
+import { postsalesInvoice,POST_SALES_INVOICE_RESET } from "../../../actions/Charges-Actions/postSalesInvoice";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
@@ -52,10 +52,9 @@ const InvoiceInpatient = () => {
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
-  const { loading: postSalesInvoiceLoading } = useSelector(
+  const { loading: postSalesInvoiceLoading, success: postSalesInvoiceSuccess, error: postSalesInvoiceError } = useSelector(
     (state) => state.postSalesInvoice
   );
-
   //states
   const [RebatesModal, setRebatesModal] = useState(false);
   const [DiscountModal, setDiscountModal] = useState(false);
@@ -68,6 +67,21 @@ const InvoiceInpatient = () => {
       dispatch(getReceiptLines(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
+
+    useEffect(() => {
+    if(generateInvoiceError){
+      message.error(generateInvoiceError);
+      dispatch({type: POST_GENERATE_INVOICE_RESET}); // Reset error state   
+    } 
+    
+    }, [generateInvoiceError, dispatch]);
+  
+    useEffect(() => {
+      if (postSalesInvoiceError) {
+        message.error(postSalesInvoiceError);
+        dispatch({ type: POST_SALES_INVOICE_RESET }); // Reset error state
+      }
+    }, [postSalesInvoiceError, dispatch]);
 
   const handleCancel = () => {
     setRebatesModal(false);
@@ -84,6 +98,8 @@ const InvoiceInpatient = () => {
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
         message.success(`Invoice generated ${status}fully`, 5);
+                dispatch({type: POST_GENERATE_INVOICE_RESET});
+        
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -104,6 +120,8 @@ const InvoiceInpatient = () => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
         message.success("Invoice Posted successfully", 5);
+                dispatch({ type: POST_SALES_INVOICE_RESET });
+        
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
