@@ -108,7 +108,7 @@ const ConsultationRoomPatients = () => {
         const { color } = getUrgencyColorcode(record.UrgencyStatus);
         return (
           <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
             className="fw-bold"
             style={{ color: color }}
           >
@@ -129,7 +129,7 @@ const ConsultationRoomPatients = () => {
       render: (text, record) => {
         return (
           <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
             className="fw-bold"
             style={{ color: '#0f5689', cursor: 'pointer' }}
           >
@@ -156,7 +156,7 @@ const ConsultationRoomPatients = () => {
       render: (text, record) => {
         return (
           <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
             style={{ color: '#0f5689', cursor: 'pointer' }}
           >
             {text.toUpperCase()}
