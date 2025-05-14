@@ -3,25 +3,28 @@ import { Route } from 'react-router-dom';
 import ViewProfile from '../Auth/ViewProfile';
 import MainLayout from '../Layouts/MainLayout';
 import PrivateRoute from '../private/PrivateRoute';
+
 import {
   FaBedPulse,
-  FaHouseMedical,
-  FaPersonWalking,
-  FaPersonWalkingArrowRight,
-  FaClockRotateLeft,
   FaBoxArchive,
+  FaHouseMedical,
   FaPrescription,
+  FaPersonWalking,
+  FaClockRotateLeft,
+  FaPersonWalkingArrowRight,
 } from 'react-icons/fa6';
+import { GiPayMoney } from 'react-icons/gi';
 
 import PharmacyCard from '../pages/pharmacy-views/PharmacyCard';
 import PharmacyWalkIn from '../pages/pharmacy-views/PharmacyWalkIn.jsx';
 import PharmacyInpatient from '../pages/pharmacy-views/PharmacyInpatient';
 import PharmacyDashboard from '../pages/pharmacy-views/PhamarcyDashboard';
-import PharmacyOutpatient from '../pages/pharmacy-views/PharmacyOutpatient';
-import PharmacyHistoryList from '../pages/pharmacy-views/PharmacyHistoryList';
-import PharmacyListReturnLines from '../pages/pharmacy-views/PharmacyListReturnLines';
 import PharmacyHistory from '../pages/pharmacy-views/PharmacyHistory.jsx';
 import PharmacyArchived from '../pages/pharmacy-views/PharmacyArchived.jsx';
+import PharmacyOutpatient from '../pages/pharmacy-views/PharmacyOutpatient';
+import PharmacyHistoryList from '../pages/pharmacy-views/PharmacyHistoryList';
+import PharmacyQuotation from '../pages/pharmacy-views/PharmacyQuotation';
+import PharmacyListReturnLines from '../pages/pharmacy-views/PharmacyListReturnLines';
 
 export const pharmacyRoutes = [
   {
@@ -61,6 +64,11 @@ export const pharmacyRoutes = [
     label: 'Pharmacy Walk In',
     icon: <FaPersonWalking style={{ color: '#fff' }} />,
   },
+  {
+    key: '/Pharmacy/Pharmacy-Quotation',
+    label: 'Pharmacy Quotation',
+    icon: <GiPayMoney style={{ color: '#fff' }} />,
+  },
 ];
 
 export default function PharmacyRoutes() {
@@ -93,6 +101,10 @@ export default function PharmacyRoutes() {
         <Route
           path="/Pharmacy/Pharmacy-WalkIn"
           element={<PharmacyWalkIn />}
+        />
+        <Route
+          path="/Pharmacy/Pharmacy-Quotation"
+          element={<PharmacyQuotation />}
         />
         <Route
           path="/Pharmacy/Pharmacy-Card"

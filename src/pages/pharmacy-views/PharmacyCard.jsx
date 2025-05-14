@@ -1,38 +1,38 @@
+import { useLocation } from 'react-router-dom';
+
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  Row,
   Col,
+  Row,
   Tag,
   Card,
   Form,
-  Space,
+  Spin,
   Input,
   Modal,
+  Space,
   Table,
   Button,
   message,
   Typography,
-  Popconfirm,
   InputNumber,
-  Spin,
-  Drawer,
 } from 'antd';
 import {
   IdcardOutlined,
   SignatureOutlined,
-  MedicineBoxOutlined,
   ExclamationCircleFilled,
 } from '@ant-design/icons';
 import { Select } from 'antd';
 
+import { SearchDrugTable } from './SearchDrugTable';
 import {
-  GET_PHARMACY_RETURN_LIST_RESET,
-  getPharmacyLineReturnbyPharmacyNo,
-} from '../../actions/pharmacy-actions/getPharmacyLineReturns';
-import { getItemsSlice } from '../../actions/triage-actions/getItemsSlice';
-import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
+  pharmacyCardPatientData,
+  pharmacyCardSearchDrugsColumns,
+  pharmacyCardCurrentSelectionColumns,
+} from './pharmacy-utils';
+
 import {
   postDrugIssuance,
   postArchivePrescription,
@@ -41,15 +41,16 @@ import {
   POST_ARCHIVE_PRESCRIPTION_RESET,
   POST_PHARMACY_DRUG_ISSUANCE_RESET,
 } from '../../actions/pharmacy-actions/postPharmacyAction';
-import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
-import { useLocation } from 'react-router-dom';
 import {
-  RETURN_DRUGS_RESET,
-  returnDrugs,
-} from '../../actions/pharmacy-actions/returnDrugs';
+  GET_PHARMACY_RETURN_LIST_RESET,
+  getPharmacyLineReturnbyPharmacyNo,
+} from '../../actions/pharmacy-actions/getPharmacyLineReturns';
+import { getItemsSlice } from '../../actions/triage-actions/getItemsSlice';
+import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
+import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
 
 const { confirm } = Modal;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const EditableCell = ({
   editing,
@@ -81,99 +82,6 @@ const EditableCell = ({
         children
       )}
     </td>
-  );
-};
-
-const ReturnDrugsComponent = ({ record }) => {
-  const dispatch = useDispatch();
-
-  const { DrugName, Description, SystemId, Quantity } = record;
-
-  const [open, setOpen] = useState(false);
-  const { data, loading, error } = useSelector((state) => state.returnDrugs);
-
-  useEffect(() => {
-    if (data) {
-      message.success('The return was successful');
-      setOpen(false);
-    }
-
-    if (error) {
-      message.error('Something went wrong when removing the drugs');
-    }
-
-    if (data || error) {
-      dispatch({ type: RETURN_DRUGS_RESET });
-    }
-  }, [data, error]);
-
-  const handleSubmit = (values) => {
-    dispatch(returnDrugs(values));
-  };
-
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>Return Drug</Button>
-      <Drawer
-        open={open}
-        width={360}
-        destroyOnHidden={true}
-        onClose={() => setOpen(false)}
-        title={`Return ${DrugName || Description}`}
-        children={
-          <Form
-            layout="vertical"
-            initialValues={{ recId: SystemId }}
-            onFinish={handleSubmit}
-          >
-            <Form.Item
-              name="returnQty"
-              label="Number to return"
-              rules={[{ required: true, message: 'Quantity is required' }]}
-            >
-              <Input
-                min={1}
-                required
-                type="number"
-                max={Quantity}
-              />
-            </Form.Item>
-            <small>
-              Value must be <strong>greater</strong> than <strong>0</strong> or
-              less than <strong>{Quantity + 1}</strong>
-            </small>
-            <Form.Item
-              name="returnRemarks"
-              label="Reason of returning"
-              rules={[
-                { required: true, message: 'Please enter reason of returning' },
-              ]}
-            >
-              <Input
-                style={{ width: '100%' }}
-                placeholder="Reason of returning"
-              />
-            </Form.Item>
-            <Button
-              type="primary"
-              disabled={loading}
-              htmlType="submit"
-            >
-              Submit
-            </Button>
-            <Form.Item
-              name="recId"
-              rules={[{ required: true, message: 'Record ID is required' }]}
-            >
-              <Input
-                type="hidden"
-                max={Quantity}
-              />
-            </Form.Item>
-          </Form>
-        }
-      />
-    </>
   );
 };
 
@@ -223,8 +131,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const { data: pharmacyRecord } = useSelector(
     (state) => state.getSinglePharmacyRecord,
   );
-
-  console.log({ pharmacyRequests, pharmacyRecord });
+  const { data: returnedDrugs } = useSelector((state) => state.returnDrugs);
 
   const disabled =
     pharmacyRecord?.Status === 'Completed' ||
@@ -297,18 +204,20 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
     if (
       (!pharmacyLineDataSuccess && currentRequest) ||
-      postPharmacyLineData?.status === 'success'
+      postPharmacyLineData?.status === 'success' ||
+      returnedDrugs
     ) {
       dispatch(getPharmacyLineReturnbyPharmacyNo(currentRequest));
     } else {
       dispatch({ type: GET_PHARMACY_RETURN_LIST_RESET });
     }
   }, [
-    currentRequest,
     items,
-    pharmacyLineDataSuccess,
-    postPharmacyLineData,
+    returnedDrugs,
+    currentRequest,
     postDrugIssuanceData,
+    postPharmacyLineData,
+    pharmacyLineDataSuccess,
   ]);
 
   useEffect(() => {
@@ -363,8 +272,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
   // to get a single pharmacy record
   useEffect(() => {
-    console.log({ pharmacyRecord });
-
     // We cannot update based on whether we have archived or not because the request will not be found
     if (
       (currentRequest && !pharmacyRecord) ||
@@ -388,6 +295,17 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     postArchivePrescriptionData,
   ]);
 
+  const handleAddDrug = (drugNo) => {
+    dispatch(
+      postPrescriptionQuantity({
+        drugNo,
+        pharmacyNo: currentRequest,
+        quantity: 0,
+        myAction: 'create',
+      }),
+    );
+  };
+
   const deleteRecord = (record) => {
     // deleting a pharmacy line
     dispatch(
@@ -401,189 +319,11 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     );
   };
 
-  const columns = [
-    { title: 'No', dataIndex: 'Index', key: 'Index' },
-    { title: 'Drug No.', dataIndex: 'No', key: 'No' },
-    {
-      title: 'Drug Name',
-      dataIndex: 'Description',
-      key: 'Description',
-      render: (value, record) => {
-        var returnValue;
-        returnValue = Object.hasOwn(record, 'Description')
-          ? value
-          : record['DrugName'];
-        return returnValue;
-      },
-    },
-    {
-      title: 'Available Qty',
-      dataIndex: 'ActualQty',
-      key: 'ActualQty',
-    },
-    { title: 'Dosage', dataIndex: 'Dosage', key: 'Dosage', editable: true },
-    {
-      title: 'Frequency',
-      dataIndex: 'Frequency',
-      key: 'Frequency',
-      editable: true,
-      inputType: 'number',
-    },
-    {
-      title: 'Duration in Days',
-      dataIndex: 'Duration_Days',
-      key: 'Duration_Days',
-      editable: true,
-      inputType: 'number',
-    },
-    {
-      title: 'Billable Quantity',
-      dataIndex: 'Quantity',
-      key: 'Quantity',
-      editable: true,
-      inputType: 'number',
-    },
-    {
-      title: 'Unit Price',
-      dataIndex: 'UnitPrice',
-      key: 'UnitPrice',
-      render: (value) => value.toLocaleString(),
-    },
-    {
-      title: 'Total Price',
-      dataIndex: 'TotalPrice',
-      key: 'TotalPrice',
-      render: (value, record) => {
-        return Math.round(record.UnitPrice * record.Quantity).toLocaleString();
-      },
-    },
-    {
-      title: 'Action',
-      dataIndex: 'action',
-      render: (value, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <Space direction="horizontal">
-            <Button
-              type={'default'}
-              style={{ textTransform: 'capitalize' }}
-              onClick={() => save(record)}
-            >
-              Save
-            </Button>
-            <Popconfirm
-              type={'primary'}
-              onConfirm={cancel}
-              title="Sure to cancel?"
-            >
-              <a>Cancel</a>
-            </Popconfirm>
-          </Space>
-        ) : (
-          <>
-            {pharmacyRecord.Status === 'Completed' ? (
-              <ReturnDrugsComponent record={record} />
-            ) : (
-              <Space direction="horizontal">
-                <Button
-                  type={'default'}
-                  disabled={disabled}
-                  onClick={() => edit(record)}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  type={'primary'}
-                  disabled={disabled}
-                  style={{ textTransform: 'capitalize' }}
-                  onClick={() => showConfirm(record)}
-                >
-                  Delete
-                </Button>
-              </Space>
-            )}
-          </>
-        );
-      },
-    },
-  ];
-
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType: col.dataIndex === 'age' ? 'number' : 'text',
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-        inputType: col.inputType,
-      }),
-    };
-  });
-
-  const patientData = [
-    [
-      {
-        name: 'Pharmacy No',
-        value: 'Pharmacy_No',
-      },
-      {
-        name: 'Visit Number',
-        value: 'Link_No',
-      },
-      {
-        name: 'Patient Number',
-        value: 'Patient_No',
-      },
-      {
-        name: 'Name',
-        value: 'Search_Name',
-      },
-      {
-        name: 'Date',
-        value: 'Pharmacy_Date',
-      },
-      {
-        name: 'Age',
-        value: 'Age',
-        noBorder: true,
-      },
-    ],
-    [
-      {
-        name: 'Patient Type',
-        value: 'Patient_Type',
-      },
-      {
-        name: 'Transaction Type',
-        value: 'Patient_Type',
-      },
-      {
-        name: 'Request Area',
-        value: 'Link_Type',
-      },
-      {
-        name: 'Insurance',
-        value: 'Insurance_No',
-      },
-      {
-        name: 'Remarks',
-        value: 'Remarks',
-      },
-    ],
-  ];
-
   const handleRequestChange = (value) => {
     setCurrentRequest(value.split('-').at(-1));
   };
 
   const handleStatusChange = (value) => {
-    console.log({ value });
     setStatus(value);
   };
 
@@ -665,7 +405,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           }}
         >
           <Row>
-            {patientData.map((patientRow) => (
+            {pharmacyCardPatientData.map((patientRow) => (
               <Col span={12}>
                 {patientRow.map(({ name, value, noBorder }) => (
                   <Row
@@ -754,7 +494,15 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                 bordered
                 size="small"
                 pagination={false}
-                columns={mergedColumns}
+                columns={pharmacyCardCurrentSelectionColumns({
+                  edit,
+                  save,
+                  cancel,
+                  disabled,
+                  completed: pharmacyRecord.Status === 'Completed',
+                  isEditing,
+                  showConfirm,
+                })}
                 dataSource={[...pharmacyLineData]
                   .sort(
                     ({ line_no: LineNoA }, { line_no: LineNoB }) =>
@@ -777,7 +525,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                     <TableSummaryRow>
                       <TableSummaryCell
                         index={0}
-                        colSpan={8}
+                        colSpan={9}
                       />
                       <TableSummaryCell index={0}>
                         <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
@@ -802,137 +550,11 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           </div>
           <SearchDrugTable
             items={items}
-            pharmacyNo={currentRequest}
             loading={postPharmacyLineLoading}
+            columns={pharmacyCardSearchDrugsColumns(handleAddDrug)}
           />
         </>
       )}
-    </div>
-  );
-};
-
-const SearchDrugTable = ({ items, loading, pharmacyNo }) => {
-  const dispatch = useDispatch();
-
-  const { Compact } = Space;
-  const [filter, setFilter] = useState({ specificName: '', genericName: '' });
-
-  const handleAddDrug = (drugNo) => {
-    dispatch(
-      postPrescriptionQuantity({
-        drugNo,
-        pharmacyNo,
-        quantity: 0,
-        myAction: 'create',
-      }),
-    );
-  };
-
-  const columns = [
-    {
-      title: 'Item Code',
-      key: 'No',
-      dataIndex: 'No',
-    },
-    {
-      title: 'Item Name',
-      key: 'Description',
-      dataIndex: 'Description',
-    },
-    {
-      title: 'Generic Name',
-      key: 'Generic_Name',
-      dataIndex: 'Generic_Name',
-    },
-    {
-      title: 'Available Qty',
-      key: 'InventoryQuantity',
-      dataIndex: 'InventoryQuantity',
-      render: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      title: 'Price',
-      key: 'UnitPrice',
-      dataIndex: 'UnitPrice',
-      render: (value) => Math.round((value + Number.EPSILON) * 100) / 100,
-    },
-    {
-      key: 'No',
-      dataIndex: 'No',
-      title: 'Select',
-      render: (cell) => {
-        return (
-          <Button
-            type="primary"
-            onClick={() => handleAddDrug(cell)}
-          >
-            Select
-          </Button>
-        );
-      },
-    },
-  ];
-
-  return (
-    <div style={{ display: 'grid', gap: '16px' }}>
-      <div>
-        <Title
-          level={5}
-          style={{
-            gap: '8px',
-            display: 'flex',
-            color: '#0f5689',
-            alignItems: 'center',
-          }}
-        >
-          <MedicineBoxOutlined />
-          Add Drugs
-        </Title>
-      </div>
-      <Space
-        style={{
-          width: '100%',
-          gap: '16px',
-        }}
-      >
-        <Input
-          addonBefore="Specific Name"
-          style={{ width: '100%' }}
-          value={filter.specificName}
-          onChange={(e) =>
-            setFilter({ ...filter, specificName: e.currentTarget.value })
-          }
-          placeholder="Search Specific Name"
-        />
-        <Input
-          addonBefore="Generic Name"
-          style={{ width: '100%' }}
-          value={filter.genericName}
-          onChange={(e) =>
-            setFilter({ ...filter, genericName: e.currentTarget.value })
-          }
-          placeholder="Search Generic Name"
-        />
-      </Space>
-      <Table
-        bordered
-        size="small"
-        loading={loading}
-        columns={columns}
-        dataSource={
-          filter.specificName || filter.genericName
-            ? items.filter(
-                (drug) =>
-                  drug.Description.toLowerCase().includes(
-                    filter.specificName.toLowerCase(),
-                  ) &&
-                  drug.Description.toLowerCase().includes(
-                    filter.genericName.toLowerCase(),
-                  ),
-              )
-            : []
-        }
-      />
     </div>
   );
 };
