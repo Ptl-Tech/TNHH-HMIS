@@ -5,10 +5,14 @@ import {
   PRINT_INVOICE_RESET,
 } from "../../actions/Charges-Actions/postprintInvoice";
 
-export const postPrintInvoiceReducer = (
-  state = { loading: false },
-  action
-) => {
+const initialState = {
+  loading: false,
+  success: false,
+  error: null,
+  data: null,
+};
+
+export const postPrintInvoiceReducer = (state = initialState, action) => {
   switch (action.type) {
     case PRINT_INVOICE_REQUEST:
       return { ...state, loading: true };
@@ -17,7 +21,7 @@ export const postPrintInvoiceReducer = (
     case PRINT_INVOICE_FAIL:
       return { ...state, loading: false, error: action.payload };
     case PRINT_INVOICE_RESET:
-      return { loading: false };
+      return { ...initialState };
     default:
       return state;
   }

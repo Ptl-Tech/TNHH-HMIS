@@ -26,6 +26,7 @@ import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
+import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -260,7 +261,10 @@ const ReceiptInpatient = () => {
                   : "N/A"
               }
             />
-
+ <PrintInterimInvoice
+            patientNo={patientBillData[0]?.PatientNo}
+            activeVisitNo={activeVisitNo}
+          />
             {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
