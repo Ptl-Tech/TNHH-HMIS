@@ -7,6 +7,7 @@ import { postPatientCharges,POST_CHARGES_RESET } from "../../../actions/Charges-
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import moment from "moment";
+import { listDoctors } from "../../../actions/DropdownListActions";
 
 const AddChargesDrawer = ({
   visible,
@@ -29,11 +30,15 @@ const AddChargesDrawer = ({
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
+  const { data: doctors } = useSelector((state) => state.getDoctorsList);
 
   const [transactionType, setTransactionType] = useState(null);
   const [charges, setCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [quantity, setQuantity] = useState(1);
+    const [calculateDoctorFee, setCalculateDoctorFee] = useState(false);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    
 
 useEffect(() => {
   if (activeVisitNo) {
@@ -80,6 +85,23 @@ useEffect(() => {
       form.setFieldsValue({ chargeType: null, Amount: "" });
     }
   }, [transactionCharges, transactionType, form]);
+
+  useEffect(() => {
+    if(transactionType !== null && transactionType !== undefined) {
+      const selectedTransaction = transactionList.find(
+        (item) => item.TransactionType === transactionType
+      );
+
+       if (selectedTransaction?.CalculateDoctorFee) {
+            setCalculateDoctorFee(true);
+            dispatch(listDoctors());
+          } else {
+            setCalculateDoctorFee(false);
+            setSelectedDoctor(null); // Clear selected doctor if not required
+          }
+        }
+  }, [transactionType, transactionList, dispatch]);
+
 
   useEffect(() => {
     if (addChargesSuccess) {
@@ -130,9 +152,10 @@ useEffect(() => {
         quantity: values.Quantity,
         remarks: values.remarks,
         creationDate: values.creationDate?.format("YYYY-MM-DD") || moment().format("YYYY-MM-DD"),
+        doctorId: calculateDoctorFee ? selectedDoctor : null,
       };
       
-  
+  console.log("Payload for charges:", payload); // Debugging line
       await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
       dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
       dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
@@ -209,6 +232,26 @@ useEffect(() => {
             </Select>
           )}
         </Form.Item>
+  {calculateDoctorFee && (
+    <Form.Item
+      label="Select Doctor"
+      name="doctorId"
+      rules={[{ required: true, message: "Please select a doctor!" }]}
+    >
+      <Select
+        placeholder="Select Doctor"
+        showSearch
+        optionFilterProp="children"
+        onChange={(value) => setSelectedDoctor(value)}
+      >
+        {doctors?.map((doc) => (
+          <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+            {doc.DoctorsName}
+          </Select.Option>
+        ))}
+      </Select>
+    </Form.Item>
+)}
 
        <Row gutter={16}>
         <Col span={12}>

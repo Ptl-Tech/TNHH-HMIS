@@ -19,6 +19,7 @@ import { getChargesSetup } from "../../actions/Charges-Actions/ChargesSetup";
 import { postPatientCharges } from "../../actions/Charges-Actions/postCharges";
 import { getUnpostedCharges } from "../../actions/Charges-Actions/getUnpostedCharges";
 import ProcessPayment from "./ProcessPayment";
+import { listDoctors } from "../../actions/DropdownListActions";
 
 const { Text } = Typography;
 
@@ -43,13 +44,14 @@ const AddCharges = ({
   const { loading: chargesLoading, data: chargesList } = useSelector(
     (state) => state.getUnpostedCharges
   );
-
+ 
   const [selectedTransactionType, setSelectedTransactionType] = useState(null);
   const [filteredCharges, setFilteredCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [localChargesList, setLocalChargesList] = useState([]);
   const [quantity, setQuantity] = useState(1); // Default to 1
   const [amount, setAmount] = useState(0); // Default amount
+
   useEffect(() => {
     if (chargesList) {
       setLocalChargesList(
@@ -78,13 +80,29 @@ const AddCharges = ({
     dispatch(getChargesSetup());
   }, [dispatch]);
 
+ 
   const handleTransactionTypeChange = (value) => {
     setSelectedTransactionType(value);
-    setFilteredCharges(
-      charges.filter((item) => item.Transaction_Type === value)
-    );
+    setFilteredCharges(charges.filter((item) => item.Transaction_Type === value));
     setSelectedCharge(null);
+  
+    const transaction = data.find(
+      (item) => item.TransactionType === value
+    );
+  
+    if (transaction?.CalculateDoctorFee) {
+      setCalculateDoctorFee(true);
+      dispatch(listDoctors());
+    } else {
+      setCalculateDoctorFee(false);
+      setSelectedDoctor(null); // Clear selected doctor if not required
+    }
+
+      
+console.log("selectedTransactionType", transaction.CalculateDoctorFee);
+
   };
+
 
   const handleChargeTypeChange = (value) => {
     const charge = charges.find((item) => item.Description === value);
@@ -115,6 +133,8 @@ const AddCharges = ({
       remarks: values.remarks,
       creationDate: new Date().toISOString().split("T")[0],
       patientNo: patientNo,
+      ...(calculateDoctorFee && { doctorId: selectedDoctor }), // add doctorId only if needed
+
     };
     await dispatch(postPatientCharges(payload));
     setLocalChargesList([]); // Clear table data on modal close
@@ -221,6 +241,7 @@ const AddCharges = ({
               </Select>
             </Form.Item>
           </Col>
+        
           <Col span={6}>
             <Form.Item
               label="Charge Name"

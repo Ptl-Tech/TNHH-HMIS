@@ -221,13 +221,17 @@ const PatientCharges = ({ activeVisitNo }) => {
         />
       ) : (
         <Tabs defaultActiveKey="1">
-  <TabPane tab="Pending Charges" key="1">
-    {renderTable(pendingCharges)}
-  </TabPane>
-  <TabPane tab="Posted Charges" key="2">
-    {renderTable(postedCharges)}
-  </TabPane>
-</Tabs>
+        <TabPane tab="Pending Charges" key="1">
+          <div id="pending-charges-table">
+            {renderTable(pendingCharges)}
+          </div>
+        </TabPane>
+        <TabPane tab="Posted Charges" key="2">
+          <div id="posted-charges-table">
+            {renderTable(postedCharges)}
+          </div>
+        </TabPane>
+      </Tabs>     
 
       )}
 
