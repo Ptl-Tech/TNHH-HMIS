@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
-import SplitReceipt from "../SplitReceipt";
 import PaymentSection from "./PaymentSection";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import MpesaPayment from "./MpesaPayment";

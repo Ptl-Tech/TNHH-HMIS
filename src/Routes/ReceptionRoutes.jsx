@@ -17,9 +17,7 @@ import MainLayout from "../Layouts/MainLayout";
 import PrivateRoute from "../private/PrivateRoute";
 import ActiveAppmnts from "../pages/ActiveAppmnts";
 import OutpatientList from "../pages/OutpatientList";
-import ViewReceipt from "../pages/billing/ViewReceipt";
 import CreateVisitForm from "../pages/CreateVisitForm";
-import ViewInvoice from "../pages/billing/ViewInvoice";
 import PatientAdmissions from "../pages/PatientAdmissions";
 import WalkInPatientList from "../pages/WalkInPatientList";
 import WalkinRegistration from "../pages/WalkinRegistration";
@@ -30,12 +28,10 @@ import DirectAdmission from "../pages/nurse-view/DirectAdmission";
 import ActiveOutPatients from "../pages/billing/ActiveOutPatients";
 import AdmissionRequest from "../pages/nurse-view/AdmissionRequest";
 import AdmissionRequests from "../pages/nurse-view/AdmissionRequests";
-import ViewPatientsReceipts from "../pages/billing/ViewPatientsReceipts";
 import ConvertedPatients from "../pages/reception-views/ConvertedPatients";
 import DispatchedAppmnts from "../pages/reception-views/DispatchedAppmnts";
 import WalkInCreateVisit from "../pages/reception-views/WalkInCreateVisit";
 import { DispatchWalkInPatient } from "../pages/reception-views/DispatchWalkInPatient";
-import InPatientReceipts from "../pages/billing/InpatientReceipt";
 import ReceiptPatient from "../pages/billing/CashPatients/ReceiptPatient";
 import InvoicePatient from "../pages/billing/InsurancePatients/InvoicePatient";
 import ReceiptInpatient from "../pages/billing/CashPatients/ReceiptInpatient";
@@ -186,10 +182,10 @@ export default function ReceptionRoutes() {
           path="/Reception/Admission-requests/:id"
           element={<AdmissionRequest />}
         />
-        <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
+        {/* <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
         <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} />
         <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
-        <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} />
+        <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} /> */}
         <Route
           path="/Reception/CashPatient-Charges"
           element={<ReceiptPatient />}

@@ -27,6 +27,7 @@ import { postTriageVisit } from "../actions/patientActions";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientVisitByNo } from "../actions/reception-actions/patient-visit-actions/getPatientVisitByNo";
 import { getPatientCharges } from "../actions/Charges-Actions/getPatientCharges";
+import LoadingSpin from "../components/LoadingSpin";
 
 const CreateVisitForm = () => {
   const location = useLocation();
@@ -74,17 +75,24 @@ useEffect(() => {
     }
   }, [activeVisitNo, dispatch]);
 
-
-useEffect(() => {
-  if(dispatchingtotriage && postVisitSuccess){
+  useEffect(() => {
+    if (dispatchingtotriage) {
+      if (postVisitSuccess) {
+        message.success("Dispatched to triage successfully.");
+        
+        // Add a slight delay before fetching charges
+        setTimeout(() => {
+          dispatch(getPatientCharges(activeVisitNo));
+          setDispatchingtotriage(false);
+        }, 800); // 800ms simulated delay (adjust as needed)
+        
+      } else if (postVisitError) {
+        message.error(`Error dispatching visit to triage: ${postVisitError}`);
+        setDispatchingtotriage(false);
+      }
+    }
+  }, [postVisitSuccess, postVisitError, dispatchingtotriage, dispatch, activeVisitNo]);
    
-    dispatch(getPatientCharges(activeVisitNo));
-   }else if (dispatchingtotriage && postVisitError) {
-    message.error(`Error dispatching visit to triage: ${postVisitError}`);    
-  }
-  }, [postVisitSuccess, postVisitdata,dispatchingtotriage, postVisitError,dispatch]);
-  
-console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
 
   // Close modal
   const handleClose = () => {
@@ -109,12 +117,7 @@ console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
   const handleDirectAdmission=()=>{
     navigate(`/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
   }
-//conole log visitno
-  console.log("activeVisitNo", activeVisitNo);
-  console.log("patientDetails", patientDetails.ActiveVisitNo);
-  console.log("patientDetails", patientDetails);
-  console.log("patientVisitDetails", patientVisitDetails);
-  console.log("visitData", visitData);
+
   // Actions menu
   const menu = (
     <Menu onClick={({ key }) => key === "visit_action" && setView(true)}>
@@ -304,6 +307,9 @@ console.log("patientDetails.ActiveVisitNo", patientDetails.ActiveVisitNo);
        // visitData={visitData}
       //  onUpdateVisit={handleViewDetailsUpdate}
       />
+
+<LoadingSpin loading={dispatchingtotriage} />
+
     </div>
   );
 };

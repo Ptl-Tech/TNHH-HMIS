@@ -45,6 +45,7 @@ setPaymentSavingLoading(true)
     setPaymentSavingLoading(false)
     message.success("Payment saved successfully", 5);
     dispatch(getReceiptPage(activeVisitNo));
+    form.resetFields();
    } catch (error) {
     setPaymentSavingLoading(false);
     message.error("Failed to save payment");

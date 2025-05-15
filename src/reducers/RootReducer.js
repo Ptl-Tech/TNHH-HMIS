@@ -308,6 +308,7 @@ import { postClosingBillReducer } from './ChargesReducers/postClosingBillReducer
 import { getDoctorsNotesDataReducer } from './doc-reducers/getDoctorsNotesDataReducer';
 import { saveDoctorNotesReducer } from './doc-reducers/saveDoctorNotesReducer';
 import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
+import { returnDrugsReducer } from './pharmacy-reducers/returnDrugsReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -436,6 +437,7 @@ export const rootReducer = combineReducers({
   // ************************************* /
 
   // pharmacy
+  returnDrugs: returnDrugsReducer,
   postDrugIssuance: postDrugIssuanceReducer,
   postPharmacyHeader: postPharmacyHeaderReducer,
   getNewPharmacyList: getNewPharmacyRequestsReducer,

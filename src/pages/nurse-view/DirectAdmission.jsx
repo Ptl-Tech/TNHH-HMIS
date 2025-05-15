@@ -21,6 +21,8 @@ const DirectAdmission = () => {
   const navigate = useNavigate();
   const [psychiatricCoding, setPsychiatricCoding] = useState(null);
   const [codingReason, setCodingReason] = useState(null);
+  const [admissionDate, setAdmissionDate] = useState(null);
+  const [doctorId, setDoctorId] = useState(null);
   const location = useLocation();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loadingAdmissionDetails } = useSelector(
@@ -55,20 +57,20 @@ const DirectAdmission = () => {
       wardRoom: selectedRow[0]?.Room_No,
       ward: selectedRow[0]?.WardNo,
       bed: selectedRow[0]?.BedNo,
-      psychiatricCoding,
-      codingReason,
+      admissionDate : admissionDate,
+      doctor : doctorId,
       admissionType: "0",
     };
-
+console.log("Form Data", formData);
     try {
       const result = await dispatch(postAdmissionFormDetailsSlice(formData));
       if (result.type === POST_ADMISSION_FORM_DETAILS_SUCCESS) {
         await dispatch(postPatientAdmission({ admissionNo: result.payload.admissionNo }));
         message.success(
           result.payload.message ||
-            "Patient addmitted successfully"
+            "Patient admitted successfully"
         );
-        navigate(`/Nurse/Inpatient`);
+        navigate(-1);
       } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
         message.error(
           result.payload.message ||
@@ -109,8 +111,8 @@ const DirectAdmission = () => {
             rowSelection={rowSelection}
             handleOnFinish={handleOnFinish}
             form={form}
-            setPsychiatricCoding={setPsychiatricCoding}
-            setCodingReason={setCodingReason}
+            setAdmissionDate={setAdmissionDate}
+            setDoctorId={setDoctorId}
           />
         </div>
       </div>
