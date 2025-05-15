@@ -165,11 +165,30 @@ const VisitorForm = () => {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item label="Phone Number" name="phoneNumber">
-                <Input placeholder="Enter Phone Number" type="text" />
-              </Form.Item>
-            </Col>
+          <Col span={8}>
+          <Form.Item
+  label="Phone Number"
+  name="phoneNumber"
+  rules={[
+    {
+      required: true,
+      message: "Please enter Phone Number",
+    },
+    {
+      pattern: /^[0-9]{1,15}$/,
+      message: "Phone number must contain only digits and be at most 15 digits long",
+    },
+  ]}
+>
+  <Input
+    placeholder="Enter Phone Number"
+    type="text"
+    maxLength={15}
+  />
+</Form.Item>
+
+</Col>
+
             <Col span={8}>
               <Form.Item label="Car Registration No" name="carRegistrationNo">
                 <Input placeholder="Enter Car Registration No" type="text" />

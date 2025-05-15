@@ -6,19 +6,22 @@ import FilterWardManagement from "../../partials/nurse-partials/FilterWardManage
 import WardManagementTable from "./tables/nurse-tables/WardManagementTable";
 import { InsertRowLeftOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { listDoctors } from "../../actions/DropdownListActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const AssignBed = ({
   rowSelection,
   handleOnFinish,
   form,
-  setPsychiatricCoding,
-  setCodingReason,
+  setAdmissionDate,
+  setDoctorId,
 }) => {
+  const dispatch = useDispatch();
   const location = useLocation();
   const { getBeds, loadingWards, getWards, wardRooms } =
     useGetWardManagementHook();
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
-
+  const { data: doctors } = useSelector((state) => state.getDoctorsList);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [filteredRooms, setFilteredRooms] = useState([]);
@@ -26,12 +29,17 @@ const AssignBed = ({
   const [filteredBeds, setFilteredBeds] = useState([]);
   const [loadingBeds, setLoadingBeds] = useState(false);
 
-  const psychiatricCodingOptions = [
-    { label: "Red", value: 1 },
-    { label: "Amber", value: 2 },
-    { label: "Yellow", value: 3 },
-    { label: "Green", value: 4 },
-  ];
+
+useEffect(() => {
+  dispatch(listDoctors());
+  }, [dispatch]);
+
+  // const psychiatricCodingOptions = [
+  //   { label: "Red", value: 1 },
+  //   { label: "Amber", value: 2 },
+  //   { label: "Yellow", value: 3 },
+  //   { label: "Green", value: 4 },
+  // ];
 
   useEffect(() => {
     if (selectedWard) {
@@ -84,9 +92,9 @@ const AssignBed = ({
       </div>
 
       <FilterWardManagement
-        setPsychiatricCoding={setPsychiatricCoding}
-        setCodingReason={setCodingReason}
-        psychiatricCodingOptions={psychiatricCodingOptions}
+        setAdmissionDate={setAdmissionDate}
+        setDoctorId={setDoctorId}
+        psychiatricCodingOptions={doctors}
         getWards={getWards}
         handleWardChange={handleWardChange}
         loadingWards={loadingWards}
@@ -171,6 +179,6 @@ AssignBed.propTypes = {
   rowSelection: PropTypes.object,
   handleOnFinish: PropTypes.func,
   form: PropTypes.object,
-  setPsychiatricCoding: PropTypes.string,
-  setCodingReason: PropTypes.string,
+  setAdmissionDate: PropTypes.func.isRequired,
+  setDoctorId: PropTypes.func.isRequired,
 };

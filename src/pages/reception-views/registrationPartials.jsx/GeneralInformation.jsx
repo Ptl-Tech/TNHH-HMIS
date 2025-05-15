@@ -95,29 +95,15 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
       dob: values.dateOfBirth
         ? values.dateOfBirth.format("YYYY-MM-DD")
         : patientDetails?.DateOfBirth || "",
-
-      nationality: patientDetails?.Nationality || "",
-      county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
-      phoneNumber: values.phoneNumber || "",
-      paymentMode: patientDetails?.paymentMode || 0,
-      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
-      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
-      insuranceNo: patientDetails?.InsuranceNo || "",
-      insuranceName: patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName:
-        patientDetails?.insurancePrinicipalMemberName || "",
-      isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.MembershipNo || "",
-      schemeName: patientDetails?.SchemeName || "",
-      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-      subcounty: patientDetails?.SubCountyName || "",
+      phoneNumber: values.phoneNumber || "",     
       email: values.email || patientDetails?.Email || "",
-      residence: patientDetails?.PlaceofBirthVillage || "",
-      countyWard: patientDetails?.CountyWardName || "",
+      paymentMode: patientDetails?.paymentMode || 0,
+
       patientStatus: 0,
     };
+
+    console.log("Formatted Data:", formattedData);
 
     dispatch(saveGeneralInformation(formattedData));
     setDispatchingInfo(true);

@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
-import SplitReceipt from "../SplitReceipt";
 import PaymentSection from "./PaymentSection";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import MpesaPayment from "./MpesaPayment";
@@ -217,7 +216,7 @@ const ReceiptPatient = () => {
                 Payment Mode: {patientVisitDetails?.SettlementType}
               </p>
 
-              <p className="text-primary" style={{ gridColumn: "span 2" }}>
+              <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
                 <DollarOutlined /> Bill Balance: KSh{" "}
                 {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               </p>

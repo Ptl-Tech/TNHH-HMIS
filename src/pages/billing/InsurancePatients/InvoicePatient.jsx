@@ -12,7 +12,6 @@ import {
   DollarOutlined,
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
-import SplitReceipt from "../SplitReceipt";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
