@@ -137,6 +137,7 @@ const ReceiptInpatient = () => {
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
+      <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
       <Menu.Divider />     
       <Menu.Item key="close_bill">
