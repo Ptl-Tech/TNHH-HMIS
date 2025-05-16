@@ -217,12 +217,12 @@ const PatientRegistration = () => {
                 onUpdate={handleUpdatePatientDetails}
               />
             </Tabs.TabPane>
-            <Tabs.TabPane tab="How Did You Hear About Us ?" key="5">
+            {/* <Tabs.TabPane tab="How Did You Hear About Us ?" key="5">
               <MarketingInformation
                 patientDetails={patientDetails}
                 onUpdate={handleUpdatePatientDetails}
               />
-            </Tabs.TabPane>
+            </Tabs.TabPane> */}
           </Tabs>
         </Card>
       </div>

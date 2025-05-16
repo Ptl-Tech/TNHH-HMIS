@@ -40,7 +40,7 @@ export const saveBillingInformation = (billingData) => async (dispatch, getState
     };
 
     const response = await axios.post(
-      `${API}reception/PatientRegistration`,
+      `${API}Reception/PatientDataBilling`,
       formattedData,
       config
     );
