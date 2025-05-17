@@ -152,7 +152,7 @@ useEffect(() => {
         quantity: values.Quantity,
         remarks: values.remarks,
         creationDate: values.creationDate?.format("YYYY-MM-DD") || moment().format("YYYY-MM-DD"),
-        doctorId: calculateDoctorFee ? selectedDoctor : null,
+        doctorId: calculateDoctorFee ? selectedDoctor : "",
       };
       
   console.log("Payload for charges:", payload); // Debugging line

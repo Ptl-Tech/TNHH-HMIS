@@ -309,6 +309,7 @@ import { getDoctorsNotesDataReducer } from './doc-reducers/getDoctorsNotesDataRe
 import { saveDoctorNotesReducer } from './doc-reducers/saveDoctorNotesReducer';
 import { deleteReceiptSplitLineReducer } from "./ChargesReducers/deleteReceiptSplitLineReducer";
 import { returnDrugsReducer } from './pharmacy-reducers/returnDrugsReducer';
+import { getSingleDischargeRequestReducer } from './ChargesReducers/getSingleDischargeRequestDetails';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -341,6 +342,7 @@ export const rootReducer = combineReducers({
   //patient visit reducers:-->>mercy
   createVisit: createPatientVisitReducer,
   getVisitById: getPatientVisitByIdReducer,
+  getSingleDischargeRequest:getSingleDischargeRequestReducer,
 
   patientList: patientListReducer,
   activePatients: activePatientsReducer,

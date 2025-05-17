@@ -238,7 +238,7 @@ useEffect(() => {
               Payment Mode: {patientVisitDetails?.SettlementType}
             </p>
 
-            <p className="text-primary" style={{ gridColumn: "span 2" }}>
+            <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
               <DollarOutlined /> Bill Balance: KSh{" "}
               {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
             </p>

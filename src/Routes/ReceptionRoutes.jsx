@@ -36,6 +36,7 @@ import ReceiptPatient from "../pages/billing/CashPatients/ReceiptPatient";
 import InvoicePatient from "../pages/billing/InsurancePatients/InvoicePatient";
 import ReceiptInpatient from "../pages/billing/CashPatients/ReceiptInpatient";
 import InvoiceInpatient from "../pages/billing/InsurancePatients/InvoiceInpatient";
+import DischargePage from "../pages/billing/DischargePage";
 
 export const receptionRoutes = [
   {
@@ -48,6 +49,7 @@ export const receptionRoutes = [
     icon: <UserOutlined style={{ color: "#fff" }} />,
     label: "Visitors",
   },
+  
   {
     key: "/Reception/patient-list",
     icon: <FaUserGroup style={{ color: "#fff" }} />,
@@ -125,6 +127,10 @@ export default function ReceptionRoutes() {
         <Route
           path="/Reception/Add-Appointment/:patientNo?"
           element={<CreateVisitForm />}
+        />
+        <Route
+          path="/Reception/Discharge-patient/:patientNo?"
+          element={<DischargePage />}
         />
         <Route path="/Reception/Patient-list" element={<OutpatientList />} />
         <Route
