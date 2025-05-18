@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu, message } from "antd";
+import { Button, Dropdown, Card, Menu, message , Modal} from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -27,10 +27,13 @@ import { postsalesInvoice,POST_SALES_INVOICE_RESET } from "../../../actions/Char
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
+import {POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 const InvoiceInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+      const { confirm } = Modal;
+  
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
@@ -125,7 +128,51 @@ const InvoiceInpatient = () => {
       }
     });
   };
+  const handleInitiateDischarge = () => {
+    confirm({
+      title: "Confirm Initiate Discharge",
+      content: `Are you sure you want to initiate discharge for ${patientBillData[0]?.Names}?`,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        return new Promise((resolve, reject) => {
+          handleInitiateDischargeAction(activeVisitNo)
+            .then(resolve) // Resolve the modal when successful
+            .catch(reject); // Reject on failure
+        });
+      },
+    });
+  };
+  const handleInitiateDischargeAction = async () => {
+    try {
+      const result = await dispatch(
+        postInitiateDischargeSlice("/Inpatient/InitiateDischarge", {
+          admissionNo: activeVisitNo,
+        })
+      );
 
+      if (result.type === POST_INITIATE_DISCHARGE_SUCCESS) {
+        message.success(
+          result.payload.message ||
+            `${patientBillData[0]?.Names} discharge initiated successfully!`
+        );
+        navigate(
+          `/Reception/Discharge-patient/?PatientNo=${patientBillData[0]?.CurrentAdmNo}`
+        );
+        return Promise.resolve(); // Resolve the Promise to close the modal
+      } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
+        message.error(
+          result.payload.message ||
+            "An error occurred while initiating patient discharge, please try again."
+        );
+        return Promise.reject(); // Reject the Promise to keep the modal open
+      }
+    } catch (error) {
+      message.error(error.message || "Unexpected error occurred");
+      return Promise.reject(); // Reject on unexpected errors
+    }
+  };
   // Actions menu
   const menu = (
     <Menu
@@ -138,6 +185,8 @@ const InvoiceInpatient = () => {
           setSplitAmountModal(true);
         } else if (key === "receipt_action") {
           showReceiptModal();
+        }else if (key === "initiate_discharge") {
+          handleInitiateDischarge();        
         } else if (key === "visit_action") {
           // Handle other actions here
         }
@@ -152,6 +201,7 @@ const InvoiceInpatient = () => {
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>
       <Menu.Item key="receipt_action">Receipt Lines</Menu.Item>
+            <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Divider />
       <Menu.Item key="close_bill">
         <ClosePatientBill/>
@@ -235,7 +285,7 @@ const InvoiceInpatient = () => {
                 Payment Mode: {patientBillData[0]?.PatientType}
               </p>
 
-            <p className="text-primary" style={{ gridColumn: "span 2" }}>
+            <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
               <DollarOutlined /> Bill Balance: KSh{" "}
               {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
             </p>
@@ -315,7 +365,7 @@ const InvoiceInpatient = () => {
                 </div> */}
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Balance:</p>
-                  <p className="text-danger fw-semibold">
+                  <p className="text-danger fw-bold">
                     KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
                   </p>
                 </div>
