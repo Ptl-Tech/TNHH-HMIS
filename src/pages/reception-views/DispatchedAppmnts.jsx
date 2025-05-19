@@ -138,6 +138,11 @@ const DispatchedAppmnts = () => {
       dataIndex: "PatientType",
       key: "PatientType",
     },
+    {
+      title:"Doctor Name",
+      dataIndex:"DoctorsName",
+      key:"DoctorsName"
+    },
     // {
     //   title: "Waiting At",
     //   dataIndex: "WaitingAt",

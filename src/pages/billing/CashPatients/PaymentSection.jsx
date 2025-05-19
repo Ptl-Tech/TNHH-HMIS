@@ -1,4 +1,4 @@
-import { Form, Card, Select, Row, Col, Input, Button, message } from "antd";
+import { Form, Card, Select, Row, Col, Input, Button, message, Checkbox } from "antd";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
@@ -33,7 +33,7 @@ const[paymentSavingLoading, setPaymentSavingLoading] = useState(false);
       transactionCode: values.transactionCode || "",
       splitAmount: false,
       amountReceived: parseFloat(values.amountReceived),
-      isPartialPayment: false,
+      isPartialPayment: values.isPartialPayment || false,
       coPay: false,
       ...(values.payMode === 7 && {
         transactionCode: values.transactionCode,
@@ -118,7 +118,17 @@ setPaymentSavingLoading(true)
             </Col>
           </Row>
         )}
-
+<Row gutter={16}>
+  <Col span={12}>
+    <Form.Item
+                  name="isPartialPayment"
+                  valuePropName="checked"
+                  style={{ marginTop: 16 }}
+                >
+                  <Checkbox>Partial Payment</Checkbox>
+                </Form.Item>
+  </Col>
+</Row>
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={paymentSavingLoading}>
             Save Payment

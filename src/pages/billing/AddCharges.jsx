@@ -99,7 +99,6 @@ const AddCharges = ({
     }
 
       
-console.log("selectedTransactionType", transaction.CalculateDoctorFee);
 
   };
 

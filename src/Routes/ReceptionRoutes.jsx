@@ -36,6 +36,9 @@ import ReceiptPatient from "../pages/billing/CashPatients/ReceiptPatient";
 import InvoicePatient from "../pages/billing/InsurancePatients/InvoicePatient";
 import ReceiptInpatient from "../pages/billing/CashPatients/ReceiptInpatient";
 import InvoiceInpatient from "../pages/billing/InsurancePatients/InvoiceInpatient";
+import DischargePage from "../pages/billing/DischargePage";
+import { GiCoinsPile } from "react-icons/gi";
+import PreviousBill from "../pages/billing/PreviousBill";
 
 export const receptionRoutes = [
   {
@@ -48,6 +51,7 @@ export const receptionRoutes = [
     icon: <UserOutlined style={{ color: "#fff" }} />,
     label: "Visitors",
   },
+  
   {
     key: "/Reception/patient-list",
     icon: <FaUserGroup style={{ color: "#fff" }} />,
@@ -109,6 +113,11 @@ export const receptionRoutes = [
         label: "InPatient",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
+      {
+        key: "/Reception/Billing/Previous-Bill",
+        label: "Previous Bill",
+        icon: <GiCoinsPile style={{ color: "#fff" }} />,
+      },
     ],
   },
 ];
@@ -125,6 +134,10 @@ export default function ReceptionRoutes() {
         <Route
           path="/Reception/Add-Appointment/:patientNo?"
           element={<CreateVisitForm />}
+        />
+        <Route
+          path="/Reception/Discharge-patient/:patientNo?"
+          element={<DischargePage />}
         />
         <Route path="/Reception/Patient-list" element={<OutpatientList />} />
         <Route
@@ -159,6 +172,10 @@ export default function ReceptionRoutes() {
         <Route
           path="/Reception/Billing/Inpatients"
           element={<ActiveInpatient />}
+        />
+         <Route
+          path="/Reception/Billing/Previous-Bill"
+          element={<PreviousBill />}
         />
         <Route path="/Reception/visitors-list" element={<VisitorList />} />
         {/* disptching the patient in walk in */}
