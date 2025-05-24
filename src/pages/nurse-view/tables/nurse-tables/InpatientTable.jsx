@@ -70,8 +70,17 @@ const InpatientTable = ({
       title: "Adm Date",
       dataIndex: "Admission_Date",
       key: "Admission_Date",
-      sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date),
+      sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date) ,
       defaultSortOrder: "ascend", // Ensure default sorting is newest to oldest
+     //format to dd//MM//yyyy
+      render: (date) => {
+        const formattedDate = new Date(date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+        return formattedDate;
+      },
     },
     {
       title: "Ward",

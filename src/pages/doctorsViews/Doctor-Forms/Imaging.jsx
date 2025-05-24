@@ -214,7 +214,7 @@ const Imaging = () => {
         Radiology Request
       </Typography.Title>
 
-      {role === "Doctor" && patientDetails?.Status !== "Completed" && (
+      {role === "Doctor" || role ==="Nurse" && patientDetails?.Status !== "Completed" && (
         <div className="d-flex justify-content-between my-4">
           {!showForm && (
             <Button

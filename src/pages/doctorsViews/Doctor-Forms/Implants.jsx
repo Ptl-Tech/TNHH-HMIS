@@ -58,7 +58,7 @@ import useAuth from "../../../hooks/useAuth";
         </Typography.Title>
         </div>
         {
-          role === "Doctor" &&
+          role === "Doctor" || role ==="Nurse" && 
           patientDetails?.Status !== "Completed" && (
             <div style={{ display: "flex", gap: "10px"}}>
         

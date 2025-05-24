@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   Form,
@@ -11,31 +11,31 @@ import {
   Checkbox,
   Button,
   message,
-} from 'antd';
+} from "antd";
 
 import {
   listClinics,
   //   listDoctors,
   listInsuranceOptions,
-} from '../../actions/DropdownListActions';
-import LoadingSkeleton from '../../components/LoadingSkeleton';
-import { createTriageVisit } from '../../actions/patientActions';
-import { TRIAGE_VISIT_RESET } from '../../constants/patientConstants';
-import { getSinglePatient } from '../../actions/reception-actions/getSinglePatient';
+} from "../../actions/DropdownListActions";
+import LoadingSkeleton from "../../components/LoadingSkeleton";
+import { createTriageVisit } from "../../actions/patientActions";
+import { TRIAGE_VISIT_RESET } from "../../constants/patientConstants";
+import { getSinglePatient } from "../../actions/reception-actions/getSinglePatient";
 
 export default function WalkInCreateVisit() {
   const { Group: RadioGroup } = Radio;
   const { useForm, useWatch, Item } = Form;
 
   const [form] = useForm();
-  const paymentMode = useWatch('paymentMode', form);
+  const paymentMode = useWatch("paymentMode", form);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { search: searchParams } = useLocation();
 
   const newSearchParams = new URLSearchParams(searchParams);
-  const patientNo = newSearchParams.get('PatientNo');
+  const patientNo = newSearchParams.get("PatientNo");
 
   const { clinics } = useSelector((state) => state.clinics);
   //   const { data: doctors } = useSelector((state) => state.getDoctorsList);
@@ -46,11 +46,11 @@ export default function WalkInCreateVisit() {
     error: visitError,
     loading: visitLoading,
     success: visitSuccess,
-  } = useSelector((state) => state.createTriageVisit);
+  } = useSelector((state) => state.createVisit);
 
   useEffect(() => {
     if (patientNo) {
-      dispatch(getSinglePatient('PatientNo', patientNo)); // gets the patient
+      dispatch(getSinglePatient("PatientNo", patientNo)); // gets the patient
 
       dispatch(listClinics()); //gets the clinics
       //   dispatch(listDoctors()); //gets the doctors
@@ -60,12 +60,12 @@ export default function WalkInCreateVisit() {
 
   //Runs to check if the visit was created successfully and redirects to the dispatch area
   useEffect(() => {
-    if (visitLoading) message.info('Creating a visit and creating a request.');
+    if (visitLoading) message.info("Creating a visit and creating a request.");
 
     if (visitSuccess) {
-      const { appointmentNo } = createVisitData;
+      const { appointmentNo } = createVisitData || {};
 
-      message.success('Visit created successfully, await redirection.');
+      message.success("Visit created successfully, await redirection.");
       navigate(`/Reception/Walkin-Patient-List/${appointmentNo}`);
     }
 
@@ -80,14 +80,14 @@ export default function WalkInCreateVisit() {
       patientNo,
       schemeName,
       paymentMode,
-      doctor = '',
-      insurance = '',
-      membershipNo = '',
+      doctor = "",
+      insurance = "",
+      membershipNo = "",
       isPrincipleMember,
       insurancePrincipalMemberName,
     } = values;
 
-    const [insuranceNo = '', insuranceName = ''] = insurance.split('_');
+    const [insuranceNo = "", insuranceName = ""] = insurance.split("_");
 
     const visitData = {
       patientNo,
@@ -102,37 +102,34 @@ export default function WalkInCreateVisit() {
       schemeName,
     };
 
-    dispatch(createTriageVisit(visitData));
+    dispatch(createPatientVisitRequest(visitData));
   };
 
   const initialValues = {
     clinic: undefined,
     doctor: undefined,
     insuranceNo: undefined,
-    membershipNo: '',
+    membershipNo: "",
     patientNo,
     paymentMode: 0,
     isPrincipleMember: false,
     insurancePrincipalMemberName: patient?.SearchName,
-    schemeName: '',
+    schemeName: "",
   };
 
   return (
     <div
       className="d-grid align-content-start p-2"
-      style={{ color: '#0f5689', maxWidth: '768px' }}
+      style={{ color: "#0f5689", maxWidth: "768px" }}
     >
       <div className="d-grid">
         <h4>Create Visit</h4>
-        <p style={{ color: '#6d6d6d', margin: 0, fontSize: 15 }}>
+        <p style={{ color: "#6d6d6d", margin: 0, fontSize: 15 }}>
           Create a visit to dispatch a patient
         </p>
       </div>
       <Divider />
-      <LoadingSkeleton
-        rows={10}
-        loading={Boolean(!patient)}
-      >
+      <LoadingSkeleton rows={10} loading={Boolean(!patient)}>
         <Form
           form={form}
           layout="vetical"
@@ -144,55 +141,49 @@ export default function WalkInCreateVisit() {
           <div>
             <div
               className="d-flex gap-2 align-items-center"
-              style={{ color: '#0f5689' }}
+              style={{ color: "#0f5689" }}
             >
               <h5
                 className="d-flex align-items-center justify-content-center"
                 style={{
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '50%',
-                  border: '1px solid #0f5689',
+                  width: "30px",
+                  height: "30px",
+                  borderRadius: "50%",
+                  border: "1px solid #0f5689",
                 }}
               >
                 1
               </h5>
               <h5>Patient Details</h5>
             </div>
-            <Item
-              name="patientNo"
-              className="m-0"
-            >
+            <Item name="patientNo" className="m-0">
               <div className="d-flex gap-4">
-                <p style={{ color: '#6d6d6d', margin: 0 }}>
-                  <strong>Patient Number:</strong>{' '}
-                  <span style={{ color: '#333' }}>{patientNo}</span>
+                <p style={{ color: "#6d6d6d", margin: 0 }}>
+                  <strong>Patient Number:</strong>{" "}
+                  <span style={{ color: "#333" }}>{patientNo}</span>
                 </p>
-                <p style={{ color: '#6d6d6d', margin: 0 }}>
-                  <strong>Patient Name:</strong>{' '}
-                  <span style={{ color: '#333' }}>{patient?.SearchName}</span>
+                <p style={{ color: "#6d6d6d", margin: 0 }}>
+                  <strong>Patient Name:</strong>{" "}
+                  <span style={{ color: "#333" }}>{patient?.SearchName}</span>
                 </p>
-                <Input
-                  type="hidden"
-                  style={{ margin: 0 }}
-                />
+                <Input type="hidden" style={{ margin: 0 }} />
               </div>
             </Item>
           </div>
           <div>
-            <Divider variant={'dashed'} />
+            <Divider variant={"dashed"} />
             <div className="d-grid gap-2">
               <div
                 className="d-flex gap-2 align-items-center"
-                style={{ color: '#0f5689' }}
+                style={{ color: "#0f5689" }}
               >
                 <h5
                   className="d-flex align-items-center justify-content-center"
                   style={{
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    border: '1px solid #0f5689',
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    border: "1px solid #0f5689",
                   }}
                 >
                   2
@@ -203,27 +194,27 @@ export default function WalkInCreateVisit() {
                 <Item
                   required
                   rules={[
-                    { required: true, message: 'The clinic value is required' },
+                    { required: true, message: "The clinic value is required" },
                   ]}
                   name="clinic"
                   className="m-0"
                   layout="vertical"
                   label={
-                    <span style={{ color: '#6d6d6d', fontWeight: 'bolder' }}>
+                    <span style={{ color: "#6d6d6d", fontWeight: "bolder" }}>
                       Select Clinic
                     </span>
                   }
                 >
                   <Select
                     showSearch
-                    style={{ width: '200px' }}
+                    style={{ width: "200px" }}
                     placeholder="Clinic"
                     options={clinics.map((clinic) => ({
                       value: clinic.No,
                       label: clinic.Description,
                       disabled:
-                        clinic.No === 'PSYCHIATRIST' ||
-                        clinic.No === 'PSYCHOLOGIST',
+                        clinic.No === "PSYCHIATRIST" ||
+                        clinic.No === "PSYCHOLOGIST",
                     }))}
                   />
                 </Item>
@@ -251,19 +242,19 @@ export default function WalkInCreateVisit() {
             </div>
           </div>
           <div>
-            <Divider variant={'dashed'} />
+            <Divider variant={"dashed"} />
             <div className="d-grid gap-2">
               <div
                 className="d-flex gap-2 align-items-center"
-                style={{ color: '#0f5689' }}
+                style={{ color: "#0f5689" }}
               >
                 <h5
                   className="d-flex align-items-center justify-content-center"
                   style={{
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    border: '1px solid #0f5689',
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    border: "1px solid #0f5689",
                   }}
                 >
                   3
@@ -271,15 +262,11 @@ export default function WalkInCreateVisit() {
                 <h5>Payment Method</h5>
               </div>
               <div className="d-grid gap-4">
-                <Item
-                  className="m-0"
-                  layout="vertical"
-                  name="paymentMode"
-                >
+                <Item className="m-0" layout="vertical" name="paymentMode">
                   <RadioGroup
                     options={[
-                      { value: 0, label: 'Cash' },
-                      { value: 1, label: 'Insurance' },
+                      { value: 0, label: "Cash" },
+                      { value: 1, label: "Insurance" },
                     ]}
                   />
                 </Item>
@@ -288,10 +275,10 @@ export default function WalkInCreateVisit() {
                   style={{
                     opacity: paymentMode ? 1 : 0, // Use 0 to 1 range
                     transform: `scaleY(${paymentMode})`, // Animate only the Y scale
-                    transformOrigin: 'center',
-                    transition: 'opacity 0.5s ease-in-out',
-                    height: paymentMode ? 'auto' : 0,
-                    overflow: 'hidden',
+                    transformOrigin: "center",
+                    transition: "opacity 0.5s ease-in-out",
+                    height: paymentMode ? "auto" : 0,
+                    overflow: "hidden",
                   }}
                 >
                   <div className="d-flex gap-4">
@@ -303,12 +290,12 @@ export default function WalkInCreateVisit() {
                       rules={[
                         {
                           required: Boolean(paymentMode),
-                          message: 'The insurance is required',
+                          message: "The insurance is required",
                         },
                       ]}
                       label={
                         <span
-                          style={{ color: '#6d6d6d', fontWeight: 'bolder' }}
+                          style={{ color: "#6d6d6d", fontWeight: "bolder" }}
                         >
                           Select Insurance
                         </span>
@@ -316,7 +303,7 @@ export default function WalkInCreateVisit() {
                     >
                       <Select
                         showSearch
-                        style={{ width: '300px' }}
+                        style={{ width: "300px" }}
                         placeholder="Insurance"
                         options={insurances.map((insurance) => ({
                           value: `${insurance.No}_${insurance.Name}`,
@@ -332,21 +319,18 @@ export default function WalkInCreateVisit() {
                       rules={[
                         {
                           required: Boolean(paymentMode),
-                          message: 'The scheme name is required',
+                          message: "The scheme name is required",
                         },
                       ]}
                       label={
                         <span
-                          style={{ color: '#6d6d6d', fontWeight: 'bolder' }}
+                          style={{ color: "#6d6d6d", fontWeight: "bolder" }}
                         >
                           Select Scheme Name
                         </span>
                       }
                     >
-                      <Input
-                        style={{ width: '300px' }}
-                        placeholder="Scheme"
-                      />
+                      <Input style={{ width: "300px" }} placeholder="Scheme" />
                     </Item>
                   </div>
                   <div className="d-flex gap-4">
@@ -358,19 +342,19 @@ export default function WalkInCreateVisit() {
                       rules={[
                         {
                           required: Boolean(paymentMode),
-                          message: 'The membership number is required',
+                          message: "The membership number is required",
                         },
                       ]}
                       label={
                         <span
-                          style={{ color: '#6d6d6d', fontWeight: 'bolder' }}
+                          style={{ color: "#6d6d6d", fontWeight: "bolder" }}
                         >
                           Membership Number
                         </span>
                       }
                     >
                       <Input
-                        style={{ width: '300px' }}
+                        style={{ width: "300px" }}
                         placeholder="1234 5678 9101 1121"
                       />
                     </Item>
@@ -382,21 +366,18 @@ export default function WalkInCreateVisit() {
                       rules={[
                         {
                           required: Boolean(paymentMode),
-                          message: 'The principal name is required',
+                          message: "The principal name is required",
                         },
                       ]}
                       label={
                         <span
-                          style={{ color: '#6d6d6d', fontWeight: 'bolder' }}
+                          style={{ color: "#6d6d6d", fontWeight: "bolder" }}
                         >
                           Principal Name
                         </span>
                       }
                     >
-                      <Input
-                        style={{ width: '300px' }}
-                        placeholder="Scheme"
-                      />
+                      <Input style={{ width: "300px" }} placeholder="Scheme" />
                     </Item>
                   </div>
 
@@ -408,7 +389,7 @@ export default function WalkInCreateVisit() {
                     <Checkbox
                       children={
                         <span
-                          style={{ color: '#6d6d6d', fontWeight: 'bolder' }}
+                          style={{ color: "#6d6d6d", fontWeight: "bolder" }}
                         >
                           Principal Member?
                         </span>
@@ -421,10 +402,7 @@ export default function WalkInCreateVisit() {
           </div>
           <div>
             <Divider variant="dashed" />
-            <Button
-              type="primary"
-              htmlType="submit"
-            >
+            <Button type="primary" htmlType="submit">
               Create Visit
             </Button>
           </div>
