@@ -42,8 +42,8 @@ export default function WalkInCreateVisit() {
   const { data: insurances } = useSelector((state) => state.getInsurance);
   const { data: patient } = useSelector((state) => state.getSinglePatient);
   const {
-    data: createVisitData,
     error: visitError,
+    data: createVisitData,
     loading: visitLoading,
     success: visitSuccess,
   } = useSelector((state) => state.createTriageVisit);
@@ -106,15 +106,15 @@ export default function WalkInCreateVisit() {
   };
 
   const initialValues = {
+    patientNo,
+    schemeName: '',
+    paymentMode: 0,
+    membershipNo: '',
     clinic: undefined,
     doctor: undefined,
     insuranceNo: undefined,
-    membershipNo: '',
-    patientNo,
-    paymentMode: 0,
     isPrincipleMember: false,
     insurancePrincipalMemberName: patient?.SearchName,
-    schemeName: '',
   };
 
   return (

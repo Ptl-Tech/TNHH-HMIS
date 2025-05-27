@@ -55,8 +55,6 @@ export const getDoctorsNotesData =
         formItems: consultationNotesFormResponse.data,
       };
 
-      console.log({ result });
-
       dispatch({ type: GET_DOCTOR_NOTES_SUCCESS, payload: result });
     } catch (error) {
       console.log({ error });

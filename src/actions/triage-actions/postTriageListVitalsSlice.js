@@ -3,12 +3,14 @@ import apiHeaderConfig from '../configHelpers';
 
 export const POST_TRIAGE_LIST_VITALS_REQUEST =
   'POST_TRIAGE_LIST_VITALS_REQUEST';
+export const POST_TRIAGE_LIST_VITALS_RESET = 'POST_TRIAGE_LIST_VITALS_RESET';
 export const POST_TRIAGE_LIST_VITALS_SUCCESS =
   'POST_TRIAGE_LIST_VITALS_SUCCESS';
 export const POST_TRIAGE_LIST_VITALS_FAIL = 'POST_TRIAGE_LIST_VITALS_FAIL';
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+  import.meta.env.VITE_PORTAL_API_BASE_URL ||
+  'https://chiromo.potestastechnologies.net:8085';
 
 export const postTriageListVitalsSlice =
   (vitals) => async (dispatch, getState) => {

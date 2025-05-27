@@ -41,9 +41,7 @@ export const getNewPharmacyRequests =
       };
 
       const finalQuery = `${API}data/odatafilter?webservice=PgPharmacyListNew&isList=true${query}`;
-
-      console.log({ finalQuery });
-
+      
       const response = await axios.get(finalQuery, config);
 
       dispatch({

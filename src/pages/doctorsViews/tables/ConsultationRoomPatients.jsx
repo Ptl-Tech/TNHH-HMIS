@@ -62,7 +62,7 @@ const ConsultationRoomPatients = () => {
     Inpatient: patient.Inpatient,
   }));
 
-  const combinedList = activeConsultationList.map((room) => {
+  const combinedList = activeConsultationList?.map((room) => {
     const matchingPatient = closedConsultationListWithPatientDetails.find(
       (patient) => patient.PatientNo === room.PatientNo,
     );
@@ -139,9 +139,9 @@ const ConsultationRoomPatients = () => {
       },
     },
     {
+      key: 'PatientNo',
       title: 'Patient No',
       dataIndex: 'PatientNo',
-      key: 'PatientNo',
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
         record?.PatientNo
@@ -150,9 +150,9 @@ const ConsultationRoomPatients = () => {
     },
 
     {
+      key: 'DoctorsName',
       title: 'Doctor Name',
       dataIndex: 'DoctorsName',
-      key: 'DoctorsName',
       render: (text, record) => {
         return (
           <span

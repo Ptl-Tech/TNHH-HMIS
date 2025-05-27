@@ -210,15 +210,6 @@ const DoctorVisits = () => {
         return <span>{record.Age} years</span>;
       },
     },
-    // {
-    //   title:"Inpatient",
-    //   dataIndex: "Inpatient",
-    //   key: "Inpatient",
-    //   render: (_, record) => {
-    //     return <span>{record.Inpatient ? "Yes" : "No"}</span>;
-    //   },
-    // },
-
     {
       title: 'Urgency',
       dataIndex: 'UrgencyStatus',
