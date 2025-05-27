@@ -1,14 +1,14 @@
-import { Form, Input, Modal, Button } from "antd";
+import { Form, Input, Modal, Button, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import { postDiscount } from "../../actions/Charges-Actions/postPatientDiscount";
+import { postDiscount,POST_DISCOUNT_RESET } from "../../actions/Charges-Actions/postPatientDiscount";
 import { getSinglePatientBill } from "../../actions/Charges-Actions/getSinglePatientBill";
 
 const AllocateDiscount = ({ onClose, visible, patientNo }) => {
   const dispatch = useDispatch();
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
-  const { loading } = useSelector((state) => state.postDiscount);
+  const { loading, success, error } = useSelector((state) => state.postDiscount);
   const {
     loading: patientBillLoading,
     error: patientBillError,
@@ -17,11 +17,23 @@ const AllocateDiscount = ({ onClose, visible, patientNo }) => {
   const [form] = Form.useForm(); // Initialize Ant Design Form
 
   const [discountData, setDiscountData] = useState({
-    patientNo: patientNo || "",
     discountPercentage: 0,
     discountAmount: 0,
   });
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+      dispatch({ type: POST_DISCOUNT_RESET }); // Reset error state
+      setDiscountData((prev) => ({
+        ...prev,
+        discountPercentage: 0,
+        discountAmount: 0,
+      }));
+    }
+  }, [error, dispatch]);
 
+ 
+ 
   const handleInputChange = (name, value) => {
     setDiscountData((prev) => ({
       ...prev,
@@ -32,11 +44,16 @@ const AllocateDiscount = ({ onClose, visible, patientNo }) => {
     }));
   };
 
-  const handleSubmitDiscount = async () => {
-    dispatch(postDiscount(discountData));
-    await dispatch(getSinglePatientBill(activeVisitNo));
 
-    form.resetFields(); // Reset form after submission
+  const handleSubmitDiscount = async () => {
+    const discountPayload = {
+      ...discountData,
+      patientNo: patientNo,
+    }
+    dispatch(postDiscount(discountPayload));
+
+    await dispatch(getSinglePatientBill(activeVisitNo));
+form.resetFields(); // Reset form fields after submission
     onClose(); // Close modal
   };
 
@@ -62,7 +79,10 @@ const AllocateDiscount = ({ onClose, visible, patientNo }) => {
       style={{ top: 20 }}
       width={600}
       footer={null}
-      afterClose={() => form.resetFields()} // Reset on close
+      afterClose={() => {
+        form.resetFields();                
+        dispatch({ type: POST_DISCOUNT_RESET }); 
+      }}
     >
       <Form
         form={form}

@@ -87,33 +87,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
     // Concatenate firstName, middleName, and lastName to create nextOfKinFullName
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
-      patientNo: patientDetails?.PatientNo || "",
-      firstName: patientDetails?.Surname?.split(" ")[0] || "",
-      middleName: patientDetails?.MiddleName || "",
-      lastName: patientDetails?.LastName || "",
-      gender:
-        patientDetails?.Gender === "Male"
-          ? 1
-          : patientDetails?.Gender === "Female"
-          ? 2
-          : values.gender === 1
-          ? "Male"
-          : values.gender === 2
-          ? "Female"
-          : "",
-      dob: patientDetails?.DateOfBirth || "", // Ensure valid date format
-      nationality: patientDetails?.Nationality || "",
-      county: patientDetails?.PlaceofBirthDistrict || "",
-      idNumber: patientDetails?.IDNumber || "",
-      phoneNumber: patientDetails?.TelephoneNo1 || "",
-      paymentMode:
-        patientDetails?.PatientType === "Corporate"
-          ? 1
-          : patientDetails?.PatientType === "Cash"
-          ? 2
-          : patientDetails?.paymentMode
-          ? patientDetails.paymentMode
-          : 0,
+      patientNo: patientDetails?.PatientNo || "",  
       nextOfKinRelationship:
         values.nextOfKinRelationship ||
         patientDetails?.NextofkinRelationship ||
@@ -122,18 +96,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         values.nextOfKinFullName || patientDetails?.NextOfkinFullName || "",
       nextOfKinPhoneNo:
         values.nextOfKinPhoneNo || patientDetails?.NextOfKinPhoneNo || "",
-      insuranceNo: patientDetails?.InsuranceNo || "",
-      insuranceName: patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName:
-        patientDetails?.PrincipalMemberName || "",
-      isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.MembershipNo || "",
-      schemeName: patientDetails?.SchemeName || "",
-      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-      subcounty: patientDetails?.SubCountyName || "",
-        email: patientDetails?.Email || "",
-        residence: patientDetails?.PlaceofBirthVillage || "",
-        countyWard: patientDetails?.CountyWardName || "",
+     
     };
 
     // Dispatch the saveKinDetails action with the formatted data

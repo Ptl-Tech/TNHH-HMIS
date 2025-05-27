@@ -154,7 +154,11 @@ const handleReceiptPost = async () => {
                 }
                 optionFilterProp="children"
               >
-              
+                              <Select.Option value={2}>Cheque </Select.Option>
+                <Select.Option value={3}>EFT</Select.Option>
+                                <Select.Option value={6}>Rtgs</Select.Option>
+
+ 
                 <Select.Option value={7}>MPESA</Select.Option>
                 
                 <Select.Option value={9}>PDQ</Select.Option>

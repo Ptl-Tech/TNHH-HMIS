@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu, message } from "antd";
+import { Button, Dropdown, Card, Menu, message, Skeleton } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -12,7 +12,6 @@ import {
   DollarOutlined,
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
-import SplitReceipt from "../SplitReceipt";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { postReceipt } from "../../../actions/Charges-Actions/postReceipt";
@@ -22,9 +21,9 @@ import InsurancePaymentSection from "./InsurancePaymentSection";
 import AllocateRebates from "../AllocateRebates";
 import AllocateDiscount from "../AllocateDiscount";
 import { PrintFinalInvoice, PrintInterimInvoice } from "./InvoicePrinting";
-import { postGenerateInvoice } from "../../../actions/Charges-Actions/postGenerateInvoice";
+import { postGenerateInvoice,POST_GENERATE_INVOICE_RESET } from "../../../actions/Charges-Actions/postGenerateInvoice";
 import ReopenCharges from "./ReopenCharges";
-import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
+import { postsalesInvoice, POST_SALES_INVOICE_RESET } from "../../../actions/Charges-Actions/postSalesInvoice";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
@@ -52,7 +51,7 @@ const InvoicePatient = () => {
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
-  const { loading: postSalesInvoiceLoading } = useSelector(
+  const { loading: postSalesInvoiceLoading, success: postSalesInvoiceSuccess, error: postSalesInvoiceError } = useSelector(
     (state) => state.postSalesInvoice
   );
 
@@ -61,6 +60,7 @@ const InvoicePatient = () => {
   const [DiscountModal, setDiscountModal] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const[patientNo,setPatientNo]=useState("")
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -68,6 +68,29 @@ const InvoicePatient = () => {
       dispatch(getReceiptLines(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
+
+useEffect(() => {
+    if (activeVisitNo &&  patientBillData) {
+      setPatientNo(patientVisitDetails?.PatientNo)
+    }else{
+      setPatientNo("")
+    }
+  }, [activeVisitNo, patientBillData, patientVisitDetails]);
+
+  useEffect(() => {
+  if(generateInvoiceError){
+    message.error(generateInvoiceError);
+    dispatch({type: POST_GENERATE_INVOICE_RESET}); // Reset error state   
+  } 
+  
+  }, [generateInvoiceError, dispatch]);
+
+  useEffect(() => {
+    if (postSalesInvoiceError) {
+      message.error(postSalesInvoiceError);
+      dispatch({ type: POST_SALES_INVOICE_RESET }); // Reset error state
+    }
+  }, [postSalesInvoiceError, dispatch]);
 
   const handleCancel = () => {
     setRebatesModal(false);
@@ -83,8 +106,8 @@ const InvoicePatient = () => {
     };
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
-        console.log("statues", status);
         message.success(`Invoice generated ${status}fully`, 5);
+        dispatch({type: POST_GENERATE_INVOICE_RESET});
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -106,6 +129,7 @@ const InvoicePatient = () => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
         message.success("Invoice Posted successfully", 5);
+        dispatch({ type: POST_SALES_INVOICE_RESET });
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -169,6 +193,7 @@ const InvoicePatient = () => {
         </Dropdown>
       </div>
       <div className="d-flex flex-column">
+           <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
         <Card
           title={
             <div className="d-flex justify-content-between align-items-center">
@@ -214,7 +239,7 @@ const InvoicePatient = () => {
               Payment Mode: {patientVisitDetails?.SettlementType}
             </p>
 
-            <p className="text-primary" style={{ gridColumn: "span 2" }}>
+            <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
               <DollarOutlined /> Bill Balance: KSh{" "}
               {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
             </p>
@@ -244,6 +269,7 @@ const InvoicePatient = () => {
             </p>
           </div>
         </Card>
+        </Skeleton>
         <div className="d-flex justify-content-end gap-3 my-3">
           <Button
             type="primary"
@@ -254,11 +280,11 @@ const InvoicePatient = () => {
             Generate Invoice
           </Button>
           <ReopenCharges
-            patientNo={patientVisitDetails?.PatientNo}
+            patientNo={patientNo}
             activeVisitNo={activeVisitNo}
           />
           <PrintInterimInvoice
-            patientNo={patientVisitDetails?.PatientNo}
+            patientNo={patientNo}
             activeVisitNo={activeVisitNo}
           />
         </div>
@@ -317,12 +343,12 @@ const InvoicePatient = () => {
               <AllocateRebates
                 visible={RebatesModal}
                 onClose={handleCancel}
-                patientNo={patientVisitDetails?.PatientNo}
+                patientNo={patientNo}
               />
               <AllocateDiscount
                 visible={DiscountModal}
                 onClose={handleCancel}
-                patientNo={patientVisitDetails?.PatientNo}
+                patientNo={patientNo}
               />
               <SplitPayments
                 receiptNo={

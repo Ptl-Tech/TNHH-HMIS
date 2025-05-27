@@ -161,8 +161,7 @@ const CreateVisitDrawer = ({
 
     const filtered = doctors.filter(
       (doc) =>
-        doc.Specialization?.toUpperCase() === value.toUpperCase() &&
-        (value === "PSYCHOLOGIST" || doc.GlobalDimension1Code === branchCode)
+        doc.Specialization?.toUpperCase() === value.toUpperCase()
     );
     setFilteredDoctors(filtered);
   };

@@ -2,7 +2,7 @@ import React, { act, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu, message } from "antd";
+import { Button, Dropdown, Card, Menu, message, Skeleton } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
-import SplitReceipt from "../SplitReceipt";
 import PaymentSection from "./PaymentSection";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import MpesaPayment from "./MpesaPayment";
@@ -25,6 +24,8 @@ import PrintReceipt from "./PrintReceipt";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
+import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
+import { shape } from "prop-types";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -110,7 +111,7 @@ const ReceiptPatient = () => {
     };
 
     try {
-      const status = await dispatch(postReceipt(payload));
+      const status = dispatch(postReceipt(payload));
 
       if (status === "success") {
         // setIsModalVisible(false);
@@ -168,6 +169,8 @@ const ReceiptPatient = () => {
           </Dropdown>
         </div>
         <div className="d-flex flex-column">
+          <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
+
           <Card
             title={
               <div className="d-flex justify-content-between align-items-center">
@@ -216,7 +219,7 @@ const ReceiptPatient = () => {
                 Payment Mode: {patientVisitDetails?.SettlementType}
               </p>
 
-              <p className="text-primary" style={{ gridColumn: "span 2" }}>
+              <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
                 <DollarOutlined /> Bill Balance: KSh{" "}
                 {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               </p>
@@ -246,6 +249,7 @@ const ReceiptPatient = () => {
               </p>
             </div>
           </Card>
+          </Skeleton>
           <div className="d-flex justify-content-end gap-3 my-3">
             <PrintReceipt
               receiptNo={
@@ -254,7 +258,10 @@ const ReceiptPatient = () => {
                   : "N/A"
               }
             />
-
+ <PrintInterimInvoice
+            patientNo={patientVisitDetails?.PatientNo}
+            activeVisitNo={activeVisitNo}
+          />
             {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}

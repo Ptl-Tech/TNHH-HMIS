@@ -2,7 +2,7 @@ import React, { act, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu } from "antd";
+import { Button, Dropdown, Card, Menu, message, Modal, Skeleton } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import useFetchPatientVisitDetailsHook from "../../../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./PatientCharges";
-import SplitReceipt from "../SplitReceipt";
 import PaymentSection from "./PaymentSection";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import MpesaPayment from "./MpesaPayment";
@@ -26,10 +25,14 @@ import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
+import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
+import {POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+    const { confirm } = Modal;
+  
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
 
   const { loading, error, data } = useSelector(
@@ -66,7 +69,6 @@ const ReceiptInpatient = () => {
       dispatch(getReceiptLines(activeVisitNo));
       dispatch(getReceiptPage(activeVisitNo));
     }
-   
   }, [dispatch, activeVisitNo]);
 
   const handleCancel = () => {
@@ -97,7 +99,6 @@ const ReceiptInpatient = () => {
   };
 
   const handlePaymentProcessing = async () => {
-
     if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
       return;
     }
@@ -124,6 +125,53 @@ const ReceiptInpatient = () => {
     }
   };
 
+  const handleInitiateDischarge = () => {
+    confirm({
+      title: "Confirm Initiate Discharge",
+      content: `Are you sure you want to initiate discharge for ${patientBillData[0]?.Names}?`,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk() {
+        return new Promise((resolve, reject) => {
+          handleInitiateDischargeAction(activeVisitNo)
+            .then(resolve) // Resolve the modal when successful
+            .catch(reject); // Reject on failure
+        });
+      },
+    });
+  };
+
+  const handleInitiateDischargeAction = async () => {
+    try {
+      const result = await dispatch(
+        postInitiateDischargeSlice("/Inpatient/InitiateDischarge", {
+          admissionNo: activeVisitNo,
+        })
+      );
+
+      if (result.type === POST_INITIATE_DISCHARGE_SUCCESS) {
+        message.success(
+          result.payload.message ||
+            `${patientBillData[0]?.Names} discharge initiated successfully!`
+        );
+        navigate(
+          `/Reception/Discharge-patient/?PatientNo=${patientBillData[0]?.CurrentAdmNo}`
+        );
+        return Promise.resolve(); // Resolve the Promise to close the modal
+      } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
+        message.error(
+          result.payload.message ||
+            "An error occurred while initiating patient discharge, please try again."
+        );
+        return Promise.reject(); // Reject the Promise to keep the modal open
+      }
+    } catch (error) {
+      message.error(error.message || "Unexpected error occurred");
+      return Promise.reject(); // Reject on unexpected errors
+    }
+  };
+
   // Actions menu
   const menu = (
     <Menu
@@ -132,15 +180,18 @@ const ReceiptInpatient = () => {
           showReceiptModal(); // Show receipt modal
         } else if (key === "split_amount") {
           InitiateSplitPayment();
+        } else if (key === "initiate_discharge") {
+          handleInitiateDischarge();
         }
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
+      <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
-      <Menu.Divider />     
+      <Menu.Divider />
       <Menu.Item key="close_bill">
-        <ClosePatientBill/>
+        <ClosePatientBill />
       </Menu.Item>
     </Menu>
   );
@@ -169,6 +220,7 @@ const ReceiptInpatient = () => {
           </Dropdown>
         </div>
         <div className="d-flex flex-column">
+              <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
           <Card
             title={
               <div className="d-flex justify-content-between align-items-center">
@@ -195,9 +247,7 @@ const ReceiptInpatient = () => {
               {/* First row */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient Name:{" "}
-                <span className="fw-bold">
-                  {patientBillData[0]?.Names}
-                </span>
+                <span className="fw-bold">{patientBillData[0]?.Names}</span>
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Gender: {patientBillData[0]?.Gender}
@@ -205,16 +255,17 @@ const ReceiptInpatient = () => {
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Age in Years:{" "}
                 {` (${Math.floor(
-                    (Date.now() - new Date(patientBillData[0]?.DateOfBirth
-                    ).getTime()) /
+                  (Date.now() -
+                    new Date(patientBillData[0]?.DateOfBirth).getTime()) /
                     (1000 * 60 * 60 * 24 * 365.25)
-                    )} years)`}
+                )} years)`}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient ID: {patientBillData[0]?.PatientNo}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientBillData[0]?.Inpatient ? "Inpatient" : "N/a"}
+                Visit Type:{" "}
+                {patientBillData[0]?.Inpatient ? "Inpatient" : "N/a"}
               </p>
 
               {/* Second row */}
@@ -222,7 +273,7 @@ const ReceiptInpatient = () => {
                 Payment Mode: {patientBillData[0]?.PatientType}
               </p>
 
-              <p className="text-primary" style={{ gridColumn: "span 2" }}>
+              <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
                 <DollarOutlined /> Bill Balance: KSh{" "}
                 {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               </p>
@@ -252,6 +303,7 @@ const ReceiptInpatient = () => {
               </p> */}
             </div>
           </Card>
+          </Skeleton>
           <div className="d-flex justify-content-end gap-3 my-3">
             <PrintReceipt
               receiptNo={
@@ -260,7 +312,10 @@ const ReceiptInpatient = () => {
                   : "N/A"
               }
             />
-
+            <PrintInterimInvoice
+              patientNo={patientBillData[0]?.PatientNo}
+              activeVisitNo={activeVisitNo}
+            />
             {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
@@ -269,7 +324,9 @@ const ReceiptInpatient = () => {
           <div className="row gap-3 gap-md-0">
             {/* Left Side (Split Receipt) */}
             <div className="col-12 col-md-8">
-              <InsurancePaymentSection patientNo={patientBillData[0]?.PatientNo} />
+              <InsurancePaymentSection
+                patientNo={patientBillData[0]?.PatientNo}
+              />
             </div>
 
             {/* Right Side (Amount Details + Buttons) */}

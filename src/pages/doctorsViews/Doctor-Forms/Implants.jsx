@@ -64,8 +64,11 @@ const ImagingRequests = () => {
             Implant Request
           </Typography.Title>
         </div>
-        {role === 'Doctor' && patientDetails?.Status !== 'Completed' && (
-          <div style={{ display: 'flex', gap: '10px' }}>
+        {
+          role === "Doctor" || role ==="Nurse" && 
+          patientDetails?.Status !== "Completed" && (
+            <div style={{ display: "flex", gap: "10px"}}>
+        
             <Button
               type="primary"
               onClick={() => setShowForm(!showForm)}

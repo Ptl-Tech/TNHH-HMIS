@@ -1,4 +1,4 @@
-import { Card, Col, Form, Input, Row, Select, Typography } from "antd";
+import { Card, Col, Form, Input, Row, Select, Typography,DatePicker } from "antd";
 import PropTypes from "prop-types";
 
 const FilterWardManagement = ({
@@ -8,6 +8,8 @@ const FilterWardManagement = ({
   psychiatricCodingOptions,
   setPsychiatricCoding,
   setCodingReason,
+  setAdmissionDate,
+  setDoctorId,  
   form,
   handleOnFinish,
   patientNo,
@@ -65,48 +67,57 @@ const FilterWardManagement = ({
             {patientNo && (
               <>
                 <Col xs={24} md={24} lg={8}>
-                  <Form.Item
-                    name="psychiatricCoding"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please select a Psychiatrist Coding",
-                      },
-                    ]}
-                  >
-                    <Select
-                      size="large"
-                      onChange={(value) => setPsychiatricCoding(value)}
-                      placeholder="Select Psychiatric Coding"
-                      showSearch
-                      options={psychiatricCodingOptions?.map((option) => ({
-                        value: option.value,
-                        label: option.label,
-                      }))}
-                      filterSort={(optionA, optionB) =>
-                        (optionA?.label ?? "")
-                          .toLowerCase()
-                          .localeCompare((optionB?.label ?? "").toLowerCase())
-                      }
-                    />
-                  </Form.Item>
+                <Form.Item
+  name="doctorId"
+  rules={[
+    {
+      required: true,
+      message: "Please select a Doctor",
+    },
+  ]}
+>
+  <Select
+    size="large"
+    onChange={(value) => setDoctorId(value)}
+    placeholder="Search to select doctor"
+    showSearch
+    optionFilterProp="label"
+    options={psychiatricCodingOptions?.map((option) => ({
+      value: option.DoctorID,
+      label: option.DoctorsName,
+    }))}
+    filterSort={(optionA, optionB) =>
+      (optionA?.label ?? "")
+        .toLowerCase()
+        .localeCompare((optionB?.label ?? "").toLowerCase())
+    }
+  />
+</Form.Item>
+
                 </Col>
 
                 <Col xs={24} md={24} lg={8}>
                   <Form.Item
-                    name="codingReason"
+                    name="admissionDate"
                     rules={[
                       {
                         required: true,
-                        message: "Please enter a coding reason",
+                        message: "Please enter a admission date",
                       },
                     ]}
                   >
-                    <Input
+                    <DatePicker
+  size="large"
+  style={{ width: "100%" }}
+  onChange={(date, dateString) => setAdmissionDate(dateString)}
+/>
+
+
+                    {/* <Input
                       placeholder="Coding reason"
                       size="large"
                       onChange={(e) => setCodingReason(e.target.value)}
-                    />
+                    /> */}
                   </Form.Item>
                 </Col>
               </>
@@ -127,6 +138,8 @@ FilterWardManagement.propTypes = {
   psychiatricCodingOptions: PropTypes.array.isRequired,
   setPsychiatricCoding: PropTypes.string.isRequired,
   setCodingReason: PropTypes.string.isRequired,
+  setAdmissionDate: PropTypes.string.isRequired,
+  setDoctorId: PropTypes.string.isRequired,
   form: PropTypes.object,
   handleOnFinish: PropTypes.func,
   patientNo: PropTypes.string,

@@ -191,49 +191,17 @@ console.log("daotient", patientDetails);
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
       patientNo: patientDetails?.PatientNo || "",
-      firstName: patientDetails?.Surname?.split(" ")[0] || "",
-      middleName: patientDetails?.MiddleName || "",
-      lastName: patientDetails?.LastName || "",
-      gender:
-        patientDetails?.Gender === "Male"
-          ? 1
-          : patientDetails?.Gender === "Female"
-          ? 2
-          : "",
-      dob: patientDetails?.DateOfBirth
-        ? moment(patientDetails.DateOfBirth).format("YYYY-MM-DD")
-        : "",
+     
       nationality: selectedCountry || patientDetails?.Nationality || "",
       county: selectedCounty || patientDetails?.placeofBirthDistrict || "",
       subcounty: selectedSubCounty || patientDetails?.SubCountyName || "",
       countyWard:
         selectedCountry === "KE"
           ? selectedWard || patientDetails?.CountyWardName || ""
-          : "",
-      idNumber: patientDetails.IDNumber || "",
-      phoneNumber: patientDetails?.TelephoneNo1 || "",
-      paymentMode:
-        patientDetails?.PatientType === "Corporate"
-          ? 1
-          : patientDetails?.PatientType === "Cash"
-          ? 2
-          : patientDetails?.paymentMode
-          ? patientDetails.paymentMode
-          : 0,
-      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
-      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfkinAddress1 || "",
-      insuranceNo: patientDetails?.InsuranceNo || "",
-      insuranceName: patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName: patientDetails?.PrincipalMemberName || "",
-      isPrincipleMember: patientDetails?.Principal || false,
-      membershipNo: patientDetails?.MembershipNo || "",
-      schemeName: patientDetails?.SchemeName || "",
-      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
+          : "",  
+   
       residence: values.residence || patientDetails?.PlaceofBirthVillage || "",
-      email: values.email || patientDetails?.Email || "",
-
-      patientStatus: patientDetails?.patientStatus || 0,
+     
     };
 
     // Dispatch to save or update patient data, including regional info

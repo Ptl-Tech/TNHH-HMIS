@@ -85,6 +85,7 @@ const DischargeTable = ({
       dataIndex: "BedNo",
       key: "BedNo",
     },
+  
     {
       title: "Doctor",
       dataIndex: "DoctorName",

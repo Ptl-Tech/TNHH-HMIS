@@ -10,13 +10,19 @@ import {
   Button,
   Alert,
   Spin,
+  Select,
+  Switch,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { saveGeneralInformation } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
+import {
+  saveGeneralInformation,
+  SAVE_GENERAL_INFORMATION_RESET,
+} from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { getPatientByNo } from "../../../actions/patientActions";
 import { useState } from "react";
+import { marketingStrategies } from "../../../actions/DropdownListActions";
 
 const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const [form] = Form.useForm();
@@ -29,7 +35,13 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-const[dispatchingInfo,setDispatchingInfo]=useState(false)
+  const [dispatchingInfo, setDispatchingInfo] = useState(false);
+  const {
+    loading: marketingStrategiesLoading,
+    error: marketingStrategiesError,
+    success: marketingStrategiesSuccess,
+    data: marketingStrategiesPayload,
+  } = useSelector((state) => state.marketingList);
 
   useEffect(() => {
     if (dispatchingInfo && success && data?.patientNo) {
@@ -37,22 +49,25 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
       dispatch(getPatientByNo(data.patientNo)); // Fetch new details
     }
   }, [dispatchingInfo, success, data, dispatch]);
+  useEffect(() => {
+    dispatch(marketingStrategies());
+  }, [dispatch]);
 
   // Update form values when patientDetails change
   useEffect(() => {
     if (patientDetails) {
       form.resetFields(); // Reset fields to avoid stale state
       const genderValue =
-      patientDetails?.Gender === "Female"
-        ? 2
-        : patientDetails?.Gender === "Male"
-        ? 1
-        : 0;
+        patientDetails?.Gender === "Female"
+          ? 2
+          : patientDetails?.Gender === "Male"
+          ? 1
+          : 0;
       form.setFieldsValue({
         firstName: patientDetails?.Surname?.split(" ")[0] || "",
         middleName: patientDetails?.MiddleName || "",
         lastName: patientDetails?.LastName || "",
-      gender:genderValue,
+        gender: genderValue,
         dateOfBirth: patientDetails?.DateOfBirth
           ? moment(patientDetails.DateOfBirth)
           : null,
@@ -90,39 +105,38 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
         values.firstName || patientDetails?.Surname?.split(" ")[0] || "",
       middleName: values.middleName || patientDetails?.MiddleName || "",
       lastName: values.lastName || patientDetails?.LastName || "",
-     gender: values.gender || patientDetails?.Gender || 0,
+      gender: values.gender || patientDetails?.Gender || 0,
       dob: values.dateOfBirth
         ? values.dateOfBirth.format("YYYY-MM-DD")
         : patientDetails?.DateOfBirth || "",
-
-      nationality: patientDetails?.Nationality || "",
-      county: patientDetails?.PlaceofBirthDistrict || "",
       idNumber: values.idNumber || patientDetails?.IDNumber || "",
       phoneNumber: values.phoneNumber || "",
-      paymentMode: patientDetails?.paymentMode || 0,
-      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
-      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
-      insuranceNo: patientDetails?.InsuranceNo || "",
-      insuranceName: patientDetails?.InsuranceName || "",
-      insurancePrinicipalMemberName:
-        patientDetails?.insurancePrinicipalMemberName || "",
-      isPrincipleMember: patientDetails?.isPrincipleMember || false,
-      membershipNo: patientDetails?.MembershipNo || "",
-      schemeName: patientDetails?.SchemeName || "",
-      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-      subcounty: patientDetails?.SubCountyName || "",
+      howYouKnewABoutUs:
+        values.howYouKnewABoutUs || patientDetails?.HowyouKnewAboutUs || "",
       email: values.email || patientDetails?.Email || "",
-      residence: patientDetails?.PlaceofBirthVillage || "",
-      countyWard: patientDetails?.CountyWardName || "",
-      patientStatus: 0,
+      dependant: values.dependant || false,
     };
 
     dispatch(saveGeneralInformation(formattedData));
     setDispatchingInfo(true);
     onUpdate(data);
   };
+  useEffect(() => {
+    if (data) {
+      const status = data.status;
+      if (status === "success") {
+        setDispatchingInfo(false);
+        setFormSubmitted(false);
+      }
+      dispatch({ type: SAVE_GENERAL_INFORMATION_RESET });
+    }
 
+    if (error) {
+      setDispatchingInfo(false);
+      setFormSubmitted(false);
+      dispatch({ type: SAVE_GENERAL_INFORMATION_RESET });
+    }
+  }, [error, data, dispatch]);
   return (
     <div>
       <Typography.Title level={5} underline>
@@ -149,9 +163,10 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
           showIcon
           closeText="Close"
           onClose={() => {
-            setFormSubmitted(false); 
+            setFormSubmitted(false);
             dispatch({ type: "CLEAR_SUCCESS" });
-          }}        />
+          }}
+        />
       )}
 
       <Form layout="vertical" form={form} onFinish={handleSubmission}>
@@ -181,17 +196,30 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
           </Col>
         </Row>
 
-        <Form.Item
-          label="Gender"
-          name="gender"
-          rules={[{ required: true, message: "Please select gender" }]}
-        >
-          <Radio.Group style={{ width: "100%" }}>
-            <Radio value={1}>Male</Radio>
-            <Radio value={2}>Female</Radio>
-            <Radio value={0}>Other</Radio>
-          </Radio.Group>
-        </Form.Item>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="Gender"
+              name="gender"
+              rules={[{ required: true, message: "Please select gender" }]}
+            >
+              <Radio.Group style={{ width: "100%" }}>
+                <Radio value={1}>Male</Radio>
+                <Radio value={2}>Female</Radio>
+                <Radio value={0}>Other</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="Dependant ?" name="dependant" rules={[{required: true, message: "Please select if dependant"}]}>
+              <Switch
+                checkedChildren="Yes"
+                unCheckedChildren="No"
+                defaultChecked={false}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Row gutter={16}>
           <Col span={8}>
@@ -224,10 +252,39 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
             </Form.Item>
           </Col>
         </Row>
-        <Row>
+        <Row gutter={16}>
           <Col span={8}>
             <Form.Item label="Email" name="email">
               <Input placeholder="Enter Email" autoComplete="off" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="How did you hear about us?"
+              name="howYouKnewABoutUs"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select a marketing strategy!",
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                placeholder="Select a marketing strategy"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+              >
+                {marketingStrategiesPayload &&
+                  marketingStrategiesPayload.map((item) => (
+                    <Select.Option key={item.Code} value={item.Code}>
+                      {item.Description}
+                    </Select.Option>
+                  ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

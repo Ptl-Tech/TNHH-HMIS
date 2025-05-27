@@ -117,26 +117,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
-      patientNo: patientDetails?.PatientNo || "",
-      firstName: patientDetails?.Surname?.split(" ")[0] || "",
-      middleName: patientDetails?.MiddleName || "",
-      lastName: patientDetails?.LastName || "",
-      gender:
-        patientDetails?.Gender === "Male"
-          ? 1
-          : patientDetails?.Gender === "Female"
-          ? 2
-          : "",
-      dob: patientDetails?.DateOfBirth
-        ? moment(patientDetails.DateOfBirth).format("YYYY-MM-DD")
-        : "", // Ensure valid date format
-      idNumber: patientDetails?.IDNumber || "",
-      phoneNumber: patientDetails?.TelephoneNo1 || "",
-      nationality: patientDetails?.Nationality || "",
-      county: patientDetails?.PlaceofBirthDistrict || "",
-      nextOfKinRelationship: patientDetails?.NextofkinRelationship || "",
-      nextOfKinFullName: patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo: patientDetails?.NextOfKinPhoneNo || "",
+      patientNo: patientDetails?.PatientNo || "",      
       paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
@@ -149,11 +130,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
         values.isPrincipleMember || patientDetails.isPrincipleMember || false,
       membershipNo: values.membershipNo || patientDetails?.MembershipNo || "",
       schemeName: values.schemeName || patientDetails?.SchemeName || "",
-      email: patientDetails?.Email || "",
-      howYouKnewABoutUs: patientDetails?.HowyouKnewAboutUs || "",
-      subcounty: patientDetails?.SubCountyName || "",
-      residence: patientDetails?.PlaceofBirthVillage || "",
-      countyWard: patientDetails?.CountyWardName || "",
+      
 
     };
 

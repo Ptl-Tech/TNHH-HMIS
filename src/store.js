@@ -1,6 +1,5 @@
-// src/store/store.js
 import { configureStore } from "@reduxjs/toolkit";
-import {thunk} from "redux-thunk"; // Correct import for redux-thunk
+import {thunk} from "redux-thunk"; 
 import {rootReducer} from "./reducers/RootReducer";
 import {jwtDecode} from "jwt-decode";
 
@@ -31,7 +30,7 @@ const store = configureStore({
     immutableCheck: false,
     serializableCheck: false
   }).concat(thunk),
-  devTools: true,
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 store.subscribe(() => {
