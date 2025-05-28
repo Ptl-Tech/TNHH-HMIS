@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Typography, Table, Button, Modal, Form, Input, message } from 'antd';
+import {
+  Typography,
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  message,
+  Select,
+} from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 
 import { labLinesColumns as defaultColumns } from './utils';
@@ -109,8 +118,38 @@ const SampleModal = ({ open, test, handleOk, handleCancel }) => {
 const SampleForm = ({ closeModal, test }) => {
   const { Laboratory_No, LaboratoryTestCode } = test;
 
+  const samples = [
+    { value: 'pus', label: 'Pus' },
+    { value: 'EDTA', label: 'EDTA' },
+    { value: 'serum', label: 'Serum' },
+    { value: 'blood', label: 'Blood' },
+    { value: 'stool', label: 'Stool' },
+    { value: 'urine', label: 'Urine' },
+    { value: 'semen', label: 'Semen' },
+    { value: 'sputum', label: 'Sputum' },
+    { value: 'saliva', label: 'Saliva' },
+    { value: 'citrate', label: 'Citrate' },
+    { value: 'heparin', label: 'Heparin' },
+    { value: 'fluoride', label: 'Fluoride' },
+    { value: 'tissue', label: 'Tissue Biopsy' },
+    { value: 'nasal_swab', label: 'Nasal Swab' },
+    { value: 'wound_swab', label: 'Wound Swab' },
+    { value: 'throat_swab', label: 'Throat Swab' },
+    { value: 'bone_marrow', label: 'Bone Marrow' },
+    { value: 'vaginal_swab', label: 'Vaginal Swab' },
+    { value: 'hair_samples', label: 'Hair Samples' },
+    { value: 'urethral_swab', label: 'Urethral Swab' },
+    { value: 'pleural_fluid', label: 'Pleural Fluid' },
+    { value: 'csf', label: 'Cerebrospinal Fluid (CSF)' },
+    { value: 'nail_ckippings', label: 'Nail Clippings' },
+    { value: 'skin_scrapings', label: 'Skin Scrapings' },
+    { value: 'amniotic_fluid', label: 'Amniotic Fluid' },
+    { value: 'synovial_fluid', label: 'Synovial Fluid' },
+    { value: 'peritoneal_fluid', label: 'Peritoneal Fluid' },
+    { value: 'pericardial_fluid', label: 'Pericardial Fluid' },
+  ];
+
   // destructor
-  const { TextArea } = Input;
   const { Item, useForm } = Form;
 
   // hooks
@@ -172,7 +211,10 @@ const SampleForm = ({ closeModal, test }) => {
               },
             ]}
           >
-            <TextArea />
+            <Select
+              showSearch
+              options={samples}
+            />
           </Item>
           <Item label={null}>
             <Button
