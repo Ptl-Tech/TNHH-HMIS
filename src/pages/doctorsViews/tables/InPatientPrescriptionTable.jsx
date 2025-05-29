@@ -46,6 +46,31 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
       key: "Dosage",
     },
     {
+      title: "Frequency",
+      dataIndex: "Frequency",
+      key: "Frequency",
+    },
+    {
+      title: "Duration",
+      dataIndex: "Number_of_Days",
+      key: "Number_of_Days",
+    },
+    {
+      title: "Take",
+      dataIndex: "Take",
+      key: "Take",
+    },
+    {
+      title: "Quantity",
+      dataIndex: "Quantity",
+      key: "Quantity",
+    },
+    {
+      title: "Unit",
+      dataIndex: "Unit_Of_Measure",
+      key: "Unit_Of_Measure",
+    },
+    {
       title: "Route",
       dataIndex: "Route",
       key: "Route",
@@ -81,6 +106,9 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
           columns={columns}
           dataSource={filteredPrescriptions}
           onRowSelect={handleEdit}
+          rowKey="key"
+          size="small"
+          scroll={{ x: 1300, y: 500 }}
         />
       )}
     </div>

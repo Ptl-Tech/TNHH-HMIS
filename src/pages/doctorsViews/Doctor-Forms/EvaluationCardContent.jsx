@@ -1,12 +1,10 @@
-import { Card, Tabs } from "antd";
-import ObservationRoom from "./ObservationRoom";
-import PatientCarePlan from "./PatientCarePlan";
-import PatientRequests from "./PatientRequests";
-import PatientFile from "../../nurse-view/PatientFile";
-import ConsultationroomDetails from "./ConsultationroomDetails";
-import AdmissionTab from "./AdmissionTab";
-import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
+import { Card, Tabs } from 'antd';
+import PatientRequests from './PatientRequests';
+import ConsultationroomDetails from './ConsultationroomDetails';
+import AdmissionTab from './AdmissionTab';
+import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
+import Medication from './Medication';
 
 const EvaluationCardContent = ({
   treatmentNo,
@@ -20,28 +18,29 @@ const EvaluationCardContent = ({
 
   return (
     <div>
-      <Card className="card" style={{ padding: "10px 16px" }}>
+      <Card
+        variant="borderless"
+        styles={{ body: { boxShadow: 'none' } }}
+        style={{ padding: '12px', boxShadow: 'none' }}
+      >
         <Tabs defaultActiveKey="1">
-          {(role === "Doctor" ||  role === "Nurse") && (
-            <Tabs.TabPane tab="Triage Room" key="2">
-              <ObservationRoom
-                treatmentNo={treatmentNo}
-                observationNo={observationNo}
-                patientNo={patientNo}
-              />
-            </Tabs.TabPane>
-          )}
-          <Tabs.TabPane tab="Consultation Room " key="3">
+          <Tabs.TabPane
+            tab="Consultation Room "
+            key="1"
+          >
             <ConsultationroomDetails
               treatmentNo={treatmentNo}
               observationNo={observationNo}
               patientNo={patientNo}
             />
           </Tabs.TabPane>
-          {(role === "Doctor" || role === "Nurse") && (
+          {(role === 'Doctor' || role === 'Nurse') && (
             <>
-              <Tabs.TabPane tab="Medication" key="5">
-                <PatientCarePlan
+              <Tabs.TabPane
+                tab="Medication"
+                key="2"
+              >
+                <Medication
                   treatmentNo={treatmentNo}
                   observationNo={observationNo}
                   patientNo={patientNo}
@@ -49,28 +48,26 @@ const EvaluationCardContent = ({
               </Tabs.TabPane>
             </>
           )}
-          {(role === "Doctor" || role === "Nurse") && (
+          {(role === 'Doctor' || role === 'Nurse') && (
             <>
-              <Tabs.TabPane tab="Procedures" key="4">
+              <Tabs.TabPane
+                tab="Procedures"
+                key="3"
+              >
                 <PatientRequests />
-              </Tabs.TabPane>{" "}
+              </Tabs.TabPane>{' '}
             </>
           )}
-          {role === "Doctor" && patientDetail?.Status !== "Completed" && (
+          {role === 'Doctor' && patientDetail?.Status !== 'Completed' && (
             <>
-              <Tabs.TabPane tab="Admission & Referral" key="7">
+              <Tabs.TabPane
+                tab="Admission & Referral"
+                key="4"
+              >
                 <AdmissionTab />
               </Tabs.TabPane>
             </>
           )}
-          {(role === "Nurse" || role === "Doctor" || role === "Psychology") &&
-            patientDetail?.Status !== "Completed" && (
-              <>
-                <Tabs.TabPane tab="Patient File" key="8">
-                  <PatientFile patientDetails={patientDetails} />
-                </Tabs.TabPane>
-              </>
-            )}
         </Tabs>
       </Card>
     </div>

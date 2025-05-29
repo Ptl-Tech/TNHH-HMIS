@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu, message } from "antd";
+import { Button, Dropdown, Card, Menu, message, Skeleton } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -193,6 +193,7 @@ useEffect(() => {
         </Dropdown>
       </div>
       <div className="d-flex flex-column">
+           <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
         <Card
           title={
             <div className="d-flex justify-content-between align-items-center">
@@ -268,6 +269,7 @@ useEffect(() => {
             </p>
           </div>
         </Card>
+        </Skeleton>
         <div className="d-flex justify-content-end gap-3 my-3">
           <Button
             type="primary"

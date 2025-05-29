@@ -68,7 +68,9 @@ const DischargeList = () => {
       ])
     );
 
-    return getPatientDischargeList.map((discharge) => ({
+    return getPatientDischargeList
+      .filter((discharge) => discharge?.Status  !=="Completed" )
+    .map((discharge) => ({
       ...discharge,
       DoctorName: doctorMap.get(discharge?.DoctorsName) || "",
     }));

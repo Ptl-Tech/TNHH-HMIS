@@ -32,11 +32,7 @@ function App() {
       <Route
         path="/reset-password"
         element={<ResetPwd />}
-      />
-      <Route
-        path="*"
-        element={<Navigate to="/login" />}
-      />
+      />      
       {LabRoutes()}
       {NurseRoutes()}
       {DoctorRoutes()}
@@ -45,6 +41,10 @@ function App() {
       {RadiologyRoutes()}
       {ReceptionRoutes()}
       {PsychologyRoutes()}
+      <Route
+        path="*"
+        element={<Navigate to="/login" />}
+      />
     </Routes>
   );
 }

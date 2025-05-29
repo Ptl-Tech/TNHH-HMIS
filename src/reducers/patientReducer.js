@@ -35,7 +35,7 @@ import {
   APPMNT_LIST_SUCCESS,
   APPMNT_LIST_FAIL,
   APPMNT_LIST_RESET,
-} from "../constants/patientConstants";
+} from '../constants/patientConstants';
 
 import {
   CREATE_WALK_IN_PATIENT_REQUEST,
@@ -54,7 +54,7 @@ import {
   PATIENT_BY_ID_SUCCESS,
   PATIENT_BY_ID_FAIL,
   PATIENT_BY_ID_RESET,
-} from "../actions/patientActions";
+} from '../actions/patientActions';
 
 export const patientCreateReducer = (state = { loading: false }, action) => {
   switch (action.type) {
@@ -78,7 +78,7 @@ export const patientCreateReducer = (state = { loading: false }, action) => {
 
 export const createWalkInPatientReducer = (
   state = { loading: false },
-  action
+  action,
 ) => {
   switch (action.type) {
     case CREATE_WALK_IN_PATIENT_REQUEST:
@@ -101,7 +101,7 @@ export const createWalkInPatientReducer = (
 
 export const dispatchWalkInLabReducer = (
   state = { loading: false },
-  action
+  action,
 ) => {
   switch (action.type) {
     case DISPATCH_WALK_IN_PATIENT_LAB_REQUEST:
@@ -124,7 +124,7 @@ export const dispatchWalkInLabReducer = (
 
 export const dispatchWalkInPharmacyReducer = (
   state = { loading: false },
-  action
+  action,
 ) => {
   switch (action.type) {
     case DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST:
@@ -154,7 +154,7 @@ const initialTriageVisitCreateState = {
 
 export const patientTriageVisitCreateReducer = (
   state = initialTriageVisitCreateState,
-  action
+  action,
 ) => {
   switch (action.type) {
     case TRIAGE_VISIT_REQUEST:
@@ -206,8 +206,8 @@ export const convertPatientReducer = (state = {}, action) => {
 };
 
 export const patientListReducer = (
-  state = { loading: false, patients: [], error: null }, 
-  action
+  state = { loading: false, patients: [], error: null },
+  action,
 ) => {
   switch (action.type) {
     case PATIENT_LIST_REQUEST:
@@ -223,7 +223,10 @@ export const patientListReducer = (
   }
 };
 
-export const patientByIdReducer = (state = { loading: false, patient: {} }, action) => {    
+export const patientByIdReducer = (
+  state = { loading: false, patient: {} },
+  action,
+) => {
   switch (action.type) {
     case PATIENT_BY_ID_REQUEST:
       return { loading: true, patient: {} };
@@ -238,16 +241,18 @@ export const patientByIdReducer = (state = { loading: false, patient: {} }, acti
   }
 };
 
-export const appmntListReducer = (state = { patients: [] }, action) => {
+const initialState = { patients: [], loading: false, error: null };
+
+export const appmntListReducer = (state = initialState, action) => {
   switch (action.type) {
     case APPMNT_LIST_REQUEST:
-      return { loading: true, patients: [] };
+      return { ...state, loading: true };
     case APPMNT_LIST_SUCCESS:
-      return { loading: false, patients: action.payload };
+      return { ...state, loading: false, patients: action.payload };
     case APPMNT_LIST_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     case APPMNT_LIST_RESET:
-      return { patients: [] };
+      return initialState;
     default:
       return state;
   }
@@ -309,4 +314,4 @@ export const postDoctorTreatmentReducer = (state = {}, action) => {
     default:
       return state;
   }
-}
+};

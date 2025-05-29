@@ -61,7 +61,12 @@ const BedTransferTable = ({
       key: "Admission_Date",
       render: (_, record) => {
         if (record?.Admission_Date && record?.Occupied === true) {
-          return record?.Admission_Date;
+          return new Date(record?.Admission_Date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }
+          );
         } else {
           return (
             // current date

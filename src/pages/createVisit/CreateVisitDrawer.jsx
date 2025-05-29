@@ -45,10 +45,10 @@ const CreateVisitDrawer = ({
     (state) => state.getInsurance
   );
   const {
-    loading: visitLoading,
     error: visitError,
-    success: visitSuccess,
     data: visitPayload,
+    loading: visitLoading,
+    success: visitSuccess,
   } = useSelector((state) => state.createVisit);
   const { loadingPatientDetails, patientDetails, refetchDetails } =
     useFetchPatientDetailsHook(patientNo);

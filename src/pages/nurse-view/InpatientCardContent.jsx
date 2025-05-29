@@ -6,6 +6,7 @@ import Discharges from "./Discharges";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
 import WardTransfer from "./WardTransfer";
+import NursingPatientCharges from "./billing/NursingPatientCharges";
 
 const InpatientCardContent = () => {
   const role = useAuth().userData.departmentName;
@@ -31,6 +32,11 @@ const InpatientCardContent = () => {
           {role === "Nurse" && (
             <Tabs.TabPane tab="Ward Transfer" key="5">
               <WardTransfer />
+            </Tabs.TabPane>
+          )}
+           {role === "Nurse" && (
+            <Tabs.TabPane tab="Patient Charges" key="6">
+              <NursingPatientCharges />
             </Tabs.TabPane>
           )}
           {/* {

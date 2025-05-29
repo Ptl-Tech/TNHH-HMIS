@@ -1,15 +1,15 @@
-import { Badge, Table } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
-import dayjs from "dayjs";
-import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
-import Loading from "../../../partials/nurse-partials/Loading";
-import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
-import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
-import { getUrgencyColorcode, rowClassName } from "../../../utils/helpers";
-import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
-import useAuth from "../../../hooks/useAuth";
+import { Badge, Table } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
+import Loading from '../../../partials/nurse-partials/Loading';
+import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
+import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
+import { getUrgencyColorcode, rowClassName } from '../../../utils/helpers';
+import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
+import useAuth from '../../../hooks/useAuth';
 const CloseList = () => {
   const role = useAuth().userData.departmentName;
   const doctorId = useAuth().userData.doctorID;
@@ -17,12 +17,12 @@ const CloseList = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-  const [searchName, setSearchName] = useState("");
-  const [searchPatientNumber, setSearchPatientNumber] = useState("");
-  const [searchVisitNumber, setSearchVisitNumber] = useState("");
+  const [searchName, setSearchName] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchVisitNumber, setSearchVisitNumber] = useState('');
 
   const { triageWaitingList: patients } = useSelector(
-    (state) => state.getTriageWaitingList
+    (state) => state.getTriageWaitingList,
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
@@ -34,34 +34,33 @@ const CloseList = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
- 
   const openDoctorVisitList = useMemo(() => {
     return treatmentList?.filter((item) => {
-      if (role === "Doctor" || role === "Psychology") {
-        return item.Status === "New" && item.DoctorID === doctorId;
+      if (role === 'Doctor' || role === 'Psychology') {
+        return item.Status === 'New' && item.DoctorID === doctorId;
       }
-      return item.Status === "New";
+      return item.Status === 'New';
     });
   }, [treatmentList, role, doctorId]);
-  
+
   const activeConsultationList = useMemo(() => {
     return treatmentList?.filter((item) => {
-      if (role === "Doctor" || role === "Psychology") {
-        return item.Status === "Active" && item.DoctorID === doctorId;
+      if (role === 'Doctor' || role === 'Psychology') {
+        return item.Status === 'Active' && item.DoctorID === doctorId;
       }
-      return item.Status === "Active";
+      return item.Status === 'Active';
     });
   }, [treatmentList, role, doctorId]);
-  
+
   const closedConsultationList = useMemo(() => {
     return treatmentList?.filter((item) => {
-      if (role === "Doctor" || role === "Psychology") {
-        return item.Status === "Completed" && item.DoctorID === doctorId;
+      if (role === 'Doctor' || role === 'Psychology') {
+        return item.Status === 'Completed' && item.DoctorID === doctorId;
       }
-      return item.Status === "Completed";
+      return item.Status === 'Completed';
     });
   }, [treatmentList, role, doctorId]);
-  
+
   const closedConsultationListWithPatientDetails = useMemo(() => {
     return patients?.map((patient) => ({
       PatientNo: patient.PatientNo,
@@ -72,36 +71,36 @@ const CloseList = () => {
       Inpatient: patient.Inpatient,
     }));
   }, [patients]);
-  
+
   const combinedList = useMemo(() => {
     return closedConsultationList.map((room) => {
       const matchingPatient = closedConsultationListWithPatientDetails.find(
-        (patient) => patient.PatientNo === room.PatientNo
+        (patient) => patient.PatientNo === room.PatientNo,
       );
-  
+
       return {
         ...room,
         PatientNo: room?.PatientNo,
-        SearchName: matchingPatient?.SearchName || "",
-        IDNumber: matchingPatient?.IDNumber || "",
-        Age: matchingPatient?.Age || "",
-        PatientType: matchingPatient?.PatientType || "",
-        Inpatient: matchingPatient?.Inpatient || "",
+        SearchName: matchingPatient?.SearchName || '',
+        IDNumber: matchingPatient?.IDNumber || '',
+        Age: matchingPatient?.Age || '',
+        PatientType: matchingPatient?.PatientType || '',
+        Inpatient: matchingPatient?.Inpatient || '',
       };
     });
   }, [closedConsultationList, closedConsultationListWithPatientDetails]);
 
   const waitingListColumns = [
     {
-      title: "#",
-      dataIndex: "key",
-      key: "key",
+      title: '#',
+      dataIndex: 'key',
+      key: 'key',
       render: (text, record, index) => index + 1,
     },
     {
-      title: "Treatment No",
-      dataIndex: "TreatmentNo",
-      key: "TreatmentNo",
+      title: 'Treatment No',
+      dataIndex: 'TreatmentNo',
+      key: 'TreatmentNo',
       filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
       onFilter: (value, record) =>
         record?.TreatmentNo
@@ -111,7 +110,7 @@ const CloseList = () => {
         const { color } = getUrgencyColorcode(record.UrgencyStatus);
         return (
           <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
             className="fw-bold"
             style={{ color: color }}
           >
@@ -121,9 +120,9 @@ const CloseList = () => {
       },
     },
     {
-      title: "Patient Name",
-      dataIndex: "SearchName",
-      key: "SearchName",
+      title: 'Patient Name',
+      dataIndex: 'SearchName',
+      key: 'SearchName',
       filteredValue: searchName ? [searchName] : null,
       onFilter: (value, record) =>
         record?.SearchName
@@ -134,7 +133,7 @@ const CloseList = () => {
           <span
             onClick={() => handleNavigate(record, record.TreatmentNo)}
             className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            style={{ color: '#0f5689', cursor: 'pointer' }}
           >
             {text.toUpperCase()}
           </span>
@@ -142,9 +141,9 @@ const CloseList = () => {
       },
     },
     {
-      title: "Patient No",
-      dataIndex: "PatientNo",
-      key: "PatientNo",
+      title: 'Patient No',
+      dataIndex: 'PatientNo',
+      key: 'PatientNo',
       filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
       onFilter: (value, record) =>
         record?.PatientNo
@@ -153,14 +152,14 @@ const CloseList = () => {
     },
 
     {
-      title: "Doctor Name",
-      dataIndex: "DoctorsName",
-      key: "DoctorsName",
+      title: 'Doctor Name',
+      dataIndex: 'DoctorsName',
+      key: 'DoctorsName',
       render: (text, record) => {
         return (
           <span
-            onClick={() => handleNavigate(record, record.treatmentNo)}
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            onClick={() => handleNavigate(record, record.TreatmentNo)}
+            style={{ color: '#0f5689', cursor: 'pointer' }}
           >
             {text.toUpperCase()}
           </span>
@@ -168,17 +167,17 @@ const CloseList = () => {
       },
     },
     {
-      title: "Treatment Date",
-      dataIndex: "TreatmentDate",
-      key: "TreatmentDate",
+      title: 'Treatment Date',
+      dataIndex: 'TreatmentDate',
+      key: 'TreatmentDate',
     },
     {
-      title: "Waiting Time",
-      dataIndex: "TreatmentTime",
-      key: "TreatmentTime",
+      title: 'Waiting Time',
+      dataIndex: 'TreatmentTime',
+      key: 'TreatmentTime',
       render: (_, record) => {
         const combinedDateTime = `${record.TreatmentDate}T${record.TreatmentTime}`;
-        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), "minute");
+        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
         const hours = Math.floor(elapsedMinutes / 60);
         const minutes = elapsedMinutes % 60;
 
@@ -186,23 +185,23 @@ const CloseList = () => {
       },
     },
     {
-      title: "Patient Type",
-      dataIndex: "PatientType",
-      key: "PatientType",
+      title: 'Patient Type',
+      dataIndex: 'PatientType',
+      key: 'PatientType',
     },
     {
-      title: "Age",
-      dataIndex: "Age",
-      key: "Age",
+      title: 'Age',
+      dataIndex: 'Age',
+      key: 'Age',
       render: (_, record) => {
         return <span>{record.Age} years</span>;
       },
     },
 
     {
-      title: "Urgency",
-      dataIndex: "urgency",
-      key: "urgency",
+      title: 'Urgency',
+      dataIndex: 'urgency',
+      key: 'urgency',
       render: (_, record) => {
         const { color, text } = getUrgencyColorcode(record.UrgencyStatus);
         return (
@@ -240,9 +239,9 @@ const CloseList = () => {
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      role === "Doctor"
+      role === 'Doctor'
         ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-        : role === "Psychology"
+        : role === 'Psychology'
         ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
         : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
@@ -251,12 +250,12 @@ const CloseList = () => {
           observationNo: record.ObservationNo,
           patientDetails: record,
         },
-      }
+      },
     );
   };
 
   return (
-    <div style={{ padding: "10px 10px" }}>
+    <div style={{ padding: '10px 10px' }}>
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}
@@ -280,7 +279,7 @@ const CloseList = () => {
           size="small"
           rowClassName={rowClassName} // Apply the row color
           pagination={{
-            position: ["bottom", "right"],
+            position: ['bottom', 'right'],
             showSizeChanger: true,
             pageSize: 10,
             showTotal: (total, range) =>

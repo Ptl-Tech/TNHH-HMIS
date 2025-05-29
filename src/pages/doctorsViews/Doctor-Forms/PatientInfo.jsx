@@ -1,92 +1,76 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Card,
-  Typography,
+  Form,
+  Modal,
   Avatar,
   Button,
-  message,
-  Modal,
-  Form,
   Select,
-} from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { UserOutlined } from "@ant-design/icons";
-import useAuth from "../../../hooks/useAuth";
-import { postInterimInvoice } from "../../../actions/Charges-Actions/printInterimInvoice";
-import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
-import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
-import TextArea from "antd/es/input/TextArea";
-import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
-import { calculateAge } from "../../../utils/helpers";
-import { useLocation } from "react-router-dom";
+  message,
+  Popover,
+  Typography,
+} from 'antd';
+import TextArea from 'antd/es/input/TextArea';
+import { UserOutlined } from '@ant-design/icons';
+import { IoCloseOutline, IoEllipsisVertical } from 'react-icons/io5';
+
+import useAuth from '../../../hooks/useAuth';
+
+import {
+  smartMerge,
+  fullPatientInfo,
+  summaryPatientInfo,
+} from './doctor-utils';
+import {
+  postInterimInvoice,
+  PRINT_INTERIM_INVOICE_RESET,
+} from '../../../actions/Charges-Actions/printInterimInvoice';
+import { listClinics, listDoctors } from '../../../actions/DropdownListActions';
+import { postMarkasCompleted } from '../../../actions/Doc-actions/postMarkasCompleted';
+import { postPsychologyRequestReviewSlice } from '../../../actions/Doc-actions/psychologyReducers';
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const dispatch = useDispatch();
-  const staffNo = useAuth().userData.No;
   const location = useLocation();
-  const patient = location.state?.patientDetails || {};
+  const staffNo = useAuth().userData.no;
 
+  const patient = smartMerge(
+    location.state?.patientDetails || {},
+    patientDetails || {},
+  );
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [moreDetailsOpen, setMoreDetailOpen] = useState(false);
+  const [patientReviewOpen, setPatientReviewOpen] = useState(false);
 
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
   const { loadingCheInPatient: markasCompleteLoading } = useSelector(
-    (state) => state.markAsCompleted
+    (state) => state.markAsCompleted,
   );
 
-  const { loading: doctorsLoading, data: doctorsPayload } = useSelector(
-    (state) => state.getDoctorsList
-  );
-  const [form] = Form.useForm();
+  useEffect(() => {
+    if (invoiceProcessingError) {
+      dispatch({ type: PRINT_INTERIM_INVOICE_RESET });
+    }
+    if (invoiceProcessingLoading) message.info('Printing Interim Invoice');
+  }, [invoiceProcessingLoading, invoiceProcessingError]);
 
-  const { loading: loadingPostPsychologyRequest } = useSelector(
-    (state) => state.postPsychologyRequest
-  );
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    form.submit();
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const { loading: clinicsLoading, clinics: clinicsPayload } = useSelector(
-    (state) => state.clinics
-  );
-
-  const [selectedClinic, setSelectedClinic] = useState(null);
-  const [filteredDoctors, setFilteredDoctors] = useState([]);
-
-  const handleSelectChange = (value) => {
-    setSelectedClinic(value);
-    const matchingDoctors = doctorsPayload.filter(
-      (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase()
-    );
-    setFilteredDoctors(matchingDoctors);
-  };
-
-  const handleOnFinish = async (values) => {
-    const data = {
-      ...values,
-      patientNo,
-      treatmentNo,
-      staffNo,
-    };
-
-    await dispatch(postPsychologyRequestReviewSlice(data)).then((data) => {
-      if (data?.status === "success") {
-        message.success("Request Sent Successfully");
-      } else {
-        message.error("Failed to send request. Please try again.");
-      }
-    });
+  const handleMarkAsCompleted = () => {
+    dispatch(postMarkasCompleted(treatmentNo))
+      .then((data) => {
+        if (data?.status === 'success') {
+          message.success('Patient has been Marked as completed');
+        } else {
+          message.error('Failed to mark as completed. Please try again.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error marking as completed:', error);
+        message.error('An error occurred. Please try again.');
+      });
   };
 
   const handlePrintInvoice = () => {
@@ -99,354 +83,362 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
     dispatch(postInterimInvoice(invoiceData));
   };
 
-  useEffect(() => {
-    dispatch(listClinics());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(listDoctors());
-  }, [dispatch]);
-
-  const handleMarkAsCompleted = () => {
-    dispatch(postMarkasCompleted(treatmentNo))
-      .then((data) => {
-        if (data?.status === "success") {
-          message.success("Patient has been Marked as completed");
-        } else {
-          message.error("Failed to mark as completed. Please try again.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error marking as completed:", error);
-        message.error("An error occurred. Please try again.");
-      });
-  };
-
   return (
     <div
       style={{
-        display: "flex",
-        alignContent: "center",
-        gap: "20px",
-        paddingBottom: "20px",
+        gap: '20px',
+        display: 'flex',
+        paddingBottom: '20px',
+        alignContent: 'center',
       }}
     >
-      <Modal
-        title="Request Patient Review"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Send Request"
-        confirmLoading={loadingPostPsychologyRequest}
+      <PatientReviewModal
+        patientNo={patientNo}
+        open={patientReviewOpen}
+        treatmentNo={treatmentNo}
+        setOpen={setPatientReviewOpen}
+      />
+      <MoreDeailsModal
+        open={moreDetailsOpen}
+        setOpen={setMoreDetailOpen}
+        values={fullPatientInfo(patient)}
+      />
+      <Card
+        size="small"
+        styles={{ body: { boxShadow: 'none' } }}
+        style={{ width: '100%', boxShadow: 'none', borderColor: '#d9d9d9' }}
       >
-        <Form
-          layout="vertical"
-          style={{ paddingTop: "10px" }}
-          form={form}
-          onFinish={handleOnFinish}
-          initialValues={{
-            date: "",
-            time: "",
-            handingOver: "",
-            takingOver: "",
-            remarks: "",
-          }}
+        <div style={{ display: 'flex' }}>
+          <div
+            className="d-grid gap-2 p-3"
+            style={{ width: '100%' }}
+          >
+            {summaryPatientInfo(patient).map((patientInfo) => (
+              <RenderPatientDetails component={patientInfo} />
+            ))}
+          </div>
+          <div className="d-flex gap-2 p-3">
+            <Button
+              onClick={() => {
+                setMoreDetailOpen(true);
+              }}
+            >
+              More Details
+            </Button>
+            {(role === 'Doctor' || role === 'Psychology') &&
+              patient?.Status !== 'Completed' && (
+                <PopoverMenu
+                  content={
+                    <CardMenu
+                      items={[
+                        {
+                          key: '0',
+                          children: 'Mark as Completed',
+                          onClick: handleMarkAsCompleted,
+                          loading: markasCompleteLoading,
+                          disabled: markasCompleteLoading,
+                        },
+                        {
+                          key: '1',
+                          onClick: () => setPatientReviewOpen(true),
+                          children: 'Request Patient Review',
+                        },
+                        {
+                          key: '2',
+                          children: 'Print Interim Invoice',
+                          onClick: () => handlePrintInvoice(patient?.PatientNo),
+                        },
+                      ]}
+                    />
+                  }
+                >
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<IoEllipsisVertical />}
+                  ></Button>
+                </PopoverMenu>
+              )}
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const staffNo = useAuth()?.userData.no;
+
+  const [selectedClinic, setSelectedClinic] = useState(null);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+
+  const { loading: loadingPostPsychologyRequest } = useSelector(
+    (state) => state.postPsychologyRequest,
+  );
+  const { loading: doctorsLoading, data: doctorsPayload } = useSelector(
+    (state) => state.getDoctorsList,
+  );
+  const { loading: clinicsLoading, clinics: clinicsPayload } = useSelector(
+    (state) => state.clinics,
+  );
+
+  useEffect(() => {
+    dispatch(listClinics());
+    dispatch(listDoctors());
+  }, []);
+
+  const handleOk = () => {
+    form.submit();
+    setOpen(false);
+  };
+
+  const handleOnFinish = async (values) => {
+    const data = {
+      ...values,
+      staffNo,
+      patientNo,
+      treatmentNo,
+    };
+
+    await dispatch(postPsychologyRequestReviewSlice(data)).then((data) => {
+      if (data?.status === 'success') {
+        message.success('Request Sent Successfully');
+      } else {
+        message.error('Failed to send request. Please try again.');
+      }
+    });
+  };
+
+  const handleSelectChange = (value) => {
+    setSelectedClinic(value);
+    const matchingDoctors = doctorsPayload.filter(
+      (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase(),
+    );
+    setFilteredDoctors(matchingDoctors);
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  return (
+    <Modal
+      onOk={handleOk}
+      open={open}
+      okText="Send Request"
+      onCancel={handleCancel}
+      title="Request Patient Review"
+      confirmLoading={loadingPostPsychologyRequest}
+    >
+      <Form
+        layout="vertical"
+        style={{ paddingTop: '10px' }}
+        form={form}
+        onFinish={handleOnFinish}
+        initialValues={{
+          date: '',
+          time: '',
+          remarks: '',
+          takingOver: '',
+          handingOver: '',
+        }}
+      >
+        <Form.Item
+          label="Select Clinic"
+          name="clinic"
+          rules={[{ required: true, message: 'Please select clinic' }]}
         >
+          <Select
+            showSearch
+            placeholder="Select Clinic"
+            style={{ width: '100%' }}
+            onChange={handleSelectChange}
+            loading={clinicsLoading}
+            options={
+              clinicsPayload?.map((clinic) => ({
+                value: clinic?.No,
+                label: clinic?.Description,
+              })) || []
+            }
+            filterOption={(value, option) =>
+              option?.label.toLowerCase().includes(value.toLowerCase())
+            }
+          />
+        </Form.Item>
+        {(selectedClinic?.toLowerCase() === 'psychiatrist' ||
+          selectedClinic?.toLowerCase() === 'psychologist') && (
           <Form.Item
-            label="Select Clinic"
-            name="clinic"
-            rules={[{ required: true, message: "Please select clinic" }]}
+            label={
+              selectedClinic?.toLowerCase() === 'psychiatrist'
+                ? 'Select Psychiatrist'
+                : 'Select Psychologist'
+            }
+            name="doctor"
           >
             <Select
               showSearch
-              placeholder="Select Clinic"
-              style={{ width: "100%" }}
-              onChange={handleSelectChange}
-              loading={clinicsLoading}
-              options={
-                clinicsPayload?.map((clinic) => ({
-                  value: clinic?.No,
-                  label: clinic?.Description,
-                })) || []
+              placeholder={
+                selectedClinic?.toLowerCase() === 'psychiatrist'
+                  ? 'Select Psychiatrist'
+                  : 'Select Psychologist'
               }
+              style={{ width: '100%' }}
+              loading={doctorsLoading}
+              options={filteredDoctors.map((doctor) => ({
+                value: doctor?.DoctorID,
+                label: doctor?.DoctorsName,
+              }))}
               filterOption={(value, option) =>
                 option?.label.toLowerCase().includes(value.toLowerCase())
               }
             />
           </Form.Item>
-          {(selectedClinic?.toLowerCase() === "psychiatrist" ||
-            selectedClinic?.toLowerCase() === "psychologist") && (
-            <Form.Item
-              label={
-                selectedClinic?.toLowerCase() === "psychiatrist"
-                  ? "Select Psychiatrist"
-                  : "Select Psychologist"
-              }
-              name="doctor"
-            >
-              <Select
-                showSearch
-                placeholder={
-                  selectedClinic?.toLowerCase() === "psychiatrist"
-                    ? "Select Psychiatrist"
-                    : "Select Psychologist"
-                }
-                style={{ width: "100%" }}
-                loading={doctorsLoading}
-                options={filteredDoctors.map((doctor) => ({
-                  value: doctor?.DoctorID,
-                  label: doctor?.DoctorsName,
-                }))}
-                filterOption={(value, option) =>
-                  option?.label.toLowerCase().includes(value.toLowerCase())
-                }
-              />
-            </Form.Item>
-          )}
+        )}
 
-          <Form.Item label="Request Reason" name="remarks">
-            <TextArea
-              placeholder="Enter Request Reason"
-              style={{ width: "100%" }}
-              rows={3}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      <Card
-        className="card col-md-6 col-lg-6 col-xl-6"
-        style={{
-          padding: "10px 16px",
-          marginTop: "10px",
-          background: "#e5e3e3",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            marginBottom: "20px",
-          }}
+        <Form.Item
+          label="Request Reason"
+          name="remarks"
         >
-          <Avatar icon={<UserOutlined />} size={48} />
-          <div>
-            <Typography.Title
-              level={5}
-              style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
-            >
-              {patientDetails?.Names || patientDetails?.SearchName || patient.SearchName || ""}
-            </Typography.Title>
-            <Typography.Text style={{ fontSize: "13px", color: "gray" }}>
-              Age: {calculateAge(patientDetails?.DateOfBirth)}
-            </Typography.Text>
-          </div>
-        </div>
-
-        <Typography.Title
-          level={5}
-          style={{
-            color: "#0F5689",
-            fontSize: "16px",
-            marginBottom: "12px",
-          }}
-        >
-          Additional Information
-        </Typography.Title>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          <InfoRow
-            label="Patient Number"
-            value={patientDetails?.PatientNo || patientNo}
+          <TextArea
+            placeholder="Enter Request Reason"
+            style={{ width: '100%' }}
+            rows={3}
           />
-          <InfoRow label="Treatment Number" value={treatmentNo} />
-          {/* <InfoRow label="Age" value={`${patientDetails?.AgeinYears} Years`} /> */}
-          <InfoRow label="Gender" value={patientDetails?.Gender} />
-          {/* {!loadingConsultationRoomDetails && <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} />} */}
-          {/* <InfoRow label={'Consulting Doctor'} value={consultationRoomDetails[0].DoctorsName} /> */}
-        </div>
-      </Card>
-      <Card
-        className="card col-md-6 col-lg-6 col-xl-6"
-        style={{
-          padding: "10px 16px",
-          marginTop: "10px",
-          background: "#e5e3e3",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        }}
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+
+const MoreDeailsModal = ({ open, setOpen, values }) => {
+  return (
+    <Modal
+      closable
+      open={open}
+      closeIcon={
+        <IoCloseOutline
+          size={21}
+          color="black"
+        />
+      }
+      onCancel={() => setOpen(false)}
+      footer={null}
+    >
+      <div style={{ display: 'grid', gap: '4px' }}>
+        {values.map((patientInfo) => (
+          <RenderPatientDetails component={patientInfo} />
+        ))}
+      </div>
+    </Modal>
+  );
+};
+
+const CardMenu = ({ items }) => {
+  return (
+    <div style={{ maxWidth: '280px' }}>
+      {items.map(({ key, onClick, loading, disabled, children }, idx) => (
+        <Button
+          block
+          key={key}
+          type="text"
+          size="medium"
+          loading={loading}
+          onClick={onClick}
+          disabled={disabled}
+          style={{
+            color: '#333',
+            justifyContent: 'start',
+            borderTop: idx === 0 ? 'none' : '.5px solid #efefef',
+          }}
+        >
+          {children}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+const PopoverMenu = ({ content, children }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleOpenChange = (newOpen) => {
+    setOpen(newOpen);
+  };
+
+  return (
+    <Popover
+      open={open}
+      trigger="click"
+      content={content}
+      placement="bottomRight"
+      styles={{
+        body: {
+          padding: 0,
+          background: 'rgba(255, 255, 255, .7)',
+          backdropFilter: 'blur(10px)',
+        },
+      }}
+      onOpenChange={handleOpenChange}
+    >
+      {children}
+    </Popover>
+  );
+};
+
+const RenderPatientDetails = ({ component }) => {
+  const { type, value, label } = component;
+  var componentToRender;
+
+  switch (type) {
+    case 'avatar':
+      componentToRender = <AvatarComponent values={value} />;
+      break;
+    case 'rowData':
+      componentToRender = (
+        <InfoRow
+          label={label}
+          value={value}
+        />
+      );
+    default:
+      break;
+  }
+  return componentToRender;
+};
+
+const AvatarComponent = ({ values }) => {
+  const { Title, Text } = Typography;
+  const [{ value: name }, { label: ageLabel, value: age }] = values;
+
+  return (
+    <div
+      style={{
+        gap: '8px',
+        display: 'flex',
+        padding: '8px 0px',
+        alignItems: 'center',
+      }}
+    >
+      <Avatar
+        icon={<UserOutlined />}
+        size={48}
+      />
+      <div
+        className="d-grid"
+        style={{ gap: '2px' }}
       >
-        <Typography.Title
+        <Title
           level={5}
-          style={{
-            color: "#0f5689",
-            fontSize: "14px",
-            margin: "10px 0 10px 0",
-          }}
+          style={{ margin: 0, fontSize: '16px', color: '#0F5689' }}
         >
-          Doctor's Name
-        </Typography.Title>
-        
-        <Typography.Title
-          level={5}
-          style={{
-            fontSize: "14px",
-            margin: "10px 0 10px 0",
-          }}
-        >
-          {patient?.DoctorsName || "N/A"}
-        </Typography.Title>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ fontSize: "14px", color: "black" }}
-          >
-            Treatment Date
-          </Typography.Title>
-          <Typography.Text
-          >
-            {patient?.TreatmentDate}
-          </Typography.Text>
-        </div>
-        <Typography.Title
-          level={5}
-          style={{
-            color: "#0f5689",
-            fontSize: "14px",
-            margin: "10px 0 10px 0",
-          }}
-        >
-          Settlement Information
-        </Typography.Title>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ fontSize: "14px", color: "black" }}
-          >
-            Settlement Type
-          </Typography.Title>
-
-          <Typography.Text
-            style={{
-              fontSize: "12px",
-              color: "gray",
-              fontWeight: "bold",
-            }}
-          >
-            {patientDetails?.PatientType || "N/A"}
-          </Typography.Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography.Title
-            level={5}
-            style={{ fontSize: "14px", color: "black" }}
-          >
-            Phone Number
-          </Typography.Title>
-
-          <Typography.Text
-            style={{
-              fontSize: "12px",
-              color: "gray",
-              fontWeight: "bold",
-            }}
-          >
-            {patientDetails?.TelephoneNo1 || "N/A"}
-          </Typography.Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-          }}
-        >
-          {patientDetails?.PatientType === "Cash" ? null : (
-            <>
-              <Typography.Title
-                level={5}
-                style={{ fontSize: "14px", color: "black" }}
-              >
-                Insurance
-              </Typography.Title>
-              <Typography.Text
-                style={{
-                  fontSize: "12px",
-                  color: "gray",
-                  fontWeight: "bold",
-                }}
-              >
-                {patientDetails?.SchemeName || "N/A"}
-              </Typography.Text>
-            </>
-          )}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: "20px",
-          }}
-        >
-          {(role === "Doctor" || role === "Psychology") &&
-        patient?.Status !== "Completed" && (
-            <div className="d-block gap-4 d-md-flex justify-content-center align-items-center w-100">
-              <Button
-                type="primary"
-                onClick={handleMarkAsCompleted}
-                loading={markasCompleteLoading}
-                disabled={markasCompleteLoading}
-                style={{ width: "100%", marginBottom: "10px" }}
-              >
-                Mark as Completed
-              </Button>
-              <Button
-                type="default"
-                onClick={showModal}
-                style={{ width: "100%" }}
-              >
-                Request Patient Review
-              </Button>
-              {/* <Button
-                    type="primary"
-                    // style={{ marginTop: "10px", width: "100%" }}
-                    onClick={() => handlePrintInvoice(patientDetails?.PatientId)}
-                    >
-                    Print Interim Invoice
-                    </Button> */}
-            </div>
-          )}
-        </div>
-      </Card>
+          {name}
+        </Title>
+        <Text style={{ fontSize: '13px', color: 'gray', fontWeight: 'bold' }}>
+          {ageLabel}: {age}
+        </Text>
+      </div>
     </div>
   );
 };
@@ -455,24 +447,25 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
 const InfoRow = ({ label, value }) => (
   <div
     style={{
-      display: "flex",
-      justifyContent: "space-between",
+      gap: '8px',
+      display: 'flex',
+      alignItems: 'center',
     }}
   >
     <Typography.Title
       level={5}
-      style={{ fontSize: "14px", color: "black", margin: 0 }}
+      style={{ fontSize: '14px', color: 'black', margin: 0 }}
     >
-      {label}
+      {label} :
     </Typography.Title>
     <Typography.Text
       style={{
-        fontSize: "14px",
-        color: "gray",
-        fontWeight: "bold",
+        fontSize: '14px',
+        color: 'gray',
+        fontWeight: 'bold',
       }}
     >
-      {value || "N/A"}
+      {value || 'N/A'}
     </Typography.Text>
   </div>
 );

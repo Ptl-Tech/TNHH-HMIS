@@ -1,40 +1,43 @@
-
 import {
-
-    POST_ALLERGIES_MEDICATION_REQUEST,
-    POST_ALLERGIES_MEDICATION_SUCCESS,
-    POST_ALLERGIES_MEDICATION_FAIL
+  POST_ALLERGIES_MEDICATION_FAIL,
+  POST_ALLERGIES_MEDICATION_RESET,
+  POST_ALLERGIES_MEDICATION_SUCCESS,
+  POST_ALLERGIES_MEDICATION_REQUEST,
 } from '../../actions/triage-actions/postAllergiesMedicationSlice';
 
-
 const initialState = {
-    postAllergyMedicationLoading: false,
-    postAllergiesMedication: [],
-    error: null,
+  postAllergyMedicationLoading: false,
+  postAllergiesMedication: [],
+  error: null,
 };
 
-export const postAllergiesMedicationReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case POST_ALLERGIES_MEDICATION_REQUEST:
-            return {
-                ...state,
-                postAllergyMedicationLoading: true,
-                error: null,
-            };
-        case POST_ALLERGIES_MEDICATION_SUCCESS:
-            return {
-                ...state,
-                postAllergyMedicationLoading: false,
-                postAllergiesMedication: action.payload,
-                error: null,
-            };
-        case POST_ALLERGIES_MEDICATION_FAIL:
-            return {
-                ...state,
-                postAllergyMedicationLoading: false,
-                error: action.payload,
-            };
-        default:
-            return state;
-    }
+export const postAllergiesMedicationReducer = (
+  state = initialState,
+  action,
+) => {
+  switch (action.type) {
+    case POST_ALLERGIES_MEDICATION_REQUEST:
+      return {
+        ...state,
+        postAllergyMedicationLoading: true,
+        error: null,
+      };
+    case POST_ALLERGIES_MEDICATION_SUCCESS:
+      return {
+        ...state,
+        postAllergyMedicationLoading: false,
+        postAllergiesMedication: action.payload,
+        error: null,
+      };
+    case POST_ALLERGIES_MEDICATION_FAIL:
+      return {
+        ...state,
+        postAllergyMedicationLoading: false,
+        error: action.payload,
+      };
+    case POST_ALLERGIES_MEDICATION_RESET:
+      return initialState;
+    default:
+      return state;
+  }
 };

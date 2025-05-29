@@ -301,7 +301,7 @@ const LabResults = () => {
         Laboratory Request
       </Typography.Title>
 
-      {role === "Doctor" && patientDetails?.Status !== "Completed" ? (
+      {role === "Doctor" || role ==="Nurse" && patientDetails?.Status !== "Completed" ? (
         <div className="d-block d-md-flex align-items-center gap-3 my-3">
           <div className="d-flex justify-content-start align-items-center">
             {!showForm && (

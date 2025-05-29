@@ -311,8 +311,6 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
   }
 };
 
-
-
 export const postTriageVisit = (visitData) => async (dispatch, getState) => {
   try {
     dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
@@ -377,7 +375,7 @@ export const listPatients =
       typeof parameterValue === 'boolean'
         ? parameterValue
         : `'${parameterValue}'`;
-        
+
     const filters =
       parameterName && parameterValue
         ? `&query=$filter=${parameterName} eq ${newParameterValue}`
@@ -390,27 +388,27 @@ export const listPatients =
         otpVerify: { userInfo },
       } = getState();
 
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem('branchCode');
+      // Fetch branchCode from localStorage
+      const branchCode = localStorage.getItem('branchCode');
 
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-        branchCode: branchCode, // Include branchCode in headers
-      },
-    };
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          staffNo: userInfo.userData.no, // Add staffNo as a custom header
+          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          branchCode: branchCode, // Include branchCode in headers
+        },
+      };
 
       const { data } = await axios.get(
         `${API}data/odatafilter?webservice=QyPatients${filters}`,
         config,
       );
 
-    // Filter the patients by branchCode matching GlobalDimension1Code
-    const filteredData = data.filter(
-      (patient) => patient.GlobalDimension1Code === branchCode,
-    );
+      // Filter the patients by branchCode matching GlobalDimension1Code
+      const filteredData = data.filter(
+        (patient) => patient.GlobalDimension1Code === branchCode,
+      );
 
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });
     } catch (error) {
@@ -605,7 +603,7 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } else {
       dispatch({ type: PATIENT_LIST_FAIL, payload: 'Patient not found' });
-   //   message.warning('No patient found with the provided patient number.', 5);
+      //   message.warning('No patient found with the provided patient number.', 5);
     }
   } catch (error) {
     dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
