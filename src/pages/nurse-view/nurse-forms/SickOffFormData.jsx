@@ -7,9 +7,10 @@ import {
   notification,
   Row,
   Space,
+  Switch,
 } from "antd";
 import PropTypes from "prop-types";
-import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { SaveOutlined, CloseOutlined, PrinterOutlined, UserAddOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,7 @@ import {
   postSickOff,
 } from "../../../actions/Doc-actions/Admission/postInitiateDischarge";
 import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 
 const SickOffFormData = ({
   isViewing,
@@ -31,30 +33,26 @@ const SickOffFormData = ({
   const { loading: loadingSickOff } = useSelector((state) => state.postSickOff);
 
   const handleOnFinish = async (values) => {
-    const { sickOffDays, startDate, remarks } = values;
+    const { sickOffDays, startDate, remarks, inPatient } = values;
     const sickOffData = {
       myAction: "create",
-      inPatient: !!admissionNo,
+      inPatient: inPatient,
       documentNo: admissionNo ?? treatmentNo,
       offDutyDays: parseInt(sickOffDays),
       startDate: startDate.format("YYYY-MM-DD"),
       offDutyComments: remarks,
     };
 
-    // console.log("Sick Off Data", sickOffData);
-
     await dispatch(postSickOff(sickOffData))
       .then((response) => {
         if (response.status === "success") {
           form.resetFields();
-          setIsFormVisible(false);
           notification.success({
             message: "Sick Off Created Successfully",
           });
           dispatch(getAdmittedSinglePatient(admissionNo, treatmentNo));
         } else if (response.type === POST_PATIENT_SICK_OFF_FAIL) {
           form.resetFields();
-          setIsFormVisible(false);
           notification.error({
             message: "Sick Off Creation Failed",
           });
@@ -62,7 +60,6 @@ const SickOffFormData = ({
       })
       .then(() => {
         form.resetFields();
-        setIsFormVisible(false);
       })
       .catch((error) => {
         notification.error({
@@ -72,11 +69,19 @@ const SickOffFormData = ({
   };
   const handleResetForm = () => {
     form.resetFields();
-    setIsFormVisible(false);
   };
 
   return (
-    <Form
+   <div>
+    <div className="d-flex justify-content-between align-items-center" style={{ paddingBottom: "10px" }}>
+          <NurseInnerHeader icon={<UserAddOutlined />} title="Sick Off" />
+
+       <Button icon={<PrinterOutlined />} type="primary">
+                Print
+              </Button>
+      </div>
+      <hr/>
+     <Form
       form={form}
       layout="vertical"
       style={{ paddingTop: "10px" }}
@@ -85,6 +90,7 @@ const SickOffFormData = ({
         startDate: "",
         sickOffDays: "",
         remarks: "",
+        inPatient: false, 
       }}
     >
       <Row gutter={[16, 16]}>
@@ -103,16 +109,18 @@ const SickOffFormData = ({
             <DatePicker
               placeholder="Sick off Start Date"
               style={{ width: "100%" }}
+              format="DD/MM/YYYY"
               disabledDate={(current) => {
                 // Disable dates before today
                 return current && current < dayjs().startOf("day");
               }}
+              disabled={isViewing}
             />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
-            label="Sick off Number of Days"
+            label="Sick off Days"
             name="sickOffDays"
             rules={[
               {
@@ -127,14 +135,16 @@ const SickOffFormData = ({
               type="number"
               min={0}
               style={{ width: "100%" }}
+              disabled={isViewing}
             />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
-        <Col span={24}>
+        <Col span={12}>
           <Form.Item
-            label="Remarks"
+            label="Off Duty Remarks"
+            hasFeedback
             name="remarks"
             rules={[
               {
@@ -149,13 +159,34 @@ const SickOffFormData = ({
               },
             ]}
           >
-            <TextArea placeholder="Enter remarks" rows={2} />
+            <TextArea placeholder="Enter remarks" rows={2} disabled={isViewing} />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+        <Form.Item
+            label="Inpatient "
+            name="inPatient"
+            valuePropName="checked"
+            rules={[
+              {
+                required: true,
+                message: "Please confirm if this is an inpatient!",
+              },
+            ]}>
+            <Switch
+              checkedChildren="Yes"
+              unCheckedChildren="No"
+              defaultChecked={true}
+              disabled={isViewing}
+              size="large"
+              />
           </Form.Item>
         </Col>
       </Row>
       <Form.Item>
         <Space>
           {isViewing ? null : (
+           <>
             <Button
               type="primary"
               htmlType="submit"
@@ -165,8 +196,7 @@ const SickOffFormData = ({
             >
               Save Sick Off
             </Button>
-          )}
-          <Button
+            <Button
             color="danger"
             variant="outlined"
             icon={<CloseOutlined />}
@@ -174,9 +204,13 @@ const SickOffFormData = ({
           >
             Cancel
           </Button>
+           </>
+          )}
+          
         </Space>
       </Form.Item>
     </Form>
+    </div>
   );
 };
 

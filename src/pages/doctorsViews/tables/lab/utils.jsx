@@ -55,9 +55,10 @@ export const labResultsColumns = [
     key: 'Specimen_Name',
   },
   {
-    title: 'Reference Range',
-    dataIndex: 'Test_Normal_Ranges',
-    key: 'Test_Normal_Ranges',
+    title: 'Lab Results',
+    dataIndex: 'Results',
+    key: 'Results',
+    editable: true,
   },
   {
     title: 'Unit',
@@ -65,16 +66,9 @@ export const labResultsColumns = [
     key: 'Measuring_Unit_Code',
   },
   {
-    title: 'Lab Results',
-    dataIndex: 'Results',
-    key: 'Results',
-    editable: true,
-  },
-  {
-    title: 'Remarks',
-    dataIndex: 'Remarks',
-    key: 'Remarks',
-    editable: true,
+    title: 'Reference Range',
+    dataIndex: 'Test_Normal_Ranges',
+    key: 'Test_Normal_Ranges',
   },
 ];
 

@@ -15,6 +15,7 @@ import {
   Dropdown,
   Modal,
   Space,
+  Popover,
 } from 'antd';
 
 import { labLinesColumns, labResultsColumns } from './utils';
@@ -121,33 +122,61 @@ const LabResultsEntry = ({ data, loading }) => {
 };
 
 const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
-  console.log({ record });
+  const [open, setOpen] = useState(false);
 
   const items = [
     {
       key: '1',
       label: (
-        <div onClick={() => handleOpenResults(record)}>Add Test Results</div>
+        <Button
+          block
+          type="text"
+          onClick={() => {
+            setOpen(false);
+            handleOpenResults(record);
+          }}
+        >
+          Add Test Results
+        </Button>
       ),
     },
     {
       key: '2',
       label: (
-        <div onClick={() => handleOpenRemarks(record)}>
+        <Button
+          block
+          type="text"
+          onClick={() => {
+            setOpen(false);
+            handleOpenRemarks(record);
+          }}
+        >
           {record.Remarks ? 'View Final Remarks' : 'Add Final Remarks'}
-        </div>
+        </Button>
       ),
     },
   ];
 
   return (
-    <Dropdown
-      menu={{ items }}
+    <Popover
+      open={open}
+      trigger={'click'}
       placement="bottomRight"
       arrow={{ pointAtCenter: true }}
+      styles={{ body: { padding: '2px' } }}
+      content={
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          {items.map((item) => (
+            <li key={item.key}>{item.label}</li>
+          ))}
+        </ul>
+      }
     >
-      <AiOutlineMore size={28} />
-    </Dropdown>
+      <AiOutlineMore
+        size={28}
+        onClick={() => setOpen(true)}
+      />
+    </Popover>
   );
 };
 

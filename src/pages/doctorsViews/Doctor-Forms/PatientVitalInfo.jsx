@@ -907,6 +907,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     suicideFormList,
     triage: nursingTriage,
     mentalStatusChecklist,
+    consultationNotes,
   } = nursingTool || {};
   const {
     triageVitals: nursingTriageVitals,
@@ -914,7 +915,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     treatmentDetails: nursingTreatmentDetails,
   } = nursingTriage || {};
 
-  console.log({ nursingCareplan });
+  console.log({ consultationNotes });
 
   const tableTriageVitals = vitalKeys.map(({ label, key }) => {
     const row = {
