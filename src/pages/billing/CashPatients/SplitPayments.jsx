@@ -18,9 +18,44 @@ import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage"
 import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptHeader";
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import moment from "moment";
-import { deleteReceiptSplitLine } from "../../../actions/Charges-Actions/deleteSplitLine";
+import {
+  DELETE_RECEIPT_SPLIT_LINE_RESET,
+  deleteReceiptSplitLine,
+} from "../../../actions/Charges-Actions/deleteSplitLine";
 
 const { Option } = Select;
+
+const DeleteButton = ({ record, handleDeleteSplitLine }) => {
+  const [loading, setLoading] = useState(false);
+  const { error: deleteSplitLineError, success: deleteSplitLineSuccess } =
+    useSelector((state) => state.deleteSplitLine);
+
+  useEffect(() => {
+    console.log(loading);
+  }, loading);
+
+  useEffect(() => {
+    if ((deleteSplitLineSuccess || deleteSplitLineError) && loading)
+
+      setLoading(false);
+  }, [deleteSplitLineSuccess, deleteSplitLineError]);
+
+  return (
+    <Button
+      danger
+      type="text"
+      loading={loading}
+      icon={<DeleteFilled />}
+      style={{ color: "red" }}
+      onClick={() =>
+        setLoading(() => {
+          handleDeleteSplitLine(record);
+          return true;
+        })
+      }
+    />
+  );
+};
 
 const SplitPayments = ({
   open,
@@ -28,13 +63,13 @@ const SplitPayments = ({
   receiptNo,
   amount,
   activeVisitNo,
-  patientNo
+  patientNo,
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [selectedPaymentType, setSelectedPaymentType] = useState(null);
   const [amountError, setAmountError] = useState("");
-const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
   const { loading: receiptLinesLoading, data: receiptLines } = useSelector(
     (state) => state.getReceiptLines
@@ -47,13 +82,12 @@ const [deleteLoading, setDeleteLoading] = useState(false);
     error,
     success,
   } = useSelector((state) => state.postSplitReceipt);
-  
+
   const {
     loading: deleteSplitLineLoading,
-    error :deleteSplitLineError,
+    error: deleteSplitLineError,
     success: deleteSplitLineSuccess,
   } = useSelector((state) => state.deleteSplitLine);
- 
 
   useEffect(() => {
     if (open) {
@@ -74,8 +108,22 @@ const [deleteLoading, setDeleteLoading] = useState(false);
       dispatch(getReceiptPage(activeVisitNo));
     }
   }, [dispatch, activeVisitNo]);
-  const handleDeleteSplitLine =async (record) => {
-    const recID = record.SystemId; 
+
+  useEffect(() => {
+    if (deleteSplitLineSuccess || deleteSplitLineError) {
+      dispatch({ type: DELETE_RECEIPT_SPLIT_LINE_RESET });
+      if (deleteSplitLineSuccess) {
+        message.success("Payment deleted successfully", 5);
+              dispatch(getSplitReceiptLines(receiptNo));
+
+      } else if (deleteSplitLineError) {
+        message.error("Failed to delete payment", 5);
+      }
+    }
+  }, [deleteSplitLineSuccess, deleteSplitLineError, dispatch, receiptNo]);
+
+  const handleDeleteSplitLine = async (record) => {
+    const recID = record.SystemId;
     const payload = {
       myAction: "delete",
       recId: recID,
@@ -85,13 +133,7 @@ const [deleteLoading, setDeleteLoading] = useState(false);
       transactionNo: record.TransactionNo || "N/A",
       amount: 0,
     };
-    const status = await dispatch(deleteReceiptSplitLine(payload));
-    if (status) {
-      message.success("Payment deleted successfully", 10);
-      dispatch(getSplitReceiptLines(receiptNo));
-    } else {
-      message.error("Failed to delete payment", 10);
-    }
+  await dispatch(deleteReceiptSplitLine(payload));
   };
 
   const columns = [
@@ -110,19 +152,15 @@ const [deleteLoading, setDeleteLoading] = useState(false);
       render: (value) => `Ksh ${value.toFixed(2)}`,
     },
     {
-      title:"Action",
-      key:"action",
-      render:(_, record) => (
-        <Button
-          type="text"
-          icon={<DeleteFilled />}
-        onClick={() => handleDeleteSplitLine(record)}
-          style={{ color: "red" }}
-          danger
-          loading={deleteSplitLineLoading}
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <DeleteButton
+          record={record}
+          handleDeleteSplitLine={handleDeleteSplitLine}
         />
-      )
-    }
+      ),
+    },
   ];
 
   const totalSplitAmount = data?.reduce(
@@ -157,7 +195,7 @@ const [deleteLoading, setDeleteLoading] = useState(false);
 
       const status = await dispatch(postReceiptSplitLine(payload));
       if (status === "success") {
-        message.success("Payment saved successfully", 10);
+        message.success("Payment saved successfully", 5);
         dispatch(getSplitReceiptLines(receiptNo));
       }
 
@@ -217,7 +255,7 @@ const [deleteLoading, setDeleteLoading] = useState(false);
           <strong>Expected Amount:</strong> KSh {parseFloat(amount).toFixed(2)}
         </p>
         <p>
-          <strong>Total Paid:</strong> KSh {totalSplitAmount.toFixed(2)}
+          <strong>Total Paid:</strong> KSh {totalSplitAmount?.toFixed(2)}
         </p>
         <p>
           <strong>Remaining Balance:</strong>{" "}
@@ -245,13 +283,10 @@ const [deleteLoading, setDeleteLoading] = useState(false);
                   showSearch
                   onChange={(value) => setSelectedPaymentType(value)}
                   filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
+                    option.children.toLowerCase().includes(input.toLowerCase())
                   }
                 >
-             
-                  <Option value={7}>MPESA</Option>                
+                  <Option value={7}>MPESA</Option>
                   <Option value={9}>PDQ</Option>
                 </Select>
               </Form.Item>
@@ -307,7 +342,7 @@ const [deleteLoading, setDeleteLoading] = useState(false);
               <Button
                 type="dashed"
                 onClick={handleProcessReceipt}
-                loading={postReceiptLinesLoading}
+               // loading={postReceiptLinesLoading}
                 block
               >
                 Process Payment

@@ -13,9 +13,9 @@ const SickOff = () => {
   const [selectedRowKey, setSelectedRowKey] = useState(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [selectedRow, setSelectedRow] = useState([]);
-  const role = useAuth().userData.departmentName;
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [isViewing, setIsViewing] = useState(false);
+  const role = useAuth().userData.departmentName
+  const [isFormVisible, setIsFormVisible] = useState(true);
+  const [isViewing, setIsViewing] = useState(role === "Nurse");
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
@@ -56,21 +56,18 @@ const SickOff = () => {
 
   return (
     <div>
-      <NurseInnerHeader icon={<UserAddOutlined />} title="Sick Off" />
-
-      {!isFormVisible && role === "Doctor" && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-          }}
-        >
-          <Button type="primary" onClick={handleButtonVisibility}>
-            <PlusOutlined /> Add Sick Off
-          </Button>
-        </div>
-      )}
+      
+      {/* <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "20px",
+        }}
+      >
+        <Button type="primary" onClick={handleButtonVisibility}>
+          <PlusOutlined /> Add Sick Off
+        </Button>
+      </div> */}
 
       {isFormVisible && (
         <SickOffFormData

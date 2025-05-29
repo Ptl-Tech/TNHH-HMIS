@@ -90,7 +90,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
-        patientStatus: patientDetails?.PatientStatus || 0,
+        dependant: patientDetails?.Dependant || 0,
       });
     }
   }, [patientDetails, form]);
