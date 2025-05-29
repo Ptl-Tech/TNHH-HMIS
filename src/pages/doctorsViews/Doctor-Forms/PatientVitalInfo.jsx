@@ -902,6 +902,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     suicideFormList,
     triage: nursingTriage,
     mentalStatusChecklist,
+    consultationNotes,
   } = nursingTool || {};
   const {
     triageVitals: nursingTriageVitals,
@@ -909,7 +910,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     treatmentDetails: nursingTreatmentDetails,
   } = nursingTriage || {};
 
-  console.log({ dischargeSummary });
+  console.log({ consultationNotes });
 
   const tableTriageVitals = vitalKeys.map(({ label, key }) => {
     const row = {
@@ -1076,10 +1077,6 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
   const objectsToRenderRefs = useRef([]);
 
   useEffect(() => {
-    console.log({ objectsToRenderRefs });
-  }, [objectsToRenderRefs]);
-
-  useEffect(() => {
     if (encounter) {
       dispatch(
         getEncounterDetails({
@@ -1124,23 +1121,12 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
             >
               {SearchName?.toLowerCase()} Encounter
             </h4>
-            <Space className="d-flex gap-2 align-items-center">
-              <h6 style={{ color: 'gray' }}>
-                {appointmentDate === dischargeDate
-                  ? dayjs(appointmentDate).format('DD MMM YYYY')
-                  : `${dayjs(appointmentDate).format('DD MMM YYYY')} -
+            <h6 style={{ color: 'gray' }}>
+              {appointmentDate === dischargeDate
+                ? dayjs(appointmentDate).format('DD MMM YYYY')
+                : `${dayjs(appointmentDate).format('DD MMM YYYY')} -
                     ${dayjs(dischargeDate).format('DD MMM YYYY')}`}
-              </h6>
-              <Button
-                shape="round"
-                type="default"
-                onClick={() => setOpen(false)}
-                className="gap-1 text-main-primary"
-              >
-                <IoClose size={14} />
-                <span style={{ fontSize: '16px' }}>Close</span>
-              </Button>
-            </Space>
+            </h6>
           </Space>
         </Skeleton>
       }
