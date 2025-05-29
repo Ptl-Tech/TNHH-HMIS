@@ -1,8 +1,5 @@
-import { classNames } from '@react-pdf-viewer/core';
-import { current } from '@reduxjs/toolkit';
-import { Button, Space } from 'antd';
-import Title from 'antd/es/skeleton/Title';
 import dayjs from 'dayjs';
+import { Button, Space } from 'antd';
 
 import { MdAttachFile } from 'react-icons/md';
 
@@ -22,6 +19,30 @@ const formattedDate = (date, format = 'DD MMM YYYY') =>
 const renderDate = ({ month, day, year }) => {
   const newDate = `${month}/${day}/${year}`;
   return formattedDate(newDate);
+};
+
+export const generateFileTabsData = ({
+  data,
+  labelKey,
+  renderLabel,
+  objectSpecifier,
+  component: Component,
+}) => {
+  const response = data?.map((dataItem, index) => ({
+    key: index + 1,
+    label: renderLabel ? renderLabel(dataItem[labelKey]) : dataItem[labelKey],
+    children: (
+      <Component
+        index={index}
+        data={dataItem}
+        objectSpecifier={objectSpecifier}
+      />
+    ),
+  }));
+
+  console.log({ response });
+
+  return response;
 };
 
 // TODO: waiting on Ndirangu to finish the API side.
@@ -536,18 +557,6 @@ export const dietaryIntakeObjectArray = [
 
 export const nursingCarePlanObjectArray = [
   {
-    key: 'date',
-    title: 'Date',
-    dataIndex: 'date',
-    render: (date) => date && renderDate(date),
-    className: 'text-main-primary fw-bolder',
-  },
-  {
-    key: 'nursing_Diagnosis',
-    title: 'Nursing Diagnosis',
-    dataIndex: 'nursing_Diagnosis',
-  },
-  {
     key: 'nursing_Diagnosis',
     title: 'Nursing Diagnosis',
     dataIndex: 'nursing_Diagnosis',
@@ -625,5 +634,14 @@ export const visitorListObjectArray = [
     key: 'phoneNumber',
     title: 'Phone Number',
     dataIndex: 'phoneNumber',
+  },
+];
+
+export const nurseCardExObjectArray = [
+  {
+    key: 'notes',
+    title: 'Notes',
+    dataIndex: 'notes',
+    innerHTML: true,
   },
 ];
