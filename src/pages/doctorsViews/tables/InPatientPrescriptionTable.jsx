@@ -1,7 +1,7 @@
 import Loading from "../../../partials/nurse-partials/Loading";
 import PropTypes from "prop-types";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
-import { Tag, Typography } from "antd";
+import { Table, Tag, Typography } from "antd";
 
 const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
   const handleEdit = (record) => {
@@ -102,13 +102,13 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
       {loadingPrescriptions ? (
         <Loading />
       ) : (
-        <RowSelectionTable
+        <Table
           columns={columns}
           dataSource={filteredPrescriptions}
           onRowSelect={handleEdit}
           rowKey="key"
           size="small"
-          scroll={{ x: 1300, y: 500 }}
+      scroll={{ x: 1500 }}
         />
       )}
     </div>

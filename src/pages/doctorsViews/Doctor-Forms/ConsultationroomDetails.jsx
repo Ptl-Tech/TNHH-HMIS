@@ -19,7 +19,7 @@ const ConsultationroomDetails = ({ treatmentNo, observationNo, patientNo }) => {
       icon: <SolutionOutlined />,
       children: <PatientSigns treatmentNo={treatmentNo} filter={'PH'} />,
     },
-    ...(role === 'Doctor'
+    ...(role === 'Doctor' || role === 'Nurse'
       ? [
           {
             label: 'Physical Examination',

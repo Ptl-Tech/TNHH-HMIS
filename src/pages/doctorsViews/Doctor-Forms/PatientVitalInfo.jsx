@@ -81,7 +81,7 @@ const PatientVitalInfo = () => {
       key: '3',
       label: 'Latest Encounter',
       children: <LatestEncounter />,
-    },
+    }
   ];
 
   return (
@@ -103,9 +103,9 @@ const PatientVitalInfo = () => {
 
 const Vitals = () => {
   const { state } = useLocation() || {};
-  const { patientNo } = state || {};
-
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const dispatch = useDispatch();
+  console.log(patientNo);
 
   const [openAddVitals, setOpenAddVitals] = useState(false);
   const [openPreviousVitals, setOpenPreviousVitals] = useState(false);
@@ -708,8 +708,7 @@ const TraigeNotes = ({}) => {
 const LatestEncounter = () => {
   const dispatch = useDispatch();
   const { state } = useLocation() || {};
-  const { patientNo } = state || {};
-
+ const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const [open, setOpen] = useState(false);
   const [openPastEncountersDrawer, setOpenPastEncountersDrawer] =
     useState(false);

@@ -35,20 +35,20 @@ const PatientFile = ({ patientDetails }) => {
     { label: "Patient Info", icon: <UserOutlined /> },
     // "Medical Info",
     { label: "Next of Kin", icon: <UserAddOutlined /> },
-    ...(userRole.userData.departmentName === "Doctor" ||
-    userRole.userData.departmentName === "Nurse" ||
-    (userRole.userData.departmentName === "Psychology" &&
-      patientDetail?.Status !== "Completed")
-      ? [{ label: "Past Doctor Notes", icon: <FileMarkdownOutlined /> }]
-      : []),
+    // ...(userRole.userData.departmentName === "Doctor" ||
+    // userRole.userData.departmentName === "Nurse" ||
+    // (userRole.userData.departmentName === "Psychology" &&
+    //   patientDetail?.Status !== "Completed")
+    //   ? [{ label: "Past Doctor Notes", icon: <FileMarkdownOutlined /> }]
+    //   : []),
     // "Nursing Notes",
     ...(userRole.userData.departmentName === "Nurse"
       ? [{ label: "Nursing Notes", icon: <FileProtectOutlined /> }]
       : []),
     // "Consumables",
-    ...(userRole.userData.departmentName === "Nurse"
-      ? [{ label: "Order Sheet", icon: <FilterOutlined /> }]
-      : []),
+    // ...(userRole.userData.departmentName === "Nurse"
+    //   ? [{ label: "Order Sheet", icon: <FilterOutlined /> }]
+    //   : []),
 
     // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
@@ -69,18 +69,18 @@ const PatientFile = ({ patientDetails }) => {
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
-      case "Past Doctor Notes":
-        setSelectedItem(<PastDoctorNotes />);
-        break;
+      // case "Past Doctor Notes":
+      //   setSelectedItem(<PastDoctorNotes />);
+      //   break;
       case "Nursing Notes":
         setSelectedItem(<NursingNotes />);
         break;
       // case "Past Encounters Notes":
       //   setSelectedItem(<PastDoctorNotes />);
       //   break;
-      case "Order Sheet":
-        setSelectedItem(<Consumables />);
-        break;
+      // case "Order Sheet":
+      //   setSelectedItem(<Consumables />);
+      //   break;
       // case "Charges":
       //   setSelectedItem(<Charges/>);
       //   break;

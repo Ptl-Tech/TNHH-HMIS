@@ -90,6 +90,7 @@ const InpatientMedication = () => {
         <InPatientPrescriptionTable
           filteredPrescriptions={prescriptions}
           loadingPrescriptions={loadingPrescriptions}
+          
         />
       ) : (
         <InpatientPrescriptionForm setShowForm={setShowForm} />
