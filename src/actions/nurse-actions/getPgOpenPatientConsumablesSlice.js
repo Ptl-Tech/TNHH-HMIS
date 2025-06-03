@@ -13,7 +13,7 @@ export const getPgOpenPatientConsumablesSlice = () =>
     try {
         dispatch({ type: GET_PG_OPEN_PATIENT_CONSUMABLES_REQUEST });
 
-        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgOpenPatientConsumables&isList=true`, config);
+        const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgNurseOrderSheet&isList=true`, config);
     
 
         dispatch({ type: GET_PG_OPEN_PATIENT_CONSUMABLES_SUCCESS, payload: data });

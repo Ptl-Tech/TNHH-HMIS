@@ -227,6 +227,7 @@ const InvoiceInpatient = () => {
         >
           Go back
         </Button>
+         <h5 className="fw-bold m-0 p-0 text-primary">Patient Invoice Bill</h5>
         <Dropdown overlay={menu} trigger={["click"]}>
           <Button type="primary" icon={<MoreOutlined />}>
             <span className="ant-dropdown-link fw-bold">Actions</span>
@@ -261,7 +262,7 @@ const InvoiceInpatient = () => {
             {/* First row */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Patient Name:{" "}
-              <span className="fw-bold">{patientBillData[0]?.Names}</span>
+              <span className="fw-bold text-primary">{patientBillData[0]?.Names}</span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Gender: {patientBillData[0]?.Gender}
@@ -275,10 +276,10 @@ const InvoiceInpatient = () => {
               )} years)`}
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient ID: <span className="fw-bold">{patientBillData[0]?.CurrentAdmNo}</span>
+              Encounter No: <span className="fw-bold text-secondary">{patientBillData[0]?.CurrentAdmNo}</span>
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold">Inpatient</span> : <span className="fw-bold">Outpatient</span>}
+                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold text-secondary">Inpatient</span> : <span className="fw-bold text-secondary">Outpatient</span>}
               </p>
 
               {/* Second row */}
@@ -294,7 +295,7 @@ const InvoiceInpatient = () => {
             {/* Receipt no section */}
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Invoice No:{" "}
-              <span style={{ fontWeight: "semibold", color: "blue" }}>
+              <span className="fw-bold text-primary">
                 {Array.isArray(data) && data.length > 0
                   ? data[data.length - 1].Invoice_Number
                   : "N/A"}
@@ -302,7 +303,8 @@ const InvoiceInpatient = () => {
             </p>
             <p className="mb-0" style={{ gridColumn: "span 2" }}>
               Date:{" "}
-              {Array.isArray(data) && data.length > 0
+             <span className="fw-medium fst-italic">
+               {Array.isArray(data) && data.length > 0
                 ? new Date(data[data.length - 1].Date).toLocaleDateString(
                     "en-GB",
                     {
@@ -313,6 +315,7 @@ const InvoiceInpatient = () => {
                     }
                   )
                 : "N/A"}
+              </span>
             </p>
           </div>
         </Card>

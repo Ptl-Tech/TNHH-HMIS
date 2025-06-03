@@ -162,6 +162,7 @@ const ReceiptPatient = () => {
           >
             Go back
           </Button>
+          <h5 className="fw-bold m-0 p-0 text-primary">Patient Receipt</h5>
           <Dropdown overlay={menu} trigger={["click"]}>
             <Button type="primary" icon={<MoreOutlined />}>
               <span className="ant-dropdown-link fw-bold">Actions</span>
@@ -197,7 +198,7 @@ const ReceiptPatient = () => {
               {/* First row */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient Name:{" "}
-                <span className="fw-bold">
+                <span className="fw-bold text-primary">
                   {patientVisitDetails?.Names.toUpperCase()}
                 </span>
               </p>
@@ -205,13 +206,18 @@ const ReceiptPatient = () => {
                 Gender: {patientVisitDetails?.Gender}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Age in Years: {patientVisitDetails?.AgeinYears}
+                Age in Years: {patientVisitDetails?.AgeinYears} 
+                <span className="fst-italic ml-2"> years</span>
               </p>
+               <p className="mb-0" style={{ gridColumn: "span 2" }}>
+              Encounter No : <span className="fw-bold text-secondary">
+                {activeVisitNo}
+              </span>
+            </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Patient ID: {patientVisitDetails?.PatientNo}
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientVisitDetails?.AppointmentType}
+                Visit Type: <span className="fw-bold text-secondary">
+                  {patientVisitDetails?.AppointmentType}
+                </span>
               </p>
 
               {/* Second row */}
@@ -227,25 +233,25 @@ const ReceiptPatient = () => {
               {/* Receipt no section */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Receipt No:
-                <span style={{ fontWeight: "semibold", color: "blue" }}>
+                <span className="fw-bold text-primary">
                   {" "}
-                  {Array.isArray(receiptLines) && receiptLines.length > 0
-                    ? receiptLines[receiptLines.length - 1].No
+                  {Array.isArray(receiptHeader) && receiptHeader.length > 0
+                    ? receiptHeader[receiptHeader.length - 1].No
                     : "N/A"}
                 </span>
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Date:{" "}
-                {Array.isArray(receiptLines) && receiptLines.length > 0
+                <span className="fw-medium fst-italic">   {Array.isArray(receiptHeader) && receiptHeader.length > 0
                   ? new Date(
-                      receiptLines[receiptLines.length - 1].Date
+                      receiptHeader[receiptHeader.length - 1].Date
                     ).toLocaleDateString("en-GB", {
                       weekday: "short", // Optional, for day of the week
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })
-                  : "N/A"}
+                  : "N/A"} </span>
               </p>
             </div>
           </Card>
@@ -253,8 +259,8 @@ const ReceiptPatient = () => {
           <div className="d-flex justify-content-end gap-3 my-3">
             <PrintReceipt
               receiptNo={
-                Array.isArray(receiptLines) && receiptLines?.length > 0
-                  ? receiptLines[receiptLines?.length - 1]?.No
+                Array.isArray(receiptHeader) && receiptHeader?.length > 0
+                  ? receiptHeader[receiptHeader?.length - 1]?.No
                   : "N/A"
               }
             />

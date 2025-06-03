@@ -124,7 +124,7 @@ const handleReceiptPost = async () => {
     form.resetFields(); // This will clear all fields in the form
     setPaymentType(null); // Reset payment type
   };
-
+console.log("patientBillData", patientBillData);
   return (
     <Card title="Add Payment Option" style={{ padding: "10px 16px" }}>
       <Form
@@ -212,7 +212,7 @@ const handleReceiptPost = async () => {
 
         <Row gutter={16}>
           <Col span={24}>
-            {patientBillData[0]?.Inpatient  && patientBillData[0].PatientType !== "Cash"? (
+            {patientBillData?.Inpatient  && patientBillData.PatientType !== "Cash"? (
              <Form.Item
                 name="coPay"
                 valuePropName="checked"
@@ -246,29 +246,34 @@ const handleReceiptPost = async () => {
           <Col span={12}>
          
           <Button
-          onClick={handleClear} // Clear button will only reset the fields
-          style={{ marginLeft: 8 }}
+          onClick={handleClear}
+          type="default"
+          style={{ marginLeft: 8, color: '#0f5689' }}
+          danger
         >
           Clear
         </Button>
           </Col>
         </Row>
 
-        {receiptHeader && receiptHeader.length > 0 && (
-          <Row gutter={16} style={{ marginTop: 16 }}>
-            <Col span={24}>
-              <Button
-                type="primary"
-                onClick={handleReceiptPost}
-                loading={saveloading }
-                disabled={saveloading || receiptLinesLoading}
-              >
-                Post Receipt
-              </Button>
-            </Col>
-          </Row>
-        )}
-     
+       {patientBillData[0]?.Inpatient &&
+  patientBillData[0].PatientType !== "Cash" &&
+  receiptHeader &&
+  receiptHeader.length > 0 && (
+    <Row gutter={16} style={{ marginTop: 16 }}>
+      <Col span={24}>
+        <Button
+          type="primary"
+          onClick={handleReceiptPost}
+          loading={saveloading}
+          disabled={saveloading || receiptLinesLoading}
+        >
+          Post Receipt
+        </Button>
+      </Col>
+    </Row>
+)}
+
       </Form>
     </Card>
   );

@@ -41,7 +41,7 @@ const handleOnFinish = async (values) => {
       admissionNo: patientDetails?.Admission_No,
       recId: "",
       branchCode: location,
-      prescriptionDose: quantity,
+  prescriptionDose: parseInt(quantity, 10),
       drugNo: item,
       staffNo: userDetails.userData.no,
     };

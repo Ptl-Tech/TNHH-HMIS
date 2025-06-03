@@ -213,6 +213,7 @@ const ReceiptInpatient = () => {
           >
             Go back
           </Button>
+          <h5 className="fw-bold m-0 p-0 text-primary"> Receipt InPatient</h5>
           <Dropdown overlay={menu} trigger={["click"]}>
             <Button type="primary" icon={<MoreOutlined />}>
               <span className="ant-dropdown-link fw-bold">Actions</span>
@@ -247,7 +248,7 @@ const ReceiptInpatient = () => {
               {/* First row */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Patient Name:{" "}
-                <span className="fw-bold">{patientBillData[0]?.Names}</span>
+                <span className="fw-bold text-primary">{patientBillData[0]?.Names}</span>
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Gender: {patientBillData[0]?.Gender}
@@ -261,11 +262,10 @@ const ReceiptInpatient = () => {
                 )} years)`}
               </p>
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Patient ID: {patientBillData[0]?.PatientNo}
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type:{" "}
-                {patientBillData[0]?.Inpatient ? "Inpatient" : "N/a"}
+              Encounter No: <span className="fw-bold text-secondary">{patientBillData[0]?.CurrentAdmNo}</span>
+            </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold text-secondary">Inpatient</span> : <span className="fw-bold text-secondary">Outpatient</span>}
               </p>
 
               {/* Second row */}
@@ -281,7 +281,7 @@ const ReceiptInpatient = () => {
               {/* Receipt no section */}
               <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Receipt No:
-                <span style={{ fontWeight: "semibold", color: "blue" }}>
+                <span className="fw-bold text-primary">
                   {" "}
                   {Array.isArray(receiptLines) && receiptLines.length > 0
                     ? receiptLines[receiptLines.length - 1].No
