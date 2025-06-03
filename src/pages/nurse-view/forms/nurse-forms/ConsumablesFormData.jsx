@@ -14,6 +14,7 @@ import { getQyLocationsSlice } from "../../../../actions/nurse-actions/getQyLoca
 import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { POST_NURSE_ORDER_SHEET_FAILURE, POST_NURSE_ORDER_SHEET_SUCCESS, postNurseOrderSheetSlice } from "../../../../actions/nurse-actions/postNurseOrderSheet";
 const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const [form] = Form.useForm();
   const { patientDetails } = useLocation().state;
@@ -27,60 +28,63 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const { loadingPostConsumables } = useSelector(
     (state) => state.postPatientConsumables
   );
-  const handleOnFinish = async (values) => {
-    try {
-      const { location, quantity, item, remarks } = values;
+  const { loadingpostNurseOrderSheet } = useSelector(
+    (state) => state.postNurseOrderSheet
+  );
+  
+const handleOnFinish = async (values) => {
+  try {
+    const { location, quantity, item, remarks } = values;
 
-      // Construct the visitor data
-      const consumableData = {
-        myAction: "create",
-        admissionNo: patientDetails?.Admission_No,
-        recId: "",
-        location,
-        quantity,
-        remarks,
-        item,
-        documentNo: patientDetails?.Admission_No,
-        branchCode: branchCode,
-        staffNo: userDetails.userData.no,
-      };
+    const consumableData = {
+      myAction: "create",
+      admissionNo: patientDetails?.Admission_No,
+      recId: "",
+      branchCode: location,
+      prescriptionDose: quantity,
+      drugNo: item,
+      staffNo: userDetails.userData.no,
+    };
 
-      // Dispatch function to handle API call and feedback
-      const dispatchPatientConsumablesData = async (data) => {
-        await dispatch(
-          postPatientConsumablesSlice(
-            "/GeneralProcesses/PatientConsumables",
-            data
-          )
-        )
-          .then((result) => {
-            if (result.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
-              message.success(`Consumables posted successfully!`);
-              dispatch(getPgOpenPatientConsumablesSlice());
-              setIsConsumableFormVisible(false);
-            } else if (result.type === POST_PATIENT_CONSUMABLES_FAILURE) {
-              message.error(
-                result?.payload?.message ||
-                  "Internal server error, please try again later."
-              );
-            }
-          })
-          .then(() => {
-            form.resetFields();
-          })
-          .catch((err) => {
-            message.error(
-              err.message || "Internal server error, please try again later."
-            );
-          });
-      };
+    // Dispatch postPatientConsumablesSlice and wait for result
+    const consumablesResult = await dispatch(
+      postPatientConsumablesSlice("/Nurse/NurseOrderSheet", consumableData)
+    );
 
-      // Call the function
-      await dispatchPatientConsumablesData(consumableData);
-    } catch (error) {
-      message.error(error.message || "An unexpected error occurred.");
+    if (consumablesResult.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
+      message.success("Consumables posted successfully!");
+
+      // Dispatch postNurseOrderSheetSlice and wait for result
+      const orderSheetResult = await dispatch(
+        postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
+          admissionNo: patientDetails?.Admission_No,
+          branchCode: location,
+          staffNo: userDetails.userData.no,
+        })
+      );
+
+      if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_SUCCESS) {
+        message.success("Order sheet sent to pharmacy successfully!");
+        dispatch(getPgOpenPatientConsumablesSlice());
+        setIsConsumableFormVisible(false);
+        form.resetFields();
+      } else if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_FAILURE) {
+        message.error(
+          orderSheetResult?.payload?.message ||
+            "Failed to send order sheet to pharmacy."
+        );
+      }
+    } else if (consumablesResult.type === POST_PATIENT_CONSUMABLES_FAILURE) {
+      message.error(
+        consumablesResult?.payload?.message ||
+          "Internal server error, please try again later."
+      );
     }
-  };
+  } catch (error) {
+    message.error(error.message || "An unexpected error occurred.");
+  }
+};
+
 
   useEffect(() => {
     if (!qyLocations?.length) {
@@ -125,6 +129,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
                   value: item.Code,
                   label: item.Name,
                 }))}
+                 size="large"
               />
             </Form.Item>
           </Col>
@@ -146,6 +151,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
                   value: item.No,
                   label: item.Description,
                 }))}
+                 size="large"
               />
             </Form.Item>
           </Col>
@@ -156,12 +162,12 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
               rules={[{ required: true, message: "Please enter quantity!" }]}
               hasFeedback
             >
-              <Input type="number" placeholder="Enter Quantity" />
+              <Input type="number" size="large" placeholder="Enter Quantity" />
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item
+        {/* <Form.Item
           label="Remarks"
           name="remarks"
           hasFeedback
@@ -185,7 +191,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
             name="consumablesRemarks"
             rows={2}
           />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item>
           <Space>
             <Button

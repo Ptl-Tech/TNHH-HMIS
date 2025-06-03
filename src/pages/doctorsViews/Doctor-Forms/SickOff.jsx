@@ -2,7 +2,9 @@ import React from 'react'
 
 const SickOff = () => {
   return (
-    <div>SickOff</div>
+    <div>
+      
+    </div>
   )
 }
 

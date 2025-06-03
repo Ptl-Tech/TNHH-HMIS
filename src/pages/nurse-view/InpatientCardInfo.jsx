@@ -1,161 +1,143 @@
-import { Card, Divider, Spin, Typography } from "antd";
+import { useState } from "react";
+import { Button, Card, Divider, Spin, Typography, Modal } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { calculateAge } from "../../utils/helpers";
-import moment from "moment/moment";
+import moment from "moment";
 import PropTypes from "prop-types";
 import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
+import PatientFile from "./PatientFile";
 
 const InpatientCardInfo = ({ patientDetail }) => {
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("PatientNo");
+  const [patientFileVisible, setPatientFileVisible] = useState(false);
 
-  const { loadingPatientDetails, patientDetails } =
-    useFetchPatientDetailsHook(patientNo);
+  const { loadingPatientDetails, patientDetails } = useFetchPatientDetailsHook(patientNo);
 
-  const invalidDate = "0001-01-01"; // Define the "invalid" date
+  const invalidDate = "0001-01-01";
+
+  const handlePatientFileClick = () => {
+    setPatientFileVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setPatientFileVisible(false);
+  };
+
+  console.log("deets", patientDetails);
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          alignContent: "center",
-          gap: "20px",
-          paddingBottom: "20px",
-        }}
+      <Card
+        className="card"
+        style={{ width: "100%", borderTop: "3px solid #0f5689", padding: "20px" }}
       >
-        <Card
-          className="card"
-          style={{ width: "100%", borderTop: "3px solid #0f5689" }}
-        >
-          <div className="inpatient-details-container-1">
+        <div className="d-flex justify-content-between align-items-center">
+          <div >
             <Typography.Text
-              className="patient-name"
-              style={{ fontWeight: "bold", color: "#0f5689" }}
+              style={{ fontWeight: "bold", fontSize: "16px", color: "#0f5689" }}
             >
               {patientDetails?.SearchName || "N/A"}
             </Typography.Text>
-            <Typography.Text
-              className="patient-id"
-              style={{ fontWeight: "bold", color: "#0f5689" }}
+            <br />
+            <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+              Patient Number: {patientDetails?.PatientNo || "N/A"}
+            </Typography.Text>
+          </div>
+          <div>
+            <Button
+              type="primary"
+              style={{ backgroundColor: "#0f5689", color: "#ffffff" }}
+              onClick={handlePatientFileClick}
             >
-              Patient Number : {patientDetails?.PatientNo || "N/A"}
+              Patient File
+            </Button>
+          </div>
+        </div>
+
+        <Divider />
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "40px" }}>
+          <div>
+            <Typography.Text strong>Admission No:</Typography.Text>
+            <br />
+            <Typography.Text>{patientDetails?.CurrentAdmNo || "N/A"}</Typography.Text>
+          </div>
+
+          <div>
+            <Typography.Text strong>Age and Gender:</Typography.Text>
+            <br />
+            {loadingPatientDetails ? (
+              <Spin
+                indicator={
+                  <LoadingOutlined style={{ fontSize: 24, color: "#0f5689" }} spin />
+                }
+              />
+            ) : (
+              <Typography.Text>
+                {calculateAge(patientDetails?.DateOfBirth) || "N/A"},{" "}
+                {patientDetails?.Gender || "N/A"}
+              </Typography.Text>
+            )}
+          </div>
+
+          <div>
+            <Typography.Text strong>Admitting Doctor:</Typography.Text>
+            <br />
+            <Typography.Text>{patientDetail?.DoctorsName || "N/A"}</Typography.Text>
+          </div>
+
+          <div>
+            <Typography.Text strong>Date of Admission:</Typography.Text>
+            <br />
+            <Typography.Text>
+              {moment(patientDetails?.Admission_Date).isValid() &&
+              patientDetails?.Admission_Date !== invalidDate
+                ? moment(patientDetails?.Admission_Date).format("dddd, MMMM Do, YYYY")
+                : "N/A"}
             </Typography.Text>
           </div>
 
-          <Divider />
-
-          <div className="inpatient-details-container-2">
-            <div className="patient-hospital-number-container">
-              <Typography.Text className="hospital-number-header">
-                Admission No
-              </Typography.Text>
-              <Typography.Text className="hospital-number">
-                {patientDetails?.CurrentAdmNo || "N/A"}
-              </Typography.Text>
-            </div>
-
-            <Divider type="vertical" style={{ height: "40px" }} />
-
-            <div className="patient-age-gender-container">
-              <Typography.Text className="age-and-gender-header">
-                Age and Gender
-              </Typography.Text>
-              {loadingPatientDetails ? (
-                <Spin
-                  indicator={
-                    <LoadingOutlined
-                      style={{ fontSize: 24, color: "#0f5689" }}
-                      spin
-                    />
-                  }
-                />
-              ) : (
-                <Typography.Text className="age-and-gender">
-                  {calculateAge(patientDetails?.DateOfBirth) || "N/A"},{" "}
-                  {patientDetails?.Gender || "N/A"}
-                </Typography.Text>
-              )}
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          className="card"
-          style={{
-            width: "100%",
-            backgroundColor: "#e5e3e3",
-            border: "none",
-            borderTop: "3px solid #0f5689",
-          }}
-        >
-          <div className="inpatient-details-container-1">
-            <Typography.Text
-              className="patient-name"
-              style={{ fontWeight: "bold", color: "#0f5689" }}
-            >
-              Admission Details
-            </Typography.Text>
-            <Typography.Text
-              className="patient-id"
-              style={{ fontWeight: "bold", color: "#0f5689" }}
-            >
-              Admitting Doctor : {patientDetails?.DoctorsName || "N/A"}
+          <div>
+            <Typography.Text strong>Expected Discharge:</Typography.Text>
+            <br />
+            <Typography.Text>
+              {moment(patientDetails?.Expected_Date_of_Discharge).isValid() &&
+              patientDetails?.Expected_Date_of_Discharge !== invalidDate
+                ? moment(patientDetails?.Expected_Date_of_Discharge).format(
+                    "dddd, MMMM Do, YYYY"
+                  )
+                : "N/A"}
             </Typography.Text>
           </div>
 
-          <div className="inpatient-details-container-2">
-            <div className="patient-hospital-number-container">
-              <Typography.Text className="hospital-number-header text-black-50">
-                Date of Admission
-              </Typography.Text>
-              <Typography.Text key={patientDetails?.Admission_Date}>
-                {moment(patientDetails?.Admission_Date).isValid() &&
-                patientDetails?.Admission_Date !== invalidDate
-                  ? moment(patientDetails?.Admission_Date).format(
-                      "dddd, MMMM Do, YYYY"
-                    )
-                  : "N/A"}
-                {/* {patientDetails?.Admission_Date && moment(patientDetails?.Admission_Date).format('dddd, MMMM Do, YYYY')} */}
-              </Typography.Text>
-            </div>
-
-            <Divider type="vertical" style={{ height: "40px" }} />
-
-            <div className="patient-age-gender-container">
-              <Typography.Text className="hospital-number-header text-black-50">
-                Expected Discharge Date
-              </Typography.Text>
-              <Typography.Text key={patientDetails?.Expected_Date_of_Discharge}>
-                {moment(patientDetails?.Expected_Date_of_Discharge).isValid() &&
-                patientDetails?.Expected_Date_of_Discharge !== invalidDate
-                  ? moment(patientDetails?.Expected_Date_of_Discharge).format(
-                      "dddd, MMMM Do, YYYY"
-                    )
-                  : "N/A"}
-                {/* {patientDetails?.Expected_Date_of_Discharge && moment(patientDetails?.Expected_Date_of_Discharge).format('dddd, MMMM Do, YYYY')} */}
-              </Typography.Text>
-            </div>
+          <div>
+            <Typography.Text strong>Ward and Room:</Typography.Text>
+            <br />
+            <Typography.Text>
+              {patientDetail?.Ward || "N/A"}, {patientDetail?.Bed || "N/A"}
+            </Typography.Text>
           </div>
+        </div>
+      </Card>
 
-          <div className="inpatient-details-container-2">
-            <div className="patient-hospital-number-container">
-              <Typography.Text className="hospital-number-header text-black-50">
-                Ward and Room Number
-              </Typography.Text>
-              <Typography.Text key={patientDetails?.Admission_Date}>
-                {patientDetail?.Ward || "N/A"}, {patientDetail?.Bed || "N/A"}
-              </Typography.Text>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Modal
+        title="Patient File"
+        open={patientFileVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        width={800}
+        style={{ top: 20 }}
+        bodyStyle={{ padding: "8px" }}
+      >
+        <PatientFile patientNo={patientNo} />
+      </Modal>
     </>
   );
 };
 
 export default InpatientCardInfo;
-// props validations
+
 InpatientCardInfo.propTypes = {
   patientDetail: PropTypes.object,
 };

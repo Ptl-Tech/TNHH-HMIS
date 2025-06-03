@@ -108,9 +108,7 @@ const Discharges = () => {
     { label: "Summary", icon: <FileOutlined /> },
     { label: "Discharge Medication", icon: <FileMarkdownOutlined /> },
     { label: "Sick Off", icon: <UserAddOutlined /> },
-    ...(role === "Nurse"
-      ? []
-      : [{ label: "Initiate Discharge", icon: <FileOutlined /> }]), // move to the end
+   
   ];
 
   return (

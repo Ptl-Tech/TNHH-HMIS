@@ -23,33 +23,36 @@ import DietaryIntakeForm from "./nurse-forms/DietaryIntakeForm";
 import JacksonVisualForm from "./nurse-forms/JacksonVisualForm";
 import CarePlanForm from "./nurse-forms/CarePlanForm";
 import InpatientMedication from "./nurse-care-plan/InpatientMedication";
+import ConsultationroomDetails from "../doctorsViews/Doctor-Forms/ConsultationroomDetails";
 
-const CarePlan = () => {
-  const [activeItem, setActiveItem] = useState("Allergies and Medications");
-  const [selectedItem, setSelectedItem] = useState(<AddAllergies />);
-  const role = useAuth().userData.departmentName;
+const CarePlan = ({ treatmentNo, observationNo, patientNo, patientDetails }) => {
+  const [activeItem, setActiveItem] = useState("Consultation Room File");
+  const [selectedItem, setSelectedItem] = useState(
+    <ConsultationroomDetails
+      treatmentNo={treatmentNo}
+      observationNo={observationNo}
+      patientNo={patientNo}
+    />
+  );
+  const userRole = useAuth().userData.departmentName;
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);
     switch (item.label) {
-      case "Allergies and Medications":
-        setSelectedItem(<AddAllergies />);
+      case "Consultation Room File":
+        setSelectedItem(
+          <ConsultationroomDetails
+            treatmentNo={treatmentNo}
+            observationNo={observationNo}
+            patientNo={patientNo}
+          />
+        );
         break;
-      case "Vitals":
-        setSelectedItem(<Vitals />);
-        break;
-      case "Diagnosis":
-        setSelectedItem(<Diagnosis />);
-        break;
-      case "Prescription":
-        setSelectedItem(<InpatientMedication />);
-        break;
+     
       case "Care Plan":
         setSelectedItem(<CarePlanForm />);
         break;
-      case "Treatments Sheet":
-        setSelectedItem(<TreatmentsSheet />);
-        break;
+      
       case "ECT Procedure":
         setSelectedItem(<ECTScan />);
         break;
@@ -65,12 +68,6 @@ const CarePlan = () => {
       case "Suicidal Form":
         setSelectedItem(<SuicidalForm />);
         break;
-      case "MSE Status Level Checklist":
-        setSelectedItem(<MentalStateExaminationForm />);
-        break;
-      case "Brief MSE Form":
-        setSelectedItem(<BriefMentalStateExaminationForm />);
-        break;
       case "Dietary Intake Form":
         setSelectedItem(<DietaryIntakeForm />);
         break;
@@ -82,27 +79,24 @@ const CarePlan = () => {
         break;
     }
   };
+
   const menuItems = [
-    { label: "Allergies and Medications", icon: <FileOutlined /> },
-    { label: "Vitals", icon: <FileMarkdownOutlined /> },
-    ...(role === "Doctor" || role === "Nurse"
+    { label: "Consultation Room File", icon: <FileMarkdownOutlined /> },
+    ...(userRole === "Doctor" || userRole === "Nurse"
       ? [{ label: "Daily Ward Rounds", icon: <FileOutlined /> }]
       : []),
-    { label: "Diagnosis", icon: <MedicineBoxOutlined /> },
-    { label: "Prescription", icon: <SolutionOutlined /> },
-    ...(role === "Nurse"
+    ...(userRole === "Nurse"
       ? [
           { label: "Care Plan", icon: <BorderlessTableOutlined /> },
-          { label: "Treatments Sheet", icon: <FileOutlined /> },
+         
           { label: "Visitor List", icon: <FileOutlined /> },
           { label: "Suicidal Form", icon: <FileOutlined /> },
-          { label: "MSE Status Level Checklist", icon: <FileOutlined /> },
-          { label: "Brief MSE Form", icon: <FileOutlined /> },
           { label: "Dietary Intake Form", icon: <FileOutlined /> },
           { label: "Jackson Visual Form", icon: <FileOutlined /> },
         ]
       : []),
   ];
+
   return (
     <>
       <div

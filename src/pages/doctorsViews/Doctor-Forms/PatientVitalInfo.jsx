@@ -14,6 +14,8 @@ import {
   Collapse,
   Skeleton,
   Divider,
+  Tabs,
+  Card,
 } from 'antd';
 import { IoClose } from 'react-icons/io5';
 import { LiaAllergiesSolid } from 'react-icons/lia';
@@ -41,6 +43,8 @@ import {
   nursingCarePlanObjectArray,
   suicideFormListObjectArray,
   visitorListObjectArray,
+  generateFileTabsData,
+  nurseCardExObjectArray,
 } from './doctor-utils';
 
 import {
@@ -81,7 +85,7 @@ const PatientVitalInfo = () => {
       key: '3',
       label: 'Latest Encounter',
       children: <LatestEncounter />,
-    },
+    }
   ];
 
   return (
@@ -103,9 +107,9 @@ const PatientVitalInfo = () => {
 
 const Vitals = () => {
   const { state } = useLocation() || {};
-  const { patientNo } = state || {};
-
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const dispatch = useDispatch();
+  console.log(patientNo);
 
   const [openAddVitals, setOpenAddVitals] = useState(false);
   const [openPreviousVitals, setOpenPreviousVitals] = useState(false);
@@ -708,8 +712,7 @@ const TraigeNotes = ({}) => {
 const LatestEncounter = () => {
   const dispatch = useDispatch();
   const { state } = useLocation() || {};
-  const { patientNo } = state || {};
-
+ const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const [open, setOpen] = useState(false);
   const [openPastEncountersDrawer, setOpenPastEncountersDrawer] =
     useState(false);
@@ -895,6 +898,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
   } = treatmentDetails || admissionDetails || {};
   const { triageVitals, triageDetails, triageAllergies } = triage || {};
   const {
+    cardex,
     jvForm,
     visitorList,
     dietaryIntake,
@@ -1016,12 +1020,17 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       columns: dietaryIntakeObjectArray,
     },
     {
-      pagination: false,
-      dataSource: nursingCareplan,
+      data: generateFileTabsData({
+        labelKey: 'date',
+        data: nursingCareplan,
+        component: FileSectionFrameWork,
+        objectSpecifier: nursingCarePlanObjectArray,
+        renderLabel: ({ month, year, day }) =>
+          dayjs(`${month} ${day} ${year}`).format('DD MMM YYYY'),
+      }),
       title: 'Nursing Care Plans',
-      renderer: FileSectionTable,
+      renderer: FileSectionTabs,
       display: nursingCareplan?.length,
-      columns: nursingCarePlanObjectArray,
     },
     {
       pagination: false,
@@ -1046,6 +1055,18 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       dataSource: nursingTriageAllergies,
       display: nursingTriageAllergies?.length,
       title: 'Nursing Allergies (Food & Drugs)',
+    },
+    {
+      data: generateFileTabsData({
+        data: cardex,
+        labelKey: 'systemCreatedAt',
+        component: FileTabChildContent,
+        objectSpecifier: nurseCardExObjectArray,
+        renderLabel: (value) => dayjs(value).format('DD MMM YYYY HH:mm A'),
+      }),
+      display: cardex?.length,
+      title: 'Nurses Card X',
+      renderer: FileSectionTabs,
     },
     {
       pagination: false,
@@ -1225,12 +1246,13 @@ const FileSectionFrameWork = forwardRef(
         paragraph={{ rows: objectSpecifier.length }}
       >
         <Space
-          direction="vertical"
           ref={ref}
+          direction="vertical"
+          style={{ width: '100%' }}
         >
-          <FileTitleSection title={title} />
+          {title && <FileTitleSection title={title} />}
           <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-            {objectSpecifier.map(
+            {objectSpecifier?.map(
               ({
                 key,
                 dataIndex,
@@ -1305,5 +1327,63 @@ const FileConsultationNotes = forwardRef(({ title, loading, data }, ref) => {
     </Skeleton>
   );
 });
+
+const FileSectionTabs = forwardRef(({ title, loading, data }, ref) => {
+  return (
+    <Skeleton loading={loading}>
+      <Space
+        ref={ref}
+        direction="vertical"
+        style={{ width: '100%', overflowX: 'scroll' }}
+      >
+        <FileTitleSection title={title} />
+        <Tabs
+          type="card"
+          items={data}
+          defaultActiveKey="1"
+        />
+      </Space>
+    </Skeleton>
+  );
+});
+
+export const FileTabChildContent = ({ title, data, objectSpecifier }) => {
+  return (
+    <ul
+      style={{
+        margin: 0,
+        gap: '4px',
+        padding: 0,
+        display: 'flex',
+        listStyle: 'none',
+        flexDirection: 'column',
+      }}
+    >
+      {objectSpecifier.map(({ key, title, innerHTML }) => (
+        <li key={data[key]}>
+          {/* <h5
+            style={{
+              fontSize: '18px',
+              color: '#777777',
+              fontWeight: 'lighter',
+            }}
+          >
+            {title}
+          </h5> */}
+          <Card
+            title={null}
+            style={{ padding: '16px', borderRadius: '0' }}
+          >
+            {innerHTML ? (
+              <div dangerouslySetInnerHTML={{ __html: data[key] }} />
+            ) : (
+              <div>{data[key]}</div>
+            )}
+          </Card>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 export default PatientVitalInfo;
