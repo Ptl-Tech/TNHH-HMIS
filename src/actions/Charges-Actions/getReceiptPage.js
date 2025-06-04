@@ -35,16 +35,17 @@ export const getReceiptPage = (visitNo) => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgReceiptHeaders&isList=true&query=$filter=Patient_Appointment_No eq '${visitNo}'`,
-        config
+      `${API}data/odatafilter?webservice=PgReceiptHeaders&isList=true&query=$filter=Patient_Appointment_No eq '${visitNo}'`,
+      config
     );
 
     dispatch({ type: REQUEST_RECEIPT_PAGE_SUCCESS, payload: response.data });
-return response.data.status;
-
+    return response.data.status;
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch receipt header";
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch receipt header";
 
     message.error(errorMessage);
     dispatch({ type: REQUEST_RECEIPT_PAGE_FAIL, payload: errorMessage });
