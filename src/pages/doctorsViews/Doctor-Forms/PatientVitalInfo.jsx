@@ -45,6 +45,7 @@ import {
   visitorListObjectArray,
   generateFileTabsData,
   nurseCardExObjectArray,
+  dailyWardRoundsObjectArray,
 } from './doctor-utils';
 
 import {
@@ -892,6 +893,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     treatmentHeader,
     dischargeDetails,
     // TODO: Ask Ndirangu about the discharge summary
+    dailyWardRounds,
     dischargeSummary,
     radiologyRequests,
     laboratoryRequests,
@@ -914,7 +916,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     treatmentDetails: nursingTreatmentDetails,
   } = nursingTriage || {};
 
-  console.log({ consultationNotes });
+  console.log({ dailyWardRounds });
 
   const tableTriageVitals = vitalKeys.map(({ label, key }) => {
     const row = {
@@ -1031,6 +1033,19 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       title: 'Nursing Care Plans',
       renderer: FileSectionTabs,
       display: nursingCareplan?.length,
+    },
+    {
+      data: generateFileTabsData({
+        labelKey: 'created_Date',
+        data: dailyWardRounds,
+        component: FileTabChildContent,
+        objectSpecifier: dailyWardRoundsObjectArray,
+        renderLabel: ({ month, year, day }) =>
+          dayjs(`${month} ${day} ${year}`).format('DD MMM YYYY'),
+      }),
+      title: 'Daily Ward Rounds',
+      renderer: FileSectionTabs,
+      display: dailyWardRounds?.length,
     },
     {
       pagination: false,

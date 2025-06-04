@@ -1,24 +1,31 @@
-import { Button, message, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
-import Loading from '../../partials/nurse-partials/Loading';
-import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
-import { getUrgencyColorcode, rowClassName } from '../../utils/helpers';
-import { postCheckInPatient } from '../../actions/Doc-actions/postCheckInPatient';
+
+import { message, Table } from 'antd';
+
 import useAuth from '../../hooks/useAuth';
+import { rowClassName } from '../../utils/helpers';
+import Loading from '../../partials/nurse-partials/Loading';
+
+import { postCheckInPatient } from '../../actions/Doc-actions/postCheckInPatient';
+import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
+import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
+
+import { waitingListColumns } from './tables/tables-utils';
+import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
 import FilterConsultationRoom from '../../partials/nurse-partials/FilterConsultationRoom';
+
 const DoctorVisits = () => {
-  const role = useAuth().userData.departmentName;
   const doctorId = useAuth().userData.doctorID;
+  const role = useAuth().userData.departmentName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
+
+  const [currentRecord, setCurrentRecord] = useState('');
+  const [currentTreatmentNo, setCurrentTreatmentNo] = useState('');
 
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');
@@ -29,17 +36,45 @@ const DoctorVisits = () => {
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
-  const { loadingCheInPatient: checkInLoading } = useSelector(
-    (state) => state.checkInConsulation,
-  );
+
+  const {
+    error: checkInError,
+    checkInPatient,
+    loadingCheInPatient,
+  } = useSelector((state) => state.checkInConsulation);
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
-  }, [dispatch]);
-  useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
+  useEffect(() => {
+    console.log({ checkInPatient });
+
+    if (checkInPatient?.length && currentRecord && currentTreatmentNo) {
+      message.success('Patient checked in to the Consultation Room ');
+      navigate(
+        role === 'Doctor'
+          ? `/Doctor/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
+          : role === 'Psychology'
+          ? `/Psychology/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
+          : `/Nurse/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
+        {
+          state: {
+            patientDetails: currentRecord,
+            patientNo: currentRecord.PatientNo,
+            observationNo: currentRecord.ObservationNo,
+          },
+        },
+      );
+      dispatch({ type: POST_CHECK_IN_PATIENT_RESET });
+    }
+
+    if (checkInError) {
+      dispatch({ type: POST_CHECK_IN_PATIENT_RESET });
+      message.error('An error occurred, please try again');
+    }
+  }, [checkInError, checkInPatient]);
   // console.log('consultation Room list', treatmentList);
 
   const openDoctorVisitList = treatmentList?.filter((item) => {
@@ -94,183 +129,10 @@ const DoctorVisits = () => {
     };
   });
 
-  const waitingListColumns = [
-    {
-      title: '#',
-      dataIndex: 'key',
-      key: 'key',
-      render: (text, record, index) => index + 1,
-    },
-    {
-      title: 'Treatment No',
-      dataIndex: 'TreatmentNo',
-      key: 'TreatmentNo',
-      filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
-      onFilter: (value, record) =>
-        record?.TreatmentNo
-          ? record.TreatmentNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (_, record) => {
-        const { color } = getUrgencyColorcode(record.UrgencyStatus);
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: color }}
-          >
-            {record.TreatmentNo}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Patient Name',
-      dataIndex: 'SearchName',
-      key: 'SearchName',
-      filteredValue: searchName ? [searchName] : null,
-      onFilter: (value, record) =>
-        record?.SearchName
-          ? record.SearchName.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (text, record) => {
-        console.log({ record });
-
-        return (
-          <span
-            onClick={
-              role !== 'Nurse'
-                ? () => handleNavigate(record, record.TreatmentNo)
-                : undefined
-            }
-            className="fw-bold"
-            style={{
-              color: role !== 'Nurse' ? '#0f5689' : 'inherit',
-              cursor: role !== 'Nurse' ? 'pointer' : 'default',
-            }}
-          >
-            {record?.SearchName}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Patient No',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
-      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
-      onFilter: (value, record) =>
-        record?.PatientNo
-          ? record.PatientNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-    },
-
-    {
-      title: 'Doctor Name',
-      dataIndex: 'DoctorsName',
-      key: 'DoctorsName',
-      render: (text, record) => {
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            style={{ color: '#0f5689', cursor: 'pointer' }}
-          >
-            {text.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Treatment Date',
-      dataIndex: 'TreatmentDate',
-      key: 'TreatmentDate',
-    },
-    {
-      title: 'Waiting Time',
-      dataIndex: 'TreatmentTime',
-      key: 'TreatmentTime',
-      render: (_, record) => {
-        const combinedDateTime = `${record.TreatmentDate}T${record.TreatmentTime}`;
-        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
-        const hours = Math.floor(elapsedMinutes / 60);
-        const minutes = elapsedMinutes % 60;
-
-        return `${hours}h ${minutes}m`;
-      },
-    },
-    {
-      title: 'Patient Type',
-      dataIndex: 'PatientType',
-      key: 'PatientType',
-    },
-    {
-      title: 'Age',
-      dataIndex: 'Age',
-      key: 'Age',
-      render: (_, record) => {
-        return <span>{record.Age} years</span>;
-      },
-    },
-    {
-      title: 'Urgency',
-      dataIndex: 'UrgencyStatus',
-      key: 'UrgencyStatus',
-      render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.UrgencyStatus);
-        return (
-          <Tag
-            color={color}
-            // text={text} // Display urgency text
-            className="fw-bold"
-            // style={{
-            //   color: color,
-            // }}
-          >
-            {text}
-          </Tag>
-        );
-      },
-    },
-
-    ...(role !== 'Nurse'
-      ? [
-          {
-            title: 'Check In',
-            key: 'checkIn',
-            render: (_, record) => (
-              <Button
-                type="primary"
-                onClick={() => handleNavigate(record, record.TreatmentNo)}
-              >
-                <CheckOutlined /> Check In
-              </Button>
-            ),
-          },
-        ]
-      : []),
-  ];
-
   const handleNavigate = (record, treatmentNo) => {
-    dispatch(postCheckInPatient(treatmentNo)).then((data) => {
-      if (data.status === 'success') {
-        message.success('Patient checked in to the Consultation Room ');
-        navigate(
-          role === 'Doctor'
-            ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-            : role === 'Psychology'
-            ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-            : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
-          {
-            state: {
-              patientNo: record.PatientNo,
-              observationNo: record.ObservationNo,
-              patientDetails: record,
-            },
-          },
-        );
-      } else {
-        message.error('An error occurred, please try again');
-      }
-    });
+    setCurrentRecord(record);
+    setCurrentTreatmentNo(treatmentNo);
+    dispatch(postCheckInPatient(treatmentNo));
   };
 
   return (
@@ -292,15 +154,21 @@ const DoctorVisits = () => {
         <Loading />
       ) : (
         <Table
-          columns={waitingListColumns}
-          dataSource={combinedList}
           bordered
-          size="middle"
-          rowClassName={rowClassName} // Apply the row color
+          size="small"
+          dataSource={combinedList}
+          rowClassName={rowClassName}
+          columns={waitingListColumns({
+            handleNavigate,
+            searchName,
+            searchVisitNumber,
+            searchPatientNumber,
+            loading: loadingCheInPatient,
+          })}
           pagination={{
-            position: ['bottom', 'right'],
-            showSizeChanger: true,
             pageSize: 10,
+            showSizeChanger: true,
+            position: ['bottom', 'right'],
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} items`,
           }}

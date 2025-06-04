@@ -1,20 +1,20 @@
-import { Badge, Button, Table } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { EyeOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
-import Loading from '../../../partials/nurse-partials/Loading';
-import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
-import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
-import {
-  getColorByWaitingTreatmentTime,
-  getUrgencyColorcode,
-  rowClassName,
-} from '../../../utils/helpers';
+
+import { Table } from 'antd';
+
 import useAuth from '../../../hooks/useAuth';
+import { rowClassName } from '../../../utils/helpers';
+import Loading from '../../../partials/nurse-partials/Loading';
+
+import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
+import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
+
+import { waitingListColumns } from './tables-utils';
+import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
 import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
+
 const ConsultationRoomPatients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -78,161 +78,6 @@ const ConsultationRoomPatients = () => {
     };
   });
 
-  const waitingListColumns = [
-    {
-      title: '#',
-      dataIndex: 'key',
-      key: 'key',
-      render: (text, record, index) => index + 1,
-    },
-    {
-      title: 'Treatment No',
-      dataIndex: 'TreatmentNo',
-      key: 'TreatmentNo',
-      // render: (_, record) => {
-      //     const { color, text } = getUrgencyColorcode(record.urgency);
-      //     return (
-      //       <Badge
-      //         color={color}
-      //         text={text} // Display urgency text
-      //         style={{ color: color }}
-      //       />
-      //     );
-      //   },
-      filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
-      onFilter: (value, record) =>
-        record?.TreatmentNo
-          ? record.TreatmentNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (_, record) => {
-        const { color } = getUrgencyColorcode(record.UrgencyStatus);
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: color }}
-          >
-            {record.TreatmentNo}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Patient Name',
-      dataIndex: 'SearchName',
-      key: 'SearchName',
-      filteredValue: searchName ? [searchName] : null,
-      onFilter: (value, record) =>
-        record?.SearchName
-          ? record.SearchName.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (text, record) => {
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: '#0f5689', cursor: 'pointer' }}
-          >
-            {text.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'PatientNo',
-      title: 'Patient No',
-      dataIndex: 'PatientNo',
-      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
-      onFilter: (value, record) =>
-        record?.PatientNo
-          ? record.PatientNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-    },
-
-    {
-      key: 'DoctorsName',
-      title: 'Doctor Name',
-      dataIndex: 'DoctorsName',
-      render: (text, record) => {
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            style={{ color: '#0f5689', cursor: 'pointer' }}
-          >
-            {text.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Treatment Date',
-      dataIndex: 'TreatmentDate',
-      key: 'TreatmentDate',
-    },
-    {
-      title: 'Waiting Time',
-      dataIndex: 'TreatmentTime',
-      key: 'TreatmentTime',
-      render: (_, record) => {
-        const combinedDateTime = `${record.TreatmentDate}T${record.TreatmentTime}`;
-        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
-        const hours = Math.floor(elapsedMinutes / 60);
-        const minutes = elapsedMinutes % 60;
-
-        return `${hours}h ${minutes}m`;
-      },
-    },
-    {
-      title: 'Patient Type',
-      dataIndex: 'PatientType',
-      key: 'PatientType',
-    },
-    {
-      title: 'Age',
-      dataIndex: 'Age',
-      key: 'Age',
-      render: (_, record) => {
-        return <span>{record.Age} years</span>;
-      },
-    },
-
-    {
-      title: 'Urgency',
-      dataIndex: 'urgency',
-      key: 'urgency',
-      render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.urgency);
-        return (
-          <Badge
-            color={color}
-            text={text} // Display urgency text
-            style={{ color: color }}
-          />
-        );
-      },
-    },
-    // {
-    //   title: "Completion Status",
-    //   dataIndex: "Status",
-    //   key: "Status",
-    //   render: (_, record) => {
-    //     return <span className="fw-bold text-success">{record.Status} </span>;
-    //   },
-    // },
-    {
-      title: 'Check In',
-      key: 'checkIn',
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => handleNavigate(record, record.TreatmentNo)}
-        >
-          <EyeOutlined /> Open
-        </Button>
-      ),
-    },
-  ];
-
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       `/${role}/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
@@ -265,15 +110,21 @@ const ConsultationRoomPatients = () => {
         <Loading />
       ) : (
         <Table
-          columns={waitingListColumns}
-          dataSource={combinedList}
           bordered
           size="small"
+          dataSource={combinedList}
           rowClassName={rowClassName} // Apply the row color
+          columns={waitingListColumns({
+            handleNavigate,
+            searchName,
+            searchVisitNumber,
+            searchPatientNumber,
+          })}
+          showSorterTooltip={{ target: 'sorter-icon' }}
           pagination={{
-            position: ['bottom', 'right'],
-            showSizeChanger: true,
             pageSize: 10,
+            showSizeChanger: true,
+            position: ['bottom', 'right'],
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} items`,
           }}

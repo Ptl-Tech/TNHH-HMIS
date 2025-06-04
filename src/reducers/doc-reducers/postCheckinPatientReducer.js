@@ -1,18 +1,19 @@
 import {
   POST_CHECK_IN_PATIENT_REQUEST,
   POST_CHECK_IN_PATIENT_SUCCESS,
+  POST_CHECK_IN_PATIENT_RESET,
   POST_CHECK_IN_PATIENT_FAIL,
-} from "../../actions/Doc-actions/postCheckInPatient";
+} from '../../actions/Doc-actions/postCheckInPatient';
 
 const initialState = {
-  loadingCheInPatient: false,
-  checkInPatient: [],
   error: null,
+  checkInPatient: [],
+  loadingCheInPatient: false,
 };
 
 export const postCheckInPatientConfirmReducer = (
   state = initialState,
-  action
+  action,
 ) => {
   switch (action.type) {
     case POST_CHECK_IN_PATIENT_REQUEST:
@@ -34,6 +35,8 @@ export const postCheckInPatientConfirmReducer = (
         loadingCheInPatient: false,
         error: action.payload,
       };
+    case POST_CHECK_IN_PATIENT_RESET:
+      return initialState;
     default:
       return state;
   }

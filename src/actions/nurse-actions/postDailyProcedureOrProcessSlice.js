@@ -15,7 +15,7 @@ export const postDailyProcedureOrProcessSlice = ( formData ) =>
         dispatch({ type: POST_DAILY_PROCEDURE_OR_PROCESS_REQUEST });
 
         
-        const { data } = await axios.post(`${API_URL}/Inpatient/DailyProcedureOrProcess`, formData, config);
+        const { data } = await axios.post(`${API_URL}/Doctor/DoctorTreatmentNotes`, formData, config);
 
         dispatch({ type: POST_DAILY_PROCEDURE_OR_PROCESS_SUCCESS, payload: data });
 
