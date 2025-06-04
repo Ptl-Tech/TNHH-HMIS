@@ -88,9 +88,9 @@ form.resetFields(); // Reset form fields after submission
         form={form}
         layout="vertical"
         onFinish={handleSubmitDiscount}
-        initialValues={discountData}
+      //  initialValues={discountData}
       >
-        <Form.Item label="Patient No" name="patientNo">
+        <Form.Item label="Patient No" name="patientNo" style={ { display: "none" }}>
           <Input
             value={discountData.patientNo}
             style={{ color: "#0F5689", fontWeight: "semibold" }}
