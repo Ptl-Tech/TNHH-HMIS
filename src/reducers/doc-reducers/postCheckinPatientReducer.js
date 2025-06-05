@@ -8,7 +8,7 @@ import {
 const initialState = {
   error: null,
   checkInPatient: [],
-  loadingCheInPatient: false,
+  loadinCheckInPatient: false,
 };
 
 export const postCheckInPatientConfirmReducer = (
@@ -19,20 +19,20 @@ export const postCheckInPatientConfirmReducer = (
     case POST_CHECK_IN_PATIENT_REQUEST:
       return {
         ...state,
-        loadingCheInPatient: true,
+        loadinCheckInPatient: true,
         error: null,
       };
     case POST_CHECK_IN_PATIENT_SUCCESS:
       return {
         ...state,
-        loadingCheInPatient: false,
+        loadinCheckInPatient: false,
         checkInPatient: action.payload,
         error: null,
       };
     case POST_CHECK_IN_PATIENT_FAIL:
       return {
         ...state,
-        loadingCheInPatient: false,
+        loadinCheckInPatient: false,
         error: action.payload,
       };
     case POST_CHECK_IN_PATIENT_RESET:

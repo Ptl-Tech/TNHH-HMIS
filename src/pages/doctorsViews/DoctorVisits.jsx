@@ -8,7 +8,7 @@ import useAuth from '../../hooks/useAuth';
 import { rowClassName } from '../../utils/helpers';
 import Loading from '../../partials/nurse-partials/Loading';
 
-import { postCheckInPatient } from '../../actions/Doc-actions/postCheckInPatient';
+import { POST_CHECK_IN_PATIENT_RESET, postCheckInPatient } from '../../actions/Doc-actions/postCheckInPatient';
 import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
 import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
 
@@ -40,7 +40,7 @@ const DoctorVisits = () => {
   const {
     error: checkInError,
     checkInPatient,
-    loadingCheInPatient,
+    loadinCheckInPatient,
   } = useSelector((state) => state.checkInConsulation);
 
   useEffect(() => {
@@ -51,14 +51,14 @@ const DoctorVisits = () => {
   useEffect(() => {
     console.log({ checkInPatient });
 
-    if (checkInPatient?.length && currentRecord && currentTreatmentNo) {
+    if (checkInPatient?.status === 'success' && currentRecord && currentTreatmentNo) {
       message.success('Patient checked in to the Consultation Room ');
       navigate(
         role === 'Doctor'
           ? `/Doctor/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
           : role === 'Psychology'
-          ? `/Psychology/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
-          : `/Nurse/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
+            ? `/Psychology/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
+            : `/Nurse/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
         {
           state: {
             patientDetails: currentRecord,
@@ -163,7 +163,7 @@ const DoctorVisits = () => {
             searchName,
             searchVisitNumber,
             searchPatientNumber,
-            loading: loadingCheInPatient,
+            loading: loadinCheckInPatient,
           })}
           pagination={{
             pageSize: 10,
