@@ -645,3 +645,12 @@ export const nurseCardExObjectArray = [
     innerHTML: true,
   },
 ];
+
+export const dailyWardRoundsObjectArray = [
+  {
+    key: 'notes',
+    title: 'Notes',
+    dataIndex: 'notes',
+    innerHTML: true,
+  },
+];

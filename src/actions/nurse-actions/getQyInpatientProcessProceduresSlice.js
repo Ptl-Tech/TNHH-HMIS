@@ -13,7 +13,7 @@ export const getQyInpatientProcessProceduresSlice = (admissionNo) =>
         try {
             dispatch({ type: GET_QY_INPATIENT_PROCESS_PROCEDURE_REQUEST });
 
-            const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=QyInpatientProcessProcedures&isList=true&query=$filter=AdmissionNo eq '${admissionNo}' `, config);
+            const { data } = await axios.get(`${API_URL}/data/odatafilter?webservice=PgTreatmentDoctorsNotes&isList=true&query=$filter=TreatmentNo eq '${admissionNo}' `, config);
 
             dispatch({ type: GET_QY_INPATIENT_PROCESS_PROCEDURE_SUCCESS, payload: data });
 

@@ -1,13 +1,15 @@
-import { Table } from "antd";
-import PropTypes from "prop-types";
-import useSetTablePagination from "../../../../hooks/useSetTablePagination";
-import Loading from "../../../../partials/nurse-partials/Loading";
-import DOMPurify from "dompurify";
+import { Table } from 'antd';
+import PropTypes from 'prop-types';
+import useSetTablePagination from '../../../../hooks/useSetTablePagination';
+import Loading from '../../../../partials/nurse-partials/Loading';
+import DOMPurify from 'dompurify';
 
 const GeneralObservationsTable = ({
   ipGetProcedure,
   loadingGetIpProcedure,
 }) => {
+  console.log({ ipGetProcedure });
+
   const renderNotes = (notes) => {
     if (!notes) return null;
     // Sanitize and render HTML safely
@@ -16,27 +18,22 @@ const GeneralObservationsTable = ({
   };
   const columns = [
     {
-      title: "Patient Admission No",
-      dataIndex: "AdmissionNo",
-      key: "AdmissionNo",
+      title: 'Patient Admission No',
+      dataIndex: 'TreatmentNo',
+      key: 'TreatmentNo',
     },
     {
-      title: "Date",
-      dataIndex: "ProcessDate",
-      key: "ProcessDate",
+      title: 'Date',
+      dataIndex: 'Created_Date',
+      key: 'Created_Date',
       render: (text) => (
-        <span>{text ? new Date(text).toLocaleDateString() : ""}</span>
+        <span>{text ? new Date(text).toLocaleDateString() : ''}</span>
       ),
     },
     {
-      title: "Title",
-      dataIndex: "Process",
-      key: "Process",
-    },
-    {
-      title: "Remarks",
-      dataIndex: "Remarks",
-      key: "ProcessTime",
+      title: 'Remarks',
+      dataIndex: 'Notes',
+      key: 'Notes',
       render: (text) => {
         return renderNotes(text);
       },
@@ -54,7 +51,7 @@ const GeneralObservationsTable = ({
           columns={columns}
           rowKey="SystemId"
           dataSource={ipGetProcedure}
-          scroll={{ x: "max-content" }}
+          scroll={{ x: 'max-content' }}
           bordered
           size="middle"
           pagination={{
@@ -62,7 +59,7 @@ const GeneralObservationsTable = ({
             total: ipGetProcedure?.length,
             showSizeChanger: true,
             showQuickJumper: true,
-            position: ["bottom", "right"],
+            position: ['bottom', 'right'],
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} items`,
             onChange: (page, pageSize) =>
@@ -78,7 +75,7 @@ const GeneralObservationsTable = ({
                 total: pagination.total,
               }),
             style: {
-              marginTop: "30px",
+              marginTop: '30px',
             },
           }}
         />

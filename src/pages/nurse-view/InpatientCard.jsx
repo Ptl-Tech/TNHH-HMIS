@@ -60,9 +60,7 @@ const InpatientCard = () => {
         return null;
     }
   };
-console.log("Inpatient card deets",patientDetails );
   const handleInitiateDischarge = () => {
-      console.log("Initiate Discharge button clicked");
 
     confirm({
       title: "Confirm Initiate Discharge",
@@ -115,6 +113,7 @@ console.log("Inpatient card deets",patientDetails );
     <div style={{ margin: "20px 10px" }}>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <NurseInnerHeader title="Patient Card" />
+       {role !== "Psychology" && (
         <Button
           type="primary"
           icon={<i className="fas fa-ellipsis-v"></i>}
@@ -123,6 +122,8 @@ console.log("Inpatient card deets",patientDetails );
         >
           Proceed to Initiate Discharge
         </Button>
+       )}
+
       </div>
 
       <Row gutter={[16, 16]}>
@@ -179,15 +180,16 @@ console.log("Inpatient card deets",patientDetails );
                   >
                     Ward Transfer
                   </Button>
-                  <Button
+                 
+                </>
+              )}
+               <Button
                     block
                     type={activeTab === "6" ? "primary" : "default"}
                     onClick={() => setActiveTab("6")}
                   >
                     Patient Charges
                   </Button>
-                </>
-              )}
             </Space>
           </Card>
         </Col>

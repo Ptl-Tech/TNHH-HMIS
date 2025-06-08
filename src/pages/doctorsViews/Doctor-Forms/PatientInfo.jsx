@@ -47,7 +47,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
 
   const { loading: invoiceProcessingLoading, error: invoiceProcessingError } =
     useSelector((state) => state.postInterimInvoice);
-  const { loadingCheInPatient: markasCompleteLoading } = useSelector(
+  const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted,
   );
 

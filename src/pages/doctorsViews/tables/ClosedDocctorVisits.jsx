@@ -1,25 +1,32 @@
-import { Badge, Table } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import dayjs from 'dayjs';
-import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
+
+import { Table } from 'antd';
+
 import Loading from '../../../partials/nurse-partials/Loading';
 import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
-import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
-import { getUrgencyColorcode, rowClassName } from '../../../utils/helpers';
-import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
+
 import useAuth from '../../../hooks/useAuth';
-const CloseList = () => {
-  const role = useAuth().userData.departmentName;
+import { rowClassName } from '../../../utils/helpers';
+
+import { waitingListColumns } from './tables-utils';
+import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
+import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
+import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
+
+export default function CloseList() {
   const doctorId = useAuth().userData.doctorID;
+  const role = useAuth().userData.departmentName;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+
   const currentPath = location.pathname;
   const [searchName, setSearchName] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
   const [searchVisitNumber, setSearchVisitNumber] = useState('');
+  const [searchPatientNumber, setSearchPatientNumber] = useState('');
 
   const { triageWaitingList: patients } = useSelector(
     (state) => state.getTriageWaitingList,
@@ -29,8 +36,6 @@ const CloseList = () => {
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
-  }, [dispatch]);
-  useEffect(() => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
@@ -90,153 +95,6 @@ const CloseList = () => {
     });
   }, [closedConsultationList, closedConsultationListWithPatientDetails]);
 
-  const waitingListColumns = [
-    {
-      title: '#',
-      dataIndex: 'key',
-      key: 'key',
-      render: (text, record, index) => index + 1,
-    },
-    {
-      title: 'Treatment No',
-      dataIndex: 'TreatmentNo',
-      key: 'TreatmentNo',
-      filteredValue: searchVisitNumber ? [searchVisitNumber] : null,
-      onFilter: (value, record) =>
-        record?.TreatmentNo
-          ? record.TreatmentNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (_, record) => {
-        const { color } = getUrgencyColorcode(record.UrgencyStatus);
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: color }}
-          >
-            {record.TreatmentNo}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Patient Name',
-      dataIndex: 'SearchName',
-      key: 'SearchName',
-      filteredValue: searchName ? [searchName] : null,
-      onFilter: (value, record) =>
-        record?.SearchName
-          ? record.SearchName.toLowerCase().includes(value.toLowerCase())
-          : false,
-      render: (text, record) => {
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            className="fw-bold"
-            style={{ color: '#0f5689', cursor: 'pointer' }}
-          >
-            {text.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Patient No',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
-      filteredValue: searchPatientNumber ? [searchPatientNumber] : null,
-      onFilter: (value, record) =>
-        record?.PatientNo
-          ? record.PatientNo.toLowerCase().includes(value.toLowerCase())
-          : false,
-    },
-
-    {
-      title: 'Doctor Name',
-      dataIndex: 'DoctorsName',
-      key: 'DoctorsName',
-      render: (text, record) => {
-        return (
-          <span
-            onClick={() => handleNavigate(record, record.TreatmentNo)}
-            style={{ color: '#0f5689', cursor: 'pointer' }}
-          >
-            {text.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      title: 'Treatment Date',
-      dataIndex: 'TreatmentDate',
-      key: 'TreatmentDate',
-    },
-    {
-      title: 'Waiting Time',
-      dataIndex: 'TreatmentTime',
-      key: 'TreatmentTime',
-      render: (_, record) => {
-        const combinedDateTime = `${record.TreatmentDate}T${record.TreatmentTime}`;
-        const elapsedMinutes = dayjs().diff(dayjs(combinedDateTime), 'minute');
-        const hours = Math.floor(elapsedMinutes / 60);
-        const minutes = elapsedMinutes % 60;
-
-        return `${hours}h ${minutes}m`;
-      },
-    },
-    {
-      title: 'Patient Type',
-      dataIndex: 'PatientType',
-      key: 'PatientType',
-    },
-    {
-      title: 'Age',
-      dataIndex: 'Age',
-      key: 'Age',
-      render: (_, record) => {
-        return <span>{record.Age} years</span>;
-      },
-    },
-
-    {
-      title: 'Urgency',
-      dataIndex: 'urgency',
-      key: 'urgency',
-      render: (_, record) => {
-        const { color, text } = getUrgencyColorcode(record.UrgencyStatus);
-        return (
-          <Badge
-            color={color}
-            text={text} // Display urgency text
-            style={{ color: color }}
-          />
-        );
-      },
-    },
-    /* {
-      title: "Completion Status",
-      dataIndex: "UrgencyStatus",
-      key: "UrgencyStatus",
-      render: (_, record) => {
-        if(record.UrgencyStatus === "0") {
-          return <span className="fw-bold text-danger">Completed </span>;
-        }
-      },
-    }, */
-    /* {
-      title: "Check In",
-      key: "checkIn",
-      render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => handleNavigate(record, record.treatmentNo)}
-        >
-          <CheckOutlined /> Check In
-        </Button>
-      ),
-    }, */
-  ];
-
   const handleNavigate = (record, treatmentNo) => {
     navigate(
       role === 'Doctor'
@@ -273,7 +131,13 @@ const CloseList = () => {
         <Loading />
       ) : (
         <Table
-          columns={waitingListColumns}
+          columns={waitingListColumns({
+            searchName,
+            handleNavigate,
+            searchVisitNumber,
+            searchPatientNumber,
+            checkInButton: 'View Closed',
+          })}
           dataSource={combinedList}
           bordered
           size="small"
@@ -289,6 +153,4 @@ const CloseList = () => {
       )}
     </div>
   );
-};
-
-export default CloseList;
+}
