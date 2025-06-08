@@ -193,7 +193,7 @@ const InvoiceInpatient = () => {
       }}
     >
       <Menu.Item key="visit_action">
-        <PrintFinalInvoice patientNo={patientBillData[0]?.PatientNo} />
+        <PrintFinalInvoice patientNo={patientBillData[0]?.PatientNo} activeVisitNo={activeVisitNo} />
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="split_amount">Split Payment</Menu.Item>

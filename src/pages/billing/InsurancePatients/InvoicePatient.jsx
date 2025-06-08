@@ -153,7 +153,7 @@ useEffect(() => {
       }}
     >
       <Menu.Item key="visit_action">
-        <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} />
+        <PrintFinalInvoice patientNo={patientVisitDetails?.PatientNo} activeVisitNo={activeVisitNo} />
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="split_amount">Split Payment</Menu.Item>

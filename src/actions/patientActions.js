@@ -82,7 +82,6 @@ export const createPatient = (patient) => async (dispatch, getState) => {
         branchCode: branchCode,
       },
     };
-
     const response = await axios.post(
       `${API}reception/PatientRegistration`,
       patient,

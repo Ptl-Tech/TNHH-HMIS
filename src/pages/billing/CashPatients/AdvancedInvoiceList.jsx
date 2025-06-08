@@ -214,7 +214,7 @@ const handleReset = (clearFilters) => {
       title: "Print Invoice",
       key: "Print Invoice",
       render: (_, record) => (
-        <PrintFinalInvoice patientNo={record.Patient_No} />
+        <PrintFinalInvoice patientNo={record.Patient_No} activeVisitNo={record.VisitNo} />
       ),
     },
     // {
