@@ -23,6 +23,7 @@ import useAuth from "../../../hooks/useAuth";
 
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
+import { getNurseBriefMSEData } from "../../../actions/nurse-actions/getBriefMSENotes";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const dispatch = useDispatch();
@@ -31,16 +32,25 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
     new URLSearchParams(location.search).get("TreatmentNo") ||
     new URLSearchParams(location.search).get("AdmNo");
 
+
   const { data: getDoctorNotesData } = useSelector(
     (state) => state.getDoctorsNotesData
   );
   const { data: saveDoctorNotesData, error: saveDoctorNotesError } =
     useSelector((state) => state.saveDoctorNotes);
 
+     const { data: getBriefMseData } = useSelector(
+    (state) => state.getBriefMseNotes
+  );
+
   // Loading the doctor notes data to add
   useEffect(() => {
     dispatch(getDoctorsNotesData({ treatmentNo }));
   }, [treatmentNo, dispatch, saveDoctorNotesData]);
+
+  useEffect(() => {
+    dispatch(getNurseBriefMSEData({patientNo}));
+  }, [patientNo, dispatch, getBriefMseData]);
 
   // Tracking when the adding of data has failed
   useEffect(() => {
@@ -72,6 +82,17 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       icon: <SolutionOutlined />,
       children: <SearchChildView filter={"MSE"} data={getDoctorNotesData} />,
     },
+     ...(role === "Doctor" || role === "Nurse"
+      ? [
+          {
+            label: "Brief MSE Form",
+            icon: <HeartOutlined />,
+            children: (
+              <SearchChildView filter={"Brief MSE"} data={getBriefMseData} />
+            ),
+          },
+        ]
+      : []),
     {
       label: "Diagnosis Formulation",
       icon: <MedicineBoxOutlined />,
@@ -115,7 +136,7 @@ const SearchChildView = ({ data, filter }) => {
       PH: "Patient History",
       MSE: "MSE",
       PE: "Physical Exam",
-      "Brief MSE": "Breif MSE",
+      "Brief MSE": "Brief MSE",
     };
 
     return filteredData.sections.filter(
