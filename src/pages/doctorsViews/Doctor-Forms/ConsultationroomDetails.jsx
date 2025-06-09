@@ -81,7 +81,7 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       label: "Aetiology",
       icon: <HeartOutlined />,
       children: (
-        <FourPsForm patientNo={patientNo} observationNo={observationNo} />
+        <FourPsForm treatmentNo={treatmentNo} patientNo={patientNo} observationNo={observationNo} />
       ),
     },
   ];

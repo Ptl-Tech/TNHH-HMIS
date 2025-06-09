@@ -8,6 +8,7 @@ import {
   Modal,
   Tabs,
   Spin,
+  Drawer,
 } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -299,7 +300,7 @@ const Diagnosis = () => {
       <DiagnosisTable treatmentNo={treatmentNo} />
 
       {/* Show the diagnosis history modal */}
-      <Modal
+      <Drawer
         title="DIAGNOSTIC FORMULATION"
         visible={historyVisible}
         onCancel={handleClose}
@@ -364,7 +365,7 @@ const Diagnosis = () => {
             />
           </TabPane>
         </Tabs>
-      </Modal>
+      </Drawer>
     </div>
   );
 };

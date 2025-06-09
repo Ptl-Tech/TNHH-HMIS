@@ -48,16 +48,16 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const initialValues = useMemo(() => {
     return {
       12:
-        data.find((item) => item.Notes_Type === "Predisposing Factors")
+        data?.find((item) => item?.Notes_Type === "Predisposing Factors")
           ?.Notes || "",
       13:
-        data.find((item) => item.Notes_Type === "Precipitating Factors")
+        data?.find((item) => item?.Notes_Type === "Precipitating Factors")
           ?.Notes || "",
       14:
-        data.find((item) => item.Notes_Type === "Perpetuating Factors")
+        data?.find((item) => item?.Notes_Type === "Perpetuating Factors")
           ?.Notes || "",
       15:
-        data.find((item) => item.Notes_Type === "Protective Factors")?.Notes ||
+        data?.find((item) => item?.Notes_Type === "Protective Factors")?.Notes ||
         "",
     };
   }, [data]);

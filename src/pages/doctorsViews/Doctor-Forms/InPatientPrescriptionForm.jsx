@@ -185,25 +185,8 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
                   />
                 </Form.Item>
               </div>
-
-              <div className="d-block d-flex align-items-center justify-content-between gap-2">
-                <Form.Item
-                  label="Dosage (eg 2 tablets)"
-                  name="dosage"
-                  hasFeedback
-                  className="w-100"
-                >
-                  <Input
-                    type="number"
-                    name="quantity"
-                    className="w-100"
-                    placeholder="Enter Dosage eg 2 tablets"
-                  />
-                </Form.Item>
-              </div>
-
               <Form.Item
-                label="Prescription Dose"
+                label="Frequency"
                 name="prescriptionDose"
                 hasFeedback
                 className="w-100"
@@ -226,18 +209,6 @@ const InPatientPrescriptionForm = ({ setShowForm }) => {
                     ))}
                 </Select>
               </Form.Item>
-
-              <Form.Item
-                label="Prescription Remarks"
-                name="PrescriptionRemarks"
-                hasFeedback
-              >
-                <TextArea
-                  autoSize={{ minRows: 3, maxRows: 5 }}
-                  name="PrescriptionRemarks"
-                />
-              </Form.Item>
-
               <Space>
                 <Form.Item>
                   <Button
