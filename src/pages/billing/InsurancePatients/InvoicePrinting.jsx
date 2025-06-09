@@ -17,7 +17,7 @@ export const PrintInterimInvoice = ({ activeVisitNo, patientNo }) => {
     setLoading(true); // Start loading state
     const data = {
       PatientNo: patientNo,
-      encounterNO: activeVisitNo,
+      visitNo: activeVisitNo,
     };
 
     dispatch(postInterimInvoice(data))
