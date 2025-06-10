@@ -1,7 +1,7 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Col,
@@ -18,20 +18,20 @@ import {
   message,
   Typography,
   InputNumber,
-} from 'antd';
+} from "antd";
 import {
   IdcardOutlined,
   SignatureOutlined,
   ExclamationCircleFilled,
-} from '@ant-design/icons';
-import { Select } from 'antd';
+} from "@ant-design/icons";
+import { Select } from "antd";
 
-import { SearchDrugTable } from './SearchDrugTable';
+import { SearchDrugTable } from "./SearchDrugTable";
 import {
   pharmacyCardPatientData,
   pharmacyCardSearchDrugsColumns,
   pharmacyCardCurrentSelectionColumns,
-} from './pharmacy-utils';
+} from "./pharmacy-utils";
 
 import {
   postDrugIssuance,
@@ -40,14 +40,14 @@ import {
   POST_EDIT_PRESCRIPTION_RESET,
   POST_ARCHIVE_PRESCRIPTION_RESET,
   POST_PHARMACY_DRUG_ISSUANCE_RESET,
-} from '../../actions/pharmacy-actions/postPharmacyAction';
+} from "../../actions/pharmacy-actions/postPharmacyAction";
 import {
   GET_PHARMACY_RETURN_LIST_RESET,
   getPharmacyLineReturnbyPharmacyNo,
-} from '../../actions/pharmacy-actions/getPharmacyLineReturns';
-import { getItemsSlice } from '../../actions/triage-actions/getItemsSlice';
-import { getPharmacyRequestsAll } from '../../actions/pharmacy-actions/getPharmacyRequestsAll';
-import { getSinglePharmacyRecord } from '../../actions/pharmacy-actions/getSinglePharmacyRecord';
+} from "../../actions/pharmacy-actions/getPharmacyLineReturns";
+import { getItemsSlice } from "../../actions/triage-actions/getItemsSlice";
+import { getPharmacyRequestsAll } from "../../actions/pharmacy-actions/getPharmacyRequestsAll";
+import { getSinglePharmacyRecord } from "../../actions/pharmacy-actions/getSinglePharmacyRecord";
 
 const { confirm } = Modal;
 const { Text } = Typography;
@@ -61,7 +61,7 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
 
   return (
     <td {...restProps}>
@@ -93,20 +93,20 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
   const [form] = Form.useForm();
 
-  const [editingKey, setEditingKey] = useState('');
+  const [editingKey, setEditingKey] = useState("");
   const [currentRequest, setCurrentRequest] = useState(null);
-  const [Status, setStatus] = useState(searchParams.get('status') || '');
+  const [Status, setStatus] = useState(searchParams.get("status") || "");
 
   const { Title } = Typography;
   const SpaceCompact = Space.Compact;
   const { Row: TableSummaryRow, Cell: TableSummaryCell } = Table.Summary;
 
   const statuses = [
-    { label: 'All', value: '' },
-    { label: 'New', value: 'New' },
-    { label: 'Forwarded', value: 'Forwarded' },
-    { label: 'Completed', value: 'Completed' },
-    { label: 'Cancelled', value: 'Cancelled' },
+    { label: "All", value: "" },
+    { label: "New", value: "New" },
+    { label: "Forwarded", value: "Forwarded" },
+    { label: "Completed", value: "Completed" },
+    { label: "Cancelled", value: "Cancelled" },
   ];
 
   const { data: pharmacyRequests, loading: pharmacyRequestsLoading } =
@@ -129,13 +129,13 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     loading: pharmacyLineDataLoading,
   } = useSelector((state) => state.getPatientPharmacyReturnLine);
   const { data: pharmacyRecord } = useSelector(
-    (state) => state.getSinglePharmacyRecord,
+    (state) => state.getSinglePharmacyRecord
   );
   const { data: returnedDrugs } = useSelector((state) => state.returnDrugs);
 
   const disabled =
-    pharmacyRecord?.Status === 'Completed' ||
-    pharmacyRecord?.Status === 'Cancelled';
+    pharmacyRecord?.Status === "Completed" ||
+    pharmacyRecord?.Status === "Cancelled";
 
   const isEditing = (record) => record.No === editingKey;
 
@@ -145,7 +145,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   };
 
   const cancel = () => {
-    setEditingKey('');
+    setEditingKey("");
   };
 
   const save = async (record) => {
@@ -158,12 +158,12 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
         Frequency,
         Quantity,
         Take = 0,
-        remarks = '',
+        remarks = "",
       } = row;
 
       dispatch(
         postPrescriptionQuantity({
-          myAction: 'edit',
+          myAction: "edit",
           recId: SystemId,
           pharmacyNo: Pharmacy_No,
           quantity: Quantity,
@@ -174,10 +174,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           dosage: Dosage,
           TotalAmount: Math.round(UnitPrice * Quantity),
           remarks,
-        }),
+        })
       );
 
-      setEditingKey('');
+      setEditingKey("");
     } catch (error) {
       console.log({ error });
     }
@@ -185,9 +185,9 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
   const showConfirm = (record) => {
     confirm({
-      title: 'Delete the pharmacy line?',
+      title: "Delete the pharmacy line?",
       icon: <ExclamationCircleFilled />,
-      content: 'Are you sure you want to delete the pharmacy line?',
+      content: "Are you sure you want to delete the pharmacy line?",
       onOk() {
         deleteRecord(record);
       },
@@ -204,7 +204,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
     if (
       (!pharmacyLineDataSuccess && currentRequest) ||
-      postPharmacyLineData?.status === 'success' ||
+      postPharmacyLineData?.status === "success" ||
       returnedDrugs
     ) {
       dispatch(getPharmacyLineReturnbyPharmacyNo(currentRequest));
@@ -229,10 +229,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     if (postPharmacyLineData) {
       const status = postPharmacyLineData.status;
 
-      message[status === 'success' ? status : 'error'](
-        status === 'success'
-          ? 'Pharmacy line updated successfully'
-          : postPharmacyLineData.data.msg,
+      message[status === "success" ? status : "error"](
+        status === "success"
+          ? "Pharmacy line updated successfully"
+          : postPharmacyLineData.data.msg
       );
 
       dispatch({ type: POST_EDIT_PRESCRIPTION_RESET });
@@ -249,9 +249,9 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       const status = postArchivePrescriptionData.status;
 
       message[status](
-        status === 'success'
-          ? 'The prescription has been archived successfully'
-          : 'Something went wrong when acrchiving the prescription',
+        status === "success"
+          ? "The prescription has been archived successfully"
+          : "Something went wrong when acrchiving the prescription"
       );
       dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
     }
@@ -263,9 +263,9 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       const status = postDrugIssuanceData.status;
 
       message[status](
-        status === 'success'
-          ? 'The prescription has been posted successfully'
-          : 'Something went wrong when posting the prescription',
+        status === "success"
+          ? "The prescription has been posted successfully"
+          : "Something went wrong when posting the prescription"
       );
     }
   }, [postDrugIssuanceData]);
@@ -278,10 +278,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       (currentRequest &&
         pharmacyRecord &&
         currentRequest !== pharmacyRecord.Pharmacy_No) ||
-      postDrugIssuanceData?.status === 'success' ||
-      postArchivePrescriptionData?.status === 'success'
+      postDrugIssuanceData?.status === "success" ||
+      postArchivePrescriptionData?.status === "success"
     ) {
-      dispatch(getSinglePharmacyRecord('Pharmacy_No', currentRequest));
+      dispatch(getSinglePharmacyRecord("Pharmacy_No", currentRequest));
       if (postArchivePrescriptionData)
         dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
       if (postDrugIssuanceData)
@@ -301,8 +301,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
         drugNo,
         pharmacyNo: currentRequest,
         quantity: 0,
-        myAction: 'create',
-      }),
+        myAction: "create",
+      })
     );
   };
 
@@ -310,17 +310,17 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     // deleting a pharmacy line
     dispatch(
       postPrescriptionQuantity({
-        myAction: 'delete',
+        myAction: "delete",
         recId: record.SystemId,
         pharmacyNo: record.Pharmacy_No,
         quantity: record.Quantity,
         drugNo: record.No,
-      }),
+      })
     );
   };
 
   const handleRequestChange = (value) => {
-    setCurrentRequest(value.split('-').at(-1));
+    setCurrentRequest(value.split("-").at(-1));
   };
 
   const handleStatusChange = (value) => {
@@ -337,11 +337,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   };
 
   return (
-    <div style={{ display: 'grid', gap: '16px', padding: '16px 0' }}>
-      <Title
-        level={4}
-        style={{ color: '#0f5689', marginBottom: '0px' }}
-      >
+    <div style={{ display: "grid", gap: "16px", padding: "16px 0" }}>
+      <Title level={4} style={{ color: "#0f5689", marginBottom: "0px" }}>
         {title}
       </Title>
       <SpaceCompact direction="horizontal">
@@ -352,17 +349,17 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
             prefix={<Tag color="#ac8342">Status</Tag>}
             placeholder="Status"
             defaultValue={Status}
-            style={{ width: '200px' }}
+            style={{ width: "200px" }}
             onChange={handleStatusChange}
           />
         )}
         <Select
           showSearch
-          style={{ width: '400px' }}
+          style={{ width: "400px" }}
           onChange={handleRequestChange}
           placeholder="Select a patient"
           notFoundContent={
-            pharmacyRequestsLoading ? <Spin size="small" /> : 'No results found'
+            pharmacyRequestsLoading ? <Spin size="small" /> : "No results found"
           }
           options={
             pharmacyRequestsLoading
@@ -379,15 +376,15 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
         />
       </SpaceCompact>
       <Card
-        style={{ background: '#00000006' }}
+        style={{ background: "#00000006" }}
         title={
           <Title
             level={5}
             style={{
-              gap: '8px',
-              display: 'flex',
-              color: '#0f5689',
-              alignItems: 'center',
+              gap: "8px",
+              display: "flex",
+              color: "#0f5689",
+              alignItems: "center",
             }}
           >
             <IdcardOutlined />
@@ -398,10 +395,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       >
         <div
           style={{
-            color: '#0F5689',
-            padding: '0 16px',
-            borderRadius: '5px',
-            fontWeight: 'semibold',
+            color: "#0F5689",
+            padding: "0 16px",
+            borderRadius: "5px",
+            fontWeight: "semibold",
           }}
         >
           <Row>
@@ -410,22 +407,22 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                 {patientRow.map(({ name, value, noBorder }) => (
                   <Row
                     style={{
-                      gap: '8px',
-                      display: 'flex',
-                      padding: '8px 16px',
-                      borderBottom: !noBorder && '1px solid #ebebeb',
+                      gap: "8px",
+                      display: "flex",
+                      padding: "8px 16px",
+                      borderBottom: !noBorder && "1px solid #ebebeb",
                     }}
                   >
                     <Text strong>{name} :</Text>
                     {` ${
                       pharmacyRecord
-                        ? value === 'Link_Type' &&
-                          pharmacyRecord[value] === 'DOCTOR'
+                        ? value === "Link_Type" &&
+                          pharmacyRecord[value] === "DOCTOR"
                           ? `${pharmacyRecord[value]} (${
-                              pharmacyRecord['Doctor_Name'] || 'From Reception'
+                              pharmacyRecord["Doctor_Name"] || "From Reception"
                             })`
                           : pharmacyRecord[value]
-                        : ''
+                        : ""
                     }`}
                   </Row>
                 ))}
@@ -436,19 +433,16 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       </Card>
       {currentRequest && pharmacyRecord && (
         <>
-          <div style={{ display: 'grid', gap: '16px' }}>
-            <Form
-              form={form}
-              component={false}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: "grid", gap: "16px" }}>
+            <Form form={form} component={false}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Title
                   level={5}
                   style={{
-                    gap: '8px',
-                    display: 'flex',
-                    color: '#0f5689',
-                    alignItems: 'center',
+                    gap: "8px",
+                    display: "flex",
+                    color: "#0f5689",
+                    alignItems: "center",
                   }}
                 >
                   <SignatureOutlined />
@@ -456,7 +450,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                 </Title>
                 <SpaceCompact direction="horizontal">
                   <Button
-                    style={{ height: '32px' }}
+                    style={{ height: "32px" }}
                     disabled={
                       disabled ||
                       postDrugIssuanceLoading ||
@@ -473,8 +467,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                         disabled ||
                         postDrugIssuanceLoading ||
                         postArchivePrescriptionLoading
-                          ? '32px'
-                          : '30px',
+                          ? "32px"
+                          : "30px",
                     }}
                     disabled={
                       disabled ||
@@ -499,14 +493,14 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                   save,
                   cancel,
                   disabled,
-                  completed: pharmacyRecord.Status === 'Completed',
+                  completed: pharmacyRecord.Status === "Completed",
                   isEditing,
                   showConfirm,
                 })}
                 dataSource={[...pharmacyLineData]
                   .sort(
                     ({ line_no: LineNoA }, { line_no: LineNoB }) =>
-                      LineNoA - LineNoB,
+                      LineNoA - LineNoB
                   )
                   .map((pharmacyLine, Index) => ({
                     ...pharmacyLine,
@@ -518,24 +512,21 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                   const totalValue = pageData.reduce(
                     (acc, { Quantity, UnitPrice }) =>
                       (acc += Quantity * UnitPrice),
-                    0,
+                    0
                   );
 
                   return pageData.length ? (
                     <TableSummaryRow>
-                      <TableSummaryCell
-                        index={0}
-                        colSpan={9}
-                      />
+                      <TableSummaryCell index={0} colSpan={9} />
                       <TableSummaryCell index={0}>
-                        <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                        <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
                           Total
                         </Text>
                       </TableSummaryCell>
                       <TableSummaryCell index={1}>
-                        <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
-                          {new Intl.NumberFormat('en-US').format(
-                            Math.round(totalValue),
+                        <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+                          {new Intl.NumberFormat("en-US").format(
+                            Math.round(totalValue)
                           )}
                         </Text>
                       </TableSummaryCell>

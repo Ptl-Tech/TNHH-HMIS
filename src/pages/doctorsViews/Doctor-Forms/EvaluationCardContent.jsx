@@ -1,10 +1,10 @@
-import { Card, Tabs } from 'antd';
-import PatientRequests from './PatientRequests';
-import ConsultationroomDetails from './ConsultationroomDetails';
-import AdmissionTab from './AdmissionTab';
-import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
-import Medication from './Medication';
+import { Card, Tabs } from "antd";
+import PatientRequests from "./PatientRequests";
+import ConsultationroomDetails from "./ConsultationroomDetails";
+import AdmissionTab from "./AdmissionTab";
+import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
+import Medication from "./Medication";
 
 const EvaluationCardContent = ({
   treatmentNo,
@@ -20,26 +20,19 @@ const EvaluationCardContent = ({
     <div>
       <Card
         variant="borderless"
-        styles={{ body: { boxShadow: 'none' } }}
-        style={{ padding: '12px', boxShadow: 'none' }}
+        styles={{ body: { boxShadow: "none" } }}
+        style={{ padding: "12px", boxShadow: "none" }}
       >
         <Tabs defaultActiveKey="1">
-          <Tabs.TabPane
-            tab="Consultation Room "
-            key="1"
-          >
+          <Tabs.TabPane tab="Consultation Room " key="1">
             <ConsultationroomDetails
-              treatmentNo={treatmentNo}
-              observationNo={observationNo}
               patientNo={patientNo}
+              observationNo={observationNo}
             />
           </Tabs.TabPane>
-          {(role === 'Doctor' || role === 'Nurse') && (
+          {(role === "Doctor" || role === "Nurse") && (
             <>
-              <Tabs.TabPane
-                tab="Medication"
-                key="2"
-              >
+              <Tabs.TabPane tab="Medication" key="2">
                 <Medication
                   treatmentNo={treatmentNo}
                   observationNo={observationNo}
@@ -48,22 +41,16 @@ const EvaluationCardContent = ({
               </Tabs.TabPane>
             </>
           )}
-          {(role === 'Doctor' || role === 'Nurse') && (
+          {(role === "Doctor" || role === "Nurse") && (
             <>
-              <Tabs.TabPane
-                tab="Procedures"
-                key="3"
-              >
+              <Tabs.TabPane tab="Procedures" key="3">
                 <PatientRequests />
-              </Tabs.TabPane>{' '}
+              </Tabs.TabPane>{" "}
             </>
           )}
-          {role === 'Doctor' && patientDetail?.Status !== 'Completed' && (
+          {role === "Doctor" && patientDetail?.Status !== "Completed" && (
             <>
-              <Tabs.TabPane
-                tab="Admission & Referral"
-                key="4"
-              >
+              <Tabs.TabPane tab="Admission & Referral" key="4">
                 <AdmissionTab />
               </Tabs.TabPane>
             </>

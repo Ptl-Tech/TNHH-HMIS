@@ -17,7 +17,6 @@ import {
   Tabs,
   Card,
 } from 'antd';
-import { IoClose } from 'react-icons/io5';
 import { LiaAllergiesSolid } from 'react-icons/lia';
 import { BsHeartPulse, BsClipboard2Pulse } from 'react-icons/bs';
 

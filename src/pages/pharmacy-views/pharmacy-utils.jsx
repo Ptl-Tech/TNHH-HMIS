@@ -1,44 +1,41 @@
-import { Button, Popconfirm, Space } from 'antd';
-import { ReturnDrugsComponent } from './ReturnDrugsComponent';
+import { Button, Popconfirm, Space } from "antd";
+import { ReturnDrugsComponent } from "./ReturnDrugsComponent";
 
 export const pharmacyCardSearchDrugsColumns = (handleAddDrug) => [
   {
-    title: 'Item Code',
-    key: 'No',
-    dataIndex: 'No',
+    title: "Item Code",
+    key: "No",
+    dataIndex: "No",
   },
   {
-    title: 'Item Name',
-    key: 'Description',
-    dataIndex: 'Description',
+    title: "Item Name",
+    key: "Description",
+    dataIndex: "Description",
   },
   {
-    title: 'Generic Name',
-    key: 'Generic_Name',
-    dataIndex: 'Generic_Name',
+    title: "Generic Name",
+    key: "Generic_Name",
+    dataIndex: "Generic_Name",
   },
   {
-    title: 'Available Qty',
-    key: 'InventoryQuantity',
-    dataIndex: 'InventoryQuantity',
-    render: (value) => value.toLocaleString('en-US'),
+    title: "Available Qty",
+    key: "InventoryQuantity",
+    dataIndex: "InventoryQuantity",
+    render: (value) => value.toLocaleString("en-US"),
   },
   {
-    title: 'Price',
-    key: 'UnitPrice',
-    dataIndex: 'UnitPrice',
-    render: (value) => Math.round((value + Number.EPSILON) * 100) / 100,
+    title: "Price",
+    key: "UnitPrice",
+    dataIndex: "UnitPrice",
+    render: (value) => Math.round((value + Number.EPSILON) * 1000) / 1000,
   },
   {
-    key: 'No',
-    dataIndex: 'No',
-    title: 'Select',
+    key: "No",
+    dataIndex: "No",
+    title: "Select",
     render: (cell) => {
       return (
-        <Button
-          type="primary"
-          onClick={() => handleAddDrug(cell)}
-        >
+        <Button type="primary" onClick={() => handleAddDrug(cell)}>
           Select
         </Button>
       );
@@ -48,37 +45,34 @@ export const pharmacyCardSearchDrugsColumns = (handleAddDrug) => [
 
 export const pharmacyQuotationSearchDrugsColumns = (handleAddDrug) => [
   {
-    title: 'Item Name',
-    key: 'Description',
-    dataIndex: 'Description',
+    title: "Item Name",
+    key: "Description",
+    dataIndex: "Description",
   },
   {
-    title: 'Generic Name',
-    key: 'Generic_Name',
-    dataIndex: 'Generic_Name',
+    title: "Generic Name",
+    key: "Generic_Name",
+    dataIndex: "Generic_Name",
   },
   {
-    title: 'Available Qty',
-    key: 'InventoryQuantity',
-    dataIndex: 'InventoryQuantity',
-    render: (value) => value.toLocaleString('en-US'),
+    title: "Available Qty",
+    key: "InventoryQuantity",
+    dataIndex: "InventoryQuantity",
+    render: (value) => value.toLocaleString("en-US"),
   },
   {
-    title: 'Price',
-    key: 'UnitPrice',
-    dataIndex: 'UnitPrice',
-    render: (value) => Math.round((value + Number.EPSILON) * 100) / 100,
+    title: "Price",
+    key: "UnitPrice",
+    dataIndex: "UnitPrice",
+    render: (value) => Math.round((value + Number.EPSILON) * 1000) / 1000,
   },
   {
-    key: 'No',
-    dataIndex: 'No',
-    title: 'Select',
+    key: "No",
+    dataIndex: "No",
+    title: "Select",
     render: (cell) => {
       return (
-        <Button
-          type="primary"
-          onClick={() => handleAddDrug(cell)}
-        >
+        <Button type="primary" onClick={() => handleAddDrug(cell)}>
           Select
         </Button>
       );
@@ -89,51 +83,51 @@ export const pharmacyQuotationSearchDrugsColumns = (handleAddDrug) => [
 export const pharmacyCardPatientData = [
   [
     {
-      name: 'Pharmacy No',
-      value: 'Pharmacy_No',
+      name: "Pharmacy No",
+      value: "Pharmacy_No",
     },
     {
-      name: 'Visit Number',
-      value: 'Link_No',
+      name: "Visit Number",
+      value: "Link_No",
     },
     {
-      name: 'Patient Number',
-      value: 'Patient_No',
+      name: "Patient Number",
+      value: "Patient_No",
     },
     {
-      name: 'Name',
-      value: 'Search_Name',
+      name: "Name",
+      value: "Search_Name",
     },
     {
-      name: 'Date',
-      value: 'Pharmacy_Date',
+      name: "Date",
+      value: "Pharmacy_Date",
     },
     {
-      name: 'Age',
-      value: 'Age',
+      name: "Age",
+      value: "Age",
       noBorder: true,
     },
   ],
   [
     {
-      name: 'Patient Type',
-      value: 'Patient_Type',
+      name: "Patient Type",
+      value: "Patient_Type",
     },
     {
-      name: 'Transaction Type',
-      value: 'Patient_Type',
+      name: "Transaction Type",
+      value: "Patient_Type",
     },
     {
-      name: 'Request Area',
-      value: 'Link_Type',
+      name: "Request Area",
+      value: "Link_Type",
     },
     {
-      name: 'Insurance',
-      value: 'Insurance_No',
+      name: "Insurance",
+      value: "Insurance_No",
     },
     {
-      name: 'Remarks',
-      value: 'Remarks',
+      name: "Remarks",
+      value: "Remarks",
     },
   ],
 ];
@@ -148,82 +142,84 @@ export const pharmacyCardCurrentSelectionColumns = ({
   showConfirm,
 }) =>
   [
-    { title: 'No', dataIndex: 'Index', key: 'Index' },
+    { title: "No", dataIndex: "Index", key: "Index" },
     {
-      title: 'Drug Name',
-      dataIndex: 'Description',
-      key: 'Description',
+      title: "Drug Name",
+      dataIndex: "Description",
+      key: "Description",
       render: (value, record) => {
         var returnValue;
-        returnValue = Object.hasOwn(record, 'Description')
+        returnValue = Object.hasOwn(record, "Description")
           ? value
-          : record['DrugName'];
+          : record["DrugName"];
         return returnValue;
       },
     },
     {
-      title: 'Available Qty',
-      dataIndex: 'ActualQty',
-      key: 'ActualQty',
+      title: "Available Qty",
+      dataIndex: "ActualQty",
+      key: "ActualQty",
     },
-    { title: 'Dosage', dataIndex: 'Dosage', key: 'Dosage', editable: true },
+    { title: "Dosage", dataIndex: "Dosage", key: "Dosage", editable: true },
     {
-      title: 'Frequency',
-      dataIndex: 'Frequency',
-      key: 'Frequency',
+      title: "Frequency",
+      dataIndex: "Frequency",
+      key: "Frequency",
       editable: true,
-      inputType: 'number',
+      inputType: "number",
     },
     {
-      title: 'Duration in Days',
-      dataIndex: 'Duration_Days',
-      key: 'Duration_Days',
+      title: "Duration in Days",
+      dataIndex: "Duration_Days",
+      key: "Duration_Days",
       editable: true,
-      inputType: 'number',
+      inputType: "number",
     },
     {
-      title: 'Quantity',
-      dataIndex: 'Quantity',
-      key: 'Quantity',
-      inputType: 'number',
+      title: "Quantity",
+      dataIndex: "Quantity",
+      key: "Quantity",
+      inputType: "number",
       editable: true,
-      inputType: 'number',
+      inputType: "number",
     },
     {
-      key: 'Returns_Quantity',
-      title: 'Quantity Returned',
-      dataIndex: 'Returns_Quantity',
+      key: "Returns_Quantity",
+      title: "Quantity Returned",
+      dataIndex: "Returns_Quantity",
     },
     {
-      title: 'Unit Price',
-      dataIndex: 'UnitPrice',
-      key: 'UnitPrice',
+      title: "Unit Price",
+      dataIndex: "UnitPrice",
+      key: "UnitPrice",
       render: (value) => value.toLocaleString(),
     },
     {
-      title: 'Total Price',
-      dataIndex: 'TotalPrice',
-      key: 'TotalPrice',
+      title: "Total Price",
+      dataIndex: "TotalPrice",
+      key: "TotalPrice",
       render: (value, record) => {
-        return Math.round(record.UnitPrice * record.Quantity).toLocaleString();
+        return (
+          Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+        ).toLocaleString();
       },
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
+      title: "Action",
+      dataIndex: "action",
       render: (value, record) => {
         const editable = isEditing(record);
         return editable ? (
           <Space direction="horizontal">
             <Button
-              type={'default'}
-              style={{ textTransform: 'capitalize' }}
+              type={"default"}
+              style={{ textTransform: "capitalize" }}
               onClick={() => save(record)}
             >
               Save
             </Button>
             <Popconfirm
-              type={'primary'}
+              type={"primary"}
               onConfirm={cancel}
               title="Sure to cancel?"
             >
@@ -237,17 +233,17 @@ export const pharmacyCardCurrentSelectionColumns = ({
             ) : (
               <Space direction="horizontal">
                 <Button
-                  type={'default'}
+                  type={"default"}
                   disabled={disabled}
                   onClick={() => edit(record)}
-                  style={{ textTransform: 'capitalize' }}
+                  style={{ textTransform: "capitalize" }}
                 >
                   Edit
                 </Button>
                 <Button
-                  type={'primary'}
+                  type={"primary"}
                   disabled={disabled}
-                  style={{ textTransform: 'capitalize' }}
+                  style={{ textTransform: "capitalize" }}
                   onClick={() => showConfirm(record)}
                 >
                   Delete
@@ -266,7 +262,7 @@ export const pharmacyCardCurrentSelectionColumns = ({
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'age' ? 'number' : 'text',
+        inputType: col.dataIndex === "age" ? "number" : "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -280,64 +276,74 @@ export const pharmacyQuotationCurrentSelectionColumns = (
   save,
   cancel,
   isEditing,
-  deleteItem,
+  deleteItem
 ) =>
   [
-    { title: 'No', dataIndex: 'Index', key: 'Index' },
+    { title: "No", dataIndex: "Index", key: "Index" },
     {
-      title: 'Drug Name',
-      dataIndex: 'Description',
-      key: 'Description',
+      title: "Drug Name",
+      dataIndex: "Description",
+      key: "Description",
       render: (value, record) => {
         var returnValue;
-        returnValue = Object.hasOwn(record, 'Description')
+        returnValue = Object.hasOwn(record, "Description")
           ? value
-          : record['DrugName'];
+          : record["DrugName"];
         return returnValue;
       },
     },
     {
-      title: 'Available Qty',
-      dataIndex: 'InventoryQuantity',
-      key: 'InventoryQuantity',
+      title: "Available Qty",
+      dataIndex: "InventoryQuantity",
+      key: "InventoryQuantity",
     },
     {
-      title: 'Billable Quantity',
-      dataIndex: 'Quantity',
-      key: 'Quantity',
+      title: "Billable Quantity",
+      dataIndex: "Quantity",
+      key: "Quantity",
       editable: true,
-      inputType: 'number',
+      inputType: "number",
     },
     {
-      title: 'Unit Price',
-      dataIndex: 'UnitPrice',
-      key: 'UnitPrice',
+      title: "Unit Price",
+      dataIndex: "UnitPrice",
+      key: "UnitPrice",
       render: (value) => value.toLocaleString(),
     },
     {
-      title: 'Total Price',
-      dataIndex: 'TotalPrice',
-      key: 'TotalPrice',
+      title: "Total Price",
+      dataIndex: "TotalPrice",
+      key: "TotalPrice",
       render: (value, record) => {
-        return Math.round(record.UnitPrice * record.Quantity).toLocaleString();
+        console.log({
+          unitPrice: record.UnitPrice,
+          quantity: record.Quantity,
+          value: (
+            Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+          ).toLocaleString(),
+        });
+
+        return (
+          Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+        ).toLocaleString();
       },
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
+      title: "Action",
+      dataIndex: "action",
       render: (value, record) => {
         const editable = isEditing(record);
         return editable ? (
           <Space direction="horizontal">
             <Button
-              type={'default'}
-              style={{ textTransform: 'capitalize' }}
+              type={"default"}
+              style={{ textTransform: "capitalize" }}
               onClick={() => save(record)}
             >
               Save
             </Button>
             <Popconfirm
-              type={'primary'}
+              type={"primary"}
               onConfirm={cancel}
               title="Sure to cancel?"
             >
@@ -347,15 +353,15 @@ export const pharmacyQuotationCurrentSelectionColumns = (
         ) : (
           <Space direction="horizontal">
             <Button
-              type={'default'}
+              type={"default"}
               onClick={() => edit(record)}
-              style={{ textTransform: 'capitalize' }}
+              style={{ textTransform: "capitalize" }}
             >
               Edit
             </Button>
             <Button
-              type={'primary'}
-              style={{ textTransform: 'capitalize' }}
+              type={"primary"}
+              style={{ textTransform: "capitalize" }}
               onClick={() => deleteItem(record)}
             >
               Delete
@@ -372,7 +378,7 @@ export const pharmacyQuotationCurrentSelectionColumns = (
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'age' ? 'number' : 'text',
+        inputType: col.dataIndex === "age" ? "number" : "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),

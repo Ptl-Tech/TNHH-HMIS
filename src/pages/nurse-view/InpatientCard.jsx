@@ -1,6 +1,6 @@
 import { Button, Card, Col, message, Modal, Row, Space } from "antd";
 import { useLocation, redirect, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";  // import dispatch hook
+import { useDispatch } from "react-redux"; // import dispatch hook
 import { useState } from "react";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import InpatientCardInfo from "./InpatientCardInfo";
@@ -34,13 +34,11 @@ const InpatientCard = () => {
     return redirect("/login");
   }
 
-
   const renderTabContent = () => {
     switch (activeTab) {
       case "1":
         return (
           <CarePlan
-            treatmentNo={treatmentNo}
             patientNo={patientNo}
             patientDetails={patientDetails}
             role={role}
@@ -61,7 +59,6 @@ const InpatientCard = () => {
     }
   };
   const handleInitiateDischarge = () => {
-
     confirm({
       title: "Confirm Initiate Discharge",
       content: `Are you sure you want to initiate discharge for ${patientDetails?.PatientName}?`,
@@ -95,7 +92,7 @@ const InpatientCard = () => {
           result.payload.message ||
             `${patientDetails?.PatientName} discharge initiated successfully!`
         );
-        navigate('/Nurse/Discharge-list');
+        navigate("/Nurse/Discharge-list");
         return Promise.resolve();
       } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
         message.error(
@@ -113,17 +110,16 @@ const InpatientCard = () => {
     <div style={{ margin: "20px 10px" }}>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <NurseInnerHeader title="Patient Card" />
-       {role !== "Psychology" && (
-        <Button
-          type="primary"
-          icon={<i className="fas fa-ellipsis-v"></i>}
-          style={{ backgroundColor: "#0f5689", color: "#ffffff" }}
-          onClick={handleInitiateDischarge}
-        >
-          Proceed to Initiate Discharge
-        </Button>
-       )}
-
+        {role !== "Psychology" && (
+          <Button
+            type="primary"
+            icon={<i className="fas fa-ellipsis-v"></i>}
+            style={{ backgroundColor: "#0f5689", color: "#ffffff" }}
+            onClick={handleInitiateDischarge}
+          >
+            Proceed to Initiate Discharge
+          </Button>
+        )}
       </div>
 
       <Row gutter={[16, 16]}>
@@ -180,16 +176,15 @@ const InpatientCard = () => {
                   >
                     Ward Transfer
                   </Button>
-                 
                 </>
               )}
-               <Button
-                    block
-                    type={activeTab === "6" ? "primary" : "default"}
-                    onClick={() => setActiveTab("6")}
-                  >
-                    Patient Charges
-                  </Button>
+              <Button
+                block
+                type={activeTab === "6" ? "primary" : "default"}
+                onClick={() => setActiveTab("6")}
+              >
+                Patient Charges
+              </Button>
             </Space>
           </Card>
         </Col>

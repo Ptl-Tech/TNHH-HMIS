@@ -25,11 +25,10 @@ import CarePlanForm from "./nurse-forms/CarePlanForm";
 import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 import ConsultationroomDetails from "../doctorsViews/Doctor-Forms/ConsultationroomDetails";
 
-const CarePlan = ({ treatmentNo, observationNo, patientNo, patientDetails }) => {
+const CarePlan = ({ observationNo, patientNo }) => {
   const [activeItem, setActiveItem] = useState("Consultation Room File");
   const [selectedItem, setSelectedItem] = useState(
     <ConsultationroomDetails
-      treatmentNo={treatmentNo}
       observationNo={observationNo}
       patientNo={patientNo}
     />
@@ -42,17 +41,16 @@ const CarePlan = ({ treatmentNo, observationNo, patientNo, patientDetails }) => 
       case "Consultation Room File":
         setSelectedItem(
           <ConsultationroomDetails
-            treatmentNo={treatmentNo}
             observationNo={observationNo}
             patientNo={patientNo}
           />
         );
         break;
-     
+
       case "Care Plan":
         setSelectedItem(<CarePlanForm />);
         break;
-      
+
       case "ECT Procedure":
         setSelectedItem(<ECTScan />);
         break;
@@ -88,7 +86,7 @@ const CarePlan = ({ treatmentNo, observationNo, patientNo, patientDetails }) => 
     ...(userRole === "Nurse"
       ? [
           { label: "Care Plan", icon: <BorderlessTableOutlined /> },
-         
+
           { label: "Visitor List", icon: <FileOutlined /> },
           { label: "Suicidal Form", icon: <FileOutlined /> },
           { label: "Dietary Intake Form", icon: <FileOutlined /> },

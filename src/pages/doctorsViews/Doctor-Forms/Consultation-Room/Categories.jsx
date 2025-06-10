@@ -1,26 +1,24 @@
-import { Collapse, Space } from 'antd';
+import { useState } from "react";
 
-import { RadioInputs } from './RadioInputs';
-import { CheckboxInputs } from './CheckboxInputs';
+import { Collapse, Space } from "antd";
 
-export const Categories = ({ categories, treatmentNo }) => {
+import { RadioInputs } from "./RadioInputs";
+import { CheckboxInputs } from "./CheckboxInputs";
+
+export const Categories = ({ categories, treatmentNo, multiple }) => {
+  const [activeKey, setActiveKey] = useState(
+    multiple ? categories.map(({ Category_ID }) => Category_ID) : null
+  );
+
   function renderFormItems(formItems) {
     const { Input_Type } = formItems[0] || {};
 
     switch (Input_Type) {
-      case 'radio':
+      case "radio":
+        return <RadioInputs formItems={formItems} treatmentNo={treatmentNo} />;
+      case "checkbox":
         return (
-          <RadioInputs
-            formItems={formItems}
-            treatmentNo={treatmentNo}
-          />
-        );
-      case 'checkbox':
-        return (
-          <CheckboxInputs
-            formItems={formItems}
-            treatmentNo={treatmentNo}
-          />
+          <CheckboxInputs formItems={formItems} treatmentNo={treatmentNo} />
         );
       default:
         break;
@@ -30,45 +28,50 @@ export const Categories = ({ categories, treatmentNo }) => {
   return (
     <div
       style={{
-        border: '1px solid #f0f0f0',
-        borderRadius: '8px',
-        overflow: 'clip',
+        border: "1px solid #f0f0f0",
+        borderRadius: "8px",
+        overflow: "clip",
       }}
     >
       <Collapse
-        accordion
         size="small"
         bordered={false}
+        accordion={false}
+        activeKey={activeKey}
+        onChange={(key) =>
+          setActiveKey((previousKey) => (previousKey === key ? null : key))
+        }
         items={categories.map(
           (
             {
-              Category_Name: label,
-              Category_ID: key,
               formItems,
               subCategories,
+              Category_ID: key,
+              Category_Name: label,
             },
-            index,
+            index
           ) => ({
             key,
             label,
             style: {
-              border: 'none',
+              border: "none",
             },
             styles: {
               body: {
-                background: 'white',
+                background: "white",
               },
               header: {
                 borderBottom:
                   index === categories.length - 1 && categories.length !== 1
-                    ? 'none'
-                    : '1px solid #f0f0f0',
+                    ? "none"
+                    : "1px solid #f0f0f0",
               },
             },
             children: (
               <Space direction="vertical">
                 {subCategories?.length > 0 && (
                   <Categories
+                    multiple={multiple}
                     treatmentNo={treatmentNo}
                     categories={subCategories}
                   />
@@ -76,7 +79,7 @@ export const Categories = ({ categories, treatmentNo }) => {
                 {formItems && renderFormItems(formItems)}
               </Space>
             ),
-          }),
+          })
         )}
       />
     </div>

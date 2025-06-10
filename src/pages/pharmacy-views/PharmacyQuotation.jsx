@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { GiPayMoney } from 'react-icons/gi';
-import { Form, Space, Table, Typography } from 'antd';
+import { GiPayMoney } from "react-icons/gi";
+import { Form, Space, Table, Typography } from "antd";
 
 import {
   pharmacyQuotationSearchDrugsColumns,
   pharmacyQuotationCurrentSelectionColumns,
-} from './pharmacy-utils';
-import { SearchDrugTable } from './SearchDrugTable';
-import { PharmacyCurrentSelection } from './PharmacyCurrentSelection';
+} from "./pharmacy-utils";
+import { SearchDrugTable } from "./SearchDrugTable";
+import { PharmacyCurrentSelection } from "./PharmacyCurrentSelection";
 
-import { getItemsSlice } from '../../actions/triage-actions/getItemsSlice';
+import { getItemsSlice } from "../../actions/triage-actions/getItemsSlice";
 
 export default function PharmacyQuotation() {
   const dispatch = useDispatch();
@@ -19,7 +19,7 @@ export default function PharmacyQuotation() {
   const { Text } = Typography;
   const [form] = Form.useForm();
 
-  const [editingKey, setEditingKey] = useState('');
+  const [editingKey, setEditingKey] = useState("");
   const [selectedDrugs, setSelectedDrugs] = useState([]);
   const { items, loadingItems } = useSelector((state) => state.getItems);
 
@@ -42,19 +42,19 @@ export default function PharmacyQuotation() {
 
       const newRecord = { ...record, Quantity };
       const indexToReplace = selectedDrugs.findIndex(
-        (item) => item.No === record.No,
+        (item) => item.No === record.No
       );
       var newSelected = [...selectedDrugs];
       newSelected.splice(indexToReplace, 1, newRecord);
 
       setSelectedDrugs(newSelected);
-      setEditingKey('');
+      setEditingKey("");
     } catch (error) {
       console.log({ error });
     }
   };
 
-  const cancel = () => setEditingKey('');
+  const cancel = () => setEditingKey("");
 
   const isEditing = (record) => record.No === editingKey;
 
@@ -65,28 +65,26 @@ export default function PharmacyQuotation() {
 
   const deleteItem = ({ No }) => {
     setSelectedDrugs(
-      selectedDrugs.filter((selectedDrug) => selectedDrug.No !== No),
+      selectedDrugs.filter((selectedDrug) => selectedDrug.No !== No)
     );
   };
 
   const pharmacyCurrentSelectionSummary = (pageData) => {
     const totalValue = pageData.reduce(
-      (acc, { Quantity, UnitPrice }) => (acc += Quantity * UnitPrice),
-      0,
+      (acc, { Quantity, UnitPrice }) =>
+        Math.round((acc += Quantity * UnitPrice) * 1000) / 1000,
+      0
     );
 
     return pageData.length ? (
       <TableSummaryRow>
-        <TableSummaryCell
-          index={0}
-          colSpan={4}
-        />
+        <TableSummaryCell index={0} colSpan={4} />
         <TableSummaryCell index={0}>
-          <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>Total</Text>
+          <Text style={{ fontWeight: "bold", color: "#0f5689" }}>Total</Text>
         </TableSummaryCell>
         <TableSummaryCell index={1}>
-          <Text style={{ fontWeight: 'bold', color: '#0f5689' }}>
-            {new Intl.NumberFormat('en-US').format(Math.round(totalValue))}
+          <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+            {totalValue}
           </Text>
         </TableSummaryCell>
         <TableSummaryCell index={2} />
@@ -97,37 +95,31 @@ export default function PharmacyQuotation() {
   };
 
   return (
-    <div style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+    <div style={{ color: "rgba(0, 0, 0, 0.88)" }}>
       <div
         className="d-flex"
-        style={{ color: '#0f5689', gap: '8px', padding: '8px 0' }}
+        style={{ color: "#0f5689", gap: "8px", padding: "8px 0" }}
       >
         <GiPayMoney size={20} />
         <h6>Pharmacy Quotation</h6>
       </div>
 
-      <Space
-        direction="vertical"
-        style={{ width: '100%' }}
-      >
-        <Form
-          form={form}
-          component={false}
-        >
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Form form={form} component={false}>
           <PharmacyCurrentSelection
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             summary={pharmacyCurrentSelectionSummary}
             data={selectedDrugs.map((selectedDrug, index) => ({
               ...selectedDrug,
-              Index: selectedDrug.Index || index + 1,
               Quantity: selectedDrug.Quantity || 0,
+              Index: selectedDrug.Index || index + 1,
             }))}
             columns={pharmacyQuotationCurrentSelectionColumns(
               edit,
               save,
               cancel,
               isEditing,
-              deleteItem,
+              deleteItem
             )}
           />
         </Form>
