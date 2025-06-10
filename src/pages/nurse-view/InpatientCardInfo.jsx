@@ -12,7 +12,8 @@ const InpatientCardInfo = ({ patientDetail }) => {
   const patientNo = queryParams.get("PatientNo");
   const [patientFileVisible, setPatientFileVisible] = useState(false);
 
-  const { loadingPatientDetails, patientDetails } = useFetchPatientDetailsHook(patientNo);
+  const { loadingPatientDetails, patientDetails } =
+    useFetchPatientDetailsHook(patientNo);
 
   const invalidDate = "0001-01-01";
 
@@ -24,16 +25,18 @@ const InpatientCardInfo = ({ patientDetail }) => {
     setPatientFileVisible(false);
   };
 
-  console.log("deets", patientDetails);
-
   return (
     <>
       <Card
         className="card"
-        style={{ width: "100%", borderTop: "3px solid #0f5689", padding: "20px" }}
+        style={{
+          width: "100%",
+          borderTop: "3px solid #0f5689",
+          padding: "20px",
+        }}
       >
         <div className="d-flex justify-content-between align-items-center">
-          <div >
+          <div>
             <Typography.Text
               style={{ fontWeight: "bold", fontSize: "16px", color: "#0f5689" }}
             >
@@ -61,7 +64,9 @@ const InpatientCardInfo = ({ patientDetail }) => {
           <div>
             <Typography.Text strong>Admission No:</Typography.Text>
             <br />
-            <Typography.Text>{patientDetails?.CurrentAdmNo || "N/A"}</Typography.Text>
+            <Typography.Text>
+              {patientDetails?.CurrentAdmNo || "N/A"}
+            </Typography.Text>
           </div>
 
           <div>
@@ -70,7 +75,10 @@ const InpatientCardInfo = ({ patientDetail }) => {
             {loadingPatientDetails ? (
               <Spin
                 indicator={
-                  <LoadingOutlined style={{ fontSize: 24, color: "#0f5689" }} spin />
+                  <LoadingOutlined
+                    style={{ fontSize: 24, color: "#0f5689" }}
+                    spin
+                  />
                 }
               />
             ) : (
@@ -84,7 +92,9 @@ const InpatientCardInfo = ({ patientDetail }) => {
           <div>
             <Typography.Text strong>Admitting Doctor:</Typography.Text>
             <br />
-            <Typography.Text>{patientDetail?.DoctorsName || "N/A"}</Typography.Text>
+            <Typography.Text>
+              {patientDetail?.DoctorsName || "N/A"}
+            </Typography.Text>
           </div>
 
           <div>
@@ -93,7 +103,9 @@ const InpatientCardInfo = ({ patientDetail }) => {
             <Typography.Text>
               {moment(patientDetails?.Admission_Date).isValid() &&
               patientDetails?.Admission_Date !== invalidDate
-                ? moment(patientDetails?.Admission_Date).format("dddd, MMMM Do, YYYY")
+                ? moment(patientDetails?.Admission_Date).format(
+                    "dddd, MMMM Do, YYYY"
+                  )
                 : "N/A"}
             </Typography.Text>
           </div>

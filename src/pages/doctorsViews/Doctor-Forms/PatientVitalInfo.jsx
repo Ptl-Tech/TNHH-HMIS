@@ -891,7 +891,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     prescriptions,
     treatmentHeader,
     dischargeDetails,
-    // TODO: Ask Ndirangu about the discharge summary
+    // TODO Ask Ndirangu about the discharge summary
     dailyWardRounds,
     dischargeSummary,
     radiologyRequests,
@@ -994,7 +994,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       display: nursingTriageVitals?.length,
       columns: triageVitalsObjectArray(nursingTriageVitals?.toReversed()),
     },
-    // TODO: check that we can pass the mental status checklist from the nurses, ask Mercy
+    // TODO check that we can pass the mental status checklist from the nurses, ask Mercy
     {
       renderer: FileConsultationNotes,
       title: 'Mental Status checklist',
@@ -1090,7 +1090,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       display: prescriptions?.length,
       columns: prescriptionObjectArray,
     },
-    // TODO: Add lab and radiology here, Ndirangu
+    // TODO Add lab and radiology here, Ndirangu
     {
       pagination: false,
       title: 'Procedures',

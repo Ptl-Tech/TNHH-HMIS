@@ -112,10 +112,10 @@ const AdmitPatientForm = () => {
   const handleCancel = () => {
     form.resetFields();
     setHistoryVisible(false);
-  }
+  };
 
   const handleAdmissionRequest = () => {
-  const res=  dispatch(requestPatientAdmission(treatmentNo));
+    const res = dispatch(requestPatientAdmission(treatmentNo));
 
     if (res) {
       dispatch(getAdmissionLines(treatmentNo));
@@ -206,7 +206,6 @@ const AdmitPatientForm = () => {
             </Button>
           </Space>
         }
-        width={800}
       >
         <Form
           layout="vertical"
@@ -217,42 +216,32 @@ const AdmitPatientForm = () => {
           }}
           form={form}
         >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="treatmentNo"
-                label="Treatment Number"
-                rules={[{ required: true }]}
-              >
-                <Input
-                  style={{
-                    width: "100%",
-                    color: "#0F5689",
-                    fontWeight: "bold",
-                  }}
-                  disabled
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="Date of Admission" name="dateOfAdmission">
-                <DatePicker
-                  format="YYYY-MM-DD"
-                  style={{ width: "100%" }}
-                  placeholder="Select Date"
-                  // defaultValue={moment()} // Set default date to current date
-                />
-                {/* Default to current date */}
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Admission Reason" name="admissionReason">
-                <TextArea />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item
+            name="treatmentNo"
+            label="Treatment Number"
+            rules={[{ required: true }]}
+          >
+            <Input
+              style={{
+                width: "100%",
+                color: "#0F5689",
+                fontWeight: "bold",
+              }}
+              disabled
+            />
+          </Form.Item>
+          <Form.Item label="Date of Admission" name="dateOfAdmission">
+            <DatePicker
+              format="YYYY-MM-DD"
+              style={{ width: "100%" }}
+              placeholder="Select Date"
+              // defaultValue={moment()} // Set default date to current date
+            />
+            {/* Default to current date */}
+          </Form.Item>
+          <Form.Item label="Admission Reason" name="admissionReason">
+            <TextArea />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

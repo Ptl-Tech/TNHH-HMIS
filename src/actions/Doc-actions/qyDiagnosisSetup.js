@@ -27,8 +27,6 @@ export const getdiagnosisSetup = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: QY_DIAGNOSIS_LIST_SUCCESS, payload: data });
-
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: QY_DIAGNOSIS_LIST_FAIL, payload: error.message });
   }
