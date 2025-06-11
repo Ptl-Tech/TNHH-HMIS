@@ -8,9 +8,10 @@ import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage"
 
 const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
   const dispatch = useDispatch();
- 
-    const { data: receiptHeader, loading } = useSelector((state) => state.getReceiptPage);
-  
+
+  const { data: receiptHeader, loading } = useSelector(
+    (state) => state.getReceiptPage
+  );
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -31,11 +32,6 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
       dataIndex: "No",
       key: "No",
     },
-    // {
-    //   title: "Transaction Type",
-    //   dataIndex: "Status",
-    //   key: "Status",
-    // },
     {
       title: "Amount",
       dataIndex: "Total_Amount",
@@ -47,15 +43,12 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
       dataIndex: "Amount_Recieved",
       key: "Amount_Recieved",
       render: (Amount_Recieved) => `KSh ${Amount_Recieved.toFixed(2)}`,
-
     },
-   
+
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <PrintReceipt receiptNo={record.No} />
-      ),
+      render: (_, record) => <PrintReceipt receiptNo={record.No} />,
     },
   ];
 
@@ -72,14 +65,12 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
         <Skeleton active />
       ) : (
         <Table
-          dataSource={receiptHeader}
-          columns={columns}
-          size="small"
           bordered
+          size="small"
+          columns={columns}
           rowKey="SystemId"
-          pagination={
-            receiptHeader.length > 10 ? { pageSize: 10 } : false
-          } // Optional, if you don't want pagination
+          dataSource={receiptHeader.filter(({ Posted }) => Posted)}
+          pagination={receiptHeader.length > 10 ? { pageSize: 10 } : false} // Optional, if you don't want pagination
         />
       )}
     </Modal>

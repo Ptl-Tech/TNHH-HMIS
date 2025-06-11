@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   borderBottom: {
-    borderBottom: "0.5 dashed #efefef",
+    borderBottom: "0.5 solid black",
   },
 });
 
