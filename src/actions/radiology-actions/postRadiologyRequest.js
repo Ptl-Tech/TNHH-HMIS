@@ -19,7 +19,7 @@ export const postRadiologyRequest =
 
       const config = apiHeaderConfig(getState);
 
-      //   TODO: Create the endpoint to post the radiology request
+      //   TODO Create the endpoint to post the radiology request
       //   const { data } = await axios.post(
       //     `${API_URL}/Laboratory/LabTestheader`,
       //     labHeaderData,

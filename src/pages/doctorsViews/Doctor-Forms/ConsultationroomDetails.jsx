@@ -42,6 +42,8 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
     dispatch(getDoctorsNotesData({ treatmentNo }));
   }, [treatmentNo, dispatch, saveDoctorNotesData]);
 
+  console.log({ getDoctorNotesData });
+
   // Tracking when the adding of data has failed
   useEffect(() => {
     if (saveDoctorNotesError) {
@@ -81,7 +83,11 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       label: "Aetiology",
       icon: <HeartOutlined />,
       children: (
-        <FourPsForm treatmentNo={treatmentNo} patientNo={patientNo} observationNo={observationNo} />
+        <FourPsForm
+          treatmentNo={treatmentNo}
+          patientNo={patientNo}
+          observationNo={observationNo}
+        />
       ),
     },
   ];

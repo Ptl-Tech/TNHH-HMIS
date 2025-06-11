@@ -11,8 +11,6 @@ export const NoData = ({ content = 'No data', style = {} }) => {
     flexDirection: 'column',
   });
 
-  if (Object.keys(style).length) console.log({ styles });
-
   return (
     <div style={styles}>
       <svg

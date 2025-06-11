@@ -22,7 +22,7 @@ export const postLabTest = (params) => async (dispatch, getState) => {
 
     const data = { status: 'success' };
 
-    // TODO: Change the url to match the post of the test
+    // TODO Change the url to match the post of the test
     // const { data } = await axios.post(
     //   `${API_URL}/Laboratory/LabTestSample`,
     //   sample,

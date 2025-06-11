@@ -125,9 +125,9 @@ const Diagnosis = () => {
     console.log("clicked", type);
     if (diagnosisInput !== "") {
       const newDiagnosis = {
-        diagnosisCode: diagnosisInput,
-        confirmed: false,
         remarks: "",
+        confirmed: false,
+        diagnosisCode: diagnosisInput,
         diagnosisType: type, // 1 for primary, 2 for secondary
       };
       if (type === 1) {
