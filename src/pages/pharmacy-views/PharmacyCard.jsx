@@ -166,8 +166,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
         remarks = "",
       } = row;
 
-      console.log({row});
-      
+      console.log({ row });
 
       dispatch(
         postPrescriptionQuantity({
@@ -533,9 +532,9 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                     Issue Drugs
                   </Button>
                   <Button
-                    disabled={disabled}
                     style={{ height: "32px" }}
                     onClick={handlePrintLabels}
+                    disabled={!Boolean(pharmacyLineData?.length)}
                   >
                     Print Labels
                   </Button>

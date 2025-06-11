@@ -39,6 +39,8 @@ export const getReceiptPage = (visitNo) => async (dispatch, getState) => {
       config
     );
 
+    console.log({ response });
+
     dispatch({ type: REQUEST_RECEIPT_PAGE_SUCCESS, payload: response.data });
     return response.data.status;
   } catch (error) {
