@@ -339,7 +339,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   };
 
   const handleIssuePrescription = () => {
-    // TODO print the pharmacy prescription and the printable
     dispatch(postDrugIssuance(currentRequest));
   };
 

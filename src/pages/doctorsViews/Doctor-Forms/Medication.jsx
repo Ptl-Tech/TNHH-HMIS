@@ -18,6 +18,9 @@ const Medication = () => {
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientDetails = getLocation.state?.patientDetails;
 
+  const { data: sendtoPharmacyData } = useSelector(
+    (state) => state.sendtoPharmacy
+  );
   const { loadingPrescriptions, prescriptions } = useSelector(
     (state) => state.getQyPrescriptionLine
   );
@@ -26,7 +29,7 @@ const Medication = () => {
 
   useEffect(() => {
     dispatch(getQyPrescriptionLineSlice(treatmentNo));
-  }, [dispatch, treatmentNo]);
+  }, [treatmentNo, sendtoPharmacyData]);
 
   return (
     <div>

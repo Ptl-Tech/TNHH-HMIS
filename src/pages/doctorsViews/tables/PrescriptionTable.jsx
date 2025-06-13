@@ -26,14 +26,14 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
       key: "DrugName",
     },
     {
-      title: "Dosage",
-      dataIndex: "Dosage",
-      key: "Dosage",
+      title: "Frequency",
+      dataIndex: "PrescriptionDose",
+      key: "PrescriptionDose",
     },
     {
-      title: "Route",
-      dataIndex: "Route",
-      key: "Route",
+      title: "Number of Days",
+      dataIndex: "NumberofDays",
+      key: "NumberofDays",
     },
     {
       title: "Remarks",
@@ -47,6 +47,9 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
       key: "Status",
     },
   ];
+
+  console.log({ filteredPrescriptions });
+
   return (
     <div>
       {loadingPrescriptions ? (
