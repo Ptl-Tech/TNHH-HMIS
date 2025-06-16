@@ -34,20 +34,11 @@ const InpatientCardContent = () => {
               <WardTransfer />
             </Tabs.TabPane>
           )}
-           {role === "Nurse" && (
+          {role === "Nurse" && (
             <Tabs.TabPane tab="Patient Charges" key="6">
               <NursingPatientCharges />
             </Tabs.TabPane>
           )}
-          {/* {
-                    role === "Doctor" &&
-                    <Tabs.TabPane tab=" OutPatient Notes" key="6">
-                        <Discharges/>
-                    </Tabs.TabPane>
-                } */}
-          {/* <Tabs.TabPane tab={role === "Nurse" ? "Nurse Forms" : ""} key="5">
-                    <NurseForms/>
-                </Tabs.TabPane> */}
         </Tabs>
       </Card>
     </>

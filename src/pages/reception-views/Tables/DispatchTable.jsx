@@ -10,7 +10,7 @@ import { postPharmacyHeader } from '../../../actions/pharmacy-actions/postPharma
 
 const DispatchesTable = ({ data, handleOpenLab, loading }) => {
   const dispatch = useDispatch();
-  // TODO: this will be done once we get the last API for submitting the lab tests of the lab header
+  // TODO this will be done once we get the last API for submitting the lab tests of the lab header
   const handleOpenEditRequest = (record) => {
     handleOpenLab(record.RequestNo);
   };

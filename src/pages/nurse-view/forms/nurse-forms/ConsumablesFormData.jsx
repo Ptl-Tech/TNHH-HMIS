@@ -1,20 +1,25 @@
-import { Button, Col, Form, Input, message, Row, Select, Space } from "antd";
-import TextArea from "antd/es/input/TextArea";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
+
+import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { Button, Col, Form, Input, message, Row, Select, Space } from "antd";
+
+import useAuth from "../../../../hooks/useAuth";
 import {
+  postNurseOrderSheetSlice,
+  POST_NURSE_ORDER_SHEET_FAILURE,
+  POST_NURSE_ORDER_SHEET_SUCCESS,
+} from "../../../../actions/nurse-actions/postNurseOrderSheet";
+import {
+  postPatientConsumablesSlice,
   POST_PATIENT_CONSUMABLES_FAILURE,
   POST_PATIENT_CONSUMABLES_SUCCESS,
-  postPatientConsumablesSlice,
 } from "../../../../actions/nurse-actions/postPatientConsumablesSlice";
-import { getPgOpenPatientConsumablesSlice } from "../../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
-import { useEffect } from "react";
-import { getQyLocationsSlice } from "../../../../actions/nurse-actions/getQyLocationsSlice";
 import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice";
-import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
-import PropTypes from "prop-types";
-import { POST_NURSE_ORDER_SHEET_FAILURE, POST_NURSE_ORDER_SHEET_SUCCESS, postNurseOrderSheetSlice } from "../../../../actions/nurse-actions/postNurseOrderSheet";
+import { getQyLocationsSlice } from "../../../../actions/nurse-actions/getQyLocationsSlice";
+import { getPgOpenPatientConsumablesSlice } from "../../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
+
 const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const [form] = Form.useForm();
   const { patientDetails } = useLocation().state;
@@ -31,60 +36,59 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const { loadingpostNurseOrderSheet } = useSelector(
     (state) => state.postNurseOrderSheet
   );
-  
-const handleOnFinish = async (values) => {
-  try {
-    const { location, quantity, item, remarks } = values;
 
-    const consumableData = {
-      myAction: "create",
-      admissionNo: patientDetails?.Admission_No,
-      recId: "",
-      branchCode: location,
-  prescriptionDose: parseInt(quantity, 10),
-      drugNo: item,
-      staffNo: userDetails.userData.no,
-    };
+  const handleOnFinish = async (values) => {
+    try {
+      const { location, quantity, item, remarks } = values;
 
-    // Dispatch postPatientConsumablesSlice and wait for result
-    const consumablesResult = await dispatch(
-      postPatientConsumablesSlice("/Nurse/NurseOrderSheet", consumableData)
-    );
+      const consumableData = {
+        myAction: "create",
+        admissionNo: patientDetails?.Admission_No,
+        recId: "",
+        branchCode: location,
+        prescriptionDose: parseInt(quantity, 10),
+        drugNo: item,
+        staffNo: userDetails.userData.no,
+      };
 
-    if (consumablesResult.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
-      message.success("Consumables posted successfully!");
-
-      // Dispatch postNurseOrderSheetSlice and wait for result
-      const orderSheetResult = await dispatch(
-        postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
-          admissionNo: patientDetails?.Admission_No,
-          branchCode: location,
-          staffNo: userDetails.userData.no,
-        })
+      // Dispatch postPatientConsumablesSlice and wait for result
+      const consumablesResult = await dispatch(
+        postPatientConsumablesSlice("/Nurse/NurseOrderSheet", consumableData)
       );
 
-      if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_SUCCESS) {
-        message.success("Order sheet sent to pharmacy successfully!");
-        dispatch(getPgOpenPatientConsumablesSlice());
-        setIsConsumableFormVisible(false);
-        form.resetFields();
-      } else if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_FAILURE) {
+      if (consumablesResult.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
+        message.success("Consumables posted successfully!");
+
+        // Dispatch postNurseOrderSheetSlice and wait for result
+        const orderSheetResult = await dispatch(
+          postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
+            admissionNo: patientDetails?.Admission_No,
+            branchCode: location,
+            staffNo: userDetails.userData.no,
+          })
+        );
+
+        if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_SUCCESS) {
+          message.success("Order sheet sent to pharmacy successfully!");
+          dispatch(getPgOpenPatientConsumablesSlice());
+          setIsConsumableFormVisible(false);
+          form.resetFields();
+        } else if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_FAILURE) {
+          message.error(
+            orderSheetResult?.payload?.message ||
+              "Failed to send order sheet to pharmacy."
+          );
+        }
+      } else if (consumablesResult.type === POST_PATIENT_CONSUMABLES_FAILURE) {
         message.error(
-          orderSheetResult?.payload?.message ||
-            "Failed to send order sheet to pharmacy."
+          consumablesResult?.payload?.message ||
+            "Internal server error, please try again later."
         );
       }
-    } else if (consumablesResult.type === POST_PATIENT_CONSUMABLES_FAILURE) {
-      message.error(
-        consumablesResult?.payload?.message ||
-          "Internal server error, please try again later."
-      );
+    } catch (error) {
+      message.error(error.message || "An unexpected error occurred.");
     }
-  } catch (error) {
-    message.error(error.message || "An unexpected error occurred.");
-  }
-};
-
+  };
 
   useEffect(() => {
     if (!qyLocations?.length) {
@@ -129,7 +133,7 @@ const handleOnFinish = async (values) => {
                   value: item.Code,
                   label: item.Name,
                 }))}
-                 size="large"
+                size="large"
               />
             </Form.Item>
           </Col>
@@ -151,7 +155,7 @@ const handleOnFinish = async (values) => {
                   value: item.No,
                   label: item.Description,
                 }))}
-                 size="large"
+                size="large"
               />
             </Form.Item>
           </Col>
@@ -219,9 +223,3 @@ const handleOnFinish = async (values) => {
 };
 
 export default ConsumablesFormData;
-
-// props validation
-ConsumablesFormData.propTypes = {
-  setIsConsumableFormVisible: PropTypes.bool,
-  setConsumablesFormData: PropTypes.array.isRequired,
-};

@@ -64,7 +64,7 @@ const TestLinesCreation = () => {
   };
 
   const handleOk = async (data) => {
-    // TODO: dispatch the data to the backend
+    // TODO dispatch the data to the backend
     await dispatch(postLabTest(data));
     setOpen(false);
   };

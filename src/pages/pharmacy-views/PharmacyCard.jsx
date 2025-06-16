@@ -1,7 +1,8 @@
-import { useLocation } from "react-router-dom";
-
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
+import ReactPDF, { pdf } from "@react-pdf/renderer";
 
 import {
   Col,
@@ -33,6 +34,7 @@ import {
   pharmacyCardCurrentSelectionColumns,
 } from "./pharmacy-utils";
 
+import PharmacyLabel from "./PharmacyLabel";
 import {
   postDrugIssuance,
   postArchivePrescription,
@@ -46,6 +48,7 @@ import {
   getPharmacyLineReturnbyPharmacyNo,
 } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
 import { getItemsSlice } from "../../actions/triage-actions/getItemsSlice";
+import PDFViewer from "../../components/PDFView";
 import { getPharmacyRequestsAll } from "../../actions/pharmacy-actions/getPharmacyRequestsAll";
 import { getSinglePharmacyRecord } from "../../actions/pharmacy-actions/getSinglePharmacyRecord";
 
@@ -94,6 +97,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const [form] = Form.useForm();
 
   const [editingKey, setEditingKey] = useState("");
+  const [pdfLabels, setPdfLabels] = useState(null);
+  const [viewPDFLabel, setViewPDFLabel] = useState(false);
   const [currentRequest, setCurrentRequest] = useState(null);
   const [Status, setStatus] = useState(searchParams.get("status") || "");
 
@@ -160,6 +165,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
         Take = 0,
         remarks = "",
       } = row;
+
+      console.log({ row });
 
       dispatch(
         postPrescriptionQuantity({
@@ -332,8 +339,53 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   };
 
   const handleIssuePrescription = () => {
-    // TODO: print the pharmacy prescription and the printable
+    // TODO print the pharmacy prescription and the printable
     dispatch(postDrugIssuance(currentRequest));
+  };
+
+  const handlePrintLabels = async () => {
+    try {
+      const blob = await pdf(
+        <PharmacyLabel
+          items={pharmacyLineData?.map((pLineData) => ({
+            ...pLineData,
+            patientName: pharmacyRecord?.Search_Name,
+          }))}
+        />
+      ).toBlob();
+
+      console.log({ pharmacyLineData });
+
+      const blobToBase64 = (blob) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob); // This reads the blob as a Data URL (base64 with MIME)
+          reader.onloadend = () => {
+            const base64data = reader.result;
+            // Strip the data prefix to get only the base64 string (optional)
+            const base64 = base64data.split(",")[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+        });
+      };
+
+      const base64String = await blobToBase64(blob);
+      console.log({ base64String });
+
+      // Displaying the printables
+      setViewPDFLabel(() => {
+        setPdfLabels(base64String);
+        return true;
+      });
+    } catch (error) {
+      console.log({ error: error?.message });
+    }
+  };
+
+  const handleCloseLabelModal = () => {
+    setPdfLabels(null);
+    setViewPDFLabel(false);
   };
 
   return (
@@ -479,6 +531,23 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                   >
                     Issue Drugs
                   </Button>
+                  <Button
+                    style={{ height: "32px" }}
+                    onClick={handlePrintLabels}
+                    disabled={!Boolean(pharmacyLineData?.length)}
+                  >
+                    Print Labels
+                  </Button>
+                  <Modal
+                    destroyOnHidden
+                    title="Basic Modal"
+                    open={viewPDFLabel}
+                    onOk={handleCloseLabelModal}
+                    onCancel={handleCloseLabelModal}
+                    closable={{ "aria-label": "Custom Close Button" }}
+                  >
+                    <PDFViewer base64String={pdfLabels} />
+                  </Modal>
                 </SpaceCompact>
               </div>
               <Table
@@ -508,7 +577,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                   }))}
                 loading={pharmacyLineDataLoading || postPharmacyLineLoading}
                 summary={(pageData) => {
-                  console.log({ pageData });
                   const totalValue = pageData.reduce(
                     (acc, { Quantity, UnitPrice }) =>
                       (acc += Quantity * UnitPrice),

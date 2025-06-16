@@ -45,7 +45,7 @@ export const generateFileTabsData = ({
   return response;
 };
 
-// TODO: waiting on Ndirangu to finish the API side.
+// TODO waiting on Ndirangu to finish the API side.
 // export const categorizeDoctorNotes = (doctorNotes) => {
 //   if (doctorNotes?.length) {
 //     doctorNotes.reduce(

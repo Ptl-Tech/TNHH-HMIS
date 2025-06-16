@@ -162,10 +162,10 @@ export const pharmacyCardCurrentSelectionColumns = ({
     },
     { title: "Dosage", dataIndex: "Dosage", key: "Dosage", editable: true },
     {
+      editable: true,
+      key: "Frequency",
       title: "Frequency",
       dataIndex: "Frequency",
-      key: "Frequency",
-      editable: true,
       inputType: "number",
     },
     {

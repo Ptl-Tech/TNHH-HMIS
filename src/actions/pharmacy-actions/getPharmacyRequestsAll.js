@@ -54,8 +54,6 @@ export const getPharmacyRequestsAll =
   async (dispatch, getState) => {
     const query = generateQuery({ type, status });
 
-    console.log({ type, status, query });
-
     try {
       dispatch({ type: GET_PHARMACY_REQUESTS_ALL });
 
@@ -78,8 +76,6 @@ export const getPharmacyRequestsAll =
         config,
       );
 
-      console.log({ response });
-
       if (response.data === '') {
         return message.error(
           'The requested pharmacy header could not be found',
@@ -90,8 +86,6 @@ export const getPharmacyRequestsAll =
         payload: response.data,
       });
     } catch (error) {
-      console.log({ error });
-
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
