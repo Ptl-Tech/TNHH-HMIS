@@ -1,18 +1,25 @@
-
 export const POST_PRESCRIPTION_REQUEST = "POST_PRESCRIPTION_REQUEST";
 export const POST_PRESCRIPTION_SUCCESS = "POST_PRESCRIPTION_SUCCESS";
 export const POST_PRESCRIPTION_FAIL = "POST_PRESCRIPTION_FAIL";
 export const POST_PRESCRIPTION_RESET = "POST_PRESCRIPTION_RESET";
 
-export const POST_PRESCRIPTION_TO_PHARMACY_REQUEST = "POST_PRESCRIPTION_TO_PHARMACY_REQUEST";
-export const POST_PRESCRIPTION_TO_PHARMACY_SUCCESS = "POST_PRESCRIPTION_TO_PHARMACY_SUCCESS";
-export const POST_PRESCRIPTION_TO_PHARMACY_FAIL = "POST_PRESCRIPTION_TO_PHARMACY_FAIL";
-export const POST_PRESCRIPTION_TO_PHARMACY_RESET = "POST_PRESCRIPTION_TO_PHARMACY_RESET";
+export const POST_PRESCRIPTION_TO_PHARMACY_REQUEST =
+  "POST_PRESCRIPTION_TO_PHARMACY_REQUEST";
+export const POST_PRESCRIPTION_TO_PHARMACY_SUCCESS =
+  "POST_PRESCRIPTION_TO_PHARMACY_SUCCESS";
+export const POST_PRESCRIPTION_TO_PHARMACY_FAIL =
+  "POST_PRESCRIPTION_TO_PHARMACY_FAIL";
+export const POST_PRESCRIPTION_TO_PHARMACY_RESET =
+  "POST_PRESCRIPTION_TO_PHARMACY_RESET";
 
-export const GET_PATIENT_PRESCRIPTION_LINE_REQUEST = "GET_PATIENT_PRESCRIPTION_LINE_REQUEST";
-export const GET_PATIENT_PRESCRIPTION_LINE_SUCCESS = "GET_PATIENT_PRESCRIPTION_LINE_SUCCESS";
-export const GET_PATIENT_PRESCRIPTION_LINE_FAIL = "GET_PATIENT_PRESCRIPTION_LINE_FAIL";
-export const GET_PATIENT_PRESCRIPTION_LINE_RESET = "GET_PATIENT_PRESCRIPTION_LINE_RESET";
+export const GET_PATIENT_PRESCRIPTION_LINE_REQUEST =
+  "GET_PATIENT_PRESCRIPTION_LINE_REQUEST";
+export const GET_PATIENT_PRESCRIPTION_LINE_SUCCESS =
+  "GET_PATIENT_PRESCRIPTION_LINE_SUCCESS";
+export const GET_PATIENT_PRESCRIPTION_LINE_FAIL =
+  "GET_PATIENT_PRESCRIPTION_LINE_FAIL";
+export const GET_PATIENT_PRESCRIPTION_LINE_RESET =
+  "GET_PATIENT_PRESCRIPTION_LINE_RESET";
 
 import {
   POST_INPATIENT_PRESCRIPTION_REQUEST,
@@ -22,11 +29,13 @@ import {
   POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_REQUEST,
   POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_SUCCESS,
   POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_FAIL,
-  POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_RESET
+  POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_RESET,
 } from "../../actions/Doc-actions/postPrescription";
 
-
-export const getPatientPrescriptionLine = (state = { loading: false }, action) => {
+export const getPatientPrescriptionLine = (
+  state = { loading: false },
+  action
+) => {
   switch (action.type) {
     case GET_PATIENT_PRESCRIPTION_LINE_REQUEST:
       return { ...state, loading: true };
@@ -41,7 +50,10 @@ export const getPatientPrescriptionLine = (state = { loading: false }, action) =
   }
 };
 
-export const savePrescriptionDetailsReducer = (state = { loading: false }, action) => {
+export const savePrescriptionDetailsReducer = (
+  state = { data: null, error: null, loading: false },
+  action
+) => {
   switch (action.type) {
     case POST_PRESCRIPTION_REQUEST:
       return { ...state, loading: true };
@@ -56,8 +68,10 @@ export const savePrescriptionDetailsReducer = (state = { loading: false }, actio
   }
 };
 
-
-export const saveInPatientPrescriptionDetails = (state = { loading: false }, action) => {
+export const saveInPatientPrescriptionDetails = (
+  state = { loading: false },
+  action
+) => {
   switch (action.type) {
     case POST_INPATIENT_PRESCRIPTION_REQUEST:
       return { ...state, loading: true };
@@ -87,7 +101,10 @@ export const sendtoPharmacyReducer = (state = { loading: false }, action) => {
   }
 };
 
-export const inpatientSendToPharmacyReducer = (state = { loading: false }, action) => {
+export const inpatientSendToPharmacyReducer = (
+  state = { loading: false },
+  action
+) => {
   switch (action.type) {
     case POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_REQUEST:
       return { ...state, loading: true };

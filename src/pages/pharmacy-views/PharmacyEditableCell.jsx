@@ -1,17 +1,27 @@
-import { Form, Input, InputNumber } from 'antd';
+import { Form, Input, InputNumber, Select } from "antd";
 
 export const EditableCell = ({
-  editing,
-  dataIndex,
   title,
-  inputType,
   record,
+  options,
+  editing,
   children,
+  inputType,
+  dataIndex,
+  placeholder,
+  required = true,
   ...restProps
 }) => {
   const { Item: FormItem } = Form;
 
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const inputNode =
+    inputType === "number" ? (
+      <InputNumber placeholder={placeholder} />
+    ) : inputType === "select" ? (
+      <Select options={options} placeholder={placeholder} />
+    ) : (
+      <Input placeholder={placeholder} />
+    );
 
   return (
     <td {...restProps}>
@@ -21,7 +31,7 @@ export const EditableCell = ({
           style={{ margin: 0 }}
           rules={[
             {
-              required: true,
+              required: Boolean(required),
               message: `Please Input ${title}!`,
             },
           ]}

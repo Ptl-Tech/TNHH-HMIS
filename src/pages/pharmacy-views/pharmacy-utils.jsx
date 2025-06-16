@@ -1,6 +1,17 @@
 import { Button, Popconfirm, Space } from "antd";
 import { ReturnDrugsComponent } from "./ReturnDrugsComponent";
 
+export const frequencyOptions = [
+  { value: 1, label: "STAT" },
+  { value: 2, label: "As Needed" },
+  { value: 3, label: "Twice a Day" },
+  { value: 4, label: "Three Times a Day" },
+  { value: 5, label: "Once a Day" },
+  { value: 6, label: "Four Times a Day" },
+  { value: 8, label: "HOURLY" },
+  { value: 9, label: "At Night" },
+];
+
 export const pharmacyCardSearchDrugsColumns = (handleAddDrug) => [
   {
     title: "Item Code",
@@ -386,3 +397,298 @@ export const pharmacyQuotationCurrentSelectionColumns = (
       }),
     };
   });
+
+export const doctorPrescriptionColumns = (
+  edit,
+  save,
+  cancel,
+  isEditing,
+  deleteItem
+) =>
+  [
+    { title: "No", dataIndex: "Index", key: "Index" },
+    {
+      title: "Drug Name",
+      dataIndex: "Description",
+      key: "Description",
+      render: (value, record) => {
+        var returnValue;
+        returnValue = Object.hasOwn(record, "Description")
+          ? value
+          : record["DrugName"];
+        return returnValue;
+      },
+    },
+    {
+      width: "180px",
+      editable: true,
+      title: "Frequency",
+      inputType: "select",
+      key: "prescriptionDose",
+      options: frequencyOptions,
+      dataIndex: "prescriptionDose",
+      placeholder: "Select Freqency",
+      render: (value) =>
+        frequencyOptions.find(({ value: VALUE }) => VALUE === value)?.label,
+    },
+    {
+      editable: true,
+      key: "duration",
+      inputType: "number",
+      dataIndex: "duration",
+      title: "Duration (Days)",
+      placeholder: "Duration",
+    },
+    {
+      key: "remarks",
+      editable: true,
+      required: false,
+      title: "Remarks",
+      dataIndex: "remarks",
+      placeholder: "Remarks",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (value, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Space direction="horizontal">
+            <Button
+              type={"default"}
+              style={{ textTransform: "capitalize" }}
+              onClick={() => save(record)}
+            >
+              Save
+            </Button>
+            <Popconfirm
+              type={"primary"}
+              onConfirm={cancel}
+              title="Sure to cancel?"
+            >
+              <a>Cancel</a>
+            </Popconfirm>
+          </Space>
+        ) : (
+          <Space direction="horizontal">
+            <Button
+              type={"default"}
+              onClick={() => edit(record)}
+              style={{ textTransform: "capitalize" }}
+            >
+              Edit
+            </Button>
+            <Button
+              type={"primary"}
+              style={{ textTransform: "capitalize" }}
+              onClick={() => deleteItem(record)}
+            >
+              Delete
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ].map((col) => {
+    if (!col.editable) return col;
+
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        title: col.title,
+        options: col.options,
+        required: col.required,
+        dataIndex: col.dataIndex,
+        editing: isEditing(record),
+        placeholder: col.placeholder,
+        inputType: col.inputType || "text",
+      }),
+    };
+  });
+
+export const doctorIPPrescriptionColumns = (
+  edit,
+  save,
+  cancel,
+  isEditing,
+  deleteItem
+) =>
+  [
+    { title: "No", dataIndex: "Index", key: "Index" },
+    {
+      title: "Drug Name",
+      dataIndex: "Description",
+      key: "Description",
+      render: (value, record) => {
+        var returnValue;
+        returnValue = Object.hasOwn(record, "Description")
+          ? value
+          : record["DrugName"];
+        return returnValue;
+      },
+    },
+    {
+      width: "180px",
+      editable: true,
+      title: "Frequency",
+      inputType: "select",
+      key: "prescriptionDose",
+      options: frequencyOptions,
+      dataIndex: "prescriptionDose",
+      placeholder: "Select Freqency",
+      render: (value) =>
+        frequencyOptions.find(({ value: VALUE }) => VALUE === value)?.label,
+    },
+    {
+      editable: true,
+      key: "duration",
+      required: false,
+      inputType: "number",
+      dataIndex: "duration",
+      title: "Duration (Days)",
+      placeholder: "Duration",
+    },
+    {
+      editable: true,
+      key: "remarks",
+      required: false,
+      title: "Remarks",
+      dataIndex: "remarks",
+      placeholder: "Remarks",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (value, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <Space direction="horizontal">
+            <Button
+              type={"default"}
+              style={{ textTransform: "capitalize" }}
+              onClick={() => save(record)}
+            >
+              Save
+            </Button>
+            <Popconfirm
+              type={"primary"}
+              onConfirm={cancel}
+              title="Sure to cancel?"
+            >
+              <a>Cancel</a>
+            </Popconfirm>
+          </Space>
+        ) : (
+          <Space direction="horizontal">
+            <Button
+              type={"default"}
+              onClick={() => edit(record)}
+              style={{ textTransform: "capitalize" }}
+            >
+              Edit
+            </Button>
+            <Button
+              type={"primary"}
+              style={{ textTransform: "capitalize" }}
+              onClick={() => deleteItem(record)}
+            >
+              Delete
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ].map((col) => {
+    if (!col.editable) return col;
+
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        title: col.title,
+        options: col.options,
+        required: col.required,
+        dataIndex: col.dataIndex,
+        editing: isEditing(record),
+        placeholder: col.placeholder,
+        inputType: col.inputType || "text",
+      }),
+    };
+  });
+
+export const pharmacyTable = [
+  {
+    title: "Encounter No",
+    dataIndex: "TreatmentNo",
+    key: "TreatmentNo",
+    fixed: "left",
+    width: 100,
+  },
+  {
+    title: "Drug No",
+    dataIndex: "DrugNo",
+    key: "DrugNo",
+  },
+  {
+    title: "Drug Name",
+    dataIndex: "DrugName",
+    key: "DrugName",
+  },
+  {
+    title: "Frequency",
+    dataIndex: "PrescriptionDose",
+    key: "PrescriptionDose",
+  },
+  {
+    title: "Number of Days",
+    dataIndex: "NumberofDays",
+    key: "NumberofDays",
+  },
+  {
+    title: "Remarks",
+    dataIndex: "Remarks",
+    key: "Remarks",
+    fixed: "right",
+  },
+  {
+    title: "Status",
+    dataIndex: "Status",
+    key: "Status",
+  },
+];
+
+export const IpPhramcyTable = [
+  {
+    fixed: "left",
+    key: "Admission_No",
+    title: "Admission No",
+    dataIndex: "Admission_No",
+  },
+  {
+    key: "Drug_No",
+    title: "Drug No",
+    dataIndex: "Drug_No",
+  },
+  {
+    key: "Drug_Name",
+    title: "Drug Name",
+    dataIndex: "Drug_Name",
+  },
+  {
+    key: "Frequency",
+    title: "Frequency",
+    dataIndex: "Frequency",
+  },
+  {
+    key: "Number_of_Days",
+    title: "Number of Days",
+    dataIndex: "Number_of_Days",
+  },
+  {
+    fixed: "right",
+    key: "Remarks",
+    title: "Remarks",
+    dataIndex: "Remarks",
+  },
+];

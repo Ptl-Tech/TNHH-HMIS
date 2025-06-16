@@ -103,7 +103,6 @@ export default function PharmacyQuotation() {
         <GiPayMoney size={20} />
         <h6>Pharmacy Quotation</h6>
       </div>
-
       <Space direction="vertical" style={{ width: "100%" }}>
         <Form form={form} component={false}>
           <PharmacyCurrentSelection
