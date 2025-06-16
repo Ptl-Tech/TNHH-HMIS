@@ -1,4 +1,3 @@
-import { message } from "antd";
 import axios from "axios";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
@@ -90,7 +89,7 @@ export const postPrescriptionDetails =
   };
 
 export const postInPatientPrescriptionDetails =
-  (prescription) => async (dispatch, getState) => {
+  (prescriptions) => async (dispatch, getState) => {
     try {
       dispatch({ type: POST_INPATIENT_PRESCRIPTION_REQUEST });
 
@@ -108,42 +107,33 @@ export const postInPatientPrescriptionDetails =
         },
       };
 
-      console.log("prescription data", prescription);
-      // Send request to the backend API
-      const response = await axios.post(
-        `${API}Inpatient/DrugPrescription`,
-        prescription,
-        config
-      );
+      const resposes = prescriptions.map(async (prescription) => {
+        const response = await axios.post(
+          `${API}Inpatient/DrugPrescription`,
+          prescription,
+          config
+        );
 
-      const responseData = {
-        status: response.data.status,
-        data: response.data,
-      };
+        if (response.data.status === "error")
+          throw new Error(`Could not add ${prescription.Description} drug`);
 
-      // Show success modal if status is "success"
-      setTimeout(() => {
-        // Dispatch success action
-        dispatch({
-          type: POST_INPATIENT_PRESCRIPTION_SUCCESS,
-          payload: responseData,
-        });
+        return response.data;
+      });
 
-        if (responseData.status === "success") {
-          message.success(
-            "prescription saved successfully, please proceed send to pharmacy"
-          );
-        }
-      }, 2000);
+      await Promise.all(resposes);
+      const responseData = { status: "success", data: { status: "success" } };
 
-      return responseData.data; // Return response data if needed
+      dispatch({
+        type: POST_INPATIENT_PRESCRIPTION_SUCCESS,
+        payload: responseData,
+      });
     } catch (error) {
       setTimeout(() => {
         dispatch({
           type: POST_INPATIENT_PRESCRIPTION_FAIL,
-          payload: error.response?.data?.message || error.errors,
+          payload:
+            error.message || error.response?.data?.message || error.errors,
         });
-        message.error(error.response?.data?.errors || error.errors);
       }, 1200);
 
       throw error; // Rethrow error for handling in the component
@@ -193,7 +183,6 @@ export const sendtoPharmacy = (treatmentId) => async (dispatch, getState) => {
         type: POST_PRESCRIPTION_TO_PHARMACY_FAIL,
         payload: error.response?.data?.message || error.errors,
       });
-      message.error(error.response?.data?.errors || error.errors);
     }, 1200);
     throw error; // Rethrow error for `handleSubmit` to handle
   }
@@ -241,8 +230,6 @@ export const InpatientSendToPharmacy =
         type: POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_SUCCESS,
         payload: responseData,
       });
-
-      return responseData.data;
     } catch (error) {
       console.error("Error:", error);
 
@@ -250,8 +237,6 @@ export const InpatientSendToPharmacy =
         type: POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_FAIL,
         payload: error.response?.data?.message || error.message,
       });
-
-      message.error(error.response?.data?.errors || error.message);
       throw error; // Rethrow to allow further handling
     }
   };

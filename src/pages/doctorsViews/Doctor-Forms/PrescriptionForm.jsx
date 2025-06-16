@@ -13,8 +13,8 @@ import {
 import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
 
 import {
+  doctorPrescriptionColumns,
   pharmacyCardSearchDrugsColumns,
-  doctorPrescriptionCurrentSelectionColumns,
 } from "../../pharmacy-views/pharmacy-utils";
 import { SearchDrugTable } from "../../pharmacy-views/SearchDrugTable";
 import { PharmacyCurrentSelection } from "../../pharmacy-views/PharmacyCurrentSelection";
@@ -113,7 +113,7 @@ const PrescriptionForm = () => {
     );
   };
 
-  const columns = doctorPrescriptionCurrentSelectionColumns(
+  const columns = doctorPrescriptionColumns(
     edit,
     save,
     cancel,

@@ -179,7 +179,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           noOfDays: Duration_Days,
           frequency: Frequency,
           dosage: Dosage,
-          TotalAmount: Math.round(UnitPrice * Quantity),
+          TotalAmount: Math.round(UnitPrice * Quantity * 1000) / 1000,
           remarks,
         })
       );
@@ -593,7 +593,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                       <TableSummaryCell index={1}>
                         <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
                           {new Intl.NumberFormat("en-US").format(
-                            Math.round(totalValue)
+                            Math.round(totalValue * 1000) / 1000
                           )}
                         </Text>
                       </TableSummaryCell>
