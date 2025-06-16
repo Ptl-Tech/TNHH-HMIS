@@ -1,5 +1,5 @@
-import { Button } from "antd"
-import { PlusOutlined, FilterOutlined } from "@ant-design/icons"
+import { Button, message } from "antd";
+import { PlusOutlined, FilterOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,63 +7,106 @@ import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumabl
 import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 import ConsumablesFormData from "../forms/nurse-forms/ConsumablesFormData";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import useAuth from "../../../hooks/useAuth";
+import {
+  POST_NURSE_ORDER_SHEET_FAILURE,
+  POST_NURSE_ORDER_SHEET_SUCCESS,
+  postNurseOrderSheetSlice,
+} from "../../../actions/nurse-actions/postNurseOrderSheet";
 
 const Consumables = () => {
+  const { patientDetails } = useLocation().state;
 
-    const { patientDetails } = useLocation().state;
-   
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
+  const userDetails = useAuth();
+const[loadingPostConsumables, setLoadingPostConsumables] = useState(false);
+  const [isConsumableFormVisible, setIsConsumableFormVisible] = useState(false);
 
-    const [isConsumableFormVisible, setIsConsumableFormVisible] = useState(false);
-    
-    const {loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables} = useSelector(state => state.getPgOpenPatientConsumables);
+  const { loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables } =
+    useSelector((state) => state.getPgOpenPatientConsumables);
 
-    const consumables = getPgOpenPatientConsumables?.filter(item => item.Admission_No === patientDetails?.Admission_No);
+  const consumables = getPgOpenPatientConsumables?.filter(
+    (item) => item.Admission_No === patientDetails?.Admission_No
+  );
 
-    const handleVitalsButtonVisibility = () => {
-      setIsConsumableFormVisible(!isConsumableFormVisible);
+  const handleVitalsButtonVisibility = () => {
+    setIsConsumableFormVisible(!isConsumableFormVisible);
+  };
+
+  useEffect(() => {
+    dispatch(getPgOpenPatientConsumablesSlice());
+  }, [dispatch, getPgOpenPatientConsumables?.length]);
+
+  const handlePostOrderSheet = async () => {
+    // Logic to handle posting the order sheet
+    const orderSheetResult = await dispatch(
+      postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
+        admissionNo: patientDetails?.Admission_No,
+        branchCode:
+          userDetails?.userData?.shortcut_Dimension_1_Code || branchCode,
+        staffNo: userDetails.userData.no,
+      })
+    );
+    setLoadingPostConsumables(true);
+    if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_SUCCESS) {
+      setLoadingPostConsumables(false);
+      message.success("Order sheet sent to pharmacy successfully!");
+      dispatch(getPgOpenPatientConsumablesSlice());
+      form.resetFields();
+    } else if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_FAILURE) {
+      setLoadingPostConsumables(false);
+      message.error(
+        orderSheetResult?.payload?.message ||
+          "Failed to send order sheet to pharmacy."
+      );
     }
-
-    useEffect(() => {
-        
-            dispatch(getPgOpenPatientConsumablesSlice());
-        
-    }, [dispatch, getPgOpenPatientConsumables?.length]);
-
+  };
   return (
     <div>
-      
       <NurseInnerHeader icon={<FilterOutlined />} title="Order sheets" />
-
-        {
-          !isConsumableFormVisible && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', paddingBottom: '10px',  marginTop: '20px'}}>
-            <Button type="primary" onClick={handleVitalsButtonVisibility}> 
-            <PlusOutlined />
-            Order Sheets
-            </Button>
-            </div>
-          )
-        }
-
-
-
-          {
-            isConsumableFormVisible && (
-              
-              <ConsumablesFormData setIsConsumableFormVisible={setIsConsumableFormVisible} />
-              
-            )
-          }
-
-          {
-            !isConsumableFormVisible && (
-              <InpatientConsumablesTable loadingGetPgOpenPatientConsumables={loadingGetPgOpenPatientConsumables} consumables={consumables}/>
-            )
-          }
-
+<div className="flex justify-items-between items-center">
+  {!isConsumableFormVisible && (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "20px",
+        paddingBottom: "10px",
+        marginTop: "20px",
+      }}
+    >
+      <Button type="primary" onClick={handleVitalsButtonVisibility}>
+        <PlusOutlined />
+        Order Sheets
+      </Button>
     </div>
-  )
-}
+  )}
+  {consumables?.length > 0 && (
+    <Button type="default" onClick={handlePostOrderSheet} loading={loadingPostConsumables}>
+      Send Order to Pharmacy
+    </Button>
+  )}
+</div>
 
-export default Consumables
+
+      {isConsumableFormVisible && (
+        <ConsumablesFormData
+          id="tableId"
+          setIsConsumableFormVisible={setIsConsumableFormVisible}
+        />
+      )}
+
+      {!isConsumableFormVisible && (
+        <InpatientConsumablesTable
+          loadingGetPgOpenPatientConsumables={
+            loadingGetPgOpenPatientConsumables
+          }
+          consumables={consumables}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Consumables;
