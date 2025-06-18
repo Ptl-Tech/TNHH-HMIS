@@ -1,16 +1,18 @@
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getSingleDischargeRequest } from "../../actions/reception-actions/getSingleDischargeRequest";
-import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
-import LoadingParagraphs from "../../partials/nurse-partials/LoadingParagraphs";
+
 import {
   UserOutlined,
   DisconnectOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { Alert, Button, Card, Col, Row, Typography, message } from "antd";
-import { useLocation } from "react-router-dom";
+
 import PatientCharges from "./CashPatients/PatientCharges";
+import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+import LoadingParagraphs from "../../partials/nurse-partials/LoadingParagraphs";
+
 import {
   postPostDischargeSlice,
   POST_DISCHARGE_PATIENT_FAILURE,
@@ -21,6 +23,7 @@ import {
   POST_CANCEL_DISCHARGE_FAILURE,
   POST_CANCEL_DISCHARGE_SUCCESS,
 } from "../../actions/nurse-actions/postCancelDischargeSlice";
+import { getSingleDischargeRequest } from "../../actions/reception-actions/getSingleDischargeRequest";
 
 const DischargePage = () => {
   const dispatch = useDispatch();

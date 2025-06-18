@@ -70,9 +70,9 @@ const InpatientTable = ({
       title: "Adm Date",
       dataIndex: "Admission_Date",
       key: "Admission_Date",
-      sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date) ,
+      sorter: (a, b) => new Date(b.Admission_Date) - new Date(a.Admission_Date),
       defaultSortOrder: "ascend", // Ensure default sorting is newest to oldest
-     //format to dd//MM//yyyy
+      //format to dd//MM//yyyy
       render: (date) => {
         const formattedDate = new Date(date).toLocaleDateString("en-GB", {
           day: "2-digit",
@@ -138,26 +138,20 @@ const InpatientTable = ({
       render: (doctor) => doctor || "Not assigned",
     },
     {
-      title: "Coding",
-      dataIndex: "Psychiatric_Coding",
-      key: "Psychiatric_Coding",
-      render: (coding) => {
+      title: "Status",
+      dataIndex: "Status",
+      key: "Status",
+      render: (value) => {
         let color = null;
-        switch (coding) {
-          case "Red":
-            color = "#ff0000";
+        switch (value) {
+          case "Admitted":
+            color = "#00CC66";
             break;
-          case "Amber":
+          case "Discharge Pending":
             color = "#FFBF00";
             break;
-          case "Yellow":
-            color = "#FFFF00";
-            break;
-          case "Green":
-            color = "#008000";
-            break;
         }
-        return color ? <Tag color={color}>{coding}</Tag> : null;
+        return color ? <Tag color={color}>{value}</Tag> : null;
       },
     },
   ];
