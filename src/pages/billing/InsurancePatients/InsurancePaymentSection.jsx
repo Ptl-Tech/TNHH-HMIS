@@ -35,8 +35,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading: receiptLinesLoading } = useSelector(
     (state) => state.getReceiptLines
   );
-    const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
-  
+  const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
+
   const { data: patientBillData } = useSelector((state) => state.getSingleBill);
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
@@ -75,9 +75,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
       coPay: coPay || false,
       ...(payMode === 7
         ? {
-            transactionCode,
-            phoneNumber,
-          }
+          phoneNumber,
+        }
         : {}),
     };
 
@@ -95,36 +94,36 @@ const InsurancePaymentSection = ({ patientNo }) => {
       message.error("Failed to save the payment. Please try again.");
     }
   };
-const handleReceiptPost = async () => {
-  if(!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
-    return;
-  }
-
-  const lastReceipt = receiptHeader[receiptHeader.length - 1];
-  const payload = {
-    recId: lastReceipt.SystemId,
-    patientNo: patientNo,
-    receiptNo: lastReceipt.No
-  };
-
-  try{
-    const status= await dispatch(postReceipt(payload));
-    if(status){
-      message.success("Receipt posted successfully.");
-      dispatch(getReceiptLines(activeVisitNo));
-      dispatch(getSinglePatientBill(activeVisitNo));
-      getPatientCharges(activeVisitNo);
+  const handleReceiptPost = async () => {
+    if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
+      return;
     }
-  }catch(error){
-    message.error("Failed to post receipt. Please try again.");
-  }
-};
+
+    const lastReceipt = receiptHeader[receiptHeader.length - 1];
+    const payload = {
+      recId: lastReceipt.SystemId,
+      patientNo: patientNo,
+      receiptNo: lastReceipt.No
+    };
+
+    try {
+      const status = await dispatch(postReceipt(payload));
+      if (status) {
+        message.success("Receipt posted successfully.");
+        dispatch(getReceiptLines(activeVisitNo));
+        dispatch(getSinglePatientBill(activeVisitNo));
+        getPatientCharges(activeVisitNo);
+      }
+    } catch (error) {
+      message.error("Failed to post receipt. Please try again.");
+    }
+  };
   // New handleClear function to reset the form fields when the Clear button is clicked
   const handleClear = () => {
     form.resetFields(); // This will clear all fields in the form
     setPaymentType(null); // Reset payment type
   };
-console.log("patientBillData", patientBillData);
+  console.log("patientBillData", patientBillData);
   return (
     <Card title="Add Payment Option" style={{ padding: "10px 16px" }}>
       <Form
@@ -154,13 +153,13 @@ console.log("patientBillData", patientBillData);
                 }
                 optionFilterProp="children"
               >
-                              <Select.Option value={2}>Cheque </Select.Option>
+                <Select.Option value={2}>Cheque </Select.Option>
                 <Select.Option value={3}>EFT</Select.Option>
-                                <Select.Option value={6}>Rtgs</Select.Option>
+                <Select.Option value={6}>Rtgs</Select.Option>
 
- 
+
                 <Select.Option value={7}>MPESA</Select.Option>
-                
+
                 <Select.Option value={9}>PDQ</Select.Option>
               </Select>
             </Form.Item>
@@ -177,8 +176,8 @@ console.log("patientBillData", patientBillData);
           </Col>
         </Row>
 
-        {paymentType === 7 && (
-          <Row gutter={16}>
+        <Row gutter={16}>
+          {paymentType === 7 && (
             <Col span={12}>
               <Form.Item
                 name="phoneNumber"
@@ -197,23 +196,23 @@ console.log("patientBillData", patientBillData);
                 <Input placeholder="0712345678" />
               </Form.Item>
             </Col>
+          )}
 
-            <Col span={12}>
-              <Form.Item
-                name="transactionCode"
-                label="Transaction Code"
-                rules={[{ required: true, message: "Enter transaction code" }]}
-              >
-                <Input placeholder="MPESA Code" />
-              </Form.Item>
-            </Col>
-          </Row>
-        )}
+          <Col span={12}>
+            <Form.Item
+              name="transactionCode"
+              label="Transaction Code"
+              rules={[{ required: true, message: "Enter transaction code" }]}
+            >
+              <Input placeholder="MPESA Code" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Row gutter={16}>
           <Col span={24}>
-            {patientBillData?.Inpatient  && patientBillData.PatientType !== "Cash"? (
-             <Form.Item
+            {patientBillData?.Inpatient && patientBillData.PatientType !== "Cash" ? (
+              <Form.Item
                 name="coPay"
                 valuePropName="checked"
                 style={{ marginTop: 16 }}
@@ -221,7 +220,7 @@ console.log("patientBillData", patientBillData);
                 <Checkbox>Co-Pay</Checkbox>
               </Form.Item>
             ) : (
-               <Form.Item
+              <Form.Item
                 name="isPartialPayment"
                 valuePropName="checked"
                 style={{ marginTop: 16 }}
@@ -232,8 +231,8 @@ console.log("patientBillData", patientBillData);
           </Col>
         </Row>
 
-      <Row gutter={16}> 
-        <Col span={12}>
+        <Row gutter={16}>
+          <Col span={12}>
             <Button
               type="primary"
               htmlType="submit"
@@ -244,35 +243,35 @@ console.log("patientBillData", patientBillData);
             </Button>
           </Col>
           <Col span={12}>
-         
-          <Button
-          onClick={handleClear}
-          type="default"
-          style={{ marginLeft: 8, color: '#0f5689' }}
-          danger
-        >
-          Clear
-        </Button>
+
+            <Button
+              onClick={handleClear}
+              type="default"
+              style={{ marginLeft: 8, color: '#0f5689' }}
+              danger
+            >
+              Clear
+            </Button>
           </Col>
         </Row>
 
-       {patientBillData[0]?.Inpatient &&
-  patientBillData[0].PatientType !== "Cash" &&
-  receiptHeader &&
-  receiptHeader.length > 0 && (
-    <Row gutter={16} style={{ marginTop: 16 }}>
-      <Col span={24}>
-        <Button
-          type="primary"
-          onClick={handleReceiptPost}
-          loading={saveloading}
-          disabled={saveloading || receiptLinesLoading}
-        >
-          Post Receipt
-        </Button>
-      </Col>
-    </Row>
-)}
+        {patientBillData[0]?.Inpatient &&
+          patientBillData[0].PatientType !== "Cash" &&
+          receiptHeader &&
+          receiptHeader.length > 0 && (
+            <Row gutter={16} style={{ marginTop: 16 }}>
+              <Col span={24}>
+                <Button
+                  type="primary"
+                  onClick={handleReceiptPost}
+                  loading={saveloading}
+                  disabled={saveloading || receiptLinesLoading}
+                >
+                  Post Receipt
+                </Button>
+              </Col>
+            </Row>
+          )}
 
       </Form>
     </Card>
