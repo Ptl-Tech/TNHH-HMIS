@@ -133,7 +133,7 @@
 }
 
 .text-main-primary {
-  color: #0f5689;
+  color: #0f5689 !important;
 }
 
 .ant-card .ant-card-body {

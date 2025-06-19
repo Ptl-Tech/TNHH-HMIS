@@ -38,16 +38,16 @@ const InpatientConsumablesTable = ({
         );
       },
     },
-    {
-      title: "Issued Quantity",
-      dataIndex: "Quantity",
-      key: "Quantity",
-    },
-    {
-      title: "Remaining Quantity",
-      dataIndex: "RemainingQuantity",
-      key: "RemainingQuantity",
-    },
+    // {
+    //   title: "Issued Quantity",
+    //   dataIndex: "Quantity",
+    //   key: "Quantity",
+    // },
+    // {
+    //   title: "Remaining Quantity",
+    //   dataIndex: "RemainingQuantity",
+    //   key: "RemainingQuantity",
+    // },
   ];
 
   const [pagination, setPagination] = useState({

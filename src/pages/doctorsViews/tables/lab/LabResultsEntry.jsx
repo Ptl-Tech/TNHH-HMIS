@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Form,
@@ -16,23 +16,23 @@ import {
   Modal,
   Space,
   Popover,
-} from 'antd';
+} from "antd";
 
-import { labLinesColumns, labResultsColumns } from './utils';
+import { labLinesColumns, labResultsColumns } from "./utils";
 
-import { AiOutlineMore } from 'react-icons/ai';
-import Loading from '../../../../partials/nurse-partials/Loading';
-import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
+import { AiOutlineMore } from "react-icons/ai";
+import Loading from "../../../../partials/nurse-partials/Loading";
+import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
 import {
   POST_LAB_TEST_REMARKS_RESET,
   postTestRemarks,
-} from '../../../../actions/lab-actions/postTestRemarks';
-import { getLabTestResults } from '../../../../actions/lab-actions/getLabTestResults';
+} from "../../../../actions/lab-actions/postTestRemarks";
+import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
 import {
   POST_LAB_TEST_RESULTS_RESET,
   postLabTestResults,
-} from '../../../../actions/lab-actions/postLabTestResults';
+} from "../../../../actions/lab-actions/postLabTestResults";
 
 const LabResultsEntry = ({ data, loading }) => {
   // state
@@ -70,8 +70,8 @@ const LabResultsEntry = ({ data, loading }) => {
   const columns = [
     ...labLinesColumns,
     {
-      align: 'right',
-      title: 'Add results',
+      align: "right",
+      title: "Add results",
       render: (_, record) => {
         return (
           <TestMenu
@@ -86,10 +86,7 @@ const LabResultsEntry = ({ data, loading }) => {
 
   return (
     <div>
-      <Title
-        level={5}
-        style={{ color: '#0F5689', marginBottom: '12px' }}
-      >
+      <Title level={5} style={{ color: "#0F5689", marginBottom: "12px" }}>
         Results Recording
       </Title>
       {loading ? (
@@ -98,7 +95,7 @@ const LabResultsEntry = ({ data, loading }) => {
         <>
           <Table
             rowClassName={(record) =>
-              !record.Sample_Collected ? 'disabled-row' : 'editable-row'
+              !record.Sample_Collected ? "disabled-row" : "editable-row"
             }
             columns={columns}
             dataSource={data}
@@ -126,7 +123,7 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
 
   const items = [
     {
-      key: '1',
+      key: "1",
       label: (
         <Button
           block
@@ -141,7 +138,7 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
       ),
     },
     {
-      key: '2',
+      key: "2",
       label: (
         <Button
           block
@@ -151,7 +148,7 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
             handleOpenRemarks(record);
           }}
         >
-          {record.Remarks ? 'View Final Remarks' : 'Add Final Remarks'}
+          {record.Remarks ? "View Final Remarks" : "Add Final Remarks"}
         </Button>
       ),
     },
@@ -160,22 +157,19 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
   return (
     <Popover
       open={open}
-      trigger={'click'}
+      trigger={"click"}
       placement="bottomRight"
       arrow={{ pointAtCenter: true }}
-      styles={{ body: { padding: '2px' } }}
+      styles={{ body: { padding: "2px" } }}
       content={
-        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+        <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
           {items.map((item) => (
             <li key={item.key}>{item.label}</li>
           ))}
         </ul>
       }
     >
-      <AiOutlineMore
-        size={28}
-        onClick={() => setOpen(true)}
-      />
+      <AiOutlineMore size={28} onClick={() => setOpen(true)} />
     </Popover>
   );
 };
@@ -185,7 +179,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
 
   const dispatch = useDispatch();
   const { data, loading, error } = useSelector(
-    (state) => state.getLabTestResults,
+    (state) => state.getLabTestResults
   );
   const { LaboratoryTestName } = record || {};
 
@@ -195,7 +189,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
       getLabTestResults({
         labNo: record.Laboratory_No,
         testCode: record.LaboratoryTestCode,
-      }),
+      })
     );
   }, [record]);
 
@@ -211,11 +205,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
       {loading ? (
         <SkeletonLoading />
       ) : (
-        <ResultsTable
-          initialData={data}
-          error={error}
-          loading={loading}
-        />
+        <ResultsTable initialData={data} error={error} loading={loading} />
       )}
     </Drawer>
   );
@@ -225,41 +215,33 @@ const RemarksModal = ({ record, open, handleCancel }) => {
   const dispatch = useDispatch();
 
   const { data, loading, error } = useSelector(
-    (state) => state.postTestRemarks,
+    (state) => state.postTestRemarks
   );
 
   useEffect(() => {
     if (data) {
       const { status } = data;
-      status === 'success'
-        ? message.success('Remarks posted successfully')
-        : message.error('Something went wrong');
+      status === "success"
+        ? message.success("Remarks posted successfully")
+        : message.error("Something went wrong");
 
       dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
     }
 
     if (error) {
-      message.info('Something went wrong');
+      message.info("Something went wrong");
       dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
     }
 
-    if (loading) message.info('Submitting remarks');
+    if (loading) message.info("Submitting remarks");
   }, [data, loading]);
 
   return (
-    <Modal
-      open={open}
-      size="large"
-      title={`Final Test Remarks`}
-      footer={null}
-    >
+    <Modal open={open} size="large" title={`Final Test Remarks`} footer={null}>
       {loading ? (
         <SkeletonLoading />
       ) : (
-        <RemarkForm
-          record={record}
-          handleCancel={handleCancel}
-        />
+        <RemarkForm record={record} handleCancel={handleCancel} />
       )}
     </Modal>
   );
@@ -275,7 +257,7 @@ const RemarkForm = ({ record, handleCancel }) => {
   const dispatch = useDispatch();
 
   const { data, error, loading } = useSelector(
-    (state) => state.postTestRemarks,
+    (state) => state.postTestRemarks
   );
 
   // handling pushing code
@@ -298,7 +280,7 @@ const RemarkForm = ({ record, handleCancel }) => {
     const finalData = {
       remarks,
       recId: SystemId,
-      myAction: 'edit',
+      myAction: "edit",
       positive: Positive,
       laboratoryNo: Laboratory_No,
       labTestCode: LaboratoryTestCode,
@@ -330,7 +312,7 @@ const RemarkForm = ({ record, handleCancel }) => {
             rules={[
               {
                 required: true,
-                message: 'Please add a description for your sample',
+                message: "Please add a description for your sample",
               },
             ]}
           >
@@ -338,9 +320,9 @@ const RemarkForm = ({ record, handleCancel }) => {
           </Item>
           <Space
             style={{
-              justifyContent: 'flex-end',
-              display: 'flex',
-              width: '100%',
+              justifyContent: "flex-end",
+              display: "flex",
+              width: "100%",
             }}
           >
             <Item label={null}>
@@ -353,12 +335,8 @@ const RemarkForm = ({ record, handleCancel }) => {
               </Button>
             </Item>
             <Item label={null}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : 'Submit Remark'}
+              <Button type="primary" htmlType="submit" disabled={loading}>
+                {loading ? "Loading..." : "Submit Remark"}
               </Button>
             </Item>
           </Space>
@@ -379,7 +357,7 @@ const EditableCell = ({
 }) => {
   const { Item } = Form;
   const [value, setValue] = useState(
-    inputType === 'number' ? parseFloat(children) || 0 : children || '',
+    inputType === "number" ? parseFloat(children) || 0 : children || ""
   );
 
   const handleChange = (newValue) => {
@@ -388,25 +366,16 @@ const EditableCell = ({
   };
 
   const inputNode =
-    inputType === 'number' ? (
-      <InputNumber
-        value={value}
-        onChange={handleChange}
-      />
+    inputType === "number" ? (
+      <InputNumber value={value} onChange={handleChange} />
     ) : (
-      <Input
-        value={value}
-        onChange={(e) => handleChange(e.target.value)}
-      />
+      <Input value={value} onChange={(e) => handleChange(e.target.value)} />
     );
 
   return (
     <td {...props}>
       {editing ? (
-        <Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-        >
+        <Item name={dataIndex} style={{ margin: 0 }}>
           {inputNode}
         </Item>
       ) : (
@@ -424,7 +393,7 @@ const ResultsTable = ({ initialData, error, loading }) => {
   const [editingKey, setEditingKey] = useState(null);
 
   const [results, setResults] = useState(
-    [...initialData].map((item) => ({ ...item })),
+    [...initialData].map((item) => ({ ...item }))
   );
 
   const {
@@ -436,19 +405,19 @@ const ResultsTable = ({ initialData, error, loading }) => {
   useEffect(() => {
     if (labResultsData) {
       const { status } = labResultsData;
-      status === 'success'
-        ? message.success('Results submitted successfully!')
-        : message.error('Something went wrong!');
+      status === "success"
+        ? message.success("Results submitted successfully!")
+        : message.error("Something went wrong!");
 
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
     }
 
     if (labResultsError) {
-      message.error('Something went wrong');
+      message.error("Something went wrong");
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
     }
 
-    if (labResultsLoading) message.info('Submitting the results');
+    if (labResultsLoading) message.info("Submitting the results");
   }, [labResultsData, labResultsLoading, labResultsError]);
 
   const isEditing = (record) => record.Specimen_Code === editingKey;
@@ -456,23 +425,22 @@ const ResultsTable = ({ initialData, error, loading }) => {
   const handleSave = (key, dataIndex, value) => {
     setResults((prevResults) =>
       prevResults.map((item) =>
-        item.Specimen_Code === key ? { ...item, [dataIndex]: value } : item,
-      ),
+        item.Specimen_Code === key ? { ...item, [dataIndex]: value } : item
+      )
     );
   };
 
   const columns = labResultsColumns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
+    if (!col.editable) return col;
+
     return {
       ...col,
       onCell: (record) => ({
         record,
-        inputType: col.dataIndex === 'Results' ? 'number' : 'text',
+        handleSave,
         dataIndex: col.dataIndex,
         editing: isEditing(record),
-        handleSave,
+        inputType: col.dataIndex === "Results" ? "number" : "text",
       }),
     };
   });
@@ -496,29 +464,20 @@ const ResultsTable = ({ initialData, error, loading }) => {
       {loading ? (
         <SkeletonLoading />
       ) : (
-        <Form
-          form={form}
-          component={false}
-        >
+        <Form form={form} component={false}>
           <Table
-            rowClassName={'editable-row'}
+            rowClassName={"editable-row"}
             onRow={(record) => ({
               onClick: () => edit(record),
             })}
             footer={() => (
-              <Flex
-                justify="end"
-                onClick={handleSubmit}
-              >
-                <Button
-                  type="primary"
-                  disabled={labResultsLoading}
-                >
+              <Flex justify="end" onClick={handleSubmit}>
+                <Button type="primary" disabled={labResultsLoading}>
                   {labResultsLoading
-                    ? 'Loading...'
+                    ? "Loading..."
                     : editingKey
-                    ? 'Preview'
-                    : 'Submit'}
+                    ? "Preview"
+                    : "Submit"}
                 </Button>
               </Flex>
             )}

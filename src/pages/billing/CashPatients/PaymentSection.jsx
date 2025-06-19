@@ -14,7 +14,7 @@ const PaymentSection = ({ patientNo }) => {
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
 
   const [paymentType, setPaymentType] = useState(null);
-const[paymentSavingLoading, setPaymentSavingLoading] = useState(false);
+  const [paymentSavingLoading, setPaymentSavingLoading] = useState(false);
   const { loading: processReceiptLoading } = useSelector(
     (state) => state.savePayment
   );
@@ -22,35 +22,34 @@ const[paymentSavingLoading, setPaymentSavingLoading] = useState(false);
   const { data: receiptHeader } = useSelector((state) => state.getReceiptPage);
 
   const handleSavePayment = async (values) => {
-   try {
-    const payload = {
-      myAction: "create",
-      recId: "",
-      patientNo,
-      receiptDate: moment().format("YYYY-MM-DD"),
-      depositDate: moment().format("YYYY-MM-DD"),
-      payMode: values.payMode,
-      transactionCode: values.transactionCode || "",
-      splitAmount: false,
-      amountReceived: parseFloat(values.amountReceived),
-      isPartialPayment: values.isPartialPayment || false,
-      coPay: false,
-      ...(values.payMode === 7 && {
-        transactionCode: values.transactionCode,
-        phoneNumber: values.phoneNumber,
-      }),
-    };
-setPaymentSavingLoading(true)
-    await dispatch(postReceiptHeader(payload));
-    setPaymentSavingLoading(false)
-    message.success("Payment saved successfully", 5);
-    dispatch(getReceiptPage(activeVisitNo));
-    form.resetFields();
-   } catch (error) {
-    setPaymentSavingLoading(false);
-    message.error("Failed to save payment");
-    
-   }
+    try {
+      const payload = {
+        myAction: "create",
+        recId: "",
+        patientNo,
+        receiptDate: moment().format("YYYY-MM-DD"),
+        depositDate: moment().format("YYYY-MM-DD"),
+        payMode: values.payMode,
+        transactionCode: values.transactionCode || "",
+        splitAmount: false,
+        amountReceived: parseFloat(values.amountReceived),
+        isPartialPayment: values.isPartialPayment || false,
+        coPay: false,
+        ...(values.payMode === 7 && {
+          phoneNumber: values.phoneNumber,
+        }),
+      };
+      setPaymentSavingLoading(true)
+      await dispatch(postReceiptHeader(payload));
+      setPaymentSavingLoading(false)
+      message.success("Payment saved successfully", 5);
+      dispatch(getReceiptPage(activeVisitNo));
+      form.resetFields();
+    } catch (error) {
+      setPaymentSavingLoading(false);
+      message.error("Failed to save payment");
+
+    }
   };
 
   const handleClear = () => {
@@ -96,39 +95,39 @@ setPaymentSavingLoading(true)
           </Col>
         </Row>
 
-        {paymentType === 7 && (
-          <Row gutter={16}>
+        <Row gutter={16}>
+          {paymentType === 7 && (
             <Col span={12}>
               <Form.Item
                 name="phoneNumber"
                 label="Phone Number"
-               
+
               >
                 <Input type="tel" placeholder="Enter MPESA phone number" />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="transactionCode"
-                label="Reference Code"
-                rules={[{ required: true, message: "Enter reference code" }]}
-              >
-                <Input placeholder="Enter ref. code" />
-              </Form.Item>
-            </Col>
-          </Row>
-        )}
-<Row gutter={16}>
-  <Col span={12}>
-    <Form.Item
-                  name="isPartialPayment"
-                  valuePropName="checked"
-                  style={{ marginTop: 16 }}
-                >
-                  <Checkbox>Partial Payment</Checkbox>
-                </Form.Item>
-  </Col>
-</Row>
+          )}
+          <Col span={12}>
+            <Form.Item
+              name="transactionCode"
+              label="Reference Code"
+              rules={[{ required: true, message: "Enter reference code" }]}
+            >
+              <Input placeholder="Enter ref. code" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={12}>
+            <Form.Item
+              name="isPartialPayment"
+              valuePropName="checked"
+              style={{ marginTop: 16 }}
+            >
+              <Checkbox>Partial Payment</Checkbox>
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={paymentSavingLoading}>
             Save Payment

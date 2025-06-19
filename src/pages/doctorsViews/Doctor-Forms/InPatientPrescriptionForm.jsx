@@ -1,281 +1,181 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  Select,
-  Empty,
-  Card,
-  List,
-  Space,
-  Typography,
-} from "antd";
-import TextArea from "antd/es/input/TextArea";
-import PropTypes from "prop-types";
-import { useDispatch, useSelector } from "react-redux";
-import { SaveOutlined, SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { getItemUnitsOfMeasureSlice } from "../../../actions/triage-actions/getItemUnitsOfMeasureSlice";
-import { postInPatientPrescriptionDetails } from "../../../actions/Doc-actions/postPrescription";
 import { useLocation } from "react-router-dom";
-import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
-import useAuth from "../../../hooks/useAuth";
-import {
-  getInPatientQyPrescriptionLineSlice,
-  getQyPrescriptionLineSlice,
-} from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
-import useFetchAllergiesAndMedicationsHook from "../../../hooks/useFetchAllergiesAndMedicationsHook";
-import { prescriptionDoseTypes } from "../../../constants/DropDownConstants";
+import { useDispatch, useSelector } from "react-redux";
 
-const InPatientPrescriptionForm = ({ setShowForm }) => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const admissionNo = queryParams.get("AdmNo"); // Get treatmentNo from URL
-  const staffNo = useAuth().userData.no;
-  const { combinedList, loadingAllergies } =
-    useFetchAllergiesAndMedicationsHook();
-  const patientNumber = queryParams.get("PatientNo"); // Get treatmentNo from URL
-  const filterAllergies = combinedList?.filter(
-    (allergy) => allergy.PatientNo === patientNumber
-  );
+import { Button, Form, message, Space } from "antd";
+
+import {
+  InpatientSendToPharmacy,
+  postInPatientPrescriptionDetails,
+  POST_INPATIENT_PRESCRIPTION_RESET,
+  POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_RESET,
+} from "../../../actions/Doc-actions/postPrescription";
+import { getItemsSlice } from "../../../actions/triage-actions/getItemsSlice";
+
+import {
+  doctorIPPrescriptionColumns,
+  pharmacyCardSearchDrugsColumns,
+} from "../../pharmacy-views/pharmacy-utils";
+import { SearchDrugTable } from "../../pharmacy-views/SearchDrugTable";
+import { PharmacyCurrentSelection } from "../../pharmacy-views/PharmacyCurrentSelection";
+
+const InpatientPrescriptionForm = () => {
+  const { useForm } = Form;
+  const [form] = useForm();
 
   const dispatch = useDispatch();
-  const { loading: savingPrescription, success: prescriptionSaved } =
-    useSelector((state) => state.postInPatientPrescription);
+  const location = useLocation();
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const { items } = useSelector((state) => state.getItems);
+  const [editingKey, setEditingKey] = useState("");
+  const [selectedDrugs, setSelectedDrugs] = useState([]);
+
+  const {
+    data: postPrescriptionData,
+    error: postPrescriptionError,
+    loading: postPrescriptionLoading,
+  } = useSelector((state) => state.postInPatientPrescription);
+  const {
+    data: sendtoPharmacyData,
+    error: sendtoPharmacyError,
+    loading: sendtoPharmacyLoading,
+  } = useSelector((state) => state.inpatientSentToPharmacy);
+  const { items, loadingItems } = useSelector((state) => state.getItems);
 
   useEffect(() => {
     dispatch(getItemsSlice());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    dispatch(getItemUnitsOfMeasureSlice());
-  }, [dispatch]);
+    if (postPrescriptionLoading) message.info("Posting the prescription");
 
-  useEffect(() => {
-    dispatch(getQyPrescriptionLineSlice());
-  }, [dispatch]);
-
-  const onFinish = async (values) => {
-    const { PrescriptionRemarks, DrugNo, prescriptionDose, dosage, duration } =
-      values;
-
-    const prescription = {
-      myAction: "create",
-      admissionNo: admissionNo, // Send treatmentNo to the backend
-      staffNo,
-      recId: "",
-      drug: DrugNo,
-      duration,
-      dosage,
-      prescriptionDose,
-      remarks: PrescriptionRemarks,
-    };
-    setIsSubmitting(true); // Start the loading simulation
-    await dispatch(postInPatientPrescriptionDetails(prescription));
-    dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
-    setShowForm(false);
-  };
-
-  const handleSearch = (value) => {
-    setSearchValue(value);
-  };
-
-  useEffect(() => {
-    if (prescriptionSaved) {
-      // Enable Send to Pharmacy button after prescription is saved
-      setIsSubmitting(false);
+    if (postPrescriptionData) {
+      dispatch(InpatientSendToPharmacy(admissionNo));
     }
-  }, [prescriptionSaved]);
 
-  const transformedData = [
-    {
-      title: "Food Allergies",
-      description: filterAllergies
-        .map((item) => item.FoodAllergy)
-        .filter(Boolean)
-        .join(", "),
-    },
-    {
-      title: "Drug Allergies",
-      description: filterAllergies
-        .map((item) => item.DrugAllergy)
-        .filter(Boolean)
-        .join(", "),
-    },
-  ];
+    if (postPrescriptionError) message.error(postPrescriptionError);
+
+    if (postPrescriptionData || postPrescriptionError)
+      dispatch({ type: POST_INPATIENT_PRESCRIPTION_RESET });
+  }, [postPrescriptionData, postPrescriptionError, postPrescriptionLoading]);
+
+  // We send the prescription to the pharmacy
+  useEffect(() => {
+    if (sendtoPharmacyData) {
+      form.resetFields();
+      setSelectedDrugs([]);
+      message.success("Prescription sent to pharmacy");
+    }
+    if (sendtoPharmacyError) message.error(sendtoPharmacyError);
+
+    dispatch({ type: POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_RESET });
+  }, [sendtoPharmacyData, sendtoPharmacyError]);
+
+  // *********************************************Table functions and variables *****************************************************/
+  const edit = (record) => {
+    form.setFieldsValue({ ...record });
+    setEditingKey(record.No);
+  };
+
+  const save = async (record) => {
+    try {
+      const row = await form.validateFields();
+      console.log({ row, record });
+      const { prescriptionDose, duration, remarks } = row;
+
+      const newRecord = { ...record, prescriptionDose, duration, remarks };
+      const indexToReplace = selectedDrugs.findIndex(
+        (item) => item.No === record.No
+      );
+      var newSelected = [...selectedDrugs];
+      newSelected.splice(indexToReplace, 1, newRecord);
+
+      setSelectedDrugs(newSelected);
+      setEditingKey("");
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
+  const cancel = () => setEditingKey("");
+
+  const isEditing = (record) => record.No === editingKey;
+
+  const handleAddDrug = (drug) => {
+    const drugToAdd = items.find((item) => item.No === drug);
+    setSelectedDrugs(Array.from([...selectedDrugs, drugToAdd]));
+  };
+
+  const deleteItem = ({ No }) => {
+    setSelectedDrugs(
+      selectedDrugs.filter((selectedDrug) => selectedDrug.No !== No)
+    );
+  };
+
+  const columns = doctorIPPrescriptionColumns(
+    edit,
+    save,
+    cancel,
+    isEditing,
+    deleteItem
+  );
+
+  const data = selectedDrugs.map((selectedDrug, index) => ({
+    ...selectedDrug,
+    admissionNo,
+    quantity: 0,
+    myAction: "create",
+    drug: selectedDrug.No,
+    Index: selectedDrug.Index || index + 1,
+  }));
+
+  const searchDrugsColumns = pharmacyCardSearchDrugsColumns(handleAddDrug);
+
+  // *********************************************End of table functions and variables *****************************************************/
+
+  const handleDispatchPrescription = () => {
+    const emptyDrug = selectedDrugs.find(
+      ({ drug, prescriptionDose }) => !(drug && prescriptionDose)
+    );
+
+    if (emptyDrug)
+      return message.warning(
+        `Kindly ensure you have added the frequency to ${emptyDrug.Description}`
+      );
+
+    dispatch(postInPatientPrescriptionDetails(selectedDrugs));
+  };
+
   return (
-    <>
-      <Row gutter={24}>
-        {/* drug input card */}
-        <Col span={16}>
-          <Card title="Prescription Form" style={{ padding: "10px 16px" }}>
-            <Form
-              layout="vertical"
-              validateTrigger="onChange"
-              onFinish={onFinish}
-              initialValues={{
-                Prescriptions: {
-                  PrescriptionRemarks: "",
-                  DrugNo: "",
-                  prescriptionDose: undefined,
-                  dosage: undefined,
-                  duration: "",
-                  admissionNo: admissionNo, // Keep treatmentNo in initial values
-                },
-              }}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="Search Drug Name"
-                name="DrugNo"
-                hasFeedback
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a drug",
-                  },
-                ]}
-                className="w-100 my-2"
-              >
-                {items && (
-                  <Select
-                    placeholder="Select Drug e.g Paracetamol"
-                    showSearch
-                    suffixIcon={<SearchOutlined />}
-                    onSearch={handleSearch}
-                    filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    notFoundContent={
-                      searchValue && items.length === 0 ? (
-                        <Empty
-                          image={Empty.PRESENTED_IMAGE_SIMPLE}
-                          description="No drugs found"
-                        />
-                      ) : null
-                    }
-                  >
-                    {searchValue &&
-                      items.map((item) => (
-                        <Select.Option key={item.No} value={item.No}>
-                          {item.Description}
-                        </Select.Option>
-                      ))}
-                  </Select>
-                )}
-              </Form.Item>
-              <div className="d-block d-flex align-items-center justify-content-between gap-2">
-                <Form.Item
-                  label="Duration (No of Days)"
-                  name="duration"
-                  hasFeedback
-                  className="w-100"
-                >
-                  <Input
-                    type="number"
-                    className="w-100"
-                    placeholder="Enter Duration eg 3 days"
-                  />
-                </Form.Item>
-              </div>
-              <Form.Item
-                label="Frequency"
-                name="prescriptionDose"
-                hasFeedback
-                className="w-100"
-              >
-                <Select
-                  placeholder="Select Prescription Dose"
-                  className="w-100"
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {prescriptionDoseTypes &&
-                    prescriptionDoseTypes.map((item) => (
-                      <Select.Option key={item.value} value={item.value}>
-                        {item.label}
-                      </Select.Option>
-                    ))}
-                </Select>
-              </Form.Item>
-              <Space>
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={savingPrescription}
-                  >
-                    <SaveOutlined />
-                    Save Prescription
-                  </Button>
-                </Form.Item>
-              </Space>
-            </Form>
-          </Card>
-        </Col>
-        <Col span={8}>
-          <div>
-            <Card
-              className="card"
-              style={{
-                width: "100%",
-                backgroundColor: "#e5e3e3",
-                border: "none",
-                padding: "10px",
-              }}
-            >
-              <List
-                header={
-                  <div
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      color: "red",
-                    }}
-                  >
-                    Allergies and Chronics
-                  </div>
-                }
-                itemLayout="horizontal"
-                loading={loadingAllergies}
-                dataSource={transformedData}
-                renderItem={(item, index) => (
-                  <List.Item
-                    key={index}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Typography.Text className="allergies-item-list-title">
-                      {item.title}
-                    </Typography.Text>
-                    <Typography.Text>{item.description}</Typography.Text>
-                  </List.Item>
-                )}
-              ></List>
-            </Card>
-          </div>
-        </Col>
-      </Row>
-    </>
+    <Space direction="vertical" className="d-flex gap-4">
+      <div className="d-flex justify-content-end">
+        <Button
+          type="primary"
+          disabled={!selectedDrugs.length}
+          loading={postPrescriptionLoading || sendtoPharmacyLoading}
+          onClick={handleDispatchPrescription}
+        >
+          Send to Pharmacy
+        </Button>
+      </div>
+      <Form
+        form={form}
+        component={false}
+        disabled={postPrescriptionLoading || sendtoPharmacyLoading}
+      >
+        <PharmacyCurrentSelection
+          data={data}
+          columns={columns}
+          style={{ width: "100%" }}
+        />
+      </Form>
+      <SearchDrugTable
+        items={items}
+        loading={loadingItems}
+        columns={searchDrugsColumns}
+      />
+    </Space>
   );
 };
 
-export default InPatientPrescriptionForm;
-
-InPatientPrescriptionForm.propTypes = {
-  setShowForm: PropTypes.func,
-};
+export default InpatientPrescriptionForm;

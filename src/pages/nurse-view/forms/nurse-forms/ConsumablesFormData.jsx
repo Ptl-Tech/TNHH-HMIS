@@ -36,7 +36,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const { loadingpostNurseOrderSheet } = useSelector(
     (state) => state.postNurseOrderSheet
   );
-
+console.log(userDetails);
   const handleOnFinish = async (values) => {
     try {
       const { location, quantity, item, remarks } = values;
@@ -45,7 +45,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
         myAction: "create",
         admissionNo: patientDetails?.Admission_No,
         recId: "",
-        branchCode: location,
+        branchCode: userDetails?.userData?.shortcut_Dimension_1_Code || branchCode,
         prescriptionDose: parseInt(quantity, 10),
         drugNo: item,
         staffNo: userDetails.userData.no,
@@ -60,25 +60,10 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
         message.success("Consumables posted successfully!");
 
         // Dispatch postNurseOrderSheetSlice and wait for result
-        const orderSheetResult = await dispatch(
-          postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
-            admissionNo: patientDetails?.Admission_No,
-            branchCode: location,
-            staffNo: userDetails.userData.no,
-          })
-        );
+             dispatch(getPgOpenPatientConsumablesSlice());
+      setIsConsumableFormVisible(false);
 
-        if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_SUCCESS) {
-          message.success("Order sheet sent to pharmacy successfully!");
-          dispatch(getPgOpenPatientConsumablesSlice());
-          setIsConsumableFormVisible(false);
-          form.resetFields();
-        } else if (orderSheetResult.type === POST_NURSE_ORDER_SHEET_FAILURE) {
-          message.error(
-            orderSheetResult?.payload?.message ||
-              "Failed to send order sheet to pharmacy."
-          );
-        }
+       
       } else if (consumablesResult.type === POST_PATIENT_CONSUMABLES_FAILURE) {
         message.error(
           consumablesResult?.payload?.message ||
@@ -115,29 +100,8 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
         }}
       >
         <Row gutter={[16, 16]}>
-          <Col span={8}>
-            <Form.Item
-              label="Location"
-              name="location"
-              rules={[{ required: true, message: "Please select location!" }]}
-              hasFeedback
-            >
-              <Select
-                style={{ width: "100%" }}
-                placeholder="Select Location"
-                allowClear
-                showSearch
-                loading={loadingQyLocations}
-                options={qyLocations?.map((item) => ({
-                  key: item.AdmNo,
-                  value: item.Code,
-                  label: item.Name,
-                }))}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
+       
+          <Col span={12}>
             <Form.Item
               label="Item"
               name="item"
@@ -159,7 +123,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={12}>
             <Form.Item
               label="Quantity"
               name="quantity"

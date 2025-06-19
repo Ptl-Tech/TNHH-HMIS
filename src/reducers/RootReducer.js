@@ -328,6 +328,7 @@ import { getSingleDischargeRequestReducer } from './ChargesReducers/getSingleDis
 import { getReceiptsReducer } from './ChargesReducers/getReceiptsReducer';
 import { getInvoiceReducer } from './ChargesReducers/getInvoiceListReducer';
 import { postNurseOrderSheetReducer } from './nurse-reducers/postNurseOrderSheetReducer';
+import { getNurseBriefMSEDataReducer } from './nurse-reducers/getNurseBriefMseReducer';
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -492,6 +493,7 @@ export const rootReducer = combineReducers({
   getPgTreatmentDoctorNotes: getPgTreatmentDoctorNotesReducer,
   postPatientConsumables: postPatientConsumablesReducer,
   postNurseOrderSheet:postNurseOrderSheetReducer,
+  getBriefMseNotes:getNurseBriefMSEDataReducer,
   // getPatientConsumables:getPatientConsumablesReducer,
   getQyLocations: getQyLocationsReducer,
   postPatientDoctorAdmission: postPatientDoctorAdmissionReducer,
