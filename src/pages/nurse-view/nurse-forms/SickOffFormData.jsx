@@ -41,8 +41,8 @@ const SickOffFormData = ({ currentInpatient }) => {
   const handleOnFinish = async (values) => {
     const { sickOffDays, startDate, remarks } = values;
     const sickOffData = {
-      inPatient: true,
       myAction: "create",
+      inPatient: isInpatient,
       offDutyComments: remarks,
       offDutyDays: parseInt(sickOffDays),
       documentNo: admissionNo ?? treatmentNo,

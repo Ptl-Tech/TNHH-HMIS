@@ -51,7 +51,9 @@ function AppointmentTCAForm({ currentInpatient }) {
   const location = useLocation();
 
   const { doctorID } = user?.userData || {};
-  const visitNo = new URLSearchParams(location.search).get("AdmNo");
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+  const visitNo = admissionNo || treatmentNo;
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
   const {

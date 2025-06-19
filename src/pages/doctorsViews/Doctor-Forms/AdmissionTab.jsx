@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+
 import { Tabs } from "antd";
 import { IoBedOutline } from "react-icons/io5";
 import { BsBookmarkCheck } from "react-icons/bs";
