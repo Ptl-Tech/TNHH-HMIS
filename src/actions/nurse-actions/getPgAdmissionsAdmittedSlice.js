@@ -13,15 +13,16 @@ const API_URL =
   "https://chiromo.potestastechnologies.net:8085";
 
 export const getPgAdmissionsAdmittedSlice =
-  () => async (dispatch, getState) => {
+  (admissionNo) => async (dispatch, getState) => {
+    var query = `${API_URL}/data/odatafilter?webservice=QyAdmissionsList&isList=true`;
+
+    if (admissionNo) query += `&query=$filter=Admission_No eq '${admissionNo}'`;
+
     const config = configHelpers(getState);
     try {
       dispatch({ type: GET_PG_ADMISSIONS_ADMITTED_REQUEST });
 
-      const { data } = await axios.get(
-        `${API_URL}/data/odatafilter?webservice=QyAdmissionsList&isList=true`,
-        config
-      );
+      const { data } = await axios.get(query, config);
 
       console.log({ data });
 

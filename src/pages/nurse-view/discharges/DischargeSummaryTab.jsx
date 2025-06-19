@@ -19,9 +19,9 @@ function DischargeSummaryTab({ currentInpatient }) {
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
 
   /* 
-  This component renders the different discharge summary options 
+   - This component renders the different discharge summary options
    - It receives the currentInpatient which it needs to render the <DischargeDiagnosis /> component
-   - It fetches the single discharge of the current inpatient so that it can be rendered in the <DischargeSummary /> component
+   - It also fetches the single discharge of the current inpatient so that it can be rendered in the <DischargeSummary /> component
    - It also reused the <DischargeSummary /> component since it handles different requests
   */
 
@@ -33,6 +33,7 @@ function DischargeSummaryTab({ currentInpatient }) {
 
   console.log({ dischargeData, dischargeError });
 
+  // Fetching the dischargeSummary info here since this is where it will be needed
   useEffect(() => {
     dispatch(getDischargeSummary(admissionNo));
   }, [admissionNo]);

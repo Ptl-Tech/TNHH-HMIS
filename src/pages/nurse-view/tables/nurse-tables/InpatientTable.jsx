@@ -7,11 +7,11 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../../../../hooks/useAuth";
 
 const InpatientTable = ({
-  loadingPatientList,
-  handleNavigate,
-  filterInPatients,
   loading,
   searchName,
+  handleNavigate,
+  filterInPatients,
+  loadingPatientList,
   searchPatientNumber,
   searchAdmissionNumber,
 }) => {
@@ -216,14 +216,3 @@ const InpatientTable = ({
 };
 
 export default InpatientTable;
-
-// props validation
-InpatientTable.propTypes = {
-  loadingPatientList: PropTypes.bool,
-  handleNavigate: PropTypes.func,
-  filterInPatients: PropTypes.array,
-  loading: PropTypes.bool,
-  searchName: PropTypes.string,
-  searchPatientNumber: PropTypes.string,
-  searchAdmissionNumber: PropTypes.string,
-};

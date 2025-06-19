@@ -333,6 +333,7 @@ import { postDischargeTCAReducer } from "./postDischargeTCAReducer";
 import { postPrintSickOffReducer } from "./doc-reducers/postPrintSickOffReducer";
 import { postDischargeDiagnosisReducer } from "./doc-reducers/postDischargeDiagnosisReducer";
 import { currentInpatientReducer } from "./doc-reducers/currentInpatientReducer";
+import { getSingleAdmittedReducer } from "./nurse-reducers/getSingleAdmittedReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -573,6 +574,7 @@ export const rootReducer = combineReducers({
   getPatientMSE: getPatientMSENotesReducer,
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
+  getSingleAdmitted: getSingleAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,
   getTreatmentSheet: getTreatmentSheetLines,
   getInPatientPrescriptionLine: getInPatientQyPrescriptionLines,

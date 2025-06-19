@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
+import { message } from "antd";
+
 import useAuth from "../../hooks/useAuth";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
@@ -10,7 +12,6 @@ import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientLi
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
-import { message } from "antd";
 
 const Impatient = () => {
   const userDetails = useAuth(); // Use the custom hook to get user info
@@ -35,7 +36,10 @@ const Impatient = () => {
   }, [currentInpatientError]);
 
   const handleNavigate = (record) => {
+    console.log({ record });
+
     dispatch(currentInpatient(record));
+
     if (userDetails.userData.departmentName === "Nurse") {
       navigate(
         `/Nurse/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
