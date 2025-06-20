@@ -51,8 +51,10 @@ function AppointmentTCAForm({ currentInpatient }) {
   const location = useLocation();
 
   const { doctorID } = user?.userData || {};
+
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+
   const visitNo = admissionNo || treatmentNo;
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
@@ -77,7 +79,13 @@ function AppointmentTCAForm({ currentInpatient }) {
   function onFinish(values) {
     const { appointmentDate: date, remarks } = values;
     const appointmentDate = dayjs(date).format("YYYY-MM-DD");
-    const data = { appointmentDate, remarks, doctorID, visitNo, patientNo };
+    const data = {
+      remarks,
+      visitNo,
+      doctorID,
+      patientNo,
+      appointmentDate,
+    };
     dispatch(postDischargeTCA(data));
   }
 

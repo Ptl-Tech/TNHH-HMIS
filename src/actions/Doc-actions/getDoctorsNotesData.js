@@ -2,10 +2,10 @@ import axios from "axios";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
-export const GET_DOCTOR_NOTES_REQUEST = "GET_DOCTOR_NOTES_REQUEST";
-export const GET_DOCTOR_NOTES_SUCCESS = "GET_DOCTOR_NOTES_SUCCESS";
 export const GET_DOCTOR_NOTES_FAIL = "GET_DOCTOR_NOTES_FAIL";
 export const GET_DOCTOR_NOTES_RESET = "GET_DOCTOR_NOTES_RESET";
+export const GET_DOCTOR_NOTES_REQUEST = "GET_DOCTOR_NOTES_REQUEST";
+export const GET_DOCTOR_NOTES_SUCCESS = "GET_DOCTOR_NOTES_SUCCESS";
 
 export const getDoctorsNotesData =
   ({ treatmentNo: encounterNo }) =>
@@ -61,8 +61,6 @@ export const getDoctorsNotesData =
 
       dispatch({ type: GET_DOCTOR_NOTES_SUCCESS, payload: result });
     } catch (error) {
-      console.log({ error });
-
       dispatch({ type: GET_DOCTOR_NOTES_FAIL, payload: error.message });
     }
   };

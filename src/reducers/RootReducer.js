@@ -328,12 +328,12 @@ import { getSingleDischargeRequestReducer } from "./ChargesReducers/getSingleDis
 import { getReceiptsReducer } from "./ChargesReducers/getReceiptsReducer";
 import { getInvoiceReducer } from "./ChargesReducers/getInvoiceListReducer";
 import { postNurseOrderSheetReducer } from "./nurse-reducers/postNurseOrderSheetReducer";
-import { getNurseBriefMSEDataReducer } from "./nurse-reducers/getNurseBriefMseReducer";
 import { postDischargeTCAReducer } from "./postDischargeTCAReducer";
 import { postPrintSickOffReducer } from "./doc-reducers/postPrintSickOffReducer";
 import { postDischargeDiagnosisReducer } from "./doc-reducers/postDischargeDiagnosisReducer";
 import { currentInpatientReducer } from "./doc-reducers/currentInpatientReducer";
 import { getSingleAdmittedReducer } from "./nurse-reducers/getSingleAdmittedReducer";
+import { getBriefMSENotesDataReducer } from "./nurse-reducers/getBriefMSEReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -416,6 +416,7 @@ export const rootReducer = combineReducers({
   docTreatmentList: treatmentListReducer,
   getPatientList: getPatientListReducer,
   getDoctorsNotesData: getDoctorsNotesDataReducer,
+  getBriefMSENotesData: getBriefMSENotesDataReducer,
   saveDoctorNotes: saveDoctorNotesReducer,
   // past encounters
   getPatientEncounters: getPatientEncounterListReducer,
@@ -498,7 +499,6 @@ export const rootReducer = combineReducers({
   getPgTreatmentDoctorNotes: getPgTreatmentDoctorNotesReducer,
   postPatientConsumables: postPatientConsumablesReducer,
   postNurseOrderSheet: postNurseOrderSheetReducer,
-  getBriefMseNotes: getNurseBriefMSEDataReducer,
   // getPatientConsumables:getPatientConsumablesReducer,
   getQyLocations: getQyLocationsReducer,
   postPatientDoctorAdmission: postPatientDoctorAdmissionReducer,

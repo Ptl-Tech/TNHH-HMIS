@@ -16,10 +16,10 @@ export const InputForm = ({ treatmentNo, formItem, setEditing }) => {
     setEditing(false);
     dispatch(
       saveDoctorNotes({
-        myAction: 'edit',
-        encounterNo: treatmentNo,
         itemId: value,
+        myAction: 'edit',
         isSelected: true,
+        encounterNo: treatmentNo,
         specifiedText: textValue,
       }),
     );

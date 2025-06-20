@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Input, Tabs } from "antd";
@@ -23,32 +23,30 @@ import useAuth from "../../../hooks/useAuth";
 
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
-import { getNurseBriefMSEData } from "../../../actions/nurse-actions/getBriefMSENotes";
+import { getBriefMSENotesData } from "../../../actions/nurse-actions/getBriefMSENotesData";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const dispatch = useDispatch();
   const role = useAuth().userData.departmentName;
+  const searchParams = new URLSearchParams(useLocation().search);
+
   const treatmentNo =
-    new URLSearchParams(location.search).get("TreatmentNo") ||
-    new URLSearchParams(location.search).get("AdmNo");
+    searchParams.get("TreatmentNo") || searchParams.get("AdmNo");
 
-
-  const { data: getDoctorNotesData } = useSelector(
+  const { data: doctorNotesData } = useSelector(
     (state) => state.getDoctorsNotesData
+  );
+  const { data: briefMSENotesData } = useSelector(
+    (state) => state.getBriefMSENotesData
   );
   const { data: saveDoctorNotesData, error: saveDoctorNotesError } =
     useSelector((state) => state.saveDoctorNotes);
 
-     const { data: getBriefMseData } = useSelector(
-    (state) => state.getBriefMseNotes
-  );
-
   // Loading the doctor notes data to add
   useEffect(() => {
     dispatch(getDoctorsNotesData({ treatmentNo }));
+    dispatch(getBriefMSENotesData(treatmentNo));
   }, [treatmentNo, dispatch, saveDoctorNotesData]);
-
-  console.log({ getDoctorNotesData });
 
   // Tracking when the adding of data has failed
   useEffect(() => {
@@ -62,31 +60,29 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
     {
       label: "Patient History Notes",
       icon: <SolutionOutlined />,
-      children: <SearchChildView filter={"PH"} data={getDoctorNotesData} />,
+      children: <SearchChildView filter={"PH"} data={doctorNotesData} />,
     },
     ...(role === "Doctor" || role === "Nurse"
       ? [
           {
             label: "Physical Examination",
             icon: <HeartOutlined />,
-            children: (
-              <SearchChildView filter={"PE"} data={getDoctorNotesData} />
-            ),
+            children: <SearchChildView filter={"PE"} data={doctorNotesData} />,
           },
         ]
       : []),
     {
       label: "Mental Status Exam",
       icon: <SolutionOutlined />,
-      children: <SearchChildView filter={"MSE"} data={getDoctorNotesData} />,
+      children: <SearchChildView filter={"MSE"} data={doctorNotesData} />,
     },
-     ...(role === "Doctor" || role === "Nurse"
+    ...(role === "Doctor" || role === "Nurse"
       ? [
           {
             label: "Brief MSE Form",
             icon: <HeartOutlined />,
             children: (
-              <SearchChildView filter={"Brief MSE"} data={getBriefMseData} />
+              <SearchChildView filter={"Brief MSE"} data={briefMSENotesData} />
             ),
           },
         ]
@@ -101,8 +97,8 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       icon: <HeartOutlined />,
       children: (
         <FourPsForm
-          treatmentNo={treatmentNo}
           patientNo={patientNo}
+          treatmentNo={treatmentNo}
           observationNo={observationNo}
         />
       ),
@@ -132,12 +128,14 @@ const SearchChildView = ({ data, filter }) => {
     ? keywordFilterHelper(sections, sectionCategories, formItems, searchValue)
     : { sections, sectionCategories, formItems };
 
+  // console.log({ data, filter });
+
   // The filter function for the category we are in
   const filterSections = () => {
     const filterObject = {
-      PH: "Patient History",
       MSE: "MSE",
       PE: "Physical Exam",
+      PH: "Patient History",
       "Brief MSE": "Brief MSE",
     };
 
@@ -149,7 +147,7 @@ const SearchChildView = ({ data, filter }) => {
   // This is the tree that holds everything in it's category eg: MSE, Patient History, Physical Exam etc.
   const tree = Object.keys(data).length
     ? buildFormStructure(
-        filterSections(filter),
+        filterSections(),
         filteredData.sectionCategories,
         filteredData.formItems
       )

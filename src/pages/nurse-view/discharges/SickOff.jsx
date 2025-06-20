@@ -20,7 +20,7 @@ const SickOff = ({ currentInpatient }) => {
   const admissionNo = searchParams.get("AdmNo");
   const treatmentNo = searchParams.get("TreatmentNo");
 
-  const isInpatient = Boolean(admissionNo) || false;
+  const isInpatient = Boolean(admissionNo);
 
   const items = [
     {
