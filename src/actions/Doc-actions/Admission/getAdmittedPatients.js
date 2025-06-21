@@ -99,7 +99,6 @@ export const getAdmittedSinglePatient = (admissionNo, treatmentNo) => async (dis
     };
 
     // Determine which column and value to filter by QyTreatmentHeaders
-
     const endPoint = admissionNo ? 'PgAdmissionsAdmitted' : 'QyTreatmentHeaders';
     const filterColumn = admissionNo ? 'Admission_No' : 'TreatmentNo';
     const filterValue = admissionNo || treatmentNo;

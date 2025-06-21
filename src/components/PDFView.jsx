@@ -4,13 +4,13 @@ import { Spin } from "antd";
 const PDFViewer = ({ base64String, height = "500px" }) => {
   const [loading, setLoading] = useState(true);
 
-  if (!base64String) return null;
-
   const pdfSrc = `data:application/pdf;base64,${base64String}`;
 
   useEffect(() => {
     setLoading(true);
   }, [base64String]);
+
+  if (!base64String) return null;
 
   return (
     <div style={{ position: "relative", width: "100%", height }}>

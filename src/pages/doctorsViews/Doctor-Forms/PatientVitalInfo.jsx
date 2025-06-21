@@ -1,6 +1,6 @@
-import { forwardRef, useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Form,
@@ -16,12 +16,12 @@ import {
   Divider,
   Tabs,
   Card,
-} from 'antd';
-import { LiaAllergiesSolid } from 'react-icons/lia';
-import { BsHeartPulse, BsClipboard2Pulse } from 'react-icons/bs';
+} from "antd";
+import { LiaAllergiesSolid } from "react-icons/lia";
+import { BsHeartPulse, BsClipboard2Pulse } from "react-icons/bs";
 
-import useAuth from '../../../hooks/useAuth';
-import { NoData } from '../../../components/NoData';
+import useAuth from "../../../hooks/useAuth";
+import { NoData } from "../../../components/NoData";
 import {
   vitalsInfo,
   allergenTypes,
@@ -45,54 +45,54 @@ import {
   generateFileTabsData,
   nurseCardExObjectArray,
   dailyWardRoundsObjectArray,
-} from './doctor-utils';
+} from "./doctor-utils";
 
 import {
   POST_TRIAGE_LIST_VITALS_RESET,
   postTriageListVitalsSlice,
-} from '../../../actions/triage-actions/postTriageListVitalsSlice';
+} from "../../../actions/triage-actions/postTriageListVitalsSlice";
 import {
   POST_ALLERGIES_MEDICATION_RESET,
   postAllergiesMedicationSlice,
-} from '../../../actions/triage-actions/postAllergiesMedicationSlice';
-import { getEncounterList } from '../../../actions/encounters/encounter-list';
-import { getTriageList } from '../../../actions/triage-actions/getTriageListSlice';
-import { getEncounterDetails } from '../../../actions/encounters/encounter-details';
-import { getSinglePatientAllVitalsLines } from '../../../actions/triage-actions/getVitalsLinesSlice';
-import { getAllergiesAndMedicationsSlice } from '../../../actions/triage-actions/getAllergiesAndMedicationsSlice';
-import { MdAttachFile } from 'react-icons/md';
-import dayjs from 'dayjs';
-import PatientSignsReport from './PatientSignsReport';
+} from "../../../actions/triage-actions/postAllergiesMedicationSlice";
+import { getEncounterList } from "../../../actions/encounters/encounter-list";
+import { getTriageList } from "../../../actions/triage-actions/getTriageListSlice";
+import { getEncounterDetails } from "../../../actions/encounters/encounter-details";
+import { getSinglePatientAllVitalsLines } from "../../../actions/triage-actions/getVitalsLinesSlice";
+import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
+import { MdAttachFile } from "react-icons/md";
+import dayjs from "dayjs";
+import PatientSignsReport from "./PatientSignsReport";
 
 const PatientVitalInfo = () => {
   const items = [
     {
-      key: '0',
-      label: 'Latest Vitals',
+      key: "0",
+      label: "Latest Vitals",
       children: <Vitals />,
     },
     {
-      key: '1',
-      label: 'Allergies & Medications',
+      key: "1",
+      label: "Allergies & Medications",
       children: <AllergiesAndMedications />,
     },
     {
-      key: '2',
-      label: 'Triage Notes',
+      key: "2",
+      label: "Triage Notes",
       children: <TraigeNotes />,
     },
     {
-      key: '3',
-      label: 'Latest Encounter',
+      key: "3",
+      label: "Latest Encounter",
       children: <LatestEncounter />,
-    }
+    },
   ];
 
   return (
     <Collapse
       accordion
       size="small"
-      defaultActiveKey={['0']}
+      defaultActiveKey={["0"]}
       items={items.map((item) => ({
         ...item,
         styles: {
@@ -120,21 +120,21 @@ const Vitals = () => {
     loading: loadingPostingVitals,
   } = useSelector((state) => state.postTriageListVitals);
   const { loading: loadingVitals, data: vitals } = useSelector(
-    (state) => state.getPatientVitals,
+    (state) => state.getPatientVitals
   );
 
   useEffect(() => {
     dispatch(getSinglePatientAllVitalsLines(patientNo));
 
-    if (loadingPostingVitals) message.info('Posting the patient vitals');
+    if (loadingPostingVitals) message.info("Posting the patient vitals");
 
-    if (postedVitals?.status === 'success')
-      message.success('Vitals posted successfully');
+    if (postedVitals?.status === "success")
+      message.success("Vitals posted successfully");
 
     if (errorPostingVitals)
-      message.error('An error occured when posting the vitals');
+      message.error("An error occured when posting the vitals");
 
-    if (postedVitals?.status === 'success' || errorPostingVitals)
+    if (postedVitals?.status === "success" || errorPostingVitals)
       dispatch({ type: POST_TRIAGE_LIST_VITALS_RESET });
   }, [postedVitals, loadingPostingVitals, errorPostingVitals]);
 
@@ -143,17 +143,17 @@ const Vitals = () => {
       <Skeleton
         loading={loadingVitals || loadingPostingVitals}
         paragraph={{ rows: 2 }}
-        style={{ padding: '16px 16px 0 16px' }}
+        style={{ padding: "16px 16px 0 16px" }}
       >
         {vitals?.length ? (
           <ul
             style={{
               margin: 0,
               padding: 0,
-              display: 'grid',
-              listStyle: 'none',
-              justifyItems: 'stretch',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              display: "grid",
+              listStyle: "none",
+              justifyItems: "stretch",
+              gridTemplateColumns: "repeat(2, 1fr)",
             }}
           >
             {vitalsInfo(vitals[vitals.length - 1]).map(
@@ -161,68 +161,58 @@ const Vitals = () => {
                 <li
                   key={{ label }}
                   style={{
-                    borderBottom: '1px dashed #d5d5d5',
+                    borderBottom: "1px dashed #d5d5d5",
                     borderRight:
-                      index % 2 === 0 ? '1px dashed #d5d5d5' : 'none',
+                      index % 2 === 0 ? "1px dashed #d5d5d5" : "none",
                   }}
                   className="text-center px-1 py-2 d-grid"
                 >
                   <span
                     style={{
-                      fontSize: '14px',
-                      color: '#0f5689',
-                      fontWeight: 'bolder',
+                      fontSize: "14px",
+                      color: "#0f5689",
+                      fontWeight: "bolder",
                     }}
                   >
                     {label}
                   </span>
                   <span
                     style={{
-                      color: '#555',
-                      fontSize: '14px',
-                      fontWeight: 'bolder',
+                      color: "#555",
+                      fontSize: "14px",
+                      fontWeight: "bolder",
                     }}
                   >
                     {value}
                   </span>
                 </li>
-              ),
+              )
             )}
           </ul>
         ) : (
           <NoData />
         )}
       </Skeleton>
-      <AddVitalsDrawer
-        open={openAddVitals}
-        setOpen={setOpenAddVitals}
-      />
+      <AddVitalsDrawer open={openAddVitals} setOpen={setOpenAddVitals} />
       <ViewPreviousVitals
         open={openPreviousVitals}
         setOpen={setOpenPreviousVitals}
       />
       <Space
         style={{
-          gap: '4px',
-          padding: '4px',
-          display: 'grid',
-          alignItems: 'center',
+          gap: "4px",
+          padding: "4px",
+          display: "grid",
+          alignItems: "center",
           gridTemplateColumns: `repeat(${vitals?.length > 1 ? 2 : 1}, 1fr)`,
         }}
       >
         {vitals?.length > 1 && (
-          <Button
-            block
-            onClick={() => setOpenPreviousVitals(true)}
-          >
+          <Button block onClick={() => setOpenPreviousVitals(true)}>
             Previous Vitals
           </Button>
         )}
-        <Button
-          block
-          type="primary"
-          onClick={() => setOpenAddVitals(true)}
-        >
+        <Button block type="primary" onClick={() => setOpenAddVitals(true)}>
           Add Vitals
         </Button>
       </Space>
@@ -246,7 +236,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       type: 0, //Type 0 means Triage
       patientNo,
       observationNo,
-      myAction: 'create',
+      myAction: "create",
       bloodPressure: `${diastolic}/${systolic}`,
     };
 
@@ -261,7 +251,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       size="medium"
       styles={{
         header: {
-          color: '#0f5689',
+          color: "#0f5689",
         },
       }}
       title={
@@ -282,117 +272,89 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         <FormItem
           name="pulseRate"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Pulse rate &#40;bpm&#41;
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the pulse rate' }]}
+          rules={[{ required: true, message: "Please add the pulse rate" }]}
         >
-          <Input
-            required
-            type="number"
-            placeholder="eg. 70"
-          />
+          <Input required type="number" placeholder="eg. 70" />
         </FormItem>
         <Space direction="vertical">
-          <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+          <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
             Blood Pressure &#40;mmHg&#41;
           </span>
           <SpaceCompact>
             <FormItem
               name="systolic"
               label={
-                <span style={{ color: '#333333', fontWeight: 'bolder' }}>
+                <span style={{ color: "#333333", fontWeight: "bolder" }}>
                   Systolic
                 </span>
               }
               layout="vertical"
               rules={[
-                { required: true, message: 'Please add the diastoluc value' },
+                { required: true, message: "Please add the diastoluc value" },
               ]}
             >
-              <Input
-                required
-                type="number"
-                placeholder="eg. 120"
-              />
+              <Input required type="number" placeholder="eg. 120" />
             </FormItem>
             <FormItem
               name="diastolic"
               label={
-                <span style={{ color: '#333333', fontWeight: 'bolder' }}>
+                <span style={{ color: "#333333", fontWeight: "bolder" }}>
                   Diastolic
                 </span>
               }
               layout="vertical"
               rules={[
-                { required: true, message: 'Please add the systolic value' },
+                { required: true, message: "Please add the systolic value" },
               ]}
             >
-              <Input
-                required
-                type="number"
-                placeholder="eg. 80"
-              />
+              <Input required type="number" placeholder="eg. 80" />
             </FormItem>
           </SpaceCompact>
         </Space>
         <FormItem
           name="temperature"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Temperature &#40;°C&#41;
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the temperature' }]}
+          rules={[{ required: true, message: "Please add the temperature" }]}
         >
-          <Input
-            required
-            type="number"
-            placeholder="eg. 37"
-          />
+          <Input required type="number" placeholder="eg. 37" />
         </FormItem>
         <FormItem
           name="sP02"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               SPO₂ &#40;%&#41;
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the sP0₂' }]}
+          rules={[{ required: true, message: "Please add the sP0₂" }]}
         >
-          <Input
-            required
-            type="number"
-            placeholder="eg. 98"
-          />
+          <Input required type="number" placeholder="eg. 98" />
         </FormItem>
         <FormItem
           name="respirationRate"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Respiration Rate &#40;BPM&#41;
             </span>
           }
           layout="vertical"
           rules={[
-            { required: true, message: 'Please add the respiratory rate' },
+            { required: true, message: "Please add the respiratory rate" },
           ]}
         >
-          <Input
-            required
-            type="number"
-            placeholder="eg. 16"
-          />
+          <Input required type="number" placeholder="eg. 16" />
         </FormItem>
-        <Button
-          block
-          type="primary"
-          htmlType="submit"
-        >
+        <Button block type="primary" htmlType="submit">
           Submit Vitals
         </Button>
       </Form>
@@ -407,7 +369,7 @@ const ViewPreviousVitals = ({ open, setOpen }) => {
   const { patientNo } = state || {};
 
   const { loading: loadingVitals, data: vitals } = useSelector(
-    (state) => state.getPatientVitals,
+    (state) => state.getPatientVitals
   );
 
   useEffect(() => {
@@ -432,7 +394,7 @@ const ViewPreviousVitals = ({ open, setOpen }) => {
       }
       styles={{
         header: {
-          color: '#0f5689',
+          color: "#0f5689",
         },
       }}
       title={
@@ -471,14 +433,14 @@ const AllergiesAndMedications = () => {
   useEffect(() => {
     dispatch(getAllergiesAndMedicationsSlice(observationNo));
 
-    if (postAllergiesMedication.status === 'success')
-      message.success('Allergy posted successfully');
+    if (postAllergiesMedication.status === "success")
+      message.success("Allergy posted successfully");
 
     if (postAllergiesMedicationError)
-      message.error('Something went wrong while posting the allergy');
+      message.error("Something went wrong while posting the allergy");
 
     if (
-      postAllergiesMedication?.status === 'success' ||
+      postAllergiesMedication?.status === "success" ||
       postAllergiesMedicationError
     )
       dispatch({ type: POST_ALLERGIES_MEDICATION_RESET });
@@ -487,17 +449,14 @@ const AllergiesAndMedications = () => {
   const AllergenGroup = ({ allergies, type }) => {
     return (
       <div className="d-grid gap-2">
-        <h6 style={{ margin: 0, color: 'rgb(15, 86, 137)', fontSize: '15px' }}>
+        <h6 style={{ margin: 0, color: "rgb(15, 86, 137)", fontSize: "15px" }}>
           {type}
         </h6>
-        <ul style={{ margin: 0, padding: '0 0 0 24px' }}>
+        <ul style={{ margin: 0, padding: "0 0 0 24px" }}>
           {allergies
             .filter(({ Type }) => Type === type)
             .map(({ Allergen, Complaints }, idx) => (
-              <li
-                key={idx}
-                style={{ color: '#555' }}
-              >
+              <li key={idx} style={{ color: "#555" }}>
                 <span>{Allergen} - </span>
                 <span>{Complaints}</span>
               </li>
@@ -517,28 +476,15 @@ const AllergiesAndMedications = () => {
       >
         {allergiesMedication?.length ? (
           <div className="d-grid gap-2">
-            <AllergenGroup
-              allergies={allergiesMedication}
-              type={'Food'}
-            />
-            <AllergenGroup
-              allergies={allergiesMedication}
-              type={'Drug'}
-            />
+            <AllergenGroup allergies={allergiesMedication} type={"Food"} />
+            <AllergenGroup allergies={allergiesMedication} type={"Drug"} />
           </div>
         ) : (
           <NoData />
         )}
       </Skeleton>
-      <AddAllergiesAndMedicines
-        open={open}
-        setOpen={setOpen}
-      />
-      <Button
-        block
-        type="primary"
-        onClick={() => setOpen(true)}
-      >
+      <AddAllergiesAndMedicines open={open} setOpen={setOpen} />
+      <Button block type="primary" onClick={() => setOpen(true)}>
         Add Allergies
       </Button>
     </div>
@@ -557,7 +503,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
   const [form] = useForm();
 
   const { postAllergyMedicationLoading } = useSelector(
-    (state) => state.postAllergiesMedication,
+    (state) => state.postAllergiesMedication
   );
 
   const onFinish = ({ ...values }) => {
@@ -565,10 +511,10 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
       ...values,
       staffNo,
       observationNo,
-      myAction: 'create',
+      myAction: "create",
       assessedBy: staffNo,
-      foodAllergy: '',
-      drugAllergy: '',
+      foodAllergy: "",
+      drugAllergy: "",
     };
 
     dispatch(postAllergiesMedicationSlice(finalValues));
@@ -582,7 +528,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
       onClose={() => setOpen(false)}
       styles={{
         header: {
-          color: '#0f5689',
+          color: "#0f5689",
         },
       }}
       title={
@@ -601,49 +547,39 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
         <FormItem
           name="type"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Allergy Type
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the Allery Type' }]}
+          rules={[{ required: true, message: "Please add the Allery Type" }]}
         >
-          <Select
-            placeholder="Choose allergy type"
-            options={allergenTypes}
-          />
+          <Select placeholder="Choose allergy type" options={allergenTypes} />
         </FormItem>
 
         <FormItem
           name="allergen"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Allergen Name
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the item name' }]}
+          rules={[{ required: true, message: "Please add the item name" }]}
         >
-          <Input
-            required
-            type="name"
-            placeholder="Nuts, Ibuprofen"
-          />
+          <Input required type="name" placeholder="Nuts, Ibuprofen" />
         </FormItem>
         <FormItem
           name="complaints"
           label={
-            <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
               Complaints
             </span>
           }
           layout="vertical"
-          rules={[{ required: true, message: 'Please add the complaints' }]}
+          rules={[{ required: true, message: "Please add the complaints" }]}
         >
-          <TextArea
-            required
-            placeholder="eg. Patient gets rashes"
-          />
+          <TextArea required placeholder="eg. Patient gets rashes" />
         </FormItem>
         <Button
           block
@@ -662,25 +598,27 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
 const TraigeNotes = ({}) => {
   const dispatch = useDispatch();
   const { state } = useLocation() || {};
+  console.log({ state, location: useLocation() });
+
   const { observationNo } = state || {};
 
   const { loadingTriageList, triageList } = useSelector(
-    (state) => state.getTriageList,
+    (state) => state.getTriageList
   );
 
   useEffect(() => {
-    dispatch(getTriageList(observationNo));
-  }, []);
+    if (observationNo) dispatch(getTriageList(observationNo));
+  }, [observationNo]);
 
   return (
     <div>
       <Skeleton
         paragraph={{ rows: 1 }}
         loading={loadingTriageList}
-        style={{ padding: loadingTriageList ? '16px 16px 0 16px' : '' }}
+        style={{ padding: loadingTriageList ? "16px 16px 0 16px" : "" }}
       >
         {triageList.length ? (
-          <ul style={{ marginBottom: 0, padding: '8px', paddingLeft: '32px' }}>
+          <ul style={{ marginBottom: 0, padding: "8px", paddingLeft: "32px" }}>
             {triageList.map(
               ({
                 ObservationTime,
@@ -692,13 +630,13 @@ const TraigeNotes = ({}) => {
                   style={{
                     color:
                       ObservationRemarks || ObservationRemarks2
-                        ? '#333'
-                        : 'gray',
+                        ? "#333"
+                        : "gray",
                   }}
                 >
-                  {ObservationRemarks || ObservationRemarks2 || 'No Remarks'}
+                  {ObservationRemarks || ObservationRemarks2 || "No Remarks"}
                 </li>
-              ),
+              )
             )}
           </ul>
         ) : (
@@ -712,14 +650,14 @@ const TraigeNotes = ({}) => {
 const LatestEncounter = () => {
   const dispatch = useDispatch();
   const { state } = useLocation() || {};
- const patientNo = new URLSearchParams(location.search).get("PatientNo");
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const [open, setOpen] = useState(false);
   const [openPastEncountersDrawer, setOpenPastEncountersDrawer] =
     useState(false);
   const [encounter, setEncounter] = useState(null);
 
   const { loading, data, error } = useSelector(
-    (state) => state.getEncounterList,
+    (state) => state.getEncounterList
   );
 
   useEffect(() => {
@@ -752,9 +690,9 @@ const LatestEncounter = () => {
             style={{
               margin: 0,
               padding: 0,
-              display: 'grid',
-              listStyle: 'none',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              display: "grid",
+              listStyle: "none",
+              gridTemplateColumns: "repeat(2, 1fr)",
             }}
           >
             {/* Isn't it beautiful 😅 */}
@@ -763,47 +701,44 @@ const LatestEncounter = () => {
                 <li
                   key={key}
                   style={{
-                    borderBottom: '1px dashed #d9d9d9',
-                    borderLeft: index % 2 === 0 ? '' : '1px dashed #d9d9d9',
+                    borderBottom: "1px dashed #d9d9d9",
+                    borderLeft: index % 2 === 0 ? "" : "1px dashed #d9d9d9",
                   }}
                   className="text-center px-1 py-2 d-grid"
                 >
                   <span
                     style={{
-                      color: '#0f5689',
-                      fontSize: '14px',
-                      fontWeight: 'bolder',
+                      color: "#0f5689",
+                      fontSize: "14px",
+                      fontWeight: "bolder",
                     }}
                   >
                     {title}
                   </span>
                   <span
                     style={{
-                      color: '#555',
-                      fontSize: '14px',
-                      fontWeight: 'bolder',
+                      color: "#555",
+                      fontSize: "14px",
+                      fontWeight: "bolder",
                     }}
                   >
                     {render(data[0][dataIndex], data[0])}
                   </span>
                 </li>
-              ),
+              )
             )}
             <li
               style={{
-                gap: '4px',
-                padding: '4px',
-                display: 'grid',
-                gridColumn: '1 / 3',
-                alignItems: 'center',
+                gap: "4px",
+                padding: "4px",
+                display: "grid",
+                gridColumn: "1 / 3",
+                alignItems: "center",
                 gridTemplateColumns: `repeat(${data?.length > 1 ? 2 : 1}, 1fr)`,
               }}
             >
               {data?.length > 1 && (
-                <Button
-                  block
-                  onClick={() => setOpenPastEncountersDrawer(true)}
-                >
+                <Button block onClick={() => setOpenPastEncountersDrawer(true)}>
                   Past Encounters
                 </Button>
               )}
@@ -840,9 +775,9 @@ const PastEncountersDrawer = ({ open, setOpen, encounters }) => {
       closable={false}
       onClose={() => setOpen(false)}
       title={
-        <Space style={{ color: '#0f5689' }}>
+        <Space style={{ color: "#0f5689" }}>
           <MdAttachFile size={21} />
-          <h6 style={{ margin: '0' }}>Past Encounters</h6>
+          <h6 style={{ margin: "0" }}>Past Encounters</h6>
         </Space>
       }
     >
@@ -877,7 +812,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
   } = encounter || {};
 
   const { data, error, loading } = useSelector(
-    (state) => state.getEncounterDetails,
+    (state) => state.getEncounterDetails
   );
 
   const { admissionDetails, treatmentDetails } = data || {};
@@ -923,7 +858,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       vital: label,
     };
     triageVitals?.toReversed().forEach((entry, index) => {
-      row[`col_${index}`] = entry[key] ?? '';
+      row[`col_${index}`] = entry[key] ?? "";
     });
     return row;
   });
@@ -931,16 +866,16 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
   const objectsToRenderFile = [
     {
       data: triageDetails,
-      title: 'Triage Details',
+      title: "Triage Details",
       display: !!triageDetails,
       renderer: FileSectionFrameWork,
       objectSpecifier: triageDetailsObjectArray,
     },
     {
       pagination: false,
-      title: 'Triage Vitals',
+      title: "Triage Vitals",
       renderer: FileSectionTable,
-      scroll: { x: 'max-content' },
+      scroll: { x: "max-content" },
       dataSource: tableTriageVitals,
       display: triageVitals?.length,
       columns: triageVitalsObjectArray(triageVitals?.toReversed()),
@@ -951,11 +886,11 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       dataSource: triageAllergies,
       columns: allergiesObjectArray,
       display: triageAllergies?.length,
-      title: 'Allergies (Food & Drugs)',
+      title: "Allergies (Food & Drugs)",
     },
     {
       data: treatmentHeader,
-      title: 'Treatment Details',
+      title: "Treatment Details",
       renderer: FileSectionFrameWork,
       display: treatmentHeader,
       objectSpecifier: treatmentHeaderObjectArray,
@@ -963,7 +898,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     // Restructure and get the data in a better way so that we can actually check if we can render the data: Ndirangu
     {
       renderer: FileConsultationNotes,
-      title: 'Doctor Consultation Notes',
+      title: "Doctor Consultation Notes",
       data:
         treatmentHeader?.treatmentNo || (dischargeDetails && [0]?.admission_No),
       display:
@@ -972,7 +907,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: 'Diagnosis',
+      title: "Diagnosis",
       dataSource: diagnosis,
       renderer: FileSectionTable,
       display: diagnosis?.length,
@@ -980,7 +915,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       data: nursingTreatmentDetails,
-      title: 'Nursing Triage Details',
+      title: "Nursing Triage Details",
       display: !!nursingTreatmentDetails,
       renderer: FileSectionFrameWork,
       objectSpecifier: triageDetailsObjectArray,
@@ -988,16 +923,16 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     {
       pagination: false,
       renderer: FileSectionTable,
-      scroll: { x: 'max-content' },
+      scroll: { x: "max-content" },
       dataSource: tableTriageVitals,
-      title: 'Nursing Triage Vitals',
+      title: "Nursing Triage Vitals",
       display: nursingTriageVitals?.length,
       columns: triageVitalsObjectArray(nursingTriageVitals?.toReversed()),
     },
     // TODO check that we can pass the mental status checklist from the nurses, ask Mercy
     {
       renderer: FileConsultationNotes,
-      title: 'Mental Status checklist',
+      title: "Mental Status checklist",
       data:
         treatmentHeader?.treatmentNo || (dischargeDetails && [0]?.admission_No),
       display:
@@ -1006,7 +941,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: 'JV Form',
+      title: "JV Form",
       dataSource: jvForm,
       display: jvForm?.length,
       columns: jvFormObjectArray,
@@ -1014,7 +949,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: 'Dietrary Intake',
+      title: "Dietrary Intake",
       dataSource: dietaryIntake,
       renderer: FileSectionTable,
       display: dietaryIntake?.length,
@@ -1022,33 +957,33 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       data: generateFileTabsData({
-        labelKey: 'date',
+        labelKey: "date",
         data: nursingCareplan,
         component: FileSectionFrameWork,
         objectSpecifier: nursingCarePlanObjectArray,
         renderLabel: ({ month, year, day }) =>
-          dayjs(`${month} ${day} ${year}`).format('DD MMM YYYY'),
+          dayjs(`${month} ${day} ${year}`).format("DD MMM YYYY"),
       }),
-      title: 'Nursing Care Plans',
+      title: "Nursing Care Plans",
       renderer: FileSectionTabs,
       display: nursingCareplan?.length,
     },
     {
       data: generateFileTabsData({
-        labelKey: 'created_Date',
+        labelKey: "created_Date",
         data: dailyWardRounds,
         component: FileTabChildContent,
         objectSpecifier: dailyWardRoundsObjectArray,
         renderLabel: ({ month, year, day }) =>
-          dayjs(`${month} ${day} ${year}`).format('DD MMM YYYY'),
+          dayjs(`${month} ${day} ${year}`).format("DD MMM YYYY"),
       }),
-      title: 'Daily Ward Rounds',
+      title: "Daily Ward Rounds",
       renderer: FileSectionTabs,
       display: dailyWardRounds?.length,
     },
     {
       pagination: false,
-      title: 'Suicide Form List',
+      title: "Suicide Form List",
       renderer: FileSectionTable,
       dataSource: suicideFormList,
       display: suicideFormList?.length,
@@ -1056,7 +991,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: 'Visitor List',
+      title: "Visitor List",
       renderer: FileSectionTable,
       dataSource: visitorList,
       display: visitorList?.length,
@@ -1068,23 +1003,23 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       columns: allergiesObjectArray,
       dataSource: nursingTriageAllergies,
       display: nursingTriageAllergies?.length,
-      title: 'Nursing Allergies (Food & Drugs)',
+      title: "Nursing Allergies (Food & Drugs)",
     },
     {
       data: generateFileTabsData({
         data: cardex,
-        labelKey: 'systemCreatedAt',
+        labelKey: "systemCreatedAt",
         component: FileTabChildContent,
         objectSpecifier: nurseCardExObjectArray,
-        renderLabel: (value) => dayjs(value).format('DD MMM YYYY HH:mm A'),
+        renderLabel: (value) => dayjs(value).format("DD MMM YYYY HH:mm A"),
       }),
       display: cardex?.length,
-      title: 'Nurses Card X',
+      title: "Nurses Card X",
       renderer: FileSectionTabs,
     },
     {
       pagination: false,
-      title: 'Prescriptions',
+      title: "Prescriptions",
       dataSource: prescriptions,
       renderer: FileSectionTable,
       display: prescriptions?.length,
@@ -1093,7 +1028,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     // TODO Add lab and radiology here, Ndirangu
     {
       pagination: false,
-      title: 'Procedures',
+      title: "Procedures",
       dataSource: procedures,
       renderer: FileSectionTable,
       display: procedures?.length,
@@ -1101,7 +1036,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: 'Referrals',
+      title: "Referrals",
       dataSource: referrals,
       display: referrals?.length,
       renderer: FileSectionTable,
@@ -1118,7 +1053,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
           patientNo,
           encounterNo,
           patientCategory: encounterType,
-        }),
+        })
       );
     }
   }, [encounter]);
@@ -1127,40 +1062,36 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     <Drawer
       open={open}
       size="large"
-      width={'90%'}
-      style={{ overflowX: 'hidden' }}
+      width={"90%"}
+      style={{ overflowX: "hidden" }}
       styles={{
         header: {
-          padding: '8px 24px',
+          padding: "8px 24px",
         },
       }}
       title={
-        <Skeleton
-          paragraph={false}
-          loading={loading}
-          className="no-margin"
-        >
+        <Skeleton paragraph={false} loading={loading} className="no-margin">
           <Space
             style={{
-              display: 'flex',
-              alignItems: 'end',
-              justifyContent: 'space-between',
+              display: "flex",
+              alignItems: "end",
+              justifyContent: "space-between",
             }}
           >
             <h4
               style={{
-                color: '#555',
-                fontWeight: '300',
-                textTransform: 'capitalize',
+                color: "#555",
+                fontWeight: "300",
+                textTransform: "capitalize",
               }}
             >
               {SearchName?.toLowerCase()} Encounter
             </h4>
-            <h6 style={{ color: 'gray' }}>
+            <h6 style={{ color: "gray" }}>
               {appointmentDate === dischargeDate
-                ? dayjs(appointmentDate).format('DD MMM YYYY')
-                : `${dayjs(appointmentDate).format('DD MMM YYYY')} -
-                    ${dayjs(dischargeDate).format('DD MMM YYYY')}`}
+                ? dayjs(appointmentDate).format("DD MMM YYYY")
+                : `${dayjs(appointmentDate).format("DD MMM YYYY")} -
+                    ${dayjs(dischargeDate).format("DD MMM YYYY")}`}
             </h6>
           </Space>
         </Skeleton>
@@ -1173,10 +1104,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
         });
       }}
     >
-      <div
-        className="d-grid gap-4"
-        style={{ gridTemplateColumns: '1fr 5fr' }}
-      >
+      <div className="d-grid gap-4" style={{ gridTemplateColumns: "1fr 5fr" }}>
         <Skeleton
           title={false}
           loading={loading}
@@ -1184,13 +1112,13 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
         >
           <ul
             style={{
-              gap: '4px',
-              top: '0px',
-              display: 'grid',
-              listStyle: 'none',
-              position: 'sticky',
-              background: 'white',
-              height: 'fit-content',
+              gap: "4px",
+              top: "0px",
+              display: "grid",
+              listStyle: "none",
+              position: "sticky",
+              background: "white",
+              height: "fit-content",
             }}
           >
             {objectsToRenderFile
@@ -1199,15 +1127,15 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
                 <li
                   key={title}
                   style={{
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    textDecoration: 'none',
-                    color: display ? '#333' : 'gray',
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    textDecoration: "none",
+                    color: display ? "#333" : "gray",
                   }}
                   onClick={() => {
                     console.log({ ref: objectsToRenderRefs[index] });
                     objectsToRenderRefs.current[index]?.scrollIntoView({
-                      behavior: 'smooth',
+                      behavior: "smooth",
                     });
                   }}
                 >
@@ -1218,7 +1146,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
         </Skeleton>
         <div
           className="d-grid gap-4"
-          style={{ width: '100%', maxWidth: '720px' }}
+          style={{ width: "100%", maxWidth: "720px" }}
         >
           {objectsToRenderFile
             .filter(({ display }) => display)
@@ -1241,11 +1169,8 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
 
 const FileTitleSection = ({ title }) => {
   return (
-    <Space
-      direction="vertical"
-      style={{ width: '100%', overflowX: 'scroll' }}
-    >
-      <h5 style={{ color: '#777', fontWeight: '400' }}>{title}</h5>
+    <Space direction="vertical" style={{ width: "100%", overflowX: "scroll" }}>
+      <h5 style={{ color: "#777", fontWeight: "400" }}>{title}</h5>
       <Divider style={{ margin: 0 }} />
     </Space>
   );
@@ -1259,49 +1184,45 @@ const FileSectionFrameWork = forwardRef(
         loading={loading}
         paragraph={{ rows: objectSpecifier.length }}
       >
-        <Space
-          ref={ref}
-          direction="vertical"
-          style={{ width: '100%' }}
-        >
+        <Space ref={ref} direction="vertical" style={{ width: "100%" }}>
           {title && <FileTitleSection title={title} />}
-          <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
             {objectSpecifier?.map(
               ({
                 key,
                 dataIndex,
                 title,
-                render = (value) => value || 'N/A',
+                render = (value) => value || "N/A",
               }) => (
                 <li
                   key={key}
                   style={{
-                    padding: '8px 0',
-                    borderBottom: '.5px solid #d9d9d9',
+                    padding: "8px 0",
+                    borderBottom: ".5px solid #d9d9d9",
                   }}
                 >
                   <Space
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+                    <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
                       {title}
                     </span>
-                    <span style={{ color: 'gray', fontWeight: 'bolder' }}>
+                    <span style={{ color: "gray", fontWeight: "bolder" }}>
                       {render(data[dataIndex], data)}
                     </span>
                   </Space>
                 </li>
-              ),
+              )
             )}
           </ul>
         </Space>
       </Skeleton>
     );
-  },
+  }
 );
 
 const FileSectionTable = forwardRef(({ title, loading, ...props }, ref) => {
@@ -1314,14 +1235,10 @@ const FileSectionTable = forwardRef(({ title, loading, ...props }, ref) => {
       <Space
         ref={ref}
         direction="vertical"
-        style={{ width: '100%', overflowX: 'scroll' }}
+        style={{ width: "100%", overflowX: "scroll" }}
       >
         <FileTitleSection title={title} />
-        <Table
-          bordered
-          size="small"
-          {...props}
-        />
+        <Table bordered size="small" {...props} />
       </Space>
     </Skeleton>
   );
@@ -1333,7 +1250,7 @@ const FileConsultationNotes = forwardRef(({ title, loading, data }, ref) => {
       <Space
         ref={ref}
         direction="vertical"
-        style={{ width: '100%', overflowX: 'scroll' }}
+        style={{ width: "100%", overflowX: "scroll" }}
       >
         <FileTitleSection title={title} />
         <PatientSignsReport treatmentNo={data} />
@@ -1348,14 +1265,10 @@ const FileSectionTabs = forwardRef(({ title, loading, data }, ref) => {
       <Space
         ref={ref}
         direction="vertical"
-        style={{ width: '100%', overflowX: 'scroll' }}
+        style={{ width: "100%", overflowX: "scroll" }}
       >
         <FileTitleSection title={title} />
-        <Tabs
-          type="card"
-          items={data}
-          defaultActiveKey="1"
-        />
+        <Tabs type="card" items={data} defaultActiveKey="1" />
       </Space>
     </Skeleton>
   );
@@ -1366,11 +1279,11 @@ export const FileTabChildContent = ({ title, data, objectSpecifier }) => {
     <ul
       style={{
         margin: 0,
-        gap: '4px',
+        gap: "4px",
         padding: 0,
-        display: 'flex',
-        listStyle: 'none',
-        flexDirection: 'column',
+        display: "flex",
+        listStyle: "none",
+        flexDirection: "column",
       }}
     >
       {objectSpecifier.map(({ key, title, innerHTML }) => (
@@ -1384,10 +1297,7 @@ export const FileTabChildContent = ({ title, data, objectSpecifier }) => {
           >
             {title}
           </h5> */}
-          <Card
-            title={null}
-            style={{ padding: '16px', borderRadius: '0' }}
-          >
+          <Card title={null} style={{ padding: "16px", borderRadius: "0" }}>
             {innerHTML ? (
               <div dangerouslySetInnerHTML={{ __html: data[key] }} />
             ) : (

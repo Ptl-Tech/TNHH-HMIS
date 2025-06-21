@@ -1,38 +1,66 @@
-import { Button, Card, Col, message, Modal, Row, Space } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, redirect, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux"; // import dispatch hook
-import { useState } from "react";
-import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
-import InpatientCardInfo from "./InpatientCardInfo";
-import PatientVitalInfo from "../doctorsViews/Doctor-Forms/PatientVitalInfo";
+
+import { Button, Card, Col, message, Modal, Row, Space } from "antd";
+
 import CarePlan from "./CarePlan";
-import Medication from "./Medication";
 import Requests from "./Requests";
 import Discharges from "./Discharges";
+import Medication from "./Medication";
 import WardTransfer from "./WardTransfer";
+import InpatientCardInfo from "./InpatientCardInfo";
 import NursingPatientCharges from "./billing/NursingPatientCharges";
+import PatientVitalInfo from "../doctorsViews/Doctor-Forms/PatientVitalInfo";
+import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
+
 import useAuth from "../../hooks/useAuth";
+
 import {
+  postInitiateDischargeSlice,
   POST_INITIATE_DISCHARGE_FAILURE,
   POST_INITIATE_DISCHARGE_SUCCESS,
-  postInitiateDischargeSlice,
 } from "../../actions/nurse-actions/postInitiateDischargeSlice";
+import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { currentInpatient } from "../../actions/Doc-actions/currentInpatient";
+import { getSingleAdmittedSlice } from "../../actions/nurse-actions/getSingleAdmittedSlice";
 
 const InpatientCard = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const role = useAuth().userData.departmentName;
-  const location = useLocation();
-  const { patientDetails } = location.state || {};
-  const [activeTab, setActiveTab] = useState("1");
-  const [confirmLoading, setConfirmLoading] = useState(false); // loading state for modal buttons
-  const patientNo = new URLSearchParams(location.search).get("PatientNo");
-  const treatmentNo = new URLSearchParams(location.search).get("AdmNo");
   const { confirm } = Modal;
 
-  if (!patientDetails) {
-    return redirect("/login");
-  }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const role = useAuth().userData.departmentName;
+
+  const { patientDetails } = location.state || {};
+
+  const [activeTab, setActiveTab] = useState("1");
+  const [confirmLoading, setConfirmLoading] = useState(false); // loading state for modal buttons
+
+  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
+  const patientNo = new URLSearchParams(location.search).get("PatientNo");
+
+  const { error: singleAdmittedError, data: singleAdmittedData } = useSelector(
+    (state) => state.getSingleAdmitted
+  );
+
+  /* 
+    - The first useEffect gets a single admitted patient's data using the admissionNo in the URL's search params
+    - The second useEffect sets the admitted patient's data to the state for global use.
+  */
+
+  // First useEffect - getting admitted patient
+  useEffect(() => {
+    dispatch(getSingleAdmittedSlice(admissionNo));
+  }, [admissionNo]);
+
+  // Second useEffect - setting the addmited patient to global state
+  useEffect(() => {
+    if (singleAdmittedData) dispatch(currentInpatient(singleAdmittedData));
+  }, [singleAdmittedError, singleAdmittedData]);
+
+  if (!patientDetails) return redirect("/login");
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -58,6 +86,7 @@ const InpatientCard = () => {
         return null;
     }
   };
+
   const handleInitiateDischarge = () => {
     confirm({
       title: "Confirm Initiate Discharge",
@@ -83,7 +112,7 @@ const InpatientCard = () => {
     try {
       const result = await dispatch(
         postInitiateDischargeSlice("/Inpatient/InitiateDischarge", {
-          admissionNo: treatmentNo,
+          admissionNo,
         })
       );
 
@@ -106,6 +135,7 @@ const InpatientCard = () => {
       return Promise.reject();
     }
   };
+
   return (
     <div style={{ margin: "20px 10px" }}>
       <div className="d-flex justify-content-between align-items-center mb-2">
@@ -128,7 +158,7 @@ const InpatientCard = () => {
         </Col>
 
         <Col xs={24} md={8}>
-          <Card bodyStyle={{ padding: 16 }}>
+          <Card>
             <h5
               style={{
                 textAlign: "center",

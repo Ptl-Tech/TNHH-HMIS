@@ -1,37 +1,30 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { Input, Space, Table, Typography } from 'antd';
-import { MedicineBoxOutlined } from '@ant-design/icons';
+import { IoSearchOutline } from "react-icons/io5";
+import { Input, Space, Table, Typography } from "antd";
 
 export const SearchDrugTable = ({ items, loading, columns }) => {
   const { Title } = Typography;
-  const [filter, setFilter] = useState({ specificName: '', genericName: '' });
+  const [filter, setFilter] = useState({ specificName: "", genericName: "" });
 
   return (
-    <div style={{ display: 'grid', gap: '16px' }}>
-      <div>
-        <Title
-          level={5}
-          style={{
-            gap: '8px',
-            display: 'flex',
-            color: '#0f5689',
-            alignItems: 'center',
-          }}
-        >
-          <MedicineBoxOutlined />
-          Search Items
-        </Title>
-      </div>
+    <div className="d-grid gap-3">
+      <Title
+        level={5}
+        className="d-flex align-items-center gap-2 m-0 text-main-primary"
+      >
+        <IoSearchOutline />
+        Search Drugs
+      </Title>
       <Space
         style={{
-          width: '100%',
-          gap: '16px',
+          width: "100%",
+          gap: "16px",
         }}
       >
         <Input
           addonBefore="Specific Name"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           value={filter.specificName}
           onChange={(e) =>
             setFilter({ ...filter, specificName: e.currentTarget.value })
@@ -40,7 +33,7 @@ export const SearchDrugTable = ({ items, loading, columns }) => {
         />
         <Input
           addonBefore="Generic Name"
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           value={filter.genericName}
           onChange={(e) =>
             setFilter({ ...filter, genericName: e.currentTarget.value })
@@ -59,11 +52,11 @@ export const SearchDrugTable = ({ items, loading, columns }) => {
                 .filter(
                   (drug) =>
                     drug.Description.toLowerCase().includes(
-                      filter.specificName.toLowerCase(),
+                      filter.specificName.toLowerCase()
                     ) &&
                     drug.Description.toLowerCase().includes(
-                      filter.genericName.toLowerCase(),
-                    ),
+                      filter.genericName.toLowerCase()
+                    )
                 )
                 .map(({ No, ...item }) => ({ ...item, No, key: No }))
             : []

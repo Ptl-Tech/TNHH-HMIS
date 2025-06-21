@@ -1,17 +1,17 @@
+import { useLocation } from "react-router-dom";
+
 import { Card, Tabs } from "antd";
+
+import Medication from "./Medication";
+import AdmissionTab from "./AdmissionTab";
 import PatientRequests from "./PatientRequests";
 import ConsultationroomDetails from "./ConsultationroomDetails";
-import AdmissionTab from "./AdmissionTab";
-import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
-import Medication from "./Medication";
 
 const EvaluationCardContent = ({
+  role,
+  patientNo,
   treatmentNo,
   observationNo,
-  patientNo,
-  patientDetails,
-  role,
 }) => {
   const location = useLocation();
   const patientDetail = location.state?.patientDetails;
@@ -62,11 +62,3 @@ const EvaluationCardContent = ({
 };
 
 export default EvaluationCardContent;
-// props validation
-EvaluationCardContent.propTypes = {
-  treatmentNo: PropTypes.string,
-  observationNo: PropTypes.string,
-  patientNo: PropTypes.string,
-  patientDetails: PropTypes.object,
-  role: PropTypes.string,
-};

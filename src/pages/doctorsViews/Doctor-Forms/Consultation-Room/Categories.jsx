@@ -10,15 +10,26 @@ export const Categories = ({ categories, treatmentNo, multiple }) => {
     multiple ? categories.map(({ Category_ID }) => Category_ID) : null
   );
 
-  function renderFormItems(formItems) {
-    const { Input_Type } = formItems[0] || {};
+  function renderFormItems(formItems, inputType, sectionId) {
+    // Ensure the Doctor Notes works as well
+    // const { Input_Type } = formItems[0] || {};
 
-    switch (Input_Type) {
+    switch (inputType) {
       case "radio":
-        return <RadioInputs formItems={formItems} treatmentNo={treatmentNo} />;
+        return (
+          <RadioInputs
+            formItems={formItems}
+            sectionId={sectionId}
+            treatmentNo={treatmentNo}
+          />
+        );
       case "checkbox":
         return (
-          <CheckboxInputs formItems={formItems} treatmentNo={treatmentNo} />
+          <CheckboxInputs
+            formItems={formItems}
+            sectionId={sectionId}
+            treatmentNo={treatmentNo}
+          />
         );
       default:
         break;
@@ -45,6 +56,8 @@ export const Categories = ({ categories, treatmentNo, multiple }) => {
           (
             {
               formItems,
+              Input_Type,
+              Section_ID,
               subCategories,
               Category_ID: key,
               Category_Name: label,
@@ -76,7 +89,8 @@ export const Categories = ({ categories, treatmentNo, multiple }) => {
                     categories={subCategories}
                   />
                 )}
-                {formItems && renderFormItems(formItems)}
+                {formItems &&
+                  renderFormItems(formItems, Input_Type, Section_ID)}
               </Space>
             ),
           })

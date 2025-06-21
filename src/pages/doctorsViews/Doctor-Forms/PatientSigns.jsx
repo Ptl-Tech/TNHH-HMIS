@@ -13,9 +13,10 @@ const PatientSigns = ({ tree, searchValue, selectedTreeReport }) => {
   const location = useLocation();
 
   const { patientDetails } = location.state || {};
-  const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo") ||
-    new URLSearchParams(location.search).get("PatientNo");
-console.log("PatientSigns tree", tree);
+  const treatmentNo =
+    new URLSearchParams(location.search).get("TreatmentNo") ||
+    new URLSearchParams(location.search).get("AdmNo");
+
   const items = tree?.map(
     ({ Section_Name: label, Section_ID: key, categories }) => {
       const matchingResultsSection = selectedTreeReport.find(

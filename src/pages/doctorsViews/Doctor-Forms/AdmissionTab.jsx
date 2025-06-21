@@ -1,75 +1,51 @@
-import { useState } from "react";
+import { useSelector } from "react-redux";
+
+import { Tabs } from "antd";
+import { IoBedOutline } from "react-icons/io5";
+import { BsBookmarkCheck } from "react-icons/bs";
 import { UsergroupAddOutlined, PrinterOutlined } from "@ant-design/icons";
 
-import { Button, Space } from "antd";
-import { IoBedOutline } from "react-icons/io5";
-import AdmitPatientForm from "./AdmitPatient";
 import Referrals from "./Referrals";
-import LabResults from "./LabResults";
+import AdmitPatientForm from "./AdmitPatient";
+
 import SickOff from "../../nurse-view/discharges/SickOff";
+import AppointmentTCA from "../../nurse-view/discharges/AppointmentTCA";
 
 const AdmissionTab = () => {
-  const [activeItem, setActiveItem] = useState("Admission Requests");
-  const handleOnClick = (item) => {
-    setActiveItem(item.label);
-    switch (item.label) {
-      case "Admission Requests":
-        setSelectedItem(<AdmitPatientForm />);
-        break;
-      case "Patient Referals":
-        setSelectedItem(<Referrals />);
-        break;
-      case "Sick Off":
-        setSelectedItem(<SickOff />);
-        break;
-      default:
-        setSelectedItem(<LabResults />);
-    }
-  };
+  const { data: currentInpatient } = useSelector(
+    (state) => state.currentInpatient
+  );
 
-  const [selectedItem, setSelectedItem] = useState(<AdmitPatientForm />);
+  console.log({ currentInpatient });
+
   const buttonItems = [
     {
-      label: "Admission Requests",
       icon: <IoBedOutline />,
+      key: "admissionRequests",
+      label: "Admission Requests",
+      children: <AdmitPatientForm />,
     },
     {
+      key: "patientRefferals",
+      children: <Referrals />,
       label: "Patient Referals",
       icon: <UsergroupAddOutlined />,
     },
     {
+      key: "sickOff",
       label: "Sick Off",
+      children: <SickOff />,
       icon: <PrinterOutlined />,
+    },
+    {
+      key: "appointmentTCA",
+      label: "Appointment TCA",
+      icon: <BsBookmarkCheck />,
+      children: <AppointmentTCA currentInpatient={currentInpatient} />,
     },
   ];
 
-  return (
-    <div>
-      <Space
-        direction="horizontal"
-        size="middle"
-        style={{ marginBottom: "20px", display: "flex", flexWrap: "wrap" }}
-      >
-        {buttonItems.map((item, index) => (
-          <Button
-            key={index}
-            style={{
-              backgroundColor: "#0f5689",
-              color: "#ffffff",
-              border: "none",
-              padding: "18px 20px",
-            }}
-            className={activeItem === item.label ? "active-button" : ""}
-            onClick={() => handleOnClick(item)}
-          >
-            {item.icon}
-            {item.label}
-          </Button>
-        ))}
-      </Space>
-      <div>{selectedItem}</div>
-    </div>
-  );
+  return <Tabs type="card" items={buttonItems} />;
 };
 
 export default AdmissionTab;

@@ -8,6 +8,7 @@ import useAuth from "../../../hooks/useAuth";
 import PrescriptionForm from "./PrescriptionForm";
 import PrescriptionTable from "../tables/PrescriptionTable";
 import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
+import { pharmacyTable } from "../../pharmacy-views/pharmacy-utils";
 
 const Medication = () => {
   const dispatch = useDispatch();
@@ -18,15 +19,16 @@ const Medication = () => {
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientDetails = getLocation.state?.patientDetails;
 
+  const { data: sendtoPharmacyData } = useSelector(
+    (state) => state.sendtoPharmacy
+  );
   const { loadingPrescriptions, prescriptions } = useSelector(
     (state) => state.getQyPrescriptionLine
   );
 
-  console.log({ prescriptions });
-
   useEffect(() => {
     dispatch(getQyPrescriptionLineSlice(treatmentNo));
-  }, [dispatch, treatmentNo]);
+  }, [treatmentNo, sendtoPharmacyData]);
 
   return (
     <div>
@@ -45,6 +47,7 @@ const Medication = () => {
                 label: "Sent Prescriptions",
                 children: (
                   <PrescriptionTable
+                    columns={pharmacyTable}
                     filteredPrescriptions={prescriptions}
                     loadingPrescriptions={loadingPrescriptions}
                   />

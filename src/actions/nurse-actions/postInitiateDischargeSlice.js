@@ -83,9 +83,9 @@ export const getDischargeSummary =
         config
       );
 
-      dispatch({ type: GET_DISCHARGE_SUMMARY_SUCCESS, payload: data });
+      console.log({ data });
 
-      return { type: GET_DISCHARGE_SUMMARY_SUCCESS, payload: data };
+      dispatch({ type: GET_DISCHARGE_SUMMARY_SUCCESS, payload: data });
     } catch (error) {
       dispatch({
         type: POST_DISCHARGE_SUMMARY_FAILURE,
