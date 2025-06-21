@@ -26,6 +26,7 @@ import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
 import { shape } from "prop-types";
+import RefreshPatientCharges from "../RefreshPatientCharges";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -256,6 +257,9 @@ const ReceiptPatient = () => {
             </div>
           </Card>
           </Skeleton>
+                    <div className="d-flex justify-content-between gap-3 my-3">
+
+            <RefreshPatientCharges patientNo={patientVisitDetails?.PatientNo} activeVisitNo={activeVisitNo} />
           <div className="d-flex justify-content-end gap-3 my-3">
             <PrintReceipt
               receiptNo={
@@ -268,9 +272,11 @@ const ReceiptPatient = () => {
             patientNo={patientVisitDetails?.PatientNo}
             activeVisitNo={activeVisitNo}
           />
+        
             {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
+          </div>
           </div>
           <PatientCharges activeVisitNo={activeVisitNo} />
           <div className="row gap-3 gap-md-0">

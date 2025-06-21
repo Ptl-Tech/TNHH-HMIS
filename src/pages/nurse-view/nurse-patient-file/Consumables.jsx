@@ -1,5 +1,5 @@
 import { Button, message } from "antd";
-import { PlusOutlined, FilterOutlined } from "@ant-design/icons";
+import { PlusOutlined, FilterOutlined, SendOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,7 @@ const Consumables = () => {
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
   const userDetails = useAuth();
-const[loadingPostConsumables, setLoadingPostConsumables] = useState(false);
+  const [loadingPostConsumables, setLoadingPostConsumables] = useState(false);
   const [isConsumableFormVisible, setIsConsumableFormVisible] = useState(false);
 
   const { loadingGetPgOpenPatientConsumables, getPgOpenPatientConsumables } =
@@ -65,30 +65,44 @@ const[loadingPostConsumables, setLoadingPostConsumables] = useState(false);
   return (
     <div>
       <NurseInnerHeader icon={<FilterOutlined />} title="Order sheets" />
-<div className="flex justify-items-between items-center">
-  {!isConsumableFormVisible && (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "20px",
-        paddingBottom: "10px",
-        marginTop: "20px",
-      }}
-    >
-      <Button type="primary" onClick={handleVitalsButtonVisibility}>
-        <PlusOutlined />
-        Order Sheets
-      </Button>
-    </div>
-  )}
-  {consumables?.length > 0 && (
-    <Button type="default" onClick={handlePostOrderSheet} loading={loadingPostConsumables}>
-      Send Order to Pharmacy
-    </Button>
-  )}
-</div>
-
+      <div style={{ marginTop: "10px", display: "flex", gap: "10px",justifyContent: "space-between" }}>
+        {!isConsumableFormVisible && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              paddingBottom: "10px",
+              marginTop: "20px",
+            }}
+          >
+            <Button type="primary" onClick={handleVitalsButtonVisibility}>
+              <PlusOutlined />
+              New Order Sheet
+            </Button>
+          </div>
+        )}
+        {consumables?.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              paddingBottom: "10px",
+              marginTop: "20px",
+            }}
+          >
+          <Button
+            type="primary"
+            onClick={handlePostOrderSheet}
+            loading={loadingPostConsumables}
+          >
+          <SendOutlined />  
+            Send Order to Pharmacy
+          </Button>
+            </div>
+        )}
+      </div>
 
       {isConsumableFormVisible && (
         <ConsumablesFormData

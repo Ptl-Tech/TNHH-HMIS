@@ -19,13 +19,8 @@ const PatientReceiptLines = ({ activeVisitNo, onClose, visible }) => {
     }
   }, [dispatch, activeVisitNo]);
 
-  console.log("Receipt Header Data:", receiptHeader);
 
-  const handlePrintReceipt = (receiptNo) => {
-    console.log(`Print Receipt ${receiptNo}`);
-    // Implement the print functionality here
-  };
-
+  
   const columns = [
     {
       title: "Receipt No",

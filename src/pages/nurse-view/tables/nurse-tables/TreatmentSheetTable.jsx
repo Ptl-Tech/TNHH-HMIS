@@ -31,16 +31,29 @@ const TreatmentSheetTable = ({ loadingTreatmentSheet, treatmentSheet }) => {
       dataIndex: "Dosage",
       key: "Dosage",
     },
+   {
+  title: "Issued Date",
+  dataIndex: "IssuedDate",
+  key: "IssuedDate",
+  render: (date) => {
+    const d = new Date(date);
+    return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}/${d.getFullYear()}`;
+  },
+},
     {
-      title: "Issued Date",
-      dataIndex: "IssuedDate",
-      key: "IssuedDate",
-    },
-    {
-      title: "Issued Time",
-      dataIndex: "IssuedTime",
-      key: "IssuedTime",
-    },
+  title: "Issued Time",
+  dataIndex: "IssuedTime",
+  key: "IssuedTime",
+  render: (time) => {
+    const [hour, minute] = time.split(":");
+    const h = parseInt(hour, 10);
+    const suffix = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${minute} ${suffix}`;
+  },
+},
     {
       title: "Remarks",
       dataIndex: "Remarks",
