@@ -17,7 +17,6 @@ import {
 
 import { labLinesColumns, labResultsColumns } from "./utils";
 
-import { AiOutlineMore } from "react-icons/ai";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
@@ -27,11 +26,8 @@ import {
 } from "../../../../actions/lab-actions/postLabTestResults";
 import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
 import { getSingleLabDetails } from "../../../../actions/Doc-actions/getSingleLabRequestDetails";
-import { IoIosCloseCircle } from "react-icons/io";
 
 const LabResultsEntry = ({ data, loading }) => {
-  console.log({ data });
-
   // state
   const [openResults, setOpenResults] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
@@ -207,12 +203,6 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
     error: singleLabDetailsError,
     loading: singleLabDetailsLoading,
   } = useSelector((state) => state.singleLabDetails);
-
-  console.log({
-    singleLabDetails,
-    singleLabDetailsError,
-    singleLabDetailsLoading,
-  });
 
   const [results, setResults] = useState(
     [...initialData].map((item) => ({ ...item }))
