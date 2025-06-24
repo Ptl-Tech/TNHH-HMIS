@@ -289,7 +289,6 @@ import getPharmacyHistoryListReducer from "./pharmacy-reducers/getPharmacyHistor
 import getPharmacyRequestsAllReducer from "./pharmacy-reducers/getPharmacyRequestsAllReducer";
 import { postsalesInvoiceReducer } from "./ChargesReducers/postSalesInvoiceReducer";
 import { reopensalesInvoiceReducer } from "./ChargesReducers/postreopenSalesInvoiceReducer";
-import { postTestRemarksReducer } from "./lab-reducers/postTestRemarksReducer";
 import { postLabRequestToDoctorReducer } from "./lab-reducers/postLabRequestToDoctorReducer";
 import { getLabRequestReducer } from "./lab-reducers/getLabRequestReducer";
 import { getLabTestCodesReducer } from "./lab-reducers/getLabtestCodesReducer";
@@ -334,6 +333,7 @@ import { postDischargeDiagnosisReducer } from "./doc-reducers/postDischargeDiagn
 import { currentInpatientReducer } from "./doc-reducers/currentInpatientReducer";
 import { getSingleAdmittedReducer } from "./nurse-reducers/getSingleAdmittedReducer";
 import { getBriefMSENotesDataReducer } from "./nurse-reducers/getBriefMSEReducer";
+import { getSingleLabDetailsReducer } from "./doc-reducers/getSingleLabDetailsReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -454,12 +454,12 @@ export const rootReducer = combineReducers({
   // lab
   labList: getLabListReducer,
   labDetails: getLabDetailsReducer,
+  singleLabDetails: getSingleLabDetailsReducer,
   getLabRequest: getLabRequestReducer,
   getLabTestCodes: getLabTestCodesReducer,
   getLabTestResults: getLabTestResultsReducer,
   postLabSample: postLabSampleReducer,
   postLabTest: postLabTestReducer,
-  postTestRemarks: postTestRemarksReducer,
   postLabTestLines: postLabTestLinesReducer,
   postLabTestResults: postLabTestResultsReducer,
   createLabTestHeader: createLabTestHeaderReducer,

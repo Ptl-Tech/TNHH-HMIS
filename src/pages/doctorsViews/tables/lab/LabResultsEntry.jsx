@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+  Flex,
   Form,
   Input,
+  Space,
   Table,
   Drawer,
   Button,
+  Popover,
   message,
   Typography,
   InputNumber,
-  Flex,
-  Dropdown,
-  Modal,
-  Space,
-  Popover,
 } from "antd";
 
 import { labLinesColumns, labResultsColumns } from "./utils";
@@ -25,19 +22,15 @@ import Loading from "../../../../partials/nurse-partials/Loading";
 import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
 import {
-  POST_LAB_TEST_REMARKS_RESET,
-  postTestRemarks,
-} from "../../../../actions/lab-actions/postTestRemarks";
-import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
-import {
-  POST_LAB_TEST_RESULTS_RESET,
   postLabTestResults,
+  POST_LAB_TEST_RESULTS_RESET,
 } from "../../../../actions/lab-actions/postLabTestResults";
+import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
+import { getSingleLabDetails } from "../../../../actions/Doc-actions/getSingleLabRequestDetails";
 
 const LabResultsEntry = ({ data, loading }) => {
   // state
   const [openResults, setOpenResults] = useState(false);
-  const [openRemarks, setOpenRemarks] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
 
   const showResultsDrawer = (record) => {
@@ -55,16 +48,6 @@ const LabResultsEntry = ({ data, loading }) => {
     setOpenResults(false);
   };
 
-  const showRemarksDrawer = (record) => {
-    setCurrentRecord(record);
-    setOpenRemarks(true);
-  };
-
-  const handleRemarksCancel = () => {
-    setCurrentRecord(null);
-    setOpenRemarks(false);
-  };
-
   const { Title } = Typography;
 
   const columns = [
@@ -74,11 +57,7 @@ const LabResultsEntry = ({ data, loading }) => {
       title: "Add results",
       render: (_, record) => {
         return (
-          <TestMenu
-            record={record}
-            handleOpenResults={showResultsDrawer}
-            handleOpenRemarks={showRemarksDrawer}
-          />
+          <TestMenu record={record} handleOpenResults={showResultsDrawer} />
         );
       },
     },
@@ -107,18 +86,13 @@ const LabResultsEntry = ({ data, loading }) => {
             handleOk={handleResultsOk}
             handleCancel={handleResultsCancel}
           />
-          <RemarksModal
-            open={openRemarks}
-            record={currentRecord}
-            handleCancel={handleRemarksCancel}
-          />
         </>
       )}
     </div>
   );
 };
 
-const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
+const TestMenu = ({ record, handleOpenResults }) => {
   const [open, setOpen] = useState(false);
 
   const items = [
@@ -134,21 +108,6 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
           }}
         >
           Add Test Results
-        </Button>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <Button
-          block
-          type="text"
-          onClick={() => {
-            setOpen(false);
-            handleOpenRemarks(record);
-          }}
-        >
-          {record.Remarks ? "View Final Remarks" : "Add Final Remarks"}
         </Button>
       ),
     },
@@ -175,174 +134,48 @@ const TestMenu = ({ record, handleOpenResults, handleOpenRemarks }) => {
 };
 
 const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
-  console.log({ record });
-
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector(
-    (state) => state.getLabTestResults
-  );
+
+  const {
+    data: resultsData,
+    error: resultsError,
+    loading: resultsLoading,
+  } = useSelector((state) => state.getLabTestResults);
+
   const { LaboratoryTestName } = record || {};
+  const { Laboratory_No: labNo, LaboratoryTestCode: testCode } = record || {};
 
   useEffect(() => {
-    if (!record) return;
-    dispatch(
-      getLabTestResults({
-        labNo: record.Laboratory_No,
-        testCode: record.LaboratoryTestCode,
-      })
-    );
+    if (record) dispatch(getLabTestResults({ labNo, testCode }));
   }, [record]);
 
   return (
     <Drawer
       open={open}
       size="large"
-      title={`Results for ${LaboratoryTestName}`}
       onOk={handleOk}
-      onCancel={handleCancel}
+      onCancel={() => {
+        setRemarks("");
+        handleCancel();
+      }}
+      destroyOnHidden={true}
+      title={`Results for ${LaboratoryTestName}`}
       extra={<Button onClick={handleCancel}>Cancel</Button>}
     >
-      {loading ? (
+      {resultsLoading ? (
         <SkeletonLoading />
       ) : (
-        <ResultsTable initialData={data} error={error} loading={loading} />
+        <ResultsTable
+          error={resultsError}
+          loading={resultsLoading}
+          initialData={resultsData}
+          currentLabLine={{
+            recId: record?.SystemId,
+            laboratoryNo: record?.Laboratory_No,
+          }}
+        />
       )}
     </Drawer>
-  );
-};
-
-const RemarksModal = ({ record, open, handleCancel }) => {
-  const dispatch = useDispatch();
-
-  const { data, loading, error } = useSelector(
-    (state) => state.postTestRemarks
-  );
-
-  useEffect(() => {
-    if (data) {
-      const { status } = data;
-      status === "success"
-        ? message.success("Remarks posted successfully")
-        : message.error("Something went wrong");
-
-      dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
-    }
-
-    if (error) {
-      message.info("Something went wrong");
-      dispatch({ type: POST_LAB_TEST_REMARKS_RESET });
-    }
-
-    if (loading) message.info("Submitting remarks");
-  }, [data, loading]);
-
-  return (
-    <Modal open={open} size="large" title={`Final Test Remarks`} footer={null}>
-      {loading ? (
-        <SkeletonLoading />
-      ) : (
-        <RemarkForm record={record} handleCancel={handleCancel} />
-      )}
-    </Modal>
-  );
-};
-
-const RemarkForm = ({ record, handleCancel }) => {
-  // destructor
-  const { TextArea } = Input;
-  const { Item, useForm } = Form;
-
-  // hooks
-  const [form] = useForm();
-  const dispatch = useDispatch();
-
-  const { data, error, loading } = useSelector(
-    (state) => state.postTestRemarks
-  );
-
-  // handling pushing code
-  const onFinish = async (data) => {
-    const { remarks } = data;
-    console.log({ record });
-
-    const {
-      SystemId,
-      Laboratory_No,
-      Positive,
-      LaboratoryTestCode,
-      SpecimenCode,
-      MeasuringUnitCode,
-      CountValue,
-    } = record;
-
-    console.log({ remarks });
-
-    const finalData = {
-      remarks,
-      recId: SystemId,
-      myAction: "edit",
-      positive: Positive,
-      laboratoryNo: Laboratory_No,
-      labTestCode: LaboratoryTestCode,
-      specimenCode: SpecimenCode,
-      unitOfMeasure: MeasuringUnitCode,
-      countValue: CountValue,
-    };
-
-    await dispatch(postTestRemarks(finalData));
-    form.resetFields();
-    handleCancel();
-  };
-
-  return (
-    <>
-      {loading ? (
-        <SkeletonLoading />
-      ) : (
-        <Form
-          form={form}
-          name="sampleForm"
-          layout="vertical"
-          autoComplete="off"
-          onFinish={onFinish}
-        >
-          <Item
-            name="remarks"
-            label="Sample Description"
-            rules={[
-              {
-                required: true,
-                message: "Please add a description for your sample",
-              },
-            ]}
-          >
-            <TextArea />
-          </Item>
-          <Space
-            style={{
-              justifyContent: "flex-end",
-              display: "flex",
-              width: "100%",
-            }}
-          >
-            <Item label={null}>
-              <Button
-                onClick={handleCancel}
-                htmlType="button"
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-            </Item>
-            <Item label={null}>
-              <Button type="primary" htmlType="submit" disabled={loading}>
-                {loading ? "Loading..." : "Submit Remark"}
-              </Button>
-            </Item>
-          </Space>
-        </Form>
-      )}
-    </>
   );
 };
 
@@ -385,40 +218,75 @@ const EditableCell = ({
   );
 };
 
-const ResultsTable = ({ initialData, error, loading }) => {
-  const { useForm } = Form;
+const ResultsTable = ({ loading, initialData, currentLabLine }) => {
+  const { TextArea } = Input;
+  const { Item, useForm } = Form;
+
+  const { recId, laboratoryNo } = currentLabLine;
+
+  console.log({ currentLabLine });
+
   const [form] = useForm();
   const dispatch = useDispatch();
 
-  const [editingKey, setEditingKey] = useState(null);
+  const {
+    data: labResultsData,
+    error: labResultsError,
+    loading: labResultsLoading,
+  } = useSelector((state) => state.postLabTestResults);
+  const {
+    data: singleLabDetails,
+    error: singleLabDetailsError,
+    loading: singleLabDetailsLoading,
+  } = useSelector((state) => state.singleLabDetails);
+
+  console.log({
+    singleLabDetails,
+    singleLabDetailsError,
+    singleLabDetailsLoading,
+  });
 
   const [results, setResults] = useState(
     [...initialData].map((item) => ({ ...item }))
   );
+  const [editingKey, setEditingKey] = useState(null);
+  const [remarks, setRemarks] = useState(singleLabDetails?.Remarks || "");
 
-  const {
-    data: labResultsData,
-    loading: labResultsLoading,
-    error: labResultsError,
-  } = useSelector((state) => state.postLabTestResults);
+  useEffect(() => {
+    // fetching the current lab request both initially and after we have changed the remarks
+    dispatch(getSingleLabDetails(laboratoryNo, recId));
+  }, [labResultsData]);
+
+  // This will set the remarks to be the value of the singleLabDetails after it loads
+  useEffect(() => {
+    if (singleLabDetails) setRemarks(singleLabDetails?.Remarks);
+  }, [singleLabDetails]);
 
   useEffect(() => {
     if (labResultsData) {
-      const { status } = labResultsData;
-      status === "success"
+      const { labResults, labRemarks } = labResultsData;
+      labRemarks?.status === "success" && labResults?.status === "success"
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
-
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
     }
 
     if (labResultsError) {
-      message.error("Something went wrong");
+      message.error(labResultsError);
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
     }
 
     if (labResultsLoading) message.info("Submitting the results");
   }, [labResultsData, labResultsLoading, labResultsError]);
+
+  const {
+    Positive,
+    SystemId,
+    CountValue,
+    SpecimenCode,
+    MeasuringUnitCode,
+    LaboratoryTestCode,
+  } = singleLabDetails || {};
 
   const isEditing = (record) => record.Specimen_Code === editingKey;
 
@@ -452,40 +320,67 @@ const ResultsTable = ({ initialData, error, loading }) => {
   };
 
   const handleSubmit = () => {
+    if (!(recId && SystemId)) return;
+
+    const finalData = {
+      recId,
+      remarks,
+      laboratoryNo,
+      myAction: "edit",
+      positive: Positive,
+      countValue: CountValue,
+      specimenCode: SpecimenCode,
+      labTestCode: LaboratoryTestCode,
+      unitOfMeasure: MeasuringUnitCode,
+    };
+
     if (editingKey) {
       setEditingKey(null);
     } else {
-      dispatch(postLabTestResults([...results]));
+      dispatch(postLabTestResults([...results], finalData));
     }
   };
 
   return (
     <>
-      {loading ? (
+      {loading || singleLabDetailsLoading ? (
         <SkeletonLoading />
       ) : (
-        <Form form={form} component={false}>
-          <Table
-            rowClassName={"editable-row"}
-            onRow={(record) => ({
-              onClick: () => edit(record),
-            })}
-            footer={() => (
-              <Flex justify="end" onClick={handleSubmit}>
-                <Button type="primary" disabled={labResultsLoading}>
-                  {labResultsLoading
-                    ? "Loading..."
-                    : editingKey
-                    ? "Preview"
-                    : "Submit"}
-                </Button>
-              </Flex>
-            )}
-            columns={columns}
-            components={{ body: { cell: EditableCell } }}
-            dataSource={results}
-            pagination={false}
-          />
+        <Form form={form} layout="vertical" component={false} clearOnDestroy>
+          <Space direction="vertical" className="gap-2 m-0 p-0">
+            <Table
+              columns={columns}
+              pagination={false}
+              dataSource={results}
+              rowClassName={"editable-row"}
+              onRow={(record) => ({
+                onClick: () => edit(record),
+              })}
+              components={{ body: { cell: EditableCell } }}
+            />
+            <Item layout="vertical" label="Add Comments">
+              <TextArea
+                value={remarks}
+                defaultValue={remarks}
+                onChange={(e) => {
+                  setRemarks(e.target.value);
+                }}
+              />
+            </Item>
+            <Flex justify="end">
+              <Button
+                type="primary"
+                onClick={handleSubmit}
+                disabled={labResultsLoading}
+              >
+                {labResultsLoading
+                  ? "Loading..."
+                  : editingKey
+                  ? "Preview"
+                  : "Submit"}
+              </Button>
+            </Flex>
+          </Space>
         </Form>
       )}
     </>

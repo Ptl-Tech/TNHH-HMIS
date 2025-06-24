@@ -1,127 +1,84 @@
-import { Route } from 'react-router-dom';
-import MainLayout from '../Layouts/MainLayout';
+import { Route } from "react-router-dom";
+import MainLayout from "../Layouts/MainLayout";
 
 import {
-  AppstoreOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  HistoryOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-  PlusCircleOutlined,
-  QuestionCircleOutlined,
   SendOutlined,
-  SnippetsOutlined,
   UndoOutlined,
   UserOutlined,
-} from '@ant-design/icons';
+  LoginOutlined,
+  LogoutOutlined,
+  AppstoreOutlined,
+  PlusCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
 
-import PrivateRoute from '../private/PrivateRoute';
-import LabDashboard from '../Dashboards/LabDashboard';
-import LabRequests from '../pages/doctorsViews/tables/lab/LabRequests';
-import LaboratoryEvaluationCard from '../pages/doctorsViews/tables/lab/LaboratoryEvaluationCard';
+import PrivateRoute from "../private/PrivateRoute";
+import LabDashboard from "../Dashboards/LabDashboard";
+import LabRequests from "../pages/doctorsViews/tables/lab/LabRequests";
+import LaboratoryEvaluationCard from "../pages/doctorsViews/tables/lab/LaboratoryEvaluationCard";
+import { IoAlbums } from "react-icons/io5";
 
 const statuses = [
-  { name: 'New', icon: <PlusCircleOutlined /> },
-  { name: 'Forwarded', icon: <SendOutlined /> },
+  { name: "New", icon: <PlusCircleOutlined /> },
+  { name: "Forwarded", icon: <SendOutlined /> },
   {
-    name: 'Review',
-    icon: <QuestionCircleOutlined style={{ color: '#fff' }} />,
+    name: "Review",
+    icon: <QuestionCircleOutlined style={{ color: "#fff" }} />,
   },
   {
-    name: 'Completed',
-    icon: <CheckCircleOutlined style={{ color: '#fff' }} />,
+    name: "Completed",
+    icon: <CheckCircleOutlined style={{ color: "#fff" }} />,
   },
-  { name: 'Recalled', icon: <UndoOutlined style={{ color: '#fff' }} /> },
+  { name: "Recalled", icon: <UndoOutlined style={{ color: "#fff" }} /> },
   {
-    name: 'Voided',
-    icon: <CloseCircleOutlined style={{ color: '#fff' }} />,
+    name: "Voided",
+    icon: <CloseCircleOutlined style={{ color: "#fff" }} />,
   },
 ];
-
-const allPatientStatusLinks = statuses.map(({ name, icon }) => ({
-  key: `/Lab/All/${name}`,
-  label: `All ${name} Requests`,
-  icon,
-}));
-
-const outPatientStatusLinks = statuses.map(({ name, icon }) => ({
-  key: `/Lab/Outpatient/${name}`,
-  label: `${name} Laboratory Outpatient`,
-  icon,
-}));
-
-const inPatientStatusLinks = statuses.map(({ name, icon }) => ({
-  key: `/Lab/Inpatient/${name}`,
-  label: `${name} Laboratory Inpatient`,
-  icon,
-}));
-
-const walkInPatientStatusLinks = statuses.map(({ name, icon }) => ({
-  key: `/Lab/Walk-In/${name}`,
-  label: `${name} Laboratory Walk In`,
-  icon,
-}));
 
 // Define the menu items
 export const labRoutes = [
   {
-    key: '/Lab',
-    icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-    label: 'Dashboard',
+    key: "/Lab",
+    icon: <AppstoreOutlined style={{ color: "#fff" }} />,
+    label: "Dashboard",
   },
   {
-    key: '/Lab/All',
-    label: 'All Laboratory Requests',
-    icon: <SnippetsOutlined style={{ color: '#fff' }} />,
-    children: allPatientStatusLinks,
+    key: "/Lab/All",
+    label: "All Laboratory Requests",
+    icon: <IoAlbums style={{ color: "#fff" }} />,
   },
   {
-    key: '/Lab/Outpatient',
-    label: 'Laboratory Outpatient',
-    icon: <LogoutOutlined style={{ color: '#fff' }} />,
-    children: outPatientStatusLinks,
+    key: "/Lab/Outpatient",
+    label: "Laboratory Outpatient",
+    icon: <LogoutOutlined style={{ color: "#fff" }} />,
   },
   {
-    key: '/Lab/Inpatient',
-    label: 'Laboratory Inpatient',
-    icon: <LoginOutlined style={{ color: '#fff' }} />,
-    children: inPatientStatusLinks,
+    key: "/Lab/Inpatient",
+    label: "Laboratory Inpatient",
+    icon: <LoginOutlined style={{ color: "#fff" }} />,
   },
   {
-    key: '/Lab/Walk-In',
-    label: 'Laboratory Walk In',
-    icon: <UserOutlined style={{ color: '#fff' }} />,
-    children: walkInPatientStatusLinks,
+    key: "/Lab/Walk-In",
+    label: "Laboratory Walk In",
+    icon: <UserOutlined style={{ color: "#fff" }} />,
   },
 ];
 
 export default function LabRoutes() {
   return (
     <>
-      <Route element={<PrivateRoute allowedDepartments={['Laboratory']} />}>
-        <Route
-          path="/Lab"
-          element={<MainLayout />}
-        >
-          <Route
-            index
-            element={<LabDashboard />}
-          />
+      <Route element={<PrivateRoute allowedDepartments={["Laboratory"]} />}>
+        <Route path="/Lab" element={<MainLayout />}>
+          <Route index element={<LabDashboard />} />
           {/* All */}
-          <Route
-            path="/Lab/All"
-            element={<LabRequests requestType="All" />}
-          />
+          <Route path="/Lab/All" element={<LabRequests requestType="All" />} />
           {statuses.map(({ name }) => (
             <Route
               key={name}
-              element={
-                <LabRequests
-                  status={name}
-                  requestType="All"
-                />
-              }
+              element={<LabRequests status={name} requestType="All" />}
               path={`/Lab/All/${name}`}
             />
           ))}
@@ -133,12 +90,7 @@ export default function LabRoutes() {
           {statuses.map(({ name }) => (
             <Route
               key={name}
-              element={
-                <LabRequests
-                  status={name}
-                  requestType="Outpatient"
-                />
-              }
+              element={<LabRequests status={name} requestType="Outpatient" />}
               path={`/Lab/Outpatient/${name}`}
             />
           ))}
@@ -154,12 +106,7 @@ export default function LabRoutes() {
           {statuses.map(({ name }) => (
             <Route
               key={name}
-              element={
-                <LabRequests
-                  status={name}
-                  requestType="Walk-In"
-                />
-              }
+              element={<LabRequests status={name} requestType="Walk-In" />}
               path={`/Lab/Walk-In/${name}`}
             />
           ))}
@@ -175,12 +122,7 @@ export default function LabRoutes() {
           {statuses.map(({ name }) => (
             <Route
               key={name}
-              element={
-                <LabRequests
-                  status={name}
-                  requestType="Inpatient"
-                />
-              }
+              element={<LabRequests status={name} requestType="Inpatient" />}
               path={`/Lab/Inpatient/${name}`}
             />
           ))}

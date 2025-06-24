@@ -1,5 +1,6 @@
 import axios from "axios";
 import { message } from "antd";
+import apiHeaderConfig from "../configHelpers";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
@@ -12,29 +13,13 @@ export const REQUEST_LAB_DETAILS_SUCCESS = "REQUEST_LAB_DETAILS_SUCCESS";
 export const getLabDetails = (labNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_LAB_DETAILS });
-
-    const {
-      otpVerify: { userInfo },
-    } = getState();
-
-    // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem("branchCode") || "";
+    var query = `${API}data/odatafilter?isList=true&webservice=PgLaboratoryTestLines&query=$filter=Laboratory_No eq '${labNo}'`;
 
     // Set up the request configuration with headers
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
-        branchCode,
-      },
-    };
+    const config = apiHeaderConfig(getState);
 
     // API request
-    const { data } = await axios.get(
-      `${API}data/odatafilter?isList=true&webservice=PgLaboratoryTestLines&query=$filter=Laboratory_No eq '${labNo}'`,
-      config
-    );
+    const { data } = await axios.get(query, config);
 
     // Dispatch success action with the fetched data
     dispatch({
