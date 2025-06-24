@@ -1,30 +1,19 @@
-import { Button, Divider } from "antd";
 import { useEffect, useState } from "react";
-import PatientInfo from "./nurse-patient-file/PatientInfo";
-import NextOfKin from "./nurse-patient-file/NextOfKin";
-import PastDoctorNotes from "./nurse-patient-file/PastDoctorNotes";
-import NursingNotes from "./nurse-patient-file/NursingNotes";
-import Consumables from "./nurse-patient-file/Consumables";
-import PropTypes from "prop-types";
-import useAuth from "../../hooks/useAuth";
-import TCAAppointments from "./nurse-care-plan/TCAAppointments";
-import {
-  UserOutlined,
-  FileMarkdownOutlined,
-  FileProtectOutlined,
-  FilterOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
 import { useDispatch } from "react-redux";
+
+import { Button, Divider } from "antd";
+import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
+
+import NextOfKin from "./nurse-patient-file/NextOfKin";
+import PatientInfo from "./nurse-patient-file/PatientInfo";
+import TCAAppointments from "./nurse-care-plan/TCAAppointments";
+
 import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
-import { useLocation } from "react-router-dom";
 
 const PatientFile = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Patient Info");
-  const userRole = useAuth();
+
   const dispatch = useDispatch();
-  const location = useLocation();
-  const patientDetail = location.state?.patientDetails;
 
   const [selectedItem, setSelectedItem] = useState(
     <PatientInfo patientDetails={patientDetails} />
@@ -33,24 +22,7 @@ const PatientFile = ({ patientDetails }) => {
   // Define menu items conditionally
   const menuItems = [
     { label: "Patient Info", icon: <UserOutlined /> },
-    // "Medical Info",
     { label: "Next of Kin", icon: <UserAddOutlined /> },
-    // ...(userRole.userData.departmentName === "Doctor" ||
-    // userRole.userData.departmentName === "Nurse" ||
-    // (userRole.userData.departmentName === "Psychology" &&
-    //   patientDetail?.Status !== "Completed")
-    //   ? [{ label: "Past Doctor Notes", icon: <FileMarkdownOutlined /> }]
-    //   : []),
-    // "Nursing Notes",
-    ...(userRole.userData.departmentName === "Nurse"
-      ? [{ label: "Nursing Notes", icon: <FileProtectOutlined /> }]
-      : []),
-    // "Consumables",
-    // ...(userRole.userData.departmentName === "Nurse"
-    //   ? [{ label: "Order Sheet", icon: <FilterOutlined /> }]
-    //   : []),
-
-    // ...(userRole.userData.departmentName === "Doctor" ? ["TCA"] : []),
   ];
 
   useEffect(() => {
@@ -63,27 +35,9 @@ const PatientFile = ({ patientDetails }) => {
       case "Patient Info":
         setSelectedItem(<PatientInfo />);
         break;
-      // case "Medical Info":
-      //   setSelectedItem(<MedicalInfo />);
-      //   break;
       case "Next of Kin":
         setSelectedItem(<NextOfKin />);
         break;
-      // case "Past Doctor Notes":
-      //   setSelectedItem(<PastDoctorNotes />);
-      //   break;
-      case "Nursing Notes":
-        setSelectedItem(<NursingNotes />);
-        break;
-      // case "Past Encounters Notes":
-      //   setSelectedItem(<PastDoctorNotes />);
-      //   break;
-      // case "Order Sheet":
-      //   setSelectedItem(<Consumables />);
-      //   break;
-      // case "Charges":
-      //   setSelectedItem(<Charges/>);
-      //   break;
       case "TCA":
         setSelectedItem(<TCAAppointments />);
         break;
@@ -121,8 +75,3 @@ const PatientFile = ({ patientDetails }) => {
 };
 
 export default PatientFile;
-
-// Props validation
-PatientFile.propTypes = {
-  patientDetails: PropTypes.object,
-};

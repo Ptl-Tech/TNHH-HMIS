@@ -17,13 +17,12 @@ const TreatmentCardContent = () => {
   const { loadingConsultationRoomList, consultationRoomList } = useSelector(
     (state) => state.getPatientConsultationList
   );
-const { loading: loadingInpatientEncounters, data:inpatientEncounters } = useSelector((state) => state.getInpatientPastEncounters) || {};
-
+  const { loading: loadingInpatientEncounters, data: inpatientEncounters } =
+    useSelector((state) => state.getInpatientPastEncounters) || {};
 
   const { triageWaitingList } = useSelector(
     (state) => state.getTriageWaitingList
   );
-
 
   const formattedTriageWaitingList = useMemo(() => {
     return triageWaitingList?.map((patient) => ({
@@ -86,10 +85,10 @@ const { loading: loadingInpatientEncounters, data:inpatientEncounters } = useSel
             boxShadow: "10px 10px 10px 10px #e6e6e6",
           }}
         >
-          <EncounterListInPatientTable 
+          <EncounterListInPatientTable
+            patientNo={patientNo}
             filteredList={combinedInpatientList}
             loadingConsultationRoomList={loadingInpatientEncounters}
-            patientNo={patientNo}
           />
         </Card>
       ),
@@ -101,7 +100,7 @@ const { loading: loadingInpatientEncounters, data:inpatientEncounters } = useSel
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getConsultationSlice(patientNo, 'Completed'));
+    dispatch(getConsultationSlice(patientNo, "Completed"));
   }, [dispatch, patientNo]);
 
   useEffect(() => {

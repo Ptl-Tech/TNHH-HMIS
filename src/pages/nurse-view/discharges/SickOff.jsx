@@ -1,95 +1,87 @@
-import { Button, Form } from "antd";
-import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import SickOffTable from "../tables/nurse-tables/SickOffTable";
-import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useAuth from "../../../hooks/useAuth";
-import SickOffFormData from "../nurse-forms/SickOffFormData";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAdmittedSinglePatient } from "../../../actions/Doc-actions/Admission/getAdmittedPatients";
+import { useLocation } from "react-router-dom";
 
-const SickOff = () => {
-  const [selectedRowKey, setSelectedRowKey] = useState(null);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [selectedRow, setSelectedRow] = useState([]);
-  const role = useAuth().userData.departmentName
-  const [isFormVisible, setIsFormVisible] = useState(true);
-  const [isViewing, setIsViewing] = useState(role === "Nurse");
-  const location = useLocation();
-  const admissionNo = new URLSearchParams(location.search).get("AdmNo");
-  const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
+import { Card, Drawer, Space, Tabs, message, Button, Skeleton } from "antd";
+import { PrinterOutlined, CloseCircleFilled } from "@ant-design/icons";
 
-  const dispatch = useDispatch();
+import PDFViewer from "../../../components/PDFView";
+import { NoData } from "../../../components/NoData";
+import SickOffFormData from "../nurse-forms/SickOffFormData";
 
-  const [form] = Form.useForm();
+import {
+  postPrintSickOff,
+  POST_PRINT_SICK_OFF_RESET,
+} from "../../../actions/Doc-actions/postPrintSickOff";
 
-  const { loading: loadingSickOff, admissions: getSickOffData } = useSelector(
-    (state) => state.getSingleAdmittedPatient
-  );
+const SickOff = ({ currentInpatient }) => {
+  const searchParams = new URLSearchParams(useLocation().search);
 
-  const rowSelection = {
-    selectedRowKeys: selectedRowKey ? [selectedRowKey] : [], // Controlled selection
-    onChange: (selectedRowKeys, selectedRows) => {
-      if (selectedRowKeys.length > 1) {
-        setSelectedRowKey(selectedRowKeys[selectedRowKeys.length - 1]); // Keep the most recently selected row
-        setSelectedRow([selectedRows[selectedRows.length - 1]]); // Update the selected row
-      } else {
-        setSelectedRowKey(selectedRowKeys[0]); // Update the selected row key
-        setSelectedRow(selectedRows); // Update the selected row
-      }
-      setIsButtonDisabled(selectedRowKeys.length === 0); // Enable or disable buttons
+  const admissionNo = searchParams.get("AdmNo");
+  const treatmentNo = searchParams.get("TreatmentNo");
+
+  const isInpatient = Boolean(admissionNo);
+
+  const items = [
+    {
+      key: "sickOffForm",
+      label: "Sick off Form",
+      children: <SickOffFormData currentInpatient={currentInpatient} />,
     },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User", // Disable specific rows if needed
-    }),
-  };
-
-  const handleButtonVisibility = () => {
-    setIsViewing(false);
-    setIsFormVisible(!isFormVisible);
-  };
-
-  useEffect(() => {
-    dispatch(getAdmittedSinglePatient(admissionNo, treatmentNo));
-  }, [admissionNo, treatmentNo, dispatch]);
-
-  return (
-    <div>
-      
-      {/* <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "20px",
-        }}
-      >
-        <Button type="primary" onClick={handleButtonVisibility}>
-          <PlusOutlined /> Add Sick Off
-        </Button>
-      </div> */}
-
-      {isFormVisible && (
-        <SickOffFormData
-          setIsFormVisible={setIsFormVisible}
-          form={form}
-          isViewing={isViewing}
+    {
+      key: "sickOffCard",
+      label: "Print Sick Off",
+      children: (
+        <SickOffCard
+          posted={true}
           admissionNo={admissionNo}
           treatmentNo={treatmentNo}
+          isInpatient={isInpatient}
         />
-      )}
-
-      {!isFormVisible && (
-        <SickOffTable
-          admissionNo={admissionNo}
-          rowSelection={rowSelection}
-          form={form}
-          loadingSickOff={loadingSickOff}
-          getSickOff={getSickOffData}
-        />
-      )}
-    </div>
-  );
+      ),
+    },
+  ];
+  return <Tabs items={items} size="small" type="card" />;
 };
+
+function SickOffCard({ posted, admissionNo, treatmentNo, isInpatient }) {
+  const dispatch = useDispatch();
+  const encounterNo = admissionNo || treatmentNo;
+
+  const [printData, setPrintData] = useState(null);
+  const {
+    data: printSickOffData,
+    error: printSickOffError,
+    loading: printSickOffLoading,
+  } = useSelector((state) => state.postPrintSickOff);
+
+  useEffect(() => {
+    dispatch(postPrintSickOff({ isInpatient, encounterNo }));
+  }, []);
+
+  useEffect(() => {
+    if (printSickOffData) setPrintData(printSickOffData.data?.base64);
+
+    if (printSickOffError) message.error(printSickOffError);
+
+    if (printSickOffData || printSickOffError)
+      dispatch({ type: POST_PRINT_SICK_OFF_RESET });
+  }, [printSickOffData, printSickOffError, printSickOffLoading]);
+
+  return (
+    <Skeleton loading={printSickOffLoading}>
+      {posted && printData ? (
+        <Card
+          styles={{ header: { color: "#0f5689", fontWeight: "700" } }}
+          size="small"
+          title={"Off Duty Info"}
+          children={<PDFViewer base64String={printData} />}
+        />
+      ) : (
+        <NoData content="No sick off issued" />
+      )}
+    </Skeleton>
+  );
+}
 
 export default SickOff;

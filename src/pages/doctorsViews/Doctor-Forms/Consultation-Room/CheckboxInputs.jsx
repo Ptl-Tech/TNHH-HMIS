@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 
-import { Button, Checkbox, Space } from 'antd';
+import { Button, Checkbox, Space } from "antd";
 
-import { InputForm } from './InputForm';
+import { InputForm } from "./InputForm";
 
-import { saveDoctorNotes } from '../../../../actions/Doc-actions/saveDoctorNotes';
+import { saveDoctorNotes } from "../../../../actions/Doc-actions/saveDoctorNotes";
 
-export const CheckboxInputs = ({ formItems, treatmentNo }) => {
+export const CheckboxInputs = ({ formItems, treatmentNo, sectionId }) => {
   const CheckboxGroup = Checkbox.Group;
 
   const dispatch = useDispatch();
@@ -16,42 +16,46 @@ export const CheckboxInputs = ({ formItems, treatmentNo }) => {
   const [selectedValues, setSelectedValues] = useState(
     formItems
       .filter((selectedValue) => selectedValue.IsSelected)
-      .map(({ Item_ID }) => Item_ID),
+      .map(({ Item_ID }) => Item_ID)
   );
 
   const onChange = (newValues) => {
+    console.log({ newValues });
+
     // updating the state
     setSelectedValues((formerValues) => {
       // getting the removed item
       const removedItem = formerValues.findIndex(
-        (formerValue) => !newValues.includes(formerValue),
+        (formerValue) => !newValues.includes(formerValue)
       );
       // getting the added item
       const addedItem = newValues.find(
-        (newValue) => !formerValues.includes(newValue),
+        (newValue) => !formerValues.includes(newValue)
       );
 
       if (removedItem >= 0) {
         // delete an item from the database
         dispatch(
           saveDoctorNotes({
-            myAction: 'edit',
+            sectionId,
+            myAction: "edit",
+            isSelected: false,
+            specifiedText: "",
             encounterNo: treatmentNo,
             itemId: formerValues[removedItem],
-            isSelected: false,
-            specifiedText: '',
-          }),
+          })
         );
       } else if (addedItem) {
         // add an item to the database
         dispatch(
           saveDoctorNotes({
-            myAction: 'edit',
-            encounterNo: treatmentNo,
-            itemId: addedItem,
+            sectionId,
+            myAction: "edit",
             isSelected: true,
-            specifiedText: '',
-          }),
+            itemId: addedItem,
+            specifiedText: "",
+            encounterNo: treatmentNo,
+          })
         );
       }
 
@@ -71,16 +75,13 @@ export const CheckboxInputs = ({ formItems, treatmentNo }) => {
             />
           ) : (
             <Space>
-              <div
-                className="d-flex gap-2"
-                style={{ whiteSpace: 'nowrap' }}
-              >
-                <span style={{ color: '#0f5689' }}>Added value:</span>
+              <div className="d-flex gap-2" style={{ whiteSpace: "nowrap" }}>
+                <span style={{ color: "#0f5689" }}>Added value:</span>
                 <span>{Other_Specify}</span>
               </div>
 
               <Button
-                style={{ padding: '0px 2px', height: 'fit-content' }}
+                style={{ padding: "0px 2px", height: "fit-content" }}
                 onClick={(e) => {
                   e.preventDefault();
                   setEditing(true);
@@ -97,16 +98,16 @@ export const CheckboxInputs = ({ formItems, treatmentNo }) => {
         label
       ),
       value,
-      className: Is_Text_Item ? 'other-select' : '',
-    }),
+      className: Is_Text_Item ? "other-select" : "",
+    })
   );
 
   return (
     <CheckboxGroup
-      onChange={onChange}
+      onChange={(values) => onChange(values)}
       value={selectedValues}
       options={checkboxOptions}
-      style={{ display: 'grid', gap: 8, width: '100%' }}
+      style={{ display: "grid", gap: 8, width: "100%" }}
     />
   );
 };

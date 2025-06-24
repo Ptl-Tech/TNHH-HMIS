@@ -113,7 +113,7 @@ const DoctorVisits = () => {
     Inpatient: patient.Inpatient,
   }));
 
-  const combinedList = openDoctorVisitList.map((room) => {
+  const combinedList = openDoctorVisitList?.map((room) => {
     const matchingPatient = openDoctorVisitListWithPatientDetails.find(
       (patient) => patient.PatientNo === room.PatientNo,
     );

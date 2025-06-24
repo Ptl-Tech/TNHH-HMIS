@@ -1,20 +1,22 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 
-import { Button, Radio, Space } from 'antd';
+import { Button, Radio, Space } from "antd";
 
-import { InputForm } from './InputForm';
+import { InputForm } from "./InputForm";
 
-import { saveDoctorNotes } from '../../../../actions/Doc-actions/saveDoctorNotes';
+import { saveDoctorNotes } from "../../../../actions/Doc-actions/saveDoctorNotes";
 
-export const RadioInputs = ({ formItems, treatmentNo }) => {
+export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
+  // console.log({ formItems });
+
   const RadioGroup = Radio.Group;
 
   const dispatch = useDispatch();
 
   const [editing, setEditing] = useState(false);
   const [selectedItem, setSelectedItem] = useState(
-    formItems.find(({ IsSelected }) => IsSelected)?.Item_ID,
+    formItems.find(({ IsSelected }) => IsSelected)?.Item_ID
   );
 
   const onChange = (e, valueToReset) => {
@@ -27,12 +29,13 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
       if (prevItem) {
         dispatch(
           saveDoctorNotes({
-            myAction: 'edit',
-            encounterNo: treatmentNo,
+            sectionId,
+            myAction: "edit",
             itemId: prevItem,
             isSelected: false,
-            specifiedText: '',
-          }),
+            specifiedText: "",
+            encounterNo: treatmentNo,
+          })
         );
       }
 
@@ -41,22 +44,24 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
       if (valueToReset && prevItem === valueToReset) {
         dispatch(
           saveDoctorNotes({
-            itemId: valueToReset,
-            myAction: 'edit',
+            sectionId,
+            myAction: "edit",
             isSelected: false,
-            specifiedText: '',
+            specifiedText: "",
+            itemId: valueToReset,
             encounterNo: treatmentNo,
-          }),
+          })
         );
       } else {
         dispatch(
           saveDoctorNotes({
+            sectionId,
             itemId: value,
-            myAction: 'edit',
+            myAction: "edit",
             isSelected: true,
-            specifiedText: '',
+            specifiedText: "",
             encounterNo: treatmentNo,
-          }),
+          })
         );
       }
       // set the state finally
@@ -76,16 +81,13 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
             />
           ) : (
             <Space>
-              <div
-                className="d-flex gap-2"
-                style={{ whiteSpace: 'nowrap' }}
-              >
-                <span style={{ color: '#0f5689' }}>Added value:</span>
+              <div className="d-flex gap-2" style={{ whiteSpace: "nowrap" }}>
+                <span style={{ color: "#0f5689" }}>Added value:</span>
                 <span>{Other_Specify}</span>
               </div>
 
               <Button
-                style={{ padding: '0px 2px', height: 'fit-content' }}
+                style={{ padding: "0px 2px", height: "fit-content" }}
                 onClick={(e) => {
                   e.preventDefault();
                   setEditing(true);
@@ -100,10 +102,10 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
                   onChange(e, selectedItem);
                 }}
                 style={{
-                  textDecoration: 'underline',
-                  padding: '0px',
-                  border: 'none',
-                  boxShadow: 'none',
+                  textDecoration: "underline",
+                  padding: "0px",
+                  border: "none",
+                  boxShadow: "none",
                 }}
               >
                 Reset
@@ -114,7 +116,7 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
           label
         )
       ) : (
-        <span style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        <span style={{ display: "flex", gap: "4px", alignItems: "center" }}>
           <span>{label}</span>
           {selectedItem === value && (
             <Button
@@ -124,10 +126,10 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
                 onChange(e, selectedItem);
               }}
               style={{
-                textDecoration: 'underline',
-                padding: '0px',
-                border: 'none',
-                boxShadow: 'none',
+                textDecoration: "underline",
+                padding: "0px",
+                border: "none",
+                boxShadow: "none",
               }}
             >
               Reset
@@ -136,8 +138,8 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
         </span>
       ),
       value,
-      className: Is_Text_Item ? 'other-select' : '',
-    }),
+      className: Is_Text_Item ? "other-select" : "",
+    })
   );
 
   return (
@@ -145,7 +147,7 @@ export const RadioInputs = ({ formItems, treatmentNo }) => {
       value={selectedItem}
       onChange={onChange}
       options={radioOptions}
-      style={{ display: 'grid', gap: 8, width: '100%' }}
+      style={{ display: "grid", gap: 8, width: "100%" }}
     />
   );
 };
