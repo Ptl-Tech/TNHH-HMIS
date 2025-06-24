@@ -27,8 +27,11 @@ import {
 } from "../../../../actions/lab-actions/postLabTestResults";
 import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
 import { getSingleLabDetails } from "../../../../actions/Doc-actions/getSingleLabRequestDetails";
+import { IoIosCloseCircle } from "react-icons/io";
 
 const LabResultsEntry = ({ data, loading }) => {
+  console.log({ data });
+
   // state
   const [openResults, setOpenResults] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
@@ -57,7 +60,14 @@ const LabResultsEntry = ({ data, loading }) => {
       title: "Add results",
       render: (_, record) => {
         return (
-          <TestMenu record={record} handleOpenResults={showResultsDrawer} />
+          <Button
+            type="primary"
+            onClick={() => {
+              showResultsDrawer(record);
+            }}
+          >
+            Add Test Results
+          </Button>
         );
       },
     },
@@ -92,47 +102,6 @@ const LabResultsEntry = ({ data, loading }) => {
   );
 };
 
-const TestMenu = ({ record, handleOpenResults }) => {
-  const [open, setOpen] = useState(false);
-
-  const items = [
-    {
-      key: "1",
-      label: (
-        <Button
-          block
-          type="text"
-          onClick={() => {
-            setOpen(false);
-            handleOpenResults(record);
-          }}
-        >
-          Add Test Results
-        </Button>
-      ),
-    },
-  ];
-
-  return (
-    <Popover
-      open={open}
-      trigger={"click"}
-      placement="bottomRight"
-      arrow={{ pointAtCenter: true }}
-      styles={{ body: { padding: "2px" } }}
-      content={
-        <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
-          {items.map((item) => (
-            <li key={item.key}>{item.label}</li>
-          ))}
-        </ul>
-      }
-    >
-      <AiOutlineMore size={28} onClick={() => setOpen(true)} />
-    </Popover>
-  );
-};
-
 const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
   const dispatch = useDispatch();
 
@@ -158,6 +127,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
         setRemarks("");
         handleCancel();
       }}
+      closeIcon={null}
       destroyOnHidden={true}
       title={`Results for ${LaboratoryTestName}`}
       extra={<Button onClick={handleCancel}>Cancel</Button>}
@@ -223,8 +193,6 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   const { Item, useForm } = Form;
 
   const { recId, laboratoryNo } = currentLabLine;
-
-  console.log({ currentLabLine });
 
   const [form] = useForm();
   const dispatch = useDispatch();
@@ -347,18 +315,25 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
         <SkeletonLoading />
       ) : (
         <Form form={form} layout="vertical" component={false} clearOnDestroy>
-          <Space direction="vertical" className="gap-2 m-0 p-0">
-            <Table
-              columns={columns}
-              pagination={false}
-              dataSource={results}
-              rowClassName={"editable-row"}
-              onRow={(record) => ({
-                onClick: () => edit(record),
-              })}
-              components={{ body: { cell: EditableCell } }}
-            />
-            <Item layout="vertical" label="Add Comments">
+          <Space direction="vertical" className="gap-3 m-0 p-0 d-grid">
+            <Space direction="vertical" className="d-grid">
+              <h6 className="text-main-primary">Results</h6>
+              <Table
+                columns={columns}
+                pagination={false}
+                dataSource={results}
+                className="d-block"
+                rowClassName={"editable-row"}
+                onRow={(record) => ({
+                  onClick: () => edit(record),
+                })}
+                components={{ body: { cell: EditableCell } }}
+              />
+            </Space>
+            <Item
+              layout="vertical"
+              label={<h6 className="text-main-primary">Comments</h6>}
+            >
               <TextArea
                 value={remarks}
                 defaultValue={remarks}

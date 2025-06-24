@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { message } from 'antd';
+import axios from "axios";
+import { message } from "antd";
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = "https://chiromo.potestastechnologies.net:8085/";
 
 // Action Types
-export const GET_LAB_TEST_CODES_FAIL = 'GET_LAB_TEST_CODES_FAIL';
-export const GET_LAB_TEST_CODES_RESET = 'GET_LAB_TEST_CODES_RESET';
-export const GET_LAB_TEST_CODES_REQUEST = 'GET_LAB_TEST_CODES_REQUEST';
-export const GET_LAB_TEST_CODES_SUCCESS = 'GET_LAB_TEST_CODES_SUCCESS';
+export const GET_LAB_TEST_CODES_FAIL = "GET_LAB_TEST_CODES_FAIL";
+export const GET_LAB_TEST_CODES_RESET = "GET_LAB_TEST_CODES_RESET";
+export const GET_LAB_TEST_CODES_REQUEST = "GET_LAB_TEST_CODES_REQUEST";
+export const GET_LAB_TEST_CODES_SUCCESS = "GET_LAB_TEST_CODES_SUCCESS";
 
 // Action to fetch radiology list
 export const getLabTestCodes = () => async (dispatch, getState) => {
@@ -19,14 +19,14 @@ export const getLabTestCodes = () => async (dispatch, getState) => {
     } = getState();
 
     // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = localStorage.getItem("branchCode") || "";
 
     // Set up the request configuration with headers
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo?.userData?.no || '',
-        sessionToken: userInfo?.userData?.portalSessionToken || '',
+        "Content-Type": "application/json",
+        staffNo: userInfo?.userData?.no || "",
+        sessionToken: userInfo?.userData?.portalSessionToken || "",
         branchCode,
       },
     };
@@ -34,10 +34,8 @@ export const getLabTestCodes = () => async (dispatch, getState) => {
     // API request
     const { data } = await axios.get(
       `${API}data/odatafilter?isList=true&webservice=QyLabTestsSetup`,
-      config,
+      config
     );
-
-    console.log({ data });
 
     // Dispatch success action with the fetched data
     dispatch({
@@ -47,11 +45,9 @@ export const getLabTestCodes = () => async (dispatch, getState) => {
 
     return data; // Optionally return the data
   } catch (error) {
-    console.log({ error });
-
     // Extract and handle errors properly
     const errorMessage =
-      error.response?.data?.message || error.message || 'An error occurred';
+      error.response?.data?.message || error.message || "An error occurred";
 
     dispatch({
       type: GET_LAB_TEST_CODES_FAIL,

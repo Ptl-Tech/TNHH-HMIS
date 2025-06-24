@@ -5,20 +5,23 @@ import {
   SendOutlined,
   UndoOutlined,
   UserOutlined,
-  LoginOutlined,
-  LogoutOutlined,
   AppstoreOutlined,
   PlusCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
+import { IoAlbums } from "react-icons/io5";
+import {
+  FaBedPulse,
+  FaPersonWalking,
+  FaPersonWalkingDashedLineArrowRight,
+} from "react-icons/fa6";
 
 import PrivateRoute from "../private/PrivateRoute";
 import LabDashboard from "../Dashboards/LabDashboard";
 import LabRequests from "../pages/doctorsViews/tables/lab/LabRequests";
 import LaboratoryEvaluationCard from "../pages/doctorsViews/tables/lab/LaboratoryEvaluationCard";
-import { IoAlbums } from "react-icons/io5";
 
 const statuses = [
   { name: "New", icon: <PlusCircleOutlined /> },
@@ -53,17 +56,17 @@ export const labRoutes = [
   {
     key: "/Lab/Outpatient",
     label: "Laboratory Outpatient",
-    icon: <LogoutOutlined style={{ color: "#fff" }} />,
+    icon: <FaPersonWalkingDashedLineArrowRight style={{ color: "#fff" }} />,
   },
   {
     key: "/Lab/Inpatient",
     label: "Laboratory Inpatient",
-    icon: <LoginOutlined style={{ color: "#fff" }} />,
+    icon: <FaBedPulse style={{ color: "#fff" }} />,
   },
   {
     key: "/Lab/Walk-In",
     label: "Laboratory Walk In",
-    icon: <UserOutlined style={{ color: "#fff" }} />,
+    icon: <FaPersonWalking style={{ color: "#fff" }} />,
   },
 ];
 

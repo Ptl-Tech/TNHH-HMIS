@@ -1,28 +1,23 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  ContainerOutlined,
-  EditOutlined,
-  DollarOutlined,
-} from "@ant-design/icons";
 import { Button, Card, Tabs } from "antd";
+import { PiEyedropperSampleFill } from "react-icons/pi";
+import { EditOutlined, ContainerOutlined } from "@ant-design/icons";
 
 import LabResultsEntry from "./LabResultsEntry";
 import SampleCollection from "./SampleCollection";
-import Charges from "../../../nurse-view/nurse-patient-file/Charges";
-
 import TestLinesCreation from "./TestLinesCreation";
+
 import { getLabDetails } from "../../../../actions/Doc-actions/getLabRequestDetails";
 
-const LabContentCard = ({ labRecord }) => {
+const LabContentCard = () => {
   // hooks
   const location = useLocation();
   const dispatch = useDispatch();
 
   // search params
-  const { walkIn } = location.state;
   const labNo = new URLSearchParams(location.search).get("LaboratoryNo");
 
   // when we update the sample, we need to update the data
@@ -32,6 +27,8 @@ const LabContentCard = ({ labRecord }) => {
   const { loading: labTestsLoading, data: labTestsData } = useSelector(
     (state) => state.labDetails
   );
+
+  console.log({ labTestsData });
 
   useEffect(() => {
     dispatch(getLabDetails(labNo));
@@ -48,23 +45,21 @@ const LabContentCard = ({ labRecord }) => {
         }}
         tabBarGutter={16} // Adjust spacing between tabs
       >
-        {walkIn ? (
-          <Tabs.TabPane
-            tab={
-              <Button type="primary" style={{ borderRadius: "4px" }}>
-                <ContainerOutlined style={{ marginRight: "8px" }} />
-                Create Test Lines
-              </Button>
-            }
-            key="1"
-          >
-            <TestLinesCreation />
-          </Tabs.TabPane>
-        ) : null}
         <Tabs.TabPane
           tab={
             <Button type="primary" style={{ borderRadius: "4px" }}>
               <ContainerOutlined style={{ marginRight: "8px" }} />
+              Add Test Lines
+            </Button>
+          }
+          key="1"
+        >
+          <TestLinesCreation data={labTestsData} />
+        </Tabs.TabPane>
+        <Tabs.TabPane
+          tab={
+            <Button type="primary" style={{ borderRadius: "4px" }}>
+              <PiEyedropperSampleFill style={{ marginRight: "8px" }} />
               Sample Collection
             </Button>
           }
@@ -82,17 +77,6 @@ const LabContentCard = ({ labRecord }) => {
           key="3"
         >
           <LabResultsEntry data={labTestsData} loading={labTestsLoading} />
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={
-            <Button type="primary" style={{ borderRadius: "4px" }}>
-              <DollarOutlined style={{ marginRight: "8px" }} />
-              Charges
-            </Button>
-          }
-          key="4"
-        >
-          <Charges />
         </Tabs.TabPane>
       </Tabs>
     </Card>
