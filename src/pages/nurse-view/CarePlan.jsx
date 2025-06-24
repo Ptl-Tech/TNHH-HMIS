@@ -1,133 +1,90 @@
-import { Button, Divider } from "antd";
-import { useState } from "react";
-import AddAllergies from "./nurse-care-plan/AddAllergies";
-import Vitals from "./nurse-care-plan/Vitals";
-import TreatmentsSheet from "./nurse-care-plan/TreatmentsSheet";
-import ECTScan from "./nurse-care-plan/ECTScan";
-import TCAAppointments from "./nurse-care-plan/TCAAppointments";
-import DailyProcess from "./nurse-care-plan/DailyProcess";
-import Diagnosis from "../../pages/doctorsViews/Doctor-Forms/Diagnosis";
-import useAuth from "../../hooks/useAuth";
 import {
   FileOutlined,
   FileMarkdownOutlined,
-  MedicineBoxOutlined,
-  SolutionOutlined,
   BorderlessTableOutlined,
 } from "@ant-design/icons";
+import { Tabs } from "antd";
+
+import useAuth from "../../hooks/useAuth";
+
 import VisitorsList from "./nurse-forms/VisitorsList";
+import CarePlanForm from "./nurse-forms/CarePlanForm";
 import SuicidalForm from "./nurse-forms/SuicidalForm";
-import MentalStateExaminationForm from "./nurse-forms/MentalStateExaminationForm";
-import BriefMentalStateExaminationForm from "./nurse-forms/BriefMentalStateExaminationForm";
+import DailyProcess from "./nurse-care-plan/DailyProcess";
+import NursingNotes from "./nurse-patient-file/NursingNotes";
 import DietaryIntakeForm from "./nurse-forms/DietaryIntakeForm";
 import JacksonVisualForm from "./nurse-forms/JacksonVisualForm";
-import CarePlanForm from "./nurse-forms/CarePlanForm";
-import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 import ConsultationroomDetails from "../doctorsViews/Doctor-Forms/ConsultationroomDetails";
 
 const CarePlan = ({ observationNo, patientNo }) => {
-  const [activeItem, setActiveItem] = useState("Consultation Room File");
-  const [selectedItem, setSelectedItem] = useState(
-    <ConsultationroomDetails
-      observationNo={observationNo}
-      patientNo={patientNo}
-    />
-  );
   const userRole = useAuth().userData.departmentName;
 
-  const handleOnClick = (item) => {
-    setActiveItem(item.label);
-    switch (item.label) {
-      case "Consultation Room File":
-        setSelectedItem(
-          <ConsultationroomDetails
-            observationNo={observationNo}
-            patientNo={patientNo}
-          />
-        );
-        break;
-
-      case "Care Plan":
-        setSelectedItem(<CarePlanForm />);
-        break;
-
-      case "ECT Procedure":
-        setSelectedItem(<ECTScan />);
-        break;
-      case "TCA / Appointments":
-        setSelectedItem(<TCAAppointments />);
-        break;
-      case "Daily Ward Rounds":
-        setSelectedItem(<DailyProcess />);
-        break;
-      case "Visitor List":
-        setSelectedItem(<VisitorsList />);
-        break;
-      case "Suicidal Form":
-        setSelectedItem(<SuicidalForm />);
-        break;
-      case "Dietary Intake Form":
-        setSelectedItem(<DietaryIntakeForm />);
-        break;
-      case "Jackson Visual Form":
-        setSelectedItem(<JacksonVisualForm />);
-        break;
-      default:
-        setSelectedItem(<AddAllergies />);
-        break;
-    }
-  };
-
   const menuItems = [
-    { label: "Consultation Room File", icon: <FileMarkdownOutlined /> },
+    {
+      key: "Consultation Room File",
+      icon: <FileMarkdownOutlined />,
+      label: "Consultation Room File",
+      children: (
+        <ConsultationroomDetails
+          patientNo={patientNo}
+          observationNo={observationNo}
+        />
+      ),
+    },
     ...(userRole === "Doctor" || userRole === "Nurse"
-      ? [{ label: "Daily Ward Rounds", icon: <FileOutlined /> }]
+      ? [
+          {
+            icon: <FileOutlined />,
+            key: "Daily Ward Rounds",
+            label: "Daily Ward Rounds",
+            children: <DailyProcess />,
+          },
+        ]
       : []),
+    {
+      key: "CardX",
+      label: "CardX",
+      icon: <FileMarkdownOutlined />,
+      children: <NursingNotes />,
+    },
     ...(userRole === "Nurse"
       ? [
-          { label: "Care Plan", icon: <BorderlessTableOutlined /> },
+          {
+            key: "Care Plan",
+            label: "Care Plan",
+            children: <CarePlanForm />,
+            icon: <BorderlessTableOutlined />,
+          },
 
-          { label: "Visitor List", icon: <FileOutlined /> },
-          { label: "Suicidal Form", icon: <FileOutlined /> },
-          { label: "Dietary Intake Form", icon: <FileOutlined /> },
-          { label: "Jackson Visual Form", icon: <FileOutlined /> },
+          {
+            key: "Visitor List",
+            label: "Visitor List",
+            icon: <FileOutlined />,
+            children: <VisitorsList />,
+          },
+          {
+            key: "Suicidal Form",
+            label: "Suicidal Form",
+            icon: <FileOutlined />,
+            children: <SuicidalForm />,
+          },
+          {
+            icon: <FileOutlined />,
+            key: "Dietary Intake Form",
+            label: "Dietary Intake Form",
+            children: <DietaryIntakeForm />,
+          },
+          {
+            icon: <FileOutlined />,
+            key: "Jackson Visual Form",
+            label: "Jackson Visual Form",
+            children: <JacksonVisualForm />,
+          },
         ]
       : []),
   ];
 
-  return (
-    <>
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          gap: "10px",
-          flexWrap: "wrap",
-          marginBottom: "10px",
-        }}
-      >
-        {menuItems.map((item, index) => (
-          <Button
-            key={index}
-            style={{
-              backgroundColor: "#0f5689",
-              color: "#ffffff",
-              border: "none",
-              padding: "18px 20px",
-            }}
-            className={activeItem === item.label ? "active-button" : ""}
-            onClick={() => handleOnClick(item)}
-          >
-            {item.icon}
-            {item.label}
-          </Button>
-        ))}
-      </div>
-
-      <Divider />
-      <div className="patient-file-content">{selectedItem}</div>
-    </>
-  );
+  return <Tabs type="card" items={menuItems} />;
 };
 
 export default CarePlan;
