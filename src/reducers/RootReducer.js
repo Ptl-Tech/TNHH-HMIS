@@ -334,6 +334,7 @@ import { currentInpatientReducer } from "./doc-reducers/currentInpatientReducer"
 import { getSingleAdmittedReducer } from "./nurse-reducers/getSingleAdmittedReducer";
 import { getBriefMSENotesDataReducer } from "./nurse-reducers/getBriefMSEReducer";
 import { getSingleLabDetailsReducer } from "./doc-reducers/getSingleLabDetailsReducer";
+import { postRefreshPatientChargesReducer } from "./ChargesReducers/postRefreshChargesReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
