@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -9,14 +9,18 @@ import {
   Table,
   Drawer,
   Button,
-  Popover,
   message,
   Typography,
   InputNumber,
+  Skeleton,
 } from "antd";
 
-import { labLinesColumns, labResultsColumns } from "./utils";
+// draftjs components
+import StarterKit from "@tiptap/starter-kit";
+import Strike from "@tiptap/extension-strike";
+import { EditorContent, useEditor, FloatingMenu } from "@tiptap/react";
 
+import { labLinesColumns, labResultsColumns } from "./utils";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
@@ -26,6 +30,7 @@ import {
 } from "../../../../actions/lab-actions/postLabTestResults";
 import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
 import { getSingleLabDetails } from "../../../../actions/Doc-actions/getSingleLabRequestDetails";
+import WYSIWYGEditor from "../../../../components/WYSIWYGEditor";
 
 const LabResultsEntry = ({ data, loading }) => {
   // state
@@ -101,11 +106,16 @@ const LabResultsEntry = ({ data, loading }) => {
 const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
   const dispatch = useDispatch();
 
-  const {
-    data: resultsData,
-    error: resultsError,
-    loading: resultsLoading,
-  } = useSelector((state) => state.getLabTestResults);
+  // These are the lab line tests
+  const { data: resultsData, loading: resultsLoading } = useSelector(
+    (state) => state.getLabTestResults
+  );
+
+  console.log({ resultsData });
+
+  const isNarration = resultsData?.find(
+    ({ Result_Type }) => Result_Type === "Narration"
+  );
 
   const { LaboratoryTestName } = record || {};
   const { Laboratory_No: labNo, LaboratoryTestCode: testCode } = record || {};
@@ -130,9 +140,16 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
     >
       {resultsLoading ? (
         <SkeletonLoading />
+      ) : isNarration ? (
+        <WYSIWYGContainer
+          initialData={resultsData}
+          currentLabLine={{
+            recId: record?.SystemId,
+            laboratoryNo: record?.Laboratory_No,
+          }}
+        />
       ) : (
         <ResultsTable
-          error={resultsError}
           loading={resultsLoading}
           initialData={resultsData}
           currentLabLine={{
@@ -142,6 +159,81 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
         />
       )}
     </Drawer>
+  );
+};
+
+const WYSIWYGContainer = ({ initialData, currentLabLine }) => {
+  const dispatch = useDispatch();
+  const { recId, laboratoryNo } = currentLabLine;
+
+  const {
+    data: labResultsData,
+    error: labResultsError,
+    loading: labResultsLoading,
+  } = useSelector((state) => state.postLabTestResults);
+  const { data: singleLabDetails, loading: singleLabDetailsLoading } =
+    useSelector((state) => state.singleLabDetails);
+
+  useEffect(() => {
+    // fetching the current lab request both initially and after we have changed the remarks
+    dispatch(getSingleLabDetails(laboratoryNo, recId));
+  }, [labResultsData]);
+
+  useEffect(() => {
+    if (labResultsData) {
+      const { labResults, labRemarks } = labResultsData;
+      labRemarks?.status === "success" && labResults?.status === "success"
+        ? message.success("Results submitted successfully!")
+        : message.error("Something went wrong!");
+      dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
+    }
+
+    if (labResultsError) {
+      message.error(labResultsError);
+      dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
+    }
+
+    if (labResultsLoading) message.info("Submitting the results");
+  }, [labResultsData, labResultsLoading, labResultsError]);
+
+  const {
+    Positive,
+    SystemId,
+    SpecimenCode,
+    MeasuringUnitCode,
+    LaboratoryTestCode,
+  } = singleLabDetails || {};
+
+  const handleSubmit = (remarks) => {
+    if (!(recId && SystemId)) return;
+
+    const results = [
+      {
+        SystemId: recId,
+        Laboratory_No: laboratoryNo,
+        Laboratory_Test_Code: LaboratoryTestCode,
+        Specimen_Code: SpecimenCode,
+        Reactive: "",
+        Positive,
+        Results: 0.0,
+        Remarks: remarks,
+        Measuring_Unit_Code: MeasuringUnitCode,
+        flag: "",
+      },
+    ];
+
+    console.log({ results });
+
+    dispatch(postLabTestResults([...results], ""));
+  };
+
+  return (
+    <Skeleton loading={singleLabDetailsLoading}>
+      <WYSIWYGEditor
+        handleSubmit={handleSubmit}
+        content={initialData[0]?.Remarks || ""}
+      />
+    </Skeleton>
   );
 };
 
@@ -198,11 +290,8 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
     error: labResultsError,
     loading: labResultsLoading,
   } = useSelector((state) => state.postLabTestResults);
-  const {
-    data: singleLabDetails,
-    error: singleLabDetailsError,
-    loading: singleLabDetailsLoading,
-  } = useSelector((state) => state.singleLabDetails);
+  const { data: singleLabDetails, loading: singleLabDetailsLoading } =
+    useSelector((state) => state.singleLabDetails);
 
   const [results, setResults] = useState(
     [...initialData].map((item) => ({ ...item }))
@@ -298,6 +387,8 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
       dispatch(postLabTestResults([...results], finalData));
     }
   };
+
+  console.log({ results });
 
   return (
     <>

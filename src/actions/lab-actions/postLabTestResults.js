@@ -71,14 +71,16 @@ const processLabResults = async (results, config) => {
 };
 
 const postLabResultComments = async (remarks, config) => {
-  const { data } = await axios.post(
-    `${API_URL}/Laboratory/LabTestLine`,
-    remarks,
-    config
-  );
+  if (remarks) {
+    const { data } = await axios.post(
+      `${API_URL}/Laboratory/LabTestLine`,
+      remarks,
+      config
+    );
 
-  if (data.status === "error")
-    throw new Error(`Failed to process the lab result comments`);
+    if (data.status === "error")
+      throw new Error(`Failed to process the lab result comments`);
+  }
 
   return { status: "success" };
 };
