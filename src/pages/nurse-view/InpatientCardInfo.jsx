@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Button, Card, Divider, Spin, Typography, Modal } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { calculateAge } from "../../utils/helpers";
+
 import moment from "moment";
-import PropTypes from "prop-types";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Button, Card, Divider, Spin, Typography, Modal } from "antd";
+
+import { calculateAge } from "../../utils/helpers";
 import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
+
 import PatientFile from "./PatientFile";
 
 const InpatientCardInfo = ({ patientDetail }) => {
@@ -149,7 +151,3 @@ const InpatientCardInfo = ({ patientDetail }) => {
 };
 
 export default InpatientCardInfo;
-
-InpatientCardInfo.propTypes = {
-  patientDetail: PropTypes.object,
-};

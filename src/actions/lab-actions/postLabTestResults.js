@@ -1,13 +1,14 @@
-import axios from 'axios';
-import apiHeaderConfig from '../configHelpers';
+import axios from "axios";
+import apiHeaderConfig from "../configHelpers";
 
-export const POST_LAB_TEST_RESULTS_FAIL = 'POST_LAB_TEST_RESULTS_FAIL';
-export const POST_LAB_TEST_RESULTS_RESET = 'POST_LAB_TEST_RESULTS_RESET';
-export const POST_LAB_TEST_RESULTS_REQUEST = 'POST_LAB_TEST_RESULTS_REQUEST';
-export const POST_LAB_TEST_RESULTS_SUCCESS = 'POST_LAB_TEST_RESULTS_SUCCESS';
+export const POST_LAB_TEST_RESULTS_FAIL = "POST_LAB_TEST_RESULTS_FAIL";
+export const POST_LAB_TEST_RESULTS_RESET = "POST_LAB_TEST_RESULTS_RESET";
+export const POST_LAB_TEST_RESULTS_REQUEST = "POST_LAB_TEST_RESULTS_REQUEST";
+export const POST_LAB_TEST_RESULTS_SUCCESS = "POST_LAB_TEST_RESULTS_SUCCESS";
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+  import.meta.env.VITE_PORTAL_API_BASE_URL ||
+  "https://chiromo.potestastechnologies.net:8085";
 
 const transformLabResult = (result) => {
   const {
@@ -30,7 +31,7 @@ const transformLabResult = (result) => {
   };
 
   return {
-    myAction: 'edit',
+    myAction: "edit",
     recId: SystemId,
     laboratoryNo: Laboratory_No,
     labTestCode: Laboratory_Test_Code,
@@ -53,12 +54,12 @@ const processLabResults = async (results, config) => {
       const response = await axios.post(
         `${API_URL}/Laboratory/LabTestResultsEntry`,
         finalResult,
-        config,
+        config
       );
 
-      if (response.data.status === 'error') {
+      if (response.data.status === "error") {
         throw new Error(
-          `Failed to process result for specimen ${finalResult.specimenCode}: ${response.data.message}`,
+          `Failed to process result for specimen ${finalResult.specimenCode}: ${response.data.message}`
         );
       }
 
@@ -66,30 +67,50 @@ const processLabResults = async (results, config) => {
     });
 
   await Promise.all(requests);
-  return { status: 'success' };
+  return { status: "success" };
 };
 
-export const postLabTestResults = (results) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: POST_LAB_TEST_RESULTS_REQUEST });
+const postLabResultComments = async (remarks, config) => {
+  const { data } = await axios.post(
+    `${API_URL}/Laboratory/LabTestLine`,
+    remarks,
+    config
+  );
 
-    const config = apiHeaderConfig(getState);
-    const data = await processLabResults(results, config);
+  if (data.status === "error")
+    throw new Error(`Failed to process the lab result comments`);
 
-    dispatch({
-      type: POST_LAB_TEST_RESULTS_SUCCESS,
-      payload: data,
-    });
-  } catch (error) {
-    console.error('Lab results submission error:', error);
-
-    dispatch({
-      type: POST_LAB_TEST_RESULTS_FAIL,
-      payload: {
-        message: error.message,
-        status: error.response?.status || 'Network Error',
-        data: error.response?.data || null,
-      },
-    });
-  }
+  return { status: "success" };
 };
+
+export const postLabTestResults =
+  (results, remarks) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: POST_LAB_TEST_RESULTS_REQUEST });
+
+      const config = apiHeaderConfig(getState);
+
+      const [labResults, labRemarks] = await Promise.all([
+        processLabResults(results, config),
+        postLabResultComments(remarks, config),
+      ]);
+
+      console.log({ labRemarks, labResults });
+
+      dispatch({
+        type: POST_LAB_TEST_RESULTS_SUCCESS,
+        payload: { labResults, labRemarks },
+      });
+    } catch (error) {
+      console.error("Lab results submission error:", error);
+
+      dispatch({
+        type: POST_LAB_TEST_RESULTS_FAIL,
+        payload: {
+          message: error.message,
+          status: error.response?.status || "Network Error",
+          data: error.response?.data || null,
+        },
+      });
+    }
+  };

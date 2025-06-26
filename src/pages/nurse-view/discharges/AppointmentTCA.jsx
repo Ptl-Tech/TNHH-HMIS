@@ -11,6 +11,7 @@ import {
   message,
   Divider,
   DatePicker,
+  TimePicker,
 } from "antd";
 import dayjs from "dayjs";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -77,15 +78,19 @@ function AppointmentTCAForm({ currentInpatient }) {
   }, [postDischargeTCAData, postDischargeTCAError, postDischargeTCALoading]);
 
   function onFinish(values) {
-    const { appointmentDate: date, remarks } = values;
+    const { appointmentDate: date, remarks, appointmentTime: time } = values;
     const appointmentDate = dayjs(date).format("YYYY-MM-DD");
+    const appointmentTime = time + ":00";
+
     const data = {
       remarks,
       visitNo,
       doctorID,
       patientNo,
       appointmentDate,
+      appointmentTime,
     };
+
     dispatch(postDischargeTCA(data));
   }
 
@@ -94,6 +99,7 @@ function AppointmentTCAForm({ currentInpatient }) {
       form={form}
       layout="vertical"
       onFinish={onFinish}
+      style={{ maxWidth: "360px" }}
       initialValues={{
         remarks: currentInpatient?.Remarks || "",
         appointmentDate: currentInpatient?.NextAppointmentDate
@@ -107,6 +113,13 @@ function AppointmentTCAForm({ currentInpatient }) {
         rules={[{ required: true }]}
       >
         <DatePicker style={{ width: "100%" }} minDate={dayjs(new Date())} />
+      </FormItem>
+      <FormItem
+        name={"appointmentTime"}
+        label={"Appointment Time"}
+        rules={[{ required: true }]}
+      >
+        <input type="time" style={{ width: "100%" }} />
       </FormItem>
       <FormItem name={"remarks"} label={"Remarks"}>
         <TextArea

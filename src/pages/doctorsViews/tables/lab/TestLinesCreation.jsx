@@ -1,37 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import { FileTextOutlined } from '@ant-design/icons';
-import { labLinesColumns as defaultColumns } from './utils';
 import {
-  Button,
   Form,
-  message,
-  Modal,
-  Select,
   Space,
   Table,
+  Button,
+  Drawer,
+  Select,
+  message,
   Typography,
-} from 'antd';
+} from "antd";
+import { IoIosTrash } from "react-icons/io";
+import { FileTextOutlined } from "@ant-design/icons";
 
-import { getLabTestCodes } from '../../../../actions/lab-actions/getLabTestCodes';
 import {
   postLabTest,
   POST_LAB_TEST_RESET,
-} from '../../../../actions/lab-actions/postLabTest';
+} from "../../../../actions/lab-actions/postLabTest";
+import { labLinesColumns as defaultColumns } from "./utils";
+import { getLabTestCodes } from "../../../../actions/lab-actions/getLabTestCodes";
+import { getLabDetails } from "../../../../actions/Doc-actions/getLabRequestDetails";
 
-const TestLinesCreation = () => {
+const TestLinesCreation = ({ data: labLines }) => {
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const laboratoryNo = new URLSearchParams(location.search).get("LaboratoryNo");
+
   const [open, setOpen] = useState(false);
 
-  const { data, loading, error } = useSelector(
-    (state) => state.getLabTestCodes,
-  );
+  const { data } = useSelector((state) => state.getLabTestCodes);
 
   const {
     data: postLabTestData,
-    loading: postLabTestLoading,
     error: postLabTestError,
+    loading: postLabTestLoading,
   } = useSelector((state) => state.postLabTest);
 
   useEffect(() => {
@@ -40,70 +45,92 @@ const TestLinesCreation = () => {
 
   useEffect(() => {
     if (postLabTestData) {
-      postLabTestData.status === 'success'
-        ? message.success('Test created successfully')
-        : message.error("Couldn't create test");
+      postLabTestData.status === "success"
+        ? message.success("Action completed successfully")
+        : message.error("Test action could not complete");
+      dispatch(getLabDetails(laboratoryNo));
+    }
 
+    if (postLabTestLoading) message.info("Action in progress");
+
+    if (postLabTestError) message.error(postLabTestError);
+
+    if (postLabTestData || postLabTestError)
       dispatch({ type: POST_LAB_TEST_RESET });
-    }
+  }, [postLabTestData, postLabTestError, postLabTestLoading]);
 
-    if (postLabTestLoading) {
-      message.info('Submitting the test');
-    }
+  const handleDeleteLine = (record) => {
+    const { LaboratoryTestCode: labTestCode, SystemId: recId } = record;
 
-    if (postLabTestError) {
-      message.error('Something went wrong');
-      dispatch({ type: POST_LAB_TEST_RESET });
-    }
-  }, [postLabTestData, postLabTestError]);
+    const data = {
+      recId,
+      labTestCode,
+      laboratoryNo,
+      myAction: "delete",
+    };
 
-  const columns = defaultColumns;
-
-  const handleOpen = () => {
-    setOpen(true);
+    dispatch(postLabTest(data));
   };
 
-  const handleOk = async (data) => {
-    // TODO dispatch the data to the backend
-    await dispatch(postLabTest(data));
+  const columns = [
+    ...defaultColumns,
+    {
+      key: "actions",
+      title: "Actions",
+      render: (_, record) => {
+        return (
+          <Button
+            type="primary"
+            disabled={record.Sample_Collected}
+            onClick={() => handleDeleteLine(record)}
+          >
+            <IoIosTrash />
+            Delete
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const handleOk = (code) => {
+    const { test } = code;
+
+    const data = {
+      laboratoryNo,
+      myAction: "create",
+      labTestCode: test,
+    };
+
+    dispatch(postLabTest(data));
     setOpen(false);
   };
-
-  const handleCancel = () => {
-    setOpen(false);
-  };
+  const handleOpen = () => setOpen(true);
+  const handleCancel = () => setOpen(false);
 
   return (
     <div className="">
       <Space
         style={{
-          width: '100%', // Make Space full width
-          paddingTop: '4px',
-          paddingBottom: '4px',
-          justifyContent: 'space-between',
+          width: "100%", // Make Space full width
+          paddingTop: "4px",
+          paddingBottom: "4px",
+          justifyContent: "space-between",
         }}
         align="baseline"
       >
         <Typography.Title
           level={5}
-          style={{ color: '#0F5689', marginBottom: '12px' }}
+          style={{ color: "#0F5689", marginBottom: "12px" }}
         >
-          <FileTextOutlined style={{ marginRight: '8px' }} />
+          <FileTextOutlined style={{ marginRight: "8px" }} />
           Laboratory Test Creation
         </Typography.Title>
-        <Button
-          type="primary"
-          onClick={handleOpen}
-        >
+        <Button type="primary" onClick={handleOpen}>
           New Test
         </Button>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={[]}
-        pagination={false}
-      />
-      <LabTestModal
+      <Table columns={columns} dataSource={labLines} pagination={false} />
+      <LabTestDrawer
         data={data}
         open={open}
         onOk={handleOk}
@@ -113,30 +140,24 @@ const TestLinesCreation = () => {
   );
 };
 
-const LabTestModal = ({ open, data: testData, onOk, onCancel }) => {
+const LabTestDrawer = ({ open, data: testData, onOk, onCancel }) => {
   return (
-    <Modal
-      open={open}
-      footer={null}
-      title={'Add Test'}
-    >
-      <Form
-        name="basic"
-        onFinish={onOk}
-        autoComplete="off"
-      >
+    <Drawer open={open} size="large" footer={null} title={"Add Test"}>
+      <Form name="basic" onFinish={onOk} autoComplete="off">
         <Form.Item
           label="Test"
           name="test"
           layout="vertical"
-          rules={[{ required: true, message: 'Please choose a Test!' }]}
+          rules={[{ required: true, message: "Please choose a Test!" }]}
         >
           <Select
+            showSearch
+            optionFilterProp="label"
             placeholder="Select a test"
             options={testData
               .sort(
                 (a, b) =>
-                  a.Description.toLowerCase() - b.Description.toLowerCase(),
+                  a.Description.toLowerCase() - b.Description.toLowerCase()
               )
               .map((test) => ({
                 value: test.Code,
@@ -146,30 +167,24 @@ const LabTestModal = ({ open, data: testData, onOk, onCancel }) => {
         </Form.Item>
         <Space
           style={{
-            width: '100%',
-            justifyContent: 'end',
-            paddingTop: '20px',
+            width: "100%",
+            justifyContent: "end",
+            paddingTop: "20px",
           }}
         >
           <Form.Item label={null}>
-            <Button
-              htmlType="button"
-              onClick={onCancel}
-            >
+            <Button htmlType="button" onClick={onCancel}>
               Cancel
             </Button>
           </Form.Item>
           <Form.Item label={null}>
-            <Button
-              type="primary"
-              htmlType="submit"
-            >
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
         </Space>
       </Form>
-    </Modal>
+    </Drawer>
   );
 };
 
