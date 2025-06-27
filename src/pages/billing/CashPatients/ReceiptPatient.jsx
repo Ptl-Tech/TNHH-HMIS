@@ -119,6 +119,8 @@ const ReceiptPatient = () => {
         // Optionally refresh receiptLines
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
+              dispatch(getReceiptPage(activeVisitNo));
+        
       }
     } catch (error) {
       message.error("Failed to post receipt. Please try again.");

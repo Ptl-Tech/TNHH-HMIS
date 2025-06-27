@@ -8,6 +8,7 @@ const InsurancePatients = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // React Router navigation
   const { loading, patients } = useSelector((state) => state.getBillingList);
+  const branchCode= localStorage.getItem('branchCode');
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
@@ -19,7 +20,7 @@ const InsurancePatients = () => {
 
   // Process patient list: filter inactive patients
   const filteredPatients = patients
-    ?.filter((patient) => patient?.Activated && patient?.Inpatient && patient?.PatientType === 'Corporate')
+    ?.filter((patient) => patient?.Activated && patient?.Inpatient && patient?.PatientType === 'Corporate' && patient?.Global_Dimension_1_Code === branchCode)
     .map((patient) => ({
       ...patient,
       key: patient.PatientNo,
@@ -59,6 +60,12 @@ const InsurancePatients = () => {
       title: 'Payment Type',
       dataIndex: 'PatientType',
       key: 'PatientType',
+    },
+    {
+      title: 'Branch Code',
+      dataIndex: 'Global_Dimension_1_Code',
+      key: 'Global_Dimension_1_Code',
+     
     },
     {
       title: 'Balance',
