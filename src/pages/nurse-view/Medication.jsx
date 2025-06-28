@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import useAuth from "../../hooks/useAuth";
 
-const Medication = ({  role }) => {
+const Medication = ({  role, patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
   const [selectedItem, setSelectedItem] = useState(<InpatientMedication />);
   const userRole = useAuth().userData.departmentName;
@@ -21,7 +21,7 @@ const Medication = ({  role }) => {
         setSelectedItem(<InpatientMedication role={role} />);
         break;
       case "Treatments Sheet":
-        setSelectedItem(<TreatmentsSheet />);
+        setSelectedItem(<TreatmentsSheet patientDetails={patientDetails} />);
         break;
       case "Order Sheet":
         setSelectedItem(<Consumables />);
