@@ -19,6 +19,7 @@ import {
 import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice";
 import { getQyLocationsSlice } from "../../../../actions/nurse-actions/getQyLocationsSlice";
 import { getPgOpenPatientConsumablesSlice } from "../../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
+import { frequencyOptions } from "../../../pharmacy-views/pharmacy-utils";
 
 const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const [form] = Form.useForm();
@@ -39,16 +40,17 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
 console.log(userDetails);
   const handleOnFinish = async (values) => {
     try {
-      const { location, quantity, item, remarks } = values;
+      const { location, quantity, item, remarks, prescriptionDosage } = values;
 
       const consumableData = {
-        myAction: "create",
+       myAction: "create",
         admissionNo: patientDetails?.Admission_No,
-        recId: "",
-        branchCode: userDetails?.userData?.shortcut_Dimension_1_Code || branchCode,
-        prescriptionDose: parseInt(quantity, 10),
+      recId: "",
+      branchCode: userDetails?.userData?.shortcut_Dimension_1_Code,
+    quantity: 0,
+      prescriptionDose: prescriptionDosage || 0,
         drugNo: item,
-        staffNo: userDetails.userData.no,
+      staffNo: userDetails.userData.no
       };
 
       // Dispatch postPatientConsumablesSlice and wait for result
@@ -101,7 +103,7 @@ console.log(userDetails);
       >
         <Row gutter={[16, 16]}>
        
-          <Col span={12}>
+          <Col span={8}>
             <Form.Item
               label="Item"
               name="item"
@@ -123,14 +125,36 @@ console.log(userDetails);
               />
             </Form.Item>
           </Col>
-          <Col span={12}>
+              
+          <Col span={8}>
             <Form.Item
               label="Quantity"
               name="quantity"
               rules={[{ required: true, message: "Please enter quantity!" }]}
               hasFeedback
+            
             >
-              <Input type="number" size="large" placeholder="Enter Quantity" />
+              <Input type="number" size="large" placeholder="Enter Quantity" min={0}/>
+            </Form.Item>
+          </Col>
+             <Col span={8}>
+            <Form.Item
+              label="Prescription Dosage"
+              name="prescriptionDosage"
+              hasFeedback
+            >
+              <Select
+                style={{ width: "100%" }}
+                placeholder="Select Prescription Dosage"
+                allowClear
+                showSearch
+                options={frequencyOptions?.map((item) => ({
+                  key: item.value,
+                  value: item.value,
+                  label: item.label,
+                }))}
+                size="large"
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -169,7 +193,7 @@ console.log(userDetails);
               loading={loadingPostConsumables}
               disabled={loadingPostConsumables}
             >
-              Post Consumables
+             Add Item
             </Button>
             <Button
               color="danger"

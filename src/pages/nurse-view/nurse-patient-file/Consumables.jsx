@@ -92,7 +92,8 @@ const Consumables = () => {
               marginTop: "20px",
             }}
           >
-          <Button
+         {!isConsumableFormVisible && (
+             <Button
             type="primary"
             onClick={handlePostOrderSheet}
             loading={loadingPostConsumables}
@@ -100,6 +101,8 @@ const Consumables = () => {
           <SendOutlined />  
             Send Order to Pharmacy
           </Button>
+          )
+              }
             </div>
         )}
       </div>

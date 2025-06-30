@@ -32,6 +32,9 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading: processReceiptLoading } = useSelector(
     (state) => state.savePayment
   );
+
+  const { loading: postReceiptLoading } = useSelector(
+    (state) => state.processReceipt);
   const { loading: receiptLinesLoading } = useSelector(
     (state) => state.getReceiptLines
   );
@@ -113,6 +116,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
         getPatientCharges(activeVisitNo);
+              dispatch(getReceiptPage(activeVisitNo));
+
       }
     } catch (error) {
       message.error("Failed to post receipt. Please try again.");
@@ -211,7 +216,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
 
         <Row gutter={16}>
           <Col span={24}>
-            {patientBillData?.Inpatient && patientBillData.PatientType !== "Cash" ? (
+            {patientBillData[0]?.PatientType !== "Cash" ? (
               <Form.Item
                 name="coPay"
                 valuePropName="checked"
@@ -237,7 +242,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
               type="primary"
               htmlType="submit"
               loading={saveloading}
-              disabled={saveloading || processReceiptLoading}
+              disabled={saveloading }
             >
               Save Payment
             </Button>
@@ -255,7 +260,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
           </Col>
         </Row>
 
-        {patientBillData[0]?.Inpatient &&
+        {
           patientBillData[0].PatientType !== "Cash" &&
           receiptHeader &&
           receiptHeader.length > 0 && (
@@ -264,8 +269,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
                 <Button
                   type="primary"
                   onClick={handleReceiptPost}
-                  loading={saveloading}
-                  disabled={saveloading || receiptLinesLoading}
+                 loading={postReceiptLoading}
+                 disabled={postReceiptLoading}
                 >
                   Post Receipt
                 </Button>

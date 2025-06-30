@@ -9,7 +9,7 @@ import {
   Select,
   Space,
 } from "antd";
-import { SearchOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { SearchOutlined, SaveOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ import {
   postTreatmentSheetLineSlice,
 } from "../../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 
-const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
+const TreatmentSheetFormData = ({ setIsFormVisible, form, setDrawerVisible,toggleDrawer, treatmentSheet  }) => {
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const { loading: loadingPostTreatmentSheet } = useSelector(
@@ -36,9 +36,17 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
 
   const dispatch = useDispatch();
 
+  //useffect to filter drugno found in treatment sheet from selected prescriptions
+const usedDrugNos = treatmentSheet?.map((entry) => entry.DrugNo) || [];
+
+const filteredPrescriptions = prescriptions?.filter(
+  (p) => !usedDrugNos.includes(p.Drug_No)
+) || [];
+
+
   const handleOnFinish = async (values) => {
     try {
-      const { DrugNo, Dosage, Quantity, TreatmentRemarks } = values;
+      const { DrugNo, Dosage} = values;
 
       const treatmentSheet = {
         myAction: "create",
@@ -46,9 +54,9 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         recId: "",
         drugNo: DrugNo,
         dosage: Dosage,
-        quantity: Quantity,
-        issued: true,
-        remarks: TreatmentRemarks,
+        quantity: 0,
+        issued: false,
+        remarks: "",
         issuedDate: new Date().toISOString().split("T")[0],
         issuedTime: new Date().toLocaleTimeString([], { hour12: false }),
       };
@@ -57,13 +65,17 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
         postTreatmentSheetLineSlice(treatmentSheet)
       );
       if (response.type === POST_TREATMENT_SHEET_LINE_SUCCESS) {
+                dispatch(getTreatmentSheetLineSlice(admissionNo));
+
         message.success(
           response.payload.msg || "Treatment sheet line saved successfully."
         );
         setIsFormVisible(false);
         form.resetFields();
+        //show drawer after saving
+        setDrawerVisible(true);
+        toggleDrawer();
 
-        dispatch(getTreatmentSheetLineSlice(admissionNo));
       } else if (response.type === POST_TREATMENT_SHEET_LINE_FAILURE) {
         message.error(
           response.payload.msg || "Failed to save treatment sheet line."
@@ -80,7 +92,7 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
   useEffect(() => {
     dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
   }, [dispatch, admissionNo]);
-
+  console.log({ prescriptions });
   return (
     <Form
       layout="vertical"
@@ -88,9 +100,8 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
       onFinish={handleOnFinish}
       initialValues={{
         DrugNo: undefined,
-        Dosage: "",
-        Quantity: "",
-        TreatmentRemarks: "",
+        Dosage: ""
+        
       }}
     >
       <Row gutter={[16, 16]}>
@@ -112,13 +123,22 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                 <Select
                   placeholder="Select Drug e.g Paracetamol"
                   showSearch
+                  allowClear
                   loading={loadingPrescriptions}
                   suffixIcon={<SearchOutlined />}
                   filterOption={(input, option) =>
                     option.children.toLowerCase().includes(input.toLowerCase())
                   }
+                  onChange={(value) => {
+                    const selectedPrescription = prescriptions.find(
+                      (item) => item.Drug_No === value
+                    );
+                    form.setFieldsValue({
+                      Dosage: selectedPrescription?.Prescription_Dose || "",
+                    });
+                  }}
                 >
-                  {prescriptions.map((item) => (
+                  {filteredPrescriptions.map((item) => (
                     <Select.Option key={item.Drug_No} value={item.Drug_No}>
                       {item.Drug_Name}
                     </Select.Option>
@@ -126,10 +146,10 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                 </Select>
               )}
             </Form.Item>
+
             <Form.Item
-              label="Dosage"
+              label="Precribed Dosage"
               name="Dosage"
-              placeholder="Enter Dosage e.g 1 tablet"
               hasFeedback
               rules={[
                 {
@@ -139,42 +159,9 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
               ]}
               className="w-100"
             >
-              <Input
-                className="w-100"
-                placeholder="Enter Dosage e.g 1 tablet"
-              />
+              <Input placeholder="e.g. 1 tablet" readOnly />
             </Form.Item>
-            <Form.Item
-              label="Quantity"
-              name="Quantity"
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter quantity",
-                },
-              ]}
-            >
-              <Input type="number" placeholder="Enter Quantity" />
-            </Form.Item>
-            {/* <Form.Item
-              label="Is issued"
-              name="IsIssued"
-              valuePropName="checked"
-            >
-              <Checkbox></Checkbox>
-            </Form.Item> */}
-            <Form.Item
-              label="Treatment Remarks"
-              name="TreatmentRemarks"
-              hasFeedback
-            >
-              <TextArea
-                autoSize={{ minRows: 3, maxRows: 5 }}
-                name="TreatmentRemarks"
-                placeholder="Enter Treatment Sheet Remarks"
-              />
-            </Form.Item>
+
             <Form.Item>
               <Space>
                 <Button
@@ -183,8 +170,8 @@ const TreatmentSheetFormData = ({ setIsFormVisible, form }) => {
                   loading={loadingPostTreatmentSheet}
                   disabled={loadingPostTreatmentSheet}
                 >
-                  <SaveOutlined />
-                  Save Treatment Sheet
+                  <PlusOutlined />
+                  Add to Treatment Sheet
                 </Button>
                 {setIsFormVisible && (
                   <Button

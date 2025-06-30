@@ -3,6 +3,7 @@ import {
   Checkbox,
   Input,
   message,
+  Select,
   Spin,
   Table,
   Tag,
@@ -19,8 +20,14 @@ import {
   postPatientConsumablesSlice,
 } from "../../../../actions/nurse-actions/postPatientConsumablesSlice";
 import { getPgOpenPatientConsumablesSlice } from "../../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
-import { EditOutlined, DeleteOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  DeleteFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { parse } from "dotenv";
+import { frequencyOptions } from "../../../pharmacy-views/pharmacy-utils";
 const InpatientConsumablesTable = ({
   consumables,
   loadingGetPgOpenPatientConsumables,
@@ -34,6 +41,8 @@ const InpatientConsumablesTable = ({
   );
   const [selectedRows, setSelectedRows] = useState([]);
   const [viewOrderSheet, setViewOrderSheet] = useState(false);
+  const [editingRowKey, setEditingRowKey] = useState(null);
+  const [editedRowData, setEditedRowData] = useState({});
 
   useEffect(() => {
     dispatch(getInPatientQyPrescriptionLineSlice(admissionNo));
@@ -41,15 +50,22 @@ const InpatientConsumablesTable = ({
   }, [dispatch, admissionNo]);
 
   useEffect(() => {
-  const hasConsumables = consumables.some(
-    (item) => item.Admission_No === admissionNo
-  );
-  setViewOrderSheet(hasConsumables);
-}, [consumables, admissionNo]);
+    const hasConsumables = consumables.some(
+      (item) => item.Admission_No === admissionNo
+    );
+    setViewOrderSheet(hasConsumables);
+  }, [consumables, admissionNo]);
+  useEffect(() => {
+  if (prescriptions?.length && consumables?.length) {
+    const matched = prescriptions.filter((p) =>
+      consumables.some((c) => c.Drug_No === p.Drug_No && c.Admission_No === admissionNo)
+    );
+    setSelectedRows(matched);
+  }
+}, [prescriptions, consumables, admissionNo]);
 
-  console.log({ consumables });
+
   const handleCheckboxChange = (record) => {
-    console.log("Checkbox changed for record:", record);
     const exists = selectedRows.find((r) => r.Drug_No === record.Drug_No);
     if (exists) {
       setSelectedRows(selectedRows.filter((r) => r.Drug_No !== record.Drug_No));
@@ -59,12 +75,25 @@ const InpatientConsumablesTable = ({
   };
 
   const handleCompleteOrder = async () => {
-    const payloads = selectedRows.map((item) => ({
+// Check if any rows are selected
+    if (selectedRows.length === 0) {
+      message.warning("Please select at least one drug to order.");
+      return;
+    }
+    //check if drugs are already in the order sheet and skip them in payload when creating new orders
+    const existingDrugs = consumables
+      .filter((item) => item.Admission_No === admissionNo)
+      .map((item) => item.Drug_No);
+    const newSelectedRows = selectedRows.filter(
+      (item) => !existingDrugs.includes(item.Drug_No)
+    );
+    const payloads = newSelectedRows.map((item) => ({
       myAction: "create",
       admissionNo: item.Admission_No,
       recId: "",
       branchCode: userDetails?.userData?.shortcut_Dimension_1_Code,
-      prescriptionDose: parseInt(item.Quantity, 10) || 0,
+      quantity: parseInt(item.Quantity, 10) || 0,
+      prescriptionDose: 3,
       drugNo: item.Drug_No,
       staffNo: userDetails.userData.no,
     }));
@@ -131,23 +160,12 @@ const InpatientConsumablesTable = ({
       fixed: "left",
       width: 50,
     },
-    {
-      title: "Admission No",
-      dataIndex: "Admission_No",
-      key: "Admission_No",
-      fixed: "left",
-      width: 150,
-      render: (text) => (
-        <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
-          {text}
-        </Typography.Text>
-      ),
-    },
-    {
-      title: "Drug No",
-      dataIndex: "Drug_No",
-      key: "Drug_No",
-    },
+
+    // {
+    //   title: "Drug No",
+    //   dataIndex: "Drug_No",
+    //   key: "Drug_No",
+    // },
     {
       title: "Drug Name",
       dataIndex: "Drug_Name",
@@ -155,24 +173,10 @@ const InpatientConsumablesTable = ({
     },
     {
       title: "Dosage",
-      dataIndex: "Dosage",
-      key: "Dosage",
+      dataIndex: "Prescription_Dose",
+      key: "Prescription_Dose",
     },
-    {
-      title: "Frequency",
-      dataIndex: "Frequency",
-      key: "Frequency",
-    },
-    {
-      title: "Duration",
-      dataIndex: "Number_of_Days",
-      key: "Number_of_Days",
-    },
-    {
-      title: "Take",
-      dataIndex: "Take",
-      key: "Take",
-    },
+
     {
       title: "Quantity",
       dataIndex: "Quantity",
@@ -183,23 +187,7 @@ const InpatientConsumablesTable = ({
       dataIndex: "Unit_Of_Measure",
       key: "Unit_Of_Measure",
     },
-    {
-      title: "Route",
-      dataIndex: "Route",
-      key: "Route",
-    },
-    {
-      title: "Remarks",
-      dataIndex: "Remarks",
-      key: "Remarks",
-      fixed: "right",
-      width: 100,
-    },
-    {
-      title: "System ID",
-      dataIndex: "SystemId",
-      key: "SystemId",
-    },
+
     {
       title: "Select Drug",
       dataIndex: "select",
@@ -216,22 +204,11 @@ const InpatientConsumablesTable = ({
   ];
   const consumableColumns = [
     {
-      title: "Index",
+      title: "#",
       dataIndex: "index",
       key: "index",
     },
-    {
-      title: "Adm No",
-      dataIndex: "Admission_No",
-      key: "Admission_No",
-      fixed: "left",
-      width: 100,
-    },
-    {
-      title: "Drug No",
-      dataIndex: "Drug_No",
-      key: "Drug_No",
-    },
+
     {
       title: "Drug Name",
       dataIndex: "Drug_Name",
@@ -245,25 +222,160 @@ const InpatientConsumablesTable = ({
       },
     },
     {
+      title: "Quantity",
+      dataIndex: "Quantity",
+      key: "Quantity",
+      render: (quantity, record) => {
+        if (editingRowKey === record.SystemId) {
+          return (
+            <Input
+              type="number"
+              value={editedRowData.Quantity}
+              onChange={(e) =>
+                setEditedRowData({ ...editedRowData, Quantity: e.target.value })
+              }
+              min={0}
+            />
+          );
+        }
+        return quantity;
+      },
+      width: 25,
+    },
+
+    {
+      title: "Prescription Dose",
+      dataIndex: "Prescription_Dose",
+      key: "Prescription_Dose",
+      width: 200,
+      render: (dose, record) => {
+        if (editingRowKey === record.SystemId) {
+          return (
+            <Select
+              value={editedRowData.Prescription_Dose}
+              onChange={(value) =>
+                setEditedRowData({
+                  ...editedRowData,
+                  Prescription_Dose: value,
+                })
+              }
+              style={{ width: "100%" }}
+            >
+              {frequencyOptions.map((p) => (
+                <Select.Option key={p.value} value={p.value}>
+                  {p.label}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        }
+
+        // Normalize empty string or null/undefined to 0
+        const normalizedDose =
+          dose === "" || dose === null || dose === undefined ? 0 : dose;
+
+        const found = frequencyOptions.find(
+          (opt) => opt.value === normalizedDose || opt.label === normalizedDose
+        );
+
+        return found ? found.label : "No Prescription";
+      },
+    },
+
+    {
       title: "Action",
       dataIndex: "myAction",
       key: "myAction",
       render: (_, record) => {
-        return (
-          <>
-            {/* <Button type="primary">
-              <EditOutlined />{" "}
-            </Button> */}
-            <Button
-              type="default"
-              style={{ marginLeft: "10px" }}
-              onClick={() => handledeleteItem(record)}
-              danger
-            >
-              <DeleteFilled />
-            </Button>
-          </>
-        );
+        if (editingRowKey === record.SystemId) {
+          return (
+            <>
+              <Button
+                type="primary"
+                onClick={async () => {
+                  let doseValue = editedRowData.Prescription_Dose;
+
+                  if (!doseValue || typeof doseValue === "string") {
+                    const selectedDose = frequencyOptions.find(
+                      (item) => item.label === record.Prescription_Dose
+                    );
+                    doseValue = selectedDose ? selectedDose.value : 0; // fallback to 0 if not matched
+                  }
+
+                  const updatedData = {
+                    myAction: "edit",
+                    admissionNo: record.Admission_No,
+                    recId: record.SystemId,
+                    branchCode:
+                      userDetails?.userData?.shortcut_Dimension_1_Code,
+                    quantity: editedRowData.Quantity,
+                    prescriptionDose: parseInt(doseValue, 10) || 0,
+                    drugNo: editedRowData.Drug_No,
+                    staffNo: userDetails.userData.no,
+                  };
+
+                  try {
+                    const res = await dispatch(
+                      postPatientConsumablesSlice(
+                        "/Nurse/NurseOrderSheet",
+                        updatedData
+                      )
+                    );
+
+                    if (res.type === POST_PATIENT_CONSUMABLES_SUCCESS) {
+                      message.success(
+                        `Order updated for ${updatedData.drugNo}`
+                      );
+                    } else {
+                      message.error(
+                        `Failed to update details for ${updatedData.drugNo}`
+                      );
+                    }
+
+                    setEditingRowKey(null);
+                    dispatch(getPgOpenPatientConsumablesSlice(admissionNo));
+                  } catch (error) {
+                    message.error("Something went wrong while updating.");
+                    console.error(error);
+                  }
+                }}
+              >
+                Save
+              </Button>
+
+              <Button
+                style={{ marginLeft: 8 }}
+                onClick={() => setEditingRowKey(null)}
+              >
+                Cancel
+              </Button>
+            </>
+          );
+        } else {
+          return (
+            <>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setEditingRowKey(record.SystemId);
+                  setEditedRowData({
+                    Drug_No: record.Drug_No,
+                    Quantity: record.Quantity,
+                    Prescription_Dose: record.Prescription_Dose,
+                  });
+                }}
+                icon={<EditOutlined />}
+              />
+              <Button
+                type="default"
+                style={{ marginLeft: "10px" }}
+                onClick={() => handledeleteItem(record)}
+                danger
+                icon={<DeleteFilled />}
+              />
+            </>
+          );
+        }
       },
     },
   ];
@@ -336,8 +448,9 @@ const InpatientConsumablesTable = ({
             type="primary"
             disabled={selectedRows.length === 0}
             onClick={handleCompleteOrder}
+            icon={<PlusOutlined />}
           >
-            Complete Order
+            Add to OrderSheet
           </Button>
           <Button onClick={handleViewOrderSheet}>
             {viewOrderSheet ? "Hide" : "View"} Order Sheet

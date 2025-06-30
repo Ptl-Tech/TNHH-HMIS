@@ -73,7 +73,7 @@ const InpatientCard = () => {
           />
         );
       case "2":
-        return <Medication role={role} />;
+        return <Medication role={role} patientDetails={patientDetails} />;
       case "3":
         return <Requests />;
       case "4":

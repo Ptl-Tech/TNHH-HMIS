@@ -1,67 +1,81 @@
 import { FileOutlined, PlusOutlined } from "@ant-design/icons";
 import TreatmentSheetTable from "../tables/nurse-tables/TreatmentSheetTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import { Button, Form } from "antd";
+import { Button, Drawer, Form } from "antd";
 import { useEffect, useState } from "react";
 import TreatmentSheetFormData from "../forms/nurse-forms/TreatmentSheetFormData";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getTreatmentSheetLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
+import InpatientCardInfo from "../InpatientCardInfo";
 
-const TreatmentsSheet = () => {
+const TreatmentsSheet = ({ patientDetails }) => {
   const [form] = Form.useForm();
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
+
   const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
     (state) => state.getTreatmentSheet || {}
   );
 
-  const handleButtonVisibility = () => {
-    setIsFormVisible(!isFormVisible);
+  const handleAddClick = () => {
+    setIsFormVisible(true);
+  };
+
+  const toggleDrawer = () => {
+    setDrawerVisible(!drawerVisible);
   };
 
   useEffect(() => {
-    dispatch(getTreatmentSheetLineSlice(admissionNo));
+    if (admissionNo) {
+      dispatch(getTreatmentSheetLineSlice(admissionNo));
+    }
   }, [dispatch, admissionNo]);
 
   return (
     <div>
       <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
 
-      {!isFormVisible && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            marginTop: "20px",
-          }}
-        >
-          <Button
-            type="primary"
-            onClick={handleButtonVisibility}
-            icon={<PlusOutlined />}
-          >
-            Add Treatment Sheet
-          </Button>
-        </div>
-      )}
+      <div style={{ display: "flex", gap: "20px", marginTop: 20 }}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddClick}>
+          Update Treatment Sheet
+        </Button>
+
+        <Button onClick={toggleDrawer} type="default">
+          View Medication Sheet
+        </Button>
+      </div>
 
       {isFormVisible && (
         <TreatmentSheetFormData
-          setIsFormVisible={setIsFormVisible}
           form={form}
+          setIsFormVisible={setIsFormVisible}
+          loadingTreatmentSheet={loadingTreatmentSheet}
+          treatmentSheet={treatmentSheet}
+          setDrawerVisible={setDrawerVisible}
+          toggleDrawer={toggleDrawer}
         />
       )}
 
-      {!isFormVisible && (
+      <Drawer
+        title="Medication and Treatment Sheet"
+        placement="right"
+        width="90%"
+        onClose={toggleDrawer}
+        open={drawerVisible}
+        destroyOnClose
+      >
+                  <InpatientCardInfo patientDetail={patientDetails} />
+        
         <TreatmentSheetTable
           loadingTreatmentSheet={loadingTreatmentSheet}
           treatmentSheet={treatmentSheet}
         />
-      )}
+      </Drawer>
     </div>
   );
 };
