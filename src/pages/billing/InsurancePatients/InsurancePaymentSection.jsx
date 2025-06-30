@@ -44,6 +44,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
+
+//  console.log("patientBillData", patientBillData);
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
