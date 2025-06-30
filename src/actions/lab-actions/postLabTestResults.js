@@ -46,9 +46,10 @@ const transformLabResult = (result) => {
 };
 
 const processLabResults = async (results, config) => {
-  const requests = results
-    .filter((result) => result.Specimen_Code)
-    .map(async (result) => {
+  console.log({ results });
+
+  try {
+    const requests = results.map(async (result) => {
       const finalResult = transformLabResult(result);
 
       const response = await axios.post(
@@ -56,6 +57,8 @@ const processLabResults = async (results, config) => {
         finalResult,
         config
       );
+
+      console.log({ response });
 
       if (response.data.status === "error") {
         throw new Error(
@@ -66,8 +69,12 @@ const processLabResults = async (results, config) => {
       return response.data;
     });
 
-  await Promise.all(requests);
-  return { status: "success" };
+    console.log({ requests });
+    await Promise.all(requests);
+    return { status: "success" };
+  } catch (error) {
+    console.log({ error });
+  }
 };
 
 const postLabResultComments = async (remarks, config) => {

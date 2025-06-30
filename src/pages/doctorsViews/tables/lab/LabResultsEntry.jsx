@@ -111,8 +111,6 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
     (state) => state.getLabTestResults
   );
 
-  console.log({ resultsData });
-
   const isNarration = resultsData?.find(
     ({ Result_Type }) => Result_Type === "Narration"
   );
@@ -164,7 +162,16 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
 
 const WYSIWYGContainer = ({ initialData, currentLabLine }) => {
   const dispatch = useDispatch();
+  const {
+    Flag,
+    Results,
+    Reactive,
+    Specimen_Code,
+    SystemId: TestLineSystemId,
+  } = initialData[0] || {};
   const { recId, laboratoryNo } = currentLabLine;
+
+  console.log({ initialData });
 
   const {
     data: labResultsData,
@@ -196,33 +203,26 @@ const WYSIWYGContainer = ({ initialData, currentLabLine }) => {
     if (labResultsLoading) message.info("Submitting the results");
   }, [labResultsData, labResultsLoading, labResultsError]);
 
-  const {
-    Positive,
-    SystemId,
-    SpecimenCode,
-    MeasuringUnitCode,
-    LaboratoryTestCode,
-  } = singleLabDetails || {};
+  const { Positive, SystemId, MeasuringUnitCode, LaboratoryTestCode } =
+    singleLabDetails || {};
 
   const handleSubmit = (remarks) => {
     if (!(recId && SystemId)) return;
 
     const results = [
       {
-        SystemId: recId,
-        Laboratory_No: laboratoryNo,
-        Laboratory_Test_Code: LaboratoryTestCode,
-        Specimen_Code: SpecimenCode,
-        Reactive: "",
+        Results,
         Positive,
-        Results: 0.0,
+        Reactive,
+        flag: Flag,
+        Specimen_Code,
         Remarks: remarks,
+        SystemId: TestLineSystemId,
+        Laboratory_No: laboratoryNo,
         Measuring_Unit_Code: MeasuringUnitCode,
-        flag: "",
+        Laboratory_Test_Code: LaboratoryTestCode,
       },
     ];
-
-    console.log({ results });
 
     dispatch(postLabTestResults([...results], ""));
   };
@@ -387,8 +387,6 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
       dispatch(postLabTestResults([...results], finalData));
     }
   };
-
-  console.log({ results });
 
   return (
     <>
