@@ -263,7 +263,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
         </Row>
 
         {
-          patientBillData[0].PatientType !== "Cash" &&
+          patientBillData[0]?.PatientType !== "Cash" &&
           receiptHeader &&
           receiptHeader.length > 0 && (
             <Row gutter={16} style={{ marginTop: 16 }}>
