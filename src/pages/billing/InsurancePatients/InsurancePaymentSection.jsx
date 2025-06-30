@@ -44,6 +44,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
   );
+
+//  console.log("patientBillData", patientBillData);
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
@@ -261,7 +263,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
         </Row>
 
         {
-          patientBillData[0].PatientType !== "Cash" &&
+          patientBillData[0]?.PatientType !== "Cash" &&
           receiptHeader &&
           receiptHeader.length > 0 && (
             <Row gutter={16} style={{ marginTop: 16 }}>

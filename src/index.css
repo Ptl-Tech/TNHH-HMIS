@@ -9,6 +9,10 @@
   background-color: transparent;
 }
 
+.ProseMirror:focus {
+  outline: none;
+}
+
 .ant-layout-sider {
   flex: 0 0 230px !important;
   max-width: 230px !important;
@@ -311,22 +315,22 @@ main {
 /* Define the keyframes for the dot animation */
 @keyframes dot-blink {
   0% {
-    content: '';
+    content: "";
   }
   33% {
-    content: '.';
+    content: ".";
   }
   66% {
-    content: '..';
+    content: "..";
   }
   100% {
-    content: '...';
+    content: "...";
   }
 }
 
 /* Style for loading dots */
 .loading-dots::after {
-  content: '';
+  content: "";
   animation: dot-blink 1.5s infinite steps(1);
 }
 

@@ -23,15 +23,12 @@ export const getSingleLabDetails =
       // API request
       const { data } = await axios.get(query, config);
 
-      console.log({ data });
-
       // Dispatch success action with the fetched data
       dispatch({
         type: REQUEST_SINGLE_LAB_DETAILS_SUCCESS,
         payload: data,
       });
     } catch (error) {
-      console.log({ error });
 
       // Extract and handle errors properly
       const errorMessage =

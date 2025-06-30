@@ -34,51 +34,31 @@ const LabContentCard = () => {
     dispatch(getLabDetails(labNo));
   }, [labNo, data]);
 
+  const tabsItems = [
+    {
+      key: "Add Test Lines",
+      label: "Add Test Lines",
+      children: <TestLinesCreation data={labTestsData} />,
+    },
+    {
+      key: "Sample Collection",
+      label: "Sample Collection",
+      children: (
+        <SampleCollection data={labTestsData} loading={labTestsLoading} />
+      ),
+    },
+    {
+      key: "Lab Results Entry",
+      label: "Lab Results Entry",
+      children: (
+        <LabResultsEntry data={labTestsData} loading={labTestsLoading} />
+      ),
+    },
+  ];
+
   return (
     <Card className="card" style={{ padding: "10px 16px", marginTop: "20px" }}>
-      <Tabs
-        defaultActiveKey="1"
-        tabBarStyle={{
-          display: "flex",
-          justifyContent: "space-around",
-          borderBottom: "none", // Remove the default underline
-        }}
-        tabBarGutter={16} // Adjust spacing between tabs
-      >
-        <Tabs.TabPane
-          tab={
-            <Button type="primary" style={{ borderRadius: "4px" }}>
-              <ContainerOutlined style={{ marginRight: "8px" }} />
-              Add Test Lines
-            </Button>
-          }
-          key="1"
-        >
-          <TestLinesCreation data={labTestsData} />
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={
-            <Button type="primary" style={{ borderRadius: "4px" }}>
-              <PiEyedropperSampleFill style={{ marginRight: "8px" }} />
-              Sample Collection
-            </Button>
-          }
-          key="2"
-        >
-          <SampleCollection data={labTestsData} loading={labTestsLoading} />
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          tab={
-            <Button type="primary" style={{ borderRadius: "4px" }}>
-              <EditOutlined style={{ marginRight: "8px" }} />
-              Lab Results Entry
-            </Button>
-          }
-          key="3"
-        >
-          <LabResultsEntry data={labTestsData} loading={labTestsLoading} />
-        </Tabs.TabPane>
-      </Tabs>
+      <Tabs type="card" items={tabsItems} />
     </Card>
   );
 };

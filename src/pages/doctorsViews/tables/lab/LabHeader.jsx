@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import moment from 'moment';
-import { Button, Typography, Row, Col, message, Modal } from 'antd';
+import moment from "moment";
+import { Button, Typography, Row, Col, message, Modal } from "antd";
 
-import PDFViewer from '../../../../components/PDFView';
+import PDFViewer from "../../../../components/PDFView";
 import {
   POST_LAB_TO_DOCTOR_RESET,
   submitLabRequestToDoctor,
-} from '../../../../actions/lab-actions/postLabRequestToDoctor';
+} from "../../../../actions/lab-actions/postLabRequestToDoctor";
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
   generateLabResultsReport,
-} from '../../../../actions/lab-actions/generateLabResultsReport';
-import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
-
+} from "../../../../actions/lab-actions/generateLabResultsReport";
+import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
 const LabHeader = ({ patientData, patientLabRecord }) => {
   const dispatch = useDispatch();
@@ -29,25 +28,25 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
   } = useSelector((state) => state.generateLabResultsReport);
   const [currentReportData, setCurrentReportData] = useState(reportData);
   const { data, loading, error } = useSelector(
-    (state) => state.postLabRequestToDoctor,
+    (state) => state.postLabRequestToDoctor
   );
 
   useEffect(() => {
     if (reportData) {
-      message.success('Report generated successfully');
+      message.success("Report generated successfully");
       setCurrentReportData(reportData);
       dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
     }
 
     if (reportLoading) {
-      message.info('Generating Report...');
+      message.info("Generating Report...");
     }
 
     if (reportError) {
       message.warning(
         Array.isArray(reportError?.errors)
           ? reportError.errors[0]
-          : reportError.errors,
+          : reportError.errors
       );
       dispatch({ type: GENERATE_LAB_RESULTS_REPORT_RESET });
     }
@@ -56,9 +55,9 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
   useEffect(() => {
     if (data) {
       const { status } = data;
-      status === 'success'
-        ? message.success('Lab request submitted to the doctor')
-        : message.error('Could not send the lab request to the doctor');
+      status === "success"
+        ? message.success("Lab request submitted to the doctor")
+        : message.error("Could not send the lab request to the doctor");
 
       dispatch({ type: POST_LAB_TO_DOCTOR_RESET });
     }
@@ -68,39 +67,39 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
       dispatch({ type: POST_LAB_TO_DOCTOR_RESET });
     }
 
-    if (loading) message.info('Submitting the request to the doctor');
+    if (loading) message.info("Submitting the request to the doctor");
   }, [data, loading, error]);
 
   const capitalizeWords = (name) =>
     name
-      .split(' ')
+      .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .join(" ");
 
   const patientName = patientData?.SearchName
     ? capitalizeWords(patientData.SearchName)
     : capitalizeWords(
         [patientData?.Surname, patientData?.FirstName, patientData?.MiddleName]
           .filter(Boolean)
-          .join(' '),
+          .join(" ")
       );
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Completed':
-        return '#237804';
-      case 'New':
-        return '#ad4e00';
-      case 'Voided':
-        return '#ad4e00';
-      case 'Forwarded':
-        return '#0060a3';
-      case 'Review':
-        return '#006d75';
-      case 'Recalled':
-        return '#391085';
+      case "Completed":
+        return "#237804";
+      case "New":
+        return "#ad4e00";
+      case "Voided":
+        return "#ad4e00";
+      case "Forwarded":
+        return "#0060a3";
+      case "Review":
+        return "#006d75";
+      case "Recalled":
+        return "#391085";
       default:
-        return 'black';
+        return "black";
     }
   };
 
@@ -115,100 +114,100 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
 
   const rowData = [
     {
-      title: 'Patient Information',
+      title: "Patient Information",
       data: [
         {
-          highlighted: '#5b8c00',
-          type: 'patientInformation',
-          data: { label: 'Patient Number', value: 'PatientNo' },
+          highlighted: "#5b8c00",
+          type: "patientInformation",
+          data: { label: "Patient Number", value: "PatientNo" },
         },
         {
-          highlighted: '#fa8c16',
-          type: 'patientInformation',
-          data: { label: 'Patient Name', value: 'Names' },
+          highlighted: "#fa8c16",
+          type: "patientInformation",
+          data: { label: "Patient Name", value: "Names" },
         },
         {
-          type: 'patientInformation',
-          data: { label: 'Gender', value: 'Gender' },
+          type: "patientInformation",
+          data: { label: "Gender", value: "Gender" },
         },
         {
-          type: 'patientInformation',
-          data: { label: 'Age', value: 'DateOfBirth' },
-          helper: (value) => `${moment().diff(value, 'years')} Years`,
+          type: "patientInformation",
+          data: { label: "Age", value: "DateOfBirth" },
+          helper: (value) => `${moment().diff(value, "years")} Years`,
         },
         {
-          type: 'patientInformation',
-          data: { label: 'Date of Birth', value: 'DateOfBirth' },
+          type: "patientInformation",
+          data: { label: "Date of Birth", value: "DateOfBirth" },
         },
       ],
     },
     {
-      title: 'Laboratory Information',
+      title: "Laboratory Information",
       data: [
         {
-          highlighted: '#5b8c00',
-          type: 'labInformation',
-          data: { label: 'Laboratory Number', value: 'LaboratoryNo' },
+          highlighted: "#5b8c00",
+          type: "labInformation",
+          data: { label: "Laboratory Number", value: "LaboratoryNo" },
         },
         {
-          highlighted: '#fa8c16',
-          type: 'labInformation',
-          data: { label: 'Laboratory Type', value: 'LinkType' },
+          highlighted: "#fa8c16",
+          type: "labInformation",
+          data: { label: "Laboratory Type", value: "LinkType" },
         },
         {
-          type: 'labInformation',
-          data: { label: 'Lab Test Date', value: 'LaboratoryDate' },
+          type: "labInformation",
+          data: { label: "Lab Test Date", value: "LaboratoryDate" },
         },
         {
-          type: 'labInformation',
-          data: { label: 'Lab Test Time', value: 'LaboratoryTime' },
+          type: "labInformation",
+          data: { label: "Lab Test Time", value: "LaboratoryTime" },
         },
         {
-          type: 'labInformation',
-          data: { label: 'Lab Request Area', value: 'Request_Area' },
+          type: "labInformation",
+          data: { label: "Lab Request Area", value: "Request_Area" },
         },
         {
-          type: 'labInformation',
+          type: "labInformation",
           highlighted: getStatusColor,
           data: {
-            value: 'Status',
-            label: 'Lab Request Status',
+            value: "Status",
+            label: "Lab Request Status",
           },
         },
       ],
     },
     {
-      title: 'Lab Actions',
+      title: "Lab Actions",
       data: [
         {
-          type: 'buttons',
+          type: "buttons",
           data: [
             {
-              buttonType: 'default',
+              buttonType: "default",
               data: {
-                disabled: 'Mark as Completed',
-                active: 'Mark as Completed',
+                disabled: "Finalize",
+                active: "Finalize",
               },
               style: {
-                display: 'inline',
-                width: 'fit-content',
+                display: "inline",
+                width: "fit-content",
               },
               onClick: (value) => handleMarkAsCompleted(value),
-              disabled: (value) => value === 'Completed' || loading,
+              disabled: (value) => value === "Completed" || loading,
             },
             {
-              buttonType: 'default',
+              buttonType: "default",
               data: {
-                disabled: 'Generate Report',
-                active: 'Generate Report',
+                disabled: "Report",
+                active: "Report",
               },
               style: {
-                display: 'inline',
-                width: 'fit-content',
+                display: "inline",
+                width: "fit-content",
               },
               onClick: (value) => handleGenerateResultsReport(value),
               disabled: (value) =>
-                !(value === 'Completed' || value === 'Reviewed') ||
+                !(value === "Completed" || value === "Reviewed") ||
                 reportLoading,
             },
           ],
@@ -219,8 +218,8 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
 
   const generateCellData = (cellData, index) => {
     if (
-      cellData.type === 'patientInformation' ||
-      cellData.type === 'labInformation'
+      cellData.type === "patientInformation" ||
+      cellData.type === "labInformation"
     ) {
       return (
         <InfoRow
@@ -231,9 +230,9 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
         />
       );
     }
-    if (cellData.type === 'buttons') {
+    if (cellData.type === "buttons") {
       return (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: "flex", gap: "8px" }}>
           {cellData.data.map((button, index) => (
             <Button
               key={`button${index}`}
@@ -259,19 +258,19 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
             md={{ span: 8 }}
             xs={{ span: 24 }}
             style={{
-              display: 'grid',
-              alignContent: 'flex-start',
-              gap: '8px',
+              display: "grid",
+              alignContent: "flex-start",
+              gap: "8px",
             }}
           >
             <Typography.Title
               level={5}
-              style={{ color: '#0F5689', marginBottom: '12px' }}
+              style={{ color: "#0F5689", marginBottom: "12px" }}
             >
               {colData.title}
             </Typography.Title>
             {colData.data.map((cellData, index) =>
-              generateCellData(cellData, index),
+              generateCellData(cellData, index)
             )}
           </Col>
         ))}
@@ -297,29 +296,26 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
 const InfoRow = ({ cellData, patientLabRecord, patientData }) => {
   const { highlighted, type, data, helper } = cellData || {};
 
-  let value = '';
-  let color = 'gray';
+  let value = "";
+  let color = "gray";
 
   value =
-    type === 'patientInformation' && patientData
+    type === "patientInformation" && patientData
       ? patientData[data.value]
-      : type === 'labInformation' && patientLabRecord
+      : type === "labInformation" && patientLabRecord
       ? (value = patientLabRecord[data.value])
       : value;
 
   value = helper ? helper(value) : value;
 
   if (highlighted) {
-    color = typeof highlighted === 'string' ? highlighted : highlighted(value);
+    color = typeof highlighted === "string" ? highlighted : highlighted(value);
   }
 
   return (
-    <Typography.Text
-      level={5}
-      style={{ display: 'block', fontWeight: 'bold' }}
-    >
+    <Typography.Text level={5} style={{ display: "block", fontWeight: "bold" }}>
       <span>{`${data.label} :`}</span>
-      <span style={{ color }}>{` ${value}` || 'N/A'}</span>
+      <span style={{ color }}>{` ${value}` || "N/A"}</span>
     </Typography.Text>
   );
 };
