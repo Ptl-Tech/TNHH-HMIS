@@ -172,7 +172,7 @@ const RadiologyTopSection = ({ radiologyDetails }) => {
                             style={{ flex: "1 1 calc(50% - 5px)" }}
                         // onClick={() => handleMarkAsCompleted(labObservationNo)}
                         >
-                            Mark as Completed
+                            Finalize
                         </Button> */}
                         <Button
                             type="default"

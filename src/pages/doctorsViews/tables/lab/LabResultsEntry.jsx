@@ -122,6 +122,8 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
     if (record) dispatch(getLabTestResults({ labNo, testCode }));
   }, [record]);
 
+  console.log({ record });
+
   return (
     <Drawer
       open={open}
@@ -134,16 +136,18 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
       closeIcon={null}
       destroyOnHidden={true}
       title={`Results for ${LaboratoryTestName}`}
-      extra={<Button onClick={handleCancel}>Cancel</Button>}
+      extra={<Button onClick={handleCancel}>Close</Button>}
     >
       {resultsLoading ? (
         <SkeletonLoading />
       ) : isNarration ? (
         <WYSIWYGContainer
+        handleClose={handleOk}
           initialData={resultsData}
           currentLabLine={{
             recId: record?.SystemId,
             laboratoryNo: record?.Laboratory_No,
+            testCode: record?.LaboratoryTestCode,
           }}
         />
       ) : (
@@ -160,18 +164,20 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
   );
 };
 
-const WYSIWYGContainer = ({ initialData, currentLabLine }) => {
+const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
   const dispatch = useDispatch();
   const {
     Flag,
     Results,
     Reactive,
     Specimen_Code,
+    Laboratory_Test_Code,
     SystemId: TestLineSystemId,
   } = initialData[0] || {};
-  const { recId, laboratoryNo } = currentLabLine;
 
-  console.log({ initialData });
+  console.log({ currentLabLine });
+
+  const { recId, testCode, laboratoryNo } = currentLabLine;
 
   const {
     data: labResultsData,
@@ -193,6 +199,7 @@ const WYSIWYGContainer = ({ initialData, currentLabLine }) => {
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
+      handleClose()
     }
 
     if (labResultsError) {

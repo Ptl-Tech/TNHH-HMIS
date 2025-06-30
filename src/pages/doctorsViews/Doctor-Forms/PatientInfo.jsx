@@ -51,7 +51,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
         if (data?.status === "success") {
           message.success("Patient has been Marked as completed");
         } else {
-          message.error("Failed to mark as completed. Please try again.");
+          message.error("Failed to finalize. Please try again.");
         }
       })
       .catch((error) => {
