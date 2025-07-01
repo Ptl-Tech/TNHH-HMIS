@@ -413,7 +413,7 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
               <Table
                 columns={columns}
                 pagination={false}
-                dataSource={results}
+                dataSource={results.sort((a, b) => a.SortTest - b.SortTest)}
                 className="d-block"
                 rowClassName={"editable-row"}
                 onRow={(record) => ({
