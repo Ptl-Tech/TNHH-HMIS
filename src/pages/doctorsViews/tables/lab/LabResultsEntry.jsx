@@ -288,6 +288,8 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   const { TextArea } = Input;
   const { Item, useForm } = Form;
 
+  console.log({ initialData });
+
   const { recId, laboratoryNo } = currentLabLine;
 
   const [form] = useForm();
