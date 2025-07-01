@@ -143,7 +143,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
         <SkeletonLoading />
       ) : isNarration ? (
         <WYSIWYGContainer
-        handleClose={handleOk}
+          handleClose={handleOk}
           initialData={resultsData}
           currentLabLine={{
             recId: record?.SystemId,
@@ -200,7 +200,7 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
-      handleClose()
+      handleClose();
     }
 
     if (labResultsError) {
