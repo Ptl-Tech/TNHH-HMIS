@@ -211,7 +211,13 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label="Dependant ?" name="dependant" rules={[{required: true, message: "Please select if dependant"}]}>
+            <Form.Item
+              label="Dependant ?"
+              name="dependant"
+              // rules={[
+              //   { required: true, message: "Please select if dependant" },
+              // ]}
+            >
               <Switch
                 checkedChildren="Yes"
                 unCheckedChildren="No"
@@ -262,12 +268,12 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             <Form.Item
               label="How did you hear about us?"
               name="howYouKnewABoutUs"
-              rules={[
-                {
-                  required: true,
-                  message: "Please select a marketing strategy!",
-                },
-              ]}
+              // rules={[
+              //   {
+              //     required: true,
+              //     message: "Please select a marketing strategy!",
+              //   },
+              // ]}
             >
               <Select
                 showSearch

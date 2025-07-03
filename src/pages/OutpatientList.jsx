@@ -143,6 +143,7 @@ const OutpatientList = () => {
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
+    {title:"Branch Code", dataIndex: "GlobalDimension1Code", key: "GlobalDimension1Code"},
     {
       title: "Date Registered",
       dataIndex: "DateRegistered",
