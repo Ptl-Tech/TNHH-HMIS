@@ -65,6 +65,8 @@ import dayjs from "dayjs";
 import PatientSignsReport from "./PatientSignsReport";
 
 const PatientVitalInfo = () => {
+  const observationNo = useLocation().state.observationNo;
+
   const items = [
     {
       key: "0",
@@ -76,11 +78,15 @@ const PatientVitalInfo = () => {
       label: "Allergies & Medications",
       children: <AllergiesAndMedications />,
     },
-    {
-      key: "2",
-      label: "Triage Notes",
-      children: <TraigeNotes />,
-    },
+    ...(observationNo
+      ? [
+          {
+            key: "2",
+            label: "Triage Notes",
+            children: <TraigeNotes />,
+          },
+        ]
+      : []),
     {
       key: "3",
       label: "Latest Encounter",
@@ -222,8 +228,9 @@ const Vitals = () => {
 
 const AddVitalsDrawer = ({ open, setOpen }) => {
   const dispatch = useDispatch();
-  const { state } = useLocation() || {};
-  const { patientNo, observationNo } = state || {};
+  const { state, search } = useLocation() || {};
+  const { observationNo } = state || {};
+  const patientNo = new URLSearchParams(search).get("PatientNo");
 
   const { Compact: SpaceCompact } = Space;
   const { useForm, Item: FormItem } = Form;
@@ -417,8 +424,9 @@ const ViewPreviousVitals = ({ open, setOpen }) => {
 
 const AllergiesAndMedications = () => {
   const dispatch = useDispatch();
-  const { state } = useLocation() || {};
+  const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
+  const admissionNo = new URLSearchParams(search).get("AdmNo");
 
   const [open, setOpen] = useState(false);
 
@@ -431,7 +439,7 @@ const AllergiesAndMedications = () => {
   } = useSelector((state) => state.postAllergiesMedication);
 
   useEffect(() => {
-    dispatch(getAllergiesAndMedicationsSlice(observationNo));
+    dispatch(getAllergiesAndMedicationsSlice(observationNo || admissionNo));
 
     if (postAllergiesMedication.status === "success")
       message.success("Allergy posted successfully");
@@ -493,9 +501,10 @@ const AllergiesAndMedications = () => {
 
 const AddAllergiesAndMedicines = ({ open, setOpen }) => {
   const dispatch = useDispatch();
-  const { state } = useLocation() || {};
+  const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
   const staffNo = useAuth().userData.no;
+  const admissioNo = new URLSearchParams(search).get("AdmNo");
 
   const { TextArea } = Input;
   const { useForm, Item: FormItem } = Form;
@@ -510,11 +519,11 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
     const finalValues = {
       ...values,
       staffNo,
-      observationNo,
-      myAction: "create",
-      assessedBy: staffNo,
       foodAllergy: "",
       drugAllergy: "",
+      myAction: "create",
+      assessedBy: staffNo,
+      observationNo: observationNo || admissioNo,
     };
 
     dispatch(postAllergiesMedicationSlice(finalValues));
@@ -600,14 +609,19 @@ const TraigeNotes = ({}) => {
   const { state } = useLocation() || {};
   console.log({ state, location: useLocation() });
 
-  const { observationNo } = state || {};
+  const { observationNo, patientDetails } = state || {};
+  const { Admission_No } = patientDetails || {};
 
   const { loadingTriageList, triageList } = useSelector(
     (state) => state.getTriageList
   );
 
+  const key = "ObservationNo";
+  const value = observationNo;
+
   useEffect(() => {
-    if (observationNo) dispatch(getTriageList(observationNo));
+    console.log({ observationNo });
+    dispatch(getTriageList({ key, value }));
   }, [observationNo]);
 
   return (

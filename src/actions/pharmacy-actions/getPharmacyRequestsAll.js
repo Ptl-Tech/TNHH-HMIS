@@ -1,5 +1,6 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
+import dayjs from "dayjs";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
@@ -11,51 +12,48 @@ export const GET_PHARMACY_REQUESTS_ALL_FAILURE =
 export const GET_PHARMACY_REQUESTS_ALL_RESET =
   "GET_PHARMACY_REQUESTS_ALL_RESET";
 
-const generateQuery = ({ type, status }) => {
-  var query = "&query=$filter=";
+const generateQuery = ({ type, status, branchCode }) => {
+  var query = `&query=$filter=Global_Dimension1 eq '${branchCode}' and Pharmacy_Date eq ${dayjs(
+    new Date()
+  ).format("YYYY-MM-DD")}`;
+
   switch (type) {
     case "WalkIn":
-      query += "Walkin eq true";
+      query += " and Walkin eq true";
       break;
     case "InPatient":
-      query += "InPatient eq true";
+      query += " and InPatient eq true";
       break;
     case "OutPatient":
-      query += "InPatient eq false and Walkin eq false";
+      query += " and InPatient eq false and Walkin eq false";
       break;
     default:
       break;
   }
-
-  query = query === "&query=$filter=" ? query : `${query}  and `;
 
   switch (status) {
     case "New":
-      query += "Status eq 'New'";
+      query += " and Status eq 'New'";
       break;
     case "Forwarded":
-      query += "Status eq 'Forwarded'";
+      query += " and Status eq 'Forwarded'";
       break;
     case "Completed":
-      query += "Status eq 'Completed'";
+      query += " and Status eq 'Completed'";
       break;
     case "Cancelled":
-      query += "Status eq 'Cancelled'";
+      query += " and Status eq 'Cancelled'";
       break;
     default:
-      query = query.endsWith(" and ")
-        ? query.slice(0, query.lastIndexOf(" and "))
-        : query;
       break;
   }
-  return query === "&query=$filter=" ? "" : query;
+
+  return query;
 };
 
 export const getPharmacyRequestsAll =
   ({ type, status }) =>
   async (dispatch, getState) => {
-    const query = generateQuery({ type, status });
-
     try {
       dispatch({ type: GET_PHARMACY_REQUESTS_ALL });
 
@@ -73,9 +71,10 @@ export const getPharmacyRequestsAll =
         },
       };
 
+      const query = generateQuery({ type, status, branchCode });
       const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgPharmacyHeaderAll&isList=true${query}`,
-        
+        `${API}data/odatafilter?webservice=QyPharmacyList&isList=true${query}`,
+
         config
       );
 

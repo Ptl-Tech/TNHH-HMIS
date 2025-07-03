@@ -9,33 +9,33 @@ const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
   "https://chiromo.potestastechnologies.net:8085";
 
-export const getTriageList =
-  ({ key, value }) =>
-  async (dispatch, getState) => {
-    console.log({ ObservationNo });
+export const getTriageList = (options) => async (dispatch, getState) => {
+  console.log({ options });
 
-    const filters = key && value ? `&query=$filter=${key} eq '${value}'` : "";
-    const config = configHelpers(getState);
-    const query = `${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true${filters}`;
+  const { key, value, isBoolean } = options || {};
+  const finalValue = isBoolean ? value : `'${value}'`;
+  const filters = key && value ? `&query=$filter=${key} eq ${finalValue}` : "";
+  const config = configHelpers(getState);
+  const query = `${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true${filters}`;
 
-    try {
-      dispatch({ type: GET_TRIAGE_LIST_REQUEST });
-      const { data } = await axios.get(query, config);
+  try {
+    dispatch({ type: GET_TRIAGE_LIST_REQUEST });
+    const { data } = await axios.get(query, config);
 
-      dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: data });
+    dispatch({ type: GET_TRIAGE_LIST_SUCCESS, payload: data });
 
-      return { type: GET_TRIAGE_LIST_SUCCESS, payload: data };
-    } catch (error) {
-      console.log({ error });
+    return { type: GET_TRIAGE_LIST_SUCCESS, payload: data };
+  } catch (error) {
+    console.log({ error });
 
-      dispatch({
-        type: GET_TRIAGE_LIST_FAILURE,
-        payload: {
-          message: error.message,
-          status: error.response?.status || "Network Error",
-          data: error.response?.data || null,
-        },
-      });
-      return { type: GET_TRIAGE_LIST_FAILURE, payload: error };
-    }
-  };
+    dispatch({
+      type: GET_TRIAGE_LIST_FAILURE,
+      payload: {
+        message: error.message,
+        status: error.response?.status || "Network Error",
+        data: error.response?.data || null,
+      },
+    });
+    return { type: GET_TRIAGE_LIST_FAILURE, payload: error };
+  }
+};
