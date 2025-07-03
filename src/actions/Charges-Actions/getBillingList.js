@@ -35,14 +35,9 @@ export const getBillingList = () => async (dispatch, getState) => {
       config
     );
 
-    // Filter response to match the branchCode
-    const filteredData = data?.filter(
-      (patient) => patient.Global_Dimension_1_Code === branchCode
-    );
-
     dispatch({
       type: GET_BILLING_LIST_SUCCESS,
-      payload: filteredData,
+      payload: data,
     });
 
     return filteredData; // Return only filtered data
