@@ -206,6 +206,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
                 width: "fit-content",
               },
               onClick: (value) => handleGenerateResultsReport(value),
+              disabled: (value) => false,
             },
           ],
         },
