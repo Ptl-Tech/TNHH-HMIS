@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
-import useSignIn from "../hooks/useSignIn";
-import { Alert, Button, Card, Input, Modal, Select, Typography } from "antd";
+import { Button, Card, Input, Modal, Typography } from "antd";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import loginImg from "../assets/images/loginImg.jpg";
 import logoLogin from "../assets/images/logoLogin.png";
-import { branches } from "../constants/DropDownConstants";
+import useSignIn from "../hooks/useSignIn";
 
 const { Title } = Typography;
 

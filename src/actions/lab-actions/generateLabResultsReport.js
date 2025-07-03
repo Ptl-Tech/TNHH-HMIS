@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { message } from 'antd';
 
 const API = 'https://chiromo.potestastechnologies.net:8085/';
 
