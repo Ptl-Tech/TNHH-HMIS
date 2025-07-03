@@ -40,7 +40,7 @@ export const getBillingList = () => async (dispatch, getState) => {
       payload: data,
     });
 
-    return filteredData; // Return only filtered data
+    return data; // Return only filtered data
   } catch (error) {
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
