@@ -79,6 +79,8 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
+                dependant: patientDetails?.Dependant || 0,
+
       });
     }
   }, [patientDetails, form]);

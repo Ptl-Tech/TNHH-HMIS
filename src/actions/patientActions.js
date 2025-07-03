@@ -404,12 +404,9 @@ export const listPatients =
         config,
       );
 
-      // Filter the patients by branchCode matching GlobalDimension1Code
-      const filteredData = data.filter(
-        (patient) => patient.GlobalDimension1Code === branchCode,
-      );
+    
 
-      dispatch({ type: PATIENT_LIST_SUCCESS, payload: filteredData });
+      dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } catch (error) {
       dispatch({ type: PATIENT_LIST_FAIL, payload: error.message });
     }

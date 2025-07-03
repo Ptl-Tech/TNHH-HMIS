@@ -107,6 +107,8 @@ console.log("daotient", patientDetails);
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
         patientStatus: patientDetails?.patientStatus || 0,
+                dependant: patientDetails?.Dependant || 0,
+
       });
     }
   }, [patientDetails, form]);
