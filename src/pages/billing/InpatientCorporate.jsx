@@ -20,7 +20,7 @@ const InsurancePatients = () => {
 
   // Process patient list: filter inactive patients
   const filteredPatients = patients
-    ?.filter((patient) => patient?.Activated && patient?.Inpatient && patient?.PatientType === 'Corporate' && patient?.Global_Dimension_1_Code === branchCode)
+    ?.filter((patient) => patient?.Activated && patient?.Inpatient && patient?.PatientType === 'Corporate')
     .map((patient) => ({
       ...patient,
       key: patient.PatientNo,
