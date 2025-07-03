@@ -1,5 +1,4 @@
-import React from 'react';
-import { Skeleton } from 'antd';
+import { Skeleton } from "antd";
 
 const LoadingParagraph = ({
   rows = 1,
@@ -7,7 +6,7 @@ const LoadingParagraph = ({
   width = 120,
   loading = true,
   children = <></>,
-  className = '',
+  className = "",
   avatar = false,
 }) => {
   return (

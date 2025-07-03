@@ -116,7 +116,7 @@ function PharmacyLabel({ items }) {
                 <View style={styles.row}>
                   <Text style={styles.mediumText}>Date:</Text>
                   <Text style={{ ...styles.mediumText, ...styles.boldText }}>
-                    {dayjs(new Date()).format("ddd MM YYYY h:mm A")}
+                    {dayjs(new Date()).format("ddd DD MMM YYYY h:mm A")}
                   </Text>
                 </View>
               </View>
