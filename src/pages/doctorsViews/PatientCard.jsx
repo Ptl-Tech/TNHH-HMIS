@@ -1,6 +1,10 @@
 import React from "react";
 import { Card, Row, Col, Typography, Button, Tag } from "antd";
-import { CheckCircleOutlined, PrinterOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  PrinterOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { MdOutlineAssignmentInd, MdOutlinePerson } from "react-icons/md";
 
 const { Title, Text } = Typography;
@@ -53,7 +57,8 @@ const PatientCard = () => {
       {/* Settlement Type Section */}
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col span={12}>
-          <Text strong>Settlement Type:</Text> <Tag color="purple">Insurance Payer</Tag>
+          <Text strong>Settlement Type:</Text>{" "}
+          <Tag color="purple">Insurance Payer</Tag>
         </Col>
         <Col span={12}>
           <Text strong>Insurance:</Text> <Tag color="magenta">NHIF</Tag>
@@ -77,7 +82,11 @@ const PatientCard = () => {
       <hr style={{ margin: "20px 0", border: "1px solid #e8e8e8" }} />
 
       {/* Allergies and Chronic Section */}
-      <Row justify="space-between" align="middle" style={{ marginBottom: "20px" }}>
+      <Row
+        justify="space-between"
+        align="middle"
+        style={{ marginBottom: "20px" }}
+      >
         <Col>
           <Title level={5} style={{ color: "#ff4d4f" }}>
             Allergies and Chronics
@@ -85,7 +94,7 @@ const PatientCard = () => {
         </Col>
         <Col>
           <Button type="primary" danger icon={<CheckCircleOutlined />}>
-            Mark as Completed
+            Finalize
           </Button>
           <Button
             type="default"
