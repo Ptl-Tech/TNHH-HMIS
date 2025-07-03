@@ -1,90 +1,89 @@
-import moment from 'moment';
+import moment from "moment";
 
 export const labLinesColumns = [
   {
-    title: 'Lab Number',
-    dataIndex: 'Laboratory_No',
-    key: 'Laboratory_No',
+    title: "Lab Number",
+    dataIndex: "Laboratory_No",
+    key: "Laboratory_No",
   },
   {
-    title: 'Test Name',
-    dataIndex: 'LaboratoryTestName',
-    key: 'LaboratoryTestName',
+    title: "Test Name",
+    dataIndex: "LaboratoryTestName",
+    key: "LaboratoryTestName",
   },
   {
-    title: 'Positive',
-    dataIndex: 'Positive',
-    key: 'Positive',
-    render: (_, record) =>
-      record.Positive ? 'TRUE' : !record.Positive ? 'FALSE' : record.Positive,
-  },
-  {
-    title: 'Completed',
-    dataIndex: 'Completed',
-    key: 'Completed',
+    title: "Completed",
+    dataIndex: "Completed",
+    key: "Completed",
     render: (_, record) =>
       record.Completed
-        ? 'TRUE'
+        ? "TRUE"
         : !record.Completed
-        ? 'FALSE'
+        ? "FALSE"
         : record.Completed,
   },
   {
-    title: 'Date',
-    dataIndex: 'CollectionDate',
-    key: 'CollectionDate',
+    title: "Date",
+    dataIndex: "CollectionDate",
+    key: "CollectionDate",
     render: (_, record) => {
       const date = new Date(
-        `${record.CollectionDate}T${record.CollectionTime}`,
+        `${record.CollectionDate}T${record.CollectionTime}`
       );
 
-      return moment(date).format('MMMM Do YYYY, h:mm a');
+      return moment(date).format("MMMM Do YYYY, h:mm a");
     },
   },
 ];
 
 export const labResultsColumns = [
   {
-    title: 'Specimen Code',
-    dataIndex: 'Specimen_Code',
-    key: 'Specimen_Code',
+    title: "Specimen Code",
+    dataIndex: "Specimen_Code",
+    key: "Specimen_Code",
   },
   {
-    title: 'Specimen Name',
-    dataIndex: 'Specimen_Name',
-    key: 'Specimen_Name',
+    title: "Specimen Name",
+    dataIndex: "Specimen_Name",
+    key: "Specimen_Name",
   },
   {
-    title: 'Lab Results',
-    dataIndex: 'Results',
-    key: 'Results',
+    title: "Lab Results",
+    dataIndex: "Results",
+    key: "Results",
     editable: true,
   },
   {
-    title: 'Unit',
-    dataIndex: 'Measuring_Unit_Code',
-    key: 'Measuring_Unit_Code',
+    title: "Unit",
+    dataIndex: "Measuring_Unit_Code",
+    key: "Measuring_Unit_Code",
   },
   {
-    title: 'Reference Range',
-    dataIndex: 'Test_Normal_Ranges',
-    key: 'Test_Normal_Ranges',
+    title: "Reference Range",
+    dataIndex: "Test_Normal_Ranges",
+    key: "Test_Normal_Ranges",
+  },
+  {
+    key: "Remarks",
+    editable: true,
+    title: "Remarks",
+    dataIndex: "Remarks",
   },
 ];
 
 export const filterByCategory = (labRequest, variant) => {
   var returnValue;
   switch (variant) {
-    case 'All':
+    case "All":
       returnValue = true;
       break;
-    case 'Walk-In':
+    case "Walk-In":
       returnValue = labRequest.Walk_In;
       break;
-    case 'Inpatient':
+    case "Inpatient":
       returnValue = labRequest.Inpatient;
       break;
-    case 'Outpatient':
+    case "Outpatient":
       returnValue = !labRequest.Inpatient && !labRequest.Walk_In;
       break;
     default:

@@ -143,7 +143,7 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
         <SkeletonLoading />
       ) : isNarration ? (
         <WYSIWYGContainer
-        handleClose={handleOk}
+          handleClose={handleOk}
           initialData={resultsData}
           currentLabLine={{
             recId: record?.SystemId,
@@ -200,7 +200,7 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
-      handleClose()
+      handleClose();
     }
 
     if (labResultsError) {
@@ -287,6 +287,8 @@ const EditableCell = ({
 const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   const { TextArea } = Input;
   const { Item, useForm } = Form;
+
+  console.log({ initialData });
 
   const { recId, laboratoryNo } = currentLabLine;
 
@@ -411,7 +413,7 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
               <Table
                 columns={columns}
                 pagination={false}
-                dataSource={results}
+                dataSource={results.sort((a, b) => a.SortTest - b.SortTest)}
                 className="d-block"
                 rowClassName={"editable-row"}
                 onRow={(record) => ({
