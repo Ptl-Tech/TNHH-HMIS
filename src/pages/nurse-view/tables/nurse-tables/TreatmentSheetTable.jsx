@@ -130,6 +130,8 @@ const [data, setData] = useState(() => {
 {
   title: "Issued Date",
   dataIndex: "IssuedDate",
+        fixed: "left",
+
   width: 120,
   render: (dateStr) => <Text>{moment(dateStr).format("DD/MM/YYYY")}</Text>,
 },
