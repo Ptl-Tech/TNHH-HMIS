@@ -1,27 +1,18 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
-import {
-  Form,
-  Space,
-  Table,
-  Button,
-  Drawer,
-  Select,
-  message,
-  Typography,
-} from "antd";
+import { Button, Drawer, Form, message, Select, Space, Table } from "antd";
 import { IoIosTrash } from "react-icons/io";
-import { FileTextOutlined } from "@ant-design/icons";
 
+import { FaSquarePlus } from "react-icons/fa6";
+import { getLabDetails } from "../../../../actions/Doc-actions/getLabRequestDetails";
+import { getLabTestCodes } from "../../../../actions/lab-actions/getLabTestCodes";
 import {
-  postLabTest,
   POST_LAB_TEST_RESET,
+  postLabTest,
 } from "../../../../actions/lab-actions/postLabTest";
 import { labLinesColumns as defaultColumns } from "./utils";
-import { getLabTestCodes } from "../../../../actions/lab-actions/getLabTestCodes";
-import { getLabDetails } from "../../../../actions/Doc-actions/getLabRequestDetails";
 
 const TestLinesCreation = ({ data: labLines }) => {
   const dispatch = useDispatch();
@@ -112,24 +103,16 @@ const TestLinesCreation = ({ data: labLines }) => {
       <Space
         style={{
           width: "100%", // Make Space full width
-          paddingTop: "4px",
           paddingBottom: "4px",
-          justifyContent: "space-between",
+          justifyContent: "end",
         }}
         align="baseline"
       >
-        <Typography.Title
-          level={5}
-          style={{ color: "#0F5689", marginBottom: "12px" }}
-        >
-          <FileTextOutlined style={{ marginRight: "8px" }} />
-          Laboratory Test Creation
-        </Typography.Title>
-        <Button type="primary" onClick={handleOpen}>
+        <Button icon={<FaSquarePlus />} type="primary" onClick={handleOpen}>
           New Test
         </Button>
       </Space>
-      <Table columns={columns} dataSource={labLines} pagination={false} />
+      <Table columns={columns} pagination={false} dataSource={labLines} />
       <LabTestDrawer
         data={data}
         open={open}

@@ -1,36 +1,32 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
+  Button,
+  Drawer,
   Flex,
   Form,
   Input,
+  InputNumber,
+  message,
+  Skeleton,
   Space,
   Table,
-  Drawer,
-  Button,
-  message,
   Typography,
-  InputNumber,
-  Skeleton,
 } from "antd";
 
 // draftjs components
-import StarterKit from "@tiptap/starter-kit";
-import Strike from "@tiptap/extension-strike";
-import { EditorContent, useEditor, FloatingMenu } from "@tiptap/react";
-
 import { labLinesColumns, labResultsColumns } from "./utils";
 
 import Loading from "../../../../partials/nurse-partials/Loading";
 import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
-import {
-  postLabTestResults,
-  POST_LAB_TEST_RESULTS_RESET,
-} from "../../../../actions/lab-actions/postLabTestResults";
-import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
 import { getSingleLabDetails } from "../../../../actions/Doc-actions/getSingleLabRequestDetails";
+import { getLabTestResults } from "../../../../actions/lab-actions/getLabTestResults";
+import {
+  POST_LAB_TEST_RESULTS_RESET,
+  postLabTestResults,
+} from "../../../../actions/lab-actions/postLabTestResults";
 import WYSIWYGEditor from "../../../../components/WYSIWYGEditor";
 
 const LabResultsEntry = ({ data, loading }) => {
@@ -77,9 +73,6 @@ const LabResultsEntry = ({ data, loading }) => {
 
   return (
     <div>
-      <Title level={5} style={{ color: "#0F5689", marginBottom: "12px" }}>
-        Results Recording
-      </Title>
       {loading ? (
         <Loading />
       ) : (

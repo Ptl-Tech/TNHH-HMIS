@@ -30,12 +30,14 @@ createRoot(document.getElementById('root')).render(
               headerBg: '#0f5689',
               headerColor: '#FAFAFA',
               headerCellBg: '#0f5689',
-              headerCellColor: '#FAFAFA',
+             // headerCellColor: '#FAFAFA',
               headerCellHoverBg: '#ac8342',
               headerCellHoverColor: '#ffffff',
               headerCellHoverBorder: '#ac8342',
-              rowSelectedBg: 'rgba(172, 131, 66, 0.6)',
-              rowHoverBg: 'rgba(172, 131, 66, 0.6)',
+              rowSelectedBg: '#ac8342',
+            rowHoverBg: 'transparent', // No hover effect
+            rowHoverColor: '#0f5689', // Keeps hover text white
+
             },
           },
         }}

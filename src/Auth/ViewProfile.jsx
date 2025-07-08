@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Card, Tabs, Button, Input, List, Avatar } from "antd";
-import { UserOutlined, LockOutlined, FileOutlined, ProfileOutlined } from "@ant-design/icons";
+import { FileOutlined, LockOutlined, ProfileOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Button, Card, Input, List, Tabs } from "antd";
+import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 
 const { TabPane } = Tabs;
