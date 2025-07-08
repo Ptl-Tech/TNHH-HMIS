@@ -411,7 +411,7 @@ const InpatientConsumablesTable = ({
             .sort((a, b) => a.Drug_No - b.Drug_No)}
           className="admit-patient-table"
           bordered
-          size="middle"
+            size="small"
           pagination={{
             ...pagination,
             total: prescriptions?.length,
@@ -472,7 +472,7 @@ const InpatientConsumablesTable = ({
               .sort((a, b) => a.Order_No - b.Order_No)}
             className="admit-patient-table"
             bordered
-            size="middle"
+            size="small"
             loading={loadingGetPgOpenPatientConsumables}
             pagination={{
               ...pagination,
