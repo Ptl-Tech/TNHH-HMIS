@@ -4,14 +4,13 @@ import MainLayout from "../Layouts/MainLayout";
 import {
   SendOutlined,
   UndoOutlined,
-  UserOutlined,
   AppstoreOutlined,
   PlusCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
-import { IoAlbums } from "react-icons/io5";
+import { IoAlbums, IoAddCircle } from "react-icons/io5";
 import {
   FaBedPulse,
   FaPersonWalking,
@@ -20,6 +19,7 @@ import {
 
 import PrivateRoute from "../private/PrivateRoute";
 import LabDashboard from "../Dashboards/LabDashboard";
+import { DispatchToLab } from "../pages/labViews/DispatchToLab";
 import LabRequests from "../pages/doctorsViews/tables/lab/LabRequests";
 import LaboratoryEvaluationCard from "../pages/doctorsViews/tables/lab/LaboratoryEvaluationCard";
 
@@ -49,6 +49,11 @@ export const labRoutes = [
     label: "Dashboard",
   },
   {
+    key: "/Lab/Create-Lab-Header",
+    icon: <IoAddCircle style={{ color: "#fff" }} />,
+    label: "Create Lab Header",
+  },
+  {
     key: "/Lab/All",
     label: "All Laboratory Requests",
     icon: <IoAlbums style={{ color: "#fff" }} />,
@@ -72,69 +77,68 @@ export const labRoutes = [
 
 export default function LabRoutes() {
   return (
-    <>
-      <Route element={<PrivateRoute allowedDepartments={["Laboratory"]} />}>
-        <Route path="/Lab" element={<MainLayout />}>
-          <Route index element={<LabDashboard />} />
-          {/* All */}
-          <Route path="/Lab/All" element={<LabRequests requestType="All" />} />
-          {statuses.map(({ name }) => (
-            <Route
-              key={name}
-              element={<LabRequests status={name} requestType="All" />}
-              path={`/Lab/All/${name}`}
-            />
-          ))}
-          {/* Outpatient */}
+    <Route element={<PrivateRoute allowedDepartments={["Laboratory"]} />}>
+      <Route path="/Lab" element={<MainLayout />}>
+        <Route index element={<LabDashboard />} />
+        <Route path="/Lab/Create-Lab-Header" element={<DispatchToLab />} />
+        {/* All */}
+        <Route path="/Lab/All" element={<LabRequests requestType="All" />} />
+        {statuses.map(({ name }) => (
           <Route
-            path="/Lab/Outpatient"
-            element={<LabRequests requestType="Outpatient" />}
+            key={name}
+            element={<LabRequests status={name} requestType="All" />}
+            path={`/Lab/All/${name}`}
           />
-          {statuses.map(({ name }) => (
-            <Route
-              key={name}
-              element={<LabRequests status={name} requestType="Outpatient" />}
-              path={`/Lab/Outpatient/${name}`}
-            />
-          ))}
+        ))}
+        {/* Outpatient */}
+        <Route
+          path="/Lab/Outpatient"
+          element={<LabRequests requestType="Outpatient" />}
+        />
+        {statuses.map(({ name }) => (
           <Route
-            path="/Lab/Outpatient/Lab-Request/:LaboratoryNo?"
-            element={<LaboratoryEvaluationCard />}
+            key={name}
+            element={<LabRequests status={name} requestType="Outpatient" />}
+            path={`/Lab/Outpatient/${name}`}
           />
-          {/* Walk In */}
+        ))}
+        <Route
+          path="/Lab/Outpatient/Lab-Request/:LaboratoryNo?"
+          element={<LaboratoryEvaluationCard />}
+        />
+        {/* Walk In */}
+        <Route
+          path="/Lab/Walk-In"
+          element={<LabRequests requestType="Walk-In" />}
+        />
+        {statuses.map(({ name }) => (
           <Route
-            path="/Lab/Walk-In"
-            element={<LabRequests requestType="Walk-In" />}
+            key={name}
+            element={<LabRequests status={name} requestType="Walk-In" />}
+            path={`/Lab/Walk-In/${name}`}
           />
-          {statuses.map(({ name }) => (
-            <Route
-              key={name}
-              element={<LabRequests status={name} requestType="Walk-In" />}
-              path={`/Lab/Walk-In/${name}`}
-            />
-          ))}
+        ))}
+        <Route
+          path="/Lab/Walk-In/Lab-Header/:LaboratoryNo?"
+          element={<LaboratoryEvaluationCard />}
+        />
+        {/* Inpatient */}
+        <Route
+          path="/Lab/Inpatient"
+          element={<LabRequests requestType="Inpatient" />}
+        />
+        {statuses.map(({ name }) => (
           <Route
-            path="/Lab/Walk-In/Lab-Header/:LaboratoryNo?"
-            element={<LaboratoryEvaluationCard />}
+            key={name}
+            element={<LabRequests status={name} requestType="Inpatient" />}
+            path={`/Lab/Inpatient/${name}`}
           />
-          {/* Inpatient */}
-          <Route
-            path="/Lab/Inpatient"
-            element={<LabRequests requestType="Inpatient" />}
-          />
-          {statuses.map(({ name }) => (
-            <Route
-              key={name}
-              element={<LabRequests status={name} requestType="Inpatient" />}
-              path={`/Lab/Inpatient/${name}`}
-            />
-          ))}
-          <Route
-            path="/Lab/Inpatient/Lab-Request/:LaboratoryNo?"
-            element={<LaboratoryEvaluationCard />}
-          />
-        </Route>
+        ))}
+        <Route
+          path="/Lab/Inpatient/Lab-Request/:LaboratoryNo?"
+          element={<LaboratoryEvaluationCard />}
+        />
       </Route>
-    </>
+    </Route>
   );
 }

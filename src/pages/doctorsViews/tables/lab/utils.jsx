@@ -22,18 +22,6 @@ export const labLinesColumns = [
         ? "FALSE"
         : record.Completed,
   },
-  {
-    title: "Date",
-    dataIndex: "CollectionDate",
-    key: "CollectionDate",
-    render: (_, record) => {
-      const date = new Date(
-        `${record.CollectionDate}T${record.CollectionTime}`
-      );
-
-      return moment(date).format("MMMM Do YYYY, h:mm a");
-    },
-  },
 ];
 
 export const labResultsColumns = [

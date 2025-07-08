@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Typography,
@@ -11,13 +11,13 @@ import {
   Input,
   message,
   Select,
-} from 'antd';
-import { FileTextOutlined } from '@ant-design/icons';
+} from "antd";
+import { FileTextOutlined } from "@ant-design/icons";
 
-import { labLinesColumns as defaultColumns } from './utils';
-import Loading from '../../../../partials/nurse-partials/Loading';
-import { postLabSample } from '../../../../actions/lab-actions/postLabSample';
-import SkeletonLoading from '../../../../partials/nurse-partials/Skeleton';
+import { labLinesColumns as defaultColumns } from "./utils";
+import Loading from "../../../../partials/nurse-partials/Loading";
+import { postLabSample } from "../../../../actions/lab-actions/postLabSample";
+import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 
 const SampleCollection = ({ data, loading }) => {
   const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ const SampleCollection = ({ data, loading }) => {
   const columns = [
     ...defaultColumns,
     {
-      title: 'Create Sample',
+      title: "Create Sample",
       render: (_, record) => {
         return (
           <Button
@@ -49,7 +49,7 @@ const SampleCollection = ({ data, loading }) => {
             onClick={() => showModal(record)}
             disabled={record.Sample_Collected}
           >
-            {record.Sample_Collected ? 'Sample Collected' : 'Add Sample'}
+            {record.Sample_Collected ? "Sample Collected" : "Add Sample"}
           </Button>
         );
       },
@@ -58,13 +58,6 @@ const SampleCollection = ({ data, loading }) => {
 
   return (
     <div>
-      <Typography.Title
-        level={5}
-        style={{ color: '#0F5689', marginBottom: '12px' }}
-      >
-        <FileTextOutlined style={{ marginRight: '8px' }} />
-        Sample Collection
-      </Typography.Title>
       {loading ? (
         <Loading />
       ) : (
@@ -74,7 +67,7 @@ const SampleCollection = ({ data, loading }) => {
             dataSource={data}
             pagination={false}
             rowClassName={(record) =>
-              record.Sample_Collected ? 'disabled-row' : ''
+              record.Sample_Collected ? "disabled-row" : ""
             }
           />
           <SampleModal
@@ -99,18 +92,12 @@ const SampleModal = ({ open, test, handleOk, handleCancel }) => {
       onOk={handleOk}
       onCancel={handleCancel}
       footer={[
-        <Button
-          key="back"
-          onClick={handleCancel}
-        >
+        <Button key="back" onClick={handleCancel}>
           Cancel
         </Button>,
       ]}
     >
-      <SampleForm
-        closeModal={handleCancel}
-        test={test}
-      />
+      <SampleForm closeModal={handleCancel} test={test} />
     </Modal>
   );
 };
@@ -119,34 +106,34 @@ const SampleForm = ({ closeModal, test }) => {
   const { Laboratory_No, LaboratoryTestCode } = test;
 
   const samples = [
-    { value: 'pus', label: 'Pus' },
-    { value: 'EDTA', label: 'EDTA' },
-    { value: 'serum', label: 'Serum' },
-    { value: 'blood', label: 'Blood' },
-    { value: 'stool', label: 'Stool' },
-    { value: 'urine', label: 'Urine' },
-    { value: 'semen', label: 'Semen' },
-    { value: 'sputum', label: 'Sputum' },
-    { value: 'saliva', label: 'Saliva' },
-    { value: 'citrate', label: 'Citrate' },
-    { value: 'heparin', label: 'Heparin' },
-    { value: 'fluoride', label: 'Fluoride' },
-    { value: 'tissue', label: 'Tissue Biopsy' },
-    { value: 'nasal_swab', label: 'Nasal Swab' },
-    { value: 'wound_swab', label: 'Wound Swab' },
-    { value: 'throat_swab', label: 'Throat Swab' },
-    { value: 'bone_marrow', label: 'Bone Marrow' },
-    { value: 'vaginal_swab', label: 'Vaginal Swab' },
-    { value: 'hair_samples', label: 'Hair Samples' },
-    { value: 'urethral_swab', label: 'Urethral Swab' },
-    { value: 'pleural_fluid', label: 'Pleural Fluid' },
-    { value: 'csf', label: 'Cerebrospinal Fluid (CSF)' },
-    { value: 'nail_ckippings', label: 'Nail Clippings' },
-    { value: 'skin_scrapings', label: 'Skin Scrapings' },
-    { value: 'amniotic_fluid', label: 'Amniotic Fluid' },
-    { value: 'synovial_fluid', label: 'Synovial Fluid' },
-    { value: 'peritoneal_fluid', label: 'Peritoneal Fluid' },
-    { value: 'pericardial_fluid', label: 'Pericardial Fluid' },
+    { value: "pus", label: "Pus" },
+    { value: "EDTA", label: "EDTA" },
+    { value: "serum", label: "Serum" },
+    { value: "blood", label: "Blood" },
+    { value: "stool", label: "Stool" },
+    { value: "urine", label: "Urine" },
+    { value: "semen", label: "Semen" },
+    { value: "sputum", label: "Sputum" },
+    { value: "saliva", label: "Saliva" },
+    { value: "citrate", label: "Citrate" },
+    { value: "heparin", label: "Heparin" },
+    { value: "fluoride", label: "Fluoride" },
+    { value: "tissue", label: "Tissue Biopsy" },
+    { value: "nasal_swab", label: "Nasal Swab" },
+    { value: "wound_swab", label: "Wound Swab" },
+    { value: "throat_swab", label: "Throat Swab" },
+    { value: "bone_marrow", label: "Bone Marrow" },
+    { value: "vaginal_swab", label: "Vaginal Swab" },
+    { value: "hair_samples", label: "Hair Samples" },
+    { value: "urethral_swab", label: "Urethral Swab" },
+    { value: "pleural_fluid", label: "Pleural Fluid" },
+    { value: "csf", label: "Cerebrospinal Fluid (CSF)" },
+    { value: "nail_ckippings", label: "Nail Clippings" },
+    { value: "skin_scrapings", label: "Skin Scrapings" },
+    { value: "amniotic_fluid", label: "Amniotic Fluid" },
+    { value: "synovial_fluid", label: "Synovial Fluid" },
+    { value: "peritoneal_fluid", label: "Peritoneal Fluid" },
+    { value: "pericardial_fluid", label: "Pericardial Fluid" },
   ];
 
   // destructor
@@ -162,13 +149,13 @@ const SampleForm = ({ closeModal, test }) => {
       console.log({ data });
 
       const { status } = data;
-      status === 'success'
-        ? message.success('Sample submitted successfully')
-        : message.error('Could not submit the sample');
+      status === "success"
+        ? message.success("Sample submitted successfully")
+        : message.error("Could not submit the sample");
     }
 
     if (error) {
-      message.error('Something went wrong');
+      message.error("Something went wrong");
     }
   }, [data, error]);
 
@@ -180,10 +167,10 @@ const SampleForm = ({ closeModal, test }) => {
     await dispatch(
       postLabSample({
         remarks,
-        myAction: 'create',
+        myAction: "create",
         laboratoryNo: Laboratory_No,
         labTestCode: LaboratoryTestCode,
-      }),
+      })
     );
     form.resetFields();
     closeModal();
@@ -207,22 +194,15 @@ const SampleForm = ({ closeModal, test }) => {
             rules={[
               {
                 required: true,
-                message: 'Please add a description for your sample',
+                message: "Please add a description for your sample",
               },
             ]}
           >
-            <Select
-              showSearch
-              options={samples}
-            />
+            <Select showSearch options={samples} />
           </Item>
           <Item label={null}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              disabled={loading}
-            >
-              {loading ? 'Loading...' : 'Submit Sample'}
+            <Button type="primary" htmlType="submit" disabled={loading}>
+              {loading ? "Loading..." : "Submit Sample"}
             </Button>
           </Item>
         </Form>

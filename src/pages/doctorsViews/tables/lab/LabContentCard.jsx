@@ -2,9 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Button, Card, Tabs } from "antd";
-import { PiEyedropperSampleFill } from "react-icons/pi";
-import { EditOutlined, ContainerOutlined } from "@ant-design/icons";
+import { Space, Tabs } from "antd";
 
 import LabResultsEntry from "./LabResultsEntry";
 import SampleCollection from "./SampleCollection";
@@ -57,9 +55,9 @@ const LabContentCard = () => {
   ];
 
   return (
-    <Card className="card" style={{ padding: "10px 16px", marginTop: "20px" }}>
+    <Space className="d-block" style={{ marginTop: "20px" }}>
       <Tabs type="card" items={tabsItems} />
-    </Card>
+    </Space>
   );
 };
 
