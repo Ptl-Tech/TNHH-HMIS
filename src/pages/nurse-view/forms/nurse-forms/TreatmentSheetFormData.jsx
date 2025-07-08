@@ -69,7 +69,7 @@ const TreatmentSheetFormData = ({
         quantity: quantity || 0,
         issued: false,
         remarks: remarks || "",
-        issuedDate: date.format("YYYY-MM-DD"),
+        issuedDate: date ? date.format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
         issuedTime: time ? time.format("HH:mm:ss") : moment().format("HH:mm:ss"),
       };
       console.log("Treatment Sheet Data:", treatmentSheet);

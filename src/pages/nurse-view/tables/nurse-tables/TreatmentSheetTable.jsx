@@ -59,13 +59,11 @@ const [data, setData] = useState(() => {
   treatmentSheet.forEach((entry) => {
     const issuedDate = moment(entry.IssuedDate).format("YYYY-MM-DD");
     const weekday = moment(entry.IssuedDate).format("dddd");
-    const slot = getTimeSlot(entry.IssuedTime); // Morning, Afternoon, etc.
+    const slot = getTimeSlot(entry.IssuedTime);
     const mapKey = `${weekday}||${slot}`;
-    const rowKey = `${entry.AdmissionNo}-${entry.DrugNo}-${issuedDate}`; // Add date for uniqueness
+    const rowKey = `${entry.AdmissionNo}-${entry.DrugNo}-${issuedDate}`;
 
-    // Find if row already exists
     let row = rows.find((r) => r.key === rowKey);
-
     if (!row) {
       row = {
         key: rowKey,
@@ -74,6 +72,8 @@ const [data, setData] = useState(() => {
         DrugName: entry.DrugName,
         Dosage: normalizeFrequency(entry.Dosage),
         IssuedDate: issuedDate,
+        issuedDateRaw: entry.IssuedDate, // Keep raw date for sorting
+        issuedTime: entry.IssuedTime,
       };
       rows.push(row);
     }
@@ -90,6 +90,9 @@ const [data, setData] = useState(() => {
       remark: entry.Remarks,
     });
   });
+
+  //  Sort rows by date descending (latest at top)
+  rows.sort((a, b) => moment(b.issuedDateRaw).diff(moment(a.issuedDateRaw)));
 
   return rows;
 });
@@ -258,7 +261,7 @@ const dynamicCols = daysOfWeek.map((day) => ({
         loading={loadingTreatmentSheet}
         dataSource={data}
         columns={[...baseColumns, ...dynamicCols]}
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 1200 }}
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
