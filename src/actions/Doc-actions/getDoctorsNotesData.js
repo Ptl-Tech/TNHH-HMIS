@@ -44,7 +44,7 @@ export const getDoctorsNotesData =
           config
         ),
         axios.get(
-          `${API}data/odatafilter?webservice=PgConsultationNotesForm&query=$filter=Treatment_No eq '${encounterNo}'`,
+          `${API}data/odatafilter?webservice=QyFormItems`,
           config
         ),
       ]);
