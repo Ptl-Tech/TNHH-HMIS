@@ -122,7 +122,7 @@ useEffect(() => {
   const menu = (
     <Menu onClick={({ key }) => key === "visit_action" && setView(true)}>
       <Menu.Item key="visit_action">
-        {patientDetails.Activated && patientDetails.ActiveVisitNo ? "View Visit Details" : "Create Visit"}
+        {patientDetails.Activated && patientDetails.ActiveVisitNo ? "View Visit Details" : "Visit Card"}
       </Menu.Item>
       <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>Dispatch to Triage</Menu.Item>
 
