@@ -10,9 +10,9 @@ export const GET_BILLING_LIST_FAIL = "GET_BILLING_LIST_FAIL";
 export const GET_BILLING_LIST_RESET = "GET_BILLING_LIST_RESET";
 
 // Action to fetch billing list
-export const getBillingList = (active) => async (dispatch, getState) => {
+export const getBillingList = () => async (dispatch, getState) => {
   var query = `${API}data/odatafilter?webservice=PgPatientsList`;
-  query += active ? "&query=$filter=Activated eq true" : "";
+  // query += active ? "&query=$filter=Activated eq true" : "";
 
   try {
     dispatch({ type: GET_BILLING_LIST_REQUEST });
@@ -42,6 +42,8 @@ export const getBillingList = (active) => async (dispatch, getState) => {
 
     return data; // Return only filtered data
   } catch (error) {
+    console.log({ error });
+
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
 

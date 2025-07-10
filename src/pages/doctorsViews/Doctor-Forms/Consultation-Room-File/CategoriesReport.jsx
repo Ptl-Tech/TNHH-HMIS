@@ -1,15 +1,13 @@
-import { NoData } from '../../../../components/NoData';
-import { RadioInputsReport } from '../Consultation-Room/RadioInputsReport';
-import { CheckboxInputsReport } from '../Consultation-Room/CheckboxInputReport';
+import { NoData } from "../../../../components/NoData";
+import { RadioInputsReport } from "../Consultation-Room/RadioInputsReport";
+import { CheckboxInputsReport } from "../Consultation-Room/CheckboxInputReport";
 
 export const CategoriesReport = ({ categories, child: Child }) => {
   function renderFormItemsReport(formItems, Category_Input_Type) {
-    const { Input_Type } = Array.isArray(formItems) ? formItems[0] || {} : {};
-
-    switch (Input_Type || Category_Input_Type) {
-      case 'radio':
+    switch (Category_Input_Type) {
+      case "radio":
         return <RadioInputsReport formItems={formItems} />;
-      case 'checkbox':
+      case "checkbox":
         return <CheckboxInputsReport formItems={formItems} />;
       default:
         return null;
@@ -48,13 +46,13 @@ export const CategoriesReportPreview = ({
     <div
       key={index}
       style={{
-        padding: `${Parent_Category_ID ? '0px' : '16px'} 0px 0px 16px`,
+        padding: `${Parent_Category_ID ? "0px" : "16px"} 0px 0px 16px`,
         borderTop: `${
-          Parent_Category_ID || index === 0 ? '' : '1px dashed #dadada'
+          Parent_Category_ID || index === 0 ? "" : "1px dashed #dadada"
         }`,
       }}
     >
-      <h6 style={{ color: '#0f5689' }}>{Category_Name}</h6>
+      <h6 style={{ color: "#0f5689" }}>{Category_Name}</h6>
       {!!formItems?.length && renderFormItemsReport(formItems, Input_Type)}
       {subCategories?.length > 0 && (
         <CategoriesReport
@@ -84,18 +82,18 @@ export const CategoriesReportShowReport = ({
     <div
       key={index}
       style={{
-        display: 'grid',
-        alignItems: 'stretch',
-        gridTemplateColumns: '1fr 2fr',
-        borderBottom: last ? 'none' : '1px dashed #dbdbdb',
-        padding: `0px ${!Parent_Category_ID ? '0px' : '8px'} 0px 8px`,
+        display: "grid",
+        alignItems: "stretch",
+        gridTemplateColumns: "1fr 2fr",
+        borderBottom: last ? "none" : "1px dashed #dbdbdb",
+        padding: `0px ${!Parent_Category_ID ? "0px" : "8px"} 0px 8px`,
       }}
     >
-      <h6 style={{ color: '#0f5689', padding: '8px' }}>{Category_Name}</h6>
+      <h6 style={{ color: "#0f5689", padding: "8px" }}>{Category_Name}</h6>
       <div
         style={{
-          display: 'grid',
-          borderLeft: '1px dashed #dbdbdb',
+          display: "grid",
+          borderLeft: "1px dashed #dbdbdb",
         }}
       >
         {subCategories?.length > 0 && (
@@ -105,7 +103,7 @@ export const CategoriesReportShowReport = ({
           />
         )}
         {!!formItems?.length && (
-          <div style={{ paddingTop: '8px' }}>
+          <div style={{ paddingTop: "8px" }}>
             {renderFormItemsReport(formItems, Input_Type)}
           </div>
         )}
