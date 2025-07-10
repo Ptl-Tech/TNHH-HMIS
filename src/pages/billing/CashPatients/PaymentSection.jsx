@@ -80,10 +80,11 @@ const PaymentSection = ({ patientNo }) => {
               >
                {/* <Select.Option value={1}>Cash</Select.Option> */}
                 <Select.Option value={7}>MPESA</Select.Option>
+                <Select.Option value={9}>PDQ</Select.Option>
                 <Select.Option value={2}>Cheque</Select.Option>
                 <Select.Option value={3}>EFT</Select.Option>
                 <Select.Option value={4}>Deposit Slip</Select.Option>
-                <Select.Option value={5}>Banker's Cheque</Select.Option>
+                <Select.Option value={5}>Banker&apos;s Cheque</Select.Option>
                 <Select.Option value={6}>RTGS</Select.Option>
               </Select>
             </Form.Item>
