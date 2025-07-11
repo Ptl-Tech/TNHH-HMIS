@@ -102,8 +102,6 @@ export const postLabTestResults =
         postLabResultComments(remarks, config),
       ]);
 
-      console.log({ labRemarks, labResults });
-
       dispatch({
         type: POST_LAB_TEST_RESULTS_SUCCESS,
         payload: { labResults, labRemarks },
