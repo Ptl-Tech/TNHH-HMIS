@@ -3,6 +3,10 @@ import {
   GET_BILLING_LIST_SUCCESS,
   GET_BILLING_LIST_FAIL,
   GET_BILLING_LIST_RESET,
+  GET_PATIENT_BILLING_LIST_REQUEST,
+  GET_PATIENT_BILLING_LIST_SUCCESS,
+  GET_PATIENT_BILLING_LIST_FAIL,
+  GET_PATIENT_BILLING_LIST_RESET,
 } from "../../actions/Charges-Actions/getBillingList";
 
 export const getBillingListReducer = (state = { patients: [] }, action) => {
@@ -15,6 +19,22 @@ export const getBillingListReducer = (state = { patients: [] }, action) => {
       return { loading: false, error: action.payload };
     case GET_BILLING_LIST_RESET:
       return { patients: [] };
+    default:
+      return state;
+  }
+};
+
+
+export const getPatientBillingListReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case GET_PATIENT_BILLING_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case GET_PATIENT_BILLING_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case GET_PATIENT_BILLING_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case GET_PATIENT_BILLING_LIST_RESET:
+      return { data: [] };
     default:
       return state;
   }

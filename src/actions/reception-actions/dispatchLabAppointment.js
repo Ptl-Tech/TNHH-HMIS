@@ -2,17 +2,17 @@ import axios from 'axios';
 
 const API = 'https://chiromo.potestastechnologies.net:8085/';
 
-export const POST_PHARMACY_APPOINTMENT_REQUEST =
-  'POST_PHARMACY_APPOINTMENT_REQUEST';
-export const POST_PHARMACY_APPOINTMENT_SUCCESS =
-  'POST_PHARMACY_APPOINTMENT_SUCCESS';
-export const POST_PHARMACY_APPOINTMENT_FAIL = 'POST_PHARMACY_APPOINTMENT_FAIL';
-export const POST_PHARMACY_APPOINTMENT_RESET =
-  'POST_PHARMACY_APPOINTMENT_RESET';
+export const POST_LAB_APPOINTMENT_REQUEST =
+  'POST_LAB_APPOINTMENT_REQUEST';
+export const POST_LAB_APPOINTMENT_SUCCESS =
+  'POST_LAB_APPOINTMENT_SUCCESS';
+export const POST_LAB_APPOINTMENT_FAIL = 'POST_LAB_APPOINTMENT_FAIL';
+export const POST_LAB_APPOINTMENT_RESET =
+  'POST_LAB_APPOINTMENT_RESET';
 
-export const postPharmacyAppointment = (record = {}, patientNo = null) => async (dispatch, getState) => {
+export const postLabAppointment = (record = {}, patientNo = null) => async (dispatch, getState) => {
   try {
-    dispatch({ type: POST_PHARMACY_APPOINTMENT_REQUEST });
+    dispatch({ type: POST_LAB_APPOINTMENT_REQUEST });
 
     const {
       otpVerify: { userInfo },
@@ -36,33 +36,38 @@ export const postPharmacyAppointment = (record = {}, patientNo = null) => async 
       },
     };
 
-    console.log({ config });
+    const payload={
+      patientNo: String(resolvedPatientNo),
+      staffNo: userInfo.userData.no,
+      branchCode: branchCode
+
+    }
 
     const response = await axios.post(
-      `${API}Reception/DirectDispatchPharmacy`,
-      { PatientNo:String(resolvedPatientNo) },
+      `${API}Laboratory/DirectLabRequest`,
+      payload,
       config
     );
 
     dispatch({
-      type: POST_PHARMACY_APPOINTMENT_SUCCESS,
+      type: POST_LAB_APPOINTMENT_SUCCESS,
       payload: response.data,
     });
     return{
-      type: POST_PHARMACY_APPOINTMENT_SUCCESS,
+      type: POST_LAB_APPOINTMENT_SUCCESS,
       payload: response.data,
     };
   } catch (error) {
     console.log({ error });
 
     dispatch({
-      type: POST_PHARMACY_APPOINTMENT_FAIL,
+      type: POST_LAB_APPOINTMENT_FAIL,
       payload:
         error.response?.data?.errors || 'An error occurred while saving.',
     });
 
     return {
-      type: POST_PHARMACY_APPOINTMENT_FAIL,
+      type: POST_LAB_APPOINTMENT_FAIL,
       payload:
         error.response?.data?.errors || 'An error occurred while saving.',
     };

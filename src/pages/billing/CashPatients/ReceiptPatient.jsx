@@ -27,6 +27,8 @@ import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage"
 import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
 import { shape } from "prop-types";
 import RefreshPatientCharges from "../RefreshPatientCharges";
+import PreviousBill from "../PreviousBill";
+import AllocateRebates from "../AllocateRebates";
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -60,6 +62,9 @@ const ReceiptPatient = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
+  const [RebatesModal, setRebatesModal] = useState(false);
+
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -67,13 +72,14 @@ const ReceiptPatient = () => {
       dispatch(getReceiptLines(activeVisitNo));
       dispatch(getReceiptPage(activeVisitNo));
     }
-   
   }, [dispatch, activeVisitNo]);
 
   const handleCancel = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
     setSplitAmountModal(false);
+        setRebatesModal(false);
+
   };
 
   const showReceiptModal = () => {
@@ -98,7 +104,6 @@ const ReceiptPatient = () => {
   };
 
   const handlePaymentProcessing = async () => {
-    
     if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
       return;
     }
@@ -119,8 +124,7 @@ const ReceiptPatient = () => {
         // Optionally refresh receiptLines
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
-              dispatch(getReceiptPage(activeVisitNo));
-        
+        dispatch(getReceiptPage(activeVisitNo));
       }
     } catch (error) {
       message.error("Failed to post receipt. Please try again.");
@@ -135,15 +139,18 @@ const ReceiptPatient = () => {
           showReceiptModal(); // Show receipt modal
         } else if (key === "split_amount") {
           InitiateSplitPayment();
+        } else if (key === "rebates_action") {
+          setRebatesModal(true); // Show receipt modal
         }
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
- <Menu.Item key="request_admission">Waive Charge</Menu.Item>
-      <Menu.Divider />     
+      <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
+      <Menu.Item key="request_admission">Waive Charge</Menu.Item>
+      <Menu.Divider />
       <Menu.Item key="close_bill">
-        <ClosePatientBill/>
+        <ClosePatientBill />
       </Menu.Item>
     </Menu>
   );
@@ -166,119 +173,136 @@ const ReceiptPatient = () => {
             Go back
           </Button>
           <h5 className="fw-bold m-0 p-0 text-primary">Patient Receipt</h5>
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button type="primary" icon={<MoreOutlined />}>
-              <span className="ant-dropdown-link fw-bold">Actions</span>
-            </Button>
-          </Dropdown>
+          <div className="d-flex align-items-center justify-content-between gap-2">
+            <Dropdown overlay={menu} trigger={["click"]}>
+              <Button type="primary" icon={<MoreOutlined />}>
+                <span className="ant-dropdown-link fw-bold">Actions</span>
+              </Button>
+            </Dropdown>
+            <Button onClick={() => setView(true)}>Previous Encounters</Button>
+          </div>
         </div>
         <div className="d-flex flex-column">
-          <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
-
-          <Card
-            title={
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <UserOutlined />
-                  <span>Patient Details</span>
-                </div>
-              </div>
-            }
-            className="mb-3"
+          <Skeleton
+            paragraph={{ rows: 5 }}
+            loading={patientBillLoading}
+            avatar={{ size: "small", shape: "circle" }}
+            title={true}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(6, auto)",
-                gridTemplateRows: "auto auto", // Two rows
-                gap: "12px 20px",
-                fontSize: "14px",
-                fontWeight: "400",
-                color: "black",
-                padding: "10px",
-              }}
-            >
-              {/* First row */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Patient Name:{" "}
-                <span className="fw-bold text-primary">
-                  {patientVisitDetails?.Names.toUpperCase()}
-                </span>
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Gender: {patientVisitDetails?.Gender}
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Age in Years: {patientVisitDetails?.AgeinYears} 
-                <span className="fst-italic ml-2"> years</span>
-              </p>
-               <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Encounter No : <span className="fw-bold text-secondary">
-                {activeVisitNo}
-              </span>
-            </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: <span className="fw-bold text-secondary">
-                  {patientVisitDetails?.AppointmentType}
-                </span>
-              </p>
-
-              {/* Second row */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Payment Mode: {patientVisitDetails?.SettlementType}
-              </p>
-
-              <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
-                <DollarOutlined /> Bill Balance: KSh{" "}
-                {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-              </p>
-
-              {/* Receipt no section */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Receipt No:
-                <span className="fw-bold text-primary">
-                  {" "}
-                  {Array.isArray(receiptHeader) && receiptHeader.length > 0
-                    ? receiptHeader[receiptHeader.length - 1].No
-                    : "N/A"}
-                </span>
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Date:{" "}
-                <span className="fw-medium fst-italic">   {Array.isArray(receiptHeader) && receiptHeader.length > 0
-                  ? new Date(
-                      receiptHeader[receiptHeader.length - 1].Date
-                    ).toLocaleDateString("en-GB", {
-                      weekday: "short", // Optional, for day of the week
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  : "N/A"} </span>
-              </p>
-            </div>
-          </Card>
-          </Skeleton>
-                    <div className="d-flex justify-content-between gap-3 my-3">
-
-            <RefreshPatientCharges patientNo={patientVisitDetails?.PatientNo} activeVisitNo={activeVisitNo} />
-          <div className="d-flex justify-content-end gap-3 my-3">
-            <PrintReceipt
-              receiptNo={
-                Array.isArray(receiptHeader) && receiptHeader?.length > 0
-                  ? receiptHeader[receiptHeader?.length - 1]?.No
-                  : "N/A"
+            <Card
+              title={
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center gap-2">
+                    <UserOutlined />
+                    <span>Patient Details</span>
+                  </div>
+                </div>
               }
+              className="mb-3"
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(6, auto)",
+                  gridTemplateRows: "auto auto", // Two rows
+                  gap: "12px 20px",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                  color: "black",
+                  padding: "10px",
+                }}
+              >
+                {/* First row */}
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Patient Name:{" "}
+                  <span className="fw-bold text-primary">
+                    {patientVisitDetails?.Names.toUpperCase()}
+                  </span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Gender: {patientVisitDetails?.Gender}
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Age in Years: {patientVisitDetails?.AgeinYears}
+                  <span className="fst-italic ml-2"> years</span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Encounter No :{" "}
+                  <span className="fw-bold text-secondary">
+                    {activeVisitNo}
+                  </span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Visit Type:{" "}
+                  <span className="fw-bold text-secondary">
+                    {patientVisitDetails?.AppointmentType}
+                  </span>
+                </p>
+
+                {/* Second row */}
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Payment Mode: {patientVisitDetails?.SettlementType}
+                </p>
+
+                <p
+                  className="text-danger fw-bold"
+                  style={{ gridColumn: "span 2" }}
+                >
+                  <DollarOutlined /> Bill Balance: KSh{" "}
+                  {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                </p>
+
+                {/* Receipt no section */}
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Receipt No:
+                  <span className="fw-bold text-primary">
+                    {" "}
+                    {Array.isArray(receiptHeader) && receiptHeader.length > 0
+                      ? receiptHeader[receiptHeader.length - 1].No
+                      : "N/A"}
+                  </span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Date:{" "}
+                  <span className="fw-medium fst-italic">
+                    {" "}
+                    {Array.isArray(receiptHeader) && receiptHeader.length > 0
+                      ? new Date(
+                          receiptHeader[receiptHeader.length - 1].Date
+                        ).toLocaleDateString("en-GB", {
+                          weekday: "short", // Optional, for day of the week
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "N/A"}{" "}
+                  </span>
+                </p>
+              </div>
+            </Card>
+          </Skeleton>
+          <div className="d-flex justify-content-between gap-3 my-3">
+            <RefreshPatientCharges
+              patientNo={patientVisitDetails?.PatientNo}
+              activeVisitNo={activeVisitNo}
             />
- <PrintInterimInvoice
-            patientNo={patientVisitDetails?.PatientNo}
-            activeVisitNo={activeVisitNo}
-          />
-        
-            {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
+            <div className="d-flex justify-content-end gap-3 my-3">
+              <PrintReceipt
+                receiptNo={
+                  Array.isArray(receiptHeader) && receiptHeader?.length > 0
+                    ? receiptHeader[receiptHeader?.length - 1]?.No
+                    : "N/A"
+                }
+              />
+              <PrintInterimInvoice
+                patientNo={patientVisitDetails?.PatientNo}
+                activeVisitNo={activeVisitNo}
+              />
+
+              {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
-          </div>
+            </div>
           </div>
           <PatientCharges activeVisitNo={activeVisitNo} />
           <div className="row gap-3 gap-md-0">
@@ -369,6 +393,16 @@ const ReceiptPatient = () => {
             </div>
           </div>
         </div>
+        <PreviousBill
+          visible={view}
+          patientNo={patientVisitDetails?.PatientNo}
+          onClose={() => setView(false)}
+        />
+        <AllocateRebates
+          visible={RebatesModal}
+          onClose={handleCancel}
+          patientNo={patientBillData[0]?.PatientNo}
+        />
       </div>
     </>
   );

@@ -33,6 +33,13 @@
 .bg-primary {
   background-color: rgba(172, 131, 66, 0.6) !important;
 }
+.custom-alert .ant-alert-close-icon {
+  color: #000 !important; /* black */
+}
+
+.custom-alert .ant-alert-close-icon:hover {
+  color: #000 !important; /* black on hover too */
+}
 
 .card-style {
   height: 150px; /* Set a fixed height */

@@ -29,7 +29,7 @@ export const PrintInterimInvoice = ({ activeVisitNo, patientNo }) => {
       })
       .catch((error) => {
         setLoading(false); // Stop loading in case of error
-        message.error("Error fetching receipt:", error);
+       
       });
   };
 

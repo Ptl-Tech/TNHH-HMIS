@@ -9,6 +9,7 @@ import { render } from "react-dom";
 import { useNavigate } from "react-router-dom";
 
 const AdvancedInvoiceList = () => {
+    const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { data: invoiceHeaders, loading } = useSelector(
@@ -23,7 +24,7 @@ const [isSearchPerformed, setIsSearchPerformed] = useState(false);
 const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
-    dispatch(getInvoiceList());
+    dispatch(getInvoiceList(patientNo));
     dispatch(getBillingList());
   }, [dispatch]);
 

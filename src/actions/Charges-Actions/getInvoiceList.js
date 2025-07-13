@@ -8,7 +8,7 @@ export const REQUEST_INVOICE_LIST_SUCCESS = "REQUEST_INVOICE_LIST_SUCCESS";
 export const REQUEST_INVOICE_LIST_FAIL = "REQUEST_INVOICE_LIST_FAIL";
 export const REQUEST_INVOICE_LIST_RESET = "REQUEST_INVOICE_LIST_RESET";
 
-export const getInvoiceList = () => async (dispatch, getState) => {
+export const getInvoiceList = (patientNo) => async (dispatch, getState) => {
   try {
     dispatch({ type: REQUEST_INVOICE_LIST });
 
@@ -33,7 +33,7 @@ export const getInvoiceList = () => async (dispatch, getState) => {
     };
 
     const response = await axios.get(
-        `${API}data/odatafilter?webservice=PgPatientCharges&isList=true`,
+        `${API}data/odatafilter?webservice=PgPatientCharges&isList=true&query=$filter=Patient_No eq '${patientNo}'`,
         config
     );
 

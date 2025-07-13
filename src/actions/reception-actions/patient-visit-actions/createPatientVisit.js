@@ -23,13 +23,13 @@ export const createPatientVisitRequest = (visitData, navigate) => async (dispatc
     const response = await axios.post(`${API}Reception/CreateVisit`, visitData, config);
 
     dispatch({ type: CREATE_PATIENT_VISIT_SUCCESS, payload: response.data });
-
+return{type: CREATE_PATIENT_VISIT_SUCCESS, payload: response.data}; 
   } catch (error) {
     dispatch({
       type: CREATE_PATIENT_VISIT_FAIL,
       payload: error.response?.data?.errors || "An error occurred",
     });
 
-    throw error;
+return {type: CREATE_PATIENT_VISIT_FAIL, payload: error.response?.data?.errors || "An error occurred"}
   }
 };

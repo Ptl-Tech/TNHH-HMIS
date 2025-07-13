@@ -26,13 +26,19 @@ import SplitPayments from "./SplitPayments";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 import InsurancePaymentSection from "../InsurancePatients/InsurancePaymentSection";
 import { PrintInterimInvoice } from "../InsurancePatients/InvoicePrinting";
-import {POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
+import {
+  POST_INITIATE_DISCHARGE_FAILURE,
+  POST_INITIATE_DISCHARGE_SUCCESS,
+  postInitiateDischargeSlice,
+} from "../../../actions/nurse-actions/postInitiateDischargeSlice";
+import PreviousBill from "../PreviousBill";
+import AllocateRebates from "../AllocateRebates";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-    const { confirm } = Modal;
-  
+  const { confirm } = Modal;
+
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
 
   const { loading, error, data } = useSelector(
@@ -62,6 +68,9 @@ const ReceiptInpatient = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
+    const [RebatesModal, setRebatesModal] = useState(false);
+  
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -75,6 +84,7 @@ const ReceiptInpatient = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
     setSplitAmountModal(false);
+        setRebatesModal(false);
   };
 
   const showReceiptModal = () => {
@@ -119,8 +129,7 @@ const ReceiptInpatient = () => {
         // Optionally refresh receiptLines
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
-              dispatch(getReceiptPage(activeVisitNo));
-        
+        dispatch(getReceiptPage(activeVisitNo));
       }
     } catch (error) {
       message.error("Failed to post receipt. Please try again.");
@@ -184,11 +193,14 @@ const ReceiptInpatient = () => {
           InitiateSplitPayment();
         } else if (key === "initiate_discharge") {
           handleInitiateDischarge();
+        }else if (key === "rebates_action") {
+          setRebatesModal(true); // Show receipt modal
         }
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
+       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
       <Menu.Divider />
@@ -216,81 +228,102 @@ const ReceiptInpatient = () => {
             Go back
           </Button>
           <h5 className="fw-bold m-0 p-0 text-primary"> Receipt InPatient</h5>
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <Button type="primary" icon={<MoreOutlined />}>
-              <span className="ant-dropdown-link fw-bold">Actions</span>
-            </Button>
-          </Dropdown>
+          <div className="d-flex align-items-center justify-content-between gap-2">
+            <Dropdown overlay={menu} trigger={["click"]}>
+              <Button type="primary" icon={<MoreOutlined />}>
+                <span className="ant-dropdown-link fw-bold">Actions</span>
+              </Button>
+            </Dropdown>
+            <Button onClick={() => setView(true)}>Previous Encounters</Button>
+          </div>
         </div>
         <div className="d-flex flex-column">
-              <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
-          <Card
-            title={
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="d-flex align-items-center gap-2">
-                  <UserOutlined />
-                  <span>Patient Details</span>
-                </div>
-              </div>
-            }
-            className="mb-3"
+          <Skeleton
+            paragraph={{ rows: 5 }}
+            loading={patientBillLoading}
+            avatar={{ size: "small", shape: "circle" }}
+            title={true}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(6, auto)",
-                gridTemplateRows: "auto auto", // Two rows
-                gap: "12px 20px",
-                fontSize: "14px",
-                fontWeight: "400",
-                color: "black",
-                padding: "10px",
-              }}
+            <Card
+              title={
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center gap-2">
+                    <UserOutlined />
+                    <span>Patient Details</span>
+                  </div>
+                </div>
+              }
+              className="mb-3"
             >
-              {/* First row */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Patient Name:{" "}
-                <span className="fw-bold text-primary">{patientBillData[0]?.Names}</span>
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Gender: {patientBillData[0]?.Gender}
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Age in Years:{" "}
-                {` (${Math.floor(
-                  (Date.now() -
-                    new Date(patientBillData[0]?.DateOfBirth).getTime()) /
-                    (1000 * 60 * 60 * 24 * 365.25)
-                )} years)`}
-              </p>
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Encounter No: <span className="fw-bold text-secondary">{patientBillData[0]?.CurrentAdmNo}</span>
-            </p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(6, auto)",
+                  gridTemplateRows: "auto auto", // Two rows
+                  gap: "12px 20px",
+                  fontSize: "14px",
+                  fontWeight: "400",
+                  color: "black",
+                  padding: "10px",
+                }}
+              >
+                {/* First row */}
                 <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold text-secondary">Inpatient</span> : <span className="fw-bold text-secondary">Outpatient</span>}
-              </p>
+                  Patient Name:{" "}
+                  <span className="fw-bold text-primary">
+                    {patientBillData[0]?.Names}
+                  </span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Gender: {patientBillData[0]?.Gender}
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Age in Years:{" "}
+                  {` (${Math.floor(
+                    (Date.now() -
+                      new Date(patientBillData[0]?.DateOfBirth).getTime()) /
+                      (1000 * 60 * 60 * 24 * 365.25)
+                  )} years)`}
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Encounter No:{" "}
+                  <span className="fw-bold text-secondary">
+                    {patientBillData[0]?.CurrentAdmNo}
+                  </span>
+                </p>
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Visit Type:{" "}
+                  {patientBillData[0]?.Inpatient ? (
+                    <span className="fw-bold text-secondary">Inpatient</span>
+                  ) : (
+                    <span className="fw-bold text-secondary">Outpatient</span>
+                  )}
+                </p>
 
-              {/* Second row */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Payment Mode: {patientBillData[0]?.PatientType}
-              </p>
+                {/* Second row */}
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Payment Mode: {patientBillData[0]?.PatientType}
+                </p>
 
-              <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
-                <DollarOutlined /> Bill Balance: KSh{" "}
-                {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-              </p>
+                <p
+                  className="text-danger fw-bold"
+                  style={{ gridColumn: "span 2" }}
+                >
+                  <DollarOutlined /> Bill Balance: KSh{" "}
+                  {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                </p>
 
-              {/* Receipt no section */}
-              <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Receipt No:
-                <span className="fw-bold text-primary">
-                  {" "}
-                  {Array.isArray(receiptLines) && receiptLines.length > 0
-                    ? receiptLines[receiptLines.length - 1].No
-                    : "N/A"}
-                </span>
-              </p>
-              {/* <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                {/* Receipt no section */}
+                <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                  Receipt No:
+                  <span className="fw-bold text-primary">
+                    {" "}
+                    {Array.isArray(receiptLines) && receiptLines.length > 0
+                      ? receiptLines[receiptLines.length - 1].No
+                      : "N/A"}
+                  </span>
+                </p>
+                {/* <p className="mb-0" style={{ gridColumn: "span 2" }}>
                 Date:{" "}
                 {Array.isArray(receiptLines) && receiptLines.length > 0
                   ? new Date(
@@ -303,8 +336,8 @@ const ReceiptInpatient = () => {
                     })
                   : "N/A"}
               </p> */}
-            </div>
-          </Card>
+              </div>
+            </Card>
           </Skeleton>
           <div className="d-flex justify-content-end gap-3 my-3">
             <PrintReceipt
@@ -413,6 +446,16 @@ const ReceiptInpatient = () => {
             </div>
           </div>
         </div>
+        <PreviousBill
+          visible={view}
+          patientNo={patientBillData[0]?.PatientNo}
+          onClose={() => setView(false)}
+        />
+          <AllocateRebates
+                  visible={RebatesModal}
+                  onClose={handleCancel}
+                  patientNo={patientBillData[0]?.PatientNo}
+                />
       </div>
     </>
   );

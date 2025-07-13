@@ -12,6 +12,13 @@
 .ProseMirror:focus {
   outline: none;
 }
+.custom-alert .ant-alert-close-icon {
+  color: #000 !important; /* black */
+}
+
+.custom-alert .ant-alert-close-icon:hover {
+  color: #000 !important; /* black on hover too */
+}
 
 .ant-layout-sider {
   flex: 0 0 230px !important;

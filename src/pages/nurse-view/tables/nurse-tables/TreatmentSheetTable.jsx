@@ -48,55 +48,58 @@ const normalizeFrequency = (value) => {
   return match?.label || String(value);
 };
 
-const TreatmentSheetTable = ({ loadingTreatmentSheet, treatmentSheet,patientDetails }) => {
+const TreatmentSheetTable = ({
+  loadingTreatmentSheet,
+  treatmentSheet,
+  patientDetails,
+}) => {
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
 
-const [data, setData] = useState(() => {
-  const rows = [];
+  const [data, setData] = useState(() => {
+    const rows = [];
 
-  treatmentSheet.forEach((entry) => {
-    const issuedDate = moment(entry.IssuedDate).format("YYYY-MM-DD");
-    const weekday = moment(entry.IssuedDate).format("dddd");
-    const slot = getTimeSlot(entry.IssuedTime);
-    const mapKey = `${weekday}||${slot}`;
-    const rowKey = `${entry.AdmissionNo}-${entry.DrugNo}-${issuedDate}`;
+    treatmentSheet.forEach((entry) => {
+      const issuedDate = moment(entry.IssuedDate).format("YYYY-MM-DD");
+      const weekday = moment(entry.IssuedDate).format("dddd");
+      const slot = getTimeSlot(entry.IssuedTime);
+      const mapKey = `${weekday}||${slot}`;
+      const rowKey = `${entry.AdmissionNo}-${entry.DrugNo}-${issuedDate}`;
 
-    let row = rows.find((r) => r.key === rowKey);
-    if (!row) {
-      row = {
-        key: rowKey,
-        AdmissionNo: entry.AdmissionNo,
-        DrugNo: entry.DrugNo,
-        DrugName: entry.DrugName,
-        Dosage: normalizeFrequency(entry.Dosage),
-        IssuedDate: issuedDate,
-        issuedDateRaw: entry.IssuedDate, // Keep raw date for sorting
+      let row = rows.find((r) => r.key === rowKey);
+      if (!row) {
+        row = {
+          key: rowKey,
+          AdmissionNo: entry.AdmissionNo,
+          DrugNo: entry.DrugNo,
+          DrugName: entry.DrugName,
+          Dosage: normalizeFrequency(entry.Dosage),
+          IssuedDate: issuedDate,
+          issuedDateRaw: entry.IssuedDate, // Keep raw date for sorting
+          issuedTime: entry.IssuedTime,
+        };
+        rows.push(row);
+      }
+
+      if (!row[mapKey]) {
+        row[mapKey] = [];
+      }
+
+      row[mapKey].push({
+        issued: entry.Issued,
+        issuedDate: entry.IssuedDate,
         issuedTime: entry.IssuedTime,
-      };
-      rows.push(row);
-    }
-
-    if (!row[mapKey]) {
-      row[mapKey] = [];
-    }
-
-    row[mapKey].push({
-      issued: entry.Issued,
-      issuedDate: entry.IssuedDate,
-      issuedTime: entry.IssuedTime,
-      quantity: entry.Quantity,
-      remark: entry.Remarks,
+        quantity: entry.Quantity,
+        remark: entry.Remarks,
+      });
     });
+
+    //  Sort rows by date descending (latest at top)
+    rows.sort((a, b) => moment(b.issuedDateRaw).diff(moment(a.issuedDateRaw)));
+
+    return rows;
   });
-
-  //  Sort rows by date descending (latest at top)
-  rows.sort((a, b) => moment(b.issuedDateRaw).diff(moment(a.issuedDateRaw)));
-
-  return rows;
-});
-
 
   const weekStart = moment().startOf("week");
   const weekDates = Array.from({ length: 7 }).map((_, i) =>
@@ -127,15 +130,17 @@ const [data, setData] = useState(() => {
         </Text>
       ),
     },
-{
-  title: "Issued Date",
-  dataIndex: "IssuedDate",
-        fixed: "left",
-
-  width: 120,
-  render: (dateStr) => <Text>{moment(dateStr).format("DD/MM/YYYY")}</Text>,
-},
-
+    {
+      title: "Issued Date",
+      dataIndex: "IssuedDate",
+      fixed: "left",
+      sorter: (a, b) =>
+        moment(a.issuedDateRaw).diff(moment(b.issuedDateRaw)),
+      defaultSortOrder: "descend",
+      sortDirections: ["descend", "ascend"],
+      width: 120,
+      render: (dateStr) => <Text>{moment(dateStr).format("DD/MM/YYYY")}</Text>,
+    },
 
     {
       title: "Dosage",
@@ -148,59 +153,82 @@ const [data, setData] = useState(() => {
       ),
     },
   ];
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
-const dynamicCols = daysOfWeek.map((day) => ({
-  title: day,
-  children: timeSlots.map((slot) => {
-    const key = `${day}||${slot}`;
-    return {
-      title: slot,
-      key,
-      dataIndex: key,
-      width: 120,
-      render: (_, record) => {
-        const entries = record[key] || [];
-        if (entries.length === 0) return <Text>-</Text>;
+  const dynamicCols = daysOfWeek.map((day) => ({
+    title: day,
+    children: timeSlots.map((slot) => {
+      const key = `${day}||${slot}`;
+      return {
+        title: slot,
+        key,
+        dataIndex: key,
+        width: 120,
+        render: (_, record) => {
+          const entries = record[key] || [];
+          if (entries.length === 0) return <Text>-</Text>;
 
-        const issuedEntries = entries.filter((e) => e.issued);
-        if (issuedEntries.length === 0) return <Text>-</Text>;
+          const issuedEntries = entries.filter((e) => e.issued);
+          if (issuedEntries.length === 0) return <Text>-</Text>;
 
-        const issuedTime = issuedEntries
-          .map((e) => moment(e.issuedTime, "HH:mm:ss").format("HH:mm"))
-          .join(", ");
-        const quantity = issuedEntries.reduce((sum, e) => sum + (e.quantity || 0), 0);
-        const remark = issuedEntries[0].remark || "-";
+          const issuedTime = issuedEntries
+            .map((e) => moment(e.issuedTime, "HH:mm:ss").format("HH:mm"))
+            .join(", ");
+          const quantity = issuedEntries.reduce(
+            (sum, e) => sum + (e.quantity || 0),
+            0
+          );
+          const remark = issuedEntries[0].remark || "-";
 
-        return (
-          <Space direction="vertical" size={0}>
-            <Tooltip title={`Issued at: ${issuedTime} \nQuantity: ${quantity}\nRemark: ${remark}`}>
-              <Text style={{ color: "green", fontWeight: "bold", fontSize: 16 }}> ✔</Text>
-            </Tooltip>
-            
-          </Space>
-        );
-      },
-    };
-  }),
-}));
-
+          return (
+            <Space direction="vertical" size={0}>
+              <Tooltip
+                title={`Issued at: ${issuedTime} \nQuantity: ${quantity}\nRemark: ${remark}`}
+              >
+                <Text
+                  style={{ color: "green", fontWeight: "bold", fontSize: 16 }}
+                >
+                  {" "}
+                  ✔
+                </Text>
+              </Tooltip>
+            </Space>
+          );
+        },
+      };
+    }),
+  }));
 
   const expandedRowRender = (record) => {
     const rows = [];
 
     for (const [key, val] of Object.entries(record)) {
-      if(key.startsWith("Monday") || key.startsWith("Tuesday") || key.startsWith("Wednesday") ||
-         key.startsWith("Thursday") || key.startsWith("Friday") || key.startsWith("Saturday") || key.startsWith("Sunday")) {
+      if (
+        key.startsWith("Monday") ||
+        key.startsWith("Tuesday") ||
+        key.startsWith("Wednesday") ||
+        key.startsWith("Thursday") ||
+        key.startsWith("Friday") ||
+        key.startsWith("Saturday") ||
+        key.startsWith("Sunday")
+      ) {
         const entries = val || [];
         entries.forEach((entry) => {
           rows.push({
             date: moment(entry.issuedDate).format("DD/MM/YYYY"),
             //FOR TIME SLOT GET DAY OF WEEK
-           DayOfWeek: moment(entry.issuedDate).format("dddd"),
+            DayOfWeek: moment(entry.issuedDate).format("dddd"),
             timeSlot: getTimeSlot(entry.issuedTime),
             //add pm or am to time and 12 hour
-            time:moment(entry.issuedTime, "HH:mm:ss").format("hh:mm A"),
+            time: moment(entry.issuedTime, "HH:mm:ss").format("hh:mm A"),
             quantity: entry.quantity,
             remark: entry.remark || "-",
           });
@@ -214,7 +242,7 @@ const dynamicCols = daysOfWeek.map((day) => ({
         columns={[
           { title: "Date", dataIndex: "date", key: "date" },
           { title: "Day of Week", dataIndex: "DayOfWeek", key: "DayOfWeek" },
-        //  { title: "Time Slot", dataIndex: "timeSlot", key: "timeSlot" },
+          //  { title: "Time Slot", dataIndex: "timeSlot", key: "timeSlot" },
           { title: "Time", dataIndex: "time", key: "time" },
           { title: "Quantity", dataIndex: "quantity", key: "quantity" },
           { title: "Remark", dataIndex: "remark", key: "remark" },
@@ -228,34 +256,38 @@ const dynamicCols = daysOfWeek.map((day) => ({
 
   return (
     <div style={{ padding: 20 }}>
-              <InpatientCardInfo patientDetails={patientDetails} />
+      <InpatientCardInfo patientDetails={patientDetails} />
 
       <Divider />
       {/* instructions on how to use the table in info card */}
       <Alert
-  message="How to Use the Treatment Sheet Table"
-  description={
-    <>
-      <ul style={{ paddingLeft: 20 }}>
-        <li>
-          The table summarizes medication issued per patient per day.
-        </li>
-        <li>
-          Columns are grouped by <strong>day of the week</strong> and <strong>time slots</strong> (Morning, Afternoon, Evening, Night).
-        </li>
-        <li>
-          A <strong>✔ icon</strong> means medication was issued at that time. Hover to see time, quantity, and any remarks.
-        </li>
-        <li>
-          Click on a row to expand and view detailed logs — including exact date, time, and notes.
-        </li>
-      </ul>
-    </>
-  }
-  type="info"
-  showIcon
-  style={{ marginBottom: 16 }}
-/>
+        message="How to Use the Treatment Sheet Table"
+        description={
+          <>
+            <ul style={{ paddingLeft: 20 }}>
+              <li>
+                The table summarizes medication issued per patient per day.
+              </li>
+              <li>
+                Columns are grouped by <strong>day of the week</strong> and{" "}
+                <strong>time slots</strong> (Morning, Afternoon, Evening,
+                Night).
+              </li>
+              <li>
+                A <strong>✔ icon</strong> means medication was issued at that
+                time. Hover to see time, quantity, and any remarks.
+              </li>
+              <li>
+                Click on a row to expand and view detailed logs — including
+                exact date, time, and notes.
+              </li>
+            </ul>
+          </>
+        }
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+      />
       <Table
         bordered
         rowKey="key"

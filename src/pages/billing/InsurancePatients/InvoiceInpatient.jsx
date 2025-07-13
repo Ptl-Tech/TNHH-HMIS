@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
-import { Button, Dropdown, Card, Menu, message , Modal, Skeleton} from "antd";
+import { Button, Dropdown, Card, Menu, message, Modal, Skeleton } from "antd";
 import {
   ArrowLeftOutlined,
   UserOutlined,
@@ -21,19 +21,30 @@ import InsurancePaymentSection from "./InsurancePaymentSection";
 import AllocateRebates from "../AllocateRebates";
 import AllocateDiscount from "../AllocateDiscount";
 import { PrintFinalInvoice, PrintInterimInvoice } from "./InvoicePrinting";
-import { postGenerateInvoice,POST_GENERATE_INVOICE_RESET } from "../../../actions/Charges-Actions/postGenerateInvoice";
+import {
+  postGenerateInvoice,
+  POST_GENERATE_INVOICE_RESET,
+} from "../../../actions/Charges-Actions/postGenerateInvoice";
 import ReopenCharges from "./ReopenCharges";
-import { postsalesInvoice,POST_SALES_INVOICE_RESET } from "../../../actions/Charges-Actions/postSalesInvoice";
+import {
+  postsalesInvoice,
+  POST_SALES_INVOICE_RESET,
+} from "../../../actions/Charges-Actions/postSalesInvoice";
 import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
-import {POST_INITIATE_DISCHARGE_FAILURE, POST_INITIATE_DISCHARGE_SUCCESS, postInitiateDischargeSlice } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
+import {
+  POST_INITIATE_DISCHARGE_FAILURE,
+  POST_INITIATE_DISCHARGE_SUCCESS,
+  postInitiateDischargeSlice,
+} from "../../../actions/nurse-actions/postInitiateDischargeSlice";
+import PreviousBill from "../PreviousBill";
 const InvoiceInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-      const { confirm } = Modal;
-  
+  const { confirm } = Modal;
+
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
@@ -54,14 +65,17 @@ const InvoiceInpatient = () => {
     error: patientBillError,
     data: patientBillData,
   } = useSelector((state) => state.getSingleBill);
-  const { loading: postSalesInvoiceLoading, success: postSalesInvoiceSuccess, error: postSalesInvoiceError } = useSelector(
-    (state) => state.postSalesInvoice
-  );
+  const {
+    loading: postSalesInvoiceLoading,
+    success: postSalesInvoiceSuccess,
+    error: postSalesInvoiceError,
+  } = useSelector((state) => state.postSalesInvoice);
   //states
   const [RebatesModal, setRebatesModal] = useState(false);
   const [DiscountModal, setDiscountModal] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -70,20 +84,19 @@ const InvoiceInpatient = () => {
     }
   }, [dispatch, activeVisitNo]);
 
-    useEffect(() => {
-    if(generateInvoiceError){
+  useEffect(() => {
+    if (generateInvoiceError) {
       message.error(generateInvoiceError);
-      dispatch({type: POST_GENERATE_INVOICE_RESET}); // Reset error state   
-    } 
-    
-    }, [generateInvoiceError, dispatch]);
-  
-    useEffect(() => {
-      if (postSalesInvoiceError) {
-        message.error(postSalesInvoiceError);
-        dispatch({ type: POST_SALES_INVOICE_RESET }); // Reset error state
-      }
-    }, [postSalesInvoiceError, dispatch]);
+      dispatch({ type: POST_GENERATE_INVOICE_RESET }); // Reset error state
+    }
+  }, [generateInvoiceError, dispatch]);
+
+  useEffect(() => {
+    if (postSalesInvoiceError) {
+      message.error(postSalesInvoiceError);
+      dispatch({ type: POST_SALES_INVOICE_RESET }); // Reset error state
+    }
+  }, [postSalesInvoiceError, dispatch]);
 
   const handleCancel = () => {
     setRebatesModal(false);
@@ -100,8 +113,8 @@ const InvoiceInpatient = () => {
     await dispatch(postGenerateInvoice(payload)).then((status) => {
       if (status) {
         message.success(`Invoice generated ${status}fully`, 5);
-                dispatch({type: POST_GENERATE_INVOICE_RESET});
-        
+        dispatch({ type: POST_GENERATE_INVOICE_RESET });
+
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -122,8 +135,8 @@ const InvoiceInpatient = () => {
       // Assuming a successful post returns data; adjust the check per your API response.
       if (status && status == "success") {
         message.success("Invoice Posted successfully", 5);
-                dispatch({ type: POST_SALES_INVOICE_RESET });
-        
+        dispatch({ type: POST_SALES_INVOICE_RESET });
+
         dispatch(getPatientCharges(activeVisitNo));
       }
     });
@@ -185,15 +198,18 @@ const InvoiceInpatient = () => {
           setSplitAmountModal(true);
         } else if (key === "receipt_action") {
           showReceiptModal();
-        }else if (key === "initiate_discharge") {
-          handleInitiateDischarge();        
+        } else if (key === "initiate_discharge") {
+          handleInitiateDischarge();
         } else if (key === "visit_action") {
           // Handle other actions here
         }
       }}
     >
       <Menu.Item key="visit_action">
-        <PrintFinalInvoice patientNo={patientBillData[0]?.PatientNo} activeVisitNo={activeVisitNo} />
+        <PrintFinalInvoice
+          patientNo={patientBillData[0]?.PatientNo}
+          activeVisitNo={activeVisitNo}
+        />
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
@@ -201,10 +217,10 @@ const InvoiceInpatient = () => {
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>
       <Menu.Item key="receipt_action">Receipt Lines</Menu.Item>
-            <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
+      <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Divider />
       <Menu.Item key="close_bill">
-        <ClosePatientBill/>
+        <ClosePatientBill />
       </Menu.Item>
       {/* <Menu.Item key="request_admission">Waive Charges</Menu.Item> */}
     </Menu>
@@ -227,59 +243,77 @@ const InvoiceInpatient = () => {
         >
           Go back
         </Button>
-         <h5 className="fw-bold m-0 p-0 text-primary">Patient Invoice Bill</h5>
-        <Dropdown overlay={menu} trigger={["click"]}>
-          <Button type="primary" icon={<MoreOutlined />}>
-            <span className="ant-dropdown-link fw-bold">Actions</span>
-          </Button>
-        </Dropdown>
+        <h5 className="fw-bold m-0 p-0 text-primary">Patient Invoice Bill</h5>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+                 <Dropdown overlay={menu} trigger={["click"]}>
+                   <Button type="primary" icon={<MoreOutlined />}>
+                     <span className="ant-dropdown-link fw-bold">Actions</span>
+                   </Button>
+                 </Dropdown>
+                 <Button onClick={() => setView(true)}>Previous Encounters</Button>
+               </div>
       </div>
       <div className="d-flex flex-column">
-           <Skeleton paragraph={{ rows: 5 }} loading={patientBillLoading} avatar={{size:"small", shape:"circle"}} title={true}>
-        <Card
-          title={
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <UserOutlined />
-                <span>Patient Details</span>
-              </div>
-            </div>
-          }
-          className="mb-3"
+        <Skeleton
+          paragraph={{ rows: 5 }}
+          loading={patientBillLoading}
+          avatar={{ size: "small", shape: "circle" }}
+          title={true}
         >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(6, auto)",
-              gridTemplateRows: "auto auto", // Two rows
-              gap: "12px 20px",
-              fontSize: "14px",
-              fontWeight: "400",
-              color: "black",
-              padding: "10px",
-            }}
+          <Card
+            title={
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center gap-2">
+                  <UserOutlined />
+                  <span>Patient Details</span>
+                </div>
+              </div>
+            }
+            className="mb-3"
           >
-            {/* First row */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Patient Name:{" "}
-              <span className="fw-bold text-primary">{patientBillData[0]?.Names}</span>
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Gender: {patientBillData[0]?.Gender}
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Age in Years:{" "}
-              {` (${Math.floor(
-                (Date.now() -
-                  new Date(patientBillData[0]?.DateOfBirth).getTime()) /
-                  (1000 * 60 * 60 * 24 * 365.25)
-              )} years)`}
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Encounter No: <span className="fw-bold text-secondary">{patientBillData[0]?.CurrentAdmNo}</span>
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-                Visit Type: {patientBillData[0]?.Inpatient ? <span className="fw-bold text-secondary">Inpatient</span> : <span className="fw-bold text-secondary">Outpatient</span>}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(6, auto)",
+                gridTemplateRows: "auto auto", // Two rows
+                gap: "12px 20px",
+                fontSize: "14px",
+                fontWeight: "400",
+                color: "black",
+                padding: "10px",
+              }}
+            >
+              {/* First row */}
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Patient Name:{" "}
+                <span className="fw-bold text-primary">
+                  {patientBillData[0]?.Names}
+                </span>
+              </p>
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Gender: {patientBillData[0]?.Gender}
+              </p>
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Age in Years:{" "}
+                {` (${Math.floor(
+                  (Date.now() -
+                    new Date(patientBillData[0]?.DateOfBirth).getTime()) /
+                    (1000 * 60 * 60 * 24 * 365.25)
+                )} years)`}
+              </p>
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Encounter No:{" "}
+                <span className="fw-bold text-secondary">
+                  {patientBillData[0]?.CurrentAdmNo}
+                </span>
+              </p>
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Visit Type:{" "}
+                {patientBillData[0]?.Inpatient ? (
+                  <span className="fw-bold text-secondary">Inpatient</span>
+                ) : (
+                  <span className="fw-bold text-secondary">Outpatient</span>
+                )}
               </p>
 
               {/* Second row */}
@@ -287,38 +321,41 @@ const InvoiceInpatient = () => {
                 Payment Mode: {patientBillData[0]?.PatientType}
               </p>
 
-            <p className="text-danger fw-bold" style={{ gridColumn: "span 2" }}>
-              <DollarOutlined /> Bill Balance: KSh{" "}
-              {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-            </p>
+              <p
+                className="text-danger fw-bold"
+                style={{ gridColumn: "span 2" }}
+              >
+                <DollarOutlined /> Bill Balance: KSh{" "}
+                {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+              </p>
 
-            {/* Receipt no section */}
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Invoice No:{" "}
-              <span className="fw-bold text-primary">
-                {Array.isArray(data) && data.length > 0
-                  ? data[data.length - 1].Invoice_Number
-                  : "N/A"}
-              </span>
-            </p>
-            <p className="mb-0" style={{ gridColumn: "span 2" }}>
-              Date:{" "}
-             <span className="fw-medium fst-italic">
-               {Array.isArray(data) && data.length > 0
-                ? new Date(data[data.length - 1].Date).toLocaleDateString(
-                    "en-GB",
-                    {
-                      weekday: "short", // Optional, for day of the week
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    }
-                  )
-                : "N/A"}
-              </span>
-            </p>
-          </div>
-        </Card>
+              {/* Receipt no section */}
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Invoice No:{" "}
+                <span className="fw-bold text-primary">
+                  {Array.isArray(data) && data.length > 0
+                    ? data[data.length - 1].Invoice_Number
+                    : "N/A"}
+                </span>
+              </p>
+              <p className="mb-0" style={{ gridColumn: "span 2" }}>
+                Date:{" "}
+                <span className="fw-medium fst-italic">
+                  {Array.isArray(data) && data.length > 0
+                    ? new Date(data[data.length - 1].Date).toLocaleDateString(
+                        "en-GB",
+                        {
+                          weekday: "short", // Optional, for day of the week
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        }
+                      )
+                    : "N/A"}
+                </span>
+              </p>
+            </div>
+          </Card>
         </Skeleton>
         <div className="d-flex justify-content-end gap-3 my-3">
           <Button
@@ -415,6 +452,11 @@ const InvoiceInpatient = () => {
                 activeVisitNo={activeVisitNo}
                 visible={receiptModalVisible}
                 onClose={() => setReceiptModalVisible(false)}
+              />
+              <PreviousBill
+                visible={view}
+                patientNo={patientBillData[0]?.PatientNo}
+                onClose={() => setView(false)}
               />
             </Card>
           </div>

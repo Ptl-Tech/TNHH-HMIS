@@ -113,11 +113,11 @@ export const receptionRoutes = [
         label: "InPatient",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
-      {
-        key: "/Reception/Billing/Previous-Bill",
-        label: "Previous Bill",
-        icon: <GiCoinsPile style={{ color: "#fff" }} />,
-      },
+      // {
+      //   key: "/Reception/Billing/Previous-Bill",
+      //   label: "Previous Bill",
+      //   icon: <GiCoinsPile style={{ color: "#fff" }} />,
+      // },
     ],
   },
 ];
