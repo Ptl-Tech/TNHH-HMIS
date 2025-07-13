@@ -16,6 +16,9 @@ export const GET_PATIENT_BILLING_LIST_FAIL = "GET_PATIENT_BILLING_LIST_FAIL";
 export const GET_PATIENT_BILLING_LIST_RESET = "GET_PATIENT_BILLING_LIST_RESET";
 // Action to fetch billing list
 export const getBillingList = () => async (dispatch, getState) => {
+  var query = `${API}data/odatafilter?webservice=PgPatientsList`;
+  // query += active ? "&query=$filter=Activated eq true" : "";
+
   try {
     dispatch({ type: GET_BILLING_LIST_REQUEST });
 
@@ -35,10 +38,7 @@ export const getBillingList = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=PgPatientsList`,
-      config
-    );
+    const { data } = await axios.get(query, config);
 
     dispatch({
       type: GET_BILLING_LIST_SUCCESS,
@@ -47,6 +47,8 @@ export const getBillingList = () => async (dispatch, getState) => {
 
     return data; // Return only filtered data
   } catch (error) {
+    console.log({ error });
+
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
 

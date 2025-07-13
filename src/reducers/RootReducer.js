@@ -337,6 +337,7 @@ import { getSingleLabDetailsReducer } from "./doc-reducers/getSingleLabDetailsRe
 import { postRefreshPatientChargesReducer } from "./ChargesReducers/postRefreshChargesReducer";
 import { postLabAppointmentReducer } from "./reception-reducers/postLabAppointmentReducer";
 import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPatientNoReducer";
+import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -469,6 +470,7 @@ export const rootReducer = combineReducers({
   postLabRequestToDoctor: postLabRequestToDoctorReducer,
   generateLabResultsReport: generateLabResultsReportReducer,
   updateLabTestLines: updateLabTestLinesReducer,
+  dispatchToLab: postDispatchToLabReducer,
   // ************************************* /
 
   // pharmacy
@@ -626,7 +628,7 @@ export const rootReducer = combineReducers({
   postRebates: postRebatesReducer,
   postDiscount: postDiscountReducer,
   closePatientBill: postClosingBillReducer,
-  postRefreshCharges:postRefreshPatientChargesReducer,
+  postRefreshCharges: postRefreshPatientChargesReducer,
 
   // radiology reducers
   postRadiologyResults: postRadiologyResultsReducer,

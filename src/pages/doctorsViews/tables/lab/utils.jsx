@@ -1,4 +1,4 @@
-import moment from "moment";
+import { Tag } from "antd";
 
 export const labLinesColumns = [
   {
@@ -12,27 +12,17 @@ export const labLinesColumns = [
     key: "LaboratoryTestName",
   },
   {
-    title: "Completed",
+    title: "Status",
     dataIndex: "Completed",
     key: "Completed",
     render: (_, record) =>
-      record.Completed
-        ? "TRUE"
-        : !record.Completed
-        ? "FALSE"
-        : record.Completed,
-  },
-  {
-    title: "Date",
-    dataIndex: "CollectionDate",
-    key: "CollectionDate",
-    render: (_, record) => {
-      const date = new Date(
-        `${record.CollectionDate}T${record.CollectionTime}`
-      );
-
-      return moment(date).format("MMMM Do YYYY, h:mm a");
-    },
+      record.Completed ? (
+        <Tag color="cyan">Completed</Tag>
+      ) : !record.Completed ? (
+        <Tag color="volcano">Incomplete</Tag>
+      ) : (
+        record.Completed
+      ),
   },
 ];
 

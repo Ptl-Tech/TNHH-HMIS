@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Button, Col, message, Modal, Row, Typography } from "antd";
+import { Button, message, Modal, Row, Space, Typography } from "antd";
 import moment from "moment";
 
+import { FaCheckToSlot, FaPrint } from "react-icons/fa6";
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
   generateLabResultsReport,
@@ -18,7 +19,7 @@ import SkeletonLoading from "../../../../partials/nurse-partials/Skeleton";
 const LabHeader = ({ patientData, patientLabRecord }) => {
   const dispatch = useDispatch();
 
-  console.log({ patientLabRecord });
+  console.log({ patientData, patientLabRecord });
 
   const [openReport, setOpenReport] = useState(false);
   const {
@@ -70,20 +71,6 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
     if (loading) message.info("Submitting the request to the doctor");
   }, [data, loading, error]);
 
-  const capitalizeWords = (name) =>
-    name
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-
-  const patientName = patientData?.SearchName
-    ? capitalizeWords(patientData.SearchName)
-    : capitalizeWords(
-        [patientData?.Surname, patientData?.FirstName, patientData?.MiddleName]
-          .filter(Boolean)
-          .join(" ")
-      );
-
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
@@ -114,7 +101,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
 
   const rowData = [
     {
-      title: "Patient Information",
+      title: "Patient & Billing Information",
       data: [
         {
           highlighted: "#5b8c00",
@@ -138,6 +125,20 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
         {
           type: "patientInformation",
           data: { label: "Date of Birth", value: "DateOfBirth" },
+        },
+        {
+          type: "labInformation",
+          data: { label: "Patient Type", value: "PatientType" },
+        },
+        {
+          highlighted: "#5b8c00",
+          type: "labInformation",
+          data: { label: "Insurance Number", value: "Insurance_No" },
+        },
+        {
+          highlighted: "#fa8c16",
+          type: "labInformation",
+          data: { label: "Insurance Name", value: "Insurance_Name" },
         },
       ],
     },
@@ -174,105 +175,101 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
             label: "Lab Request Status",
           },
         },
-      ],
-    },
-    {
-      title: "Lab Actions",
-      data: [
         {
-          type: "buttons",
-          data: [
-            {
-              buttonType: "default",
-              data: {
-                disabled: "Finalize",
-                active: "Finalize",
-              },
-              style: {
-                display: "inline",
-                width: "fit-content",
-              },
-              onClick: (value) => handleMarkAsCompleted(value),
-              disabled: (value) => value === "Completed" || loading,
-            },
-            {
-              buttonType: "default",
-              data: {
-                disabled: "Report",
-                active: "Report",
-              },
-              style: {
-                display: "inline",
-                width: "fit-content",
-              },
-              onClick: (value) => handleGenerateResultsReport(value),
-              disabled: (value) => false,
-            },
-          ],
+          highlighted: "#fa8c16",
+          type: "labInformation",
+          data: { label: "Doctor's Name", value: "Doctor_Names" },
         },
       ],
     },
   ];
 
-  const generateCellData = (cellData, index) => {
+  const generateCellData = (cellData) => {
     if (
       cellData.type === "patientInformation" ||
       cellData.type === "labInformation"
     ) {
       return (
         <InfoRow
-          key={cellData.data.value}
           cellData={cellData}
+          key={cellData.data.value}
           patientData={patientData}
           patientLabRecord={patientLabRecord}
         />
       );
     }
-    if (cellData.type === "buttons") {
-      return (
-        <div style={{ display: "flex", gap: "8px" }}>
-          {cellData.data.map((button, index) => (
-            <Button
-              key={`button${index}`}
-              style={button.style}
-              type={button.buttonType}
-              disabled={button.disabled(patientLabRecord?.Status)}
-              onClick={() => button.onClick(patientLabRecord?.LaboratoryNo)}
-            >
-              {button.disabled ? button.data.disabled : button.data.active}
-            </Button>
-          ))}
-        </div>
-      );
-    }
   };
 
   return (
-    <>
-      <Row gutter={[16, 16]}>
-        {rowData.map((colData, index) => (
-          <Col
+    <div style={{ display: "grid", gap: "16px" }}>
+      <Space className="justify-content-end" style={{ width: "100%" }}>
+        <Button
+          icon={<FaCheckToSlot />}
+          style={{
+            display: "inline",
+            width: "fit-content",
+          }}
+          onClick={() => handleMarkAsCompleted(patientLabRecord?.LaboratoryNo)}
+        >
+          {" "}
+          Finalize
+        </Button>
+        <Button
+          icon={<FaPrint />}
+          type="primary"
+          onClick={() =>
+            handleGenerateResultsReport(patientLabRecord?.LaboratoryNo)
+          }
+        >
+          Report
+        </Button>
+      </Space>
+      <Space
+        gutter={[16, 16]}
+        direction="vertical"
+        className="d-grid gap-0 border"
+        style={{
+          overflow: "clip",
+          borderTopLeftRadius: "7px",
+          borderTopRightRadius: "7px",
+        }}
+      >
+        {rowData.map((row, index) => (
+          <Row
             key={index}
             md={{ span: 8 }}
             xs={{ span: 24 }}
             style={{
               display: "grid",
-              alignContent: "flex-start",
-              gap: "8px",
+              borderTop: "1px solid #efefef",
             }}
           >
-            <Typography.Title
-              level={5}
-              style={{ color: "#0F5689", marginBottom: "12px" }}
-            >
-              {colData.title}
-            </Typography.Title>
-            {colData.data.map((cellData, index) =>
-              generateCellData(cellData, index)
+            {row.title && (
+              <Typography.Title
+                level={5}
+                style={{
+                  padding: "8px",
+                  marginBottom: 0,
+                  color: "#0F5689",
+                  background: "#efefef89",
+                }}
+              >
+                {row.title}
+              </Typography.Title>
             )}
-          </Col>
+            <Space
+              className="d-grid p-2 gap-3"
+              style={{
+                gridTemplateColumns: "repeat(6, 1fr)",
+              }}
+            >
+              {row.data.map((cellData, index) =>
+                generateCellData(cellData, index)
+              )}
+            </Space>
+          </Row>
         ))}
-      </Row>
+      </Space>
       <Modal
         title="Results Report"
         open={openReport}
@@ -287,7 +284,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
           <PDFViewer base64String={currentReportData?.base64} />
         )}
       </Modal>
-    </>
+    </div>
   );
 };
 
@@ -295,7 +292,7 @@ const InfoRow = ({ cellData, patientLabRecord, patientData }) => {
   const { highlighted, type, data, helper } = cellData || {};
 
   let value = "";
-  let color = "gray";
+  let color = "#333";
 
   value =
     type === "patientInformation" && patientData
@@ -311,9 +308,9 @@ const InfoRow = ({ cellData, patientLabRecord, patientData }) => {
   }
 
   return (
-    <Typography.Text level={5} style={{ display: "block", fontWeight: "bold" }}>
-      <span>{`${data.label} :`}</span>
-      <span style={{ color }}>{` ${value}` || "N/A"}</span>
+    <Typography.Text level={5} style={{ display: "grid" }} className="p-0 m-0">
+      <span>{data.label}</span>
+      <span style={{ color, fontWeight: "600" }}>{value || "N/A"}</span>
     </Typography.Text>
   );
 };

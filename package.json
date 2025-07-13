@@ -20,6 +20,7 @@
     "@tiptap/pm": "^2.22.3",
     "@tiptap/react": "^2.22.3",
     "@tiptap/starter-kit": "^2.24.0",
+    "@vercel/speed-insights": "^1.2.0",
     "antd": "^5.25.2",
     "antd-style": "^3.7.1",
     "axios": "^1.7.7",

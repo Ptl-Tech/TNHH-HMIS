@@ -121,13 +121,12 @@ const CreateVisitForm = () => {
       await dispatch(postTriageVisit(payload));
       setDispatchingtotriage(true);
     }
+  
   };
 
-  const handleDirectAdmission = () => {
-    navigate(
-      `/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`
-    );
-  };
+  const handleDirectAdmission=()=>{
+    navigate(`/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
+  }
 
   // // Actions menu
   // const menu = (
@@ -135,7 +134,7 @@ const CreateVisitForm = () => {
   //     <Menu.Item key="visit_action">
   //       {patientDetails.Activated && patientDetails.ActiveVisitNo
   //         ? "View Visit Details"
-  //         : "Create Visit"}
+  //         : "Visit Card"}
   //     </Menu.Item>
   //     <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>
   //       Dispatch to Triage

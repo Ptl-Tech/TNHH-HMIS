@@ -105,7 +105,9 @@ const PatientRegistration = () => {
 
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key="create_visit">Create Visit</Menu.Item>
+      <Menu.Item key="create_visit">
+        {patientDetails?.Activated && patientDetails?.ActiveVisitNo ? "View Visit Details" : "Out Patient Visit"}
+      </Menu.Item>
       <Menu.Item key="request_admission">Request Admission</Menu.Item>
       {/* <Menu.Item key="bill_patient">Bill Patient</Menu.Item> */}
     </Menu>
