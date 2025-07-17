@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import ReactPDF, { pdf } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 
 import {
   Col,
@@ -17,6 +17,7 @@ import {
   Table,
   Button,
   message,
+  DatePicker,
   Typography,
   InputNumber,
 } from "antd";
@@ -27,14 +28,15 @@ import {
 } from "@ant-design/icons";
 import { Select } from "antd";
 
-import { SearchDrugTable } from "./SearchDrugTable";
 import {
   pharmacyCardPatientData,
   pharmacyCardSearchDrugsColumns,
   pharmacyCardCurrentSelectionColumns,
 } from "./pharmacy-utils";
+import { SearchDrugTable } from "./SearchDrugTable";
 
 import PharmacyLabel from "./PharmacyLabel";
+import PDFViewer from "../../components/PDFView";
 import {
   postDrugIssuance,
   postArchivePrescription,
@@ -48,9 +50,9 @@ import {
   getPharmacyLineReturnbyPharmacyNo,
 } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
 import { getItemsSlice } from "../../actions/triage-actions/getItemsSlice";
-import PDFViewer from "../../components/PDFView";
 import { getPharmacyRequestsAll } from "../../actions/pharmacy-actions/getPharmacyRequestsAll";
 import { getSinglePharmacyRecord } from "../../actions/pharmacy-actions/getSinglePharmacyRecord";
+import dayjs from "dayjs";
 
 const { confirm } = Modal;
 const { Text } = Typography;
@@ -92,6 +94,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
+  console.log({ location });
+
+  const { RangePicker } = DatePicker;
+
   const searchParams = new URLSearchParams(location.search);
 
   const [form] = Form.useForm();
@@ -101,6 +107,12 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const [viewPDFLabel, setViewPDFLabel] = useState(false);
   const [currentRequest, setCurrentRequest] = useState(null);
   const [Status, setStatus] = useState(searchParams.get("status") || "");
+  const [dateRange, setDateRange] = useState(
+    location.state?.dateRange || {
+      from: dayjs(new Date()).format("YYYY-MM-DD"),
+      to: dayjs(new Date()).format("YYYY-MM-DD"),
+    }
+  );
 
   const { Title } = Typography;
   const SpaceCompact = Space.Compact;
@@ -227,9 +239,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     pharmacyLineDataSuccess,
   ]);
 
+  // This requests the pharmacy patients
   useEffect(() => {
-    dispatch(getPharmacyRequestsAll({ type, status: Status }));
-  }, [postArchivePrescriptionData, type, Status]);
+    dispatch(getPharmacyRequestsAll({ type, status: Status, dateRange }));
+  }, [postArchivePrescriptionData, type, Status, dateRange]);
 
   // to track once the pharmacy line has been updated
   useEffect(() => {
@@ -392,40 +405,59 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       <Title level={4} style={{ color: "#0f5689", marginBottom: "0px" }}>
         {title}
       </Title>
-      <SpaceCompact direction="horizontal">
-        {!hideSelector && (
+      <Space>
+        <SpaceCompact direction="horizontal">
+          {!hideSelector && (
+            <Select
+              showSearch
+              options={statuses}
+              prefix={<Tag color="#ac8342">Status</Tag>}
+              placeholder="Status"
+              defaultValue={Status}
+              style={{ width: "200px" }}
+              onChange={handleStatusChange}
+            />
+          )}
+          <RangePicker
+            size={"middle"}
+            onChange={(value) =>
+              setDateRange({
+                from: dayjs(value[0]).format("YYYY-MM-DD"),
+                to: dayjs(value[1]).format("YYYY-MM-DD"),
+              })
+            }
+            defaultValue={[
+              dayjs(new Date(dateRange.from)),
+              dayjs(new Date(dateRange.to)),
+            ]}
+          />
           <Select
             showSearch
-            options={statuses}
-            prefix={<Tag color="#ac8342">Status</Tag>}
-            placeholder="Status"
-            defaultValue={Status}
-            style={{ width: "200px" }}
-            onChange={handleStatusChange}
+            style={{ width: "400px" }}
+            onChange={handleRequestChange}
+            placeholder="Select a patient"
+            notFoundContent={
+              pharmacyRequestsLoading ? (
+                <Spin size="small" />
+              ) : (
+                "No results found"
+              )
+            }
+            options={
+              pharmacyRequestsLoading
+                ? []
+                : pharmacyRequests.map((request) => ({
+                    label: (
+                      <span>
+                        {request.Search_Name} - {request.Link_No}
+                      </span>
+                    ),
+                    value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
+                  }))
+            }
           />
-        )}
-        <Select
-          showSearch
-          style={{ width: "400px" }}
-          onChange={handleRequestChange}
-          placeholder="Select a patient"
-          notFoundContent={
-            pharmacyRequestsLoading ? <Spin size="small" /> : "No results found"
-          }
-          options={
-            pharmacyRequestsLoading
-              ? []
-              : pharmacyRequests.map((request) => ({
-                  label: (
-                    <span>
-                      {request.Search_Name} - {request.Link_No}
-                    </span>
-                  ),
-                  value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
-                }))
-          }
-        />
-      </SpaceCompact>
+        </SpaceCompact>
+      </Space>
       <Card
         style={{ background: "#00000006" }}
         title={

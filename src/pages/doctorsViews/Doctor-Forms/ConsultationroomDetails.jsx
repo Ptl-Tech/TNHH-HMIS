@@ -8,6 +8,7 @@ import {
   SolutionOutlined,
   MedicineBoxOutlined,
 } from "@ant-design/icons";
+import { CgNotes } from "react-icons/cg";
 
 // Import components
 import Diagnosis from "./Diagnosis";
@@ -24,6 +25,7 @@ import useAuth from "../../../hooks/useAuth";
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
 import { getBriefMSENotesData } from "../../../actions/nurse-actions/getBriefMSENotesData";
+import { ConsultationNotes } from "./ConsultationNotes";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const dispatch = useDispatch();
@@ -57,6 +59,11 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   }, [saveDoctorNotesError]);
 
   const items = [
+    {
+      label: "Consultation Notes",
+      icon: <CgNotes />,
+      children: <ConsultationNotes filter={"PH"} data={doctorNotesData} />,
+    },
     {
       label: "Patient History Notes",
       icon: <SolutionOutlined />,
