@@ -334,14 +334,14 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
             </Row>
           </>
         )}
-        <Form.Item>
+        <Form.Item style={{ textAlign: "right" }}>
           <Button
             type="primary"
             htmlType="submit"
             loading={loading}
             disabled={loading}
           >
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Saving..." : "Save Details"}
           </Button>
         </Form.Item>
       </Form>

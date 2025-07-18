@@ -10,10 +10,17 @@ import {
   Menu,
   Dropdown,
   Button,
+  Steps,
+  Typography,
+  Alert,
 } from "antd";
 import {
   ArrowLeftOutlined,
+  CreditCardOutlined,
+  HomeOutlined,
+  InfoCircleOutlined,
   MoreOutlined,
+  TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import useFetchPatientDetailsHook from "../hooks/useFetchPatientDetailsHook";
@@ -22,6 +29,9 @@ import NextofKinInformatiotion from "./reception-views/registrationPartials.jsx/
 import RegionalInformation from "./reception-views/registrationPartials.jsx/RegionalInformation";
 import BillingInformation from "./reception-views/registrationPartials.jsx/BillingInformation";
 import MarketingInformation from "./reception-views/registrationPartials.jsx/MarketingInformation";
+import { BiStreetView } from "react-icons/bi";
+import AdvancedReceiptList from "./billing/CashPatients/AdvancedReceiptList";
+import PreviousBill from "./billing/PreviousBill";
 
 const PatientRegistration = () => {
   const location = useLocation();
@@ -31,6 +41,9 @@ const PatientRegistration = () => {
     useFetchPatientDetailsHook(patientNo || null);
   const [patientDetails, setPatientDetails] = useState(null);
   const [updated, setUpdated] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [showIncompleteAlert, setShowIncompleteAlert] = useState(false);
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -55,7 +68,19 @@ const PatientRegistration = () => {
   const handleMenuClick = ({ key }) => {
     switch (key) {
       case "create_visit":
-        // Navigate with proper query parameters
+        if (
+          (current < steps.length - 1 && !patientDetails.PatientNo) ||
+          !patientDetails.PatientType
+        ) {
+          setShowIncompleteAlert(true);
+          return;
+        }
+        // // if last step but no patient details
+        // if (current === steps.length - 1 && !patientDetails) {
+        //   setShowIncompleteAlert(true);
+        //   return;
+        // }
+
         navigate(
           `/reception/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
           {
@@ -63,6 +88,7 @@ const PatientRegistration = () => {
           }
         );
         break;
+
       case "request_admission":
         navigate(
           `/Reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
@@ -71,14 +97,7 @@ const PatientRegistration = () => {
           }
         );
         break;
-      // case "bill_patient":
-      //   navigate(
-      //     `/Reception/Patient-Charges/Patient?PatientNo=${patientDetails.PatientNo}`,
-      //     {
-      //       state: { existingPatient: patientDetails },
-      //     }
-      //   );
-      //   break;
+
       default:
         break;
     }
@@ -93,6 +112,49 @@ const PatientRegistration = () => {
       {/* <Menu.Item key="bill_patient">Bill Patient</Menu.Item> */}
     </Menu>
   );
+
+  const steps = [
+    {
+      title: "General Info",
+      icon: <InfoCircleOutlined />,
+      content: (
+        <GeneralInformation
+          patientDetails={patientDetails}
+          onUpdate={handleUpdatePatientDetails}
+        />
+      ),
+    },
+    {
+      title: "Next of Kin",
+      icon: <TeamOutlined />,
+      content: (
+        <NextofKinInformatiotion
+          patientDetails={patientDetails}
+          onUpdate={handleUpdatePatientDetails}
+        />
+      ),
+    },
+    {
+      title: "Address",
+      icon: <HomeOutlined />,
+      content: (
+        <RegionalInformation
+          patientDetails={patientDetails}
+          onUpdate={handleUpdatePatientDetails}
+        />
+      ),
+    },
+    {
+      title: "Billing",
+      icon: <CreditCardOutlined />,
+      content: (
+        <BillingInformation
+          patientDetails={patientDetails}
+          onUpdate={handleUpdatePatientDetails}
+        />
+      ),
+    },
+  ];
 
   return (
     <div
@@ -111,27 +173,31 @@ const PatientRegistration = () => {
         >
           Go back{" "}
         </Button>
-
-        <Dropdown overlay={menu} trigger={["click"]}>
-          <Button type="dashed" icon={<MoreOutlined />}>
-            <span className="ant-dropdown-link fw-bold">Actions</span>
-          </Button>
-        </Dropdown>
+        <Typography.Title level={5}>
+          <u>Patient Registration Card</u>
+        </Typography.Title>
+        <div className="d-flex align-items-center justify-content-between gap-2">
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <Button type="primary" icon={<MoreOutlined />}>
+              <span className="ant-dropdown-link fw-bold">Actions</span>
+            </Button>
+          </Dropdown>
+          <Button  onClick={() => setView(true)}>Previous Encounters</Button>
+        </div>
       </div>
 
       <div className="d-flex flex-column" style={{ width: "100%" }}>
         <Card
+          className="card"
           style={{
             width: "100%",
-            maxWidth: "2900px",
+            borderTop: "3px solid #0f5689",
             padding: "20px",
-            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-            border: "2px solid #0f5689",
           }}
         >
           {loadingPatientDetails ? (
             <Skeleton active paragraph={{ rows: 4 }} />
-          ) : patientDetails ? (
+          ) : (
             <Row align="middle" gutter={16}>
               <Col flex="100px">
                 <Avatar size={80} src={"profile"} icon={<UserOutlined />} />
@@ -168,10 +234,6 @@ const PatientRegistration = () => {
                 </div>
               </Col>
             </Row>
-          ) : (
-            <p style={{ textAlign: "center", fontSize: "16px", color: "#888" }}>
-              No patient details found. Register a new patient.
-            </p>
           )}
         </Card>
 
@@ -179,55 +241,83 @@ const PatientRegistration = () => {
         <Card
           style={{
             width: "100%",
-            maxWidth: "2900px",
             padding: "20px",
-            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-            marginTop: "20px",
-            border: "2px solid #0f5689",
           }}
         >
-          <Tabs
-            defaultActiveKey="1"
-            tabPosition="left"
+          {showIncompleteAlert && (
+            <Alert
+              message="All patient registration details must be filled before creating a visit."
+              type="error"
+              showIcon
+              closable
+              onClose={() => setShowIncompleteAlert(false)}
+              style={{
+                marginBottom: 16,
+                position: "relative",
+              }}
+              className="custom-alert"
+            />
+          )}
+
+          <Steps
+            current={current}
+            items={steps.map((step, index) => ({
+              title: (
+                <span
+                  style={{
+                    color: current === index ? "#52c41a" : "#0f5689",
+                    fontWeight: current === index ? "bold" : "normal",
+                  }}
+                >
+                  {step.title}
+                </span>
+              ),
+              icon: (
+                <span
+                  style={{
+                    color: current === index ? "#52c41a" : "#0f5689",
+                  }}
+                >
+                  {step.icon}
+                </span>
+              ),
+            }))}
+          />
+
+          <div
             style={{
-              border: "2px solid #0f5689",
-              borderRadius: "5px",
-              padding: "5px",
+              marginTop: 30,
+              minHeight: 200,
+              padding: 24,
+              background: "#fff",
+              border: "1px solid #f0f0f0",
+              borderRadius: 4,
             }}
           >
-            <Tabs.TabPane tab="General Information" key="1">
-              <GeneralInformation
-                patientDetails={patientDetails}
-                onUpdate={handleUpdatePatientDetails}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Next of Kin" key="2">
-              <NextofKinInformatiotion
-                patientDetails={patientDetails}
-                onUpdate={handleUpdatePatientDetails}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Address & Region" key="3">
-              <RegionalInformation
-                patientDetails={patientDetails}
-                onUpdate={handleUpdatePatientDetails}
-              />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Billing Information" key="4">
-              <BillingInformation
-                patientDetails={patientDetails}
-                onUpdate={handleUpdatePatientDetails}
-              />
-            </Tabs.TabPane>
-            {/* <Tabs.TabPane tab="How Did You Hear About Us ?" key="5">
-              <MarketingInformation
-                patientDetails={patientDetails}
-                onUpdate={handleUpdatePatientDetails}
-              />
-            </Tabs.TabPane> */}
-          </Tabs>
+            {steps[current].content}
+          </div>
+
+          <div style={{ marginTop: 24, textAlign: "right" }}>
+            {current > 0 && (
+              <Button
+                style={{ marginRight: 8 }}
+                onClick={() => setCurrent((prev) => prev - 1)}
+              >
+                Previous
+              </Button>
+            )}
+            {current < steps.length - 1 && (
+              <Button
+                type="primary"
+                onClick={() => setCurrent((prev) => prev + 1)}
+              >
+                Next
+              </Button>
+            )}
+          </div>
         </Card>
       </div>
+      <PreviousBill visible={view} patientNo={patientNo} onClose={() => setView(false)} />
     </div>
   );
 };

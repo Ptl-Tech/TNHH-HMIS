@@ -7,7 +7,7 @@ export const ActivePatients = ({ loading, columns, dataSource }) => {
         size="medium"
         loading={loading}
         columns={columns}
-        dataSource={dataSource}
+        dataSource={(dataSource || []).toReversed()}
       />
       ;
     </div>

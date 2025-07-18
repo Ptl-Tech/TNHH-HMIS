@@ -44,6 +44,7 @@ export const postInterimInvoice = (invoiceData) => async (dispatch, getState) =>
         payload: error.response?.data?.errors || error.errors,
       });
       message.error(error.response?.data?.errors || error.errors);
+      return error;
     }, 1200);
   } finally {
     dispatch({ type: PRINT_INTERIM_INVOICE_RESET });

@@ -32,7 +32,7 @@ const Medication = () => {
 
   return (
     <div>
-      {(role === "Doctor" || role === "Psychology" || role === "Nurse") &&
+      {(role === "Doctor" || role === "Psychology" ) &&
         patientDetails?.Status !== "Completed" && (
           <Tabs
             type="card"

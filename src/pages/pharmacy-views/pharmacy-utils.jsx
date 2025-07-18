@@ -38,7 +38,7 @@ export const pharmacyCardSearchDrugsColumns = (handleAddDrug) => [
     title: "Price",
     key: "UnitPrice",
     dataIndex: "UnitPrice",
-    render: (value) => Math.round((value + Number.EPSILON) * 1000) / 1000,
+    render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
   },
   {
     key: "No",
@@ -75,7 +75,7 @@ export const pharmacyQuotationSearchDrugsColumns = (handleAddDrug) => [
     title: "Price",
     key: "UnitPrice",
     dataIndex: "UnitPrice",
-    render: (value) => Math.round((value + Number.EPSILON) * 1000) / 1000,
+    render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
   },
   {
     key: "No",
@@ -203,7 +203,7 @@ export const pharmacyCardCurrentSelectionColumns = ({
       title: "Unit Price",
       dataIndex: "UnitPrice",
       key: "UnitPrice",
-      render: (value) => value.toLocaleString(),
+      render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
     },
     {
       title: "Total Price",
@@ -211,7 +211,7 @@ export const pharmacyCardCurrentSelectionColumns = ({
       key: "TotalPrice",
       render: (value, record) => {
         return (
-          Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+          Math.round(record.UnitPrice * record.Quantity * 1) / 1
         ).toLocaleString();
       },
     },
@@ -319,7 +319,7 @@ export const pharmacyQuotationCurrentSelectionColumns = (
       title: "Unit Price",
       dataIndex: "UnitPrice",
       key: "UnitPrice",
-      render: (value) => value.toLocaleString(),
+      render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
     },
     {
       title: "Total Price",
@@ -330,12 +330,12 @@ export const pharmacyQuotationCurrentSelectionColumns = (
           unitPrice: record.UnitPrice,
           quantity: record.Quantity,
           value: (
-            Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+            Math.round(record.UnitPrice * record.Quantity * 1) / 1
           ).toLocaleString(),
         });
 
         return (
-          Math.round(record.UnitPrice * record.Quantity * 1000) / 1000
+          Math.round(record.UnitPrice * record.Quantity * 1) / 1
         ).toLocaleString();
       },
     },

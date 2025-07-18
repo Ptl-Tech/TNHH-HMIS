@@ -5,16 +5,26 @@ import {
   POST_DOCTOR_NOTES_SUCCESS,
 } from "../../actions/Doc-actions/postDoctorNotes";
 
-export const postDoctorNotesReducer = (state = { loading: false }, action) => {
+const initialState = {
+  data: null,
+  error: null,
+  loading: false,
+};
+
+export const postDoctorNotesReducer = (state = initialState, action) => {
   switch (action.type) {
     case POST_DOCTOR_NOTES_REQUEST:
-      return { ...state, loading: true };
+      return { ...initialState, loading: true };
     case POST_DOCTOR_NOTES_SUCCESS:
-      return { ...state, loading: false, success: true, data: action.payload };
+      return {
+        ...initialState,
+        loading: false,
+        data: action.payload,
+      };
     case POST_DOCTOR_NOTES_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...initialState, loading: false, error: action.payload };
     case POST_DOCTOR_NOTES_RESET:
-      return { loading: false };
+      return initialState;
     default:
       return state;
   }

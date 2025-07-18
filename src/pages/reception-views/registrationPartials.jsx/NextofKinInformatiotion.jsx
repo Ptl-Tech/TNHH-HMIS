@@ -186,7 +186,7 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           <Input placeholder="Enter Phone Number" />
         </Form.Item>
 
-        <Form.Item>
+        <Form.Item style={{ textAlign: "right" }}>
           <Button
             type="primary"
             htmlType="submit"

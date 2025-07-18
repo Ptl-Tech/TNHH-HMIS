@@ -91,6 +91,12 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
         dependant: patientDetails?.Dependant || 0,
+          paymentMode:
+          patientDetails?.PatientType === "Corporate"
+            ? 1
+            : patientDetails?.PatientType === "Cash"
+            ? 2
+            : 2,
       });
     }
   }, [patientDetails, form]);
@@ -294,14 +300,14 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item>
+        <Form.Item style={{ textAlign: "right" }}>
           <Button
             type="primary"
             htmlType="submit"
             loading={loading}
             disabled={loading}
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Submitting..." : "Save Details"}
           </Button>
         </Form.Item>
       </Form>

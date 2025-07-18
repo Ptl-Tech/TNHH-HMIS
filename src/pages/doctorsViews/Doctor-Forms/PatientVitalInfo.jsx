@@ -65,7 +65,7 @@ import dayjs from "dayjs";
 import PatientSignsReport from "./PatientSignsReport";
 
 const PatientVitalInfo = () => {
-  const observationNo = useLocation().state.observationNo;
+  const observationNo = useLocation()?.state?.observationNo;
 
   const items = [
     {

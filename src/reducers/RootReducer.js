@@ -225,7 +225,7 @@ import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgen
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
-import { getBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import { getBillingListReducer, getPatientBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
 import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
 import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
@@ -335,7 +335,10 @@ import { getSingleAdmittedReducer } from "./nurse-reducers/getSingleAdmittedRedu
 import { getBriefMSENotesDataReducer } from "./nurse-reducers/getBriefMSEReducer";
 import { getSingleLabDetailsReducer } from "./doc-reducers/getSingleLabDetailsReducer";
 import { postRefreshPatientChargesReducer } from "./ChargesReducers/postRefreshChargesReducer";
+import { postLabAppointmentReducer } from "./reception-reducers/postLabAppointmentReducer";
+import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPatientNoReducer";
 import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
+import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -480,6 +483,8 @@ export const rootReducer = combineReducers({
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
   getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
   postPharmacyAppointment: postPharmacyAppointmentReducer,
+  postLabAppointment:postLabAppointmentReducer,
+  getReceiptsByPatientNo: getReceiptsByPatientNoReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
@@ -568,8 +573,10 @@ export const rootReducer = combineReducers({
   postSplitReceipt: postReceiptSplitLineReducer,
   getReceiptPage: getReceiptPageReducer,
 
+  getDoctorNotesSections: getDoctorNotesSectionsReducer,
   postDoctorNotes: postDoctorNotesReducer,
   getBillingList: getBillingListReducer,
+  getPatientPastEncounterBillingList: getPatientBillingListReducer,
   postVisitorList: postVisitorListReducer,
   postPatientHistory: postPatientHistoryNotesReducer,
   getPatientHistoryNotesReducer: getPatientHistoryNotes,

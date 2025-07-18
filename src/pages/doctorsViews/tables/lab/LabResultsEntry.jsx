@@ -28,6 +28,7 @@ import {
   postLabTestResults,
 } from "../../../../actions/lab-actions/postLabTestResults";
 import WYSIWYGEditor from "../../../../components/WYSIWYGEditor";
+import { getLabDetails } from "../../../../actions/Doc-actions/getLabRequestDetails";
 
 const LabResultsEntry = ({ data, loading }) => {
   // state
@@ -322,6 +323,8 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
+      // refetch the lines again
+      dispatch(getLabDetails(laboratoryNo));
     }
 
     if (labResultsError) {

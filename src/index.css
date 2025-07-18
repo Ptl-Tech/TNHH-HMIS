@@ -12,6 +12,13 @@
 .ProseMirror:focus {
   outline: none;
 }
+.custom-alert .ant-alert-close-icon {
+  color: #000 !important; /* black */
+}
+
+.custom-alert .ant-alert-close-icon:hover {
+  color: #000 !important; /* black on hover too */
+}
 
 .ant-layout-sider {
   flex: 0 0 230px !important;
@@ -279,6 +286,43 @@ main {
 }
 .ant-layout .ant-layout-sider-trigger {
   display: none !important;
+}
+
+.ping-container {
+  top: 7px;
+  right: 7px;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+}
+
+.heartbeat {
+  position: absolute;
+  width: fit-content;
+  background-color: #db0000;
+  border-radius: 40px;
+  width: 4px;
+  height: 4px;
+  opacity: 0.75;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.dot {
+  position: relative;
+  width: fit-content;
+  background: #db0000;
+  border-radius: 40px;
+  width: 4px;
+  height: 4px;
+}
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(7);
+    opacity: 0;
+  }
 }
 
 @media screen and (max-width: 768px) {

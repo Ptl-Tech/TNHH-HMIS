@@ -391,7 +391,7 @@ console.log("daotient", patientDetails);
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item>
+        <Form.Item style={{ textAlign: "right" }}>
           <Button
             type="primary"
             htmlType="submit"

@@ -91,13 +91,6 @@ const PsychologyNotes = ({ treatmentNo }) => {
   const notesTypes = [
     { value: "1", label: "Doctor Notes" },
     { value: "2", label: "Medical Report" },
-    { value: "3", label: "History" },
-    { value: "4", label: "Treatment Plan" },
-    { value: "5", label: "Chief Complaints" },
-    { value: "6", label: "Past Medical History" },
-    { value: "7", label: "Past Surgical History" },
-    { value: "8", label: "Social History" },
-    { value: "9", label: "Investigations" },
     { value: "10", label: "Assessment and plan" },
     { value: "11", label: "Psychology Notes" },
   ];

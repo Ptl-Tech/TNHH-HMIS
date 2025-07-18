@@ -346,7 +346,7 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
     );
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
-    return responseData.msg;
+    return {type: POST_TRIAGE_VISIT_SUCCESS, payload: response};
   } catch (error) {
     // Extract error message from different possible sources
     const errorMessage =
@@ -363,7 +363,10 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
       payload: errorMessage,
     });
 
-    throw error;
+    return {
+      type: POST_TRIAGE_VISIT_FAIL,
+      payload: errorMessage,
+    };
   }
 };
 
