@@ -72,7 +72,7 @@ export default function PharmacyQuotation() {
   const pharmacyCurrentSelectionSummary = (pageData) => {
     const totalValue = pageData.reduce(
       (acc, { Quantity, UnitPrice }) =>
-        Math.round((acc += Quantity * UnitPrice) * 1000) / 1000,
+        Math.round((acc += Quantity * UnitPrice) * 1) / 1,
       0
     );
 

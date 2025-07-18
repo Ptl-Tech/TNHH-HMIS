@@ -191,7 +191,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           noOfDays: Duration_Days,
           frequency: Frequency,
           dosage: Dosage,
-          TotalAmount: Math.round(UnitPrice * Quantity * 1000) / 1000,
+          TotalAmount: Math.round(UnitPrice * Quantity * 1) / 1,
           remarks,
         })
       );
@@ -616,7 +616,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
 
                   return pageData.length ? (
                     <TableSummaryRow>
-                      <TableSummaryCell index={0} colSpan={9} />
+                      <TableSummaryCell index={0} colSpan={8} />
                       <TableSummaryCell index={0}>
                         <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
                           Total
@@ -625,7 +625,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
                       <TableSummaryCell index={1}>
                         <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
                           {new Intl.NumberFormat("en-US").format(
-                            Math.round(totalValue * 1000) / 1000
+                            Math.round(totalValue * 1) / 1
                           )}
                         </Text>
                       </TableSummaryCell>
