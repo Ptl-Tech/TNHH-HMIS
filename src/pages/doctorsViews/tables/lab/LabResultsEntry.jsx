@@ -190,6 +190,8 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
 
   useEffect(() => {
     if (labResultsData) {
+      console.log({ labResultsData });
+
       const { labResults, labRemarks } = labResultsData;
       labRemarks?.status === "success" && labResults?.status === "success"
         ? message.success("Results submitted successfully!")
