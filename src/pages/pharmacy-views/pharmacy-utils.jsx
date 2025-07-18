@@ -203,7 +203,7 @@ export const pharmacyCardCurrentSelectionColumns = ({
       title: "Unit Price",
       dataIndex: "UnitPrice",
       key: "UnitPrice",
-      render: (value) => value.toLocaleString(),
+      render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
     },
     {
       title: "Total Price",
@@ -319,7 +319,7 @@ export const pharmacyQuotationCurrentSelectionColumns = (
       title: "Unit Price",
       dataIndex: "UnitPrice",
       key: "UnitPrice",
-      render: (value) => value.toLocaleString(),
+      render: (value) => Math.round((value + Number.EPSILON) * 1) / 1,
     },
     {
       title: "Total Price",
