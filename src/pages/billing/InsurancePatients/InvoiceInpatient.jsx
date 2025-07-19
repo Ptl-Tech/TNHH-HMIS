@@ -39,6 +39,7 @@ import {
   postInitiateDischargeSlice,
 } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 import PreviousBill from "../PreviousBill";
+import RefreshPatientCharges from "../RefreshPatientCharges";
 const InvoiceInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -245,13 +246,13 @@ const InvoiceInpatient = () => {
         </Button>
         <h5 className="fw-bold m-0 p-0 text-primary">Patient Invoice Bill</h5>
         <div className="d-flex align-items-center justify-content-between gap-2">
-                 <Dropdown overlay={menu} trigger={["click"]}>
-                   <Button type="primary" icon={<MoreOutlined />}>
-                     <span className="ant-dropdown-link fw-bold">Actions</span>
-                   </Button>
-                 </Dropdown>
-                 <Button onClick={() => setView(true)}>Previous Encounters</Button>
-               </div>
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <Button type="primary" icon={<MoreOutlined />}>
+              <span className="ant-dropdown-link fw-bold">Actions</span>
+            </Button>
+          </Dropdown>
+          <Button onClick={() => setView(true)}>Previous Encounters</Button>
+        </div>
       </div>
       <div className="d-flex flex-column">
         <Skeleton
@@ -357,23 +358,29 @@ const InvoiceInpatient = () => {
             </div>
           </Card>
         </Skeleton>
-        <div className="d-flex justify-content-end gap-3 my-3">
-          <Button
-            type="primary"
-            onClick={handlegenerateInvoice}
-            loading={generateInvoiceLoading}
-            disabled={generateInvoiceLoading}
-          >
-            Generate Invoice
-          </Button>
-          <ReopenCharges
+        <div className="d-flex justify-content-between gap-3 my-3">
+          <RefreshPatientCharges
             patientNo={patientBillData[0]?.PatientNo}
             activeVisitNo={activeVisitNo}
           />
-          <PrintInterimInvoice
-            patientNo={patientBillData[0]?.PatientNo}
-            activeVisitNo={activeVisitNo}
-          />
+          <div className="d-flex justify-content-end gap-3 my-3">
+            <Button
+              type="primary"
+              onClick={handlegenerateInvoice}
+              loading={generateInvoiceLoading}
+              disabled={generateInvoiceLoading}
+            >
+              Generate Invoice
+            </Button>
+            <ReopenCharges
+              patientNo={patientBillData[0]?.PatientNo}
+              activeVisitNo={activeVisitNo}
+            />
+            <PrintInterimInvoice
+              patientNo={patientBillData[0]?.PatientNo}
+              activeVisitNo={activeVisitNo}
+            />
+          </div>
         </div>
         <PatientCharges activeVisitNo={activeVisitNo} />
         <div className="row gap-3 gap-md-0">

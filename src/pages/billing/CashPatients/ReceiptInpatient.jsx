@@ -33,6 +33,7 @@ import {
 } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 import PreviousBill from "../PreviousBill";
 import AllocateRebates from "../AllocateRebates";
+import RefreshPatientCharges from "../RefreshPatientCharges";
 const ReceiptInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -68,8 +69,8 @@ const ReceiptInpatient = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
   const [splitAmountModal, setSplitAmountModal] = useState(false);
-    const [RebatesModal, setRebatesModal] = useState(false);
-  
+  const [RebatesModal, setRebatesModal] = useState(false);
+
   const [view, setView] = useState(false);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const ReceiptInpatient = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
     setSplitAmountModal(false);
-        setRebatesModal(false);
+    setRebatesModal(false);
   };
 
   const showReceiptModal = () => {
@@ -193,14 +194,14 @@ const ReceiptInpatient = () => {
           InitiateSplitPayment();
         } else if (key === "initiate_discharge") {
           handleInitiateDischarge();
-        }else if (key === "rebates_action") {
+        } else if (key === "rebates_action") {
           setRebatesModal(true); // Show receipt modal
         }
       }}
     >
       <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
-       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
+      <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
       <Menu.Divider />
@@ -339,21 +340,27 @@ const ReceiptInpatient = () => {
               </div>
             </Card>
           </Skeleton>
-          <div className="d-flex justify-content-end gap-3 my-3">
-            <PrintReceipt
-              receiptNo={
-                Array.isArray(receiptLines) && receiptLines?.length > 0
-                  ? receiptLines[receiptLines?.length - 1]?.No
-                  : "N/A"
-              }
-            />
-            <PrintInterimInvoice
+          <div className="d-flex justify-content-between gap-3 my-3">
+            <RefreshPatientCharges
               patientNo={patientBillData[0]?.PatientNo}
               activeVisitNo={activeVisitNo}
             />
-            {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
+            <div className="d-flex justify-content-end gap-3 my-3">
+              <PrintReceipt
+                receiptNo={
+                  Array.isArray(receiptLines) && receiptLines?.length > 0
+                    ? receiptLines[receiptLines?.length - 1]?.No
+                    : "N/A"
+                }
+              />
+              <PrintInterimInvoice
+                patientNo={patientBillData[0]?.PatientNo}
+                activeVisitNo={activeVisitNo}
+              />
+              {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
             MPESA Payment
           </Button> */}
+            </div>
           </div>
           <PatientCharges activeVisitNo={activeVisitNo} />
           <div className="row gap-3 gap-md-0">
@@ -451,11 +458,11 @@ const ReceiptInpatient = () => {
           patientNo={patientBillData[0]?.PatientNo}
           onClose={() => setView(false)}
         />
-          <AllocateRebates
-                  visible={RebatesModal}
-                  onClose={handleCancel}
-                  patientNo={patientBillData[0]?.PatientNo}
-                />
+        <AllocateRebates
+          visible={RebatesModal}
+          onClose={handleCancel}
+          patientNo={patientBillData[0]?.PatientNo}
+        />
       </div>
     </>
   );

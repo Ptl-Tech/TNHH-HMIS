@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Drawer, Table, Divider, Typography } from "antd";
+import {CloseOutlined} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import PrintReceipt from "./CashPatients/PrintReceipt";
@@ -220,6 +221,8 @@ console.log(patientNo);
             Encounter Details - {activeVisitNo}
           </h4>
         }
+                extra={<Button onClick={() => setEncounterDrawerVisible(false)} icon={<CloseOutlined />} danger>Close</Button>}
+
       >
         <PatientHeader
             activeVisitNo={activeVisitNo}

@@ -33,6 +33,7 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
   );
   const { loading: loadingPatientDetails, patients: dataPatient } =
     useSelector((state) => state.patientList) || {};
+    
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -65,9 +66,9 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
           ? 1
           : 0;
       form.setFieldsValue({
-        firstName: patientDetails?.Surname?.split(" ")[0] || "",
-        middleName: patientDetails?.MiddleName || "",
-        lastName: patientDetails?.LastName || "",
+        firstName: patientDetails?.Surname?.split(" ")[0].toUpperCase()  || "",
+        middleName: patientDetails?.MiddleName?.toUpperCase() || "",
+        lastName: patientDetails?.LastName?.toUpperCase()  || "",
         gender: genderValue,
         dateOfBirth: patientDetails?.DateOfBirth
           ? moment(patientDetails.DateOfBirth)
@@ -92,7 +93,7 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
         dependant: patientDetails?.Dependant || 0,
-          paymentMode:
+        paymentMode:
           patientDetails?.PatientType === "Corporate"
             ? 1
             : patientDetails?.PatientType === "Cash"
@@ -102,7 +103,7 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
     }
   }, [patientDetails, form]);
 
-  const handleSubmission =async (values) => {
+  const handleSubmission = async (values) => {
     setFormSubmitted(true);
 
     const formattedData = {
@@ -124,14 +125,19 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
       dependant: values.dependant || false,
     };
 
-   const result =await dispatch(saveGeneralInformation(formattedData));
-   if(result.type===SAVE_GENERAL_INFORMATION_SUCCESS){
-    console.log("result",result);
-     setDispatchingInfo(true);
-    onUpdate(data);
-   }
-        onSuccess();
+    const result = await dispatch(saveGeneralInformation(formattedData));
+    if (result.type === SAVE_GENERAL_INFORMATION_SUCCESS) {
+      console.log("result", result.payload);
+      setDispatchingInfo(true);
+     // onUpdate(data);
+         dispatch(getPatientByNo(result.payload.patientNo));
+     
+       setTimeout(() => {
+      onSuccess(); // Go to next step
+    }, 300);
+    }
 
+   
   };
   useEffect(() => {
     if (data) {
@@ -189,7 +195,7 @@ const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
               name="firstName"
               rules={[{ required: true, message: "Please enter first name" }]}
             >
-              <Input placeholder="Enter First Name" autoComplete="off" />
+              <Input placeholder="Enter First Name"  autoComplete="off" />
             </Form.Item>
           </Col>
           <Col span={8}>

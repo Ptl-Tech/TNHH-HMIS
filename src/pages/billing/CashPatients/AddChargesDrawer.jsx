@@ -8,7 +8,7 @@ import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCh
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import moment from "moment";
 import { listDoctors } from "../../../actions/DropdownListActions";
-
+import {CloseOutlined}from "@ant-design/icons";
 const AddChargesDrawer = ({
   visible,
   onClose,
@@ -173,12 +173,13 @@ useEffect(() => {
       title={editingCharge ? "Edit Charge" : "Add Charge"}
       visible={visible}
       onClose={onClose}
-      width={400}
+      width={600}
       placement="right"
       maskClosable={false}
       footer={
        null
       }
+       extra={<Button onClick={onClose} icon={<CloseOutlined />} danger>Close</Button>}
     >
       <Form layout="vertical" form={form}>
         <Form.Item

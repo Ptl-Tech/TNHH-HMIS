@@ -194,6 +194,8 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
                 placeholder="Select payment method"
                 onChange={(value) => setPaymentMethod(value)}
               >
+                                <Select.Option value={0}>--select payment method--</Select.Option>
+
                 <Select.Option value={2}>Cash</Select.Option>
                 <Select.Option value={1}>Corporate</Select.Option>
               </Select>

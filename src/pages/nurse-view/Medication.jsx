@@ -31,15 +31,13 @@ const Medication = ({  role, patientDetails }) => {
     }
   };
 
- const menuItems = [
-  ...(role !== "Nurse"
-    ? [{ label: "Prescription", icon: <MedicineBoxOutlined /> }]
-    : []),
-  { label: "Treatments Sheet", icon: <BorderlessTableOutlined /> },
-  ...(userRole === "Nurse"
-    ? [{ label: "Order Sheet", icon: <BorderlessTableOutlined /> }]
-    : []),
-];
+  const menuItems = [
+    { label: "Prescription", icon: <MedicineBoxOutlined /> },
+    { label: "Treatments Sheet", icon: <BorderlessTableOutlined /> },
+    ...(userRole === "Nurse"
+      ? [{ label: "Order Sheet", icon: <BorderlessTableOutlined /> }]
+      : []),
+  ];
 
   return (
     <>

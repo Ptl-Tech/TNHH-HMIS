@@ -34,6 +34,7 @@ import ClosePatientBill from "../ClosePatientBill";
 import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
 import PreviousBill from "../PreviousBill";
+import RefreshPatientCharges from "../RefreshPatientCharges";
 const InvoicePatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -304,22 +305,32 @@ const InvoicePatient = () => {
             </div>
           </Card>
         </Skeleton>
-        <div className="d-flex justify-content-end gap-3 my-3">
-          <Button
-            type="primary"
-            onClick={handlegenerateInvoice}
-            loading={generateInvoiceLoading}
-            disabled={generateInvoiceLoading}
-          >
-            Generate Invoice
-          </Button>
-          <ReopenCharges patientNo={patientNo} activeVisitNo={activeVisitNo} />
-          <PrintInterimInvoice
-            patientNo={patientNo}
+        <div className="d-flex justify-content-between gap-3 my-3">
+          <RefreshPatientCharges
+            patientNo={patientVisitDetails?.PatientNo}
             activeVisitNo={activeVisitNo}
           />
+          <div className="d-flex justify-content-end gap-3 my-3">
+            <Button
+              type="primary"
+              onClick={handlegenerateInvoice}
+              loading={generateInvoiceLoading}
+              disabled={generateInvoiceLoading}
+            >
+              Generate Invoice
+            </Button>
+            <ReopenCharges
+              patientNo={patientNo}
+              activeVisitNo={activeVisitNo}
+            />
+            <PrintInterimInvoice
+              patientNo={patientNo}
+              activeVisitNo={activeVisitNo}
+            />
+          </div>
         </div>
         <PatientCharges activeVisitNo={activeVisitNo} />
+
         <div className="row gap-3 gap-md-0">
           {/* Left Side (Split Receipt) */}
           <div className="col-12 col-md-8">
