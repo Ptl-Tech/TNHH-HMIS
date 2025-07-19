@@ -160,19 +160,20 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
 };
 
 const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
+  console.log({ initialData });
+
   const dispatch = useDispatch();
   const {
     Flag,
     Results,
     Reactive,
     Specimen_Code,
-    Laboratory_Test_Code,
     SystemId: TestLineSystemId,
   } = initialData[0] || {};
 
   console.log({ currentLabLine });
 
-  const { recId, testCode, laboratoryNo } = currentLabLine;
+  const { recId, laboratoryNo } = currentLabLine;
 
   const {
     data: labResultsData,
@@ -189,6 +190,8 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
 
   useEffect(() => {
     if (labResultsData) {
+      console.log({ labResultsData });
+
       const { labResults, labRemarks } = labResultsData;
       labRemarks?.status === "success" && labResults?.status === "success"
         ? message.success("Results submitted successfully!")

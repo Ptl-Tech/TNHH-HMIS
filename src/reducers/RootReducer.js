@@ -338,6 +338,7 @@ import { postRefreshPatientChargesReducer } from "./ChargesReducers/postRefreshC
 import { postLabAppointmentReducer } from "./reception-reducers/postLabAppointmentReducer";
 import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPatientNoReducer";
 import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
+import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -572,6 +573,7 @@ export const rootReducer = combineReducers({
   postSplitReceipt: postReceiptSplitLineReducer,
   getReceiptPage: getReceiptPageReducer,
 
+  getDoctorNotesSections: getDoctorNotesSectionsReducer,
   postDoctorNotes: postDoctorNotesReducer,
   getBillingList: getBillingListReducer,
   getPatientPastEncounterBillingList: getPatientBillingListReducer,

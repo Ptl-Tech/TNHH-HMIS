@@ -1,6 +1,5 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
-import dayjs from "dayjs";
 
 const API = "https://chiromo.potestastechnologies.net:8085/";
 
@@ -12,10 +11,8 @@ export const GET_PHARMACY_REQUESTS_ALL_FAILURE =
 export const GET_PHARMACY_REQUESTS_ALL_RESET =
   "GET_PHARMACY_REQUESTS_ALL_RESET";
 
-const generateQuery = ({ type, status, branchCode }) => {
-  var query = `&query=$filter=Global_Dimension1 eq '${branchCode}' and Pharmacy_Date eq ${dayjs(
-    new Date()
-  ).format("YYYY-MM-DD")}`;
+const generateQuery = ({ type, status, branchCode, dateRange }) => {
+  var query = `&query=$filter=Global_Dimension1 eq '${branchCode}'`;
 
   switch (type) {
     case "WalkIn":
@@ -48,11 +45,13 @@ const generateQuery = ({ type, status, branchCode }) => {
       break;
   }
 
+  query += ` and Pharmacy_Date ge ${dateRange.from} and Pharmacy_Date le ${dateRange.to}`;
+
   return query;
 };
 
 export const getPharmacyRequestsAll =
-  ({ type, status }) =>
+  ({ type, status, dateRange }) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: GET_PHARMACY_REQUESTS_ALL });
@@ -71,7 +70,7 @@ export const getPharmacyRequestsAll =
         },
       };
 
-      const query = generateQuery({ type, status, branchCode });
+      const query = generateQuery({ type, status, branchCode, dateRange });
       const response = await axios.get(
         `${API}data/odatafilter?webservice=QyPharmacyList&isList=true${query}`,
 
