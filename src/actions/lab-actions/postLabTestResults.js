@@ -78,6 +78,8 @@ const processLabResults = async (results, config) => {
 };
 
 const postLabResultComments = async (remarks, config) => {
+  if (!remarks) return { status: "success" };
+
   const { data } = await axios.post(
     `${API_URL}/Laboratory/LabTestLine`,
     remarks,

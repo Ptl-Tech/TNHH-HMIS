@@ -32,8 +32,7 @@ const Medication = () => {
 
   return (
     <div>
-      {(role === "Doctor" || role === "Psychology" ) &&
-        patientDetails?.Status !== "Completed" && (
+      {patientDetails?.Status !== "Completed" && (
           <Tabs
             type="card"
             items={[

@@ -1,21 +1,48 @@
-import { Button, Modal, Table } from "antd";
+import { Button, Modal, Table, Typography } from "antd";
 import PropTypes from "prop-types";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { useState } from "react";
 import DOMPurify from "dompurify";
 import { FolderViewOutlined } from "@ant-design/icons";
+import moment from "moment";
 
 const NursingNotesTable = ({
   loadingGetNurseAdmissionNotes,
   getNurseNotes,
 }) => {
   const [selectedRecord, setSelectedRecord] = useState([]);
-  const renderNotes = (notes) => {
-    if (!notes) return null;
-    // Sanitize and render HTML safely
-    const sanitizedHtml = DOMPurify.sanitize(notes);
-    return <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
-  };
+ const renderNotes = (notes) => {
+  if (!notes) return null;
+
+  // Strip out HTML
+  const plainText = DOMPurify.sanitize(notes).replace(/<\/?[^>]+(>|$)/g, "");
+
+  // Split into sentences/paragraphs
+  const paragraphs = plainText
+    .split(/[\r\n]+|(?<=\.)\s+/) // split on newlines or end of sentence
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line, index) => {
+      const sentenceCased =
+        line.charAt(0).toUpperCase() + line.slice(1).toLowerCase();
+      return (
+        <p
+          key={index}
+          style={{
+            fontSize: "14px",
+            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+            color: "#333",
+            marginBottom: "12px",
+            lineHeight: "1.6",
+          }}
+        >
+          {sentenceCased}
+        </p>
+      );
+    });
+
+  return paragraphs;
+};
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = (record) => {
@@ -30,11 +57,25 @@ const NursingNotesTable = ({
   };
 
   const columns = [
-    {
-      title: "Notes Date",
-      dataIndex: "NotesDate",
-      key: "NotesDate",
-    },
+{
+  title: "Notes Date",
+  dataIndex: "NotesDate",
+  key: "NotesDate",
+  render: (date, record) => (
+    <span
+      style={{ color: "#0f5689", cursor: "pointer" }}
+      onClick={() => showModal(record)}
+    >
+      {date ? moment(date).format("DD/MM/YYYY") : "-"}
+    </span>
+  ),
+  sorter: (a, b) => {
+    const dateA = new Date(a.NotesDate);
+    const dateB = new Date(b.NotesDate);
+    return dateB - dateA; // Descending
+  },
+},
+
     {
       title: "Notes Time",
       dataIndex: "NotesTime",
@@ -67,14 +108,43 @@ const NursingNotesTable = ({
       },
     },
 
-    {
-      title: "Notes",
-      dataIndex: "Notes",
-      key: "Notes",
-      render: (text) => {
-        return renderNotes(text);
-      },
-    },
+ {
+  title: "Notes",
+  dataIndex: "Notes",
+  key: "Notes",
+  render: (text) => {
+    if (!text) return "-";
+
+    const bulletItems = text
+      .replace(/<\/?[^>]+(>|$)/g, "") // remove all HTML tags
+      .split(/\r?\n|\.|\r|•|-/) // split by newline, period, bullet, or dash
+      .map(item => {
+        const trimmed = item.trim();
+        return trimmed
+          ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase()
+          : "";
+      })
+      .filter(item => item.length > 0);
+
+    return (
+      <ul
+        style={{
+          paddingLeft: "20px",
+          margin: 0,
+          fontSize: "14px",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          color: "#333",
+        }}
+      >
+        {bulletItems.map((item, index) => (
+          <li key={index} style={{ marginBottom: 4 }}>{item}</li>
+        ))}
+      </ul>
+    );
+  },
+},
+
+
     {
       title: "Added By",
       dataIndex: "NurseID",
@@ -111,7 +181,7 @@ const NursingNotesTable = ({
       ) : (
         <Table
           columns={columns}
-          dataSource={getNurseNotes}
+          dataSource={[...getNurseNotes].sort((a, b) => b.LineNo - a.LineNo)}
           rowKey="SystemId"
           scroll={{ x: "max-content" }}
           bordered

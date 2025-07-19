@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Drawer, Table, Divider, Typography } from "antd";
+import {CloseOutlined} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import PrintReceipt from "./CashPatients/PrintReceipt";
@@ -197,7 +198,7 @@ console.log(patientNo);
             Previous Encounter Billing Details
           </h5>
         }
-      closable={{ 'aria-label': 'Close Button' }}
+        extra={<Button onClick={onClose} icon={<CloseOutlined />} danger>Close</Button>}
 
       >
         <Table
@@ -220,6 +221,8 @@ console.log(patientNo);
             Encounter Details - {activeVisitNo}
           </h4>
         }
+                extra={<Button onClick={() => setEncounterDrawerVisible(false)} icon={<CloseOutlined />} danger>Close</Button>}
+
       >
         <PatientHeader
             activeVisitNo={activeVisitNo}

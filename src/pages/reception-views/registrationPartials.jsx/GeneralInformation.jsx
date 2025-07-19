@@ -18,13 +18,14 @@ import moment from "moment";
 import {
   saveGeneralInformation,
   SAVE_GENERAL_INFORMATION_RESET,
+  SAVE_GENERAL_INFORMATION_SUCCESS,
 } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { getPatientByNo } from "../../../actions/patientActions";
 import { useState } from "react";
 import { marketingStrategies } from "../../../actions/DropdownListActions";
 
-const GeneralInformation = ({ patientDetails, onUpdate }) => {
+const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const { loading, success, error, data } = useSelector(
@@ -32,6 +33,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
   );
   const { loading: loadingPatientDetails, patients: dataPatient } =
     useSelector((state) => state.patientList) || {};
+    
   const [patientNo, setPatientNo] = useState("");
   const [isEditingDOB, setIsEditingDOB] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -64,9 +66,9 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
           ? 1
           : 0;
       form.setFieldsValue({
-        firstName: patientDetails?.Surname?.split(" ")[0] || "",
-        middleName: patientDetails?.MiddleName || "",
-        lastName: patientDetails?.LastName || "",
+        firstName: patientDetails?.Surname?.split(" ")[0].toUpperCase()  || "",
+        middleName: patientDetails?.MiddleName?.toUpperCase() || "",
+        lastName: patientDetails?.LastName?.toUpperCase()  || "",
         gender: genderValue,
         dateOfBirth: patientDetails?.DateOfBirth
           ? moment(patientDetails.DateOfBirth)
@@ -91,7 +93,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
         dependant: patientDetails?.Dependant || 0,
-          paymentMode:
+        paymentMode:
           patientDetails?.PatientType === "Corporate"
             ? 1
             : patientDetails?.PatientType === "Cash"
@@ -101,7 +103,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     }
   }, [patientDetails, form]);
 
-  const handleSubmission = (values) => {
+  const handleSubmission = async (values) => {
     setFormSubmitted(true);
 
     const formattedData = {
@@ -123,9 +125,19 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       dependant: values.dependant || false,
     };
 
-    dispatch(saveGeneralInformation(formattedData));
-    setDispatchingInfo(true);
-    onUpdate(data);
+    const result = await dispatch(saveGeneralInformation(formattedData));
+    if (result.type === SAVE_GENERAL_INFORMATION_SUCCESS) {
+      console.log("result", result.payload);
+      setDispatchingInfo(true);
+     // onUpdate(data);
+         dispatch(getPatientByNo(result.payload.patientNo));
+     
+       setTimeout(() => {
+      onSuccess(); // Go to next step
+    }, 300);
+    }
+
+   
   };
   useEffect(() => {
     if (data) {
@@ -183,7 +195,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
               name="firstName"
               rules={[{ required: true, message: "Please enter first name" }]}
             >
-              <Input placeholder="Enter First Name" autoComplete="off" />
+              <Input placeholder="Enter First Name"  autoComplete="off" />
             </Form.Item>
           </Col>
           <Col span={8}>

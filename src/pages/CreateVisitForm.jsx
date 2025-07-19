@@ -158,7 +158,7 @@ const CreateVisitForm = () => {
       <div className="d-flex justify-content-between align-items-center mb-2">
         <Button
           type="link"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/Reception/Patient-list")}
           icon={<ArrowLeftOutlined />}
         >
           Go back

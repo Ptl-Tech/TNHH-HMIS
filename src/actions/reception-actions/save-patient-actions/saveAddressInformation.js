@@ -45,7 +45,10 @@ export const saveAddressInformation = (formData, navigate) => async (dispatch, g
 
     dispatch({ type: SAVE_ADDRESS_INFORMATION_SUCCESS, payload: response.data });
 
-    return response.data;
+    return ({
+      type: SAVE_ADDRESS_INFORMATION_SUCCESS,
+      payload: response.data,
+    });
   } catch (error) {
     dispatch({
       type: SAVE_ADDRESS_INFORMATION_FAIL,

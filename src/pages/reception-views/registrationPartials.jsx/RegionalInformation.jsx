@@ -17,13 +17,13 @@ import {
   listSubCounties,
   listSubCountyWards,
 } from "../../../actions/DropdownListActions";
-import { saveAddressInformation } from "../../../actions/reception-actions/save-patient-actions/saveAddressInformation";
+import { SAVE_ADDRESS_INFORMATION_SUCCESS, saveAddressInformation } from "../../../actions/reception-actions/save-patient-actions/saveAddressInformation";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { getPatientByNo } from "../../../actions/patientActions";
 const { Option } = Select;
 
-const RegionalInformation = ({ patientDetails, onUpdate }) => {
+const RegionalInformation = ({ patientDetails, onUpdate, onSuccess }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -162,7 +162,6 @@ console.log("daotient", patientDetails);
       return;
     }
 
-    console.log(subCountyCode);
     const filtered = subCountyWardsPayload.filter(
       (ward) => ward.SubCounty === subCountyCode
     );
@@ -207,8 +206,12 @@ console.log("daotient", patientDetails);
     };
 
     // Dispatch to save or update patient data, including regional info
-    dispatch(saveAddressInformation(formattedData));
+    const res = dispatch(saveAddressInformation(formattedData));
+    if(res?.type ===SAVE_ADDRESS_INFORMATION_SUCCESS){
     onUpdate(data);
+    }
+        onSuccess();
+
   };
 
   return (

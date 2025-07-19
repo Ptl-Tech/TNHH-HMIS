@@ -32,6 +32,7 @@ import MarketingInformation from "./reception-views/registrationPartials.jsx/Mar
 import { BiStreetView } from "react-icons/bi";
 import AdvancedReceiptList from "./billing/CashPatients/AdvancedReceiptList";
 import PreviousBill from "./billing/PreviousBill";
+import moment from "moment";
 
 const PatientRegistration = () => {
   const location = useLocation();
@@ -59,6 +60,7 @@ const PatientRegistration = () => {
   }, [patientNo]);
 
   const handleUpdatePatientDetails = (updatedDetails) => {
+    console.log("Updated details:", updatedDetails);
     setPatientDetails((prevDetails) => ({
       ...prevDetails,
       ...updatedDetails,
@@ -106,7 +108,9 @@ const PatientRegistration = () => {
   const menu = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="create_visit">
-        {patientDetails?.Activated && patientDetails?.ActiveVisitNo ? "View Visit Details" : "Out Patient Visit"}
+        {patientDetails?.Activated && patientDetails?.ActiveVisitNo
+          ? "View Visit Details"
+          : "Create Visit"}
       </Menu.Item>
       <Menu.Item key="request_admission">Request Admission</Menu.Item>
       {/* <Menu.Item key="bill_patient">Bill Patient</Menu.Item> */}
@@ -121,6 +125,7 @@ const PatientRegistration = () => {
         <GeneralInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -131,6 +136,7 @@ const PatientRegistration = () => {
         <NextofKinInformatiotion
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -141,6 +147,7 @@ const PatientRegistration = () => {
         <RegionalInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -151,10 +158,23 @@ const PatientRegistration = () => {
         <BillingInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          // onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
   ];
+  //autonavigation of step after submission
+  const handleSteps = (index) => {
+    if (index < 0 || index >= steps.length) return;
+
+    // // Prevent moving past step 0 if no PatientNo
+    // if (index > 0 && !patientDetails?.PatientNo) {
+    //   setShowIncompleteAlert(true);
+    //   return;
+    // }
+
+    setCurrent(index);
+  };
 
   return (
     <div
@@ -182,7 +202,9 @@ const PatientRegistration = () => {
               <span className="ant-dropdown-link fw-bold">Actions</span>
             </Button>
           </Dropdown>
-          <Button  onClick={() => setView(true)}>Previous Encounters</Button>
+          {patientNo ? (
+            <Button onClick={() => setView(true)}>Previous Encounters</Button>
+          ) : null}
         </div>
       </div>
 
@@ -216,14 +238,19 @@ const PatientRegistration = () => {
                     <b>Patient No:</b> {patientDetails?.PatientNo || "N/A"}
                   </span>
                   <span>
-                    <b>Name:</b> {patientDetails?.SearchName || "N/A"}
+                    <b>Name:</b>{" "}
+                    {patientDetails?.SearchName?.toUpperCase() || "N/A"}
                   </span>
                   <span>
                     <b>ID No:</b> {patientDetails?.IDNumber || "N/A"}
                   </span>
-                  <span>
-                    <b>DOB:</b> {patientDetails?.DateOfBirth || "N/A"}
-                  </span>
+                 <span>
+  <b>DOB:</b>{" "}
+  {patientDetails?.DateOfBirth
+    ? moment(patientDetails.DateOfBirth).format("DD/MM/YYYY")
+    : "N/A"}
+</span>
+
                   <span>
                     <b>Gender:</b> {patientDetails?.Gender || "N/A"}
                   </span>
@@ -231,6 +258,13 @@ const PatientRegistration = () => {
                     <b>Mode of Payment:</b>{" "}
                     {patientDetails?.PatientType || "N/A"}
                   </span>
+                  {patientDetails?.PatientType &&
+                    patientDetails?.PatientType !== "Cash" && (
+                      <span>
+                        <b>Insurance Name:</b>{" "}
+                        {patientDetails?.InsuranceName || "N/A"}
+                      </span>
+                    )}
                 </div>
               </Col>
             </Row>
@@ -317,7 +351,13 @@ const PatientRegistration = () => {
           </div>
         </Card>
       </div>
-      <PreviousBill visible={view} patientNo={patientNo} onClose={() => setView(false)} />
+      {patientNo && (
+        <PreviousBill
+          visible={view}
+          patientNo={patientNo}
+          onClose={() => setView(false)}
+        />
+      )}
     </div>
   );
 };

@@ -69,8 +69,12 @@ const TreatmentSheetFormData = ({
         quantity: quantity || 0,
         issued: false,
         remarks: remarks || "",
-        issuedDate: date ? date.format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
-        issuedTime: time ? time.format("HH:mm:ss") : moment().format("HH:mm:ss"),
+        issuedDate: date
+          ? date.format("YYYY-MM-DD")
+          : moment().format("YYYY-MM-DD"),
+        issuedTime: time
+          ? time.format("HH:mm:ss")
+          : moment().format("HH:mm:ss"),
       };
       console.log("Treatment Sheet Data:", treatmentSheet);
       const response = await dispatch(
@@ -116,47 +120,61 @@ const TreatmentSheetFormData = ({
     >
       <Card style={{ padding: "20px" }}>
         <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Date"
-              name="date"
-              hasFeedback
-              className="w-100 my-2"
-            >
-              <DatePicker
-                placeholder="Select date"
-                style={{ width: "100%" }}
-                format="DD/MM/YYYY"
-                allowClear
-                defaultValue={moment()}
-                onClick={(e) => {
-                  e.target.select();
-                }}
-                onChange={(date) => {
-                  if (date) {
-                    form.setFieldsValue({ date });
-                  }
-                }}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-           <Form.Item
-  label="Time"
-  name="time"
-  hasFeedback
-  className="w-100 my-2"
->
-  <TimePicker
-    placeholder="Select time"
-    style={{ width: "100%" }}
-    format="HH:mm"
-    allowClear
-    defaultValue={moment()}
-  />
-</Form.Item>
+         <Col xs={24} md={12}>
+  <Form.Item
+    label="Date"
+    name="date"
+    hasFeedback
+    className="w-100 my-2"
+  >
+    <DatePicker
+      placeholder="Select date"
+      style={{
+        width: "100%",
+        backgroundColor: "#f5f9fc", // subtle light blue background
+        color: "#0f5689",
+        fontWeight: 600,
+        border: "1px solid #d9d9d9",
+        borderRadius: "6px",
+        padding: "6px 11px",
+        cursor: "not-allowed", // because it's disabled
+      }}
+      format="DD/MM/YYYY"
+      allowClear
+      defaultValue={moment()}
+      disabled
+    />
+  </Form.Item>
+</Col>
 
-          </Col>
+<Col xs={24} md={12}>
+  <Form.Item
+    label="Time"
+    name="time"
+    hasFeedback
+    className="w-100 my-2 text-primary"
+  >
+    <TimePicker
+      placeholder="Select time"
+      style={{
+        width: "100%",
+        backgroundColor: "#f5f9fc",
+        color: "#0f5689 !important",
+        fontWeight: 600,
+        border: "1px solid #d9d9d9",
+        borderRadius: "6px",
+        padding: "6px 11px",
+        cursor: "not-allowed",
+      }}
+      format="HH:mm"
+      allowClear
+      defaultValue={moment()}
+      
+      disabled
+    />
+  </Form.Item>
+</Col>
+
         </Row>
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>

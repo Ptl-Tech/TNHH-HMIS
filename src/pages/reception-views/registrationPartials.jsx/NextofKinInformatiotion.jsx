@@ -9,17 +9,17 @@ import {
   Button,
   Alert,
 } from "antd";
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listKinsRelationships } from "../../../actions/DropdownListActions";
-import { saveKinsInformation } from "../../../actions/reception-actions/save-patient-actions/saveKinsInformation";
+import { SAVE_KINS_INFORMATION_SUCCESS, saveKinsInformation } from "../../../actions/reception-actions/save-patient-actions/saveKinsInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { getPatientByNo } from "../../../actions/patientActions";
 
-const NextofKinInformation = ({ patientDetails, onUpdate }) => {
+const NextofKinInformation = ({ patientDetails, onUpdate, onSuccess }) => {
   const [form] = Form.useForm();
-    const dispatch = useDispatch();
-    const[dispatchingInfo,setDispatchingInfo]=useState(false)
+  const dispatch = useDispatch();
+  const [dispatchingInfo, setDispatchingInfo] = useState(false);
 
   const { loading, success, error, data } = useSelector(
     (state) => state.kinsRelationshipsList
@@ -37,10 +37,10 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (dispatchingInfo && savingSuccess || patientDetails?.PatientNo) {
+    if ((dispatchingInfo ) || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails.PatientNo));
     }
-  }, [dispatchingInfo, savingSuccess, dispatch, patientDetails?.PatientNo]);
+  }, [dispatchingInfo,  dispatch, patientDetails?.PatientNo]);
 
   useEffect(() => {
     if (patientDetails) {
@@ -79,34 +79,46 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
-                dependant: patientDetails?.Dependant || 0,
-
+        dependant: patientDetails?.Dependant || 0,
       });
     }
   }, [patientDetails, form]);
 
-  const handleSubmission = (values) => {
-    // Concatenate firstName, middleName, and lastName to create nextOfKinFullName
-    const formattedData = {
-      myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
-      patientNo: patientDetails?.PatientNo || "",  
-      nextOfKinRelationship:
-        values.nextOfKinRelationship ||
-        patientDetails?.NextofkinRelationship ||
-        "",
-      nextOfKinFullName:
-        values.nextOfKinFullName || patientDetails?.NextOfkinFullName || "",
-      nextOfKinPhoneNo:
-        values.nextOfKinPhoneNo || patientDetails?.NextOfKinPhoneNo || "",
-     
-    };
-
-    // Dispatch the saveKinDetails action with the formatted data
-    dispatch(saveKinsInformation(formattedData));
-    setDispatchingInfo(true); // 
-    //update with fetch patient details from hook
-    onUpdate(dataPatient);
+ const handleSubmission = async (values) => {
+  const formattedData = {
+    myAction: patientDetails?.PatientNo ? "edit" : "create",
+    patientNo: patientDetails?.PatientNo || "",
+    nextOfKinRelationship:
+      values.nextOfKinRelationship || patientDetails?.NextofkinRelationship || "",
+    nextOfKinFullName:
+      values.nextOfKinFullName || patientDetails?.NextOfkinFullName || "",
+    nextOfKinPhoneNo:
+      values.nextOfKinPhoneNo || patientDetails?.NextOfKinPhoneNo || "",
   };
+
+  try {
+    const res = await dispatch(saveKinsInformation(formattedData));
+
+    if (res?.type === SAVE_KINS_INFORMATION_SUCCESS) {
+      setDispatchingInfo(true);
+
+      const result = await dispatch(getPatientByNo(patientDetails.PatientNo));
+
+      // Assuming the updated data is in result.payload
+      if (result?.payload) {
+        onUpdate(result.payload.data);
+      } else {
+        console.warn("Patient fetch returned empty or unexpected payload.");
+      }
+
+      onSuccess(); // Move to next step
+    } else {
+      console.warn("Kin information save failed or unexpected type:", res);
+    }
+  } catch (error) {
+    console.error("Error during submission:", error);
+  }
+};
 
   return (
     <div>
@@ -153,10 +165,13 @@ const NextofKinInformation = ({ patientDetails, onUpdate }) => {
           {loading ? (
             <Skeleton.Input active style={{ width: "100%" }} />
           ) : (
-            <Select placeholder="Select Relationship" showSearch allowClear 
-            filterOption={(input, option) =>
-              option.children.toLowerCase().includes(input.toLowerCase())
-            }
+            <Select
+              placeholder="Select Relationship"
+              showSearch
+              allowClear
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
             >
               {data && data.length > 0 ? (
                 data.map((relationship) => (

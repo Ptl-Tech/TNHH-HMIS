@@ -18,7 +18,6 @@ const InpatientCardInfo = ({ patientDetail }) => {
     useFetchPatientDetailsHook(patientNo);
 
   const invalidDate = "0001-01-01";
-
   const handlePatientFileClick = () => {
     setPatientFileVisible(true);
   };
@@ -95,7 +94,7 @@ const InpatientCardInfo = ({ patientDetail }) => {
             <Typography.Text strong>Admitting Doctor:</Typography.Text>
             <br />
             <Typography.Text>
-              {patientDetail?.DoctorsName || "N/A"}
+              {patientDetail?.Doctors_Name || "N/A"}
             </Typography.Text>
           </div>
 
@@ -124,7 +123,22 @@ const InpatientCardInfo = ({ patientDetail }) => {
                 : "N/A"}
             </Typography.Text>
           </div>
-
+          <div>
+            <Typography.Text strong>Payment Mode:</Typography.Text>
+            <br />
+            <Typography.Text>
+              {patientDetails?.PatientType || "N/A"}
+            </Typography.Text>
+          </div>
+         {patientDetails?.PatientType && patientDetails?.PatientType !== "Cash" && (
+            <div>
+            <Typography.Text strong>Insurance Name:</Typography.Text>
+            <br />
+            <Typography.Text>
+              {patientDetails?.InsuranceName || "N/A"}
+            </Typography.Text>
+          </div>
+         )}
           <div>
             <Typography.Text strong>Ward and Room:</Typography.Text>
             <br />

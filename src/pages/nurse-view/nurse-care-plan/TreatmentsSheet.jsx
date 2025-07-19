@@ -1,4 +1,4 @@
-import { FileOutlined, PlusOutlined } from "@ant-design/icons";
+import { CloseOutlined, FileOutlined, PlusOutlined } from "@ant-design/icons";
 import TreatmentSheetTable from "../tables/nurse-tables/TreatmentSheetTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import { Button, Drawer, Form } from "antd";
@@ -85,6 +85,8 @@ const TreatmentsSheet = ({ patientDetails }) => {
         onClose={toggleDrawer}
         open={drawerVisible}
         destroyOnClose
+        //close icon visible on the right
+        extra={<Button onClick={toggleDrawer} icon={<CloseOutlined />} danger>Close</Button>}
       >
 
         <TreatmentSheetTable
