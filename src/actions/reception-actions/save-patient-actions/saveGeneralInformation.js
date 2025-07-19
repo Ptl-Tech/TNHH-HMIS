@@ -51,13 +51,13 @@ export const saveGeneralInformation = (formData, navigate) => async (dispatch, g
 
     dispatch({ type: SAVE_GENERAL_INFORMATION_SUCCESS, payload: { ...response.data, patientNo } });
 
-    return { patientNo }; // Return the patient number for further use
+    return ({type: SAVE_GENERAL_INFORMATION_SUCCESS, payload: { ...response.data, patientNo }});
   } catch (error) {
     dispatch({
       type: SAVE_GENERAL_INFORMATION_FAIL,
       payload: error.response?.data?.errors || "An error occurred while saving.",
     });
 
-    throw error;
+    return({type:SAVE_GENERAL_INFORMATION_FAIL, payload: error.response?.data?.errors || "An error occurred while saving."});
   }
 };

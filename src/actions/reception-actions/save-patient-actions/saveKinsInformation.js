@@ -45,7 +45,7 @@ export const saveKinsInformation = (formData, navigate) => async (dispatch, getS
 
     dispatch({ type: SAVE_KINS_INFORMATION_SUCCESS, payload: response.data });
 
-    return response.data;
+    return ({type: SAVE_KINS_INFORMATION_SUCCESS, payload: response.data});
   } catch (error) {
     dispatch({
       type: SAVE_KINS_INFORMATION_FAIL,

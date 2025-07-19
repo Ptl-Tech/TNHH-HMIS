@@ -59,7 +59,6 @@ const TreatmentSheetTable = ({
 
   const [data, setData] = useState(() => {
     const rows = [];
-
     treatmentSheet.forEach((entry) => {
       const issuedDate = moment(entry.IssuedDate).format("YYYY-MM-DD");
       const weekday = moment(entry.IssuedDate).format("dddd");
@@ -256,7 +255,7 @@ const TreatmentSheetTable = ({
 
   return (
     <div style={{ padding: 20 }}>
-      <InpatientCardInfo patientDetails={patientDetails} />
+      <InpatientCardInfo patientDetail={patientDetails} />
 
       <Divider />
       {/* instructions on how to use the table in info card */}

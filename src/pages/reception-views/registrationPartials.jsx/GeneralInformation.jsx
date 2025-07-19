@@ -18,13 +18,14 @@ import moment from "moment";
 import {
   saveGeneralInformation,
   SAVE_GENERAL_INFORMATION_RESET,
+  SAVE_GENERAL_INFORMATION_SUCCESS,
 } from "../../../actions/reception-actions/save-patient-actions/saveGeneralInformation";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { getPatientByNo } from "../../../actions/patientActions";
 import { useState } from "react";
 import { marketingStrategies } from "../../../actions/DropdownListActions";
 
-const GeneralInformation = ({ patientDetails, onUpdate }) => {
+const GeneralInformation = ({ patientDetails, onUpdate, onSuccess }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const { loading, success, error, data } = useSelector(
@@ -101,7 +102,7 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
     }
   }, [patientDetails, form]);
 
-  const handleSubmission = (values) => {
+  const handleSubmission =async (values) => {
     setFormSubmitted(true);
 
     const formattedData = {
@@ -123,9 +124,14 @@ const GeneralInformation = ({ patientDetails, onUpdate }) => {
       dependant: values.dependant || false,
     };
 
-    dispatch(saveGeneralInformation(formattedData));
-    setDispatchingInfo(true);
+   const result =await dispatch(saveGeneralInformation(formattedData));
+   if(result.type===SAVE_GENERAL_INFORMATION_SUCCESS){
+    console.log("result",result);
+     setDispatchingInfo(true);
     onUpdate(data);
+   }
+        onSuccess();
+
   };
   useEffect(() => {
     if (data) {

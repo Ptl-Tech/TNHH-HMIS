@@ -121,6 +121,7 @@ const PatientRegistration = () => {
         <GeneralInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -131,6 +132,7 @@ const PatientRegistration = () => {
         <NextofKinInformatiotion
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -141,6 +143,7 @@ const PatientRegistration = () => {
         <RegionalInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+          onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
@@ -151,11 +154,19 @@ const PatientRegistration = () => {
         <BillingInformation
           patientDetails={patientDetails}
           onUpdate={handleUpdatePatientDetails}
+         // onSuccess={() => handleSteps(current + 1)}
         />
       ),
     },
   ];
-
+//autonavigation of step after submission
+const handleSteps = (index) => {
+//get current index and set to current and on success submission call this method and got to next
+console.log("clicked index",index);
+if (index < 0) return;
+  if (index >= steps.length) return;
+  setCurrent(index);  
+}
   return (
     <div
       style={{

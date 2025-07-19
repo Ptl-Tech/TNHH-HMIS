@@ -149,7 +149,7 @@ const PatientCharges = ({ activeVisitNo }) => {
           >
             Edit
           </Button>
-          <Button
+          {/* <Button
             danger
             size="small"
             icon={<DeleteOutlined />}
@@ -157,7 +157,7 @@ const PatientCharges = ({ activeVisitNo }) => {
             disabled={record.Posted}
           >
             Delete
-          </Button>
+          </Button> */}
         </>
       ),
     },

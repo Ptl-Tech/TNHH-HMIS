@@ -197,7 +197,7 @@ console.log(patientNo);
             Previous Encounter Billing Details
           </h5>
         }
-      closable={{ 'aria-label': 'Close Button' }}
+        extra={<Button onClick={onClose} icon={<CloseOutlined />} danger>Close</Button>}
 
       >
         <Table

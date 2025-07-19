@@ -46,6 +46,10 @@ export const saveBillingInformation = (billingData) => async (dispatch, getState
     );
 
     dispatch({ type: SAVE_BILLING_INFORMATION_SUCCESS, payload: response.data });
+    return ({
+      type: SAVE_BILLING_INFORMATION_SUCCESS,
+      payload: response.data,
+    });
   } catch (error) {
     console.error("Error saving billing information:", error);
     dispatch({ type: SAVE_BILLING_INFORMATION_FAIL, payload: error.response?.data?.errors });

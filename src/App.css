@@ -50,6 +50,19 @@
   text-align: center; /* Center text */
   margin-bottom: 20px; /* Add space between cards */
 }
+.custom-disabled-picker.ant-picker-disabled {
+  background-color: #f5f9fc !important;
+  color: #0f5689 !important;
+  font-weight: 600;
+  opacity: 1 !important; /* Prevent grayed-out look */
+  cursor: not-allowed;
+}
+
+.custom-disabled-picker .ant-picker-input > input[disabled] {
+  color: #0f5689 !important;
+  font-weight: 600;
+  opacity: 1 !important;
+}
 
 .container {
   padding: 20px;

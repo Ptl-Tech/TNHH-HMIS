@@ -14,7 +14,10 @@ import React, { useEffect, useState } from "react";
 import { listInsuranceOptions } from "../../../actions/DropdownListActions";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { saveBillingInformation } from "../../../actions/reception-actions/save-patient-actions/saveBillingInformation";
+import {
+  SAVE_BILLING_INFORMATION_SUCCESS,
+  saveBillingInformation,
+} from "../../../actions/reception-actions/save-patient-actions/saveBillingInformation";
 import { getPatientByNo } from "../../../actions/patientActions";
 
 const BillingInformation = ({ patientDetails, onUpdate }) => {
@@ -23,7 +26,7 @@ const BillingInformation = ({ patientDetails, onUpdate }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [isPrincipleMember, setIsPrincipleMember] = useState(false);
-const[dispatchingInfo,setDispatchingInfo]=useState(false)
+  const [dispatchingInfo, setDispatchingInfo] = useState(false);
 
   const { loading: loadingPatientDetails, patients: data } =
     useSelector((state) => state.patientList) || {};
@@ -44,7 +47,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
   }, [dispatch]);
 
   useEffect(() => {
-    if (dispatchingInfo && success || patientDetails?.PatientNo) {
+    if ((dispatchingInfo && success) || patientDetails?.PatientNo) {
       dispatch(getPatientByNo(patientDetails?.PatientNo));
     }
   }, [success, dispatch, patientDetails?.PatientNo]);
@@ -108,8 +111,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
         email: patientDetails?.Email || "",
         residence: patientDetails?.PlaceofBirthVillage || "",
         countyWard: patientDetails?.CountyWardName || "",
-                dependant: patientDetails?.Dependant || 0,
-
+        dependant: patientDetails?.Dependant || 0,
       });
     }
   }, [patientDetails, form]);
@@ -119,7 +121,7 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
 
     const formattedData = {
       myAction: patientDetails && patientDetails.PatientNo ? "edit" : "create",
-      patientNo: patientDetails?.PatientNo || "",      
+      patientNo: patientDetails?.PatientNo || "",
       paymentMode: values.paymentMode,
       insuranceNo: values.insuranceNo || patientDetails?.InsuranceNo || "",
       insuranceName:
@@ -132,14 +134,18 @@ const[dispatchingInfo,setDispatchingInfo]=useState(false)
         values.isPrincipleMember || patientDetails.isPrincipleMember || false,
       membershipNo: values.membershipNo || patientDetails?.MembershipNo || "",
       schemeName: values.schemeName || patientDetails?.SchemeName || "",
-      
-
     };
 
     // Dispatch to save or update patient data
-    dispatch(saveBillingInformation(formattedData));
-    setDispatchingInfo(true); // Set dispatching state to true
-    onUpdate(data);
+    const res = dispatch(saveBillingInformation(formattedData));
+    if (res.type === SAVE_BILLING_INFORMATION_SUCCESS) {
+      setDispatchingInfo(true); // Set dispatching state to true
+      onUpdate(data);
+      onSuccess();
+    }else{
+      setFormSubmitted(false);
+      dispatch({ type: "CLEAR_ERROR" });
+    }
 
     //clear success state after submission
     dispatch({ type: "CLEAR_SUCCESS" });
