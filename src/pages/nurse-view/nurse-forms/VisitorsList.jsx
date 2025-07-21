@@ -12,7 +12,7 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VisitorsListFormData from "../forms/nurse-forms/VisitorsListFormData";
 import { useLocation } from "react-router-dom";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   POST_VISITOR_LIST_FAILURE,
   POST_VISITOR_LIST_SUCCESS,
@@ -20,7 +20,7 @@ import {
 } from "../../../actions/nurse-actions/postVisitorListSlice";
 
 const VisitorsList = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const { patientDetails } = useLocation().state;
   const { selectedRowKey, rowSelection, selectedRow } =
     useSetTableCheckBoxHook();

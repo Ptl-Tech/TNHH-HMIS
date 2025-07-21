@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Row, Col, Skeleton } from 'antd';
 
-import useAuth from '../../hooks/useAuth';
+// import useAuth from '../../hooks/useAuth';
 import PatientInfo from './Doctor-Forms/PatientInfo';
 import PatientVitalInfo from './Doctor-Forms/PatientVitalInfo';
 import EvaluationCardContent from './Doctor-Forms/EvaluationCardContent';
@@ -12,7 +12,7 @@ import EvaluationCardContent from './Doctor-Forms/EvaluationCardContent';
 import { getPatientDetails } from '../../actions/triage-actions/getPatientDetailsSlice';
 
 const ConsultationRoomEvalutionCard = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const location = useLocation();
   const dispatch = useDispatch();
 

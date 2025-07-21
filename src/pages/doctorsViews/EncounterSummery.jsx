@@ -4,14 +4,14 @@ import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import { Col, Row } from "antd";
 import EncounterSummeryCard from "./EncounterSummeryCard";
 import EvaluationCardContent from "./Doctor-Forms/EvaluationCardContent";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { getAppmntDetails } from "../../actions/getAppmntDetails";
 import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const EncounterSummery = () => {
   const location = useLocation();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const patientDetails = location.state?.patientDetails || {};

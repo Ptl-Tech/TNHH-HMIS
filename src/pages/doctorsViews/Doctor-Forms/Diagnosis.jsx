@@ -24,12 +24,12 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import DiagnosisTable from "../tables/Diagnosis/DiagnosisTable";
 import DiagnosisForm from "./DiagnosisForm";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 const Diagnosis = () => {
   const location = useLocation();
   const patientDetails = location.state?.patientDetails;
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");

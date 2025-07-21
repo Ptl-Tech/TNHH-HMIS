@@ -7,7 +7,7 @@ import { Table } from 'antd';
 import Loading from '../../../partials/nurse-partials/Loading';
 import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
 
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 import { rowClassName } from '../../../utils/helpers';
 
 import { waitingListColumns } from './tables-utils';
@@ -16,8 +16,8 @@ import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsu
 import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
 
 export default function CloseList() {
-  const doctorId = useAuth().userData.doctorID;
-  const role = useAuth().userData.departmentName;
+  const doctorId = null.userData.doctorID;
+  const role = null.userData.departmentName;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();

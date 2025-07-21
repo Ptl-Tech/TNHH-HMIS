@@ -20,7 +20,7 @@ import {
 import { LiaAllergiesSolid } from "react-icons/lia";
 import { BsHeartPulse, BsClipboard2Pulse } from "react-icons/bs";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { NoData } from "../../../components/NoData";
 import {
   vitalsInfo,
@@ -503,7 +503,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
-  const staffNo = useAuth().userData.no;
+  const staffNo = null.userData.no;
   const admissioNo = new URLSearchParams(search).get("AdmNo");
 
   const { TextArea } = Input;

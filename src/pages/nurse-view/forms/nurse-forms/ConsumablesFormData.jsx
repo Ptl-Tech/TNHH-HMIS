@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Input, message, Row, Select, Space } from "antd";
 
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 import {
   postNurseOrderSheetSlice,
   POST_NURSE_ORDER_SHEET_FAILURE,
@@ -25,7 +25,7 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const [form] = Form.useForm();
   const { patientDetails } = useLocation().state;
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = useAuth();
+  const userDetails = null;
   const dispatch = useDispatch();
   const { loadingItems, items } = useSelector((state) => state.getItems);
   const { loadingQyLocations, qyLocations } = useSelector(

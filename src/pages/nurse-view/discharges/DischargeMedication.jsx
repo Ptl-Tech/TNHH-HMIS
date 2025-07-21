@@ -3,11 +3,11 @@ import { PlusOutlined, FileMarkdownOutlined, FolderViewOutlined } from "@ant-des
 import { useState } from "react";
 import DischargeMedicationTable from "../tables/nurse-tables/DischargeMedicationTable";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 const DischargeMedication = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const role = useAuth().userData.departmentName
+    const role = null.userData.departmentName
     const showModal = () => {
       setIsModalOpen(true);
     };

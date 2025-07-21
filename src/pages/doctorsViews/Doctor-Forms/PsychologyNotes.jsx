@@ -16,7 +16,7 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useSelector, useDispatch } from "react-redux";
 import { postDoctorNotes } from "../../../actions/Doc-actions/postDoctorNotes";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ import ReadDoctorNotes from "../../ReadDoctorNotes";
 
 const PsychologyNotes = ({ treatmentNo }) => {
   const { loading } = useSelector((state) => state.postDoctorNotes);
-  const docDetails = useAuth();
+  const docDetails = null;
   const dispatch = useDispatch(); // Get the dispatch function
   const [isFormVisible, setIsFormVisible] = useState(true);
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const PsychologyNotes = ({ treatmentNo }) => {
   const patientDetails = location.state?.patientDetails || {};
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   console.log("patient details", patientDetails.PatientNo);
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());

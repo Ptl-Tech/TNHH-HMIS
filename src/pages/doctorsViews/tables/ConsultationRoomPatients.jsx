@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { Table } from 'antd';
 
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 import { rowClassName } from '../../../utils/helpers';
 import Loading from '../../../partials/nurse-partials/Loading';
 
@@ -20,8 +20,8 @@ const ConsultationRoomPatients = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
-  const role = useAuth().userData.departmentName;
-  const doctorId = useAuth().userData.doctorID;
+  const role = null.userData.departmentName;
+  const doctorId = null.userData.doctorID;
 
   const [searchName, setSearchName] = useState('');
   const [searchPatientNumber, setSearchPatientNumber] = useState('');

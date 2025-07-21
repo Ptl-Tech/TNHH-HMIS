@@ -30,7 +30,7 @@ import {
   requestRadiologyTest,
 } from "../../../actions/Doc-actions/requestRadiologyTest";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import LabResultDrawer from "./LabResultDrawer";
 
 const { Option } = Select;
@@ -41,7 +41,7 @@ const Imaging = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false);

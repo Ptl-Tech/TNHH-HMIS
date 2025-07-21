@@ -8,7 +8,7 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 const AddAllergies = () => {
   const [form] = Form.useForm();
@@ -20,7 +20,7 @@ const AddAllergies = () => {
   const { loadingGetAllergiesAndMedications, allergiesMedication } =
     useSelector((state) => state.getAllergiesAndMedications);
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const handleCancel = () => {
     setIsModalOpen(false);

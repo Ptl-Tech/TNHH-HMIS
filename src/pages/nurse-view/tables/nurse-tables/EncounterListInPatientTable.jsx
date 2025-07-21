@@ -1,7 +1,7 @@
 import { Button, Table } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 import PropTypes from "prop-types";
 
 const EncounterListInPatientTable = ({
@@ -10,7 +10,7 @@ const EncounterListInPatientTable = ({
   patientNo
 }) => {
   const navigate = useNavigate();
-  const userDetails = useAuth();
+  const userDetails = null;
   const user = userDetails.userData.departmentName;
   const columns = [
     {

@@ -7,7 +7,7 @@ import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumabl
 import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 import ConsumablesFormData from "../forms/nurse-forms/ConsumablesFormData";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   POST_NURSE_ORDER_SHEET_FAILURE,
   POST_NURSE_ORDER_SHEET_SUCCESS,
@@ -19,7 +19,7 @@ const Consumables = () => {
 
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = useAuth();
+  const userDetails = null;
   const [loadingPostConsumables, setLoadingPostConsumables] = useState(false);
   const [isConsumableFormVisible, setIsConsumableFormVisible] = useState(false);
 

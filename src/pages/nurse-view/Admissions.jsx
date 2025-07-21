@@ -6,7 +6,7 @@ import { getConsultationRoomListSlice } from "../../actions/nurse-actions/getCon
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import { listDoctors } from "../../actions/DropdownListActions";
 import Loading from "../../partials/nurse-partials/Loading";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import { useNavigate } from "react-router-dom";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
@@ -23,7 +23,7 @@ const Admissions = () => {
     const { loadingWaitingList, triageWaitingList } = useSelector(state => state.getTriageWaitingList);
     const { loading, data } = useSelector(state => state.getDoctorsList);
 
-    const userDetails = useAuth();
+    const userDetails = null;
     const dispatch = useDispatch();
     const navigate = useNavigate();
  

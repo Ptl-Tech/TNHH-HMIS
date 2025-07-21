@@ -14,7 +14,7 @@ import { getQyDietaryFormLinesSlice } from "../../../actions/nurse-actions/getQy
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import DietaryIntakeFormData from "./DietaryIntakeFormData";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   POST_DIETARY_INTAKE_FORM_LINE_FAILURE,
   POST_DIETARY_INTAKE_FORM_LINE_SUCCESS,
@@ -24,7 +24,7 @@ import {
 const DietaryIntakeForm = () => {
   const { selectedRowKey, rowSelection, selectedRow } =
     useSetTableCheckBoxHook();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);

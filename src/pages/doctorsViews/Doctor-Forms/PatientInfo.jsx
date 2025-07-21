@@ -18,7 +18,7 @@ import TextArea from "antd/es/input/TextArea";
 import { UserOutlined } from "@ant-design/icons";
 import { IoCloseOutline, IoEllipsisVertical } from "react-icons/io5";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 import {
   smartMerge,
@@ -138,7 +138,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
 const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const staffNo = useAuth()?.userData.no;
+  const staffNo = null?.userData.no;
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { message } from "antd";
-import useAuth from "../hooks/useAuth";
 import {
   COUNTRIES_LIST_FAIL,
   COUNTRIES_LIST_REQUEST,

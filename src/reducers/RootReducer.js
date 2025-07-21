@@ -3,7 +3,7 @@ import {
   otpVerifyReducer,
   userLoginReducer,
   userRegisterReducer,
-  forgotPwdReducer,
+  forgotPasswordReducer,
   resetPwdReducer,
 } from "./userReducer";
 import {
@@ -225,7 +225,10 @@ import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgen
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
-import { getBillingListReducer, getPatientBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import {
+  getBillingListReducer,
+  getPatientBillingListReducer,
+} from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
 import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
 import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
@@ -339,12 +342,15 @@ import { postLabAppointmentReducer } from "./reception-reducers/postLabAppointme
 import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPatientNoReducer";
 import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
 import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
+import { authReducer } from "./auth/auth-reducer";
 
 export const rootReducer = combineReducers({
+  // Auth
+  auth: authReducer,
   userLogin: userLoginReducer,
   otpVerify: otpVerifyReducer,
   userRegister: userRegisterReducer,
-  forgotPwd: forgotPwdReducer,
+  forgotPassword: forgotPasswordReducer,
   resetPwd: resetPwdReducer,
 
   //security reducers:-->>mercy
@@ -483,7 +489,7 @@ export const rootReducer = combineReducers({
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
   getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
   postPharmacyAppointment: postPharmacyAppointmentReducer,
-  postLabAppointment:postLabAppointmentReducer,
+  postLabAppointment: postLabAppointmentReducer,
   getReceiptsByPatientNo: getReceiptsByPatientNoReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,

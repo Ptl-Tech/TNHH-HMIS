@@ -1,4 +1,4 @@
-import useAuth from '../hooks/useAuth';
+// // import useAuth from '../hooks/useAuth';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -19,7 +19,7 @@ import { getPgAdmissionsPendingVerificationSlice } from '../actions/nurse-action
 
 const ReceptionDashboard = () => {
   const dispatch = useDispatch();
-  const userDetails = useAuth();
+  const userDetails = null;
   const today = moment().format('YYYY-MM-DD');
 
   const { visitors } = useSelector((state) => state.visitorsList);

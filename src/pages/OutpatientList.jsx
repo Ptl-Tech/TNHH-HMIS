@@ -21,7 +21,7 @@ import {
   Dropdown, Menu
 } from "antd";
 import { listPatients } from "../actions/patientActions";
-import useAuth from "../hooks/useAuth";
+// // import useAuth from "../hooks/useAuth";
 const { Search } = Input;
 
 const OutpatientList = () => {
@@ -30,7 +30,7 @@ const OutpatientList = () => {
   const { loading: loadingPatients, patients } = useSelector(
     (state) => state.patientList
   );
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   // get patient whose ActiveVisitNo ="" and CurrentAdmNo = ""
   const patientsToFilter = useMemo(() => {

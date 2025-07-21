@@ -7,12 +7,12 @@ import {
   MedicineBoxOutlined,
   BorderlessTableOutlined,
 } from "@ant-design/icons";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 const Medication = ({  role, patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
   const [selectedItem, setSelectedItem] = useState(<InpatientMedication />);
-  const userRole = useAuth().userData.departmentName;
+  const userRole = null.userData.departmentName;
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);

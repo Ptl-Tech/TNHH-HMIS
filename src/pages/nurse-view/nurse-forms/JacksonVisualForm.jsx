@@ -8,10 +8,10 @@ import { getJacksonVisualFormSlice } from '../../../actions/nurse-actions/getJac
 import JacksonVisualFormData from './JacksonVisualFormData';
 import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
 import useSetTableCheckBoxHook from '../../../hooks/useSetTableCheckBoxHook';
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 
 const JacksonVisualForm = () => {
-    const role = useAuth().userData.departmentName;
+    const role = null.userData.departmentName;
     const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
     const { patientDetails } = useLocation().state;
     const [ form ] = Form.useForm();

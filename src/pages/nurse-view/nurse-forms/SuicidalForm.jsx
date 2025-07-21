@@ -9,7 +9,7 @@ import { getSuicidalFormSlice } from '../../../actions/nurse-actions/getSuicidal
 import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
 import useSetTableCheckBoxHook from '../../../hooks/useSetTableCheckBoxHook';
 import SuicidalFormData from '../forms/nurse-forms/SuicidalFormData';
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 
 const SuicidalForm = () => {
     const { selectedRowKey, rowSelection, selectedRow } = useSetTableCheckBoxHook();
@@ -23,7 +23,7 @@ const SuicidalForm = () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'))
     const staffNo = userInfo?.userData?.no
     let formattedSffNo = staffNo.charAt(0).toUpperCase() + staffNo.slice(1).toLowerCase();
-    const role = useAuth().userData.departmentName;
+    const role = null.userData.departmentName;
 
     const dispatch = useDispatch();
 

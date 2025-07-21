@@ -20,7 +20,7 @@ import {
   keywordFilterHelper,
   buildSelectedItemsTree,
 } from "../../../utils/doctorNotesTree";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
@@ -29,7 +29,7 @@ import { ConsultationNotes } from "./ConsultationNotes";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const searchParams = new URLSearchParams(useLocation().search);
 
   const treatmentNo =

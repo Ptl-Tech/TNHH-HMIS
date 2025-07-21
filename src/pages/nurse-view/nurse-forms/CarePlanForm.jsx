@@ -1,7 +1,7 @@
 import { Button, Form } from "antd";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import { BorderlessTableOutlined, PlusOutlined } from "@ant-design/icons";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import CarePlanFormData from "./CarePlanFormData";
 import CarePlanFormTable from "../tables/nurse-tables/CarePlanFormTable";
@@ -10,7 +10,7 @@ import { getNursingCarePlanSlice } from "../../../actions/nurse-actions/postNurs
 import { useLocation } from "react-router-dom";
 
 const CarePlanForm = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const [isFormVisible, setIsFormVisible] = useState(false);
   const dispatch = useDispatch();
   const [form] = Form.useForm();

@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { FiFileText } from "react-icons/fi";
 import moment from "moment";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
@@ -27,7 +27,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);

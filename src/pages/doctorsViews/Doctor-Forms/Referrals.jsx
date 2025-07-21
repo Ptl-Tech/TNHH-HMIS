@@ -35,7 +35,7 @@ import {
 } from "../../../actions/Doc-actions/postRefferalDetails";
 import { useLocation } from "react-router-dom";
 import moment from "moment";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { getHospitalNumber } from "../../../actions/Doc-actions/getHospitalNumber";
 import { getReferralLines } from "../../../actions/Doc-actions/getReferralLines";
 import { Option } from "antd/es/mentions";
@@ -44,7 +44,7 @@ const Referrals = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
-  const employeeData = useAuth();
+  const employeeData = null;
   const dispatch = useDispatch();
   const { loading: saveLoading } = useSelector(
     (state) => state.saveRefferalDetails

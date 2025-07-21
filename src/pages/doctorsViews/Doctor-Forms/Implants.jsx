@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Typography } from 'antd';
 import { FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 import { listDoctors } from '../../../actions/DropdownListActions';
 import ImplantTable from '../../nurse-view/tables/nurse-tables/ImplantTable';
 import ImplantFormData from '../../nurse-view/nurse-forms/ImplantRequestFormData';
@@ -18,7 +18,7 @@ const ImagingRequests = () => {
   const treatmentNo = queryParams.get('TreatmentNo');
   const patientNo = queryParams.get('PatientNo');
   const admissionNo = queryParams.get('AdmNo');
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const [showForm, setShowForm] = useState(false);
   const dispatch = useDispatch();
 

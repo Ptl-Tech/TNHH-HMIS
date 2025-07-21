@@ -3,11 +3,11 @@ import { FilePdfOutlined } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 
 const EncounterListTable = ({ filteredList, loadingConsultationRoomList }) => {
   const navigate = useNavigate();
-  const userDetails = useAuth();
+  const userDetails = null;
 const user = userDetails.userData.departmentName
   
   const columns = [

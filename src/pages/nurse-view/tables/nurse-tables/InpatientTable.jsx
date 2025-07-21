@@ -4,7 +4,7 @@ import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 
 const InpatientTable = ({
   loading,
@@ -15,7 +15,7 @@ const InpatientTable = ({
   searchPatientNumber,
   searchAdmissionNumber,
 }) => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const columns = [
     {
       title: "#",

@@ -7,7 +7,7 @@ import ECTFormData from "../nurse-forms/ETCFormData";
 import ETCTable from "../tables/nurse-tables/ETCTable";
 import { getPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import { listDoctors } from "../../../actions/DropdownListActions";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 const ECTScan = () => {
   const location = useLocation();
@@ -16,7 +16,7 @@ const ECTScan = () => {
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientNo = queryParams.get("PatientNo");
   const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and for

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
 
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
@@ -14,11 +14,11 @@ import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js"
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 
 const Impatient = () => {
-  const userDetails = useAuth(); // Use the custom hook to get user info
+  const userDetails = null; // Use the custom hook to get user info
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const doctorId = useAuth().userData.doctorID;
-  const role = useAuth().userData.departmentName;
+  const doctorId = null.userData.doctorID;
+  const role = null.userData.departmentName;
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");

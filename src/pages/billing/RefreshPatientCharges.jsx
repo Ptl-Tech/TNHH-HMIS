@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Button, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import useAuth from '../../hooks/useAuth';
+// import useAuth from '../../hooks/useAuth';
 import {
   postRefreshPatientCharges,
   POST_REFRESH_PATIENT_CHARGES_RESET,
@@ -9,7 +9,7 @@ import {
 
 const RefreshPatientCharges = ({ patientNo, activeVisitNo }) => {
   const dispatch = useDispatch();
-  const userDetails = useAuth();
+  const userDetails = null;
 
   const { loading, success, error } = useSelector((state) => state.postRefreshCharges);
 

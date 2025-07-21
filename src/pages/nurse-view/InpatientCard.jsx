@@ -14,7 +14,7 @@ import NursingPatientCharges from "./billing/NursingPatientCharges";
 import PatientVitalInfo from "../doctorsViews/Doctor-Forms/PatientVitalInfo";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 import {
   postInitiateDischargeSlice,
@@ -31,7 +31,7 @@ const InpatientCard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const { patientDetails } = location.state || {};
 

@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTreatmentSheetLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 import InpatientCardInfo from "../InpatientCardInfo";
 import { is } from "immutable";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 const TreatmentsSheet = ({ patientDetails }) => {
   const [form] = Form.useForm();
@@ -19,7 +19,7 @@ const TreatmentsSheet = ({ patientDetails }) => {
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
-  const userRole = useAuth().userData.departmentName;
+  const userRole = null.userData.departmentName;
 
   const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
     (state) => state.getTreatmentSheet || {}

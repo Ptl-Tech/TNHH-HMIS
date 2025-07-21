@@ -6,7 +6,7 @@ import {
   UserAddOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import useAuth from '../../hooks/useAuth';
+// import useAuth from '../../hooks/useAuth';
 import moment from 'moment';
 import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
 import DashboardCard from '../nurse-view/DashboardCard';
@@ -16,10 +16,10 @@ import { getPgAdmissionsAdmittedSlice } from '../../actions/nurse-actions/getPgA
 import { listDoctors } from '../../actions/DropdownListActions';
 
 const DoctorDashboard = () => {
-  const role = useAuth().userData.departmentName;
-  const doctorId = useAuth().userData.doctorID;
+  const role = null.userData.departmentName;
+  const doctorId = null.userData.doctorID;
   const dispatch = useDispatch();
-  const userDetails = useAuth(); // Use the custom hook to get user info
+  const userDetails = null; // Use the custom hook to get user info
   const { patients: treatmentList } =
     useSelector((state) => state.docTreatmentList) || {};
   const { triageWaitingList: patients } = useSelector(

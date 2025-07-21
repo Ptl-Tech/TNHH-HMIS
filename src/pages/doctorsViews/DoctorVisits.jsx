@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { message, Table } from 'antd';
 
-import useAuth from '../../hooks/useAuth';
+// import useAuth from '../../hooks/useAuth';
 import { rowClassName } from '../../utils/helpers';
 import Loading from '../../partials/nurse-partials/Loading';
 
@@ -17,8 +17,8 @@ import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
 import FilterConsultationRoom from '../../partials/nurse-partials/FilterConsultationRoom';
 
 const DoctorVisits = () => {
-  const doctorId = useAuth().userData.doctorID;
-  const role = useAuth().userData.departmentName;
+  const doctorId = null.userData.doctorID;
+  const role = null.userData.departmentName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();

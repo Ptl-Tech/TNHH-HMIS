@@ -9,12 +9,12 @@ import { listDoctors } from "../../actions/DropdownListActions";
 import useSetTablePagination from "../../hooks/useSetTablePagination";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 const PastDoctorVisit = () => {
 
     const navigate = useNavigate();
-    const userDetails = useAuth();
+    const userDetails = null;
     const [showList, setShowList] = useState(false);
     const [filteredPatients, setFilteredPatients] = useState([]);
 

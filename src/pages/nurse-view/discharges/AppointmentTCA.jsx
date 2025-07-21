@@ -16,7 +16,7 @@ import {
 import dayjs from "dayjs";
 import { IoCalendarOutline } from "react-icons/io5";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   postDischargeTCA,
   POST_DISCHARGE_TCA_RESET,
@@ -47,7 +47,7 @@ function AppointmentTCAForm({ currentInpatient }) {
 
   console.log({ currentInpatient });
 
-  const user = useAuth();
+  const user = null;
   const dispatch = useDispatch();
   const location = useLocation();
 

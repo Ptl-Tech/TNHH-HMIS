@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Tabs } from "antd";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import PrescriptionForm from "./PrescriptionForm";
 import PrescriptionTable from "../tables/PrescriptionTable";
 import { getQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
@@ -13,7 +13,7 @@ import { pharmacyTable } from "../../pharmacy-views/pharmacy-utils";
 const Medication = () => {
   const dispatch = useDispatch();
   const getLocation = useLocation();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
 
   const treatmentNo = queryParams.get("TreatmentNo");

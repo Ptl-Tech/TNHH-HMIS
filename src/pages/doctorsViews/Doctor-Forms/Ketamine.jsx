@@ -8,7 +8,7 @@ import KetamineFormData from "../../nurse-view/nurse-forms/KetamineFormData";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import { listDoctors } from "../../../actions/DropdownListActions";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
   const Ketamine = () => {
     const location = useLocation();
@@ -17,7 +17,7 @@ import useAuth from "../../../hooks/useAuth";
     const treatmentNo = queryParams.get("TreatmentNo");
     const patientNo = queryParams.get("PatientNo");
     const admissionNo = queryParams.get("AdmNo");
-    const role = useAuth().userData.departmentName
+    const role = null.userData.departmentName
     const [showForm, setShowForm] = useState(false);
     const dispatch = useDispatch();
 

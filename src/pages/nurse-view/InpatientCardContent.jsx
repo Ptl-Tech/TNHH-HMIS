@@ -4,12 +4,12 @@ import CarePlan from "./CarePlan";
 import Requests from "./Requests";
 import Discharges from "./Discharges";
 import PropTypes from "prop-types";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import WardTransfer from "./WardTransfer";
 import NursingPatientCharges from "./billing/NursingPatientCharges";
 
 const InpatientCardContent = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   return (
     <>
       <Card className="card">

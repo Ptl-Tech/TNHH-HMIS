@@ -1,12 +1,12 @@
 import { FileOutlined, LockOutlined, ProfileOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, Card, Input, List, Tabs } from "antd";
 import { useState } from "react";
-import useAuth from "../hooks/useAuth";
+// // // import useAuth from "../hooks/useAuth";
 
 const { TabPane } = Tabs;
 
 const ViewProfile = () => {
-  const { userData } = useAuth(); // Fetch user data from context
+  const { userData } = null; // Fetch user data from context
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

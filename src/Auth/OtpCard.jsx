@@ -1,74 +1,95 @@
-import React from "react";
-import { Card, Input, Typography, Button } from "antd";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-const { Title } = Typography;
+import { Button, Form, Input, message, Modal, Typography } from "antd";
 
-const OtpCard = () => {
-  const sharedProps = {
-    maxLength: 6, // Ensures only 6 characters for OTP
-    style: { textAlign: "center", width: "100%", maxWidth: "300px" },
+import logoLogin from "../assets/images/logoLogin.png";
+
+import {
+  SHOW_OTP_MODAL,
+  AUTH_RESET_MESSAGES,
+} from "../reducers/auth/auth-reducer";
+import { verifyOTP } from "../actions/auth-actions/verify-otp";
+
+export const OTPModal = ({ open }) => {
+  const { Title } = Typography;
+
+  const dispatch = useDispatch();
+
+  const {
+    loading,
+    OTPError: error,
+    OTPSuccess: success,
+  } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (error) message.error(error);
+    if (success) message.success(success);
+    if (error || success) dispatch({ type: AUTH_RESET_MESSAGES });
+  }, [error, success]);
+
+  const onSubmit = (values) => {
+    const { otpCode } = values;
+    dispatch(verifyOTP({ otpCode }));
   };
 
-  const handleOtpSubmit = () => {
-    alert("OTP submitted successfully!");
+  const onSubmitFailed = (values) => {
+    const errors = values.errorFields[0].errors.join(", ");
+    message.error(errors);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f0f2f5",
-        padding: "20px",
-      }}
+    <Modal
+      centered
+      open={open}
+      width={400}
+      footer={null}
+      title="Enter OTP"
+      maskClosable={false}
+      onCancel={() => dispatch({ type: SHOW_OTP_MODAL })}
     >
-      <Card
+      <div
         style={{
-          width: "100%",
-          maxWidth: "400px",
+          padding: "20px",
           textAlign: "center",
-          borderRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
         }}
       >
-        {/* Logo Section */}
-        <div style={{ marginBottom: "20px" }}>
-          <img
-            src="https://via.placeholder.com/100"
-            alt="Logo"
-            style={{ width: "100px", marginBottom: "10px" }}
-          />
-          <Title level={4} style={{ margin: 0 }}>
-            Enter OTP
-          </Title>
-          <p style={{ color: "#888" }}>
-            We sent a 6-digit code to your email. Please enter it below.
-          </p>
-        </div>
-
-        {/* OTP Input Section */}
-        <div style={{ marginBottom: "20px" }}>
-          <Input.OTP
-            formatter={(str) => str.toUpperCase()}
-            placeholder="Enter OTP"
-            {...sharedProps}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="primary"
-          onClick={handleOtpSubmit}
-          block
-          style={{ fontWeight: "bold" }}
+        <img
+          src={logoLogin}
+          alt="Logo"
+          style={{ width: "100px", marginBottom: "10px" }}
+        />
+        <Title level={5}>Enter OTP</Title>
+        <p style={{ color: "#888" }}>
+          We sent a 6-digit code to your email. Please enter it below.
+        </p>
+        <Form
+          name="login"
+          layout="vertical"
+          autoComplete="off"
+          onFinish={onSubmit}
+          onFinishFailed={onSubmitFailed}
         >
-          Submit
-        </Button>
-      </Card>
-    </div>
+          <Form.Item
+            label="OTP"
+            name="otpCode"
+            rules={[{ required: true, message: "Please input your OTP!" }]}
+          >
+            <Input placeholder="******" />
+          </Form.Item>
+          <Form.Item label={null}>
+            <Button
+              block
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              disabled={loading}
+            >
+              Submit OTP
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </Modal>
   );
 };
-
-export default OtpCard;

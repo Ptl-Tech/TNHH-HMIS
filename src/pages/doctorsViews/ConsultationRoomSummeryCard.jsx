@@ -4,11 +4,11 @@ import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-desig
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeConsultationList, closedConsultationList }) => {
   
-  const role = useAuth().userData.departmentName
+  const role = null.userData.departmentName
   const cardData = [
     {
       backgroundColor: "green",

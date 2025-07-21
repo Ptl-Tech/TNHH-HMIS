@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
-import useAuth from "../../hooks/useAuth";
+
 import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 import moment from "moment";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
@@ -17,7 +17,7 @@ import { listDoctors } from "../../actions/DropdownListActions";
 const Dashboard = () => {
   const dispatch = useDispatch();
 
-  const userDetails = useAuth(); // Use the custom hook to get user info
+  const userDetails = null; // Use the custom hook to get user info
   const branchCode = localStorage.getItem("branchCode");
 
   useEffect(() => {

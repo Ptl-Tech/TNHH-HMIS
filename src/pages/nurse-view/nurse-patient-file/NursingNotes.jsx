@@ -8,7 +8,7 @@ import {
   POST_NURSE_ADMISSION_NOTES_SUCCESS,
   postNurseAdmissionNotesSlice,
 } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 import { EditorState, convertToRaw } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
@@ -20,12 +20,12 @@ import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
 
 const NursingNotes = () => {
-  const role = useAuth().userData.departmentName; // Get user role from useAuth hook
+  const role = null.userData.departmentName; // Get user role from useAuth hook
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = useAuth();
+  const userDetails = null;
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
     useState(false);
 

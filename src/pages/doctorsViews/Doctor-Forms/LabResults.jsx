@@ -27,7 +27,7 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import LabResultDrawer from "./LabResultDrawer";
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
@@ -43,7 +43,7 @@ const LabResults = () => {
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
   const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
   const [labRequests, setLabRequests] = useState([]); // Track lab requests

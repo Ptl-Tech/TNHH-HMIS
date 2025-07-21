@@ -61,7 +61,6 @@ export const PATIENT_BY_ID_FAIL = 'PATIENT_BY_ID_FAIL';
 export const PATIENT_BY_ID_RESET = 'PATIENT_BY_ID_RESET';
 
 import { message } from 'antd';
-import useAuth from '../hooks/useAuth';
 
 const API = 'https://chiromo.potestastechnologies.net:8085/';
 

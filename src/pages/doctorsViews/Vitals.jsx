@@ -8,7 +8,7 @@ import Loading from "../../partials/nurse-partials/Loading";
 import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 import {FileTextOutlined} from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -17,7 +17,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
   const [form] = Form.useForm();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const location = useLocation();
   const patientDetails = location.state?.patientDetails;
 

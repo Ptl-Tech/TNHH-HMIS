@@ -9,13 +9,13 @@ import { FileAddOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getNurseAdmissionNotesSlice } from "../../actions/nurse-actions/getNurseAdmissionNotesSlice";
 import { useEffect } from "react";
-import useAuth from "../../hooks/useAuth";
+// import useAuth from "../../hooks/useAuth";
 
 const ReadNurseNotes = () => {
     const { patientDetails } = useLocation().state;
     const invalidDate = "0001-01-01";
     const dispatch = useDispatch();
-    const role = useAuth().userData.departmentName
+    const role = null.userData.departmentName
     
     const { loadingGetNurseAdmissionNotes, getNurseNotes } = useSelector((state) => state.getNurseAdmissionNotes);
 

@@ -13,7 +13,7 @@ import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getInPatientQyPrescriptionLineSlice } from "../../../../actions/Doc-actions/QyPrescriptionLinesSlice";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 import {
   POST_PATIENT_CONSUMABLES_FAILURE,
   POST_PATIENT_CONSUMABLES_SUCCESS,
@@ -33,7 +33,7 @@ const InpatientConsumablesTable = ({
   loadingGetPgOpenPatientConsumables,
 }) => {
   const dispatch = useDispatch();
-  const userDetails = useAuth();
+  const userDetails = null;
   console.log({ consumables });
   const admissionNo = new URLSearchParams(window.location.search).get("AdmNo");
   const { loading: loadingPrescriptions, data: prescriptions } = useSelector(

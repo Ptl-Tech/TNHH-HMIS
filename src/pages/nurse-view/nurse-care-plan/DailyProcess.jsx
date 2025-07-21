@@ -14,14 +14,14 @@ import {
   POST_DAILY_PROCEDURE_OR_PROCESS_SUCCESS,
   postDailyProcedureOrProcessSlice,
 } from '../../../actions/nurse-actions/postDailyProcedureOrProcessSlice';
-import useAuth from '../../../hooks/useAuth';
+// import useAuth from '../../../hooks/useAuth';
 const DailyProcess = () => {
   const { patientDetails } = useLocation().state;
   const queryParams = new URLSearchParams(location.search);
   const AdmNo = queryParams.get('AdmNo');
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
 
   const [isDailyProcessFormVisible, setIsDailyProcessFormVisible] =
     useState(false);

@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { Table, Typography } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPati
 import { ProfileOutlined } from "@ant-design/icons";
 
 const PastEncounters = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();

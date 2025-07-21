@@ -17,7 +17,7 @@ import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
 import { appmntList, listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
-import useAuth from "../hooks/useAuth";
+// // import useAuth from "../hooks/useAuth";
 import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoice";
 import TabPane from "antd/es/tabs/TabPane";
 import { getBillingList } from "../actions/Charges-Actions/getBillingList";
@@ -61,7 +61,7 @@ const CashPatients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
   const [pdfBlob, setPdfBlob] = useState(null);
-  const staffNo = useAuth().userData.No;
+  const staffNo = null.userData.No;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   

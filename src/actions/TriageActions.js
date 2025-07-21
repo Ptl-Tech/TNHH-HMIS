@@ -5,7 +5,6 @@ import {
   TRIAGE_VISIT_LIST_SUCCESS,
   TRIAGE_VISIT_LIST_FAIL,
 } from "../constants/TriageConstants";
-import useAuth from "../hooks/useAuth";
 import {
   POST_TRIAGE_VISIT_REQUEST,
   POST_TRIAGE_VISIT_SUCCESS,

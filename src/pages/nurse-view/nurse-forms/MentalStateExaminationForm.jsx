@@ -13,7 +13,7 @@ import { useLocation } from "react-router-dom";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
 import MseStatusFormData from "./MseStatusFormData";
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   POST_MENTAL_EXAMINATION_FORM_FAILURE,
   POST_MENTAL_EXAMINATION_FORM_SUCCESS,
@@ -21,7 +21,7 @@ import {
 } from "../../../actions/nurse-actions/postMentalExaminationFormSlice";
 
 const MentalStateExaminationForm = () => {
-  const role = useAuth().userData.departmentName;
+  const role = null.userData.departmentName;
   const { patientDetails } = useLocation().state;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
