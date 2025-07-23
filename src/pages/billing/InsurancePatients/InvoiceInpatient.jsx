@@ -40,6 +40,15 @@ import {
 } from "../../../actions/nurse-actions/postInitiateDischargeSlice";
 import PreviousBill from "../PreviousBill";
 import RefreshPatientCharges from "../RefreshPatientCharges";
+const formatKES = (amount) => {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "KES 0.00";
+  return parsed.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+  });
+};
 const InvoiceInpatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -327,7 +336,7 @@ const InvoiceInpatient = () => {
                 style={{ gridColumn: "span 2" }}
               >
                 <DollarOutlined /> Bill Balance: KSh{" "}
-                {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                  {formatKES(patientBillData?.[0]?.Balance)}
               </p>
 
               {/* Receipt no section */}
@@ -415,7 +424,7 @@ const InvoiceInpatient = () => {
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Balance:</p>
                   <p className="text-danger fw-bold">
-                    KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                  {formatKES(patientBillData?.[0]?.Balance)}
                   </p>
                 </div>
               </div>

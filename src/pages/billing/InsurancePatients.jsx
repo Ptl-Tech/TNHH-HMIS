@@ -3,6 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getBillingList } from '../../actions/Charges-Actions/getBillingList';
+const formatKES = (amount) => {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "KES 0.00";
+  return parsed.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+  });
+};
 
 const InsurancePatients = () => {
   const dispatch = useDispatch();
@@ -43,11 +52,19 @@ const InsurancePatients = () => {
       dataIndex: 'PatientNo',
       key: 'PatientNo',
     },
-    {
-      title: 'Patient Name',
-      dataIndex: 'Names',
-      key: 'Names',
-    },
+   {
+         title: 'Patient Name',
+         dataIndex: 'Names',
+         key: 'Names',
+         render: (text, record) => (
+           <Typography.Text
+             style={{ cursor: 'pointer', color: '#0f5689' }}
+             onClick={() => handleViewCharges(record.ActiveVisitNo)}
+           >
+             {text.toUpperCase()}
+           </Typography.Text>
+         ),
+       },
     {
       title: 'Active Visit No',
       dataIndex: 'ActiveVisitNo',
@@ -64,20 +81,21 @@ const InsurancePatients = () => {
       key: 'Global_Dimension_1_Code',
      
     },
-    {
-      title: 'Balance',
-      dataIndex: 'Balance',
-      key: 'Balance',
-      render: (Balance) => {
-        const isZero = Balance === 0.00 || Balance === 'KSH 0.00';
-        const balanceValue = parseFloat(Balance.replace(/[^0-9.-]+/g, '')); // Extract numeric value from string
-        return (
-          <span style={{ color: isZero ? 'green' : 'red', fontWeight: 'bold' }}>
-            {isZero ? 'KSH 0.00' : `KSH ${balanceValue.toFixed(2)}`}
-          </span>
-        );
-      },
-    },    
+       {
+  title: 'Balance',
+  dataIndex: 'Balance',
+  key: 'Balance',
+  render: (_, record) => {
+    const numericBalance = parseFloat(record.Balance?.toString().replace(/[^0-9.-]+/g, '')) || 0;
+    const isZero = numericBalance === 0;
+
+    return (
+          <span style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}>
+        {formatKES(numericBalance)}
+      </span>
+    );
+  },
+},    
     {
       title: 'Action',
       key: 'action',

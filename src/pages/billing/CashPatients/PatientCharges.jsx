@@ -15,6 +15,17 @@ import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSingle
 const { confirm } = Modal;
 const { TabPane } = Tabs;
 
+const formatKES = (amount) => {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "KES 0.00";
+  return parsed.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+  });
+};
+
+
 const PatientCharges = ({ activeVisitNo }) => {
   const dispatch = useDispatch();
   const { loading, error, data } = useSelector(
@@ -108,7 +119,7 @@ const PatientCharges = ({ activeVisitNo }) => {
       title: "Total Amount",
       dataIndex: "Total_Amount",
       key: "Total_Amount",
-      render: (amount) => `KES ${amount.toFixed(2)}`,
+      render: (text) => formatKES(text),
     },
     {
       title: "Date",

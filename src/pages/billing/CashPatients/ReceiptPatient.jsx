@@ -29,6 +29,17 @@ import { shape } from "prop-types";
 import RefreshPatientCharges from "../RefreshPatientCharges";
 import PreviousBill from "../PreviousBill";
 import AllocateRebates from "../AllocateRebates";
+
+
+const formatKES = (amount) => {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "KES 0.00";
+  return parsed.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+  });
+};
 const ReceiptPatient = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -249,7 +260,7 @@ const ReceiptPatient = () => {
                   style={{ gridColumn: "span 2" }}
                 >
                   <DollarOutlined /> Bill Balance: KSh{" "}
-                  {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+                  {formatKES(patientBillData?.[0]?.Balance)}
                 </p>
 
                 {/* Receipt no section */}
@@ -318,7 +329,7 @@ const ReceiptPatient = () => {
                   <div className="d-flex justify-content-between">
                     <p className="fw-bold">Amount to be Paid :</p>
                     <p className="text-danger fw-bold">
-                      KSh {patientBillData[0]?.Balance?.toFixed(2) ?? "0.00"}
+                  {formatKES(patientBillData?.[0]?.Balance)}
                     </p>
                   </div>
 
