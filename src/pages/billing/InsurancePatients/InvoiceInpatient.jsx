@@ -335,7 +335,7 @@ const InvoiceInpatient = () => {
                 className="text-danger fw-bold"
                 style={{ gridColumn: "span 2" }}
               >
-                <DollarOutlined /> Bill Balance: KSh{" "}
+                <DollarOutlined /> Bill Balance: {" "}
                   {formatKES(patientBillData?.[0]?.Balance)}
               </p>
 
