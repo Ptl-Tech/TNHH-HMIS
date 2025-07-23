@@ -275,7 +275,6 @@ export const marketingStrategies = () => async (dispatch, getState) => {
 
     dispatch({ type: MARKETING_LIST_SUCCESS, payload: data });
 
-    console.log("data: ", data);
   } catch (error) {
     dispatch({ type: MARKETING_LIST_FAIL, payload: error.message });
   }
