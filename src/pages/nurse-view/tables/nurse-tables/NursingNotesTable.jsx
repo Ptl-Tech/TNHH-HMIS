@@ -10,39 +10,41 @@ const NursingNotesTable = ({
   loadingGetNurseAdmissionNotes,
   getNurseNotes,
 }) => {
-  const [selectedRecord, setSelectedRecord] = useState([]);
- const renderNotes = (notes) => {
+  const [selectedRecord, setSelectedRecord] = useState([]);const renderNotes = (notes) => {
   if (!notes) return null;
 
-  // Strip out HTML
+  // Clean HTML
   const plainText = DOMPurify.sanitize(notes).replace(/<\/?[^>]+(>|$)/g, "");
 
-  // Split into sentences/paragraphs
-  const paragraphs = plainText
-    .split(/[\r\n]+|(?<=\.)\s+/) // split on newlines or end of sentence
+  // Split into clean paragraphs
+  const paragraphText = plainText
+    .split(/[\r\n]+|(?<=\.)\s+/)
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .map((line, index) => {
-      const sentenceCased =
-        line.charAt(0).toUpperCase() + line.slice(1).toLowerCase();
-      return (
-        <p
-          key={index}
-          style={{
-            fontSize: "14px",
-            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-            color: "#333",
-            marginBottom: "12px",
-            lineHeight: "1.6",
-          }}
-        >
-          {sentenceCased}
-        </p>
-      );
-    });
+    .map((line) => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase())
+    .join(" "); // Optional: make it a block paragraph instead of separate lines
 
-  return paragraphs;
+ return plainText
+  .split(/[\r\n]+|(?<=\.)\s+/)
+  .map((line) => line.trim())
+  .filter((line) => line.length > 0)
+  .map((line, index) => (
+    <Typography.Paragraph
+      key={index}
+      style={{
+        fontSize: "14px",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        color: "#333",
+        lineHeight: "1.6",
+        marginBottom: "10px",
+      }}
+    >
+      {line.charAt(0).toUpperCase() + line.slice(1).toLowerCase()}
+    </Typography.Paragraph>
+  ));
+
 };
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = (record) => {
@@ -108,38 +110,39 @@ const NursingNotesTable = ({
       },
     },
 
- {
+{
   title: "Notes",
   dataIndex: "Notes",
   key: "Notes",
   render: (text) => {
     if (!text) return "-";
 
-    const bulletItems = text
-      .replace(/<\/?[^>]+(>|$)/g, "") // remove all HTML tags
-      .split(/\r?\n|\.|\r|•|-/) // split by newline, period, bullet, or dash
-      .map(item => {
-        const trimmed = item.trim();
-        return trimmed
-          ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase()
-          : "";
-      })
-      .filter(item => item.length > 0);
+    const plainText = text.replace(/<\/?[^>]+(>|$)/g, ""); // remove HTML tags
+
+    // Create a paragraph-friendly version
+    const cleanedText = plainText
+      .split(/[\r\n]+|(?<=\.)\s+/)
+      .map(item => item.trim())
+      .filter(item => item.length > 0)
+      .map(item => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase())
+      .join(" "); // Combine back into one clean paragraph
 
     return (
-      <ul
+      <Typography.Paragraph
+        ellipsis={{
+          rows: 2,
+          expandable: true,
+          symbol: "Read more",
+        }}
         style={{
-          paddingLeft: "20px",
-          margin: 0,
           fontSize: "14px",
           fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
           color: "#333",
+          marginBottom: "0px",
         }}
       >
-        {bulletItems.map((item, index) => (
-          <li key={index} style={{ marginBottom: 4 }}>{item}</li>
-        ))}
-      </ul>
+        {cleanedText}
+      </Typography.Paragraph>
     );
   },
 },
