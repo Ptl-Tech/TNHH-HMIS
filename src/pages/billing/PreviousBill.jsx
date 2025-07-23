@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Button, Drawer, Table, Divider, Typography } from "antd";
-import {CloseOutlined} from "@ant-design/icons";
+import React, { useEffect, useState, useMemo } from "react";
+import { Button, Drawer, Table, Divider, Typography, Spin } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
+import { MdAttachFile } from "react-icons/md";
 
 import PrintReceipt from "./CashPatients/PrintReceipt";
 import {
@@ -10,101 +11,90 @@ import {
 } from "./InsurancePatients/InvoicePrinting";
 import {
   getBillingList,
+  getPastEncounterBillingList,
   getPatientPastEncounterBilling,
 } from "../../actions/Charges-Actions/getBillingList";
 import { getPatientCharges } from "../../actions/Charges-Actions/getPatientCharges";
 import { getReceiptPage } from "../../actions/Charges-Actions/getReceiptPage";
-import { render } from "@react-pdf/renderer";
-import { MdAttachFile } from "react-icons/md";
-import PatientInfo from "../nurse-view/nurse-patient-file/PatientInfo";
-import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
-import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
-import useFetchPatientVisitDetailsHook from "../../hooks/useFetchPatientVisitDetailsHook";
+
 import PatientHeader from "../reception-views/PatientHeader";
 
-const PreviousBill = ({ visible, patientNo, onClose  }) => {
-  const dispatch = useDispatch();
-console.log(patientNo);
+const formatKES = (amount) => {
+  const parsed = parseFloat(amount);
+  if (isNaN(parsed)) return "KES 0.00";
+  return parsed.toLocaleString("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 2,
+  });
+};
 
-  const { loading, data } = useSelector(
+const PreviousBill = ({ visible, patientNo, onClose }) => {
+  const dispatch = useDispatch();
+
+  const { loading: encountersLoading, data: encountersData } = useSelector(
     (state) => state.getPatientPastEncounterBillingList
   );
-  const { loading: billingLoading, patients: billingData } = useSelector(
+  const { loading: billingListLoading, data: billingList } = useSelector(
     (state) => state.getBillingList
   );
+  const { loading: patientBillingLoading, data: patientBilling } = useSelector(
+    (state) => state.getPatientBillingHistory
+  );
 
-  // 💡 Encounter view drawer state
   const [encounterDrawerVisible, setEncounterDrawerVisible] = useState(false);
   const [activeVisitNo, setActiveVisitNo] = useState(null);
 
-  const { data: patientReceipts, loading: receiptLoading } = useSelector(
-    (state) => state.getReceiptPage
-  );
+  const salesInvoices = patientBilling?.salesInvoices || [];
+  const receipts = patientBilling?.receipts || [];
 
-  const {
-    loading: patientInvoicesLoading,
-    error,
-    data: patientInvoices,
-  } = useSelector((state) => state.getPatientCharges);
-
-   const { loadingPatientVisitDetails, patientVisitDetails } =
-    useFetchPatientVisitDetailsHook(activeVisitNo);
-  
   useEffect(() => {
     if (patientNo) {
       dispatch(getPatientPastEncounterBilling(patientNo));
       dispatch(getBillingList());
-    }else{
-    //reset state
-      dispatch(getPatientPastEncounterBilling(null));
+    } else {
+      dispatch(getPatientPastEncounterBilling(null)); // Reset
     }
   }, [dispatch, patientNo]);
 
-  //ensure no empty or null dsata in receipts
-  const receiptData = patientReceipts?.filter(
-    (item) => item.No && item.No.trim() !== ""
-  );
-
-  const invoiceData = patientInvoices?.filter(
-    (item) => item.Invoice_Number && item.Invoice_Number.trim() !== ""
-  );
-
-  // Open child drawer and fetch data
   const handleViewEncounter = (visitNo) => {
     setActiveVisitNo(visitNo);
     dispatch(getPatientCharges(visitNo));
+    dispatch(getPastEncounterBillingList(visitNo));
     dispatch(getReceiptPage(visitNo));
     setEncounterDrawerVisible(true);
   };
 
-  const enrichedEncounters =
-    data?.map((item) => {
-      const match = billingData?.find((b) => b.PatientNo === item.Patient_No);
-      return {
+  const enrichedEncounters = useMemo(() => {
+    if (!Array.isArray(encountersData)) return [];
+    return encountersData
+      .map((item) => ({
         ...item,
-        PatientType: match?.PatientType || "N/A",
-      };
-    }) || [];
-
-  const uniqueEncounters = Array.from(
-    new Map(
-      enrichedEncounters
-        .filter((item) => item.Visit_No && item.Visit_No.trim() !== "")
-        .map((item) => [item.Visit_No, item])
-    ).values()
-  );
+        PatientType:
+          billingList?.find((b) => b.PatientNo === item.Patient_No)?.PatientType || "N/A",
+      }))
+      .filter((item) => item.Visit_No?.trim())
+      .reduce((acc, curr) => {
+        acc.set(curr.Visit_No, curr);
+        return acc;
+      }, new Map());
+  }, [encountersData, billingList]);
 
   const columns = [
     {
       title: "Encounter No",
       dataIndex: "Visit_No",
       key: "Visit_No",
+      render: (text) => (
+        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+      ),
     },
-    {
-      title: "Patient Type",
-      dataIndex: "PatientType",
-      key: "PatientType",
-    },
+
+    // {
+    //   title: "Patient Type",
+    //   dataIndex: "PatientType",
+    //   key: "PatientType",
+    // },
     {
       title: "Date",
       dataIndex: "Date",
@@ -129,61 +119,101 @@ console.log(patientNo);
   const receiptColumns = [
     {
       title: "Receipt No",
-      dataIndex: "No",
-      key: "No",
-      sorter: (a, b) => a.No - b.No,
-      //render in bold text
+      dataIndex: "receiptNo",
+      key: "receiptNo",
       render: (text) => (
-        <span style={{ fontWeight: "semibold", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
       ),
     },
     {
       title: "Amount",
-      dataIndex: "Total_Amount",
-      key: "Total_Amount",
-      render: (amt) => `KSh ${amt?.toFixed(2)}`,
+      dataIndex: "amount",
+      key: "amount",
+      render: (text) => formatKES(text),
     },
     {
-      title: "Amount Paid",
-      dataIndex: "Amount_Recieved",
-      key: "Amount_Recieved",
-      render: (amt) => `KSh ${amt?.toFixed(2)}`,
+      title: "Payment Mode",
+      dataIndex: "paymentMode",
+      key: "paymentMode",
+    },
+    {
+      title: "Transaction Code",
+      dataIndex: "transactionCode",
+      key: "transactionCode",
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => <PrintReceipt receiptNo={record.No} />,
+      render: (_, record) => <PrintReceipt receiptNo={record.receiptNo} />,
     },
   ];
 
   const invoiceColumns = [
     {
       title: "Invoice No",
-      dataIndex: "Invoice_Number",
-      key: "Invoice_Number",
-      sorter: (a, b) => a.Invoice_Number - b.Invoice_Number,
+      dataIndex: "invoiceNo",
+      key: "invoiceNo",
       render: (text) => (
-        <span style={{ fontWeight: "semibold", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
       ),
+    },
+    {
+      title: "Invoice Date",
+      dataIndex: "invoiceDate",
+      key: "invoiceDate",
+      render: (text) => (text ? new Date(text).toLocaleDateString() : "N/A"),
+    },
+    {
+      title: "Insurance Name",
+      dataIndex: "Insurance_Name",
+      key: "Insurance_Name",
+      render: (text) => text || "N/A",
     },
     {
       title: "Amount",
-      dataIndex: "Total_Amount",
-      key: "Total_Amount",
-      render: (amt) => `KSh ${amt?.toFixed(2)}`,
+      dataIndex: "Amount",
+      key: "Amount",
+      render: (text) => formatKES(text),
     },
-    
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <PrintInterimInvoice
-          patientNo={patientNo}
-          activeVisitNo={activeVisitNo}
-        />
+      render: () => (
+        <PrintFinalInvoice patientNo={patientNo} activeVisitNo={activeVisitNo} />
       ),
     },
   ];
+
+  const normalizedReceipts = useMemo(
+    () =>
+      Array.isArray(receipts)
+        ? receipts.map((r) => ({
+            receiptNo: r.receiptNo || "N/A",
+            receiptDate: r.receiptDate
+              ? new Date(r.receiptDate).toLocaleDateString()
+              : "N/A",
+            amount: r.amount || 0,
+            paymentMode: r.paymentMode || "N/A",
+            transactionCode: r.transactionCode || "N/A",
+          }))
+        : [],
+    [receipts]
+  );
+
+  const normalizedInvoices = useMemo(
+    () =>
+      Array.isArray(salesInvoices)
+        ? salesInvoices.map((inv) => ({
+            invoiceNo: inv.invoiceNo || "N/A",
+            invoiceDate: inv.invoiceDate
+              ? new Date(inv.invoiceDate).toLocaleDateString()
+              : "N/A",
+            Insurance_Name: inv.insuranceName || "N/A",
+            Amount: inv.amount || 0,
+          }))
+        : [],
+    [salesInvoices]
+  );
 
   return (
     <>
@@ -193,21 +223,21 @@ console.log(patientNo);
         onClose={onClose}
         open={visible}
         maskClosable={false}
-        title={
-          <h5 style={{ color: "#0f5689" }}>
-            Previous Encounter Billing Details
-          </h5>
+        title={<h5 style={{ color: "#0f5689" }}>Previous Encounter Billing Details</h5>}
+        extra={
+          <Button onClick={onClose} icon={<CloseOutlined />} danger>
+            Close
+          </Button>
         }
-        extra={<Button onClick={onClose} icon={<CloseOutlined />} danger>Close</Button>}
-
       >
-        <Table
-          columns={columns}
-          dataSource={uniqueEncounters}
-          loading={loading || billingLoading}
-          rowKey="Visit_No"
-          pagination={{ pageSize: 10 }}
-        />
+        <Spin spinning={encountersLoading || billingListLoading}>
+          <Table
+            columns={columns}
+            dataSource={Array.from(enrichedEncounters.values())}
+            rowKey="Visit_No"
+            pagination={{ pageSize: 10 }}
+          />
+        </Spin>
       </Drawer>
 
       <Drawer
@@ -221,32 +251,40 @@ console.log(patientNo);
             Encounter Details - {activeVisitNo}
           </h4>
         }
-                extra={<Button onClick={() => setEncounterDrawerVisible(false)} icon={<CloseOutlined />} danger>Close</Button>}
-
+        extra={
+          <Button
+            onClick={() => setEncounterDrawerVisible(false)}
+            icon={<CloseOutlined />}
+            danger
+          >
+            Close
+          </Button>
+        }
       >
-        <PatientHeader
-            activeVisitNo={activeVisitNo}
-            patientNo={patientNo}
-          />
-          <div className="mt-3">
-<Typography.Title level={5}>List of Receipts</Typography.Title>
-        <Table
-          columns={receiptColumns}
-          dataSource={receiptData}
-          loading={receiptLoading}
-          rowKey="No"
-          pagination={{ pageSize: 12 }}
-        />
-        <Divider />
-        <Typography.Title level={5}>List of Invoices</Typography.Title>
-        <Table
-          columns={invoiceColumns}
-          dataSource={invoiceData}
-          loading={patientInvoicesLoading}
-          rowKey="Invoice_Number"
-          pagination={{ pageSize: 12 }}
-        />
-          </div>
+        <PatientHeader activeVisitNo={activeVisitNo} patientNo={patientNo} />
+        <div className="mt-3">
+          <Typography.Title level={5}>List of Receipts</Typography.Title>
+          <Spin spinning={patientBillingLoading}>
+            <Table
+              columns={receiptColumns}
+              dataSource={normalizedReceipts}
+              rowKey="receiptNo"
+              pagination={{ pageSize: 12 }}
+            />
+          </Spin>
+
+          <Divider />
+
+          <Typography.Title level={5}>List of Invoices</Typography.Title>
+          <Spin spinning={patientBillingLoading}>
+            <Table
+              columns={invoiceColumns}
+              dataSource={normalizedInvoices}
+              rowKey="invoiceNo"
+              pagination={{ pageSize: 12 }}
+            />
+          </Spin>
+        </div>
       </Drawer>
     </>
   );

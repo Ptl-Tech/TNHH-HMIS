@@ -225,7 +225,7 @@ import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgen
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
-import { getBillingListReducer, getPatientBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import { getBillingListReducer, getPastEncounterBillingListReducer, getPatientBillingListReducer } from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
 import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
 import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
@@ -577,6 +577,7 @@ export const rootReducer = combineReducers({
   postDoctorNotes: postDoctorNotesReducer,
   getBillingList: getBillingListReducer,
   getPatientPastEncounterBillingList: getPatientBillingListReducer,
+  getPatientBillingHistory: getPastEncounterBillingListReducer,
   postVisitorList: postVisitorListReducer,
   postPatientHistory: postPatientHistoryNotesReducer,
   getPatientHistoryNotesReducer: getPatientHistoryNotes,

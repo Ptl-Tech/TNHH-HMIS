@@ -7,6 +7,10 @@ import {
   GET_PATIENT_BILLING_LIST_SUCCESS,
   GET_PATIENT_BILLING_LIST_FAIL,
   GET_PATIENT_BILLING_LIST_RESET,
+  GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST,
+  GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS,
+  GET_PAST_ENCOUNTER_BILLING_LIST_FAIL,
+  GET_PAST_ENCOUNTER_BILLING_LIST_RESET,
 } from "../../actions/Charges-Actions/getBillingList";
 
 export const getBillingListReducer = (state = { patients: [] }, action) => {
@@ -39,3 +43,20 @@ export const getPatientBillingListReducer = (state = { data: [] }, action) => {
       return state;
   }
 };
+
+
+export const getPastEncounterBillingListReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case GET_PAST_ENCOUNTER_BILLING_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case GET_PAST_ENCOUNTER_BILLING_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};
+
