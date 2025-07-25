@@ -27,7 +27,8 @@ const NursingNotes = () => {
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
   const userDetails = useAuth();
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
-    useState(false);
+    useState(true);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   const { loadingNurseNotes } = useSelector(
     (state) => state.postNurseAdmissionNotes
@@ -82,7 +83,7 @@ const NursingNotes = () => {
               dispatch(
                 getNurseAdmissionNotesSlice(patientDetails?.Admission_No)
               );
-              setIsNursingNotesFormVisible(false);
+           //   setIsNursingNotesFormVisible(false);
               setEditorState(EditorState.createEmpty());
             } else if (result.type === POST_NURSE_ADMISSION_NOTES_FAILURE) {
               message.error(
@@ -112,7 +113,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-      {!isNursingNotesFormVisible && role === "Nurse" && (
+{role === "Nurse" && (
         <div
           style={{
             display: "flex",
@@ -122,9 +123,19 @@ const NursingNotes = () => {
             marginTop: "20px",
           }}
         >
+        {!isNursingNotesFormVisible && (
           <Button type="primary" onClick={handleNurseNotesButtonVisibility}>
             <PlusOutlined />
             Nursing Notes
+          </Button>
+          )
+            }
+          <Button
+            type="primary"
+            onClick={() => setIsDrawerVisible(true)}
+          >
+            <FileProtectOutlined />
+             Nursing Notes
           </Button>
         </div>
       )}
@@ -140,12 +151,12 @@ const NursingNotes = () => {
         />
       )}
 
-      {!isNursingNotesFormVisible && (
-        <NursingNotesTable
+      <NursingNotesTable
           loadingGetNurseAdmissionNotes={loadingGetNurseAdmissionNotes}
           getNurseNotes={getNurseNotes}
+          open={isDrawerVisible}
+          onClose={() => setIsDrawerVisible(false)}
         />
-      )}
     </div>
   );
 };

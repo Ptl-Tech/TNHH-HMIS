@@ -1,246 +1,186 @@
-import { Button, Modal, Table, Typography } from "antd";
+import {
+  Button,
+  Drawer,
+  Skeleton,
+  Table,
+  Typography,
+} from "antd";
 import PropTypes from "prop-types";
-import Loading from "../../../../partials/nurse-partials/Loading";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
-import { FolderViewOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { CloseOutlined } from "@ant-design/icons";
+
+const PAGE_SIZE = 5;
 
 const NursingNotesTable = ({
   loadingGetNurseAdmissionNotes,
   getNurseNotes,
+  open,
+  onClose,
 }) => {
-  const [selectedRecord, setSelectedRecord] = useState([]);const renderNotes = (notes) => {
-  if (!notes) return null;
+  const [initLoading, setInitLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState([]);
+  const [list, setList] = useState([]);
+  const [sortedNotes, setSortedNotes] = useState([]);
 
-  // Clean HTML
-  const plainText = DOMPurify.sanitize(notes).replace(/<\/?[^>]+(>|$)/g, "");
-
-  // Split into clean paragraphs
-  const paragraphText = plainText
-    .split(/[\r\n]+|(?<=\.)\s+/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((line) => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase())
-    .join(" "); // Optional: make it a block paragraph instead of separate lines
-
- return plainText
-  .split(/[\r\n]+|(?<=\.)\s+/)
-  .map((line) => line.trim())
-  .filter((line) => line.length > 0)
-  .map((line, index) => (
-    <Typography.Paragraph
-      key={index}
-      style={{
-        fontSize: "14px",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        color: "#333",
-        lineHeight: "1.6",
-        marginBottom: "10px",
-      }}
-    >
-      {line.charAt(0).toUpperCase() + line.slice(1).toLowerCase()}
-    </Typography.Paragraph>
-  ));
-
-};
-
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = (record) => {
-    setIsModalOpen(true);
-    setSelectedRecord(record);
+  const renderNotes = (notes) => {
+    if (!notes) return null;
+    const plainText = DOMPurify.sanitize(notes).replace(/<\/?[^>]+(>|$)/g, "");
+    return plainText
+      .split(/[\r\n]+|(?<=\.)\s+/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map((line, idx) => (
+        <div key={idx}>
+          {line.charAt(0).toUpperCase() + line.slice(1).toLowerCase()}
+        </div>
+      ));
   };
-  const handleOk = () => {
-    setIsModalOpen(false);
+
+  const fetchData = (currentPage, source = sortedNotes) => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const sliced = source.slice(start, end);
+    return new Promise((resolve) =>
+      setTimeout(() => resolve(sliced), 500)
+    );
   };
-  const handleCancel = () => {
-    setIsModalOpen(false);
+
+  useEffect(() => {
+    if (!getNurseNotes?.length) return;
+
+    const sorted = [...getNurseNotes].sort((a, b) => {
+      const dateA = moment(`${a.NotesDate} ${a.NotesTime || "00:00"}`, "YYYY-MM-DD HH:mm");
+      const dateB = moment(`${b.NotesDate} ${b.NotesTime || "00:00"}`, "YYYY-MM-DD HH:mm");
+      return dateA - dateB;
+    });
+
+    setSortedNotes(sorted);
+    fetchData(1, sorted).then((res) => {
+      setInitLoading(false);
+      setData(res);
+      setList(res);
+    });
+  }, [getNurseNotes]);
+
+  const onLoadMore = () => {
+    setLoading(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+
+    setList(data.concat(Array.from({ length: PAGE_SIZE }).map(() => ({ loading: true }))));
+
+    fetchData(nextPage).then((res) => {
+      const newData = data.concat(res);
+      setData(newData);
+      setList(newData);
+      setLoading(false);
+      window.dispatchEvent(new Event("resize"));
+    });
   };
 
   const columns = [
-{
-  title: "Notes Date",
-  dataIndex: "NotesDate",
-  key: "NotesDate",
-  render: (date, record) => (
-    <span
-      style={{ color: "#0f5689", cursor: "pointer" }}
-      onClick={() => showModal(record)}
-    >
-      {date ? moment(date).format("DD/MM/YYYY") : "-"}
-    </span>
-  ),
-  sorter: (a, b) => {
-    const dateA = new Date(a.NotesDate);
-    const dateB = new Date(b.NotesDate);
-    return dateB - dateA; // Descending
-  },
-},
-
     {
-      title: "Notes Time",
-      dataIndex: "NotesTime",
-      key: "NotesTime",
-      render: (time) => {
-        if (!time) return "-";
-
-        const today = new Date();
-        const dateString = `${today.toISOString().split("T")[0]}T${time}`;
-        const date = new Date(dateString);
-
-        if (isNaN(date.getTime())) return "Invalid Time";
-
-        return date.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-      },
-      sorter: (a, b) => {
-        const today = new Date();
-
-        const getTimeValue = (time) => {
-          if (!time) return 0;
-          const dateString = `${today.toISOString().split("T")[0]}T${time}`;
-          return new Date(dateString).getTime();
-        };
-
-        return getTimeValue(b.NotesTime) - getTimeValue(a.NotesTime); // Newest first
-      },
+      title: "Date",
+      dataIndex: "NotesDate",
+      key: "date",
+      render: (text, record) =>
+        record.loading ? (
+          <Skeleton.Input active size="small" style={{ width: 100 }} />
+        ) : (
+          moment(record.NotesDate).format("DD/MM/YYYY")
+        ),
     },
-
-{
-  title: "Notes",
-  dataIndex: "Notes",
-  key: "Notes",
-  render: (text) => {
-    if (!text) return "-";
-
-    const plainText = text.replace(/<\/?[^>]+(>|$)/g, ""); // remove HTML tags
-
-    // Create a paragraph-friendly version
-    const cleanedText = plainText
-      .split(/[\r\n]+|(?<=\.)\s+/)
-      .map(item => item.trim())
-      .filter(item => item.length > 0)
-      .map(item => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase())
-      .join(" "); // Combine back into one clean paragraph
-
-    return (
-      <Typography.Paragraph
-        ellipsis={{
-          rows: 2,
-          expandable: true,
-          symbol: "Read more",
-        }}
-        style={{
-          fontSize: "14px",
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          color: "#333",
-          marginBottom: "0px",
-        }}
-      >
-        {cleanedText}
-      </Typography.Paragraph>
-    );
-  },
-},
-
-
+    {
+      title: "Time",
+      dataIndex: "NotesTime",
+      key: "time",
+      render: (text, record) =>
+        record.loading ? (
+          <Skeleton.Input active size="small" style={{ width: 80 }} />
+        ) : record.NotesTime ? (
+          moment(`2023-01-01T${record.NotesTime}`).format("hh:mm:ss A")
+        ) : (
+          "--:--"
+        ),
+      width: 120,
+    },
+    {
+      title: "Notes",
+      dataIndex: "Notes",
+      key: "notes",
+      render: (text, record) =>
+        record.loading ? (
+          <Skeleton active paragraph={{ rows: 3 }} />
+        ) : (
+          renderNotes(record.Notes)
+        ),
+    },
     {
       title: "Added By",
       dataIndex: "NurseID",
-      key: "NurseID",
-    },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      fixed: "right",
-      width: 100,
-      render: (_, record) => (
-        <Button style={{ color: "#0f5689" }} onClick={() => showModal(record)}>
-          <FolderViewOutlined /> View
-        </Button>
-      ),
+      key: "nurse",
+      render: (text, record) =>
+        record.loading ? (
+          <Skeleton.Input active size="small" style={{ width: 100 }} />
+        ) : (
+          <Typography.Text italic style={{ color: "#666" }}>
+            {record.NurseID}
+          </Typography.Text>
+        ),
+      width: 150,
     },
   ];
 
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: getNurseNotes?.length,
-  });
-
-  const handleTableChange = (newPagination) => {
-    setPagination(newPagination); // Update pagination settings
-  };
+  const loadMore =
+    !initLoading && !loading && data.length < sortedNotes.length ? (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: 16,
+          height: 32,
+          lineHeight: "32px",
+        }}
+      >
+        <Button onClick={onLoadMore}>Load More</Button>
+      </div>
+    ) : null;
 
   return (
     <div style={{ paddingTop: "30px" }}>
-      {loadingGetNurseAdmissionNotes ? (
-        <Loading />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={[...getNurseNotes].sort((a, b) => b.LineNo - a.LineNo)}
-          rowKey="SystemId"
-          scroll={{ x: "max-content" }}
-          bordered
-          size="middle"
-          pagination={{
-            ...pagination,
-            total: getNurseNotes?.length,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            position: ["bottom", "right"],
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-            onChange: (page, pageSize) =>
-              handleTableChange({
-                current: page,
-                pageSize,
-                total: pagination.total,
-              }),
-            onShowSizeChange: (current, size) =>
-              handleTableChange({
-                current,
-                pageSize: size,
-                total: pagination.total,
-              }),
-            style: {
-              marginTop: "30px",
-            },
-          }}
-        />
-      )}
-
-      <Modal
-        title="Read Notes"
-        open={isModalOpen}
-        onCancel={handleCancel}
-        footer={<Button onClick={handleCancel}>Cancel</Button>}
+      <Drawer
+        title="Nursing Notes"
+        placement="right"
+        onClose={onClose}
+        open={open}
+        width={1400}
+        extra={
+          <Button onClick={onClose} icon={<CloseOutlined />} danger>
+            Close
+          </Button>
+        }
       >
-        <div
-          style={{
-            border: "1px solid gray",
-            padding: "10px",
-            borderRadius: "5px",
-          }}
-        >
-          {renderNotes(selectedRecord?.Notes)}
-        </div>
-      </Modal>
+        <Table
+          dataSource={list}
+          columns={columns}
+          rowKey={(record, idx) => record.SystemId || idx}
+          pagination={false}
+          loading={loadingGetNurseAdmissionNotes}
+        />
+        {loadMore}
+      </Drawer>
     </div>
   );
 };
 
 export default NursingNotesTable;
 
-//Prop validations
-
 NursingNotesTable.propTypes = {
   loadingGetNurseAdmissionNotes: PropTypes.bool.isRequired,
   getNurseNotes: PropTypes.array.isRequired,
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

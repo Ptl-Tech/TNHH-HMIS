@@ -111,7 +111,7 @@ const InpatientCardInfo = ({ patientDetail }) => {
             </Typography.Text>
           </div>
 
-          <div>
+          {/* <div>
             <Typography.Text strong>Expected Discharge:</Typography.Text>
             <br />
             <Typography.Text>
@@ -122,7 +122,7 @@ const InpatientCardInfo = ({ patientDetail }) => {
                   )
                 : "N/A"}
             </Typography.Text>
-          </div>
+          </div> */}
           <div>
             <Typography.Text strong>Payment Mode:</Typography.Text>
             <br />

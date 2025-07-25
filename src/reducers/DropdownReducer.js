@@ -1,4 +1,10 @@
 import {
+  GET_BRANCHES_LIST_REQUEST,
+  GET_BRANCHES_LIST_SUCCESS,
+  GET_BRANCHES_LIST_FAIL,
+  GET_BRANCHES_LIST_RESET,
+} from "../actions/Common-Actions/getBranchesListAction";
+import {
   QY_SYMPTOMS_LIST_REQUEST,
   QY_SYMPTOMS_LIST_SUCCESS,
   QY_SYMPTOMS_LIST_FAIL,
@@ -142,7 +148,7 @@ const initialInsuranceState = {
   data: [],
   loading: false,
   error: null,
-}
+};
 
 export const getInsuranceReducer = (state = initialInsuranceState, action) => {
   switch (action.type) {
@@ -233,7 +239,10 @@ export const subCountiesListReducer = (state = { subCounties: [] }, action) => {
   }
 };
 
-export const subCountWardsListReducer = (state = { subCounties: [] }, action) => {
+export const subCountWardsListReducer = (
+  state = { subCounties: [] },
+  action
+) => {
   switch (action.type) {
     case SUB_COUNTY_WARDS_LIST_REQUEST:
       return { loading: true, subCountyWards: [] };
@@ -253,7 +262,7 @@ export const QyLocationsListReducer = (state = { locations: [] }, action) => {
     case LOCATION_LIST_REQUEST:
       return { loading: true, locations: [] };
     case LOCATION_LIST_SUCCESS:
-      return { loading: false, locations:action.payload };
+      return { loading: false, locations: action.payload };
     case LOCATION_LIST_FAIL:
       return { loading: false, error: action.payload };
     case LOCATION_LIST_RESET:
@@ -308,7 +317,6 @@ export const QYHMSReducer = (state = { data: [] }, action) => {
   }
 };
 
-
 export const QyLabTestsSetupReducer = (state = { data: [] }, action) => {
   switch (action.type) {
     case QY_LAB_TEST_LIST_REQUEST:
@@ -322,8 +330,7 @@ export const QyLabTestsSetupReducer = (state = { data: [] }, action) => {
     default:
       return state;
   }
-}
-
+};
 
 export const QyRadiologyTestsSetupReducer = (state = { data: [] }, action) => {
   switch (action.type) {
@@ -338,8 +345,7 @@ export const QyRadiologyTestsSetupReducer = (state = { data: [] }, action) => {
     default:
       return state;
   }
-}
-
+};
 
 export const QyDiagnosisTestsSetupReducer = (state = { data: [] }, action) => {
   switch (action.type) {
@@ -354,5 +360,19 @@ export const QyDiagnosisTestsSetupReducer = (state = { data: [] }, action) => {
     default:
       return state;
   }
-}
+};
 
+export const QyBranchesListReducer = (state = { data: [] }, action) => {
+  switch (action.type) {
+    case GET_BRANCHES_LIST_REQUEST:
+      return { loading: true, data: [] };
+    case GET_BRANCHES_LIST_SUCCESS:
+      return { loading: false, data: action.payload };
+    case GET_BRANCHES_LIST_FAIL:
+      return { loading: false, error: action.payload };
+    case GET_BRANCHES_LIST_RESET:
+      return { data: [] };
+    default:
+      return state;
+  }
+};

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
@@ -13,12 +13,14 @@ import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 
-const Impatient = () => {
+const Impatient = ({filterParam}) => {
   const userDetails = useAuth(); // Use the custom hook to get user info
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const doctorId = useAuth().userData.doctorID;
   const role = useAuth().userData.departmentName;
+const location = useLocation();
+const paramFromRoute = location.state?.filterParam || filterParam;
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
@@ -97,10 +99,18 @@ const Impatient = () => {
   }, [combinedPatients, doctorId, role]);
 
   const filteredByStatus = useMemo(() => {
-    return filterPatientBasedWithDoctor?.filter(
+    const filteredByStatus = filterPatientBasedWithDoctor?.filter(
       ({ Status }) => Status === "Admitted" || Status === "Discharge Pending"
     );
-  });
+    //filter by bracnh from the route parameter
+    if(paramFromRoute) {
+      return filteredByStatus?.filter(
+        ({ Branch }) => Branch === paramFromRoute
+      );
+    }
+    return filteredByStatus;
+  }, [filterPatientBasedWithDoctor, paramFromRoute, filterParam]); // Use paramFromRoute if available, otherwise use filterParam
+
 
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());

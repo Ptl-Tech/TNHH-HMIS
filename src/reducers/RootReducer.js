@@ -41,6 +41,7 @@ import {
   QyDiagnosisTestsSetupReducer,
   getemployeeDetailsReducer,
   QyLocationsListReducer,
+  QyBranchesListReducer,
 } from "./DropdownReducer";
 import { triageWaitingListReducer } from "./TriageReducers";
 import {
@@ -339,6 +340,7 @@ import { postLabAppointmentReducer } from "./reception-reducers/postLabAppointme
 import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPatientNoReducer";
 import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
 import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
+import { getAdmissionsReducer } from "./nurse-reducers/getPgAdmissionsReducer";
 
 export const rootReducer = combineReducers({
   userLogin: userLoginReducer,
@@ -491,6 +493,8 @@ export const rootReducer = combineReducers({
   getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
   // ************************************* /
 
+  // nurse
+  getBranchesList:QyBranchesListReducer,
   getSinglePatient: getSinglePatientReducer,
   getIPVisitors: getVisitorsListReducer,
   postSuicidalForm: postSuicidalFormReducer,
@@ -584,6 +588,7 @@ export const rootReducer = combineReducers({
   postMSEForm: postMSENotesReducer,
   getPatientMSE: getPatientMSENotesReducer,
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
+  getAdmissionList:getAdmissionsReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
   getSingleAdmitted: getSingleAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,

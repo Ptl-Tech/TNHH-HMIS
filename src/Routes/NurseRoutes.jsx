@@ -42,6 +42,8 @@ import {
   RadiusUprightOutlined,
 } from "@ant-design/icons";
 import Consumables from "../pages/nurse-view/nurse-patient-file/Consumables";
+import InpatientBranchFilters from "../pages/nurse-view/InpatientBranchFilters";
+import Impatient from "../pages/nurse-view/Inpatient";
 
 export const nurseRoutes = [
   {
@@ -149,7 +151,8 @@ export default function NurseRoutes() {
         {/* <Route path="Patient-list" element={<Patientlist />} /> */}
         {/* <Route path="New-Patients" element={<NewPatients />} /> */}
 
-        <Route path="Inpatient" element={<Inpatient />} />
+        <Route path="Inpatient" element={<InpatientBranchFilters />} />
+            <Route path="Inpatient/Inpatient-List/:branch" element={<Impatient />} />
         <Route path="Consultation-List" element={<DoctorVisits />} />
         <Route path="Admit-patient" element={<AdmitPatients />} />
         <Route path="Admit-patient/Patient" element={<AdmitPatient />} />
