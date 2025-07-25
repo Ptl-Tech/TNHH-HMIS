@@ -33,6 +33,7 @@ const CarePlanFormData = ({
         patientNo: patientDetails?.Patient_No,
         pysicalAssessment: values.Physical_Assessmet_MSA,
         nursingDiagnosis: values.Nursing_Diagnosis,
+        plan: values.Plan,
         implementation: values.Implementation,
         rationale: values.Rationale,
         evaluation: values.Evaluation,
@@ -79,6 +80,7 @@ const CarePlanFormData = ({
       initialValues={{
         Physical_Assessmet_MSA: "",
         Nursing_Diagnosis: "",
+        Plan: "",
         Rationale: "",
         Evaluation: "",
         Implementation: "",
@@ -123,7 +125,21 @@ const CarePlanFormData = ({
         </Col>
       </Row>
       <Row gutter={[16, 16]}>
-        <Col span={24}>
+        
+        <Col span={12}>
+          <Form.Item
+            label="Plan"
+            name="Plan"
+            style={{ width: "100%" }}
+          >
+            <TextArea
+              placeholder="Nursing Plan"
+              autoSize={{ minRows: 2, maxRows: 6 }}
+            />
+          </Form.Item>
+        </Col>
+
+        <Col span={12}>
           <Form.Item
             label="Implementation"
             name="Implementation"
@@ -135,6 +151,8 @@ const CarePlanFormData = ({
             />
           </Form.Item>
         </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
         <Col span={24}>
           <Form.Item
             label="Rationale"
