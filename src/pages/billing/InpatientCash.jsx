@@ -1,8 +1,11 @@
-import { Table, Typography, Spin, Input, Button } from "antd";
-import React, { useEffect, useState } from "react";
+import { Table, Typography, Spin, Input, Button, Tooltip } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
+import { getPgAdmissions } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import moment from "moment";
+import { CgEyeAlt } from "react-icons/cg";
 
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
@@ -16,15 +19,19 @@ const formatKES = (amount) => {
 const InpatientCash = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // React Router navigation
-  const { loading, patients } = useSelector((state) => state.getBillingList);
   const branchCode = localStorage.getItem("branchCode");
 
+  const { loading, patients } = useSelector((state) => state.getBillingList);
+  const { loading: loadingAdmittedPatients, admittedPatients } = useSelector(
+    (state) => state.getAdmissionList
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const pageSize = 25; // Number of patients per page
 
   useEffect(() => {
     dispatch(getBillingList()); // Fetch data only once
+    dispatch(getPgAdmissions()); // Fetch admitted patients
   }, [dispatch]);
 
   // Process patient list: filter inactive patients
@@ -47,6 +54,23 @@ const InpatientCash = () => {
         patient.PatientNo.toLowerCase().includes(searchText.toLowerCase())
     );
 
+  //formatted list joining details from admittedPatients using usememo
+  const formattedPatients = useMemo(() => {
+    return filteredPatients.map((patient) => {
+      const admittedPatient = admittedPatients.find(
+        (admitted) => admitted.Patient_No === patient.PatientNo
+      );
+      return {
+        ...patient,
+        AdmissionDate: admittedPatient?.Admission_Date,
+        DoctorsName: admittedPatient?.Doctors_Name,
+        RoomNo: admittedPatient?.WardRoom,
+        WardNo: admittedPatient?.Ward,
+      };
+    });
+  }, [filteredPatients, admittedPatients]);
+  console.log("Formatted Patients:", formattedPatients);
+  console.log("Admitted Patients:", admittedPatients);
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
     navigate(`/Reception/InPatient-Charges?PatientNo=${patientId}`);
@@ -54,9 +78,27 @@ const InpatientCash = () => {
 
   const columns = [
     {
-      title: "Patient No",
-      dataIndex: "PatientNo",
-      key: "PatientNo",
+      title: "Admission No  ",
+      dataIndex: "ActiveVisitNo",
+      key: "ActiveVisitNo",
+      render: (text) => (
+        <span
+          style={{
+            textTransform: "capitalize",
+            fontWeight: "bold",
+            color: "#0f5689",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
+    },
+
+    {
+      title: "Gender",
+      dataIndex: "Gender",
+      key: "Gender",
+      render: (text) => <span>{text || "-"}</span>,
     },
     {
       title: "Patient Name",
@@ -64,28 +106,50 @@ const InpatientCash = () => {
       key: "Names",
       render: (text, record) => (
         <Typography.Text
-          style={{ cursor: "pointer", color: "#0f5689" }}
+          style={{ cursor: "pointer", color: "#0f5689", fontWeight: "bold" }}
           onClick={() => handleViewCharges(record.ActiveVisitNo)}
         >
           {text.toUpperCase()}
         </Typography.Text>
       ),
     },
+
     {
-      title: "Active Visit No",
-      dataIndex: "ActiveVisitNo",
-      key: "ActiveVisitNo",
-    },
-    {
-      title: "Payment Type",
+      title: "Billing Type",
       dataIndex: "PatientType",
       key: "PatientType",
     },
+
     {
       title: "Branch Code",
       dataIndex: "Global_Dimension_1_Code",
       key: "Global_Dimension_1_Code",
     },
+    {
+      title: "Admission Date",
+      dataIndex: "AdmissionDate",
+      key: "AdmissionDate",
+      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "-"),
+    },
+    {
+      title: "Consulting Doctor",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text) => <span>{text || "-"}</span>,
+    },
+    {
+      title: "Room No",
+      dataIndex: "RoomNo",
+      key: "RoomNo",
+      render: (text) => <span>{text || "-"}</span>,
+    },
+    {
+      title: "Ward No",
+      dataIndex: "WardNo",
+      key: "WardNo",
+      render: (text) => <span>{text || "-"}</span>,
+    },
+   
     {
       title: "Balance",
       dataIndex: "Balance",
@@ -96,7 +160,9 @@ const InpatientCash = () => {
         const isZero = numericBalance === 0;
 
         return (
-          <span style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}>
+          <span
+            style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}
+          >
             {formatKES(numericBalance)}
           </span>
         );
@@ -106,12 +172,14 @@ const InpatientCash = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button
-          type="primary"
-          onClick={() => handleViewCharges(record.ActiveVisitNo)}
-        >
-          View Charges
-        </Button>
+        <Tooltip title="View Patient Details">
+          <Button
+            type="primary"
+            onClick={() => handleViewCharges(record.ActiveVisitNo)}
+          >
+            <CgEyeAlt />
+          </Button>
+        </Tooltip>
       ),
     },
   ];
@@ -135,13 +203,13 @@ const InpatientCash = () => {
       ) : (
         <Table
           columns={columns}
-          dataSource={filteredPatients}
+          dataSource={formattedPatients}
           size="small"
           bordered
           pagination={{
             current: currentPage,
             pageSize: pageSize,
-            total: filteredPatients?.length || 0,
+            total: formattedPatients?.length || 0,
             onChange: (page) => setCurrentPage(page),
             showSizeChanger: false,
           }}

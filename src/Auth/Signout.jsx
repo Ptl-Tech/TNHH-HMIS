@@ -19,17 +19,12 @@ const Signout = () => {
     if (e.key === 'signout' ) {
       dispatch(logout()); // Dispatch logout action
       navigate('/login'); // Navigate to login page
-    } else if (e.key === 'view-profile' && userDetails) {
-     
-      navigate('/Reception/view-profile');
-    }
+    };
   };
 
   const menu = (
     <Menu onClick={handleMenuClick} >
-      <Menu.Item key="view-profile" icon={<GiRamProfile />}>
-        View Profile
-      </Menu.Item>
+      
       <Menu.Item key="signout" icon={<MdLogout />} danger>
         Sign Out
       </Menu.Item>

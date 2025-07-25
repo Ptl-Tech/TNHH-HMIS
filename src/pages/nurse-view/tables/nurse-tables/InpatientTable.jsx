@@ -106,8 +106,8 @@ const InpatientTable = ({
     },
     {
       title: "Room",
-      dataIndex: "Ward_Room",
-      key: "Ward_Room",
+      dataIndex: "WardRoom",
+      key: "WardRoom",
     },
     {
       title: "Bed",

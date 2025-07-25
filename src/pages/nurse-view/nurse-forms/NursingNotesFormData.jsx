@@ -91,7 +91,7 @@ const NursingNotesFormData = ({
           >
             Save Nursing Notes
           </Button>
-
+{/* 
           <Button
             color="danger"
             variant="outlined"
@@ -99,7 +99,7 @@ const NursingNotesFormData = ({
             onClick={() => setIsNursingNotesFormVisible(false)}
           >
             Cancel
-          </Button>
+          </Button> */}
         </Space>
       </Form.Item>
     </Form>

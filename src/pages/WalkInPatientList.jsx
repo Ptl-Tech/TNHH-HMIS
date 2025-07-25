@@ -15,7 +15,7 @@ const WalkInPatientList = () => {
     (state) => state.patientList,
   );
   const [searchParams, setSearchParams] = useState('');
-  const [filteredPatients, setFilteredPatients] = useState([...patients]);
+  const [filteredPatients, setFilteredPatients] = useState([patients]);
 
   useEffect(() => {
     patients.length
