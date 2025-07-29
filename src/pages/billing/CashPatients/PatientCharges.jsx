@@ -5,6 +5,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 
 import AddChargesDrawer from "./AddChargesDrawer";
@@ -216,6 +217,7 @@ const PatientCharges = ({ activeVisitNo }) => {
           onClick={handleAddChargeView}
           disabled={!activeVisitNo}
         >
+          <PlusOutlined />
           Add Charge
         </Button>
       </div>

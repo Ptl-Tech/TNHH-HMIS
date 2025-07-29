@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col, DatePicker} from "antd";
+import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col, DatePicker, message} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../../actions/Charges-Actions/ChargesSetup";
@@ -155,7 +155,6 @@ useEffect(() => {
         doctorId: calculateDoctorFee ? selectedDoctor : "",
       };
       
-  console.log("Payload for charges:", payload); // Debugging line
       await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
       dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
       dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
@@ -163,7 +162,7 @@ useEffect(() => {
       onClose();
       form.resetFields();
     } catch (error) {
-      message.error("Failed to save charges. Please try again.", error);
+      console.error("Error saving charges:", error);
     }
   };
   

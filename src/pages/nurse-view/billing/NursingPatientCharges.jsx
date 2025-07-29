@@ -19,7 +19,9 @@ const { TabPane } = Tabs;
 
 const NursingPatientCharges = () => {
   const dispatch = useDispatch();
-    const activeVisitNo = new URLSearchParams(location.search).get("AdmNo");
+   const params = new URLSearchParams(location.search);
+const activeVisitNo = params.get("AdmNo") ?? params.get("TreatmentNo");
+
 console.log("Active Visit No:", activeVisitNo);
   const { loading, error, data } = useSelector(
     (state) => state.getPatientCharges
