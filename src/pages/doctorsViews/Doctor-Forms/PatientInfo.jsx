@@ -31,6 +31,7 @@ import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
 import PatientCharges from "../../billing/CashPatients/PatientCharges";
+import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const dispatch = useDispatch();
@@ -47,7 +48,9 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted
   );
+const {loadingPatientDetails, patientDetails: patientdeets}=useFetchPatientDetailsHook(patientNo)
 
+console.log("patient details", patientdeets);
   const handleMarkAsCompleted = () => {
     dispatch(postMarkasCompleted(treatmentNo))
       .then((data) => {
@@ -82,7 +85,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
         open={moreDetailsOpen}
         setOpen={setMoreDetailOpen}
         values={fullPatientInfo(patient)}
-        treatmentNo={treatmentNo}
+        activeVisitNo={patientdeets.ActiveVisitNo}
       />
       <Card
         size="small"
@@ -282,7 +285,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   );
 };
 
-const MoreDeailsDrawer = ({ open, setOpen, values , treatmentNo}) => {
+const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
   return (
     <Drawer
       closable
@@ -308,7 +311,7 @@ const MoreDeailsDrawer = ({ open, setOpen, values , treatmentNo}) => {
   ))}
 </div>
 
-<PatientCharges activeVisitNo={treatmentNo} />
+<PatientCharges activeVisitNo={activeVisitNo} />
 
       </>
     </Drawer>
