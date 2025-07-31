@@ -18,17 +18,23 @@ import PropTypes from "prop-types";
 import NursingNotesFormData from "../nurse-forms/NursingNotesFormData";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
+import { is } from "immutable";
 
 const NursingNotes = () => {
   const role = useAuth().userData.departmentName; // Get user role from useAuth hook
+  const isDoctor = role.toLowerCase() === "doctor";
+
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
   const userDetails = useAuth();
-  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
-    useState(true);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] = useState(
+    isDoctor ? false : true
+  );
+  const [isDrawerVisible, setIsDrawerVisible] = useState(
+    isDoctor ? true : false
+  );
 
   const { loadingNurseNotes } = useSelector(
     (state) => state.postNurseAdmissionNotes
@@ -83,7 +89,7 @@ const NursingNotes = () => {
               dispatch(
                 getNurseAdmissionNotesSlice(patientDetails?.Admission_No)
               );
-           //   setIsNursingNotesFormVisible(false);
+              //   setIsNursingNotesFormVisible(false);
               setEditorState(EditorState.createEmpty());
             } else if (result.type === POST_NURSE_ADMISSION_NOTES_FAILURE) {
               message.error(
@@ -113,8 +119,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-{role === "Nurse" && (
-        <div
+     <div
           style={{
             display: "flex",
             alignItems: "center",
@@ -123,23 +128,17 @@ const NursingNotes = () => {
             marginTop: "20px",
           }}
         >
-        {!isNursingNotesFormVisible && (
-          <Button type="primary" onClick={handleNurseNotesButtonVisibility}>
-            <PlusOutlined />
-            Nursing Notes
-          </Button>
-          )
-            }
-          <Button
-            type="primary"
-            onClick={() => setIsDrawerVisible(true)}
-          >
+          {!isNursingNotesFormVisible && !isDoctor && (
+            <Button type="primary" onClick={handleNurseNotesButtonVisibility}>
+              <PlusOutlined />
+              Nursing Notes
+            </Button>
+          )}
+          <Button type="primary" onClick={() => setIsDrawerVisible(true)}>
             <FileProtectOutlined />
-             Nursing Notes
+           View Nursing Notes
           </Button>
         </div>
-      )}
-
       {isNursingNotesFormVisible && (
         <NursingNotesFormData
           form={form}
@@ -150,13 +149,13 @@ const NursingNotes = () => {
           setIsNursingNotesFormVisible={setIsNursingNotesFormVisible}
         />
       )}
-
+      {/* if role is doctore the table shld be visible by default */}
       <NursingNotesTable
-          loadingGetNurseAdmissionNotes={loadingGetNurseAdmissionNotes}
-          getNurseNotes={getNurseNotes}
-          open={isDrawerVisible}
-          onClose={() => setIsDrawerVisible(false)}
-        />
+        loadingGetNurseAdmissionNotes={loadingGetNurseAdmissionNotes}
+        getNurseNotes={getNurseNotes}
+        open={isDrawerVisible}
+        onClose={() => setIsDrawerVisible(false)}
+      />
     </div>
   );
 };

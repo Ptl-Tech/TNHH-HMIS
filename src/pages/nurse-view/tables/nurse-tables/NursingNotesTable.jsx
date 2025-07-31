@@ -156,7 +156,7 @@ const NursingNotesTable = ({
         placement="right"
         onClose={onClose}
         open={open}
-        width={1400}
+        width={1000}
         extra={
           <Button onClick={onClose} icon={<CloseOutlined />} danger>
             Close
