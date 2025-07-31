@@ -2,7 +2,7 @@ import axios from "axios";
 import configHelper from "../../actions/configHelpers";
 import { BRIEF_MSE_FORM_ID } from "../Doc-actions/saveDoctorNotes";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const GET_BRIEF_MSE_DATA_FAIL = "GET_BRIEF_MSE_DATA_FAIL";
 export const GET_BRIEF_MSE_DATA_RESET = "GET_BRIEF_MSE_DATA_RESET";

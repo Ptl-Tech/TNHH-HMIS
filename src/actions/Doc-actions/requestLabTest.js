@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8091/';
 
 export const REQUEST_LAB_TEST = 'REQUEST_LAB_TEST';
 export const REQUEST_LAB_TEST_SUCCESS = 'REQUEST_LAB_TEST_SUCCESS';

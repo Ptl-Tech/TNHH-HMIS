@@ -5,7 +5,7 @@ export const GET_INPATIENT_INJECTION_REQUEST = 'GET_INPATIENT_INJECTION_REQUEST'
 export const GET_INPATIENT_INJECTION_SUCCESS = 'GET_INPATIENT_INJECTION_SUCCESS';
 export const GET_INPATIENT_INJECTION_FAILURE = 'GET_INPATIENT_INJECTION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const getInpatientInjectionSlice = (endpoint = '/data/odatafilter?webservice=QyInpatientInjections&isList=true') => 
   async (dispatch, getState) => {

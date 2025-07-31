@@ -11,6 +11,7 @@ import { OTPModal } from "./OtpCard";
 
 import { login } from "../actions/auth-actions/login";
 import { AUTH_RESET_MESSAGES } from "../reducers/auth/auth-reducer";
+import { getUserDetails } from "../actions/getUserDetails";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,8 @@ const Login = () => {
         const role = userDetails?.role.toLowerCase();
         if (role) navigate(`/${role.charAt(0).toUpperCase() + role.slice(1)}`);
       }
+      // Fetch me
+      dispatch(getUserDetails());
     }
 
     if (loginError || loginSuccess) dispatch({ type: AUTH_RESET_MESSAGES });

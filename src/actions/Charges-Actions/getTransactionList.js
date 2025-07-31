@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const GET_TRANSACTION_LIST_REQUEST = "GET_TRANSACTION_LIST_REQUEST";
 export const GET_TRANSACTION_LIST_SUCCESS = "GET_TRANSACTION_LIST_SUCCESS";

@@ -15,7 +15,7 @@ export const GET_CONSULTATION_SUCCESS = 'GET_CONSULTATION_SUCCESS';
 export const GET_CONSULTATION_FAILURE = 'GET_CONSULTATION_FAILURE';
 
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const getConsultationRoomListSlice = (endpoint = '/data/odatafilter?webservice=QyTreatmentHeaders&isList=true') => 
   async (dispatch, getState) => {

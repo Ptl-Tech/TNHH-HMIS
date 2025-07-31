@@ -5,7 +5,7 @@ export const POST_VERIFY_ADMISSION_REQUEST = 'POST_VERIFY_ADMISSION_REQUEST';
 export const POST_VERIFY_ADMISSION_SUCCESS = 'POST_VERIFY_ADMISSION_SUCCESS';
 export const POST_VERIFY_ADMISSION_FAILURE = 'POST_VERIFY_ADMISSION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const postVerifyAdmissionSlice = (admissionData) => 
   async (dispatch, getState) => {

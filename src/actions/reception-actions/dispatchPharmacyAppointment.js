@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8091/';
 
 export const POST_PHARMACY_APPOINTMENT_REQUEST =
   'POST_PHARMACY_APPOINTMENT_REQUEST';

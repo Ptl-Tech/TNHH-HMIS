@@ -12,10 +12,17 @@ export const login =
     try {
       dispatch({ type: USER_LOGIN_REQUEST });
 
-      const response = await axios.post(`${API}/api/Auth/Login`, {
-        staffNo,
-        password,
-      });
+      const response = await axios.post(
+        `${API}/api/Auth/Login`,
+        {
+          staffNo,
+          password,
+        },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       dispatch({
         type: USER_LOGIN_SUCCESS,

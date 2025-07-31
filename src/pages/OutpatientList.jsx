@@ -165,7 +165,7 @@ const OutpatientList = () => {
                 <div
                   onClick={() =>
                     navigate(
-                      `/Reception/Patient-Registration/Patient?PatientNo=${record.PatientNo}`,
+                      `/Dashboard/Patient-Registration/Patient?PatientNo=${record.PatientNo}`,
                       { state: { patientDet: record } }
                     )
                   }
@@ -237,7 +237,7 @@ const OutpatientList = () => {
           type="primary"
           onClick={() => {
             if (role === "Reception") {
-              navigate("/Reception/Patient-Registration");
+              navigate("/Dashboard/Patient-Registration");
             } else if (role === "Nurse") {
               navigate("/Nurse/Patient-Registration");
             }

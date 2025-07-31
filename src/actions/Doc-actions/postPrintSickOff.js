@@ -1,7 +1,7 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const POST_PRINT_SICK_OFF_REQUEST = "POST_PRINT_SICK_OFF_REQUEST";
 export const POST_PRINT_SICK_OFF_FAIL = "POST_PRINT_SICK_OFF_FAIL";

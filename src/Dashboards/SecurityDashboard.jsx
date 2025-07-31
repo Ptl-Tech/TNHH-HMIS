@@ -38,7 +38,7 @@ const SecurityDashBoard = () => {
 
   // Navigate to the visitor list page
   const handleCardClick = () => {
-    navigate('/Reception/visitors-list'); // Use navigate to go to the visitor list
+    navigate('/Dashboard/visitors-list'); // Use navigate to go to the visitor list
   };
 
   return (

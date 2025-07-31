@@ -37,194 +37,180 @@ import InvoicePatient from "../pages/billing/InsurancePatients/InvoicePatient";
 import ReceiptInpatient from "../pages/billing/CashPatients/ReceiptInpatient";
 import InvoiceInpatient from "../pages/billing/InsurancePatients/InvoiceInpatient";
 import DischargePage from "../pages/billing/DischargePage";
-import { GiCoinsPile } from "react-icons/gi";
 import PreviousBill from "../pages/billing/PreviousBill";
+import { Can } from "../hooks/casl";
 
 export const receptionRoutes = [
   {
-    key: "/Reception",
+    key: "/Dashboard",
     icon: <AppstoreOutlined style={{ color: "#fff" }} />,
     label: "Dashboard",
   },
   {
-    key: "/Reception/visitors-list",
+    key: "/Dashboard/visitors-list",
     icon: <UserOutlined style={{ color: "#fff" }} />,
     label: "Visitors",
   },
-  
+
   {
-    key: "/Reception/patient-list",
+    key: "/Dashboard/patient-list",
     icon: <FaUserGroup style={{ color: "#fff" }} />,
     label: "Patient List",
     children: [
       {
-        key: "/Reception/Patient-list",
+        key: "/Dashboard/Patient-list",
         label: "Patient List",
         icon: <FileTextOutlined style={{ color: "#fff" }} />,
       },
       {
-        key: "/Reception/Walkin-Patient-List",
+        key: "/Dashboard/Walkin-Patient-List",
         label: "Walk-in Patient List",
         icon: <FaPersonWalking style={{ color: "#fff" }} />,
       },
     ],
   },
   {
-    key: "/Reception/appointments",
+    key: "/Dashboard/appointments",
     icon: <CalendarOutlined style={{ color: "#fff" }} />,
     label: "Appointments",
     children: [
       {
-        key: "/Reception/appointments/list",
+        key: "/Dashboard/appointments/list",
         label: " New Appointments",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
       {
-        key: "/Reception/appointments/Dispatched",
+        key: "/Dashboard/appointments/Dispatched",
         label: "Dispatched List",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
     ],
   },
   {
-    key: "/Reception/admission",
+    key: "/Dashboard/admission",
     icon: <BiBed style={{ color: "#fff" }} />,
     label: "Admissions",
     children: [
       {
-        key: "/Reception/admission-requests",
+        key: "/Dashboard/admission-requests",
         label: "Pending Admissions Requests",
         icon: <FieldTimeOutlined style={{ color: "#fff" }} />,
       },
     ],
   },
   {
-    key: "/Reception/billing",
+    key: "/Dashboard/billing",
     icon: <BiCoinStack style={{ color: "#fff" }} />,
     label: "Billing",
     children: [
       {
-        key: "/Reception/Billing/Outpatients",
+        key: "/Dashboard/Billing/Outpatients",
         label: "OutPatient",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
       {
-        key: "/Reception/Billing/Inpatients",
+        key: "/Dashboard/Billing/Inpatients",
         label: "InPatient",
         icon: <CalendarOutlined style={{ color: "#fff" }} />,
       },
-      // {
-      //   key: "/Reception/Billing/Previous-Bill",
-      //   label: "Previous Bill",
-      //   icon: <GiCoinsPile style={{ color: "#fff" }} />,
-      // },
     ],
   },
 ];
 
 export default function ReceptionRoutes() {
   return (
-    <Route element={<PrivateRoute allowedDepartments={["Reception"]} />}>
-      <Route path="/Reception" element={<MainLayout />}>
-        <Route index element={<ReceptionDashboard />} />
-        <Route
-          path="/Reception/Patient-Registration/:PatientNo?"
-          element={<PatientRegistration />}
-        />
-        <Route
-          path="/Reception/Add-Appointment/:patientNo?"
-          element={<CreateVisitForm />}
-        />
-        <Route
-          path="/Reception/Discharge-patient/:patientNo?"
-          element={<DischargePage />}
-        />
-        <Route path="/Reception/Patient-list" element={<OutpatientList />} />
-        <Route
-          path="/Reception/Walkin-Patient-List"
-          element={<WalkInPatientList />}
-        />
-        <Route
-          path="/Reception/Walkin-Patient-List/Walk-In-Create-Visit"
-          element={<WalkInCreateVisit />}
-        />
-        <Route
-          path="/Reception/Register-walkin"
-          element={<WalkinRegistration />}
-        />
-        <Route path="/Reception/view-profile" element={<ViewProfile />} />
-        <Route
-          path="/Reception/appointments/list"
-          element={<ActiveAppmnts />}
-        />
-        <Route
-          path="/Reception/converted-patients"
-          element={<ConvertedPatients />}
-        />
-        <Route
-          path="/Reception/appointments/Dispatched"
-          element={<DispatchedAppmnts />}
-        />
-        <Route
-          path="/Reception/Billing/Outpatients"
-          element={<ActiveOutPatients />}
-        />
-        <Route
-          path="/Reception/Billing/Inpatients"
-          element={<ActiveInpatient />}
-        />
-         <Route
-          path="/Reception/Billing/Previous-Bill"
-          element={<PreviousBill />}
-        />
-        <Route path="/Reception/visitors-list" element={<VisitorList />} />
-        {/* disptching the patient in walk in */}
-        <Route
-          path="/Reception/Walkin-Patient-List/:patientNo?"
-          element={<DispatchWalkInPatient />}
-        />
-        <Route
-          path="/Reception/create-visit/:patientNo"
-          element={<CreateVisitForm />}
-        />
-        <Route
-          path="/Reception/Patient-admissions"
-          element={<PatientAdmissions />}
-        />
-        <Route
-          path="/Reception/Admission-requests"
-          element={<AdmissionRequests />}
-        />
-        <Route
-          path="/Reception/Admission-requests/:id"
-          element={<AdmissionRequest />}
-        />
-        {/* <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
-        <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} />
-        <Route path="/Reception/invoice/:patientNo" element={<ViewInvoice />} />
-        <Route path="/Reception/Receipt/:patientNo" element={<ViewReceipt />} /> */}
-        <Route
-          path="/Reception/CashPatient-Charges"
-          element={<ReceiptPatient />}
-        />
+    <Route path="/Dashboard" element={<MainLayout />}>
+      <Route index element={<ReceptionDashboard />} />
+      <Route
+        path="/Dashboard/Patient-Registration/:PatientNo?"
+        element={<PatientRegistration />}
+      />
+      <Route
+        path="/Dashboard/Add-Appointment/:patientNo?"
+        element={<CreateVisitForm />}
+      />
+      <Route
+        path="/Dashboard/Discharge-patient/:patientNo?"
+        element={<DischargePage />}
+      />
+      <Route path="/Dashboard/Patient-list" element={<OutpatientList />} />
+      <Route
+        path="/Dashboard/Walkin-Patient-List"
+        element={<WalkInPatientList />}
+      />
+      <Route
+        path="/Dashboard/Walkin-Patient-List/Walk-In-Create-Visit"
+        element={<WalkInCreateVisit />}
+      />
+      <Route
+        path="/Dashboard/Register-walkin"
+        element={<WalkinRegistration />}
+      />
+      <Route path="/Dashboard/view-profile" element={<ViewProfile />} />
+      <Route path="/Dashboard/appointments/list" element={<ActiveAppmnts />} />
+      <Route
+        path="/Dashboard/converted-patients"
+        element={<ConvertedPatients />}
+      />
+      <Route
+        path="/Dashboard/appointments/Dispatched"
+        element={<DispatchedAppmnts />}
+      />
+      <Route
+        path="/Dashboard/Billing/Outpatients"
+        element={<ActiveOutPatients />}
+      />
+      <Route
+        path="/Dashboard/Billing/Inpatients"
+        element={<ActiveInpatient />}
+      />
+      <Route
+        path="/Dashboard/Billing/Previous-Bill"
+        element={<PreviousBill />}
+      />
+      <Route path="/Dashboard/visitors-list" element={<VisitorList />} />
+      {/* disptching the patient in walk in */}
+      <Route
+        path="/Dashboard/Walkin-Patient-List/:patientNo?"
+        element={<DispatchWalkInPatient />}
+      />
+      <Route
+        path="/Dashboard/create-visit/:patientNo"
+        element={<CreateVisitForm />}
+      />
+      <Route
+        path="/Dashboard/Patient-admissions"
+        element={<PatientAdmissions />}
+      />
+      <Route
+        path="/Dashboard/Admission-requests"
+        element={<AdmissionRequests />}
+      />
+      <Route
+        path="/Dashboard/Admission-requests/:id"
+        element={<AdmissionRequest />}
+      />
+      <Route
+        path="/Dashboard/CashPatient-Charges"
+        element={<ReceiptPatient />}
+      />
 
-        <Route
-          path="/Reception/CorporatePatient-Charges"
-          element={<InvoicePatient />}
-        />
-        <Route
-          path="/Reception/InPatient-Charges"
-          element={<ReceiptInpatient />}
-        />
-         <Route
-          path="/Reception/Corporate-Inpatient-Charges"
-          element={<InvoiceInpatient />}
-        />
-        <Route
-          path="/Reception/patient-list/Direct-Admission/:PatientNo?"
-          element={<DirectAdmission />}
-        />
-      </Route>
+      <Route
+        path="/Dashboard/CorporatePatient-Charges"
+        element={<InvoicePatient />}
+      />
+      <Route
+        path="/Dashboard/InPatient-Charges"
+        element={<ReceiptInpatient />}
+      />
+      <Route
+        path="/Dashboard/Corporate-Inpatient-Charges"
+        element={<InvoiceInpatient />}
+      />
+      <Route
+        path="/Dashboard/patient-list/Direct-Admission/:PatientNo?"
+        element={<DirectAdmission />}
+      />
     </Route>
   );
 }

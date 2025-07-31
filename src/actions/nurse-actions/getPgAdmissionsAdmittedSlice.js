@@ -10,7 +10,7 @@ export const GET_PG_ADMISSIONS_ADMITTED_FAILURE =
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8085";
+  "https://chiromo.potestastechnologies.net:8091";
 
 export const getPgAdmissionsAdmittedSlice =
   (admissionNo) => async (dispatch, getState) => {

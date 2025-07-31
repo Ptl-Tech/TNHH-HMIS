@@ -8,7 +8,7 @@ export const POST_LAB_TEST_SUCCESS = "POST_LAB_TEST_SUCCESS";
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8085";
+  "https://chiromo.potestastechnologies.net:8091";
 
 export const postLabTest = (params) => async (dispatch, getState) => {
   try {

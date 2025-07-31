@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/charts": "^2.2.0",
+    "@casl/ability": "^6.7.3",
+    "@casl/react": "^5.0.0",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
     "@react-pdf/renderer": "^4.3.0",

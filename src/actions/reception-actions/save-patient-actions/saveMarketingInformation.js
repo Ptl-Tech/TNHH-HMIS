@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 
 export const SAVE_MARKETING_INFORMATION_REQUEST = "SAVE_MARKETING_INFORMATION_REQUEST";

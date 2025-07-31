@@ -1,7 +1,7 @@
 import apiHeaderConfig from "../../configHelpers";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const GET_PATIENT_VISIT_BY_NO_REQUEST = "GET_PATIENT_VISIT_BY_NO_REQUEST";
 export const GET_PATIENT_VISIT_BY_NO_SUCCESS = "GET_PATIENT_VISIT_BY_NO_SUCCESS";

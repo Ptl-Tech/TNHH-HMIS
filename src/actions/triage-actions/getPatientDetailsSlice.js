@@ -1,7 +1,7 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 import { message } from "antd";
-const API_URL =  'https://chiromo.potestastechnologies.net:8085';
+const API_URL =  'https://chiromo.potestastechnologies.net:8091';
 
 export const GET_PATIENT_DETAILS_REQUEST = 'GET_PATIENT_DETAILS_REQUEST';
 export const GET_PATIENT_DETAILS_SUCCESS = 'GET_PATIENT_DETAILS_SUCCESS';

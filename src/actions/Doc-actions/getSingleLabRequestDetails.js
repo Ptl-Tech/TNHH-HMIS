@@ -1,7 +1,7 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 // Action Types
 export const REQUEST_SINGLE_LAB_DETAILS = "REQUEST_SINGLE_LAB_DETAILS";

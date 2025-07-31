@@ -264,7 +264,7 @@ const InsurancePatients = () => {
            <Menu.Item
           key="view"
           icon={<EyeOutlined />}
-          onClick={() => navigate(`/Reception/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
+          onClick={() => navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
         >
           View
         </Menu.Item>
@@ -366,7 +366,7 @@ const InsurancePatients = () => {
            <Menu.Item
           key="view"
           icon={<EyeOutlined />}
-          onClick={() => navigate(`/Reception/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
+          onClick={() => navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
         >
           View
         </Menu.Item>

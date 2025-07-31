@@ -2,7 +2,7 @@ import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
 // Base API URL
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 // Action Types
 export const GET_PHARMACY_HISTORY_LIST_REQUEST = "GET_PHARMACY_HISTORY_LIST_REQUEST";

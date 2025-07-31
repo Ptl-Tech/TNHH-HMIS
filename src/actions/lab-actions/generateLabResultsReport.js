@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8091/';
 
 // Action Types
 export const GENERATE_LAB_RESULTS_REPORT_FAIL =

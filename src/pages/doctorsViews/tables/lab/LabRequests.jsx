@@ -238,7 +238,7 @@ const LabRequests = ({ status, requestType }) => {
   };
 
   const handleNavigate = (record, LaboratoryNo) => {
-    navigate(`/Lab/Outpatient/Lab-Request?LaboratoryNo=${LaboratoryNo}`, {
+    navigate(`/Dashboard/Outpatient/Lab-Request?LaboratoryNo=${LaboratoryNo}`, {
       state: {
         patientNo: record.PatientNo,
         labObservationNo: record.LaboratoryNo,

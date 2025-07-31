@@ -50,7 +50,9 @@ export const DispatchToLab = () => {
       const { LABORATORYNO, REQUESTTYPE } = dispatchToLabData;
       message.success("The lab header has been created successfully");
       navigate(
-        `/Lab/${getType(REQUESTTYPE)}/Lab-Request?LaboratoryNo=${LABORATORYNO}`,
+        `/Dashboard/${getType(
+          REQUESTTYPE
+        )}/Lab-Request?LaboratoryNo=${LABORATORYNO}`,
         {
           state: {
             patientNo: currentPatientNo,

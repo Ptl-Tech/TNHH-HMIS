@@ -58,7 +58,7 @@ const ReceptionDashboard = () => {
       icon: <HourglassOutlined />,
       color: '#fff',
       backgroundColor: '#0f5689',
-      link: '/Reception/visitors-list',
+      link: '/Dashboard/visitors-list',
     },
     {
       title: 'Active Visits List',
@@ -67,7 +67,7 @@ const ReceptionDashboard = () => {
       icon: <SafetyOutlined />,
       color: '#000',
       backgroundColor: '#ac8342',
-      link: '/Reception/appointments/Dispatched',
+      link: '/Dashboard/appointments/Dispatched',
     },
     {
       title: 'Walk-In Consultations',
@@ -76,7 +76,7 @@ const ReceptionDashboard = () => {
       icon: <UserOutlined />,
       color: '#000',
       backgroundColor: '#5c85d6',
-      link: '/Reception/Walkin-Patient-List',
+      link: '/Dashboard/Walkin-Patient-List',
     },
     {
       title: 'Admission Requests',
@@ -85,7 +85,7 @@ const ReceptionDashboard = () => {
       icon: <UserAddOutlined />,
       color: '#000',
       backgroundColor: '#b0afaf',
-      link: '/Reception/admission-requests',
+      link: '/Dashboard/admission-requests',
     },
   ];
 

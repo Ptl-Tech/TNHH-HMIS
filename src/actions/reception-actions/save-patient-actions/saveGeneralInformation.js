@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const SAVE_GENERAL_INFORMATION_REQUEST = "SAVE_GENERAL_INFORMATION_REQUEST";
 export const SAVE_GENERAL_INFORMATION_SUCCESS = "SAVE_GENERAL_INFORMATION_SUCCESS";

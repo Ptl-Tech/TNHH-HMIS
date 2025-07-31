@@ -91,7 +91,7 @@ const PatientRegistration = () => {
 
       case "request_admission":
         navigate(
-          `/Reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
+          `/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }

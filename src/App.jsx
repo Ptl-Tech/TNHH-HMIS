@@ -1,9 +1,17 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Routes, Route, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Can } from "./hooks/casl";
+import { AbilityProvider } from "./hooks/casl";
 
 import Login from "./Auth/Login";
-import Register from "./Auth/Register";
 import ResetPassword from "./Auth/ResetPassword";
 import ForgotPassword from "./Auth/ForgotPassword";
 
@@ -16,31 +24,58 @@ import RadiologyRoutes from "./Routes/RadiologyRoutes";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PsychologyRoutes from "./Routes/PsychologyRoutes";
 import { getUserDetails } from "./actions/getUserDetails";
+import PrivateRoute from "./private/PrivateRoute";
 
 function App() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const { user, loading } = useSelector((state) => state.auth);
+
+  console.log({ user, loading });
 
   useEffect(() => {
-    // getting the user on every refresh
     dispatch(getUserDetails());
   }, []);
 
+  const isInAuthPages = () => {
+    return location.pathname === "/login";
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      if (user === null) navigate("/login");
+      if (user && isInAuthPages()) return navigate("/Dashboard");
+    }
+  }, [user, loading, navigate]);
+
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      {LabRoutes()}
-      {NurseRoutes()}
-      {DoctorRoutes()}
-      {SecurityRoutes()}
-      {PharmacyRoutes()}
-      {RadiologyRoutes()}
-      {ReceptionRoutes()}
-      {PsychologyRoutes()}
-      <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
+    <AbilityProvider user={user}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        {/* {() => LabRoutes()} */}
+        {/* {NurseRoutes()} */}
+        {/* {DoctorRoutes()} */}
+        {/* {SecurityRoutes()} */}
+        {/* {PharmacyRoutes()} */}
+        {/* {RadiologyRoutes()} */}
+        {ReceptionRoutes()}
+        {/* <Route
+          element={
+            <>
+              <Can I={"Read"} this={"receptionNavigation"}>
+              </Can>
+            </>
+          }
+        /> */}
+        {/* </Can> */}
+        {/* {PsychologyRoutes()} */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </AbilityProvider>
   );
 }
 

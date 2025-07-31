@@ -62,7 +62,7 @@ export const PATIENT_BY_ID_RESET = 'PATIENT_BY_ID_RESET';
 
 import { message } from 'antd';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = 'https://chiromo.potestastechnologies.net:8091/';
 
 export const createPatient = (patient) => async (dispatch, getState) => {
   try {

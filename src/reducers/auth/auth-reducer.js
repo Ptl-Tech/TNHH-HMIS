@@ -14,10 +14,20 @@ import {
   USER_LOGIN_SUCCESS,
 } from "../../actions/auth-actions/login";
 import {
+  USER_LOGOUT_FAIL,
+  USER_LOGOUT_REQUEST,
+  USER_LOGOUT_SUCCESS,
+} from "../../actions/auth-actions/logout";
+import {
   VERIFY_OTP_FAIL,
   VERIFY_OTP_REQUEST,
   VERIFY_OTP_SUCCESS,
 } from "../../actions/auth-actions/verify-otp";
+import {
+  GET_USER_DETAILS_FAIL,
+  GET_USER_DETAILS_REQUEST,
+  GET_USER_DETAILS_SUCCESS,
+} from "../../actions/getUserDetails";
 
 export const SHOW_OTP_MODAL = "SHOW_OTP_MODAL";
 export const AUTH_RESET_MESSAGES = "AUTH_RESET_MESSAGES";
@@ -25,6 +35,8 @@ export const AUTH_RESET_MESSAGES = "AUTH_RESET_MESSAGES";
 const initialState = {
   loading: false,
   OTPError: null,
+  user: undefined,
+  authError: null,
   loginError: null,
   OTPSuccess: null,
   userDetails: null,
@@ -84,19 +96,43 @@ export const authReducer = (state = initialState, action) => {
         showOTPModal: !userDetails.otpVerified,
       };
 
+    // These are supposed to handle the logout flow
+    case USER_LOGOUT_REQUEST:
+      return { ...state, loading: true };
+    case USER_LOGOUT_FAIL:
+      return { ...state, loading: false, loginError: action.payload };
+    case USER_LOGOUT_SUCCESS:
+      return { ...state, user: null, loading: false };
+
     // These are supposed to handle the login flow
     case VERIFY_OTP_REQUEST:
       return { ...state, loading: true };
     case VERIFY_OTP_FAIL:
       return { ...state, loading: false, OTPError: action.payload };
     case VERIFY_OTP_SUCCESS:
-      const { data, OTPSuccess } = action.payload;
       return {
         ...state,
         OTPSuccess,
         loading: false,
         userDetails: data,
         showOTPModal: !data.otpVerified,
+      };
+
+    // These are supposed to handle the login flow
+    case GET_USER_DETAILS_REQUEST:
+      return { ...state, loading: true };
+    case GET_USER_DETAILS_FAIL:
+      return {
+        ...state,
+        user: null,
+        loading: false,
+        authError: action.payload,
+      };
+    case GET_USER_DETAILS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        user: action.payload,
       };
 
     //   Toggle the modal
@@ -109,6 +145,7 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         OTPError: null,
         redirect: null,
+        authError: null,
         loginError: null,
         OTPSuccess: null,
         loginSuccess: null,

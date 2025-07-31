@@ -69,7 +69,7 @@ const WalkInPatientList = () => {
                 icon={<EyeOutlined />}
                 onClick={() =>
                   navigate(
-                    `/Reception/Walkin-Patient-List/${record.ActiveVisitNo}`,
+                    `/Dashboard/Walkin-Patient-List/${record.ActiveVisitNo}`,
                   )
                 }
               >
@@ -83,7 +83,7 @@ const WalkInPatientList = () => {
                 icon={<PlusOutlined />}
                 onClick={() =>
                   navigate(
-                    `/Reception/Walkin-Patient-List/Walk-In-Create-Visit?PatientNo=${record.PatientNo}`,
+                    `/Dashboard/Walkin-Patient-List/Walk-In-Create-Visit?PatientNo=${record.PatientNo}`,
                   )
                 }
               >
@@ -119,7 +119,7 @@ const WalkInPatientList = () => {
         <div className="d-flex align-items-center gap-3">
           <Button
             type="primary"
-            onClick={() => navigate('/Reception/Register-walkin')}
+            onClick={() => navigate('/Dashboard/Register-walkin')}
           >
             Register New Walk-in Patient
           </Button>

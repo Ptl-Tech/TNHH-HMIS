@@ -244,7 +244,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       patientNo,
       observationNo,
       myAction: "create",
-      bloodPressure: `${diastolic}/${systolic}`,
+      bloodPressure: `${systolic}/${diastolic}`,
     };
 
     dispatch(postTriageListVitalsSlice(finalValues));

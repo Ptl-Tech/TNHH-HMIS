@@ -5,7 +5,7 @@ export const GET_QY_IP_LOOKUP_VALUES_REQUEST = 'GET_QY_IP_LOOKUP_VALUES_REQUEST'
 export const GET_QY_IP_LOOKUP_VALUES_SUCCESS = 'GET_QY_IP_LOOKUP_VALUES_SUCCESS';
 export const GET_QY_IP_LOOKUP_VALUES_FAILURE = 'GET_QY_IP_LOOKUP_VALUES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const getQyIpLookupValuesSlice = (type) =>
     async (dispatch, getState) => {
