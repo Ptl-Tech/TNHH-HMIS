@@ -7,7 +7,6 @@ import { logout } from '../actions/userActions';
 import useAuth from '../hooks/useAuth';
 import { MdLogout } from 'react-icons/md';
 import { GiRamProfile } from 'react-icons/gi';
-import { BsEmojiSmile } from 'react-icons/bs';
 
 const Signout = () => {
   const dispatch = useDispatch();

@@ -257,7 +257,7 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
       {editing ? (
         <Space direction="vertical" style={{ width: "100%" }}>
           <Input.TextArea
-            autoSize
+            autoSize={{ minRows: 7 }}
             value={fullTranscript}
             onChange={(e) => setFullTranscript(e.target.value)}
           />
