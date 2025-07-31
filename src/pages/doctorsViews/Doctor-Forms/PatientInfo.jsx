@@ -13,6 +13,8 @@ import {
   message,
   Popover,
   Typography,
+  Row,
+  Col,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { UserOutlined } from "@ant-design/icons";
@@ -28,6 +30,8 @@ import {
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
+import PatientCharges from "../../billing/CashPatients/PatientCharges";
+import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const dispatch = useDispatch();
@@ -44,7 +48,9 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted
   );
+const {loadingPatientDetails, patientDetails: patientdeets}=useFetchPatientDetailsHook(patientNo)
 
+console.log("patient details", patientdeets);
   const handleMarkAsCompleted = () => {
     dispatch(postMarkasCompleted(treatmentNo))
       .then((data) => {
@@ -79,6 +85,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
         open={moreDetailsOpen}
         setOpen={setMoreDetailOpen}
         values={fullPatientInfo(patient)}
+        activeVisitNo={patientdeets.ActiveVisitNo}
       />
       <Card
         size="small"
@@ -278,7 +285,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   );
 };
 
-const MoreDeailsDrawer = ({ open, setOpen, values }) => {
+const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
   return (
     <Drawer
       closable
@@ -287,12 +294,26 @@ const MoreDeailsDrawer = ({ open, setOpen, values }) => {
       onClose={() => setOpen(false)}
       onCancel={() => setOpen(false)}
       closeIcon={<IoCloseOutline size={21} color="black" />}
+      width={850}
     >
-      <div style={{ display: "grid", gap: "4px" }}>
-        {values.map((patientInfo) => (
-          <RenderPatientDetails component={patientInfo} />
-        ))}
-      </div>
+      <>
+      <div
+  style={{
+    padding: "8px",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "10px",
+    backgroundColor: "#f9f9f9", // light background for contrast
+  }}
+>
+  {values.map((patientInfo, index) => (
+    <RenderPatientDetails key={index} component={patientInfo} />
+  ))}
+</div>
+
+<PatientCharges activeVisitNo={activeVisitNo} />
+
+      </>
     </Drawer>
   );
 };
@@ -384,7 +405,7 @@ const AvatarComponent = ({ values }) => {
           level={5}
           style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
         >
-          {name}
+          {name.toUpperCase()}
         </Title>
         <Text style={{ fontSize: "13px", color: "gray", fontWeight: "bold" }}>
           {ageLabel}: {age}
@@ -394,31 +415,41 @@ const AvatarComponent = ({ values }) => {
   );
 };
 
-// Helper component for displaying label and value pairs
 const InfoRow = ({ label, value }) => (
+ // <div style={{ display: "flex", justifyContent: "space-between" }}>
   <div
     style={{
-      gap: "8px",
       display: "flex",
-      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: "8px",
     }}
   >
-    <Typography.Title
-      level={5}
-      style={{ fontSize: "14px", color: "black", margin: 0 }}
-    >
-      {label} :
+    <Typography.Title level={5} style={{ fontSize: "14px", margin: 0 }}>
+      {label}
     </Typography.Title>
-    <Typography.Text
-      style={{
-        fontSize: "14px",
-        color: "gray",
-        fontWeight: "bold",
-      }}
-    >
+    <Typography.Text style={{ fontSize: "14px", color: "gray" }}>
       {value || "N/A"}
     </Typography.Text>
   </div>
 );
 
+
+const InfoCard = ({ InfoRow }) => (
+  <Row gutter={16} style={{ marginTop: '20px' }}>
+    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+      <Card
+        style={{
+          padding: '16px 24px',
+          borderTop: '3px solid #0f5689',
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          minHeight: '260px',
+        }}
+      >
+        {patientPrimaryInfo.map(({ label, value }, index) => (
+          <PrimaryInfoCard key={index} label={label} value={value} />
+        ))}
+      </Card>
+    </Col>
+  </Row>
+);
 export default PatientInfo;
