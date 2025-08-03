@@ -6,8 +6,12 @@ import Consumables from "./nurse-patient-file/Consumables";
 import {
   MedicineBoxOutlined,
   BorderlessTableOutlined,
+  ExperimentOutlined,
+  ShoppingCartOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import useAuth from "../../hooks/useAuth";
+import NursePharmacyReturnLine from "./tables/NursePharmacyReturnLine";
 
 const Medication = ({  role, patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
@@ -26,19 +30,37 @@ const Medication = ({  role, patientDetails }) => {
       case "Order Sheet":
         setSelectedItem(<Consumables />);
         break;
+        case "Pharmacy Return Drugs":
+        setSelectedItem(<NursePharmacyReturnLine patientNo={patientDetails?.Patient_No} />);
+        break;
       default:
         setSelectedItem(null);
     }
   };
-
-  const menuItems = [
-    { label: "Prescription", icon: <MedicineBoxOutlined /> },
-    { label: "Treatments Sheet", icon: <BorderlessTableOutlined /> },
-    ...(userRole === "Nurse"
-      ? [{ label: "Order Sheet", icon: <BorderlessTableOutlined /> }]
-      : []),
-  ];
-
+const menuItems = [
+  {
+    label: "Prescription",
+    icon: <MedicineBoxOutlined />,
+  },
+  {
+    label: "Treatments Sheet",
+    icon: <ExperimentOutlined />, 
+  },
+  ...(userRole === "Nurse"
+    ? [
+        {
+          label: "Order Sheet",
+          icon: <ShoppingCartOutlined />, 
+        },
+      ]
+    : []),
+  {
+    label: "Pharmacy Return Drugs",
+    icon: (
+      <RollbackOutlined /> 
+    ),
+  },
+];
   return (
     <>
       <div

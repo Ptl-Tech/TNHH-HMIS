@@ -94,7 +94,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  console.log({ location });
 
   const { RangePicker } = DatePicker;
 
@@ -226,7 +225,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
       postPharmacyLineData?.status === "success" ||
       returnedDrugs
     ) {
-      dispatch(getPharmacyLineReturnbyPharmacyNo(currentRequest));
+      dispatch(getPharmacyLineReturnbyPharmacyNo("Pharmacy_No", currentRequest));
     } else {
       dispatch({ type: GET_PHARMACY_RETURN_LIST_RESET });
     }
