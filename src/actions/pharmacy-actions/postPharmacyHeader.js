@@ -1,14 +1,12 @@
-import axios from 'axios';
-import apiHeaderConfig from '../configHelpers';
+import axios from "axios";
+import apiHeaderConfig from "../configHelpers";
 
-export const POST_PHARMACY_HEADER_FAIL = 'POST_PHARMACY_HEADER_FAIL';
-export const POST_PHARMACY_HEADER_RESET = 'POST_PHARMACY_HEADER_RESET';
-export const POST_PHARMACY_HEADER_REQUEST = 'POST_PHARMACY_HEADER_REQUEST';
-export const POST_PHARMACY_HEADER_SUCCESS = 'POST_PHARMACY_HEADER_SUCCESS';
+export const POST_PHARMACY_HEADER_FAIL = "POST_PHARMACY_HEADER_FAIL";
+export const POST_PHARMACY_HEADER_RESET = "POST_PHARMACY_HEADER_RESET";
+export const POST_PHARMACY_HEADER_REQUEST = "POST_PHARMACY_HEADER_REQUEST";
+export const POST_PHARMACY_HEADER_SUCCESS = "POST_PHARMACY_HEADER_SUCCESS";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const postPharmacyHeader =
   (pharmacyHeaderData) => async (dispatch, getState) => {
@@ -22,7 +20,7 @@ export const postPharmacyHeader =
       const { data } = await axios.post(
         `${API_URL}/Pharmacy/PharmacyHeader`,
         pharmacyHeaderData,
-        config,
+        config
       );
 
       dispatch({ type: POST_PHARMACY_HEADER_SUCCESS, payload: data });
@@ -30,7 +28,7 @@ export const postPharmacyHeader =
       dispatch({
         type: POST_PHARMACY_HEADER_FAIL,
         payload: error.message,
-        status: error.response?.status || 'Network Error',
+        status: error.response?.status || "Network Error",
         data: error.response?.data || null,
       });
     }

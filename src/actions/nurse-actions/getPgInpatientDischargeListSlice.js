@@ -8,7 +8,7 @@ export const GET_QY_INPATIENT_DISCHARGE_LIST_ENCOUNTERS_REQUEST = 'GET_QY_INPATI
 export const GET_QY_INPATIENT_DISCHARGE_LIST_ENCOUNTERS_SUCCESS = 'GET_QY_INPATIENT_DISCHARGE_LIST_ENCOUNTERS_SUCCESS';   
 export const GET_QY_INPATIENT_DISCHARGE_LIST_ENCOUNTERS_FAILURE = 'GET_QY_INPATIENT_DISCHARGE_LIST_ENCOUNTERS_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getPgInpatientDischargeListSlice = () => 
   async (dispatch, getState) => {

@@ -1,14 +1,12 @@
-import axios from 'axios';
-import apiHeaderConfig from '../configHelpers';
+import axios from "axios";
+import apiHeaderConfig from "../configHelpers";
 
-export const RETURN_DRUGS_FAIL = 'RETURN_DRUGS_FAIL';
-export const RETURN_DRUGS_RESET = 'RETURN_DRUGS_RESET';
-export const RETURN_DRUGS_REQUEST = 'RETURN_DRUGS_REQUEST';
-export const RETURN_DRUGS_SUCCESS = 'RETURN_DRUGS_SUCCESS';
+export const RETURN_DRUGS_FAIL = "RETURN_DRUGS_FAIL";
+export const RETURN_DRUGS_RESET = "RETURN_DRUGS_RESET";
+export const RETURN_DRUGS_REQUEST = "RETURN_DRUGS_REQUEST";
+export const RETURN_DRUGS_SUCCESS = "RETURN_DRUGS_SUCCESS";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const returnDrugs = (values) => async (dispatch, getState) => {
   try {
@@ -19,7 +17,7 @@ export const returnDrugs = (values) => async (dispatch, getState) => {
     const { data } = await axios.post(
       `${API_URL}/Pharmacy/PostPharmacyReturn`,
       values,
-      config,
+      config
     );
 
     console.log({ data });
@@ -29,7 +27,7 @@ export const returnDrugs = (values) => async (dispatch, getState) => {
     dispatch({
       type: RETURN_DRUGS_FAIL,
       payload: error.message,
-      status: error.response?.status || 'Network Error',
+      status: error.response?.status || "Network Error",
       data: error.response?.data || null,
     });
   }

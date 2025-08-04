@@ -6,7 +6,7 @@ export const POST_DISPATCH_TO_DOCTOR_REQUEST = "POST_DISPATCH_TO_DOCTOR_REQUEST"
 export const POST_DISPATCH_TO_DOCTOR_SUCCESS = "POST_DISPATCH_TO_DOCTOR_SUCCESS";
 export const POST_DISPATCH_TO_DOCTOR_FAIL = "POST_DISPATCH_TO_DOCTOR_FAIL";
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postDispatchToDoctorSlice = (dispatchToDoctor) => async (dispatch, getState) =>{
 

@@ -5,7 +5,7 @@ export const GET_ADMISSIONS_VERIFIED_REQUEST = 'GET_ADMISSIONS_VERIFIED_REQUEST'
 export const GET_ADMISSIONS_VERIFIED_SUCCESS = 'GET_ADMISSIONS_VERIFIED_SUCCESS';
 export const GET_ADMISSIONS_VERIFIED_FAILURE = 'GET_ADMISSIONS_VERIFIED_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getPgAdmissionsVerifiedSlice = () => 
   async (dispatch, getState) => {

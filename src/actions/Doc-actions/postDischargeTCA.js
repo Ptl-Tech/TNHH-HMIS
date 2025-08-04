@@ -1,7 +1,7 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_DISCHARGE_TCA_REQUEST = "POST_DISCHARGE_TCA_REQUEST";
 export const POST_DISCHARGE_TCA_FAIL = "POST_DISCHARGE_TCA_FAIL";

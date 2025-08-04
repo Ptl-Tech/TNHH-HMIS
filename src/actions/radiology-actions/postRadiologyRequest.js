@@ -1,14 +1,12 @@
-import axios from 'axios';
-import apiHeaderConfig from '../configHelpers';
+import axios from "axios";
+import apiHeaderConfig from "../configHelpers";
 
-export const POST_RADIOLOGY_REQUEST_FAIL = 'POST_RADIOLOGY_REQUEST_FAIL';
-export const POST_RADIOLOGY_REQUEST_RESET = 'POST_RADIOLOGY_REQUEST_RESET';
-export const POST_RADIOLOGY_REQUEST_REQUEST = 'POST_RADIOLOGY_REQUEST_REQUEST';
-export const POST_RADIOLOGY_REQUEST_SUCCESS = 'POST_RADIOLOGY_REQUEST_SUCCESS';
+export const POST_RADIOLOGY_REQUEST_FAIL = "POST_RADIOLOGY_REQUEST_FAIL";
+export const POST_RADIOLOGY_REQUEST_RESET = "POST_RADIOLOGY_REQUEST_RESET";
+export const POST_RADIOLOGY_REQUEST_REQUEST = "POST_RADIOLOGY_REQUEST_REQUEST";
+export const POST_RADIOLOGY_REQUEST_SUCCESS = "POST_RADIOLOGY_REQUEST_SUCCESS";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const postRadiologyRequest =
   (requestData) => async (dispatch, getState) => {
@@ -26,7 +24,7 @@ export const postRadiologyRequest =
       //     config,
       //   );
 
-      const data = { status: 'success' };
+      const data = { status: "success" };
 
       dispatch({ type: POST_RADIOLOGY_REQUEST_SUCCESS, payload: data });
     } catch (error) {
@@ -35,7 +33,7 @@ export const postRadiologyRequest =
       dispatch({
         type: POST_RADIOLOGY_REQUEST_FAIL,
         payload: error.message,
-        status: error.response?.status || 'Network Error',
+        status: error.response?.status || "Network Error",
         data: error.response?.data || null,
       });
     }

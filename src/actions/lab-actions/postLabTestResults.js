@@ -7,8 +7,7 @@ export const POST_LAB_TEST_RESULTS_REQUEST = "POST_LAB_TEST_RESULTS_REQUEST";
 export const POST_LAB_TEST_RESULTS_SUCCESS = "POST_LAB_TEST_RESULTS_SUCCESS";
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8091";
+  import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 const transformLabResult = (result) => {
   const {

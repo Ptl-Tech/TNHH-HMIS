@@ -7,8 +7,7 @@ export const GET_ENCOUNTER_DETAILS_REQUEST = 'GET_ENCOUNTER_DETAILS_REQUEST';
 export const GET_ENCOUNTER_DETAILS_SUCCESS = 'GET_ENCOUNTER_DETAILS_SUCCESS';
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8091';
+  import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getEncounterDetails =
   ({ patientNo, encounterNo, patientCategory }) =>

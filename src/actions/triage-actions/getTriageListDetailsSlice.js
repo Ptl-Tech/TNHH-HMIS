@@ -4,7 +4,7 @@ import { message } from "antd";
 export const GET_TRIAGE_LIST_DETAILS_REQUEST = 'GET_TRIAGE_LIST_DETAILS_REQUEST';
 export const GET_TRIAGE_LIST_DETAILS_SUCCESS = 'GET_TRIAGE_LIST_DETAILS_SUCCESS';
 export const GET_TRIAGE_LIST_DETAILS_FAILURE = 'GET_TRIAGE_LIST_DETAILS_FAILURE';
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getTriageListDetails = (patientNo) => async (dispatch, getState) => {
     try {

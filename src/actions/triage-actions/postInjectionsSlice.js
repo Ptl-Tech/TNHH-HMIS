@@ -6,7 +6,7 @@ export const POST_INJECTIONS_REQUEST = "POST_INJECTIONS_REQUEST";
 export const POST_INJECTIONS_SUCCESS = "POST_INJECTIONS_SUCCESS";
 export const POST_INJECTIONS_FAIL = "POST_INJECTIONS_FAIL";
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postInjectionsSlice = (injections) => async (dispatch, getState) =>{
 

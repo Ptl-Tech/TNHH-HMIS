@@ -17,7 +17,7 @@ export const GET_TREATMENT_SHEET_LINE_REQUEST = 'GET_TREATMENT_SHEET_LINE_REQUES
 export const GET_TREATMENT_SHEET_LINE_SUCCESS = 'GET_TREATMENT_SHEET_LINE_SUCCESS';
 export const GET_TREATMENT_SHEET_LINE_FAILURE = 'GET_TREATMENT_SHEET_LINE_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getQyPrescriptionLineSlice = (treatmentNo) =>
     async (dispatch, getState) => {

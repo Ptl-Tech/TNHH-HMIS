@@ -13,9 +13,7 @@ export const getSingleAdmittedSlice =
 
       const config = configHelpers(getState);
 
-      const API_URL =
-        import.meta.env.VITE_PORTAL_API_BASE_URL ||
-        "https://chiromo.potestastechnologies.net:8091";
+      const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
       const query = `${API_URL}/data/odatafilter?webservice=QyAdmissionsList&isList=false&query=$filter=Admission_No eq '${admissionNo}'`;
 

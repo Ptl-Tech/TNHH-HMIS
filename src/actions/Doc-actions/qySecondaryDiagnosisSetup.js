@@ -1,5 +1,5 @@
 import axios from "axios";
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const QY_SECONDARY_DIAGNOSIS_SETUP = "QY_SECONDARY_DIAGNOSIS_SETUP";
 export const QY_SECONDARY_DIAGNOSIS_SETUP_SUCCESS = "QY_SECONDARY_DIAGNOSIS_SETUP_SUCCESS";

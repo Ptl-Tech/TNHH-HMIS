@@ -5,7 +5,7 @@ export const GET_PG_TREATMENT_DOCTOR_NOTES_REQUEST = 'GET_PG_TREATMENT_DOCTOR_NO
 export const GET_PG_TREATMENT_DOCTOR_NOTES_SUCCESS = 'GET_PG_TREATMENT_DOCTOR_NOTES_SUCCESS';
 export const GET_PG_TREATMENT_DOCTOR_NOTES_FAILURE = 'GET_PG_TREATMENT_DOCTOR_NOTES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getPgTreatmentDoctorNotesSlice = () => 
   async (dispatch, getState) => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8091/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_PHARMACY_APPOINTMENT_REQUEST =
   'POST_PHARMACY_APPOINTMENT_REQUEST';

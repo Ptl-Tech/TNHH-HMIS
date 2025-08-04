@@ -2,7 +2,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 
 export const POST_RADIOLOGY_REQUEST = "POST_RADIOLOGY_REQUEST";

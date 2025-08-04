@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const SAVE_BILLING_INFORMATION_REQUEST =
   "SAVE_BILLING_INFORMATION_REQUEST";

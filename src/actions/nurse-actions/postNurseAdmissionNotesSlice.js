@@ -5,7 +5,7 @@ export const POST_NURSE_ADMISSION_NOTES_REQUEST = 'POST_NURSE_ADMISSION_NOTES_RE
 export const POST_NURSE_ADMISSION_NOTES_SUCCESS = 'POST_NURSE_ADMISSION_NOTES_SUCCESS';
 export const POST_NURSE_ADMISSION_NOTES_FAILURE = 'POST_NURSE_ADMISSION_NOTES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postNurseAdmissionNotesSlice = (endpoint = '/Nurse/NurseAdmissionNotes', visitorData) => 
   async (dispatch, getState) => {

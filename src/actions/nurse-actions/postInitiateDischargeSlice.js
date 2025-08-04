@@ -17,9 +17,7 @@ export const GET_DISCHARGE_SUMMARY_REQUEST = "GET_DISCHARGE_SUMMARY_REQUEST";
 export const GET_DISCHARGE_SUMMARY_SUCCESS = "GET_DISCHARGE_SUMMARY_SUCCESS";
 export const GET_DISCHARGE_SUMMARY_FAILURE = "GET_DISCHARGE_SUMMARY_FAILURE";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8091";
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const postInitiateDischargeSlice =
   (endpoint = "/Inpatient/InitiateDischarge", initiateDischargeData) =>

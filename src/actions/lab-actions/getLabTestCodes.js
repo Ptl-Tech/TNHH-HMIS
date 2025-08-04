@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const GET_LAB_TEST_CODES_FAIL = "GET_LAB_TEST_CODES_FAIL";

@@ -10,7 +10,7 @@ export const GET_INJECTIONS_LINES_REQUEST = 'GET_INJECTIONS_LINES_REQUEST';
 export const GET_INJECTIONS_LINES_SUCCESS = 'GET_INJECTIONS_LINES_SUCCESS';
 export const GET_INJECTIONS_LINES_FAILURE = 'GET_INJECTIONS_LINES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getInjectionsSlice = (observationNo) => async (dispatch, getState) => {
    

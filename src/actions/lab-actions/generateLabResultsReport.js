@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = 'https://chiromo.potestastechnologies.net:8091/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const GENERATE_LAB_RESULTS_REPORT_FAIL =

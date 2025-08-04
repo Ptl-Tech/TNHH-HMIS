@@ -5,7 +5,7 @@ export const POST_DIETARY_INTAKE_FORM_LINE_REQUEST = 'POST_DIETARY_INTAKE_FORM_L
 export const POST_DIETARY_INTAKE_FORM_LINE_SUCCESS = 'POST_DIETARY_INTAKE_FORM_LINE_SUCCESS';
 export const POST_DIETARY_INTAKE_FORM_LINE_FAILURE = 'POST_DIETARY_INTAKE_FORM_LINE_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postDietaryIntakeFormLineSlice = ( formData ) => 
   async (dispatch, getState) => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_DOCTOR_NOTES_FAIL = "GET_DOCTOR_NOTES_FAIL";
 export const GET_DOCTOR_NOTES_RESET = "GET_DOCTOR_NOTES_RESET";

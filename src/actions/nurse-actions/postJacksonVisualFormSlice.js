@@ -5,7 +5,7 @@ export const POST_JACKSON_VISUAL_FORM_REQUEST = 'POST_JACKSON_VISUAL_FORM_REQUES
 export const POST_JACKSON_VISUAL_FORM_SUCCESS = 'POST_JACKSON_VISUAL_FORM_SUCCESS';
 export const POST_JACKSON_VISUAL_FORM_FAILURE = 'POST_JACKSON_VISUAL_FORM_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postJacksonVisualFormSlice = (endpoint = '/InpatientForms/JacksonVisualForm', jacksonData) => 
   async (dispatch, getState) => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { QY_HMS_LIST_REQUEST, QY_HMS_LIST_SUCCESS, QY_HMS_LIST_FAIL } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 export const getHMSsetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_HMS_LIST_REQUEST });

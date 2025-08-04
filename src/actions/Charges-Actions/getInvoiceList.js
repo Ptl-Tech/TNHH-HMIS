@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_INVOICE_LIST = "REQUEST_INVOICE_LIST";
 export const REQUEST_INVOICE_LIST_SUCCESS = "REQUEST_INVOICE_LIST_SUCCESS";

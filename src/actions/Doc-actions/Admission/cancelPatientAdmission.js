@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure message is imported
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const CANCEL_PATIENT_ADMISSION = "CANCEL_PATIENT_ADMISSION";

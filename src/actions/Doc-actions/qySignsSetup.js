@@ -1,7 +1,7 @@
 import axios from "axios";
 import { QY_SIGNS_LIST_REQUEST, QY_SIGNS_LIST_SUCCESS, QY_SIGNS_LIST_FAIL } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "https://chiromo.potestastechnologies.net:8091/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 export const getSignsSetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_SIGNS_LIST_REQUEST });

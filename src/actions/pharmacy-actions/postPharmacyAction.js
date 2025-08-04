@@ -2,7 +2,7 @@ import axios from 'axios';
 import { message } from 'antd'; // Ensure message is imported
 import apiHeaderConfig from '../configHelpers';
 
-const API = 'https://chiromo.potestastechnologies.net:8091/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const POST_PHARMACY_DRUG_ISSUANCE_REQUEST =
