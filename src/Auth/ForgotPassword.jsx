@@ -1,6 +1,6 @@
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Card, Form, Input, message, Space } from "antd";
 
@@ -9,17 +9,18 @@ import logoLogin from "../assets/images/logoLogin.png";
 
 import { AUTH_RESET_MESSAGES } from "../reducers/auth/auth-reducer";
 
+import { useAuth } from "../hooks/auth";
 import { forgotPassword } from "../actions/auth-actions/forgot-password";
 
 const ForgotPassword = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const {
     loading,
     redirect,
     forgotPasswordError: error,
     forgotPasswordSuccess: success,
-  } = useSelector((state) => state.auth);
+  } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Alert the messages and then reset the values

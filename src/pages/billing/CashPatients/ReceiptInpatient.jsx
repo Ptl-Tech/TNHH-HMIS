@@ -167,7 +167,7 @@ const ReceiptInpatient = () => {
             `${patientBillData[0]?.Names} discharge initiated successfully!`
         );
         navigate(
-          `/Reception/Discharge-patient/?PatientNo=${patientBillData[0]?.CurrentAdmNo}`
+          `/Dashboard/Discharge-patient/?PatientNo=${patientBillData[0]?.CurrentAdmNo}`
         );
         return Promise.resolve(); // Resolve the Promise to close the modal
       } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {

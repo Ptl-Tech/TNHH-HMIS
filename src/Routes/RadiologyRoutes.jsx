@@ -10,7 +10,7 @@ import RadiologyOutPatients from "../pages/doctorsViews/tables/Radiology/Radiolo
 
 export const radiologyRoutes = [
   {
-    key: "/Radiology",
+    key: "/Dashboard",
     icon: <AppstoreOutlined style={{ color: "#fff" }} />,
     label: "Radiology",
   },
@@ -25,7 +25,7 @@ export const radiologyRoutes = [
     type: "group",
     children: [
       {
-        key: "/Radiology/Radiology-Patients",
+        key: "/Dashboard/Radiology-Patients",
         label: "Radiology Requests",
         icon: <UserOutlined style={{ color: "#fff" }} />,
       },
@@ -35,15 +35,19 @@ export const radiologyRoutes = [
 
 export default function RadiologyRoutes() {
   return (
-    <Route element={<PrivateRoute allowedDepartments={["Radiology"]} />}>
-      <Route path="/Radiology" element={<MainLayout />}>
+    <Route
+      element={
+        <PrivateRoute permission={"read"} resource={"radiologyNavigation"} />
+      }
+    >
+      <Route path="/Dashboard" element={<MainLayout />}>
         <Route index element={<RadiologyDashboard />} />
         <Route
-          path="/Radiology/Radiology-Patients"
+          path="/Dashboard/Radiology-Patients"
           element={<RadiologyOutPatients />}
         />
         <Route
-          path="/Radiology/Radiology-Patient/:radiologyNo?"
+          path="/Dashboard/Radiology-Patient/:radiologyNo?"
           element={<RadiologyOutPatient />}
         />
       </Route>

@@ -82,7 +82,7 @@ const PatientRegistration = () => {
         // }
 
         navigate(
-          `/reception/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
+          `/Dashboard/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }

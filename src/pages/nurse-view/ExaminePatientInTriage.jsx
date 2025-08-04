@@ -14,8 +14,10 @@ import SkeletonLoading from "../../partials/nurse-partials/Skeleton";
 import AllergyAndMedication from "./forms/triage-forms/AllergyAndMedication";
 import { getPatientDetails } from "../../actions/triage-actions/getPatientDetailsSlice";
 import TriageDispatchToDoctorFormData from "./nurse-forms/TriageDispatchToDoctorFormData";
+import { useAuth } from "../../hooks/auth";
 
 const EvaluatePatientInTriage = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const dispatch = useDispatch();
 
@@ -23,8 +25,8 @@ const EvaluatePatientInTriage = () => {
   const queryParams = new URLSearchParams(location.search);
   const patientNo = queryParams.get("Patient_id");
   const observationNo = queryParams.get("Ob_number");
-  const userDetails = null;
-  const staffNo = userDetails?.userData?.firstName;
+
+  const staffNo = user?.staffNo;
 
   const [isDispatchFormVisible, setIsDispatchFormVisible] = useState(false);
 

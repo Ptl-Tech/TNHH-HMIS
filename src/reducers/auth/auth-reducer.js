@@ -35,8 +35,8 @@ export const AUTH_RESET_MESSAGES = "AUTH_RESET_MESSAGES";
 const initialState = {
   loading: false,
   OTPError: null,
-  user: undefined,
   authError: null,
+  user: undefined,
   loginError: null,
   OTPSuccess: null,
   userDetails: null,
@@ -110,6 +110,7 @@ export const authReducer = (state = initialState, action) => {
     case VERIFY_OTP_FAIL:
       return { ...state, loading: false, OTPError: action.payload };
     case VERIFY_OTP_SUCCESS:
+      const { data, OTPSuccess } = action.payload;
       return {
         ...state,
         OTPSuccess,

@@ -18,9 +18,13 @@ import {
   POST_VISITOR_LIST_SUCCESS,
   postVisitorListSlice,
 } from "../../../actions/nurse-actions/postVisitorListSlice";
+import { useAbility } from "../../../hooks/casl";
 
 const VisitorsList = () => {
-  const role = null.userData.departmentName;
+  const ability = useAbility();
+
+  const canCreatePatienVisitor = ability.can("create", "patientVisitor");
+
   const { patientDetails } = useLocation().state;
   const { selectedRowKey, rowSelection, selectedRow } =
     useSetTableCheckBoxHook();
@@ -100,12 +104,12 @@ const VisitorsList = () => {
 
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         {!isFormVisible &&
-          (role === "Nurse" ? (
+          (canCreatePatienVisitor ? (
             <>
               <Button
                 type="primary"
-                onClick={handleButtonVisibility}
                 icon={<PlusOutlined />}
+                onClick={handleButtonVisibility}
               >
                 {" "}
                 New Visitor

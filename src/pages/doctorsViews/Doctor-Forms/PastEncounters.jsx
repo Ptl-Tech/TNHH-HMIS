@@ -6,13 +6,17 @@ import { useEffect, useState } from "react";
 import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
 import { ProfileOutlined } from "@ant-design/icons";
+import { useAbility } from "../../../hooks/casl";
 
 const PastEncounters = () => {
-  const role = null.userData.departmentName;
+  const ability = useAbility();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+
   const patientDetails = location.state?.patientDetails;
+  const canSeePastEncounters = ability.can("read", "pastEncounters");
+
   const [pastVisits, setPastVisits] = useState([]);
 
   const { triageWaitingList: patients } = useSelector(
@@ -21,47 +25,46 @@ const PastEncounters = () => {
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
 
-    useEffect(() => {
-      if (!treatmentList || !patients || !patientDetails) return;
-    
-      // Filter consultations based on role
-      const closedConsultationList = treatmentList.filter((item) =>
-        role === "Doctor" || role === "Psychology"
-          ? item.Status === "Completed" && item.Clinic === "PSYCHIATRIST"
-          : item.Status === "Completed"
-      );
-    
-      // Map patient details
-      const patientDetailsMap = new Map(
-        patients.map((patient) => [
-          patient.PatientNo,
-          {
-            SearchName: patient.SearchName,
-            IDNumber: patient.IDNumber,
-            Age: patient.AgeinYears,
-            PatientType: patient.PatientType,
-            Inpatient: patient.Inpatient,
-          },
-        ])
-      );
-    
-      // Combine consultations with patient details
-      const combinedList = closedConsultationList.map((room) => ({
-        ...room,
-        ...(patientDetailsMap.get(room.PatientNo) || {
-          SearchName: "",
-          IDNumber: "",
-          Age: "",
-          PatientType: "",
-          Inpatient: "",
-        }),
-      }));
-    
-      // Filter based on current patient
-      setPastVisits(combinedList.filter((item) => item.PatientNo === patientDetails.PatientNo));
-    }, [treatmentList, patients, patientDetails, role]);
-    
+  useEffect(() => {
+    if (!treatmentList || !patients || !patientDetails) return;
 
+    const closedConsultationList = treatmentList.filter((item) =>
+      canSeePastEncounters
+        ? item.Status === "Completed" && item.Clinic === "PSYCHIATRIST"
+        : item.Status === "Completed"
+    );
+
+    // Map patient details
+    const patientDetailsMap = new Map(
+      patients.map((patient) => [
+        patient.PatientNo,
+        {
+          SearchName: patient.SearchName,
+          IDNumber: patient.IDNumber,
+          Age: patient.AgeinYears,
+          PatientType: patient.PatientType,
+          Inpatient: patient.Inpatient,
+        },
+      ])
+    );
+
+    // Combine consultations with patient details
+    const combinedList = closedConsultationList.map((room) => ({
+      ...room,
+      ...(patientDetailsMap.get(room.PatientNo) || {
+        SearchName: "",
+        IDNumber: "",
+        Age: "",
+        PatientType: "",
+        Inpatient: "",
+      }),
+    }));
+
+    // Filter based on current patient
+    setPastVisits(
+      combinedList.filter((item) => item.PatientNo === patientDetails.PatientNo)
+    );
+  }, [treatmentList, patients, patientDetails, ability]);
 
   useEffect(() => {
     dispatch(getTriageWaitingList());
@@ -72,14 +75,10 @@ const PastEncounters = () => {
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      role === "Doctor"
-        ? `/Doctor/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
-        : role === "Psychology"
-        ? `/Psychology/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`
-        : `/Nurse/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
+      `Dashboard/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
       {
         state: {
-          patientDetails: record
+          patientDetails: record,
         },
       }
     );
@@ -155,14 +154,19 @@ const PastEncounters = () => {
   ];
   return (
     <div style={{ marginTop: "20px" }}>
-    <div style={{ marginBottom: "16px" }}>
-    <ProfileOutlined />
-      <Typography.Text
-        style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px", marginLeft: "8px" }}
-      >
-        Past Encounter Notes
-      </Typography.Text>
-    </div>
+      <div style={{ marginBottom: "16px" }}>
+        <ProfileOutlined />
+        <Typography.Text
+          style={{
+            fontWeight: "bold",
+            color: "#0f5689",
+            fontSize: "14px",
+            marginLeft: "8px",
+          }}
+        >
+          Past Encounter Notes
+        </Typography.Text>
+      </div>
       <Table
         columns={waitingListColumns}
         dataSource={pastVisits}

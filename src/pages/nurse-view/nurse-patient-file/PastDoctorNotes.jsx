@@ -11,7 +11,7 @@ import { listDoctors } from "../../../actions/DropdownListActions";
 const DoctorNotes = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const role = null.userData.departmentName;
+
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading: loadingEncounters, patientEncounters } = useSelector(
     (state) => state.getPatientEncounters
@@ -74,7 +74,6 @@ const DoctorNotes = () => {
       ></div>
 
       <PastDoctorNotesTable
-        role={role}
         combinedPatients={combinedPatients}
         loadingDoctors={loadingDoctors}
         loadingEncounters={loadingEncounters}

@@ -19,9 +19,13 @@ import {
   POST_MENTAL_EXAMINATION_FORM_SUCCESS,
   postMentalExaminationFormSlice,
 } from "../../../actions/nurse-actions/postMentalExaminationFormSlice";
+import { useAbility } from "../../../hooks/casl";
 
 const MentalStateExaminationForm = () => {
-  const role = null.userData.departmentName;
+  const ability = useAbility();
+
+  const canCreateMSE = ability.can("create", "mse");
+
   const { patientDetails } = useLocation().state;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
@@ -108,7 +112,7 @@ const MentalStateExaminationForm = () => {
 
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         {!isFormVisible &&
-          (role === "Nurse" ? (
+          (canCreateMSE ? (
             <>
               <Button type="primary" onClick={handleButtonVisibility}>
                 <PlusOutlined /> New MSE Level Checklist
@@ -159,9 +163,9 @@ const MentalStateExaminationForm = () => {
           <Button key="cancel" color="danger" onClick={handleCancel}>
             Cancel
           </Button>,
-          <Button 
-            key="submit" 
-            type="primary" 
+          <Button
+            key="submit"
+            type="primary"
             onClick={handleUpdate}
             loading={loadingMentalStatus}
             disabled={loadingMentalStatus}
@@ -192,7 +196,7 @@ const MentalStateExaminationForm = () => {
             ]}
           >
             <Select
-            placeholder="Select status"
+              placeholder="Select status"
               options={[
                 { value: "0", label: "Severe" },
                 { value: "1", label: "Moderate" },

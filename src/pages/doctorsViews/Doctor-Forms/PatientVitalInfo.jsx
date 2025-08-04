@@ -63,6 +63,7 @@ import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions
 import { MdAttachFile } from "react-icons/md";
 import dayjs from "dayjs";
 import PatientSignsReport from "./PatientSignsReport";
+import { useAuth } from "../../../hooks/auth";
 
 const PatientVitalInfo = () => {
   const observationNo = useLocation()?.state?.observationNo;
@@ -500,10 +501,12 @@ const AllergiesAndMedications = () => {
 };
 
 const AddAllergiesAndMedicines = ({ open, setOpen }) => {
+  const { user } = useAuth();
+
   const dispatch = useDispatch();
   const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
-  const staffNo = null.userData.no;
+  const staffNo = user.staffNo;
   const admissioNo = new URLSearchParams(search).get("AdmNo");
 
   const { TextArea } = Input;

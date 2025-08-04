@@ -9,16 +9,17 @@ import {
 } from "@ant-design/icons";
 // import useAuth from "../../hooks/useAuth";
 
-const Medication = ({  role, patientDetails }) => {
+const Medication = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
   const [selectedItem, setSelectedItem] = useState(<InpatientMedication />);
-  const userRole = null.userData.departmentName;
+  const { user } = useAuth();
+  const userRole = user.role;
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);
     switch (item.label) {
       case "Prescription":
-        setSelectedItem(<InpatientMedication role={role} />);
+        setSelectedItem(<InpatientMedication />);
         break;
       case "Treatments Sheet":
         setSelectedItem(<TreatmentsSheet patientDetails={patientDetails} />);
@@ -34,7 +35,7 @@ const Medication = ({  role, patientDetails }) => {
   const menuItems = [
     { label: "Prescription", icon: <MedicineBoxOutlined /> },
     { label: "Treatments Sheet", icon: <BorderlessTableOutlined /> },
-    ...(userRole === "Nurse"
+    ...(userRole == "Nurse"
       ? [{ label: "Order Sheet", icon: <BorderlessTableOutlined /> }]
       : []),
   ];

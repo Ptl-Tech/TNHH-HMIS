@@ -1,6 +1,6 @@
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Card, Form, Input, message, Space } from "antd";
 
@@ -9,22 +9,22 @@ import logoLogin from "../assets/images/logoLogin.png";
 
 import { OTPModal } from "./OtpCard";
 
+import { useAuth } from "../hooks/auth";
 import { login } from "../actions/auth-actions/login";
 import { AUTH_RESET_MESSAGES } from "../reducers/auth/auth-reducer";
-import { getUserDetails } from "../actions/getUserDetails";
 
 const Login = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const {
     loading,
     redirect,
+    fetchUser,
     loginError,
     userDetails,
     showOTPModal,
     loginSuccess,
-  } = useSelector((state) => state.auth);
+  } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (redirect === "/login") dispatch({ type: AUTH_RESET_MESSAGES });
@@ -35,12 +35,13 @@ const Login = () => {
     // A success message
     if (loginSuccess) {
       message.success(loginSuccess);
-      if (userDetails?.otpVerified) {
-        const role = userDetails?.role.toLowerCase();
-        if (role) navigate(`/${role.charAt(0).toUpperCase() + role.slice(1)}`);
-      }
+
       // Fetch me
-      dispatch(getUserDetails());
+      fetchUser();
+
+      if (userDetails?.otpVerified) {
+        navigate(`/Dashboard`);
+      }
     }
 
     if (loginError || loginSuccess) dispatch({ type: AUTH_RESET_MESSAGES });

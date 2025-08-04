@@ -11,7 +11,6 @@ import useFetchPatientDetailsHook from "../../hooks/useFetchPatientDetailsHook";
 
 const EncounterSummery = () => {
   const location = useLocation();
-  const role = null.userData.departmentName;
   const treatmentNo = new URLSearchParams(location.search).get("TreatmentNo");
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const patientDetails = location.state?.patientDetails || {};
@@ -22,10 +21,12 @@ const EncounterSummery = () => {
     (state) => state.getPatientVisit
   );
 
-  const { patientDetails: data } = useFetchPatientDetailsHook(patientDetails?.PatientNo);
+  const { patientDetails: data } = useFetchPatientDetailsHook(
+    patientDetails?.PatientNo
+  );
 
-  console.log('patientDetails', patientDetails);
-  console.log('Patient details data from the component', data);
+  console.log("patientDetails", patientDetails);
+  console.log("Patient details data from the component", data);
 
   useEffect(() => {
     dispatch(getAppmntDetails(patientDetails?.LinkNo));
@@ -61,7 +62,6 @@ const EncounterSummery = () => {
             treatmentNo={treatmentNo}
             patientNo={patientNo}
             patientDetails={patientDetails}
-            role={role}
           />
         </Col>
       </Row>

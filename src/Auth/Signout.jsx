@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { MdLogout } from "react-icons/md";
 import { FaUserAlt } from "react-icons/fa";
@@ -6,10 +6,11 @@ import { GiRamProfile } from "react-icons/gi";
 import { Menu, Dropdown, Avatar, Space } from "antd";
 
 import { logout } from "../actions/auth-actions/logout";
+import { useAuth } from "../hooks/auth";
 
 const Signout = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
 
   const handleSignOut = () => {
     dispatch(logout());

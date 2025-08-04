@@ -80,7 +80,7 @@ const TriageList = () => {
       if (data?.status === "success") {
         message.success("Patient checked in successfully in the triage room");
         navigate(
-          `/Nurse/Triage/Patient?Patient_id=${patientId}&Ob_number=${observationNo}`
+          `/Dashboard/Triage/Patient?Patient_id=${patientId}&Ob_number=${observationNo}`
         );
       } else {
         message.error("An error occurred, please try again");

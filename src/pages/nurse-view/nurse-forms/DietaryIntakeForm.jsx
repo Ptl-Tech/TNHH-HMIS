@@ -20,17 +20,23 @@ import {
   POST_DIETARY_INTAKE_FORM_LINE_SUCCESS,
   postDietaryIntakeFormLineSlice,
 } from "../../../actions/nurse-actions/postDietaryIntakeFormLineSlice";
+import { useAbility } from "../../../hooks/casl";
 
 const DietaryIntakeForm = () => {
-  const { selectedRowKey, rowSelection, selectedRow } =
-    useSetTableCheckBoxHook();
-  const role = null.userData.departmentName;
-  const { patientDetails } = useLocation().state;
-  const [form] = Form.useForm();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const ability = useAbility();
   const dispatch = useDispatch();
+
+  const [form] = Form.useForm();
+
+  const canCreateDietaryIntake = ability.can("create", "dietaryIntake");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
 
+  const { selectedRowKey, rowSelection, selectedRow } =
+    useSetTableCheckBoxHook();
+
+  const { patientDetails } = useLocation().state;
   const { loadingIpLookupValues, ipLookupValues } = useSelector(
     (state) => state.getQyIpLookupValues
   );
@@ -111,7 +117,7 @@ const DietaryIntakeForm = () => {
         }}
       >
         {!isFormVisible &&
-          (role === "Nurse" ? (
+          (canCreateDietaryIntake ? (
             <>
               <Button type="primary" onClick={handleButtonVisibility}>
                 <PlusOutlined /> New Dietary Form

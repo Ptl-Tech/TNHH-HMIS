@@ -1,23 +1,27 @@
 import { useEffect, useMemo } from "react";
-import DashboardCard from "./DashboardCard";
-import DashboardStatistics from "./DashboardStatistics";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   UserOutlined,
   HourglassOutlined,
   SafetyOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
 
-import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
 import moment from "moment";
-import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { useAuth } from "../../hooks/auth";
+
+import DashboardCard from "./DashboardCard";
+import DashboardStatistics from "./DashboardStatistics";
+
 import { listDoctors } from "../../actions/DropdownListActions";
+import { getTriageList } from "../../actions/triage-actions/getTriageListSlice";
+import { getPatientListSlice } from "../../actions/nurse-actions/getPatientListSlice";
+import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 const Dashboard = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
 
-  const userDetails = null; // Use the custom hook to get user info
   const branchCode = localStorage.getItem("branchCode");
 
   useEffect(() => {
@@ -101,7 +105,7 @@ const Dashboard = () => {
       icon: <HourglassOutlined />,
       color: "#fff", // You can set the color here
       backgroundColor: "#0f5689", // You can set the background color here,
-      link: "/Nurse/Triage", // You can set the link here
+      link: "/Dashboard/Triage", // You can set the link here
     },
     {
       title: "Patients in Triage",
@@ -110,7 +114,7 @@ const Dashboard = () => {
       icon: <SafetyOutlined />,
       color: "#000", // You can set the color here
       backgroundColor: "#b0afaf", // You can set the background color here
-      link: "/Nurse/PendingTriageList",
+      link: "/Dashboard/PendingTriageList",
     },
     {
       title: "Out patients",
@@ -119,7 +123,7 @@ const Dashboard = () => {
       icon: <UserOutlined />,
       color: "#fff", // You can set the color here
       backgroundColor: "#ac8342 ", // You can set the background color here
-      link: "/Nurse/Consultation-List",
+      link: "/Dashboard/Consultation-List",
     },
     {
       title: "In patients",
@@ -128,7 +132,7 @@ const Dashboard = () => {
       icon: <UserAddOutlined />,
       color: "#000", // You can set the color here
       backgroundColor: "#b0afaf", // You can set the background color here
-      link: "/Nurse/Inpatient",
+      link: "/Dashboard/Inpatient",
     },
   ];
 
@@ -176,7 +180,7 @@ const Dashboard = () => {
       </div>
 
       <DashboardStatistics
-        userDetails={userDetails}
+        userDetails={user}
         chartData={chartData}
         loadingPatientList={loadingPatientList}
       />

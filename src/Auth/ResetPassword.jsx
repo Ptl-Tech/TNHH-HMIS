@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button, Card, Form, Input, message, Space } from "antd";
@@ -7,19 +7,19 @@ import { Button, Card, Form, Input, message, Space } from "antd";
 import loginImg from "../assets/images/loginImg.jpg";
 import logoLogin from "../assets/images/logoLogin.png";
 
+import { useAuth } from "../hooks/auth";
 import { AUTH_RESET_MESSAGES } from "../reducers/auth/auth-reducer";
 import { resetPassword } from "../actions/auth-actions/reset-password";
 
 const ResetPassword = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate(); // For redirecting to login page
-
   const {
     loading,
     redirect,
     resetPasswordError: error,
     resetPasswordSuccess: success,
-  } = useSelector((state) => state.auth);
+  } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // For redirecting to login page
 
   useEffect(() => {
     console.log({ error });

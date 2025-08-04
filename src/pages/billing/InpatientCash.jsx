@@ -33,7 +33,7 @@ const InpatientCash = () => {
 
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    navigate(`/Reception/InPatient-Charges?PatientNo=${patientId}`);
+    navigate(`/Dashboard/InPatient-Charges?PatientNo=${patientId}`);
   };
 
   const columns = [

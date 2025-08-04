@@ -24,7 +24,6 @@ import ConsultationRoomEvalutionCard from "../pages/doctorsViews/ConsultationRoo
 import ReadDoctorNotes from "../pages/ReadDoctorNotes";
 import OutpatientList from "../pages/OutpatientList";
 import DirectAdmission from "../pages/nurse-view/DirectAdmission";
-import ViewProfile from "../Auth/ViewProfile";
 import TreatmentCard from "../pages/nurse-view/TreatmentCard";
 import ExaminePatientInTriage from "../pages/nurse-view/ExaminePatientInTriage";
 import Inpatient from "../pages/nurse-view/Inpatient";
@@ -45,7 +44,7 @@ import Consumables from "../pages/nurse-view/nurse-patient-file/Consumables";
 
 export const nurseRoutes = [
   {
-    key: "/Nurse",
+    key: "/Dashboard",
     icon: <AppstoreOutlined style={{ color: "#fff" }} />,
     label: "Dashboard",
   },
@@ -128,8 +127,12 @@ export const nurseRoutes = [
 ];
 export default function NurseRoutes() {
   return (
-    <Route element={<PrivateRoute allowedDepartments={["Nurse"]} />}>
-      <Route path="/Nurse" element={<MainLayout />}>
+    <Route
+      element={
+        <PrivateRoute permission={"read"} resource={"nurseNavigation"} />
+      }
+    >
+      <Route path="/Dashboard" element={<MainLayout />}>
         <Route index element={<Dashboard />} />
 
         {/* Routes */}
@@ -157,7 +160,10 @@ export default function NurseRoutes() {
         <Route path="Ward-management" element={<WardManagement />} />
         <Route path="Ward-management/Release-bed" element={<ReleaseBed />} />
         <Route path="Discharge-list" element={<DischargeList />} />
-        <Route path="Discharge-list/Posted-Consumables" element={<Consumables />} />
+        <Route
+          path="Discharge-list/Posted-Consumables"
+          element={<Consumables />}
+        />
         <Route path="Ward-management/Transfer-bed" element={<TransferBed />} />
         <Route path="Inpatient/Encounter" element={<EncounterSummery />} />
         <Route path="Inpatient/Patient-card" element={<InpatientCard />} />
@@ -186,7 +192,6 @@ export default function NurseRoutes() {
           path="patient-list/Direct-Admission/:PatientNo?"
           element={<DirectAdmission />}
         />
-        <Route path="view-profile" element={<ViewProfile />} />
       </Route>
     </Route>
   );

@@ -129,10 +129,10 @@ const DischargeRequestList = () => {
   };
 
   const handleNewPatient = () => {
-    navigate("/Doctor/Outpatient-list"); // Redirect to new patient registration page
+    navigate("/Dashboard/Outpatient-list"); // Redirect to new patient registration page
   };
   const handleBedManager = () => {
-    navigate("/Nurse/BedManagement"); // Redirect to new patient registration page
+    navigate("/Dashboard/BedManagement"); // Redirect to new patient registration page
   };
 
   // Function to download data as Excel

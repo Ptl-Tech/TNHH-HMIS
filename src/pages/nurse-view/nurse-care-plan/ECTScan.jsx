@@ -7,16 +7,20 @@ import ECTFormData from "../nurse-forms/ETCFormData";
 import ETCTable from "../tables/nurse-tables/ETCTable";
 import { getPatientECTRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 import { listDoctors } from "../../../actions/DropdownListActions";
+import { useAbility } from "../../../hooks/casl";
 // import useAuth from "../../../hooks/useAuth";
 
 const ECTScan = () => {
+  const ability = useAbility();
   const location = useLocation();
+
+  const canCreateECTRequest = ability.can("create", "eCTRequest");
+
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientNo = queryParams.get("PatientNo");
   const admissionNo = queryParams.get("AdmNo");
-  const role = null.userData.departmentName;
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false); // Toggle between table and for
@@ -58,7 +62,7 @@ const ECTScan = () => {
             ECT Request
           </Typography.Title>
         </div>
-        {role === "Doctor"|| role ==="Nurse" && patientDetails?.Status !== "Completed" && (
+        {canCreateECTRequest && patientDetails?.Status !== "Completed" && (
           <div style={{ display: "flex", gap: "10px" }}>
             <Button
               type="primary"

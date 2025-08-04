@@ -1,38 +1,42 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { message, Table } from 'antd';
+import { message, Table } from "antd";
 
 // import useAuth from '../../hooks/useAuth';
-import { rowClassName } from '../../utils/helpers';
-import Loading from '../../partials/nurse-partials/Loading';
+import { rowClassName } from "../../utils/helpers";
+import Loading from "../../partials/nurse-partials/Loading";
 
-import { POST_CHECK_IN_PATIENT_RESET, postCheckInPatient } from '../../actions/Doc-actions/postCheckInPatient';
-import { getOutPatientTreatmentList } from '../../actions/Doc-actions/OutPatientAction';
-import { getTriageWaitingList } from '../../actions/triage-actions/getTriageWaitingListSlice';
+import {
+  POST_CHECK_IN_PATIENT_RESET,
+  postCheckInPatient,
+} from "../../actions/Doc-actions/postCheckInPatient";
+import { getOutPatientTreatmentList } from "../../actions/Doc-actions/OutPatientAction";
+import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 
-import { waitingListColumns } from './tables/tables-utils';
-import ConsultationRoomSummeryCard from './ConsultationRoomSummeryCard';
-import FilterConsultationRoom from '../../partials/nurse-partials/FilterConsultationRoom';
+import { waitingListColumns } from "./tables/tables-utils";
+import ConsultationRoomSummeryCard from "./ConsultationRoomSummeryCard";
+import FilterConsultationRoom from "../../partials/nurse-partials/FilterConsultationRoom";
+import { useAbility } from "../../hooks/casl";
+import { subject } from "@casl/ability";
 
 const DoctorVisits = () => {
-  const doctorId = null.userData.doctorID;
-  const role = null.userData.departmentName;
+  const ability = useAbility();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const [currentRecord, setCurrentRecord] = useState('');
-  const [currentTreatmentNo, setCurrentTreatmentNo] = useState('');
+  const [currentRecord, setCurrentRecord] = useState("");
+  const [currentTreatmentNo, setCurrentTreatmentNo] = useState("");
 
-  const [searchName, setSearchName] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
-  const [searchVisitNumber, setSearchVisitNumber] = useState('');
+  const [searchName, setSearchName] = useState("");
+  const [searchPatientNumber, setSearchPatientNumber] = useState("");
+  const [searchVisitNumber, setSearchVisitNumber] = useState("");
 
   const { loadingWaitingList, triageWaitingList: patients } = useSelector(
-    (state) => state.getTriageWaitingList,
+    (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
@@ -51,58 +55,43 @@ const DoctorVisits = () => {
   useEffect(() => {
     console.log({ checkInPatient });
 
-    if (checkInPatient?.status === 'success' && currentRecord && currentTreatmentNo) {
-      message.success('Patient checked in to the Consultation Room ');
+    if (
+      checkInPatient?.status === "success" &&
+      currentRecord &&
+      currentTreatmentNo
+    ) {
+      message.success("Patient checked in to the Consultation Room ");
       navigate(
-        role === 'Doctor'
-          ? `/Doctor/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
-          : role === 'Psychology'
-            ? `/Psychology/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`
-            : `/Nurse/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
+        `Dashboard/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
         {
           state: {
             patientDetails: currentRecord,
             patientNo: currentRecord.PatientNo,
             observationNo: currentRecord.ObservationNo,
           },
-        },
+        }
       );
       dispatch({ type: POST_CHECK_IN_PATIENT_RESET });
     }
 
     if (checkInError) {
       dispatch({ type: POST_CHECK_IN_PATIENT_RESET });
-      message.error('An error occurred, please try again');
+      message.error("An error occurred, please try again");
     }
   }, [checkInError, checkInPatient]);
   // console.log('consultation Room list', treatmentList);
 
-  const openDoctorVisitList = treatmentList?.filter((item) => {
-    if (role === 'Doctor') {
-      return item.Status === 'New' && item.DoctorID === doctorId;
-    } else if (role === 'Psychology') {
-      return item.Status === 'New' && item.DoctorID === doctorId;
-    }
-    return item.Status === 'New';
-  });
+  const isDoctorOrPsychology = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId }));
 
-  const activeConsultationList = treatmentList?.filter((item) => {
-    if (role === 'Doctor') {
-      return item.Status === 'Active' && item.DoctorID === doctorId;
-    } else if (role === 'Psychology') {
-      return item.Status === 'Active' && item.DoctorID === doctorId;
-    }
-    return item.Status === 'Active';
-  });
+  const filterConsultations = (status) =>
+    treatmentList?.filter(
+      (item) => isDoctorOrPsychology(item.DoctorID) && item.Status === status
+    );
 
-  const closedConsultationList = treatmentList?.filter((item) => {
-    if (role === 'Doctor') {
-      return item.Status === 'Completed' && item.DoctorID === doctorId;
-    } else if (role === 'Psychology') {
-      return item.Status === 'Completed' && item.DoctorID === doctorId;
-    }
-    return item.Status === 'Completed';
-  });
+  const openDoctorVisitList = filterConsultations("New");
+  const activeConsultationList = filterConsultations("Active");
+  const closedConsultationList = filterConsultations("Completed");
 
   const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
@@ -115,17 +104,17 @@ const DoctorVisits = () => {
 
   const combinedList = openDoctorVisitList?.map((room) => {
     const matchingPatient = openDoctorVisitListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo,
+      (patient) => patient.PatientNo === room.PatientNo
     );
 
     return {
       ...room,
       PatientNo: room?.PatientNo,
-      SearchName: matchingPatient ? matchingPatient.SearchName : '',
-      IDNumber: matchingPatient ? matchingPatient.IDNumber : '',
-      Age: matchingPatient ? matchingPatient.Age : '',
-      PatientType: matchingPatient ? matchingPatient.PatientType : '',
-      Inpatient: matchingPatient ? matchingPatient.Inpatient : '',
+      SearchName: matchingPatient ? matchingPatient.SearchName : "",
+      IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
+      Age: matchingPatient ? matchingPatient.Age : "",
+      PatientType: matchingPatient ? matchingPatient.PatientType : "",
+      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
     };
   });
 
@@ -136,7 +125,7 @@ const DoctorVisits = () => {
   };
 
   return (
-    <div style={{ padding: '10px 10px' }}>
+    <div style={{ padding: "10px 10px" }}>
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}
@@ -146,8 +135,8 @@ const DoctorVisits = () => {
 
       <FilterConsultationRoom
         setSearchName={setSearchName}
-        setSearchPatientNumber={setSearchPatientNumber}
         setSearchVisitNumber={setSearchVisitNumber}
+        setSearchPatientNumber={setSearchPatientNumber}
       />
 
       {loadingWaitingList || treatmentListLoading ? (
@@ -168,7 +157,7 @@ const DoctorVisits = () => {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            position: ['bottom', 'right'],
+            position: ["bottom", "right"],
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} items`,
           }}

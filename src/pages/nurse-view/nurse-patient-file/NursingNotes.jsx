@@ -18,14 +18,19 @@ import PropTypes from "prop-types";
 import NursingNotesFormData from "../nurse-forms/NursingNotesFormData";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
+import { useAbility } from "../../../hooks/casl";
+import { useAuth } from "../../../hooks/auth";
 
 const NursingNotes = () => {
-  const role = null.userData.departmentName; // Get user role from useAuth hook
+  const { user } = useAuth();
+  const ability = useAbility();
+
+  const canCreateNurseNotes = ability.can("create", "nurseNotes");
+
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = null;
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
     useState(false);
 
@@ -64,7 +69,7 @@ const NursingNotes = () => {
       const notesData = {
         myAction: "create",
         recId: "",
-        staffNo: userDetails.userData.no,
+        staffNo: user.staffNo,
         branchCode: branchCode,
         patientNo: patientDetails?.Patient_No,
         admissionNo: patientDetails?.Admission_No,
@@ -112,7 +117,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-      {!isNursingNotesFormVisible && role === "Nurse" && (
+      {!isNursingNotesFormVisible && canCreateNurseNotes && (
         <div
           style={{
             display: "flex",

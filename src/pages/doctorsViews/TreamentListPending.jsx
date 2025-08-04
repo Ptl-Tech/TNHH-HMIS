@@ -88,7 +88,7 @@ const TreamentListPending = () => {
     observationNo &&
       patientNumber &&
       navigate(
-        `/Nurse/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`,
+        `/Dashboard/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`,
       );
   };
 
@@ -153,11 +153,10 @@ const TreamentListPending = () => {
   return (
     <div style={{ padding: '10px 10px' }}>
       <ConsultationRoomSummeryCard
-        waitingPatient={waitingListTableDataSource}
         currentPath={currentPath}
+        waitingPatient={waitingListTableDataSource}
         pendingTreatmentList={pendingTreatmentList}
       />
-
       <Card
         style={{
           padding: '10px 16px',

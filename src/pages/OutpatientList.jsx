@@ -1,36 +1,37 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  PlusOutlined,
-  EyeOutlined,
-  TeamOutlined,
-  DisconnectOutlined,
-  DownOutlined
-} from "@ant-design/icons";
 
 import {
-  Button,
-  Card,
   Col,
-  Input,
   Row,
+  Card,
   Table,
+  Input,
+  Button,
   Tooltip,
+  Dropdown,
   Typography,
-  Dropdown, Menu
 } from "antd";
+import {
+  EyeOutlined,
+  TeamOutlined,
+  DownOutlined,
+  PlusOutlined,
+  DisconnectOutlined,
+} from "@ant-design/icons";
+
 import { listPatients } from "../actions/patientActions";
-// // import useAuth from "../hooks/useAuth";
-const { Search } = Input;
+import { useAbility } from "../hooks/casl";
 
 const OutpatientList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const ability = useAbility();
+
   const { loading: loadingPatients, patients } = useSelector(
     (state) => state.patientList
   );
-  const role = null.userData.departmentName;
 
   // get patient whose ActiveVisitNo ="" and CurrentAdmNo = ""
   const patientsToFilter = useMemo(() => {
@@ -42,13 +43,13 @@ const OutpatientList = () => {
       ? patients
       : Object.values(patients);
 
-    return role === "Nurse"
+    return ability.can("read", "nurseNavigation")
       ? patientsArray.filter(
           (patient) =>
             patient?.ActiveVisitNo === "" && patient?.CurrentAdmNo === ""
         )
       : patientsArray;
-  }, [role, patients]);
+  }, [ability, patients]);
 
   const [searchParams, setSearchParams] = useState({
     SearchName: "",
@@ -143,7 +144,11 @@ const OutpatientList = () => {
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
     { title: "ID Number", dataIndex: "IDNumber", key: "IDNumber" },
-    {title:"Branch Code", dataIndex: "GlobalDimension1Code", key: "GlobalDimension1Code"},
+    {
+      title: "Branch Code",
+      dataIndex: "GlobalDimension1Code",
+      key: "GlobalDimension1Code",
+    },
     {
       title: "Date Registered",
       dataIndex: "DateRegistered",
@@ -156,8 +161,8 @@ const OutpatientList = () => {
       key: "actions",
       render: (_, record) => {
         const menuItems = [];
-    
-        if (role === "Reception") {
+
+        if (ability.can("read", "receptionNavigation")) {
           menuItems.push(
             {
               key: "view",
@@ -180,7 +185,7 @@ const OutpatientList = () => {
                 <div
                   onClick={() =>
                     navigate(
-                      `/reception/Add-Appointment/Patient?PatientNo=${record.PatientNo}`,
+                      `/Dashboard/Add-Appointment/Patient?PatientNo=${record.PatientNo}`,
                       {
                         state: {
                           patientNo: record.PatientNo,
@@ -195,14 +200,14 @@ const OutpatientList = () => {
               ),
             }
           );
-        } else if (role === "Nurse") {
+        } else if (ability.can("read", "nurseNavigation")) {
           menuItems.push({
             key: "admit",
             label: (
               <div
                 onClick={() =>
                   navigate(
-                    `/Nurse/patient-list/Direct-Admission?PatientNo=${record.PatientNo}`,
+                    `/Dashboard/patient-list/Direct-Admission?PatientNo=${record.PatientNo}`,
                     { state: { patientDetails: record } }
                   )
                 }
@@ -212,18 +217,21 @@ const OutpatientList = () => {
             ),
           });
         }
-    
+
         return (
           <Dropdown
             menu={{ items: menuItems }}
             placement="bottomLeft"
             trigger={["click"]}
           >
-            <Button type="primary" size="small">Actions<DownOutlined /></Button>
+            <Button type="primary" size="small">
+              Actions
+              <DownOutlined />
+            </Button>
           </Dropdown>
         );
       },
-    }
+    },
   ];
 
   return (
@@ -236,11 +244,7 @@ const OutpatientList = () => {
         <Button
           type="primary"
           onClick={() => {
-            if (role === "Reception") {
-              navigate("/Dashboard/Patient-Registration");
-            } else if (role === "Nurse") {
-              navigate("/Nurse/Patient-Registration");
-            }
+            navigate("/Dashboard/Patient-Registration");
           }}
           style={{ marginBottom: "20px" }}
         >

@@ -43,7 +43,7 @@ const RadiologyDashboard = () => {
             <div
               className="card"
               style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Radiology/Radiology-Outpatient')}
+              onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
                 <div className="card-title p-2">
@@ -59,7 +59,7 @@ const RadiologyDashboard = () => {
             <div
               className="card"
               style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Radiology/Radiology-Outpatient')}
+              onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
                 <div className="card-title p-2">
@@ -75,7 +75,7 @@ const RadiologyDashboard = () => {
             <div
               className="card"
               style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Radiology/Radiology-Outpatient')}
+              onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
                 <div className="card-title p-2">
@@ -93,7 +93,7 @@ const RadiologyDashboard = () => {
             <div
               className="card"
               style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
-              onClick={() => navigate('/Radiology/Radiology-Outpatient')}
+              onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
                 <div className="card-title p-2">

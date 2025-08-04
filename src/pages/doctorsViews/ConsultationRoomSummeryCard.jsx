@@ -1,34 +1,38 @@
-
 import { Card, Typography } from "antd";
-import { ClockCircleOutlined, HourglassOutlined, StopOutlined } from "@ant-design/icons";
+import {
+  ClockCircleOutlined,
+  HourglassOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
 import PropTypes from "prop-types";
 import CountUp from "react-countup";
 import { Link } from "react-router-dom";
-// import useAuth from "../../hooks/useAuth";
-
-const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeConsultationList, closedConsultationList }) => {
-  
-  const role = null.userData.departmentName
+const ConsultationRoomSummeryCard = ({
+  currentPath,
+  openDoctorVisitList,
+  activeConsultationList,
+  closedConsultationList,
+}) => {
   const cardData = [
     {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
       title: "OP Waiting List",
-      ...(role === "Doctor" ? { link: "/Doctor/Consultation-List" } : role === "Nurse" ? { link: "/Nurse/Consultation-List" } : { link: "/Psychology/Consultation-List" }),
+      link: "/Dashboard/Consultation-List",
       count: openDoctorVisitList?.length,
     },
     {
       backgroundColor: "orange",
       icon: <ClockCircleOutlined />,
       title: "In Consultation",
-      ...(role === "Doctor" ? { link: "/Doctor/PendingConsultationList" } : role === "Nurse" ? { link: "/Nurse/PendingConsultationList" } : { link: "/Psychology/PendingConsultationList" }),
+      link: "/Dashboard/PendingConsultationList",
       count: activeConsultationList?.length,
     },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,
       title: "Closed",
-      ...(role === "Doctor" ? { link: "/Doctor/ClosedConsultationList" } : role === "Nurse" ? { link: "/Nurse/ClosedConsultationList" } : { link: "/Psychology/ClosedConsultationList" }),
+      link: "/Dashboard/ClosedConsultationList",
       count: closedConsultationList?.length,
     },
   ];
@@ -68,7 +72,9 @@ const ConsultationRoomSummeryCard = ({ currentPath, openDoctorVisitList, activeC
                 <Typography.Title level={5} style={{ color: "gray" }}>
                   {card.title}
                 </Typography.Title>
-                <Typography.Text style={{ fontSize: "12px", fontWeight: "bold" }}>
+                <Typography.Text
+                  style={{ fontSize: "12px", fontWeight: "bold" }}
+                >
                   <CountUp start={0} end={card.count} duration={1} />
                 </Typography.Text>
               </div>

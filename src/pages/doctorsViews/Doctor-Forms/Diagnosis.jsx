@@ -24,12 +24,14 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import DiagnosisTable from "../tables/Diagnosis/DiagnosisTable";
 import DiagnosisForm from "./DiagnosisForm";
+import { useAbility } from "../../../hooks/casl";
 // import useAuth from "../../../hooks/useAuth";
 
 const Diagnosis = () => {
   const location = useLocation();
+  const ability = useAbility();
   const patientDetails = location.state?.patientDetails;
-  const role = null.userData.departmentName;
+
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
   const admissionNo = queryParams.get("AdmNo");
@@ -38,9 +40,11 @@ const Diagnosis = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { data } = useSelector((state) => state.getDiagnosisSetup);
-  const { loading: loadingDiagnosisLines, data: diagnosisLines } = useSelector(
-    (state) => state.getDiagnosisLines
+  const canSeeDoctorOrPsychologyNotes = ability.can(
+    "read",
+    "doctorPsychologyNotes"
   );
+
   const { data: secondaryDiagnosis } = useSelector(
     (state) => state.getSecondaryDiagnosisSetup
   );
@@ -48,19 +52,16 @@ const Diagnosis = () => {
     (state) => state.postdiagnosis
   );
 
-  const { loading: savePatientHistory } = useSelector(
-    (state) => state.postPatientHistory
-  );
   const [provisionDiagnosisList, setProvisionDiagnosisList] = useState([]);
   const [primaryDiagnosisList, setPrimaryDiagnosisList] = useState([]);
   const [secondaryDiagnosisList, setSecondaryDiagnosisList] = useState([]);
   const [activeKey, setActiveKey] = useState("1"); // Default active key to Primary Diagnosis
-  const [diagnosisList, setDiagnosisList] = useState([]);
+
   const [diagnosisInput, setDiagnosisInput] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [historyVisible, setHistoryVisible] = useState(false);
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const [lastSavedDiagnosis, setLastSavedDiagnosis] = useState([]);
+
   const [modalContent, setModalContent] = useState({
     type: "info",
     title: "",
@@ -85,7 +86,7 @@ const Diagnosis = () => {
     form.setFieldValue("notes", state.getCurrentContent().getPlainText());
   };
   const handleViewDoctorNotes = () => {
-    navigate("/Doctor/Doctor-Notes");
+    navigate("/Dashboard/Doctor-Notes");
   };
 
   const handleHistoryClick = () => {
@@ -281,21 +282,21 @@ const Diagnosis = () => {
         Diagnosis Lines
       </Typography.Title>
 
-      {(role === "Doctor" ||
-        (role === "Psychology" && patientDetails?.Status !== "Completed")) && (
-        <Row gutter={24}>
-          <Col span={24}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              style={{ marginBottom: "4px", float: "right" }}
-              onClick={handleHistoryClick}
-            >
-              Add New Diagnosis
-            </Button>
-          </Col>
-        </Row>
-      )}
+      {canSeeDoctorOrPsychologyNotes &&
+        patientDetails?.Status !== "Completed" && (
+          <Row gutter={24}>
+            <Col span={24}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                style={{ marginBottom: "4px", float: "right" }}
+                onClick={handleHistoryClick}
+              >
+                Add New Diagnosis
+              </Button>
+            </Col>
+          </Row>
+        )}
 
       <DiagnosisTable treatmentNo={treatmentNo} />
 

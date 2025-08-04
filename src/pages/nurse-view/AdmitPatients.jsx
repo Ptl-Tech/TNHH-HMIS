@@ -150,7 +150,7 @@ const AdmitPatients = () => {
 
   // const handleAdmitPatient = () => {
 
-  //   selectedRow[0]?.PatientNo &&  navigate(`/Nurse/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`, {
+  //   selectedRow[0]?.PatientNo &&  navigate(`/Dashboard/Admit-patient/Patient?PatientNo=${selectedRow[0].PatientNo}`, {
   //     state: { patientDetails: selectedRow[0] }
   //   });
   // }
@@ -179,7 +179,7 @@ const AdmitPatients = () => {
       ).then((data) => {
         if (data) {
           message.success("Patient admitted successfully");
-          navigate(`/Nurse/Inpatient`);
+          navigate(`/Dashboard/Inpatient`);
         } else {
           message.error("Patient admission failed");
         }
@@ -192,7 +192,7 @@ const AdmitPatients = () => {
   const handlePatientCharges = () => {
     selectedRow[0]?.patientNo &&
       navigate(
-        `/Nurse/Admit-patient/Charges?PatientNo=${selectedRow[0].patientNo}`
+        `/Dashboard/Admit-patient/Charges?PatientNo=${selectedRow[0].patientNo}`
       );
   };
 

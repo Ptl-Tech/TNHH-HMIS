@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Button, Drawer, Form, Input, Select, Skeleton ,Row, Col, DatePicker} from "antd";
+import {
+  Button,
+  Drawer,
+  Form,
+  Input,
+  Select,
+  Skeleton,
+  Row,
+  Col,
+  DatePicker,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { getTransactionListSetup } from "../../../actions/Charges-Actions/getTransactionList";
 import { getChargesSetup } from "../../../actions/Charges-Actions/ChargesSetup";
-import { postPatientCharges,POST_CHARGES_RESET } from "../../../actions/Charges-Actions/postCharges";
+import {
+  postPatientCharges,
+  POST_CHARGES_RESET,
+} from "../../../actions/Charges-Actions/postCharges";
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { getSinglePatientBill } from "../../../actions/Charges-Actions/getSinglePatientBill";
 import moment from "moment";
 import { listDoctors } from "../../../actions/DropdownListActions";
 
-const AddServices = ({
-  visible,
-  onClose,
-  activeVisitNo,
-  editingCharge,
-}) => {
+const AddServices = ({ visible, onClose, activeVisitNo, editingCharge }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const { data: transactionList, loading: transactionListLoading } =
@@ -22,9 +30,11 @@ const AddServices = ({
   const { charges: transactionCharges, loading: chargesLoading } = useSelector(
     (state) => state.getChargesSetup
   );
-  const { loading: addChargesLoading, error:addChargesError, success: addChargesSuccess } = useSelector(
-    (state) => state.postPatientCharges
-  );
+  const {
+    loading: addChargesLoading,
+    error: addChargesError,
+    success: addChargesSuccess,
+  } = useSelector((state) => state.postPatientCharges);
   const {
     loading: patientBillLoading,
     error: patientBillError,
@@ -36,15 +46,14 @@ const AddServices = ({
   const [charges, setCharges] = useState([]);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [quantity, setQuantity] = useState(1);
-    const [calculateDoctorFee, setCalculateDoctorFee] = useState(false);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
-    
+  const [calculateDoctorFee, setCalculateDoctorFee] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-useEffect(() => {
-  if (activeVisitNo) {
-    dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
-  }
-}, [dispatch, activeVisitNo]);
+  useEffect(() => {
+    if (activeVisitNo) {
+      dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
+    }
+  }, [dispatch, activeVisitNo]);
 
   useEffect(() => {
     if (visible) {
@@ -58,7 +67,9 @@ useEffect(() => {
           transactionType: editingCharge.Transaction_Type,
           chargeType: editingCharge.Description,
           Quantity: editingCharge.Quantity,
-          Amount: `KES ${(editingCharge.Total_Amount / editingCharge.Quantity).toFixed(2)}`,
+          Amount: `KES ${(
+            editingCharge.Total_Amount / editingCharge.Quantity
+          ).toFixed(2)}`,
           creationDate: editingCharge.Creation_Date
             ? moment(editingCharge.Creation_Date, "YYYY-MM-DD")
             : null,
@@ -90,26 +101,25 @@ useEffect(() => {
   }, [transactionCharges, transactionType, form]);
 
   useEffect(() => {
-    if(transactionType !== null && transactionType !== undefined) {
+    if (transactionType !== null && transactionType !== undefined) {
       const selectedTransaction = transactionList.find(
         (item) => item.TransactionType === transactionType
       );
 
-       if (selectedTransaction?.CalculateDoctorFee) {
-            setCalculateDoctorFee(true);
-            dispatch(listDoctors());
-          } else {
-            setCalculateDoctorFee(false);
-            setSelectedDoctor(null); // Clear selected doctor if not required
-          }
-        }
+      if (selectedTransaction?.CalculateDoctorFee) {
+        setCalculateDoctorFee(true);
+        dispatch(listDoctors());
+      } else {
+        setCalculateDoctorFee(false);
+        setSelectedDoctor(null); // Clear selected doctor if not required
+      }
+    }
   }, [transactionType, transactionList, dispatch]);
-
 
   useEffect(() => {
     if (addChargesSuccess) {
       form.resetFields(); // Reset form fields after successful submission
-      dispatch({type: POST_CHARGES_RESET}); // Reset success state
+      dispatch({ type: POST_CHARGES_RESET }); // Reset success state
       onClose(); // Close the drawer
     }
   }, [addChargesSuccess, form, dispatch, onClose]);
@@ -117,7 +127,7 @@ useEffect(() => {
   useEffect(() => {
     if (addChargesError) {
       message.error(addChargesError); // Show error message
-      dispatch({type: POST_CHARGES_RESET}); // Reset error state
+      dispatch({ type: POST_CHARGES_RESET }); // Reset error state
     }
   }, [addChargesError, dispatch]);
 
@@ -154,21 +164,22 @@ useEffect(() => {
         charge: selectedCharge.Code,
         quantity: values.Quantity,
         remarks: values.remarks,
-        creationDate: values.creationDate?.format("YYYY-MM-DD") || moment().format("YYYY-MM-DD"),
+        creationDate:
+          values.creationDate?.format("YYYY-MM-DD") ||
+          moment().format("YYYY-MM-DD"),
         doctorId: calculateDoctorFee ? selectedDoctor : "",
       };
-      
+
       await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
       dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
       dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
-  
+
       onClose();
       form.resetFields();
     } catch (error) {
       message.error("Failed to save charges. Please try again.", error);
     }
   };
-  
 
   return (
     <Drawer
@@ -178,9 +189,7 @@ useEffect(() => {
       width={400}
       placement="right"
       maskClosable={false}
-      footer={
-       null
-      }
+      footer={null}
     >
       <Form layout="vertical" form={form}>
         <Form.Item
@@ -220,12 +229,16 @@ useEffect(() => {
           {chargesLoading ? (
             <Skeleton.Input active />
           ) : (
-            <Select onChange={handleChargeSelect} disabled={!!editingCharge}   showSearch
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.children.toLowerCase().includes(input.toLowerCase())
-            }
-            allowClear>
+            <Select
+              onChange={handleChargeSelect}
+              disabled={!!editingCharge}
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              allowClear
+            >
               {charges.map((charge) => (
                 <Select.Option key={charge.Code} value={charge.Code}>
                   {charge.Description}
@@ -234,56 +247,57 @@ useEffect(() => {
             </Select>
           )}
         </Form.Item>
-  {calculateDoctorFee && (
-    <Form.Item
-      label="Select Doctor"
-      name="doctorId"
-      rules={[{ required: true, message: "Please select a doctor!" }]}
-    >
-      <Select
-        placeholder="Select Doctor"
-        showSearch
-        optionFilterProp="children"
-        onChange={(value) => setSelectedDoctor(value)}
-      >
-        {doctors?.map((doc) => (
-          <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
-            {doc.DoctorsName}
-          </Select.Option>
-        ))}
-      </Select>
-    </Form.Item>
-)}
+        {calculateDoctorFee && (
+          <Form.Item
+            label="Select Doctor"
+            name="doctorId"
+            rules={[{ required: true, message: "Please select a doctor!" }]}
+          >
+            <Select
+              placeholder="Select Doctor"
+              showSearch
+              optionFilterProp="children"
+              onChange={(value) => setSelectedDoctor(value)}
+            >
+              {doctors?.map((doc) => (
+                <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                  {doc.DoctorsName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
-       <Row gutter={16}>
-        <Col span={24}>
-        <Form.Item
-          name="Quantity"
-          label="Quantity"
-          rules={[{ required: true, message: "Please enter a quantity!" }]}
-        >
-          <Input
-            type="number"
-            min={1}
-            value={quantity}
-            onChange={handleQuantityChange}
-          />
-        </Form.Item>
-        </Col>
-       
-       </Row>
-       <Row gutter={16}>
-       {patientBillData[0]?.CurrentAdmNo && (
-  <Form.Item
-    name="creationDate"
-    label="Creation Date"
-    rules={[{ required: true, message: "Please select the creation date!" }]}
-    style={{ width: "100%" }}
-  >
-    <DatePicker style={{ width: "100%" }} />
-  </Form.Item>
-)}
-       </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              name="Quantity"
+              label="Quantity"
+              rules={[{ required: true, message: "Please enter a quantity!" }]}
+            >
+              <Input
+                type="number"
+                min={1}
+                value={quantity}
+                onChange={handleQuantityChange}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          {patientBillData[0]?.CurrentAdmNo && (
+            <Form.Item
+              name="creationDate"
+              label="Creation Date"
+              rules={[
+                { required: true, message: "Please select the creation date!" },
+              ]}
+              style={{ width: "100%" }}
+            >
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          )}
+        </Row>
         <Form.Item name="remarks" label="Remarks">
           <Input.TextArea rows={4} />
         </Form.Item>

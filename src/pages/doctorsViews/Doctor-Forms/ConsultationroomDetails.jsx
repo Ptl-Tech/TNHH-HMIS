@@ -26,14 +26,16 @@ import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNote
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
 import { getBriefMSENotesData } from "../../../actions/nurse-actions/getBriefMSENotesData";
 import { ConsultationNotes } from "./ConsultationNotes";
+import { useAbility } from "../../../hooks/casl";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
+  const ability = useAbility();
   const dispatch = useDispatch();
-  const role = null.userData.departmentName;
   const searchParams = new URLSearchParams(useLocation().search);
 
   const treatmentNo =
     searchParams.get("TreatmentNo") || searchParams.get("AdmNo");
+  const canSeeNurseOrDoctorContent = ability.can("read", "nurseDoctorNotes");
 
   const { data: doctorNotesData } = useSelector(
     (state) => state.getDoctorsNotesData
@@ -69,7 +71,7 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       icon: <SolutionOutlined />,
       children: <SearchChildView filter={"PH"} data={doctorNotesData} />,
     },
-    ...(role === "Doctor" || role === "Nurse"
+    ...(canSeeNurseOrDoctorContent
       ? [
           {
             label: "Physical Examination",
@@ -83,7 +85,7 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
       icon: <SolutionOutlined />,
       children: <SearchChildView filter={"MSE"} data={doctorNotesData} />,
     },
-    ...(role === "Doctor" || role === "Nurse"
+    ...(canSeeNurseOrDoctorContent
       ? [
           {
             label: "Brief MSE Form",

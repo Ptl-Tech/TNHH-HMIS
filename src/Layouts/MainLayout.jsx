@@ -44,8 +44,11 @@ const MainLayout = () => {
       { permission: "psychologyNavigation", routes: psychologyRoutes },
     ];
 
+    console.log({routeMap});
+    
+
     const found = routeMap.find(({ permission }) =>
-      ability.can("Read", permission)
+      ability.can("read", permission)
     );
     return found?.routes || [];
   };

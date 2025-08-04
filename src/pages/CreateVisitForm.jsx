@@ -125,7 +125,7 @@ const CreateVisitForm = () => {
   };
 
   const handleDirectAdmission=()=>{
-    navigate(`/reception/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
+    navigate(`/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
   }
 
   // // Actions menu

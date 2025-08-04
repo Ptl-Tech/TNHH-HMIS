@@ -17,6 +17,7 @@ import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatient
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
 import AetiologyTable from "../tables/AetiologyTable";
 import { useLocation } from "react-router-dom";
+import { useAbility } from "../../../hooks/casl";
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -27,9 +28,13 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("12");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const role = null.userData.departmentName;
+  const ability = useAbility();
 
-  const { loading:loadingHistory, data } = useSelector((state) => state.getPatientHistoryNotesReducer);
+  const canSeeEtiologyNotes = ability.can("read", "etiologyNotes");
+
+  const { loading: loadingHistory, data } = useSelector(
+    (state) => state.getPatientHistoryNotesReducer
+  );
   const { loading } = useSelector((state) => state.postPatientHistory);
 
   const notesType = [
@@ -57,8 +62,8 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
         data?.find((item) => item?.Notes_Type === "Perpetuating Factors")
           ?.Notes || "",
       15:
-        data?.find((item) => item?.Notes_Type === "Protective Factors")?.Notes ||
-        "",
+        data?.find((item) => item?.Notes_Type === "Protective Factors")
+          ?.Notes || "",
     };
   }, [data]);
 
@@ -119,8 +124,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
           Aetiology Notes
         </Typography.Title>
       </Space>
-      {(role === "Doctor" || role === "Psychology") &&
-        patientDetails?.Status !== "Completed" && (
+      {canSeeEtiologyNotes && patientDetails?.Status !== "Completed" && (
         <>
           <Tabs activeKey={currentTab} onChange={handleTabChange} type="card">
             {notesType.map((note) => (
@@ -152,7 +156,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
         </>
       )}
 
-      <AetiologyTable data={data} loadingHistory={loadingHistory}/>
+      <AetiologyTable data={data} loadingHistory={loadingHistory} />
     </div>
   );
 };

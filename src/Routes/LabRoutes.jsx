@@ -17,6 +17,7 @@ import {
   FaPersonWalkingDashedLineArrowRight,
 } from "react-icons/fa6";
 
+// import { useAbility } from "../hooks/casl";
 import PrivateRoute from "../private/PrivateRoute";
 import LabDashboard from "../Dashboards/LabDashboard";
 import { DispatchToLab } from "../pages/labViews/DispatchToLab";
@@ -78,7 +79,7 @@ export const labRoutes = [
 export default function LabRoutes() {
   return (
     <Route
-      element={<PrivateRoute />}
+      element={<PrivateRoute permission={"read"} resource={"labNavigation"} />}
     >
       <Route path="/Dashboard" element={<MainLayout />}>
         <Route index element={<LabDashboard />} />

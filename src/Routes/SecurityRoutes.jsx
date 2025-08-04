@@ -10,7 +10,7 @@ import { AppstoreOutlined, UserOutlined } from "@ant-design/icons";
 
 export const securityRoutes = [
   {
-    key: "/Security",
+    key: "/Dashboard",
     icon: <AppstoreOutlined style={{ color: "#fff" }} />,
     label: "Registration",
   },
@@ -27,7 +27,7 @@ export const securityRoutes = [
     type: "group",
     children: [
       {
-        key: "/Security/visitors-list",
+        key: "/Dashboard/visitors-list",
         label: "Visitor List",
         icon: <UserOutlined style={{ color: "#fff" }} />,
       },
@@ -37,9 +37,12 @@ export const securityRoutes = [
 
 export default function SecurityRoutes() {
   return (
-    <Route element={<PrivateRoute allowedDepartments={["Security"]} />}>
-      <Route path="/Security" element={<MainLayout />}>
-        {/* Set VisitorForm as the default (index) page */}
+    <Route
+      element={
+        <PrivateRoute permission={"read"} resource={"securityNavigation"} />
+      }
+    >
+      <Route path="/Dashboard" element={<MainLayout />}>
         <Route index element={<VisitorForm />} />
         <Route path="visitor-form/:visitorNo?" element={<VisitorForm />} />
         <Route path="visitors-list" element={<SecVisitorList />} />

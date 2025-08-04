@@ -10,7 +10,6 @@ import {
   Typography,
   Tooltip,
   Modal,
-  
   Tabs,
 } from "antd";
 import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
@@ -28,7 +27,6 @@ import { Document, pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const CashPatients = () => {
-  
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
   );
@@ -61,29 +59,28 @@ const CashPatients = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
   const [pdfBlob, setPdfBlob] = useState(null);
-  const staffNo = null.userData.No;
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     dispatch(appmntList());
     dispatch(getBillingList());
   }, [dispatch]);
 
-
-  const formattedBillingList= visitData.map((patient) =>{
-    const matchingPatient=billingData.find((p) => p.PatientNo === patient.PatientNo);
+  const formattedBillingList = visitData.map((patient) => {
+    const matchingPatient = billingData.find(
+      (p) => p.PatientNo === patient.PatientNo
+    );
     return {
       ...patient,
       PatientNo: patient.PatientNo,
-      Balance: matchingPatient?.Balance,      
-      OpenInsuranceBalance:matchingPatient?.Open_Insurance_Amount,
-      Inpatient:matchingPatient?.Inpatient
+      Balance: matchingPatient?.Balance,
+      OpenInsuranceBalance: matchingPatient?.Open_Insurance_Amount,
+      Inpatient: matchingPatient?.Inpatient,
     };
-
   });
 
- 
   useEffect(() => {
     if (selectedPatient) {
       dispatch(getPatientDetails(selectedPatient.PatientNo));
@@ -100,7 +97,6 @@ const CashPatients = () => {
     }
   }, [patientDetails, selectedPatient]);
 
- 
   useEffect(() => {
     if (formattedBillingList) {
       // Sort the list based on the AppointmentDate (latest first)
@@ -109,24 +105,20 @@ const CashPatients = () => {
         const dateB = new Date(b.AppointmentDate);
         return dateB - dateA; // For descending order
       });
-  
+
       setFilteredOutpatients(
         sortedList.filter(
-          (patient) =>
-            patient.PatientType === "Cash" && !patient.Inpatient
+          (patient) => patient.PatientType === "Cash" && !patient.Inpatient
         )
       );
       setFilteredInpatients(
         sortedList.filter(
-          (patient) =>
-            patient.PatientType === "Cash" && patient.Inpatient
+          (patient) => patient.PatientType === "Cash" && patient.Inpatient
         )
       );
     }
   }, [formattedBillingList]);
-  
 
-  
   const handleSearchChange = (e, key) => {
     const value = e.target.value.toLowerCase();
     setSearchParams((prev) => ({ ...prev, [key]: value }));
@@ -135,9 +127,10 @@ const CashPatients = () => {
       const matchesName = patient.Names?.toLowerCase().includes(
         searchParams.SearchNames.toLowerCase()
       );
-      const matchesAppointmentNo = patient.AppointmentNo?.toLowerCase().includes(
-        searchParams.AppointmentNo.toLowerCase()
-      );
+      const matchesAppointmentNo =
+        patient.AppointmentNo?.toLowerCase().includes(
+          searchParams.AppointmentNo.toLowerCase()
+        );
 
       return matchesName && matchesAppointmentNo;
     });
@@ -157,7 +150,6 @@ const CashPatients = () => {
     const invoiceData = {
       PatientNo: patient.PatientNo,
       visitNo: patient.AppointmentNo,
-      staffNo,
     };
 
     dispatch(postInterimInvoice(invoiceData)).then((response) => {
@@ -166,7 +158,9 @@ const CashPatients = () => {
         const byteArrays = [];
         for (let offset = 0; offset < byteCharacters.length; offset += 512) {
           const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = Array.from(slice).map((char) => char.charCodeAt(0));
+          const byteNumbers = Array.from(slice).map((char) =>
+            char.charCodeAt(0)
+          );
           byteArrays.push(new Uint8Array(byteNumbers));
         }
         const blob = new Blob(byteArrays, { type: "application/pdf" });
@@ -177,20 +171,20 @@ const CashPatients = () => {
       }
     });
   };
-    const handleDownload = () => {
-      if (pdfBlob && selectedPatient) {
-        // Use the patient's name or fallback to a default name if unavailable
-        const patientName = selectedPatient?.Names || "Unknown_Patient";
-        const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, '_');  // Replace spaces with underscores for a valid filename
-    
-        // Trigger the download
-        saveAs(pdfBlob, fileName);
-      }
-    };
+  const handleDownload = () => {
+    if (pdfBlob && selectedPatient) {
+      // Use the patient's name or fallback to a default name if unavailable
+      const patientName = selectedPatient?.Names || "Unknown_Patient";
+      const fileName = `${patientName}_Invoice.pdf`.replace(/\s+/g, "_"); // Replace spaces with underscores for a valid filename
+
+      // Trigger the download
+      saveAs(pdfBlob, fileName);
+    }
+  };
 
   const handlePrint = () => {
     if (pdfBlob) {
-      const printWindow = window.open("", "_blank");  // Open a blank window
+      const printWindow = window.open("", "_blank"); // Open a blank window
       const htmlContent = `
         <html>
           <head><title>Invoice</title></head>
@@ -198,12 +192,12 @@ const CashPatients = () => {
             <embed src="${pdfBlob}" width="100%" height="100%" />
           </body>
         </html>`;
-      printWindow.document.write(htmlContent);  // Write the content
-      printWindow.document.close();  // Close the document to ensure it renders
-      printWindow.print();  // Trigger the print
+      printWindow.document.write(htmlContent); // Write the content
+      printWindow.document.close(); // Close the document to ensure it renders
+      printWindow.print(); // Trigger the print
     }
   };
-  
+
   const outpatientColumns = [
     {
       title: "Patient No",
@@ -274,8 +268,12 @@ const CashPatients = () => {
             </Button>
           </Tooltip> */}
           <Tooltip title="Bill and Clear">
-            <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
-            Print Invoice
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() => handleBillingSubmit(record)}
+            >
+              Print Invoice
             </Button>
           </Tooltip>
         </div>
@@ -346,12 +344,14 @@ const CashPatients = () => {
       key: "actions",
       render: (_, record) => (
         <div style={{ display: "flex", gap: "8px" }}>
-          <Tooltip title="View Details">
-            
-          </Tooltip>
+          <Tooltip title="View Details"></Tooltip>
           <Tooltip title="Bill and Clear">
-          <Button type="primary" htmlType="submit" onClick={() => handleBillingSubmit(record)}>
-          Print Invoice
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() => handleBillingSubmit(record)}
+            >
+              Print Invoice
             </Button>
           </Tooltip>
         </div>
@@ -405,75 +405,83 @@ const CashPatients = () => {
       </Card>
 
       <div className="mt-4">
-      <Tabs defaultActiveKey="1" size="large" type="card">
-        <TabPane tab="Outpatients list" key="1">
-          <Table
-          //  rowSelection={rowSelection}
-            columns={outpatientColumns}
-            dataSource={filteredOutpatients.map((patient) => ({
-              ...patient,
-              key: patient.AppointmentNo,
-            }))}
-            pagination={{
-              total: filteredOutpatients.length,
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              onChange: handlePaginationChange,
-            }}
-            bordered
-            size="small"
-          />
-        </TabPane>
-        <TabPane tab="Inpatients list" key="2">
-          <Table
-          //  rowSelection={rowSelection}
-            columns={inpatientColumns}
-            dataSource={filteredInpatients.map((patient) => ({
-              ...patient,
-              key: patient.AppointmentNo,
-            }))}
-            pagination={{
-              total: filteredInpatients.length,
-              current: pagination.current,
-              pageSize: pagination.pageSize,
-              onChange: handlePaginationChange,
-            }}
-            bordered
-            size="small"
-          />
-        </TabPane>
-      </Tabs>
+        <Tabs defaultActiveKey="1" size="large" type="card">
+          <TabPane tab="Outpatients list" key="1">
+            <Table
+              //  rowSelection={rowSelection}
+              columns={outpatientColumns}
+              dataSource={filteredOutpatients.map((patient) => ({
+                ...patient,
+                key: patient.AppointmentNo,
+              }))}
+              pagination={{
+                total: filteredOutpatients.length,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                onChange: handlePaginationChange,
+              }}
+              bordered
+              size="small"
+            />
+          </TabPane>
+          <TabPane tab="Inpatients list" key="2">
+            <Table
+              //  rowSelection={rowSelection}
+              columns={inpatientColumns}
+              dataSource={filteredInpatients.map((patient) => ({
+                ...patient,
+                key: patient.AppointmentNo,
+              }))}
+              pagination={{
+                total: filteredInpatients.length,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                onChange: handlePaginationChange,
+              }}
+              bordered
+              size="small"
+            />
+          </TabPane>
+        </Tabs>
       </div>
 
-     
       <style jsx>{`
         .row-warning {
           background-color: #faad14 !important;
         }
       `}</style>
 
-        {/* Modal for previewing and printing/downloading the PDF */}
-        <Modal
-  title={`Invoice for ${selectedPatient?.Names}`}
-  visible={billingModalVisible}
-  onCancel={() => setBillingModalVisible(false)}
-  footer={[
-    <Button type="primary" key="download" onClick={handleDownload}>Download</Button>,
-    <Button type="default" key="print" onClick={handlePrint}>Print</Button>,
-    <Button type="primary" key="close" onClick={() => setBillingModalVisible(false)}>Close</Button>,
-  ]}
-  width={800}
-  style={{ top: 20 }}
->
-  <iframe 
-    src={pdfBlob} 
-    width="100%" 
-    height="600px" 
-    style={{ border: "none" }} 
-    className="iframe-scrollbar"
-  ></iframe>
-</Modal>
-
+      {/* Modal for previewing and printing/downloading the PDF */}
+      <Modal
+        title={`Invoice for ${selectedPatient?.Names}`}
+        visible={billingModalVisible}
+        onCancel={() => setBillingModalVisible(false)}
+        footer={[
+          <Button type="primary" key="download" onClick={handleDownload}>
+            Download
+          </Button>,
+          <Button type="default" key="print" onClick={handlePrint}>
+            Print
+          </Button>,
+          <Button
+            type="primary"
+            key="close"
+            onClick={() => setBillingModalVisible(false)}
+          >
+            Close
+          </Button>,
+        ]}
+        width={800}
+        style={{ top: 20 }}
+      >
+        <iframe
+          src={pdfBlob}
+          width="100%"
+          height="600px"
+          style={{ border: "none" }}
+          className="iframe-scrollbar"
+        ></iframe>
+      </Modal>
     </div>
   );
 };

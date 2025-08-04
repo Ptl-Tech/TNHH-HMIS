@@ -11,9 +11,16 @@ import {
   Tooltip,
   Modal,
   Tabs,
-  Dropdown, Menu
+  Dropdown,
+  Menu,
 } from "antd";
-import { EditOutlined, EyeOutlined, FilePdfOutlined, TeamOutlined,DownOutlined  } from "@ant-design/icons";
+import {
+  EditOutlined,
+  EyeOutlined,
+  FilePdfOutlined,
+  TeamOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 import { appmntList, listPatients } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
@@ -23,8 +30,10 @@ import TabPane from "antd/es/tabs/TabPane";
 import { getBillingList } from "../actions/Charges-Actions/getBillingList";
 import { saveAs } from "file-saver";
 import ViewInvoice from "./billing/ViewInvoice";
+import { useAuth } from "../hooks/auth";
 
 const InsurancePatients = () => {
+  const { user } = useAuth();
   const { loading, patients: visitData } = useSelector(
     (state) => state.appmntList
   );
@@ -58,7 +67,7 @@ const InsurancePatients = () => {
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
   const [pdfBlob, setPdfBlob] = useState(null);
 
-  const staffNo = null.userData.No;
+  const staffNo = user.staffNo;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -261,13 +270,17 @@ const InsurancePatients = () => {
       render: (_, record) => {
         const menu = (
           <Menu>
-           <Menu.Item
-          key="view"
-          icon={<EyeOutlined />}
-          onClick={() => navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
-        >
-          View
-        </Menu.Item>
+            <Menu.Item
+              key="view"
+              icon={<EyeOutlined />}
+              onClick={() =>
+                navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, {
+                  state: { patientData: record },
+                })
+              }
+            >
+              View
+            </Menu.Item>
             <Menu.Item
               key="edit"
               icon={<EditOutlined />}
@@ -284,11 +297,18 @@ const InsurancePatients = () => {
             </Menu.Item>
           </Menu>
         );
-  
+
         return (
           <Dropdown overlay={menu} trigger={["click"]}>
             <Button>
-             <span className="fw-bold text-primary" style={{ cursor: "pointer", fontSize: "16px"}}> ... </span><DownOutlined />
+              <span
+                className="fw-bold text-primary"
+                style={{ cursor: "pointer", fontSize: "16px" }}
+              >
+                {" "}
+                ...{" "}
+              </span>
+              <DownOutlined />
             </Button>
           </Dropdown>
         );
@@ -363,13 +383,17 @@ const InsurancePatients = () => {
       render: (_, record) => {
         const menu = (
           <Menu>
-           <Menu.Item
-          key="view"
-          icon={<EyeOutlined />}
-          onClick={() => navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, { state: { patientData: record } })}
-        >
-          View
-        </Menu.Item>
+            <Menu.Item
+              key="view"
+              icon={<EyeOutlined />}
+              onClick={() =>
+                navigate(`/Dashboard/invoice/PatientNo=${record.PatientNo}`, {
+                  state: { patientData: record },
+                })
+              }
+            >
+              View
+            </Menu.Item>
             <Menu.Item
               key="edit"
               icon={<EditOutlined />}
@@ -386,11 +410,18 @@ const InsurancePatients = () => {
             </Menu.Item>
           </Menu>
         );
-  
+
         return (
           <Dropdown overlay={menu} trigger={["click"]}>
             <Button>
-             <span className="fw-bold text-primary" style={{ cursor: "pointer", fontSize: "16px"}}> ... </span><DownOutlined />
+              <span
+                className="fw-bold text-primary"
+                style={{ cursor: "pointer", fontSize: "16px" }}
+              >
+                {" "}
+                ...{" "}
+              </span>
+              <DownOutlined />
             </Button>
           </Dropdown>
         );

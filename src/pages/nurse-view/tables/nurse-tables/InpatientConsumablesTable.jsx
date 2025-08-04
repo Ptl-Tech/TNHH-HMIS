@@ -33,7 +33,7 @@ const InpatientConsumablesTable = ({
   loadingGetPgOpenPatientConsumables,
 }) => {
   const dispatch = useDispatch();
-  const userDetails = null;
+  const { user } = useAuth();
   console.log({ consumables });
   const admissionNo = new URLSearchParams(window.location.search).get("AdmNo");
   const { loading: loadingPrescriptions, data: prescriptions } = useSelector(
@@ -56,14 +56,15 @@ const InpatientConsumablesTable = ({
     setViewOrderSheet(hasConsumables);
   }, [consumables, admissionNo]);
   useEffect(() => {
-  if (prescriptions?.length && consumables?.length) {
-    const matched = prescriptions.filter((p) =>
-      consumables.some((c) => c.Drug_No === p.Drug_No && c.Admission_No === admissionNo)
-    );
-    setSelectedRows(matched);
-  }
-}, [prescriptions, consumables, admissionNo]);
-
+    if (prescriptions?.length && consumables?.length) {
+      const matched = prescriptions.filter((p) =>
+        consumables.some(
+          (c) => c.Drug_No === p.Drug_No && c.Admission_No === admissionNo
+        )
+      );
+      setSelectedRows(matched);
+    }
+  }, [prescriptions, consumables, admissionNo]);
 
   const handleCheckboxChange = (record) => {
     const exists = selectedRows.find((r) => r.Drug_No === record.Drug_No);
@@ -75,7 +76,7 @@ const InpatientConsumablesTable = ({
   };
 
   const handleCompleteOrder = async () => {
-// Check if any rows are selected
+    // Check if any rows are selected
     if (selectedRows.length === 0) {
       message.warning("Please select at least one drug to order.");
       return;
@@ -91,11 +92,11 @@ const InpatientConsumablesTable = ({
       myAction: "create",
       admissionNo: item.Admission_No,
       recId: "",
-      branchCode: userDetails?.userData?.shortcut_Dimension_1_Code,
+      branchCode: user?.branchCode,
       quantity: parseInt(item.Quantity, 10) || 0,
       prescriptionDose: 3,
       drugNo: item.Drug_No,
-      staffNo: userDetails.userData.no,
+      staffNo: user?.staffNo,
     }));
 
     for (const payload of payloads) {
@@ -126,11 +127,10 @@ const InpatientConsumablesTable = ({
       myAction: "delete",
       admissionNo: record.Admission_No,
       recId: record.SystemId,
-      branchCode:
-        userDetails?.userData?.shortcut_Dimension_1_Code || branchCode,
+      branchCode: user?.branchCode,
       prescriptionDose: 0, // Assuming you want to set this to 0 when deleting
       drugNo: record.Drug_No,
-      staffNo: userDetails.userData.no,
+      staffNo: user?.staffNo,
     };
 
     dispatch(
@@ -306,12 +306,11 @@ const InpatientConsumablesTable = ({
                     myAction: "edit",
                     admissionNo: record.Admission_No,
                     recId: record.SystemId,
-                    branchCode:
-                      userDetails?.userData?.shortcut_Dimension_1_Code,
+                    branchCode: user?.branchCode,
                     quantity: editedRowData.Quantity,
                     prescriptionDose: parseInt(doseValue, 10) || 0,
                     drugNo: editedRowData.Drug_No,
-                    staffNo: userDetails.userData.no,
+                    staffNo: user?.staffNo,
                   };
 
                   try {
@@ -411,7 +410,7 @@ const InpatientConsumablesTable = ({
             .sort((a, b) => a.Drug_No - b.Drug_No)}
           className="admit-patient-table"
           bordered
-            size="small"
+          size="small"
           pagination={{
             ...pagination,
             total: prescriptions?.length,

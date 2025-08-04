@@ -20,12 +20,13 @@ import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice"
 import { getQyLocationsSlice } from "../../../../actions/nurse-actions/getQyLocationsSlice";
 import { getPgOpenPatientConsumablesSlice } from "../../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 import { frequencyOptions } from "../../../pharmacy-views/pharmacy-utils";
+import { useAuth } from "../../../../hooks/auth";
 
 const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
+  const { user } = useAuth();
   const [form] = Form.useForm();
+
   const { patientDetails } = useLocation().state;
-  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = null;
   const dispatch = useDispatch();
   const { loadingItems, items } = useSelector((state) => state.getItems);
   const { loadingQyLocations, qyLocations } = useSelector(
@@ -37,20 +38,20 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
   const { loadingpostNurseOrderSheet } = useSelector(
     (state) => state.postNurseOrderSheet
   );
-console.log(userDetails);
+
   const handleOnFinish = async (values) => {
     try {
       const { location, quantity, item, remarks, prescriptionDosage } = values;
 
       const consumableData = {
-       myAction: "create",
+        myAction: "create",
         admissionNo: patientDetails?.Admission_No,
-      recId: "",
-      branchCode: userDetails?.userData?.shortcut_Dimension_1_Code,
-    quantity: 0,
-      prescriptionDose: prescriptionDosage || 0,
+        recId: "",
+        branchCode: user.branchCode,
+        quantity: 0,
+        prescriptionDose: prescriptionDosage || 0,
         drugNo: item,
-      staffNo: userDetails.userData.no
+        staffNo: user.staffNo,
       };
 
       // Dispatch postPatientConsumablesSlice and wait for result
@@ -62,10 +63,8 @@ console.log(userDetails);
         message.success("Consumables posted successfully!");
 
         // Dispatch postNurseOrderSheetSlice and wait for result
-             dispatch(getPgOpenPatientConsumablesSlice());
-      setIsConsumableFormVisible(false);
-
-       
+        dispatch(getPgOpenPatientConsumablesSlice());
+        setIsConsumableFormVisible(false);
       } else if (consumablesResult.type === POST_PATIENT_CONSUMABLES_FAILURE) {
         message.error(
           consumablesResult?.payload?.message ||
@@ -102,7 +101,6 @@ console.log(userDetails);
         }}
       >
         <Row gutter={[16, 16]}>
-       
           <Col span={8}>
             <Form.Item
               label="Item"
@@ -125,19 +123,23 @@ console.log(userDetails);
               />
             </Form.Item>
           </Col>
-              
+
           <Col span={8}>
             <Form.Item
               label="Quantity"
               name="quantity"
               rules={[{ required: true, message: "Please enter quantity!" }]}
               hasFeedback
-            
             >
-              <Input type="number" size="large" placeholder="Enter Quantity" min={0}/>
+              <Input
+                type="number"
+                size="large"
+                placeholder="Enter Quantity"
+                min={0}
+              />
             </Form.Item>
           </Col>
-             <Col span={8}>
+          <Col span={8}>
             <Form.Item
               label="Prescription Dosage"
               name="prescriptionDosage"
@@ -193,7 +195,7 @@ console.log(userDetails);
               loading={loadingPostConsumables}
               disabled={loadingPostConsumables}
             >
-             Add Item
+              Add Item
             </Button>
             <Button
               color="danger"

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { Button, Form, Input, message, Modal, Typography } from "antd";
 
@@ -10,21 +10,27 @@ import {
   AUTH_RESET_MESSAGES,
 } from "../reducers/auth/auth-reducer";
 import { verifyOTP } from "../actions/auth-actions/verify-otp";
+import { useAuth } from "../hooks/auth";
 
 export const OTPModal = ({ open }) => {
-  const { Title } = Typography;
-
-  const dispatch = useDispatch();
-
   const {
     loading,
+    fetchUser,
     OTPError: error,
     OTPSuccess: success,
-  } = useSelector((state) => state.auth);
+  } = useAuth();
+  const dispatch = useDispatch();
+
+  const { Title } = Typography;
 
   useEffect(() => {
     if (error) message.error(error);
-    if (success) message.success(success);
+    if (success) {
+      message.success(success);
+
+      // Fetch me
+      fetchUser();
+    }
     if (error || success) dispatch({ type: AUTH_RESET_MESSAGES });
   }, [error, success]);
 

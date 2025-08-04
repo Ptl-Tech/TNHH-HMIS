@@ -5,7 +5,7 @@ import {
 } from "@ant-design/icons";
 import { Tabs } from "antd";
 
-// import useAuth from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/auth";
 
 import VisitorsList from "./nurse-forms/VisitorsList";
 import CarePlanForm from "./nurse-forms/CarePlanForm";
@@ -17,7 +17,8 @@ import JacksonVisualForm from "./nurse-forms/JacksonVisualForm";
 import ConsultationroomDetails from "../doctorsViews/Doctor-Forms/ConsultationroomDetails";
 
 const CarePlan = ({ observationNo, patientNo }) => {
-  const userRole = null.userData.departmentName;
+  const { user } = useAuth();
+  const userRole = user.role;
 
   const menuItems = [
     {
@@ -31,7 +32,7 @@ const CarePlan = ({ observationNo, patientNo }) => {
         />
       ),
     },
-    ...(userRole === "Doctor" || userRole === "Nurse"
+    ...(userRole == "Doctor" || userRole == "Nurse"
       ? [
           {
             icon: <FileOutlined />,

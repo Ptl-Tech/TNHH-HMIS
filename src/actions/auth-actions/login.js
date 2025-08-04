@@ -35,9 +35,9 @@ export const login =
       dispatch({
         type: USER_LOGIN_FAIL,
         payload:
-          error.response.data.error ||
-          error.response.statusText ||
-          error.response.data.errors ||
+          error.response?.data.error ||
+          error.response?.statusText ||
+          error.response?.data.errors ||
           "Something went wrong",
       });
     }

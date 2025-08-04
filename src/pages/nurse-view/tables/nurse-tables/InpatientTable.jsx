@@ -4,6 +4,7 @@ import { useState } from "react";
 import Loading from "../../../../partials/nurse-partials/Loading";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useAbility } from "../../../../hooks/casl";
 // import useAuth from "../../../../hooks/useAuth";
 
 const InpatientTable = ({
@@ -15,13 +16,17 @@ const InpatientTable = ({
   searchPatientNumber,
   searchAdmissionNumber,
 }) => {
-  const role = null.userData.departmentName;
+  const ability = useAbility();
+
+  const canCreateAssignBed = ability.can("create", "assignBed");
+  const canCreateAssignWard = ability.can("create", "assignWard");
+
   const columns = [
     {
       title: "#",
-      dataIndex: "key",
       key: "key",
-      render: (text, record, index) => index + 1,
+      dataIndex: "key",
+      render: (index) => index + 1,
     },
     {
       title: "Adm No",
@@ -89,7 +94,7 @@ const InpatientTable = ({
       render: (ward, record) =>
         ward ? (
           ward
-        ) : role === "Nurse" ? (
+        ) : canCreateAssignWard ? (
           <Button
             variant="link"
             style={{ color: "red", textDecoration: "none" }}
@@ -102,7 +107,7 @@ const InpatientTable = ({
           </Button>
         ) : (
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
-        ), // Renders nothing for roles other than Nurse
+        ),
     },
     {
       title: "Room",
@@ -116,7 +121,7 @@ const InpatientTable = ({
       render: (bed, record) =>
         bed ? (
           bed
-        ) : role === "Nurse" ? (
+        ) : canCreateAssignBed ? (
           <Button
             variant="link"
             style={{ color: "red", textDecoration: "none" }}
@@ -129,7 +134,7 @@ const InpatientTable = ({
           </Button>
         ) : (
           <span style={{ color: "#0f5689" }}>Not yet assigned</span>
-        ), // Renders nothing for roles other than Nurse
+        ),
     },
     {
       title: "Doctor",
@@ -168,7 +173,7 @@ const InpatientTable = ({
   const navigate = useNavigate();
   const handleClick = (record) => {
     record?.Patient_No &&
-      navigate(`/Nurse/Admit-patient/Patient?PatientNo=${record?.Patient_No}`, {
+      navigate(`/Dashboard/Admit-patient/Patient?PatientNo=${record?.Patient_No}`, {
         state: { patientDetails: record },
       });
   };

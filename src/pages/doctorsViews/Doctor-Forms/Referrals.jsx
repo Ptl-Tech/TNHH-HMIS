@@ -39,13 +39,15 @@ import moment from "moment";
 import { getHospitalNumber } from "../../../actions/Doc-actions/getHospitalNumber";
 import { getReferralLines } from "../../../actions/Doc-actions/getReferralLines";
 import { Option } from "antd/es/mentions";
+import { useAuth } from "../../../hooks/auth";
 
 const Referrals = () => {
+  const employeeData = useAuth();
+  const dispatch = useDispatch();
   const location = useLocation();
+
   const queryParams = new URLSearchParams(location.search);
   const treatmentNo = queryParams.get("TreatmentNo");
-  const employeeData = null;
-  const dispatch = useDispatch();
   const { loading: saveLoading } = useSelector(
     (state) => state.saveRefferalDetails
   );
@@ -56,7 +58,7 @@ const Referrals = () => {
   const { loading: referralLinesLoading, data: referralLines } = useSelector(
     (state) => state.getReferralLines
   );
-  
+
   const { data } = useSelector((state) => state.getHosNumber);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStaffNo, setSelectedStaffNo] = useState(null);
@@ -72,7 +74,7 @@ const Referrals = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if(treatmentNo){
+    if (treatmentNo) {
       dispatch(getReferralLines(treatmentNo));
     }
   }, [dispatch, treatmentNo]);
@@ -178,21 +180,21 @@ const Referrals = () => {
           </Typography.Text>
         );
       },
-    }
+    },
   ];
 
-  const dataSource=[
+  const dataSource = [
     {
-      key:referralLines?.TreatmentNo,
+      key: referralLines?.TreatmentNo,
       TreatmentNo: referralLines?.TreatmentNo,
       ReferralReason: referralLines?.ReferralReason,
       ClinicalHistoryTreatment: referralLines?.ClinicalHistoryTreatment,
       DateReferred: referralLines?.DateReferred,
       HospitalName: referralLines?.HospitalName,
       ContactPerson: referralLines?.ContactPerson,
-      Status: referralLines?.Status
-    }
-  ]
+      Status: referralLines?.Status,
+    },
+  ];
 
   return (
     <div>
@@ -202,7 +204,14 @@ const Referrals = () => {
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Referral Details
         </Typography.Title>
-        <div style={{ display: "flex", gap: "10px", alignItems: "right" , justifyContent: "flex-end"}}>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "right",
+            justifyContent: "flex-end",
+          }}
+        >
           <Button
             type="default"
             icon={<PrinterOutlined />}

@@ -36,9 +36,9 @@ export const verifyOTP =
       dispatch({
         type: VERIFY_OTP_FAIL,
         payload:
-          error?.response.data.errors ||
+          error?.response?.data?.errors ||
           error?.response?.data?.error ||
-          error?.response.statusText ||
+          error?.response?.statusText ||
           "Something went wrong",
       });
     }
