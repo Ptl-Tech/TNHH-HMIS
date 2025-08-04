@@ -15,11 +15,8 @@ export const AbilityProvider = ({ children }) => {
   const location = useLocation();
 
   const isInAuthPages = () => {
-    return (
-      location.pathname === "/login" ||
-      location.pathname === "/forgot-password" ||
-      location.pathname === "/reset-password"
-    );
+    const authPages = ["/login", "/forgot-password", "/reset-password"];
+    return authPages.includes(location.pathname);
   };
 
   useEffect(() => {
