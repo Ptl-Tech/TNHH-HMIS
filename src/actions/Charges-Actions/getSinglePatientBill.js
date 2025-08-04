@@ -44,7 +44,7 @@ export const getSinglePatientBill =
       }
 
       // Add the request to the cache after successful response
-      requestCache.add(ActiveVisitNo);
+    requestCache.add(ActiveVisitNo);
     } catch (error) {
         dispatch({
           type: GET_SINGLE_PATIENT_BILL_FAIL,

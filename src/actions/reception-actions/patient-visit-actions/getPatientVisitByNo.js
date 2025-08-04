@@ -40,10 +40,10 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
       const dataArray = Array.isArray(data) ? data : [data] || []; // Ensure it's an array
       const filteredData = dataArray.filter((item) => item?.Branch === branchCode);
 
-      if (filteredData.length > 0) {
+      if (dataArray.length > 0) {
         dispatch({
           type: GET_PATIENT_VISIT_BY_NO_SUCCESS,
-          payload: filteredData[0], // Store the first matching record
+          payload: dataArray[0],
         });
       } else {
         dispatch({ type: GET_PATIENT_VISIT_BY_NO_FAIL, payload: "No records found" });
