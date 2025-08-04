@@ -14,10 +14,10 @@ export const AbilityProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isInAuthPages = () => {
-    const authPages = ["/login", "/forgot-password", "/reset-password"];
-    return authPages.includes(location.pathname);
-  };
+  const isInAuthPages = () =>
+    new Set(["/login", "/forgot-password", "/reset-password"]).has(
+      location.pathname
+    );
 
   useEffect(() => {
     fetchUser();
