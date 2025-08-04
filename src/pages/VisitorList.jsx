@@ -84,7 +84,7 @@ const VisitorList = () => {
 
       if (response) {
         message.success(`Patient Number: ${response}`, 5);
-        navigate(`/Reception/Patient-Registration/Patient?PatientNo=${response}`);
+        navigate(`/Dashboard/Patient-Registration/Patient?PatientNo=${response}`);
       } else {
         message.error("Failed to retrieve patient number");
       }
@@ -141,7 +141,7 @@ const VisitorList = () => {
             <Menu.Item
               key="register"
               onClick={() =>
-                navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
+                navigate(`/Dashboard/Register-walkin`, { state: { visitorData: record } })
               }
             >
               Register Walk In

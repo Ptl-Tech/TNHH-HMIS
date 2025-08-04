@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllergiesAndMedicationsSlice } from "../../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
 import { postAllergiesMedicationSlice } from "../../../../actions/triage-actions/postAllergiesMedicationSlice";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 import TextArea from "antd/es/input/TextArea";
 import { useLocation, useSearchParams } from "react-router-dom";
 
@@ -15,7 +15,7 @@ const AllergyAndMedication = ({
 }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const config = useAuth().userData;
+  const config = null.userData;
   const location = useLocation()
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
 

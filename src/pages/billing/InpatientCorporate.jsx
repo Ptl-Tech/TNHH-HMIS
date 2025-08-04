@@ -71,8 +71,9 @@ const InsurancePatients = () => {
   }, [filteredPatients, admittedPatients]);
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    console.log("Patient ID:", patientId); // Log the patient ID for debugging
-    navigate(`/Reception/Corporate-Inpatient-Charges?PatientNo=${patientId}`);
+    console.log('Patient ID:', patientId); // Log the patient ID for debugging
+    navigate(`/Dashboard/Corporate-Inpatient-Charges?PatientNo=${patientId}`);
+
   };
 
   const columns = [

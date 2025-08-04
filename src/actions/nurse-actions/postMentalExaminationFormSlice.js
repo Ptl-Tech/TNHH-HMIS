@@ -6,7 +6,7 @@ export const POST_MENTAL_EXAMINATION_FORM_SUCCESS = 'POST_MENTAL_EXAMINATION_FOR
 export const POST_MENTAL_EXAMINATION_FORM_FAILURE = 'POST_MENTAL_EXAMINATION_FORM_FAILURE';
 
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const postMentalExaminationFormSlice = (endpoint = '/InpatientForms/MentalStatusCheckForm', mentalStatusData) => 
   async (dispatch, getState) => {

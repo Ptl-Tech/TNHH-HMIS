@@ -167,7 +167,7 @@ const WardManagement = () => {
     } else {
       selectedRow[0] &&
         navigate(
-          `/Nurse/Ward-management/Transfer-Bed?WardNo=${selectedRow[0].key}`
+          `/Dashboard/Ward-management/Transfer-Bed?WardNo=${selectedRow[0].key}`
         );
       setAlertMessage("");
     }
@@ -226,7 +226,7 @@ const WardManagement = () => {
             <Button
               type="primary"
               size="large"
-              onClick={() => navigate("/Nurse/Ward-management/Bed-occupancy")}
+              onClick={() => navigate("/Dashboard/Ward-management/Bed-occupancy")}
             >
               Bed Occupancy
             </Button>

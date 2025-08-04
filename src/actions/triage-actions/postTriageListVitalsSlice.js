@@ -10,7 +10,7 @@ export const POST_TRIAGE_LIST_VITALS_FAIL = 'POST_TRIAGE_LIST_VITALS_FAIL';
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+  'https://chiromo.potestastechnologies.net:8091';
 
 export const postTriageListVitalsSlice =
   (vitals) => async (dispatch, getState) => {

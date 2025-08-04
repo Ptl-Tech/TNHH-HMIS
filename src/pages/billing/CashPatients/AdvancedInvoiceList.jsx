@@ -227,11 +227,11 @@ const handleReset = (clearFilters) => {
     //       onClick={() => {
     //         if (record.PatientType === "IP") {
     //           navigate(
-    //             `/Reception/Corporate-Inpatient-Charges?PatientNo=${record.Patient_No}`
+    //             `/Dashboard/Corporate-Inpatient-Charges?PatientNo=${record.Patient_No}`
     //           );
     //         } else {
     //           navigate(
-    //             `/Reception/CorporatePatient-Charges?PatientNo=${record.Patient_No}`
+    //             `/Dashboard/CorporatePatient-Charges?PatientNo=${record.Patient_No}`
     //           );
     //         }
     //       }}

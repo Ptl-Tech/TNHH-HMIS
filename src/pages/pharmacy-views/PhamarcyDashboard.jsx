@@ -114,7 +114,7 @@ const PharmacyDashboard = () => {
                 onClick={() =>
                   variant
                     ? navigate(
-                        `/Pharmacy/Pharmacy-${variant
+                        `/Dashboard/Pharmacy-${variant
                           .split(" ")
                           .join("")}?status=${status}`,
                         {

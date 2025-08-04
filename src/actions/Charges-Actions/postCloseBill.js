@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const POST_CLOSE_PATIENT_BILL_REQUEST = "POST_CLOSE_PATIENT_BILL_REQUEST";
 export const POST_CLOSE_PATIENT_BILL_SUCCESS = "POST_CLOSE_PATIENT_BILL_SUCCESS";

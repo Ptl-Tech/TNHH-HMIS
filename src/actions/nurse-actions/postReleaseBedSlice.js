@@ -18,7 +18,7 @@ export const GET_QY_BED_TRANSFER_LINES_REQUEST = 'GET_QY_BED_TRANSFER_LINES_REQU
 export const GET_QY_BED_TRANSFER_LINES_SUCCESS = 'GET_QY_BED_TRANSFER_LINES_SUCCESS';
 export const GET_QY_BED_TRANSFER_LINES_FAILURE = 'GET_QY_BED_TRANSFER_LINES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const postReleaseBedSlice = (dischargeData) => 
   async (dispatch, getState) => {

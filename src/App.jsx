@@ -1,51 +1,42 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login from './Auth/Login';
-import Register from './Auth/Register';
-import ResetPwd from './Auth/ResetPwd';
-import ForgotPwd from './Auth/ForgotPwd';
+import { useAbility } from "./hooks/casl";
 
-import LabRoutes from './Routes/LabRoutes';
-import NurseRoutes from './Routes/NurseRoutes';
-import DoctorRoutes from './Routes/DoctorRoutes';
-import SecurityRoutes from './Routes/SecurityRoutes';
-import PharmacyRoutes from './Routes/PharmacyRoutes';
-import RadiologyRoutes from './Routes/RadiologyRoutes';
-import ReceptionRoutes from './Routes/ReceptionRoutes';
-import PsychologyRoutes from './Routes/PsychologyRoutes';
+import Login from "./Auth/Login";
+import LabRoutes from "./Routes/LabRoutes";
+import NurseRoutes from "./Routes/NurseRoutes";
+import ResetPassword from "./Auth/ResetPassword";
+import DoctorRoutes from "./Routes/DoctorRoutes";
+import ForgotPassword from "./Auth/ForgotPassword";
+import SecurityRoutes from "./Routes/SecurityRoutes";
+import PharmacyRoutes from "./Routes/PharmacyRoutes";
+import RadiologyRoutes from "./Routes/RadiologyRoutes";
+import ReceptionRoutes from "./Routes/ReceptionRoutes";
+import PsychologyRoutes from "./Routes/PsychologyRoutes";
+import { useAuth } from "./hooks/auth";
 
 function App() {
+  const { loading } = useAuth();
+  const ability = useAbility();
+
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={<Login />}
-      />
-      <Route
-        path="/register"
-        element={<Register />}
-      />
-      <Route
-        path="/forgot-password"
-        element={<ForgotPwd />}
-      />
-      <Route
-        path="/reset-password"
-        element={<ResetPwd />}
-      />      
-      {LabRoutes()}
-      {NurseRoutes()}
-      {DoctorRoutes()}
-      {SecurityRoutes()}
-      {PharmacyRoutes()}
-      {RadiologyRoutes()}
-      {ReceptionRoutes()}
-      {PsychologyRoutes()}
-      <Route
-        path="*"
-        element={<Navigate to="/login" />}
-      />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* All the individual user's routes */}
+        {ability.can("read", "labNavigation") && LabRoutes()}
+        {ability.can("read", "nurseNavigation") && NurseRoutes()}
+        {ability.can("read", "doctorNavigation") && DoctorRoutes()}
+        {ability.can("read", "securityNavigation") && SecurityRoutes()}
+        {ability.can("read", "pharmacyNavigation") && PharmacyRoutes()}
+        {ability.can("read", "radiologyNavigation") && RadiologyRoutes()}
+        {ability.can("read", "receptionNavigation") && ReceptionRoutes()}
+        {ability.can("read", "psychologyNavigation") && PsychologyRoutes()}
+      </Routes>
+    </>
   );
 }
 

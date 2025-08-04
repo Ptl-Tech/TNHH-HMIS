@@ -8,7 +8,7 @@ export const GET_ENCOUNTER_LIST_SUCCESS = 'GET_ENCOUNTER_LIST_SUCCESS';
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+  'https://chiromo.potestastechnologies.net:8091';
 
 export const getEncounterList = (patientNo) => async (dispatch, getState) => {
   try {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const POST_DISCHARGE_DIAGNOSIS_REQUEST =
   "POST_DISCHARGE_DIAGNOSIS_REQUEST";

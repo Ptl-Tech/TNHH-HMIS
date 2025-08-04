@@ -13,16 +13,17 @@ import {
 import useAuth from "../../hooks/useAuth";
 import NursePharmacyReturnLine from "./tables/NursePharmacyReturnLine";
 
-const Medication = ({  role, patientDetails }) => {
+const Medication = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
   const [selectedItem, setSelectedItem] = useState(<InpatientMedication />);
-  const userRole = useAuth().userData.departmentName;
+  const { user } = useAuth();
+  const userRole = user.role;
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);
     switch (item.label) {
       case "Prescription":
-        setSelectedItem(<InpatientMedication role={role} />);
+        setSelectedItem(<InpatientMedication />);
         break;
       case "Treatments Sheet":
         setSelectedItem(<TreatmentsSheet patientDetails={patientDetails} />);

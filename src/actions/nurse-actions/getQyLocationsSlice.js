@@ -5,7 +5,7 @@ export const GET_QY_LOCATION_REQUEST = 'GET_QY_LOCATION_REQUEST';
 export const GET_QY_LOCATION_SUCCESS = 'GET_QY_LOCATION_SUCCESS';
 export const GET_QY_LOCATION_FAILURE = 'GET_QY_LOCATION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8091';
 
 export const getQyLocationsSlice = () => 
   async (dispatch, getState) => {

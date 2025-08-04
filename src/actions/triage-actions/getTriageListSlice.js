@@ -7,7 +7,7 @@ export const GET_TRIAGE_LIST_FAILURE = "GET_TRIAGE_LIST_FAILURE";
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8085";
+  "https://chiromo.potestastechnologies.net:8091";
 
 export const getTriageList = (options) => async (dispatch, getState) => {
   console.log({ options });

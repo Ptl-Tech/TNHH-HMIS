@@ -1,47 +1,48 @@
 import {
-  Form,
-  Input,
-  DatePicker,
   Row,
   Col,
+  Tag,
+  Form,
+  Modal,
   Button,
-  Typography,
   Select,
   message,
-  Tag,
-  Space,
-  Modal,
+  DatePicker,
+  Typography,
 } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  FileTextOutlined,
-  EyeOutlined,
   PlusOutlined,
   SendOutlined,
+  FileTextOutlined,
   OrderedListOutlined,
 } from "@ant-design/icons";
+
 import { useLocation } from "react-router-dom";
-import { getRadiologySetup } from "../../../actions/Doc-actions/qyRadiologyTestSetups";
-import { postRadiologyRequest } from "../../../actions/Doc-actions/postRadiolgyRequest";
+import LabResultDrawer from "./LabResultDrawer";
+import { useAbility } from "../../../hooks/casl";
 import {
-  getPatientRadiologyTest,
   requestRadiologyTest,
+  getPatientRadiologyTest,
 } from "../../../actions/Doc-actions/requestRadiologyTest";
 import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
-import useAuth from "../../../hooks/useAuth";
-import LabResultDrawer from "./LabResultDrawer";
+import { getRadiologySetup } from "../../../actions/Doc-actions/qyRadiologyTestSetups";
+import { postRadiologyRequest } from "../../../actions/Doc-actions/postRadiolgyRequest";
 
 const { Option } = Select;
 
 const Imaging = () => {
+  const ability = useAbility();
   const location = useLocation();
+
+  const canCreateImagingRequest = ability.can("create", "imagingRequest");
+
+  const admissionNo = queryParams.get("AdmNo");
+  const treatmentNo = queryParams.get("TreatmentNo");
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo");
-  const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName;
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false);
@@ -63,21 +64,20 @@ const Imaging = () => {
     (state) => state.postRadiologyRequest
   );
 
+  // lab test drawer
+  const [open, setOpen] = useState(false);
+  const [size, setSize] = useState();
+  const [record, setRecord] = useState(null);
 
-   // lab test drawer
-   const [open, setOpen] = useState(false);
-   const [size, setSize] = useState();
-   const [record, setRecord] = useState(null);
- 
-   const showLargeDrawer = (record) => {
-     setSize('large');
-     setOpen(true);
-     setRecord(record);
-   };
- 
-   const onClose = () => {
-     setOpen(false);
-   };
+  const showLargeDrawer = (record) => {
+    setSize("large");
+    setOpen(true);
+    setRecord(record);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     dispatch(getRadiologySetup());
@@ -109,7 +109,7 @@ const Imaging = () => {
       const response = await dispatch(postRadiologyRequest(radiologyRequest));
 
       if (response && response.status === "success") {
-        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));;
+        dispatch(getPatientRadiologyTest(treatmentNo ?? admissionNo));
       } else {
         message.error("Failed to submit radiology request");
       }
@@ -121,7 +121,9 @@ const Imaging = () => {
   const handleRadiologyRequest = async () => {
     if (selectedRow && selectedRow.TreatmentNo) {
       const treatmentNo = selectedRow.TreatmentNo;
-      const response = await dispatch(requestRadiologyTest(treatmentNo ?? admissionNo));
+      const response = await dispatch(
+        requestRadiologyTest(treatmentNo ?? admissionNo)
+      );
       if (response && response.status === "success") {
         message.success(
           `Successfully requested radiology test for ${response.radiologyNo}`
@@ -214,7 +216,7 @@ const Imaging = () => {
         Radiology Request
       </Typography.Title>
 
-      {role === "Doctor" || role ==="Nurse" && patientDetails?.Status !== "Completed" && (
+      {canCreateImagingRequest && patientDetails?.Status !== "Completed" && (
         <div className="d-flex justify-content-between my-4">
           {!showForm && (
             <Button
@@ -279,15 +281,6 @@ const Imaging = () => {
           onFinish={handleSave}
         >
           <Row gutter={24}>
-            {/* <Col span={12}>
-              <Form.Item
-                name="treatmentNo"
-                label="Treatment Number"
-                rules={[{ required: true, message: "Please enter the treatment number." }]}
-              >
-                <Input disabled placeholder="Treatment Number" />
-              </Form.Item>
-            </Col> */}
             <Col span={12}>
               <Form.Item
                 name="dueDate"
@@ -333,9 +326,7 @@ const Imaging = () => {
               </Form.Item>
             </Col>
           </Row>
-
           <Row gutter={24}></Row>
-
           <Button
             type="primary"
             htmlType="submit"
@@ -348,7 +339,14 @@ const Imaging = () => {
         </Form>
       )}
 
-      <LabResultDrawer onClose={onClose} open={open} size={size} record={record} handleViewResults={handleViewResults} procedure="Radiology"/>
+      <LabResultDrawer
+        onClose={onClose}
+        open={open}
+        size={size}
+        record={record}
+        handleViewResults={handleViewResults}
+        procedure="Radiology"
+      />
     </div>
   );
 };

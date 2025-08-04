@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
 
-import useAuth from "../../hooks/useAuth";
+import { useAbility } from "../../hooks/casl.jsx";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
@@ -12,15 +12,12 @@ import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientLi
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
+import { subject } from "@casl/ability";
 
-const Impatient = ({filterParam}) => {
-  const userDetails = useAuth(); // Use the custom hook to get user info
+const Impatient = () => {
+  const ability = useAbility();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const doctorId = useAuth().userData.doctorID;
-  const role = useAuth().userData.departmentName;
-const location = useLocation();
-const paramFromRoute = location.state?.filterParam || filterParam;
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
@@ -41,29 +38,12 @@ const paramFromRoute = location.state?.filterParam || filterParam;
     console.log({ record });
 
     dispatch(currentInpatient(record));
-
-    if (userDetails.userData.departmentName === "Nurse") {
-      navigate(
-        `/Nurse/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    } else if (userDetails.userData.departmentName === "Doctor") {
-      navigate(
-        `/Doctor/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    } else {
-      navigate(
-        `/Psychology/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    }
+    navigate(
+      `/Dashboard/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
+      {
+        state: { patientDetails: record },
+      }
+    );
   };
 
   // get the list of doctors
@@ -88,15 +68,17 @@ const paramFromRoute = location.state?.filterParam || filterParam;
     });
   }, [admittedPatients, formattedDoctorDetails]);
 
+  const canReadOwnInpatients = (doctorId) =>
+    ability.can("read", subject("ownInPatients", { doctorId }));
+
+  console.log({ combinedPatients });
+
   // filter the patient based on the doctor
   const filterPatientBasedWithDoctor = useMemo(() => {
-    if (role === "Doctor") {
-      return combinedPatients?.filter(
-        (patient) => patient?.Doctor === doctorId
-      );
-    }
-    return combinedPatients;
-  }, [combinedPatients, doctorId, role]);
+    return combinedPatients?.filter((patient) =>
+      canReadOwnInpatients(patient.Doctor)
+    );
+  }, [combinedPatients, ability]);
 
   const filteredByStatus = useMemo(() => {
     const filteredByStatus = filterPatientBasedWithDoctor?.filter(

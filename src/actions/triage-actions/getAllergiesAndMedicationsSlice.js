@@ -9,7 +9,7 @@ export const GET_ALLERGIES_AND_MEDICATIONS_FAILURE =
   "GET_ALLERGIES_AND_MEDICATIONS_FAILURE";
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8085";
+  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8091";
 
 export const getAllergiesAndMedicationsSlice =
   (observationNo) => async (dispatch, getState) => {

@@ -2,7 +2,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 
 export const POST_PSYCHOLOGY_REQUEST_REVIEW_REQUEST = "POST_PSYCHOLOGY_REQUEST_REVIEW_REQUEST";

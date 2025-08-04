@@ -1,13 +1,13 @@
-import axios from 'axios';
-import { message } from 'antd';
+import axios from "axios";
+import { message } from "antd";
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 // Action Types
-export const REQUEST_LAB_LIST = 'REQUEST_LAB_LIST';
-export const REQUEST_LAB_LIST_SUCCESS = 'REQUEST_LAB_LIST_SUCCESS';
-export const REQUEST_LAB_LIST_FAIL = 'REQUEST_LAB_LIST_FAIL';
-export const REQUEST_LAB_LIST_RESET = 'REQUEST_LAB_LIST_RESET';
+export const REQUEST_LAB_LIST = "REQUEST_LAB_LIST";
+export const REQUEST_LAB_LIST_SUCCESS = "REQUEST_LAB_LIST_SUCCESS";
+export const REQUEST_LAB_LIST_FAIL = "REQUEST_LAB_LIST_FAIL";
+export const REQUEST_LAB_LIST_RESET = "REQUEST_LAB_LIST_RESET";
 
 // Action to fetch lab list
 export const getLabList = () => async (dispatch, getState) => {
@@ -15,27 +15,27 @@ export const getLabList = () => async (dispatch, getState) => {
     dispatch({ type: REQUEST_LAB_LIST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
     // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = localStorage.getItem("branchCode") || "";
+
+    console.log({ user });
 
     // Set up the request configuration with headers
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo?.userData?.no || '',
-        sessionToken: userInfo?.userData?.portalSessionToken || '',
-        branchCode,
+        "Content-Type": "application/json",
+        staffNo: user?.staffNo || "",
+        branchCode: user?.branchCode,
       },
     };
 
     // API request
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=PgLaboratoryTestHeaders`,
-
-      config,
+      config
     );
 
     console.log({ data });
@@ -50,7 +50,7 @@ export const getLabList = () => async (dispatch, getState) => {
   } catch (error) {
     // Extract and handle errors properly
     const errorMessage =
-      error.response?.data?.message || error.message || 'An error occurred';
+      error.response?.data?.message || error.message || "An error occurred";
 
     dispatch({
       type: REQUEST_LAB_LIST_FAIL,

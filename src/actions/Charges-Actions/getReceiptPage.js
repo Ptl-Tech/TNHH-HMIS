@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = "https://chiromo.potestastechnologies.net:8091/";
 
 export const REQUEST_RECEIPT_PAGE = "REQUEST_RECEIPT_PAGE";
 export const REQUEST_RECEIPT_PAGE_SUCCESS = "REQUEST_RECEIPT_PAGE_SUCCESS";

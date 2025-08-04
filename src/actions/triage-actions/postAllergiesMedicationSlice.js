@@ -11,7 +11,7 @@ export const POST_ALLERGIES_MEDICATION_FAIL = 'POST_ALLERGIES_MEDICATION_FAIL';
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+  'https://chiromo.potestastechnologies.net:8091';
 
 export const postAllergiesMedicationSlice =
   (allergiesMedication) => async (dispatch, getState) => {

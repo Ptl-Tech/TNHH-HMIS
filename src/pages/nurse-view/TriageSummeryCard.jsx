@@ -24,21 +24,21 @@ const TriageSummeryCard = ({ currentPath }) => {
       backgroundColor: "green",
       icon: <HourglassOutlined />,
       title: "Waiting Patients",
-      link: "/Nurse/Triage",
+      link: "/Dashboard/Triage",
       count: Object.keys(openTriageList).length || 0, // Replace with `waitingPatient?.length` or dynamic data
     },
     {
       backgroundColor: "gray",
       icon: <ClockCircleOutlined />,
       title: "In Triage",
-      link: "/Nurse/PendingTriageList",
+      link: "/Dashboard/PendingTriageList",
       count: Object.keys(pendingTriageList).length || 0,
     },
     {
       backgroundColor: "#0f5689",
       icon: <StopOutlined />,
       title: "Closed",
-      link: "/Nurse/ClosedTriageList",
+      link: "/Dashboard/ClosedTriageList",
       count: Object.keys(closedTriageList).length || 0,
     },
   ];

@@ -1,97 +1,97 @@
-
-  import { Button, Typography } from "antd";
-import { useLocation } from "react-router-dom";
-import { FileTextOutlined, PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import KetamineTable from "../../nurse-view/tables/nurse-tables/KetamineTable";
-import KetamineFormData from "../../nurse-view/nurse-forms/KetamineFormData";
+import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
+
+import { Button, Typography } from "antd";
+import { FileTextOutlined, PlusOutlined } from "@ant-design/icons";
+
+import { useAbility } from "../../../hooks/casl";
 import { listDoctors } from "../../../actions/DropdownListActions";
-import useAuth from "../../../hooks/useAuth";
+import KetamineFormData from "../../nurse-view/nurse-forms/KetamineFormData";
+import KetamineTable from "../../nurse-view/tables/nurse-tables/KetamineTable";
+import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoctorProcedures";
 
-  const Ketamine = () => {
-    const location = useLocation();
-    const patientDetails = location.state?.patientDetails;
-    const queryParams = new URLSearchParams(location.search);
-    const treatmentNo = queryParams.get("TreatmentNo");
-    const patientNo = queryParams.get("PatientNo");
-    const admissionNo = queryParams.get("AdmNo");
-    const role = useAuth().userData.departmentName
-    const [showForm, setShowForm] = useState(false);
-    const dispatch = useDispatch();
+const Ketamine = () => {
+  const ability = useAbility();
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-    const { loading: loadingKetamine, data } = useSelector(
-        (state) => state.getKetamine
-      );
-      const { loading: postKetamine } = useSelector(
-        (state) => state.postKetamine
-      );
+  const patientDetails = location.state?.patientDetails;
+  const queryParams = new URLSearchParams(location.search);
+  const canCreateKetamineRequest = ability.can("create", "ketamineRequest");
 
-    const { loading: loadingDoctors, data: doctors } = useSelector(state => state.getDoctorsList);
+  const admissionNo = queryParams.get("AdmNo");
+  const patientNo = queryParams.get("PatientNo");
+  const treatmentNo = queryParams.get("TreatmentNo");
 
-    useEffect(() => {
-        if (!doctors?.length) {
-        dispatch(listDoctors());
-        }
-    }, [dispatch, doctors?.length]);
+  const [showForm, setShowForm] = useState(false);
+  const { loading: loadingKetamine, data } = useSelector(
+    (state) => state.getKetamine
+  );
+  const { loading: loadingDoctors, data: doctors } = useSelector(
+    (state) => state.getDoctorsList
+  );
+  const { loading: postKetamine } = useSelector((state) => state.postKetamine);
+
+  useEffect(() => {
+    if (!doctors?.length) {
+      dispatch(listDoctors());
+    }
+  }, [dispatch, doctors?.length]);
 
   useEffect(() => {
     dispatch(getPatientKetamineRequest(treatmentNo ?? admissionNo));
   }, [dispatch, treatmentNo, admissionNo]);
-  
-    return (
-      <>
-        
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px",alignItems: "center" }}>
+
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "20px",
+          alignItems: "center",
+        }}
+      >
         <div>
-        <Typography.Title
-            level={5}
-            style={{ color: "#0F5689" }}
-        >
+          <Typography.Title level={5} style={{ color: "#0F5689" }}>
             <FileTextOutlined style={{ marginRight: "8px" }} />
             Ketamine Request
-        </Typography.Title>
+          </Typography.Title>
         </div>
-        {
-          role === 'Doctor' || role ==="Nurse" &&
-          patientDetails?.Status !== "Completed" && (
-            <div style={{ display: "flex", gap: "10px"}}>
-        
+        {canCreateKetamineRequest && patientDetails?.Status !== "Completed" && (
+          <div style={{ display: "flex", gap: "10px" }}>
             <Button
-            type="primary"
-            onClick={() => setShowForm(!showForm)}
-            icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
+              type="primary"
+              onClick={() => setShowForm(!showForm)}
+              icon={showForm ? <FileTextOutlined /> : <PlusOutlined />}
             >
-            {!showForm ? " New Ketamine Request" : "View Ketamine Requests"}
+              {!showForm ? " New Ketamine Request" : "View Ketamine Requests"}
             </Button>
-                
-            </div>
-          )
-        }
-        </div>
-  
-        {!showForm ? (
-          <KetamineTable 
-          loadingKetamine={loadingKetamine} 
-          data={data} 
-          doctors={doctors} 
+          </div>
+        )}
+      </div>
+
+      {!showForm ? (
+        <KetamineTable
+          loadingKetamine={loadingKetamine}
+          data={data}
+          doctors={doctors}
           treatmentNo={treatmentNo}
           patientNo={patientNo}
-          />
-        ) : (
-          <KetamineFormData 
-          patientNo={patientNo} 
-          treatmentNo={treatmentNo} 
-          doctors={doctors} 
-          loadingDoctors={loadingDoctors} 
+        />
+      ) : (
+        <KetamineFormData
+          patientNo={patientNo}
+          treatmentNo={treatmentNo}
+          doctors={doctors}
+          loadingDoctors={loadingDoctors}
           postKetamine={postKetamine}
           admissionNo={admissionNo}
-          />
-        )}
-      </>
-    );
-  };
-  
-  export default Ketamine;
-  
+        />
+      )}
+    </>
+  );
+};
+
+export default Ketamine;

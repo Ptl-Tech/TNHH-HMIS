@@ -134,7 +134,7 @@ const SecVisitorList = () => {
     } else if (visitor.Status === "Entered") {
       setClearModalVisible(true);
     } else if (visitor.Status === "Cleared") {
-      navigate(`/Security/visitor-form/${visitor.No}`, {
+      navigate(`/Dashboard/visitor-form/${visitor.No}`, {
         replace: true,
         state: { visitorData: visitor },
       });

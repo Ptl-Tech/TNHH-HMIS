@@ -8,7 +8,7 @@ export const POST_PHARMACY_HEADER_SUCCESS = 'POST_PHARMACY_HEADER_SUCCESS';
 
 const API_URL =
   import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+  'https://chiromo.potestastechnologies.net:8091';
 
 export const postPharmacyHeader =
   (pharmacyHeaderData) => async (dispatch, getState) => {

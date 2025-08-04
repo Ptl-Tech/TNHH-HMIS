@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 const PastDoctorNotesTable = ({
-  role,
   combinedPatients,
   loadingDoctors,
   loadingEncounters,
@@ -68,11 +67,7 @@ const PastDoctorNotesTable = ({
 
   const handleNavigate = (record) => {
     navigate(
-      role === "Doctor"
-        ? `/Doctor/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`
-        : role === "Psychology"
-        ? `/Psychology/Consultation-List/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`
-        : `/Nurse/Inpatient/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`,
+      `Dashboard/Inpatient/Encounter?TreatmentNo=${record?.TreatmentNo}&PatientNo=${record?.PatientNo}`,
       {
         state: {
           patientDetails: record,
@@ -98,7 +93,6 @@ export default PastDoctorNotesTable;
 
 //props validation
 PastDoctorNotesTable.propTypes = {
-  role: PropTypes.string,
   combinedPatients: PropTypes.array,
   loadingDoctors: PropTypes.bool,
   loadingEncounters: PropTypes.bool,

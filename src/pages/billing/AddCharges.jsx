@@ -133,7 +133,6 @@ const AddCharges = ({
       creationDate: new Date().toISOString().split("T")[0],
       patientNo: patientNo,
       ...(calculateDoctorFee && { doctorId: selectedDoctor }), // add doctorId only if needed
-
     };
     await dispatch(postPatientCharges(payload));
     setLocalChargesList([]); // Clear table data on modal close

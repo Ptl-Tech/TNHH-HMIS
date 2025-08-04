@@ -66,7 +66,7 @@ export default function WalkInCreateVisit() {
       const { appointmentNo } = createVisitData || {};
 
       message.success("Visit created successfully, await redirection.");
-      navigate(`/Reception/Walkin-Patient-List/${appointmentNo}`);
+      navigate(`/Dashboard/Walkin-Patient-List/${appointmentNo}`);
     }
 
     if (visitSuccess || visitError) {

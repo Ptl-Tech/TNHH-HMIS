@@ -1,17 +1,16 @@
 import { Button, Table } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
+// import useAuth from "../../../../hooks/useAuth";
 import PropTypes from "prop-types";
+import { useAuth } from "../../../../hooks/auth";
 
 const EncounterListInPatientTable = ({
   filteredList,
   loadingConsultationRoomList,
-  patientNo
 }) => {
   const navigate = useNavigate();
-  const userDetails = useAuth();
-  const user = userDetails.userData.departmentName;
+
   const columns = [
     {
       title: "admission Date",
@@ -63,28 +62,12 @@ const EncounterListInPatientTable = ({
   ];
 
   const handleOnClick = (record) => {
-    if (user === "Nurse") {
-      navigate(
-        `/Nurse/Past-doctor-visit/Encounter?AdmNo=${record?.admissionNo}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    } else if (user === "Doctor") {
-      navigate(
-        `/Doctor/Past-doctor-visit/Encounter?AdmNo=${record?.AdmissionNo}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    } else {
-      navigate(
-        `/Psychology/Past-doctor-visit/Patient/Encounter?AdmNo=${record?.AdmissionNo}`,
-        {
-          state: { patientDetails: record },
-        }
-      );
-    }
+    navigate(
+      `/Dashboard/Past-doctor-visit/Encounter?AdmNo=${record?.admissionNo}`,
+      {
+        state: { patientDetails: record },
+      }
+    );
   };
 
   return (
