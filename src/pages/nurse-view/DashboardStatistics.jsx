@@ -64,7 +64,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {user.staffName}
+                  {user?.staffName}
                 </Typography.Title>
               </div>
             </div>
@@ -89,7 +89,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {user.role || "N/A"}
+                  {user?.role || "N/A"}
                 </Typography.Text>
               </div>
             </Space>
@@ -132,7 +132,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
               }}
             >
               <div style={{ display: "flex", flexDirection: "column" }}>
-                {user.branchCode === "DOCTOR" ? (
+                {user?.branchCode === "DOCTOR" ? (
                   <>
                     <div
                       style={{
