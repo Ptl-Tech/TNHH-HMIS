@@ -135,9 +135,10 @@ const NursingNotes = () => {
           )}
           <Button type="primary" onClick={() => setIsDrawerVisible(true)}>
             <FileProtectOutlined />
-           View Nursing Notes
+            View Nursing Notes
           </Button>
         </div>
+      )}
       {isNursingNotesFormVisible && (
         <NursingNotesFormData
           form={form}
@@ -160,8 +161,3 @@ const NursingNotes = () => {
 };
 
 export default NursingNotes;
-// props validation
-NursingNotes.propTypes = {
-  setSelectedItem: PropTypes.string,
-  selectedItem: PropTypes.string,
-};

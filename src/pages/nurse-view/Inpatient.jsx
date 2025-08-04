@@ -14,7 +14,7 @@ import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js"
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import { subject } from "@casl/ability";
 
-const Impatient = () => {
+const Inpatient = () => {
   const ability = useAbility();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -84,15 +84,9 @@ const Impatient = () => {
     const filteredByStatus = filterPatientBasedWithDoctor?.filter(
       ({ Status }) => Status === "Admitted" || Status === "Discharge Pending"
     );
-    //filter by bracnh from the route parameter
-    if(paramFromRoute) {
-      return filteredByStatus?.filter(
-        ({ Branch }) => Branch === paramFromRoute
-      );
-    }
-    return filteredByStatus;
-  }, [filterPatientBasedWithDoctor, paramFromRoute, filterParam]); // Use paramFromRoute if available, otherwise use filterParam
 
+    return filteredByStatus;
+  }, [filterPatientBasedWithDoctor]);
 
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
@@ -128,4 +122,4 @@ const Impatient = () => {
   );
 };
 
-export default Impatient;
+export default Inpatient;

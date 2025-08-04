@@ -9,7 +9,7 @@ import {
   ShoppingCartOutlined,
   RollbackOutlined,
 } from "@ant-design/icons";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "../../hooks/auth";
 import NursePharmacyReturnLine from "./tables/NursePharmacyReturnLine";
 
 const Medication = ({ patientDetails }) => {
