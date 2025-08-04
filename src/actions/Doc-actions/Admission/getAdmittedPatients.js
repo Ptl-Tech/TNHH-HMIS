@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message, notification } from "antd"; // Ensure Ant Design's message is imported
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_VERIFIED_ADMITTED_PATIENTS_REQUEST = "GET_VERIFIED_ADMITTED_PATIENTS_REQUEST";
 export const GET_VERIFIED_ADMITTED_PATIENTS_SUCCESS = "GET_VERIFIED_ADMITTED_PATIENTS_SUCCESS";

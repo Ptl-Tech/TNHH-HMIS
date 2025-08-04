@@ -61,9 +61,8 @@ export const PATIENT_BY_ID_FAIL = 'PATIENT_BY_ID_FAIL';
 export const PATIENT_BY_ID_RESET = 'PATIENT_BY_ID_RESET';
 
 import { message } from 'antd';
-import useAuth from '../hooks/useAuth';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const createPatient = (patient) => async (dispatch, getState) => {
   try {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const REQUEST_RADIOLOGY_DETAILS = 'REQUEST_RADIOLOGY_DETAILS';

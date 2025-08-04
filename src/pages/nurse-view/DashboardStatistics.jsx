@@ -230,7 +230,7 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
               </div>
               <div>
                 <Button type="link" style={{ fontSize: "12px", color: "gray" }}>
-                  <Link to="/nurse/patients" style={{ color: "gray" }}>
+                  <Link to="/Dashboard/patients" style={{ color: "gray" }}>
                     View details
                     <ArrowRightOutlined
                       size={12}

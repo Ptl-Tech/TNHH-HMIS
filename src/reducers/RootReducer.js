@@ -3,7 +3,7 @@ import {
   otpVerifyReducer,
   userLoginReducer,
   userRegisterReducer,
-  forgotPwdReducer,
+  forgotPasswordReducer,
   resetPwdReducer,
 } from "./userReducer";
 import {
@@ -341,12 +341,15 @@ import { getReceiptsByPatientNoReducer } from "./ChargesReducers/getReceiptByPat
 import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReducer";
 import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
 import { getAdmissionsReducer } from "./nurse-reducers/getPgAdmissionsReducer";
+import { authReducer } from "./auth/auth-reducer";
 
 export const rootReducer = combineReducers({
+  // Auth
+  auth: authReducer,
   userLogin: userLoginReducer,
   otpVerify: otpVerifyReducer,
   userRegister: userRegisterReducer,
-  forgotPwd: forgotPwdReducer,
+  forgotPassword: forgotPasswordReducer,
   resetPwd: resetPwdReducer,
 
   //security reducers:-->>mercy
@@ -485,7 +488,7 @@ export const rootReducer = combineReducers({
   getPharmacyRequestsAll: getPharmacyRequestsAllReducer,
   getSinglePharmacyRecord: getSinglePharmacyRecordReducer,
   postPharmacyAppointment: postPharmacyAppointmentReducer,
-  postLabAppointment:postLabAppointmentReducer,
+  postLabAppointment: postLabAppointmentReducer,
   getReceiptsByPatientNo: getReceiptsByPatientNoReducer,
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,

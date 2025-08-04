@@ -239,7 +239,7 @@ const InpatientList = () => {
   ];
 
   const handleselectedPatient = () => {
-    navigate("/Reception/Patient-Registration");
+    navigate("/Dashboard/Patient-Registration");
   };
 
   return (

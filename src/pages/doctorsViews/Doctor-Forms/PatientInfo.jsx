@@ -20,7 +20,7 @@ import TextArea from "antd/es/input/TextArea";
 import { UserOutlined } from "@ant-design/icons";
 import { IoCloseOutline, IoEllipsisVertical } from "react-icons/io5";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 import {
   smartMerge,
@@ -30,10 +30,13 @@ import {
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
+import { useAbility } from "../../../hooks/casl";
+import { useAuth } from "../../../hooks/auth";
 import PatientCharges from "../../billing/CashPatients/PatientCharges";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
-const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
+const PatientInfo = ({ patientNo, treatmentNo, patientDetails }) => {
+  const ability = useAbility();
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -41,6 +44,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
     location.state?.patientDetails || {},
     patientDetails || {}
   );
+  const canSeePatientReview = ability.can("read", "patientReview");
 
   const [moreDetailsOpen, setMoreDetailOpen] = useState(false);
   const [patientReviewOpen, setPatientReviewOpen] = useState(false);
@@ -106,35 +110,34 @@ console.log("patient details", patientdeets);
             >
               More Details
             </Button>
-            {(role === "Doctor" || role === "Psychology") &&
-              patient?.Status !== "Completed" && (
-                <PopoverMenu
-                  content={
-                    <CardMenu
-                      items={[
-                        {
-                          key: "0",
-                          children: "Finalize",
-                          onClick: handleMarkAsCompleted,
-                          loading: markasCompleteLoading,
-                          disabled: markasCompleteLoading,
-                        },
-                        {
-                          key: "1",
-                          onClick: () => setPatientReviewOpen(true),
-                          children: "Request Patient Review",
-                        },
-                      ]}
-                    />
-                  }
-                >
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<IoEllipsisVertical />}
-                  ></Button>
-                </PopoverMenu>
-              )}
+            {canSeePatientReview && patient?.Status !== "Completed" && (
+              <PopoverMenu
+                content={
+                  <CardMenu
+                    items={[
+                      {
+                        key: "0",
+                        children: "Finalize",
+                        onClick: handleMarkAsCompleted,
+                        loading: markasCompleteLoading,
+                        disabled: markasCompleteLoading,
+                      },
+                      {
+                        key: "1",
+                        onClick: () => setPatientReviewOpen(true),
+                        children: "Request Patient Review",
+                      },
+                    ]}
+                  />
+                }
+              >
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<IoEllipsisVertical />}
+                ></Button>
+              </PopoverMenu>
+            )}
           </div>
         </div>
       </Card>
@@ -143,9 +146,11 @@ console.log("patient details", patientdeets);
 };
 
 const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
-  const [form] = Form.useForm();
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const staffNo = useAuth()?.userData.no;
+
+  const [form] = Form.useForm();
+  const staffNo = user.staffNo;
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);

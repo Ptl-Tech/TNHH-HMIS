@@ -6,7 +6,7 @@ export const GET_PATIENT_CONSUMABLES_REQUEST = 'GET_PATIENT_CONSUMABLES_REQUEST'
 export const GET_PATIENT_CONSUMABLES_SUCCESS = 'GET_PATIENT_CONSUMABLES_SUCCESS';
 export const GET_PATIENT_CONSUMABLES_FAILURE = 'GET_PATIENT_CONSUMABLES_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getPatientConsumablesSlice = () => 
   async (dispatch, getState) => {

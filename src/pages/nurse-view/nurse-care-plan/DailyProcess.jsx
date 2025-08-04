@@ -1,33 +1,36 @@
-import { Button, Form, message } from 'antd';
-import { useEffect, useState } from 'react';
-import { PlusOutlined, UserAddOutlined } from '@ant-design/icons';
-import GeneralObservationsTable from '../tables/nurse-tables/GeneralObservationsTable';
-import { useDispatch, useSelector } from 'react-redux';
-import { getQyInpatientProcessProceduresSlice } from '../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice';
-import { useLocation } from 'react-router-dom';
-import DailyProcessFormData from '../nurse-forms/DailyProcessFormData';
-import NurseInnerHeader from '../../../partials/nurse-partials/NurseInnerHeader';
-import { convertToRaw, EditorState } from 'draft-js';
-import { stateToHTML } from 'draft-js-export-html';
+import { Button, Form, message } from "antd";
+import { useEffect, useState } from "react";
+import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
+import GeneralObservationsTable from "../tables/nurse-tables/GeneralObservationsTable";
+import { useDispatch, useSelector } from "react-redux";
+import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
+import { useLocation } from "react-router-dom";
+import DailyProcessFormData from "../nurse-forms/DailyProcessFormData";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+import { convertToRaw, EditorState } from "draft-js";
+import { stateToHTML } from "draft-js-export-html";
 import {
   POST_DAILY_PROCEDURE_OR_PROCESS_FAILURE,
   POST_DAILY_PROCEDURE_OR_PROCESS_SUCCESS,
   postDailyProcedureOrProcessSlice,
-} from '../../../actions/nurse-actions/postDailyProcedureOrProcessSlice';
-import useAuth from '../../../hooks/useAuth';
+} from "../../../actions/nurse-actions/postDailyProcedureOrProcessSlice";
+import { useAbility } from "../../../hooks/casl";
+
 const DailyProcess = () => {
+  const ability = useAbility();
   const { patientDetails } = useLocation().state;
   const queryParams = new URLSearchParams(location.search);
-  const AdmNo = queryParams.get('AdmNo');
+  const AdmNo = queryParams.get("AdmNo");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
+
+  const canCreateDoctorNotes = ability.can("create", "doctorNotes");
 
   const [isDailyProcessFormVisible, setIsDailyProcessFormVisible] =
     useState(false);
 
   const { loadingGetIpProcedure, ipGetProcedure } = useSelector(
-    (state) => state.getQyInpatientProcessProcedure,
+    (state) => state.getQyInpatientProcessProcedure
   );
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -39,8 +42,8 @@ const DailyProcess = () => {
   const handleEditorChange = (state) => {
     setEditorState(state);
     form.setFieldValue(
-      'content',
-      JSON.stringify(convertToRaw(state.getCurrentContent())),
+      "content",
+      JSON.stringify(convertToRaw(state.getCurrentContent()))
     );
   };
 
@@ -50,12 +53,12 @@ const DailyProcess = () => {
     try {
       // Construct the visitor data
       const visitorData = {
-        recId: '',
+        recId: "",
         notesType: 1,
-        myAction: 'create',
+        myAction: "create",
         notes: htmlContent,
         treatmentNo: patientDetails?.CurrentAdmNo || AdmNo,
-        patientNo: patientDetails?.Patient_No || queryParams.get('PatientNo'),
+        patientNo: patientDetails?.Patient_No || queryParams.get("PatientNo"),
       };
 
       // Dispatch function to handle API call and feedback
@@ -71,7 +74,7 @@ const DailyProcess = () => {
             ) {
               message.error(
                 result.payload.message ||
-                  'Internal server error, please try again later.',
+                  "Internal server error, please try again later."
               );
             }
           })
@@ -80,7 +83,7 @@ const DailyProcess = () => {
           })
           .catch((err) => {
             message.error(
-              err.message || 'Internal server error, please try again later.',
+              err.message || "Internal server error, please try again later."
             );
           });
       };
@@ -88,7 +91,7 @@ const DailyProcess = () => {
       // Call the function
       await dispatchDailyProcessData(visitorData);
     } catch (error) {
-      message.error(error.message || 'An unexpected error occurred.');
+      message.error(error.message || "An unexpected error occurred.");
     }
   };
 
@@ -98,19 +101,16 @@ const DailyProcess = () => {
 
   return (
     <div>
-      <NurseInnerHeader
-        icon={<UserAddOutlined />}
-        title="Daily Ward Rounds"
-      />
+      <NurseInnerHeader icon={<UserAddOutlined />} title="Daily Ward Rounds" />
 
-      {!isDailyProcessFormVisible && role === 'Doctor' && (
+      {!isDailyProcessFormVisible && canCreateDoctorNotes && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            paddingBottom: '20px',
-            marginTop: '20px',
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            paddingBottom: "20px",
+            marginTop: "20px",
           }}
         >
           <Button

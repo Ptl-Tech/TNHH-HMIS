@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_PHARMACY_REQUESTS_ALL = "GET_PHARMACY_REQUESTS_ALL";
 export const GET_PHARMACY_REQUESTS_ALL_SUCCESS =

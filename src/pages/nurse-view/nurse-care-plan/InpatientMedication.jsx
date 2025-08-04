@@ -4,17 +4,23 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Tabs } from "antd";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import PrescriptionTable from "../../doctorsViews/tables/PrescriptionTable";
 import InpatientPrescriptionForm from "../../doctorsViews/Doctor-Forms/InPatientPrescriptionForm";
 import { getInPatientQyPrescriptionLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
 import { IpPhramcyTable } from "../../pharmacy-views/pharmacy-utils";
+import { useAbility } from "../../../hooks/casl";
 
 const Medication = () => {
+  const ability = useAbility();
   const dispatch = useDispatch();
   const getLocation = useLocation();
-  const role = useAuth().userData.departmentName;
   const queryParams = new URLSearchParams(location.search);
+
+  const canCreatePrescriptionRequest = ability.can(
+    "create",
+    "prescriptionRequest"
+  );
 
   const admissionNo = queryParams.get("AdmNo");
   const patientDetails = getLocation.state?.patientDetails;
@@ -32,7 +38,8 @@ const Medication = () => {
 
   return (
     <div>
-      {patientDetails?.Status !== "Completed" && (
+      {canCreatePrescriptionRequest &&
+        patientDetails?.Status !== "Completed" && (
           <Tabs
             type="card"
             items={[

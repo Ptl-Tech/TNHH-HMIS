@@ -73,7 +73,7 @@ const AdmitPatientForm = () => {
           result.payload.message ||
             "Ward, Room and Bed assigned successfully to patient"
         );
-        navigate(`/Nurse/Inpatient`);
+        navigate(`/Dashboard/Inpatient`);
       } else if (result.type === POST_ADMISSION_FORM_DETAILS_FAILURE) {
         message.error(
           result.payload.message ||

@@ -2,19 +2,21 @@ import { useLocation } from "react-router-dom";
 
 import { Card, Tabs } from "antd";
 
+import { useAbility } from "../../../hooks/casl";
+
 import Medication from "./Medication";
 import AdmissionTab from "./AdmissionTab";
 import PatientRequests from "./PatientRequests";
 import ConsultationroomDetails from "./ConsultationroomDetails";
 
-const EvaluationCardContent = ({
-  role,
-  patientNo,
-  treatmentNo,
-  observationNo,
-}) => {
+const EvaluationCardContent = ({ patientNo, treatmentNo, observationNo }) => {
+  const ability = useAbility();
   const location = useLocation();
+
   const patientDetail = location.state?.patientDetails;
+  const canSeePatientAdmission = ability.can("read", "patientProcedures");
+  const canSeePatientMedication = ability.can("read", "patientMedication");
+  const canSeePatientProcedures = ability.can("read", "patientProcedures");
 
   return (
     <div>
@@ -30,7 +32,7 @@ const EvaluationCardContent = ({
               observationNo={observationNo}
             />
           </Tabs.TabPane>
-          {(role === "Doctor" || role === "Nurse") && (
+          {canSeePatientMedication && (
             <>
               <Tabs.TabPane tab="Medication" key="2">
                 <Medication
@@ -41,14 +43,14 @@ const EvaluationCardContent = ({
               </Tabs.TabPane>
             </>
           )}
-          {(role === "Doctor" || role === "Nurse") && (
+          {canSeePatientProcedures && (
             <>
               <Tabs.TabPane tab="Procedures" key="3">
                 <PatientRequests />
               </Tabs.TabPane>{" "}
             </>
           )}
-          {role === "Doctor" && patientDetail?.Status !== "Completed" && (
+          {canSeePatientAdmission && patientDetail?.Status !== "Completed" && (
             <>
               <Tabs.TabPane tab="Admission & Referral" key="4">
                 <AdmissionTab />

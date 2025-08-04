@@ -5,7 +5,7 @@ export const UPDATE_TRIAGE_LIST_VITALS_REQUEST = 'UPDATE_TRIAGE_LIST_VITALS_REQU
 export const UPDATE_TRIAGE_LIST_VITALS_SUCCESS = 'UPDATE_TRIAGE_LIST_VITALS_SUCCESS';
 export const UPDATE_TRIAGE_LIST_VITALS_FAIL = 'UPDATE_TRIAGE_LIST_VITALS_FAIL';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const updateTriageListVitalsSlice = (vitals) => async (dispatch, getState) => {
     try {

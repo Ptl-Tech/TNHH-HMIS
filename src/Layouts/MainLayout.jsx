@@ -1,115 +1,57 @@
-import { useState, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import {
-  AppstoreOutlined,
-  UserOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-} from '@ant-design/icons';
-import { Layout, Menu, Button, theme } from 'antd';
-import logo from '../assets/images/logo.png';
-import smallLogo from '../assets/images/smallLogo.png';
-import Signout from '../Auth/Signout';
-import DynamicBreadcrumb from './DynamicBreadcrumb';
-import useAuth from '../hooks/useAuth';
+import { useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+
+import { Layout, Menu, Button, theme } from "antd";
+import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
+
+import Signout from "../Auth/Signout";
+import DynamicBreadcrumb from "./DynamicBreadcrumb";
 
 // routes
-import { labRoutes } from '../Routes/LabRoutes';
-import { nurseRoutes } from '../Routes/NurseRoutes';
-import { doctorRoutes } from '../Routes/DoctorRoutes';
-import { pharmacyRoutes } from '../Routes/PharmacyRoutes';
-import { receptionRoutes } from '../Routes/ReceptionRoutes';
-import { psychologyRoutes } from '../Routes/PsychologyRoutes';
+import { useAbility } from "../hooks/casl";
+import { labRoutes } from "../Routes/LabRoutes";
+import { nurseRoutes } from "../Routes/NurseRoutes";
+import { doctorRoutes } from "../Routes/DoctorRoutes";
+import { securityRoutes } from "../Routes/SecurityRoutes";
+import { pharmacyRoutes } from "../Routes/PharmacyRoutes";
+import { receptionRoutes } from "../Routes/ReceptionRoutes";
+import { radiologyRoutes } from "../Routes/RadiologyRoutes";
+import { psychologyRoutes } from "../Routes/PsychologyRoutes";
+
+import logo from "../assets/images/logo.png";
+import smallLogo from "../assets/images/smallLogo.png";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const MainLayout = () => {
-  const role = useAuth().userData.departmentName;
   const location = useLocation();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
+  const ability = useAbility();
+
   const [openKeys, setOpenKeys] = useState([]);
+  const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState(location.pathname);
-  const [menuItems, setMenuItems] = useState([]);
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const department = userInfo?.userData?.departmentName;
-
-    // Security Routes
-    const securityRoutes = [
-      {
-        key: '/Security',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Registration',
-      },
-      {
-        type: 'divider',
-      },
-      {
-        key: 'RegistrationGroup',
-        label: (
-          <span style={{ color: '#ac8342', fontWeight: 'medium' }}>
-            Registration
-          </span>
-        ),
-        type: 'group',
-        children: [
-          {
-            key: '/Security/visitors-list',
-            label: 'Visitor List',
-            icon: <UserOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
+  const generateMenuItems = () => {
+    const routeMap = [
+      { permission: "labNavigation", routes: labRoutes },
+      { permission: "nurseNavigation", routes: nurseRoutes },
+      { permission: "doctorNavigation", routes: doctorRoutes },
+      { permission: "securityNavigation", routes: securityRoutes },
+      { permission: "pharmacyNavigation", routes: pharmacyRoutes },
+      { permission: "receptionNavigation", routes: receptionRoutes },
+      { permission: "radiologyNavigation", routes: radiologyRoutes },
+      { permission: "psychologyNavigation", routes: psychologyRoutes },
     ];
 
-    const radiologyRoutes = [
-      {
-        key: '/Radiology',
-        icon: <AppstoreOutlined style={{ color: '#fff' }} />,
-        label: 'Radiology',
-      },
-      {
-        type: 'divider',
-      },
-      {
-        key: 'RadiologyGroup',
-        label: (
-          <span style={{ color: '#ac8342', fontWeight: 'medium' }}>
-            Radiology
-          </span>
-        ),
-        type: 'group',
-        children: [
-          {
-            key: '/Radiology/Radiology-Patients',
-            label: 'Radiology Requests',
-            icon: <UserOutlined style={{ color: '#fff' }} />,
-          },
-        ],
-      },
-    ];
+    console.log({routeMap});
+    
 
-    // Set the menu items based on the user's department
-    if (department === 'Reception') {
-      setMenuItems(receptionRoutes);
-    } else if (department === 'Nurse') {
-      setMenuItems(nurseRoutes);
-    } else if (department === 'Doctor') {
-      setMenuItems(doctorRoutes(role));
-    } else if (department === 'Laboratory') {
-      setMenuItems(labRoutes);
-    } else if (department === 'Security') {
-      setMenuItems(securityRoutes);
-    } else if (department === 'Psychology') {
-      setMenuItems(psychologyRoutes(role));
-    } else if (department === 'Radiology') {
-      setMenuItems(radiologyRoutes);
-    } else if (department === 'Pharmacy') {
-      setMenuItems(pharmacyRoutes);
-    }
-  }, []);
+    const found = routeMap.find(({ permission }) =>
+      ability.can("read", permission)
+    );
+    return found?.routes || [];
+  };
 
   // Handle open submenu logic
   const onOpenChange = (keys) => {
@@ -130,13 +72,10 @@ const MainLayout = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-
+  
   return (
     <Layout>
-      <Header
-        className="headerstyle"
-        style={{ zIndex: '999' }}
-      >
+      <Header className="headerstyle" style={{ zIndex: "999" }}>
         <div className="d-flex justify-content-center pt-2">
           <div className="demo-logo-vertical">
             {collapsed ? (
@@ -147,12 +86,7 @@ const MainLayout = () => {
                 alt="Logo"
               />
             ) : (
-              <img
-                src={logo}
-                height={70}
-                className="mb-3 pt-1"
-                alt="Logo"
-              />
+              <img src={logo} height={70} className="mb-3 pt-1" alt="Logo" />
             )}
           </div>
           <Button
@@ -160,10 +94,10 @@ const MainLayout = () => {
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
             style={{
-              fontSize: '22px',
+              fontSize: "22px",
               width: 64,
               height: 64,
-              color: '#fff',
+              color: "#fff",
             }}
           />
         </div>
@@ -172,7 +106,7 @@ const MainLayout = () => {
 
       <Layout hasSider>
         <Sider
-          className={`sideStyle ${collapsed ? 'collapsed' : ''}`}
+          className={`sideStyle ${collapsed ? "collapsed" : ""}`}
           trigger={null}
           collapsible
           collapsed={collapsed}
@@ -181,44 +115,40 @@ const MainLayout = () => {
           <Menu
             theme="light"
             mode="inline"
-            selectedKeys={[selectedKey]}
             openKeys={openKeys}
-            onOpenChange={onOpenChange}
             onClick={handleMenuClick}
+            onOpenChange={onOpenChange}
+            selectedKeys={[selectedKey]}
             style={{
-              backgroundColor: '#0f5689 !important',
-              height: '100vh',
-              paddingBottom: '90px',
-              color: '#fff',
+              color: "#fff",
+              height: "100vh",
+              paddingBottom: "90px",
+              backgroundColor: "#0f5689 !important",
             }}
-            items={menuItems} // Pass items here
+            items={generateMenuItems()} // Pass items here
           />
         </Sider>
-
         <Layout className="site-layout">
-          {/* import the dynamic breadcrumb component here */}
-
           <DynamicBreadcrumb collapsed={collapsed} />
-
           <Content
             className="contentStyle"
             style={{
-              marginLeft: collapsed ? 80 : 230,
-              transition: 'all 0.2s',
               padding: 12,
-              background: colorBgContainer,
               borderRadius: 8,
+              minHeight: "77vh",
+              transition: "all 0.2s",
+              background: colorBgContainer,
+              marginLeft: collapsed ? 80 : 230,
             }}
           >
             <Outlet />
           </Content>
         </Layout>
       </Layout>
-
       <Footer
         style={{
-          textAlign: 'center',
-          color: '#67336d',
+          textAlign: "center",
+          color: "#67336d",
         }}
       >
         HMIS @ {new Date().getFullYear()} By Chiromo Hospital Group

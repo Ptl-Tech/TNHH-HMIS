@@ -8,10 +8,18 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import AllergyAndMedication from "../forms/triage-forms/AllergyAndMedication";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
-import useAuth from "../../../hooks/useAuth";
+import { useAbility } from "../../../hooks/casl";
+// import useAuth from "../../../hooks/useAuth";
 
 const AddAllergies = () => {
+  const ability = useAbility();
   const [form] = Form.useForm();
+
+  const canCreateAllergiesAndMedications = ability.can(
+    "create",
+    "allergiesAndMedications"
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const { rowSelection } = useSetTableCheckBoxHook();
@@ -20,7 +28,6 @@ const AddAllergies = () => {
   const { loadingGetAllergiesAndMedications, allergiesMedication } =
     useSelector((state) => state.getAllergiesAndMedications);
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
-  const role = useAuth().userData.departmentName;
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -41,26 +48,25 @@ const AddAllergies = () => {
         title="Allergies and Medications"
       />
 
-      {(!isFormVisible && role === "Nurse") ||
-        (role === "Doctor" && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-              paddingBottom: "20px",
-              marginTop: "20px",
-            }}
+      {!isFormVisible && canCreateAllergiesAndMedications && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "20px",
+            paddingBottom: "20px",
+            marginTop: "20px",
+          }}
+        >
+          <Button
+            type="primary"
+            onClick={handleButtonVisibility}
+            icon={<PlusOutlined />}
           >
-            <Button
-              type="primary"
-              onClick={handleButtonVisibility}
-              icon={<PlusOutlined />}
-            >
-              Add Allergies and Medications
-            </Button>
-          </div>
-        ))}
+            Add Allergies and Medications
+          </Button>
+        </div>
+      )}
 
       {isFormVisible && (
         <AllergyAndMedication

@@ -5,7 +5,7 @@ export const POST_INPATIENT_INJECTION_REQUEST = 'POST_INPATIENT_INJECTION_REQUES
 export const POST_INPATIENT_INJECTION_SUCCESS = 'POST_INPATIENT_INJECTION_SUCCESS';
 export const POST_INPATIENT_INJECTION_FAILURE = 'POST_INPATIENT_INJECTION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postInpatientInjectionSlice = (endpoint = '/Inpatient/Injection', injectionsData) => 
   async (dispatch, getState) => {

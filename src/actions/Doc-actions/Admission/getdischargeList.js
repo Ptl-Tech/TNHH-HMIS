@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure Ant Design's message is imported
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 // Action Types
 export const GET_DISCHARGE_LIST_REQUEST = "GET_DISCHARGE_LIST_REQUEST";
 export const GET_DISCHARGE_LIST_SUCCESS = "GET_DISCHARGE_LIST_SUCCESS";

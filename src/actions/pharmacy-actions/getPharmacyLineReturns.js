@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { message } from 'antd'; // Import Ant Design message for error handling
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types for Pharmacy Return
 export const GET_PHARMACY_RETURN_LIST_REQUEST =

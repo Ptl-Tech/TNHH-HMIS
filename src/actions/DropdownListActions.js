@@ -1,6 +1,5 @@
 import axios from "axios";
 import { message } from "antd";
-import useAuth from "../hooks/useAuth";
 import {
   COUNTRIES_LIST_FAIL,
   COUNTRIES_LIST_REQUEST,
@@ -43,7 +42,7 @@ import {
 } from "../constants/DropDownConstants";
 import apiHeaderConfig from "./configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const listCountries = () => async (dispatch, getState) => {
   try {

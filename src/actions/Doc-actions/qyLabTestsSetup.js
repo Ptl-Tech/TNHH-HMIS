@@ -1,7 +1,7 @@
 import axios from "axios";
 import { QY_LAB_TEST_LIST_REQUEST, QY_LAB_TEST_LIST_SUCCESS, QY_LAB_TEST_LIST_FAIL } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 export const getLabRequestSetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_LAB_TEST_LIST_REQUEST });

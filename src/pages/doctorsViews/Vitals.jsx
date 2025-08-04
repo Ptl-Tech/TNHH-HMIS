@@ -1,24 +1,34 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Divider, Form, Input, message, Row, Table, Typography } from "antd";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  getPatientVitalsLinesSlice,
-} from "../../actions/triage-actions/getVitalsLinesSlice";
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  message,
+  Row,
+  Table,
+  Typography,
+} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { getPatientVitalsLinesSlice } from "../../actions/triage-actions/getVitalsLinesSlice";
 import Loading from "../../partials/nurse-partials/Loading";
 import { PlusOutlined } from "@ant-design/icons";
 import { IoListOutline } from "react-icons/io5";
 import { postTriageListVitalsSlice } from "../../actions/triage-actions/postTriageListVitalsSlice";
-import useAuth from "../../hooks/useAuth";
-import {FileTextOutlined} from "@ant-design/icons";
+// import useAuth from "../../hooks/useAuth";
+import { FileTextOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useAbility } from "../../hooks/casl";
 
 const FormVitals = ({ observationNo, patientNo }) => {
+  const ability = useAbility();
+  const dispatch = useDispatch();
+  const location = useLocation();
+
   const [form] = Form.useForm();
   const [showForm, setShowForm] = useState(false); // Toggle between table and form
-  const dispatch = useDispatch();
-  const role = useAuth().userData.departmentName;
-  const location = useLocation();
   const patientDetails = location.state?.patientDetails;
 
   const { loading: loadingVitalsLines, vitals: vitalsLines } = useSelector(
@@ -109,13 +119,8 @@ const FormVitals = ({ observationNo, patientNo }) => {
 
   const onFinish = async (values) => {
     try {
-      const {
-        pulseRate,
-        temperature,
-        bloodPreasure,
-        sP02,
-        respirationRate,
-      } = values.vitals;
+      const { pulseRate, temperature, bloodPreasure, sP02, respirationRate } =
+        values.vitals;
 
       // Transform values
       const transformedValues = {
@@ -195,12 +200,15 @@ const FormVitals = ({ observationNo, patientNo }) => {
           {!showForm ? (
             <>
               <Divider />
-              <Typography.Title level={5} style={{ marginBottom: "12px", color: "#0F5689" }}>
+              <Typography.Title
+                level={5}
+                style={{ marginBottom: "12px", color: "#0F5689" }}
+              >
                 <FileTextOutlined style={{ marginRight: "8px" }} />
                 Patient Vitals
               </Typography.Title>
-              <div className="d-flex" style={{ paddingTop: '20px'}}>
-                {role === "Doctor" &&
+              <div className="d-flex" style={{ paddingTop: "20px" }}>
+                {ability.can("read", "doctorNavigation") &&
                   patientDetails?.Status !== "Completed" && (
                     <Button
                       type="primary"

@@ -5,7 +5,7 @@ export const POST_REQUEST_PATIENT_ADMISSION_REQUEST = 'POST_REQUEST_PATIENT_ADMI
 export const POST_REQUEST_PATIENT_ADMISSION_SUCCESS = 'POST_REQUEST_PATIENT_ADMISSION_SUCCESS';
 export const POST_REQUEST_PATIENT_ADMISSION_FAILURE = 'POST_REQUEST_PATIENT_ADMISSION_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postRequestPatientAdmissionSlice = (endpoint = '/Doctor/RequestPatientAdmission', requestAdmissionData) => 
   async (dispatch, getState) => {

@@ -7,8 +7,7 @@ export const POST_LAB_TO_DOCTOR_REQUEST = 'POST_LAB_TO_DOCTOR_REQUEST';
 export const POST_LAB_TO_DOCTOR_SUCCESS = 'POST_LAB_TO_DOCTOR_SUCCESS';
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+  import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const submitLabRequestToDoctor =
   (laboratoryNo) => async (dispatch, getState) => {

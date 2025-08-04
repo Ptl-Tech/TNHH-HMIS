@@ -5,7 +5,7 @@ export const GET_PG_ROOMS_SETUP_REQUEST = 'GET_PG_ROOMS_SETUP_REQUEST';
 export const GET_PG_WARD_ROOMS_SETUP_SUCCESS = 'GET_PG_WARD_ROOMS_SETUP_SUCCESS';
 export const GET_PG_WARD_ROOMS_SETUP_FAILURE = 'GET_PG_WARD_ROOMS_SETUP_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 export const getPgWardRoomsSetupSlice = () => 
   async (dispatch, getState) => {
     const config = configHelpers(getState);

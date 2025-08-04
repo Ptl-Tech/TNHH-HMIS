@@ -6,7 +6,7 @@ export const CONSULTATION_ROOM_CHECK_IN_PATIENT_REQUEST = "CONSULTATION_ROOM_CHE
 export const CONSULTATION_ROOM_CHECK_IN_PATIENT_SUCCESS = "CONSULTATION_ROOM_CHECK_IN_PATIENT_SUCCESS";
 export const CONSULTATION_ROOM_CHECK_IN_PATIENT_FAIL = "CONSULTATION_ROOM_CHECK_IN_PATIENT_FAIL";
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postCheckInPatientSlice = (observationNo) => async (dispatch, getState) =>{
 

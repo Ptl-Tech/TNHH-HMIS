@@ -128,7 +128,7 @@ const AdmittedPatients = () => {
   const handlePostedConsumables = () => {
     if (selectedRow[0]?.AdmissionNo) {
       navigate(
-        `/Nurse/Discharge-list/Posted-Consumables?AdmNo=${selectedRow[0].AdmissionNo}`,
+        `/Dashboard/Discharge-list/Posted-Consumables?AdmNo=${selectedRow[0].AdmissionNo}`,
         {
           state: { patientDetails: selectedRow[0] },
         }
@@ -219,7 +219,7 @@ const AdmittedPatients = () => {
             type="link"
             onClick={() =>
               navigate(
-                `/Doctor/Inpatient/Patient-card?treatmentNo=${record.Admission_No}`,
+                `/Dashboard/Inpatient/Patient-card?treatmentNo=${record.Admission_No}`,
                 { state: { patientDetails: patientDetails } }
               )
             }
@@ -273,7 +273,7 @@ const AdmittedPatients = () => {
               type="primary"
               onClick={() =>
                 navigate(
-                  `/Doctor/Inpatient/Patient-card?treatmentNo=${record.No}`,
+                  `/Dashboard/Inpatient/Patient-card?treatmentNo=${record.No}`,
                   { state: { patientDetails: patientDetails } }
                 )
               }

@@ -115,7 +115,7 @@ const RadiologyOutPatients = () => {
 
   const handleNavigate = (record) => {
     navigate({
-      pathname: `/Radiology/Radiology-Patient`,
+      pathname: `/Dashboard/Radiology-Patient`,
       search: `?radiologyNo=${record.RadiologyNo}&status=${record.Status}`,
     });
   };

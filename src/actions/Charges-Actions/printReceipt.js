@@ -8,7 +8,7 @@ export const PRINT_RECEIPT_FAIL = "PRINT_RECEIPT_FAIL";
 export const PRINT_RECEIPT_RESET = "PRINT_RECEIPT_RESET";
 
 const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8085";
+  import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const printReceipt = (invoiceData) => async (dispatch, getState) => {
   try {

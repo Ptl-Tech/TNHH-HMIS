@@ -1,93 +1,95 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
+  Tag,
+  Card,
   Form,
+  Alert,
+  Input,
+  Modal,
   Button,
-  Typography,
   Select,
   message,
-  Tag,
-  Modal,
-  Card,
-  Input,
-  Alert,
+  Typography,
   notification,
 } from "antd";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getLabRequestSetup } from "../../../actions/Doc-actions/qyLabTestsSetup";
-import { postLabRequest } from "../../../actions/Doc-actions/postLabRequest";
-import {
-  getPatientLabTest,
-  requestLabTest,
-} from "../../../actions/Doc-actions/requestLabTest";
-import { useLocation } from "react-router-dom";
 import {
   FileTextOutlined,
   PlusOutlined,
   OrderedListOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
-import useAuth from "../../../hooks/useAuth";
+import moment from "moment";
+
 import LabResultDrawer from "./LabResultDrawer";
+import { useAbility } from "../../../hooks/casl";
+
+import {
+  getPatientLabTest,
+  requestLabTest,
+} from "../../../actions/Doc-actions/requestLabTest";
 import {
   GENERATE_LAB_RESULTS_REPORT_RESET,
   generateLabResultsReport,
 } from "../../../actions/lab-actions/generateLabResultsReport";
-import moment from "moment";
+import { postLabRequest } from "../../../actions/Doc-actions/postLabRequest";
+import RowSelectionTable from "../../../partials/doc-partials/RowSelectionTable";
+import { getLabRequestSetup } from "../../../actions/Doc-actions/qyLabTestsSetup";
 
 const { Option } = Select;
 
 const LabResults = () => {
+  const ability = useAbility();
+  const dispatch = useDispatch();
   const location = useLocation();
-  const patientDetails = location.state?.patientDetails;
+
   const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo");
+  const canCreateLabRequest = ability.can("create", "labRequest");
+
   const admissionNo = queryParams.get("AdmNo");
-  const role = useAuth().userData.departmentName;
-  const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
-  const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
-  const [labRequests, setLabRequests] = useState([]); // Track lab requests
-  const [error, setError] = useState(null);
+  const treatmentNo = queryParams.get("TreatmentNo");
+  const patientDetails = location.state?.patientDetails;
+
   const [form] = Form.useForm(); // AntD form instance
+  const [size, setSize] = useState();
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [record, setRecord] = useState(null);
+  const [iframeSrc, setIframeSrc] = useState("");
+  const [showForm, setShowForm] = useState(false); // Toggle between table and form
+  const [selectedRow, setSelectedRow] = useState([]); // Track selected rows
+  const [labRequests, setLabRequests] = useState([]); // Track lab requests
+  const [labRequest, setLabRequest] = useState({
+    dueDate: "",
+    myAction: "create",
+    testPackageCode: "",
+    treatmentNo: treatmentNo ? treatmentNo : admissionNo,
+  });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [noResultsMessage, setNoResultsMessage] = useState(false);
+  const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
+  const [currentReportData, setCurrentReportData] = useState(reportData);
 
   const {
     data: reportData,
-    loading: reportLoading,
     error: reportError,
+    loading: reportLoading,
   } = useSelector((state) => state.generateLabResultsReport);
-  const [currentReportData, setCurrentReportData] = useState(reportData);
 
-  const dispatch = useDispatch();
-  const [showForm, setShowForm] = useState(false); // Toggle between table and form
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [iframeSrc, setIframeSrc] = useState("");
-  const [noResultsMessage, setNoResultsMessage] = useState(false);
   const { data: labTestSetupData } = useSelector(
     (state) => state.getlabRequestSetup
   );
   const { loading: loadingLabRequestPost } = useSelector(
     (state) => state.postLabRequest
   );
-
-  const { loading: loadingPatientLabTest, data: patientLabTest } = useSelector(
-    (state) => state.patientLabTest
-  );
   const { loading: loadingLabRequest } = useSelector(
     (state) => state.requestLabTest
   );
-
-  const [labRequest, setLabRequest] = useState({
-    myAction: "create",
-    treatmentNo: treatmentNo ? treatmentNo : admissionNo,
-    testPackageCode: "",
-    dueDate: "",
-  });
-
-  // lab test drawer
-  const [open, setOpen] = useState(false);
-  const [size, setSize] = useState();
-  const [record, setRecord] = useState(null);
+  const { loading: loadingPatientLabTest, data: patientLabTest } = useSelector(
+    (state) => state.patientLabTest
+  );
 
   const showLargeDrawer = async (record) => {
     setSize("large");
@@ -133,6 +135,7 @@ const LabResults = () => {
   const handleRemoveLabTest = (code) => {
     setLabRequests(labRequests.filter((item) => item.code !== code));
   };
+
   const onClose = () => {
     setOpen(false);
   };
@@ -301,7 +304,7 @@ const LabResults = () => {
         Laboratory Request
       </Typography.Title>
 
-      {role === "Doctor" || role ==="Nurse" && patientDetails?.Status !== "Completed" ? (
+      {canCreateLabRequest && patientDetails?.Status !== "Completed" ? (
         <div className="d-block d-md-flex align-items-center gap-3 my-3">
           <div className="d-flex justify-content-start align-items-center">
             {!showForm && (

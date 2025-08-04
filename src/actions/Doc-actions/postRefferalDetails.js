@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_REFERRAL_DETAILS_REQUEST = "POST_REFERRAL_DETAILS_REQUEST";
 export const POST_REFERRAL_DETAILS_SUCCESS = "POST_REFERRAL_DETAILS_SUCCESS";

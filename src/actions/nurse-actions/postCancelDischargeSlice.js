@@ -6,7 +6,7 @@ export const POST_CANCEL_DISCHARGE_REQUEST = 'POST_CANCEL_DISCHARGE_REQUEST';
 export const POST_CANCEL_DISCHARGE_SUCCESS = 'POST_CANCEL_DISCHARGE_SUCCESS';
 export const POST_CANCEL_DISCHARGE_FAILURE = 'POST_CANCEL_DISCHARGE_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postCancelDischargeSlice = (endpoint = '/Inpatient/CancelDischarge', dischargeData) => 
   async (dispatch, getState) => {

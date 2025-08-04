@@ -18,7 +18,7 @@ import {
 } from "../constants/visitorsConstants";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 export const createVisitor = (visitor) => async (dispatch, getState) => {
   try {
     dispatch({ type: REGISTER_VISITOR_REQUEST });

@@ -5,7 +5,7 @@ export const POST_NURSE_ORDER_SHEET_REQUEST = 'POST_NURSE_ORDER_SHEET_REQUEST';
 export const POST_NURSE_ORDER_SHEET_SUCCESS = 'POST_NURSE_ORDER_SHEET_SUCCESS';
 export const POST_NURSE_ORDER_SHEET_FAILURE = 'POST_NURSE_ORDER_SHEET_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const postNurseOrderSheetSlice = (endpoint = '/Nurse/SendOrderToPharmacy', consumablesData) => 
   async (dispatch, getState) => {

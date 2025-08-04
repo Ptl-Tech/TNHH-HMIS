@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_CHARGES_SETUP_REQUEST = "GET_CHARGES_SETUP_REQUEST";
 export const GET_CHARGES_SETUP_SUCCESS = "GET_CHARGES_SETUP_SUCCESS";

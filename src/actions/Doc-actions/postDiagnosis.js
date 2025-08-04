@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message, Modal } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_DIAGNOSIS_REQUEST = "POST_DIAGNOSIS_REQUEST";
 export const POST_DIAGNOSIS_SUCCESS = "POST_DIAGNOSIS_SUCCESS";

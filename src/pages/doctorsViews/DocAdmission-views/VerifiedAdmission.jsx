@@ -81,7 +81,7 @@ const VerifiedAdmission = () => {
             type="link"
             onClick={() =>
               navigate(
-                `/Doctor/Inpatient/Patient-card?treatmentNo=${record.No}`,
+                `/Dashboard/Inpatient/Patient-card?treatmentNo=${record.No}`,
                 { state: { patientDetails: patientDetails } }
               )
             }
@@ -195,7 +195,7 @@ const VerifiedAdmission = () => {
               onClick={() => {
                 if (selectedRecord) {
                   navigate(
-                    `/Doctor/Inpatient/Patient-card?treatmentNo=${selectedRecord.No}`,
+                    `/Dashboard/Inpatient/Patient-card?treatmentNo=${selectedRecord.No}`,
                     { state: { patientDetails: patientDetails } }
                   );
                 }
