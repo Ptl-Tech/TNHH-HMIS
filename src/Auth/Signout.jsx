@@ -38,11 +38,10 @@ const Signout = () => {
   );
 
   const getSalutation = () => {
-    // Ensure userDetails is available before accessing properties
     if (user && user.staffName) {
       return `Hi ${user.staffName}`;
     }
-    return "Hi there"; // Default greeting if userDetails is not available
+    return "Hi there";
   };
 
   return (

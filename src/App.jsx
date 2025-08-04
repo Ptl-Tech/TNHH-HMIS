@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import { useAbility } from "./hooks/casl";
 
@@ -13,10 +13,8 @@ import PharmacyRoutes from "./Routes/PharmacyRoutes";
 import RadiologyRoutes from "./Routes/RadiologyRoutes";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PsychologyRoutes from "./Routes/PsychologyRoutes";
-import { useAuth } from "./hooks/auth";
 
 function App() {
-  const { loading } = useAuth();
   const ability = useAbility();
 
   return (
