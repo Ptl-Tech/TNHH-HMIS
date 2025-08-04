@@ -33,6 +33,7 @@ import {
   DispatchToPharmacy,
   DispatchToTriage,
 } from "./helper/DispatchActions";
+import { useAuth } from "../../hooks/auth";
 
 const CreateVisitDrawer = ({
   visible,
@@ -40,10 +41,11 @@ const CreateVisitDrawer = ({
   // visitData: initialVisitData,
   // onUpdateVisit,
 }) => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const [form] = Form.useForm();
-  const branchCode = localStorage.getItem("branchCode");
   const location = useLocation();
+
+  const branchCode = user?.branchCode;
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
 
   const [dispatchVisit, setDispatchVisit] = useState(false);
@@ -251,7 +253,9 @@ const CreateVisitDrawer = ({
             </div>
             <div className="d-flex justify-content-end mb-3">
               {dispatchArea === 1 ? (
-                <DispatchToTriage activeVisitNo= {patientDetails?.ActiveVisitNo} />
+                <DispatchToTriage
+                  activeVisitNo={patientDetails?.ActiveVisitNo}
+                />
               ) : dispatchArea === 3 ? (
                 <DispatchToPharmacy patientNo={patientNo} />
               ) : dispatchArea === 4 ? (
@@ -259,13 +263,15 @@ const CreateVisitDrawer = ({
               ) : dispatchArea === 5 ? (
                 <Button type="primary">Dispatch to Radiology</Button>
               ) : (
-                <DispatchToTriage activeVisitNo= {patientDetails?.ActiveVisitNo} />
+                <DispatchToTriage
+                  activeVisitNo={patientDetails?.ActiveVisitNo}
+                />
               )}
             </div>
           </div>
           <PatientHeader
             activeVisitNo={activeVisitNo}
-           // initialVisitData={visitData}
+            // initialVisitData={visitData}
             patientNo={patientNo}
           />
         </>
@@ -276,8 +282,7 @@ const CreateVisitDrawer = ({
       open={visible}
       maskClosable={false}
       footer={null}
-              closable={{ 'aria-label': 'Close Button' }}
-
+      closable={{ "aria-label": "Close Button" }}
     >
       <Spin size="large" tip="Creating Visit..." spinning={visitLoading}>
         <Form

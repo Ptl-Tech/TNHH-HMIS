@@ -1,11 +1,12 @@
 import { Table, Typography, Spin, Input, Button, Tooltip } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
 import { getPgAdmissions } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import moment from "moment";
 import { CgEyeAlt } from "react-icons/cg";
+import { useAuth } from "../../hooks/auth";
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "KES 0.00";
@@ -16,14 +17,15 @@ const formatKES = (amount) => {
   });
 };
 const InsurancePatients = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate(); // React Router navigation
-    const branchCode = localStorage.getItem("branchCode");
+  const branchCode = user?.branchCode;
 
   const { loading, patients } = useSelector((state) => state.getBillingList);
   const { loading: loadingAdmittedPatients, admittedPatients } = useSelector(
-      (state) => state.getAdmissionList
-    );
+    (state) => state.getAdmissionList
+  );
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
@@ -31,8 +33,7 @@ const InsurancePatients = () => {
 
   useEffect(() => {
     dispatch(getBillingList()); // Fetch data only once
-        dispatch(getPgAdmissions()); // Fetch admitted patients
-    
+    dispatch(getPgAdmissions()); // Fetch admitted patients
   }, [dispatch]);
 
   // Process patient list: filter inactive patients
@@ -71,9 +72,8 @@ const InsurancePatients = () => {
   }, [filteredPatients, admittedPatients]);
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    console.log('Patient ID:', patientId); // Log the patient ID for debugging
+    console.log("Patient ID:", patientId); // Log the patient ID for debugging
     navigate(`/Dashboard/Corporate-Inpatient-Charges?PatientNo=${patientId}`);
-
   };
 
   const columns = [
@@ -81,9 +81,19 @@ const InsurancePatients = () => {
       title: "Admission No  ",
       dataIndex: "ActiveVisitNo",
       key: "ActiveVisitNo",
-       render: (text) => <span style={{ textTransform: "capitalize", fontWeight: "bold", color: "#0f5689" }}>{text || "-"}</span>,
+      render: (text) => (
+        <span
+          style={{
+            textTransform: "capitalize",
+            fontWeight: "bold",
+            color: "#0f5689",
+          }}
+        >
+          {text || "-"}
+        </span>
+      ),
     },
-    
+
     {
       title: "Gender",
       dataIndex: "Gender",
@@ -103,8 +113,8 @@ const InsurancePatients = () => {
         </Typography.Text>
       ),
     },
-    
-   {
+
+    {
       title: "Billing Type",
       dataIndex: "PatientType",
       key: "PatientType",
@@ -118,18 +128,19 @@ const InsurancePatients = () => {
       title: "Branch Code",
       dataIndex: "Global_Dimension_1_Code",
       key: "Global_Dimension_1_Code",
-    },  {
-          title: "Admission Date",
-          dataIndex: "AdmissionDate",
-          key: "AdmissionDate",
-          render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "-"),
-        },
-        {
-          title: "Consulting Doctor",
-          dataIndex: "DoctorsName",
-          key: "DoctorsName",
-          render: (text) => <span>{text || "-"}</span>,
-        },
+    },
+    {
+      title: "Admission Date",
+      dataIndex: "AdmissionDate",
+      key: "AdmissionDate",
+      render: (date) => (date ? moment(date).format("DD/MM/YYYY") : "-"),
+    },
+    {
+      title: "Consulting Doctor",
+      dataIndex: "DoctorsName",
+      key: "DoctorsName",
+      render: (text) => <span>{text || "-"}</span>,
+    },
     {
       title: "Room No",
       dataIndex: "RoomNo",
@@ -171,7 +182,9 @@ const InsurancePatients = () => {
         const isZero = numericBalance === 0;
 
         return (
-          <span style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}>
+          <span
+            style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}
+          >
             {formatKES(numericBalance)}
           </span>
         );
@@ -181,13 +194,13 @@ const InsurancePatients = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-       <Tooltip title="View Patient Details">
+        <Tooltip title="View Patient Details">
           <Button
-          type="primary"
-          onClick={() => handleViewCharges(record.ActiveVisitNo)}
-        >
-         <CgEyeAlt />
-        </Button>
+            type="primary"
+            onClick={() => handleViewCharges(record.ActiveVisitNo)}
+          >
+            <CgEyeAlt />
+          </Button>
         </Tooltip>
       ),
     },

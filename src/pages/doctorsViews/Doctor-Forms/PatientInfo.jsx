@@ -52,9 +52,10 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails }) => {
   const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted
   );
-const {loadingPatientDetails, patientDetails: patientdeets}=useFetchPatientDetailsHook(patientNo)
+  const { loadingPatientDetails, patientDetails: patientdeets } =
+    useFetchPatientDetailsHook(patientNo);
 
-console.log("patient details", patientdeets);
+  console.log("patient details", patientdeets);
   const handleMarkAsCompleted = () => {
     dispatch(postMarkasCompleted(treatmentNo))
       .then((data) => {
@@ -150,7 +151,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
-  const staffNo = user.staffNo;
+  const staffNo = user?.staffNo;
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -290,7 +291,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   );
 };
 
-const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
+const MoreDeailsDrawer = ({ open, setOpen, values, activeVisitNo }) => {
   return (
     <Drawer
       closable
@@ -302,22 +303,21 @@ const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
       width={850}
     >
       <>
-      <div
-  style={{
-    padding: "8px",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "10px",
-    backgroundColor: "#f9f9f9", // light background for contrast
-  }}
->
-  {values.map((patientInfo, index) => (
-    <RenderPatientDetails key={index} component={patientInfo} />
-  ))}
-</div>
+        <div
+          style={{
+            padding: "8px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "10px",
+            backgroundColor: "#f9f9f9", // light background for contrast
+          }}
+        >
+          {values.map((patientInfo, index) => (
+            <RenderPatientDetails key={index} component={patientInfo} />
+          ))}
+        </div>
 
-<PatientCharges activeVisitNo={activeVisitNo} />
-
+        <PatientCharges activeVisitNo={activeVisitNo} />
       </>
     </Drawer>
   );
@@ -421,7 +421,7 @@ const AvatarComponent = ({ values }) => {
 };
 
 const InfoRow = ({ label, value }) => (
- // <div style={{ display: "flex", justifyContent: "space-between" }}>
+  // <div style={{ display: "flex", justifyContent: "space-between" }}>
   <div
     style={{
       display: "flex",
@@ -438,16 +438,15 @@ const InfoRow = ({ label, value }) => (
   </div>
 );
 
-
 const InfoCard = ({ InfoRow }) => (
-  <Row gutter={16} style={{ marginTop: '20px' }}>
+  <Row gutter={16} style={{ marginTop: "20px" }}>
     <Col xs={24} sm={24} md={12} lg={12} xl={12}>
       <Card
         style={{
-          padding: '16px 24px',
-          borderTop: '3px solid #0f5689',
+          padding: "16px 24px",
+          borderTop: "3px solid #0f5689",
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-          minHeight: '260px',
+          minHeight: "260px",
         }}
       >
         {patientPrimaryInfo.map(({ label, value }, index) => (

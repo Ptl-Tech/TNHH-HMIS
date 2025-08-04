@@ -22,7 +22,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const dispatch = useDispatch();
 
-  const branchCode = localStorage.getItem("branchCode");
+  const branchCode = user?.branchCode;
 
   useEffect(() => {
     dispatch(getTriageList());
@@ -180,7 +180,7 @@ const Dashboard = () => {
       </div>
 
       <DashboardStatistics
-        userDetails={user}
+        user={user}
         chartData={chartData}
         loadingPatientList={loadingPatientList}
       />

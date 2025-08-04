@@ -172,7 +172,7 @@ const DoctorDashboard = () => {
           <DashboardCard card={card} key={index} />
         ))}
       </div>
-      <DashboardStatistics userDetails={user} chartData={chartData} />
+      <DashboardStatistics user={user} chartData={chartData} />
     </div>
   );
 };

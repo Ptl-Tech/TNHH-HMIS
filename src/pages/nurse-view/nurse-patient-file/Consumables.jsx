@@ -43,7 +43,7 @@ const Consumables = () => {
       postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
         admissionNo: patientDetails?.Admission_No,
         branchCode: user?.branchCode,
-        staffNo: user.staffNo,
+        staffNo: user?.staffNo,
       })
     );
     setLoadingPostConsumables(true);

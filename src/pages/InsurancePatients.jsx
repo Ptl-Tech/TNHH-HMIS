@@ -67,7 +67,7 @@ const InsurancePatients = () => {
   const [patientBalanceDetails, setPatientBalanceDetails] = useState(null);
   const [pdfBlob, setPdfBlob] = useState(null);
 
-  const staffNo = user.staffNo;
+  const staffNo = user?.staffNo;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

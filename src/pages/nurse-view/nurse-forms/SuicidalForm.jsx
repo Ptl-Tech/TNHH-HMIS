@@ -14,6 +14,7 @@ import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader"
 import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import SuicidalFormData from "../forms/nurse-forms/SuicidalFormData";
 import { useAbility } from "../../../hooks/casl";
+import { useAuth } from "../../../hooks/auth";
 // import useAuth from '../../../hooks/useAuth';
 
 const SuicidalForm = () => {
@@ -33,8 +34,9 @@ const SuicidalForm = () => {
   );
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const staffNo = userInfo?.userData?.no;
+  const userInfo = useAuth();
+  const staffNo = userInfo?.staffNo;
+
   let formattedSffNo =
     staffNo.charAt(0).toUpperCase() + staffNo.slice(1).toLowerCase();
 

@@ -42,7 +42,7 @@ import {
 } from "../constants/DropDownConstants";
 import apiHeaderConfig from "./configHelpers";
 
-const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;;
 
 export const listCountries = () => async (dispatch, getState) => {
   try {

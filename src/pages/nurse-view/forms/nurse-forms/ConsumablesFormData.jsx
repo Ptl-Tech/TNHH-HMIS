@@ -47,11 +47,11 @@ const ConsumablesFormData = ({ setIsConsumableFormVisible }) => {
         myAction: "create",
         admissionNo: patientDetails?.Admission_No,
         recId: "",
-        branchCode: user.branchCode,
+        branchCode: user?.branchCode,
         quantity: 0,
         prescriptionDose: prescriptionDosage || 0,
         drugNo: item,
-        staffNo: user.staffNo,
+        staffNo: user?.staffNo,
       };
 
       // Dispatch postPatientConsumablesSlice and wait for result

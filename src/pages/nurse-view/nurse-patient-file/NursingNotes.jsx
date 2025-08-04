@@ -30,7 +30,7 @@ const NursingNotes = () => {
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
+  const branchCode = user?.branchCode;
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
     useState(false);
 
@@ -69,7 +69,7 @@ const NursingNotes = () => {
       const notesData = {
         myAction: "create",
         recId: "",
-        staffNo: user.staffNo,
+        staffNo: user?.staffNo,
         branchCode: branchCode,
         patientNo: patientDetails?.Patient_No,
         admissionNo: patientDetails?.Admission_No,

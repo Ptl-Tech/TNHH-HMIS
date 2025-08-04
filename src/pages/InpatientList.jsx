@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createTriageVisit, listPatients, postTriageVisit } from "../actions/patientActions";
+import {
+  createTriageVisit,
+  listPatients,
+  postTriageVisit,
+} from "../actions/patientActions";
 import {
   listClinics,
   listDoctors,
@@ -28,15 +32,15 @@ import {
   Select,
 } from "antd";
 import moment from "moment";
+import { useAuth } from "../hooks/auth";
 
 const { Search } = Input;
 
 const InpatientList = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, patients } = useSelector(
-    (state) => state.patientList
-  );
+  const { patients } = useSelector((state) => state.patientList);
 
   const [searchParams, setSearchParams] = useState({
     firstName: "",
@@ -60,22 +64,10 @@ const InpatientList = () => {
     doctor: "",
   });
 
-  const {
-    loading: clinicsLoading,
-    error: clinicsError,
-    success: clinicsSuccess,
-    clinics: clinicsPayload,
-  } = useSelector((state) => state.clinics);
-
-  const {
-    loading: doctorsLoading,
-    error: doctorsError,
-    success: doctorsSuccess,
-    data: doctorsPayload,
-  } = useSelector((state) => state.getDoctorsList);
+  const { clinics: clinicsPayload } = useSelector((state) => state.clinics);
+  const { data: doctorsPayload } = useSelector((state) => state.getDoctorsList);
 
   const [form] = Form.useForm();
-
 
   useEffect(() => {
     if (patients.length) {
@@ -170,13 +162,13 @@ const InpatientList = () => {
     dispatch(listDoctors());
   }, [dispatch]);
 
-
   useEffect(() => {
-    const branchCode = localStorage.getItem("branchCode"); // Fetch branch code from localStorage
+    const branchCode = user?.branchCode;
 
     if (branchCode && doctorsPayload) {
       // Determine the clinic to filter by
-      const clinicToFilterBy = selectedPatient?.SpecialClinics || newVisit.clinic;
+      const clinicToFilterBy =
+        selectedPatient?.SpecialClinics || newVisit.clinic;
 
       // Filter doctors based on specialization and branch
       const filtered = doctorsPayload.filter(
@@ -432,11 +424,12 @@ const InpatientList = () => {
                         {`Age: ${moment().diff(
                           moment(selectedPatient.DateOfBirth),
                           "years"
-                        )} years and ${moment().diff(
-                          moment(selectedPatient.DateOfBirth),
-                          "months"
-                        ) % 12
-                          } months`}
+                        )} years and ${
+                          moment().diff(
+                            moment(selectedPatient.DateOfBirth),
+                            "months"
+                          ) % 12
+                        } months`}
                       </span>
                     </Form.Item>
                   </Form>
@@ -521,7 +514,9 @@ const InpatientList = () => {
                           // disabled={!isEditing}
                           showSearch
                           filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            option.children
+                              .toLowerCase()
+                              .indexOf(input.toLowerCase()) >= 0
                           }
                         >
                           <Select.Option value="">Select Clinic</Select.Option>
@@ -547,13 +542,20 @@ const InpatientList = () => {
                         showSearch
                         // filterOption = {true}
                         filterOption={(input, option) =>
-                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          option.children
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
                         }
                       >
-                        <Select.Option value="">--Select Doctor--</Select.Option>
+                        <Select.Option value="">
+                          --Select Doctor--
+                        </Select.Option>
                         {filteredDoctors &&
                           filteredDoctors.map((doc) => (
-                            <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
+                            <Select.Option
+                              key={doc.DoctorID}
+                              value={doc.DoctorID}
+                            >
                               {doc.DoctorsName}
                             </Select.Option>
                           ))}

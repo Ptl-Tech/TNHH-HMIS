@@ -18,9 +18,9 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { Line } from "@ant-design/charts";
-import PropTypes from "prop-types";
 import moment from "moment";
 import LoadingParagraphs from "../../partials/nurse-partials/LoadingParagraphs";
+import { useAuth } from "../../hooks/auth";
 
 const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
   const config = {
@@ -119,7 +119,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {`${localStorage.getItem("branchCode") || "No"} Branch`}
+                  {`${user?.branchCode} Branch`}
                 </Typography.Text>
               </div>
             </Space>

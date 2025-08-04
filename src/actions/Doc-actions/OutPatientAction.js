@@ -63,8 +63,8 @@ export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: user.staffNo, // Add staffNo as a custom header
-        branchCode: user.branchCode, // Include branchCode in headers
+        staffNo: user?.staffNo, // Add staffNo as a custom header
+        branchCode: user?.branchCode, // Include branchCode in headers
       },
     };
 

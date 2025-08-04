@@ -506,7 +506,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
   const dispatch = useDispatch();
   const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
-  const staffNo = user.staffNo;
+  const staffNo = user?.staffNo;
   const admissioNo = new URLSearchParams(search).get("AdmNo");
 
   const { TextArea } = Input;
