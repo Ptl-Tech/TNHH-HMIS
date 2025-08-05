@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action types
 export const POST_MSE_NOTES_REQUEST = "POST_MSE_NOTES_REQUEST";
@@ -15,27 +15,19 @@ export const postMSENotes = (MSENotes) => async (dispatch, getState) => {
     // Dispatch the request action to indicate loading
     dispatch({ type: POST_MSE_NOTES_REQUEST });
 
-    // Retrieve user information and branch code from state and localStorage
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
-    if (!branchCode) {
-      throw new Error("Branch code is missing in localStorage");
-    }
-
-    if (!userInfo?.userData?.no || !userInfo?.userData?.portalSessionToken) {
-      throw new Error("User information is incomplete");
-    }
+    const branchCode = user.branchCode;
 
     // Request configuration
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Staff number from user data
-        sessionToken: userInfo.userData.portalSessionToken, // Session token
-        branchCode, // Branch code from localStorage
+        staffNo: user.staffNo, // Staff number from user data
+        // Session token
+        branchCode,
       },
     };
 
@@ -43,7 +35,11 @@ export const postMSENotes = (MSENotes) => async (dispatch, getState) => {
     console.log("MSE Notes Request Payload:", MSENotes);
 
     // Make the POST request to save MSE notes
-    const response = await axios.post(`${API}PatientHistoryForm/SystemicReview`, MSENotes, config);
+    const response = await axios.post(
+      `${API}PatientHistoryForm/SystemicReview`,
+      MSENotes,
+      config
+    );
 
     if (response.status !== 200 || response.data.status !== "success") {
       throw new Error(response.data.message || "Failed to save MSE notes");

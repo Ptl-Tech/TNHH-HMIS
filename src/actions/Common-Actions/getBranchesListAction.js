@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const GET_BRANCHES_LIST_REQUEST = "GET_BRANCHES_LIST_REQUEST";
@@ -12,22 +12,21 @@ export const GET_BRANCHES_LIST_RESET = "GET_BRANCHES_LIST_RESET";
 export const QyBranchesList = () => async (dispatch, getState) => {
   var query = `${API}data/odatafilter?webservice=QyDimensionValues&isList=true&query=$filter=DimensionCode eq 'BRANCH'`;
 
-
   try {
     dispatch({ type: GET_BRANCHES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    // Retrieve branch code from localStorage or fallback to empty string
-    const branchCode = localStorage.getItem("branchCode") || "";
+    
+    const branchCode = user.branchCode || "";
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
+        staffNo: user.staffNo,
+       
         branchCode,
       },
     };
@@ -38,7 +37,6 @@ export const QyBranchesList = () => async (dispatch, getState) => {
       type: GET_BRANCHES_LIST_SUCCESS,
       payload: data,
     });
-
   } catch (error) {
     console.log({ error });
 

@@ -1,22 +1,22 @@
 import axios from "axios";
 import { QY_DIAGNOSIS_LIST_FAIL, QY_DIAGNOSIS_LIST_REQUEST, QY_DIAGNOSIS_LIST_SUCCESS } from "../../constants/doc-constants/QySymptomConstants";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 export const getdiagnosisSetup = () => async (dispatch, getState) => { 
   try {
     dispatch({ type: QY_DIAGNOSIS_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };

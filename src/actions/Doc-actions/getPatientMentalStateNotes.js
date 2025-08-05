@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_PATIENT_MSE_LINES = "REQUEST_PATIENT_MSE_LINES";
 export const REQUEST_PATIENT_MSE_LINES_SUCCESS = "REQUEST_PATIENT_MSE_LINES_SUCCESS";
@@ -13,15 +13,15 @@ export const getPatientMSESlice = (patientNo) => async (dispatch, getState) => {
     dispatch({ type: REQUEST_PATIENT_MSE_LINES });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no,
-        sessionToken: userInfo?.userData?.portalSessionToken,
+        staffNo: user.staffNo,
+       
         branchCode: branchCode,
       },
     };

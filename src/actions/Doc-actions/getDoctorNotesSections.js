@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_DOCTOR_NOTES_SECTIONS_FAIL = "GET_DOCTOR_NOTES_SECTIONS_FAIL";
 export const GET_DOCTOR_NOTES_SECTIONS_RESET =
@@ -19,16 +19,16 @@ export const getDoctorsNotesSections =
       dispatch({ type: GET_DOCTOR_NOTES_SECTIONS_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      // Fetch branchCode from localStorage
-      const branchCode = localStorage.getItem("branchCode");
+      
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          staffNo: user.staffNo, // Add staffNo as a custom header
+           // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };

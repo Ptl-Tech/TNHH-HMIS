@@ -5,7 +5,7 @@ export const GET_QY_URGENCY_COLOR_CODING_REQUEST = 'GET_QY_URGENCY_COLOR_CODING_
 export const GET_QY_URGENCY_COLOR_CODING_SUCCESS = 'GET_QY_URGENCY_COLOR_CODING_SUCCESS';
 export const GET_QY_URGENCY_COLOR_CODING_FAILURE = 'GET_QY_URGENCY_COLOR_CODING_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getQyUrgencyColorCodingSetupSetupSlice = () => 
   async (dispatch, getState) => {

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure Ant Design's message is imported
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const VERIFIED_ADMISSIONS_REQUEST = "VERIFIED_ADMISSIONS_REQUEST";
@@ -17,16 +17,16 @@ export const getVerifiedAdmissions = () => async (dispatch, getState) => {
 
     // Get user info and branch code from state and local storage
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Configure headers for the VERIFY
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no, // Custom header with staff number
-        sessionToken: userInfo?.userData?.portalSessionToken, // Bearer token for session
+        staffNo: user.staffNo, // Custom header with staff number
+        // Bearer token for session
         branchCode, // Branch code from local storage
       },
     };

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Form, Input, Button, Tabs, Space, Typography, message } from "antd";
 import { FiFileText } from "react-icons/fi";
 import moment from "moment";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { postPatientHistoryNotes } from "../../../actions/Doc-actions/posPatientHistoryNotes";
 import { getPatientHistorySlice } from "../../../actions/Doc-actions/getPatientHistoryNotes";
@@ -14,7 +14,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
   const [currentTab, setCurrentTab] = useState("20");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const docDetails = useAuth();
+  const docDetails = null;
 
   const { data } = useSelector((state) => state.getPatientHistoryNotesReducer);
   const { loading } = useSelector((state) => state.postPatientHistory);

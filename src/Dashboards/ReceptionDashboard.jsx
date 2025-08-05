@@ -1,26 +1,28 @@
-import useAuth from '../hooks/useAuth';
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+// // import useAuth from '../hooks/useAuth';
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import moment from 'moment';
+import moment from "moment";
 
 import {
   UserOutlined,
   HourglassOutlined,
   SafetyOutlined,
   UserAddOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
-import { listPatients } from '../actions/patientActions';
-import { getVisitorsList } from '../actions/visitorsActions';
-import DashboardCard from '../pages/nurse-view/DashboardCard';
-import DashboardStatistics from '../pages/nurse-view/DashboardStatistics';
-import { getPgAdmissionsPendingVerificationSlice } from '../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice';
+import { useAuth } from "../hooks/auth";
+import { listPatients } from "../actions/patientActions";
+import { getVisitorsList } from "../actions/visitorsActions";
+import DashboardCard from "../pages/nurse-view/DashboardCard";
+import DashboardStatistics from "../pages/nurse-view/DashboardStatistics";
+import { getPgAdmissionsPendingVerificationSlice } from "../actions/nurse-actions/getPgAdmissionsPendingVerificationSlice";
 
 const ReceptionDashboard = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const userDetails = useAuth();
-  const today = moment().format('YYYY-MM-DD');
+
+  const today = moment().format("YYYY-MM-DD");
 
   const { visitors } = useSelector((state) => state.visitorsList);
   const { loading, patients } = useSelector((state) => state.patientList);
@@ -37,8 +39,8 @@ const ReceptionDashboard = () => {
   const currentVisitorsCount =
     visitors?.filter(
       (visitor) =>
-        moment(visitor.CreatedDate).format('YYYY-MM-DD') === today &&
-        visitor.Status === 'Entered',
+        moment(visitor.CreatedDate).format("YYYY-MM-DD") === today &&
+        visitor.Status === "Entered"
     ).length || 0;
 
   const activeVisitsCount = Array.isArray(patients)
@@ -52,47 +54,47 @@ const ReceptionDashboard = () => {
   // Dashboard Cards Data
   const cardData = [
     {
-      title: 'Current Visitors List',
+      title: "Current Visitors List",
       value: currentVisitorsCount,
-      subtitle: 'Today’s Entries',
+      subtitle: "Today’s Entries",
       icon: <HourglassOutlined />,
-      color: '#fff',
-      backgroundColor: '#0f5689',
-      link: '/Reception/visitors-list',
+      color: "#fff",
+      backgroundColor: "#0f5689",
+      link: "/Dashboard/visitors-list",
     },
     {
-      title: 'Active Visits List',
+      title: "Active Visits List",
       value: activeVisitsCount,
-      subtitle: 'Active Consultations',
+      subtitle: "Active Consultations",
       icon: <SafetyOutlined />,
-      color: '#000',
-      backgroundColor: '#ac8342',
-      link: '/Reception/appointments/Dispatched',
+      color: "#000",
+      backgroundColor: "#ac8342",
+      link: "/Dashboard/appointments/Dispatched",
     },
     {
-      title: 'Walk-In Consultations',
+      title: "Walk-In Consultations",
       value: walkInPatientsCount,
-      subtitle: 'Walk-In Consultations',
+      subtitle: "Walk-In Consultations",
       icon: <UserOutlined />,
-      color: '#000',
-      backgroundColor: '#5c85d6',
-      link: '/Reception/Walkin-Patient-List',
+      color: "#000",
+      backgroundColor: "#5c85d6",
+      link: "/Dashboard/Walkin-Patient-List",
     },
     {
-      title: 'Admission Requests',
+      title: "Admission Requests",
       value: inPatientCount,
-      subtitle: 'Currently Admitted',
+      subtitle: "Currently Admitted",
       icon: <UserAddOutlined />,
-      color: '#000',
-      backgroundColor: '#b0afaf',
-      link: '/Reception/admission-requests',
+      color: "#000",
+      backgroundColor: "#b0afaf",
+      link: "/Dashboard/admission-requests",
     },
   ];
 
   // Generate Chart Data for Last 30 Days
   const chartData = useMemo(() => {
     const last30Days = Array.from({ length: 30 }, (_, i) =>
-      moment().subtract(i, 'days').format('YYYY-MM-DD'),
+      moment().subtract(i, "days").format("YYYY-MM-DD")
     ).reverse();
 
     return last30Days.map((date) => ({
@@ -105,19 +107,13 @@ const ReceptionDashboard = () => {
   }, []);
 
   return (
-    <div style={{ padding: '10px 10px' }}>
-      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+    <div style={{ padding: "10px 10px" }}>
+      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
         {cardData.map((card, index) => (
-          <DashboardCard
-            card={card}
-            key={index}
-          />
+          <DashboardCard card={card} key={index} />
         ))}
       </div>
-      <DashboardStatistics
-        userDetails={userDetails}
-        chartData={chartData}
-      />
+      <DashboardStatistics user={user} chartData={chartData} />
     </div>
   );
 };

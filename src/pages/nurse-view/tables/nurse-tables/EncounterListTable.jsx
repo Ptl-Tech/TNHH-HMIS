@@ -1,15 +1,17 @@
-import { Button, Table } from "antd";
-import { FilePdfOutlined } from "@ant-design/icons";
-import PropTypes from "prop-types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../../../../hooks/useAuth";
+
+import { Button, Table } from "antd";
+import { FilePdfOutlined } from "@ant-design/icons";
+
+import PropTypes from "prop-types";
+import { useAuth } from "../../../../hooks/auth";
 
 const EncounterListTable = ({ filteredList, loadingConsultationRoomList }) => {
   const navigate = useNavigate();
-  const userDetails = useAuth();
-const user = userDetails.userData.departmentName
-  
+  const { user } = useAuth();
+  const userRole = user.role;
+
   const columns = [
     {
       title: "Encounter Date",
@@ -45,7 +47,10 @@ const user = userDetails.userData.departmentName
       fixed: "right",
       width: 100,
       render: (_, record) => (
-        <Button icon={<FilePdfOutlined />} onClick={() => handleOnClick(record)}>
+        <Button
+          icon={<FilePdfOutlined />}
+          onClick={() => handleOnClick(record)}
+        >
           Encounter Summary
         </Button>
       ),
@@ -53,19 +58,12 @@ const user = userDetails.userData.departmentName
   ];
 
   const handleOnClick = (record) => {
-    if(user === 'Nurse'){
-        navigate(`/Nurse/Past-doctor-visit/Encounter?TreatmentNo=${record?.TreatmentNo}`, {
-          state: { patientDetails: record },
-        });
-       }else if(user === 'Doctor'){
-           navigate(`/Doctor/Past-doctor-visit/Encounter?TreatmentNo=${record?.TreatmentNo}`, {
-               state: { patientDetails: record },
-           });
-       }else{
-           navigate(`/Psychology/Past-doctor-visit/Encounter?TreatmentNo=${record?.TreatmentNo}`, {
-               state: { patientDetails: record },
-           });
-       }
+    navigate(
+      `/Dashboard/Past-doctor-visit/Encounter?TreatmentNo=${record?.TreatmentNo}`,
+      {
+        state: { patientDetails: record },
+      }
+    );
   };
 
   const [pagination, setPagination] = useState({

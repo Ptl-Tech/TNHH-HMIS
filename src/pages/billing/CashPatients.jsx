@@ -1,8 +1,9 @@
-import { Table, Typography, Spin, Input, Button } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { getBillingList } from '../../actions/Charges-Actions/getBillingList';
+import { Table, Typography, Spin, Input, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
+import { useAuth } from "../../hooks/auth";
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "KES 0.00";
@@ -14,13 +15,16 @@ const formatKES = (amount) => {
 };
 
 const CashPatients = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate(); // React Router navigation
+
+  const branchCode = user?.branchCode;
+
   const { loading, patients } = useSelector((state) => state.getBillingList);
-  const branchCode= localStorage.getItem('branchCode');
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const pageSize = 25; // Number of patients per page
 
   useEffect(() => {
@@ -29,36 +33,42 @@ const CashPatients = () => {
 
   // Process patient list: filter inactive patients
   const filteredPatients = patients
-    ?.filter((patient) => patient?.Activated && !patient?.Inpatient && patient?.PatientType === 'Cash'&& patient?.Global_Dimension_1_Code === branchCode)
+    ?.filter(
+      (patient) =>
+        patient?.Activated &&
+        !patient?.Inpatient &&
+        patient?.PatientType === "Cash" &&
+        patient?.Global_Dimension_1_Code === branchCode
+    )
     .map((patient) => ({
       ...patient,
       key: patient.PatientNo,
       Balance: `KSH ${parseFloat(patient.Balance || 0).toFixed(2)}`,
     }))
-    .filter((patient) =>
-      patient.Names.toLowerCase().includes(searchText.toLowerCase()) || 
-      patient.PatientNo.toLowerCase().includes(searchText.toLowerCase())
+    .filter(
+      (patient) =>
+        patient.Names.toLowerCase().includes(searchText.toLowerCase()) ||
+        patient.PatientNo.toLowerCase().includes(searchText.toLowerCase())
     );
 
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    navigate(`/Reception/CashPatient-Charges?PatientNo=${patientId}`);
+    navigate(`/Dashboard/CashPatient-Charges?PatientNo=${patientId}`);
   };
-  
 
   const columns = [
     {
-      title: 'Patient No',
-      dataIndex: 'PatientNo',
-      key: 'PatientNo',
+      title: "Patient No",
+      dataIndex: "PatientNo",
+      key: "PatientNo",
     },
     {
-      title: 'Patient Name',
-      dataIndex: 'Names',
-      key: 'Names',
+      title: "Patient Name",
+      dataIndex: "Names",
+      key: "Names",
       render: (text, record) => (
         <Typography.Text
-          style={{ cursor: 'pointer', color: '#0f5689' }}
+          style={{ cursor: "pointer", color: "#0f5689" }}
           onClick={() => handleViewCharges(record.ActiveVisitNo)}
         >
           {text.toUpperCase()}
@@ -66,42 +76,47 @@ const CashPatients = () => {
       ),
     },
     {
-      title: 'Active Visit No',
-      dataIndex: 'ActiveVisitNo',
-      key: 'ActiveVisitNo',
+      title: "Active Visit No",
+      dataIndex: "ActiveVisitNo",
+      key: "ActiveVisitNo",
     },
     {
-      title: 'Payment Type',
-      dataIndex: 'PatientType',
-      key: 'PatientType',
+      title: "Payment Type",
+      dataIndex: "PatientType",
+      key: "PatientType",
     },
     {
-      title: 'Branch Code',
-      dataIndex: 'Global_Dimension_1_Code',
-      key: 'Global_Dimension_1_Code',
-     
+      title: "Branch Code",
+      dataIndex: "Global_Dimension_1_Code",
+      key: "Global_Dimension_1_Code",
     },
-   {
-  title: 'Balance',
-  dataIndex: 'Balance',
-  key: 'Balance',
-  render: (_, record) => {
-    const numericBalance = parseFloat(record.Balance?.toString().replace(/[^0-9.-]+/g, '')) || 0;
-    const isZero = numericBalance === 0;
+    {
+      title: "Balance",
+      dataIndex: "Balance",
+      key: "Balance",
+      render: (_, record) => {
+        const numericBalance =
+          parseFloat(record.Balance?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+        const isZero = numericBalance === 0;
 
-    return (
-          <span style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}>
-        {formatKES(numericBalance)}
-      </span>
-    );
-  },
-},
+        return (
+          <span
+            style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}
+          >
+            {formatKES(numericBalance)}
+          </span>
+        );
+      },
+    },
 
     {
-      title: 'Action',
-      key: 'action',
+      title: "Action",
+      key: "action",
       render: (_, record) => (
-        <Button type="primary" onClick={() => handleViewCharges(record.ActiveVisitNo)}>
+        <Button
+          type="primary"
+          onClick={() => handleViewCharges(record.ActiveVisitNo)}
+        >
           View Charges
         </Button>
       ),
@@ -111,17 +126,17 @@ const CashPatients = () => {
   return (
     <div>
       <Typography.Title level={4}>Cash Patients</Typography.Title>
-      
+
       {/* Search Input */}
       <Input
         placeholder="Search by Patient Name or No..."
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{ width: '100%', marginBottom: 16 }}
+        style={{ width: "100%", marginBottom: 16 }}
       />
 
       {loading ? (
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
+        <div style={{ textAlign: "center", marginTop: 20 }}>
           <Spin size="large" />
         </div>
       ) : (

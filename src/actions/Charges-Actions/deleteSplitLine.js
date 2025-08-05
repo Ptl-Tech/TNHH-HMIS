@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const DELETE_RECEIPT_SPLIT_LINE_REQUEST = "DELETE_RECEIPT_SPLIT_LINE_REQUEST";
 export const DELETE_RECEIPT_SPLIT_LINE_SUCCESS = "DELETE_RECEIPT_SPLIT_LINE_SUCCESS";
@@ -12,18 +12,17 @@ export const deleteReceiptSplitLine = (data) => async (dispatch, getState) => {
   try {
     dispatch({ type: DELETE_RECEIPT_SPLIT_LINE_REQUEST });
 
-    // Get user information and branch code from state and localStorage
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Set headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -31,7 +30,7 @@ export const deleteReceiptSplitLine = (data) => async (dispatch, getState) => {
     // Send patientNo as object, not string
    const splitData={
     ...data,
-    staffNo: userInfo.userData.no,
+    staffNo: user.staffNo,
     branchCode: branchCode,
    }
 

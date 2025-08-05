@@ -6,13 +6,10 @@ export const POST_LAB_HEADER_RESET = "POST_LAB_HEADER_RESET";
 export const POST_LAB_HEADER_REQUEST = "POST_LAB_HEADER_REQUEST";
 export const POST_LAB_HEADER_SUCCESS = "POST_LAB_HEADER_SUCCESS";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  "https://chiromo.potestastechnologies.net:8085";
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const createLabTestHeader =
   (labHeaderData) => async (dispatch, getState) => {
-
     try {
       dispatch({ type: POST_LAB_HEADER_REQUEST });
 

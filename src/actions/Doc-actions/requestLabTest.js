@@ -1,7 +1,7 @@
 import { message } from 'antd';
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_LAB_TEST = 'REQUEST_LAB_TEST';
 export const REQUEST_LAB_TEST_SUCCESS = 'REQUEST_LAB_TEST_SUCCESS';
@@ -16,15 +16,15 @@ export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
     dispatch({ type: REQUEST_LAB_TEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode
 
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -32,7 +32,7 @@ export const requestLabTest = (treatmentId) => async (dispatch, getState) => {
     const response = await axios.post(
       `${API}Doctor/RequestPatientLaboratoryTests`,
       {
-        staffNo: userInfo.userData.no,
+        staffNo: user.staffNo,
         treatmentNo: treatmentId,
       },
       config,
@@ -61,16 +61,16 @@ export const getPatientLabTest = (treatmentNo) => async (dispatch, getState) => 
     dispatch({ type: VIEW_PATIENT_LAB_TEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode
 
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

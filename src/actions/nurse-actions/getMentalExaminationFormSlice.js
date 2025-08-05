@@ -5,7 +5,7 @@ export const GET_MENTAL_EXAMINATION_FORM_REQUEST = 'GET_MENTAL_EXAMINATION_FORM_
 export const GET_MENTAL_EXAMINATION_FORM_SUCCESS = 'GET_MENTAL_EXAMINATION_FORM_SUCCESS';
 export const GET_MENTAL_EXAMINATION_FORM_FAILURE = 'GET_MENTAL_EXAMINATION_FORM_FAILURE';
 
-const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL || 'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL ;
 
 export const getMentalExaminationFormSlice = (admissionNo) => 
   async (dispatch, getState) => {

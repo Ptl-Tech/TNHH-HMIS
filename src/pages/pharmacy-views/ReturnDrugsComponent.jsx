@@ -7,11 +7,12 @@ import { RETURN_DRUGS_RESET, returnDrugs } from '../../actions/pharmacy-actions/
 
 export const ReturnDrugsComponent = ({ record }) => {
   const dispatch = useDispatch();
-
+console.log({ record });
   const { Item: FormItem } = Form;
   const { DrugName, Description, SystemId, Quantity } = record;
 
   const [open, setOpen] = useState(false);
+  
   const { data, loading, error } = useSelector((state) => state.returnDrugs);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export const ReturnDrugsComponent = ({ record }) => {
         destroyOnHidden={true}
         onClose={() => setOpen(false)}
         title={`Return ${DrugName || Description}`}
+    
         children={
           <Form
             layout="vertical"

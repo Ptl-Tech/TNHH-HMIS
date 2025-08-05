@@ -6,6 +6,7 @@ import { getBillingList } from "../../actions/Charges-Actions/getBillingList";
 import { getPgAdmissions } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import moment from "moment";
 import { CgEyeAlt } from "react-icons/cg";
+import { useAuth } from "../../hooks/auth";
 
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
@@ -17,9 +18,10 @@ const formatKES = (amount) => {
   });
 };
 const InpatientCash = () => {
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // React Router navigation
-  const branchCode = localStorage.getItem("branchCode");
+  const navigate = useNavigate();
+  const branchCode = user?.branchCode;
 
   const { loading, patients } = useSelector((state) => state.getBillingList);
   const { loading: loadingAdmittedPatients, admittedPatients } = useSelector(
@@ -73,7 +75,7 @@ const InpatientCash = () => {
   console.log("Admitted Patients:", admittedPatients);
   // Navigate to view charges page with patient ID
   const handleViewCharges = (patientId) => {
-    navigate(`/Reception/InPatient-Charges?PatientNo=${patientId}`);
+    navigate(`/Dashboard/InPatient-Charges?PatientNo=${patientId}`);
   };
 
   const columns = [
@@ -149,7 +151,7 @@ const InpatientCash = () => {
       key: "WardNo",
       render: (text) => <span>{text || "-"}</span>,
     },
-   
+
     {
       title: "Balance",
       dataIndex: "Balance",

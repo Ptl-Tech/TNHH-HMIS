@@ -2,13 +2,17 @@ import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
 // Base API URL
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
-export const GET_PHARMACY_HISTORY_LIST_REQUEST = "GET_PHARMACY_HISTORY_LIST_REQUEST";
-export const GET_PHARMACY_HISTORY_LIST_SUCCESS = "GET_PHARMACY_HISTORY_LIST_SUCCESS";
-export const GET_PHARMACY_HISTORY_LIST_FAILURE = "GET_PHARMACY_HISTORY_LIST_FAILURE";
-export const GET_PHARMACY_HISTORY_LIST_RESET = "GET_PHARMACY_HISTORY_LIST_RESET";
+export const GET_PHARMACY_HISTORY_LIST_REQUEST =
+  "GET_PHARMACY_HISTORY_LIST_REQUEST";
+export const GET_PHARMACY_HISTORY_LIST_SUCCESS =
+  "GET_PHARMACY_HISTORY_LIST_SUCCESS";
+export const GET_PHARMACY_HISTORY_LIST_FAILURE =
+  "GET_PHARMACY_HISTORY_LIST_FAILURE";
+export const GET_PHARMACY_HISTORY_LIST_RESET =
+  "GET_PHARMACY_HISTORY_LIST_RESET";
 
 // Async Action to Fetch Pharmacy History List
 export const getPharmacyHistoryList = () => async (dispatch, getState) => {
@@ -16,19 +20,15 @@ export const getPharmacyHistoryList = () => async (dispatch, getState) => {
     dispatch({ type: GET_PHARMACY_HISTORY_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
-
-    if (!userInfo?.userData?.no || !userInfo?.userData?.portalSessionToken) {
-      throw new Error("User authentication details are missing.");
-    }
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };
@@ -38,12 +38,20 @@ export const getPharmacyHistoryList = () => async (dispatch, getState) => {
       config
     );
 
-    dispatch({ type: GET_PHARMACY_HISTORY_LIST_SUCCESS, payload: response.data });
+    dispatch({
+      type: GET_PHARMACY_HISTORY_LIST_SUCCESS,
+      payload: response.data,
+    });
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch pharmacy history";
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch pharmacy history";
 
     message.error(errorMessage);
-    dispatch({ type: GET_PHARMACY_HISTORY_LIST_FAILURE, payload: errorMessage });
+    dispatch({
+      type: GET_PHARMACY_HISTORY_LIST_FAILURE,
+      payload: errorMessage,
+    });
   }
 };

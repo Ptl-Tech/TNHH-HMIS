@@ -7,7 +7,7 @@ import InpatientConsumablesTable from "../tables/nurse-tables/InpatientConsumabl
 import { getPgOpenPatientConsumablesSlice } from "../../../actions/nurse-actions/getPgOpenPatientConsumablesSlice";
 import ConsumablesFormData from "../forms/nurse-forms/ConsumablesFormData";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import {
   POST_NURSE_ORDER_SHEET_FAILURE,
   POST_NURSE_ORDER_SHEET_SUCCESS,
@@ -17,9 +17,8 @@ import {
 const Consumables = () => {
   const { patientDetails } = useLocation().state;
 
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = useAuth();
   const [loadingPostConsumables, setLoadingPostConsumables] = useState(false);
   const [isConsumableFormVisible, setIsConsumableFormVisible] = useState(false);
 
@@ -43,9 +42,8 @@ const Consumables = () => {
     const orderSheetResult = await dispatch(
       postNurseOrderSheetSlice("/Nurse/SendOrderToPharmacy", {
         admissionNo: patientDetails?.Admission_No,
-        branchCode:
-          userDetails?.userData?.shortcut_Dimension_1_Code || branchCode,
-        staffNo: userDetails.userData.no,
+        branchCode: user?.branchCode,
+        staffNo: user?.staffNo,
       })
     );
     setLoadingPostConsumables(true);
@@ -65,7 +63,14 @@ const Consumables = () => {
   return (
     <div>
       <NurseInnerHeader icon={<FilterOutlined />} title="Order sheets" />
-      <div style={{ marginTop: "10px", display: "flex", gap: "10px",justifyContent: "space-between" }}>
+      <div
+        style={{
+          marginTop: "10px",
+          display: "flex",
+          gap: "10px",
+          justifyContent: "space-between",
+        }}
+      >
         {!isConsumableFormVisible && (
           <div
             style={{
@@ -92,18 +97,17 @@ const Consumables = () => {
               marginTop: "20px",
             }}
           >
-         {!isConsumableFormVisible && (
-             <Button
-            type="primary"
-            onClick={handlePostOrderSheet}
-            loading={loadingPostConsumables}
-          >
-          <SendOutlined />  
-            Send Order to Pharmacy
-          </Button>
-          )
-              }
-            </div>
+            {!isConsumableFormVisible && (
+              <Button
+                type="primary"
+                onClick={handlePostOrderSheet}
+                loading={loadingPostConsumables}
+              >
+                <SendOutlined />
+                Send Order to Pharmacy
+              </Button>
+            )}
+          </div>
         )}
       </div>
 

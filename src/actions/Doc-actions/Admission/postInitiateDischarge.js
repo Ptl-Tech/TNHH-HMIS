@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Ensure message is imported
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const POST_INITIATE_PATIENT_DISCHARGE = "POST_INITIATE_PATIENT_DISCHARGE";
@@ -30,15 +30,15 @@ export const postInitiatePatientDischarge = (admissionNo) => async (dispatch, ge
     dispatch({ type: POST_INITIATE_PATIENT_DISCHARGE });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -77,15 +77,15 @@ export const postInpatientDischarge = (admissionNo) => async (dispatch, getState
     dispatch({ type: POST_INPATIENT_DISCHARGE });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -123,15 +123,15 @@ export const postDischargeSummary = (admissionNo) => async (dispatch, getState) 
     dispatch({ type: POST_INPATIENT_DISCHARGE });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -170,15 +170,15 @@ export const postSickOff = (formData) => async (dispatch, getState) => {
     dispatch({ type: POST_PATIENT_SICK_OFF });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -216,15 +216,15 @@ export const getSickOff = (admissionNo) => async (dispatch, getState) => {
     dispatch({ type: GET_PATIENT_SICK_OFF });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

@@ -18,11 +18,11 @@ import {
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { Line } from "@ant-design/charts";
-import PropTypes from "prop-types";
 import moment from "moment";
 import LoadingParagraphs from "../../partials/nurse-partials/LoadingParagraphs";
+import { useAuth } from "../../hooks/auth";
 
-const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => {
+const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
   const config = {
     data: chartData,
     xField: "date",
@@ -64,11 +64,8 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
                     fontWeight: "bold",
                   }}
                 >
-                  {userDetails?.userData?.firstName}
+                  {user?.staffName}
                 </Typography.Title>
-                {/* <Typography.Text style={{ fontSize: "14px", color: "gray" }}>
-                  Registered {userDetails?.userData?.departmentName || "N/A"}
-                </Typography.Text> */}
               </div>
             </div>
             <Divider />
@@ -92,7 +89,7 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
                     fontWeight: "bold",
                   }}
                 >
-                  {userDetails?.userData?.departmentName || "N/A"}
+                  {user?.role || "N/A"}
                 </Typography.Text>
               </div>
             </Space>
@@ -122,7 +119,7 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
                     fontWeight: "bold",
                   }}
                 >
-                  {`${localStorage.getItem("branchCode") || "No"} Branch`}
+                  {`${user?.branchCode} Branch`}
                 </Typography.Text>
               </div>
             </Space>
@@ -134,65 +131,35 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
                 marginBottom: "10px",
               }}
             >
-             
               <div style={{ display: "flex", flexDirection: "column" }}>
-                {userDetails?.userData?.shortcut_Dimension_2_Code === "DOCTOR" ? (
-                    <>
-                    {/* Floor No */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <EnvironmentOutlined style={{ fontSize: "18px", color: "#0f5689" }} />
-                      <div>
-                        <Typography.Text
-                          style={{
-                            fontSize: "14px",
-                            color: "black",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Floor No
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{
-                            fontSize: "12px",
-                            color: "gray",
-                            fontWeight: "bold",
-                            marginLeft: "10px",
-                          }}
-                        >
-                          {userDetails?.userData?.floorNo || "Floor 1"}
-                        </Typography.Text>
-                      </div>
+                {user?.branchCode === "DOCTOR" ? (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <EnvironmentOutlined
+                        style={{ fontSize: "18px", color: "#0f5689" }}
+                      />
                     </div>
-              
-                    {/* Room No */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
                       <BorderlessTableOutlined
                         style={{ fontSize: "18px", color: "#0f5689" }}
                       />
-                      <div>
-                        <Typography.Text
-                          style={{
-                            fontSize: "14px",
-                            color: "black",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Room No
-                        </Typography.Text>
-                        <Typography.Text
-                          style={{
-                            fontSize: "12px",
-                            color: "gray",
-                            fontWeight: "bold",
-                            marginLeft: "10px",
-                          }}
-                        >
-                          {userDetails?.userData?.doctorRoomNo || "Room 1"}
-                        </Typography.Text>
-                      </div>
                     </div>
                   </>
-                ) : ''}
+                ) : (
+                  ""
+                )}
               </div>
             </Space>
           </Card>
@@ -230,7 +197,7 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
               </div>
               <div>
                 <Button type="link" style={{ fontSize: "12px", color: "gray" }}>
-                  <Link to="/nurse/patients" style={{ color: "gray" }}>
+                  <Link to="/Dashboard/patients" style={{ color: "gray" }}>
                     View details
                     <ArrowRightOutlined
                       size={12}
@@ -242,13 +209,11 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
             </div>
             <Divider />
             <div>
-              {
-                  loadingPatientList ? (
-                      <LoadingParagraphs paragraphs={10}/>
-                  ) : (
-                    <Line {...config} />
-                  )
-              }
+              {loadingPatientList ? (
+                <LoadingParagraphs paragraphs={10} />
+              ) : (
+                <Line {...config} />
+              )}
             </div>
           </Card>
         </Col>
@@ -258,15 +223,3 @@ const DashboardStatistics = ({ userDetails, chartData, loadingPatientList }) => 
 };
 
 export default DashboardStatistics;
-
-// propTypes validation
-DashboardStatistics.propTypes = {
-  userDetails: PropTypes.shape({
-    userData: PropTypes.shape({
-      firstName: PropTypes.string.isRequired,
-      departmentName: PropTypes.string.isRequired,
-    }),
-  }),
-  chartData: PropTypes.array.isRequired,
-  loadingPatientList: PropTypes.bool,
-};

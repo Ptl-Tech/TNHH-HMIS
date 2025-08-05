@@ -73,7 +73,7 @@ const TriageListPending = () => {
     observationNo &&
       patientNumber &&
       navigate(
-        `/Nurse/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`
+        `/Dashboard/Triage/Patient?Patient_id=${patientNumber}&Ob_number=${observationNo}`
       );
   };
 

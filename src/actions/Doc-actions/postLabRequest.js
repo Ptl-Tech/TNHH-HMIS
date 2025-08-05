@@ -2,7 +2,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 
 export const POST_LAB_REQUEST = "POST_LAB_REQUEST";
@@ -13,15 +13,15 @@ export const postLabRequest = (labRequest) => async (dispatch, getState) => {
     dispatch({ type: POST_LAB_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };

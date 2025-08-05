@@ -14,8 +14,6 @@ import NursingPatientCharges from "./billing/NursingPatientCharges";
 import PatientVitalInfo from "../doctorsViews/Doctor-Forms/PatientVitalInfo";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 
-import useAuth from "../../hooks/useAuth";
-
 import {
   postInitiateDischargeSlice,
   POST_INITIATE_DISCHARGE_FAILURE,
@@ -24,16 +22,19 @@ import {
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient";
 import { getSingleAdmittedSlice } from "../../actions/nurse-actions/getSingleAdmittedSlice";
+import { useAbility } from "../../hooks/casl";
 
 const InpatientCard = () => {
   const { confirm } = Modal;
 
+  const ability = useAbility();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const role = useAuth().userData.departmentName;
 
   const { patientDetails } = location.state || {};
+  const canCreateWardTransfer = ability.can("create", "wardTransfer");
+  const canCreateInitiateDischarge = ability.can("create", "initiateDischarge");
 
   const [activeTab, setActiveTab] = useState("1");
   const [confirmLoading, setConfirmLoading] = useState(false); // loading state for modal buttons
@@ -66,14 +67,10 @@ const InpatientCard = () => {
     switch (activeTab) {
       case "1":
         return (
-          <CarePlan
-            patientNo={patientNo}
-            patientDetails={patientDetails}
-            role={role}
-          />
+          <CarePlan patientNo={patientNo} patientDetails={patientDetails} />
         );
       case "2":
-        return <Medication role={role} patientDetails={patientDetails} />;
+        return <Medication patientDetails={patientDetails} />;
       case "3":
         return <Requests />;
       case "4":
@@ -121,7 +118,7 @@ const InpatientCard = () => {
           result.payload.message ||
             `${patientDetails?.PatientName} discharge initiated successfully!`
         );
-        navigate("/Nurse/Discharge-list");
+        navigate("/Dashboard/Discharge-list");
         return Promise.resolve();
       } else if (result.type === POST_INITIATE_DISCHARGE_FAILURE) {
         message.error(
@@ -140,7 +137,7 @@ const InpatientCard = () => {
     <div style={{ margin: "20px 10px" }}>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <NurseInnerHeader title="Patient Card" />
-        {role !== "Psychology" && (
+        {canCreateInitiateDischarge && (
           <Button
             type="primary"
             icon={<i className="fas fa-ellipsis-v"></i>}
@@ -197,7 +194,7 @@ const InpatientCard = () => {
               >
                 Discharge
               </Button>
-              {role === "Nurse" && (
+              {canCreateWardTransfer && (
                 <>
                   <Button
                     block
@@ -234,8 +231,8 @@ const InpatientCard = () => {
             zIndex: 1,
           }}
         >
-          <Card bodyStyle={{ padding: 16 }}>
-            <PatientVitalInfo role={role} />
+          <Card styles={{ body: { padding: 16 } }}>
+            <PatientVitalInfo />
           </Card>
         </Col>
       </Row>

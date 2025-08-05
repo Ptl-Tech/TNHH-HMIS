@@ -1,6 +1,6 @@
 import { Space, Typography } from "antd";
 import { ProfileOutlined } from "@ant-design/icons";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useLocation } from "react-router-dom";
 import PastDoctorNotesTable from "../tables/nurse-tables/PastDoctorNotesTable";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import { listDoctors } from "../../../actions/DropdownListActions";
 const DoctorNotes = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const role = useAuth().userData.departmentName;
+
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading: loadingEncounters, patientEncounters } = useSelector(
     (state) => state.getPatientEncounters
@@ -74,7 +74,6 @@ const DoctorNotes = () => {
       ></div>
 
       <PastDoctorNotesTable
-        role={role}
         combinedPatients={combinedPatients}
         loadingDoctors={loadingDoctors}
         loadingEncounters={loadingEncounters}

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_RECEIPT_REQUEST = "POST_RECEIPT_REQUEST";
 export const POST_RECEIPT_SUCCESS = "POST_RECEIPT_SUCCESS";
@@ -12,18 +12,18 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
   try {
     dispatch({ type: POST_RECEIPT_REQUEST });
 
-    // Get user information and branch code from state and localStorage
+   
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Set headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

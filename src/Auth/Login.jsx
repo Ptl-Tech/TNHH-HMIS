@@ -1,40 +1,61 @@
-import { Button, Card, Input, Modal, Typography } from "antd";
-import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+
+import { Button, Card, Form, Input, message, Space } from "antd";
+
 import loginImg from "../assets/images/loginImg.jpg";
 import logoLogin from "../assets/images/logoLogin.png";
-import useSignIn from "../hooks/useSignIn";
 
-const { Title } = Typography;
+import { OTPModal } from "./OtpCard";
+
+import { useAuth } from "../hooks/auth";
+import { login } from "../actions/auth-actions/login";
+import { AUTH_RESET_MESSAGES } from "../reducers/auth/auth-reducer";
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const {
-    staffNo,
-    setStaffNo,
-    password,
-    setPassword,
-    otp,
-    setOtp,
-    // branchCode,
-    // setBranchCode,
-    isOtpRequired,
-    setIsOtpRequired,
-    handleLogin,
-    handleVerifyOtp,
     loading,
-    error,
-  } = useSignIn();
+    redirect,
+    fetchUser,
+    loginError,
+    userDetails,
+    showOTPModal,
+    loginSuccess,
+  } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((prevState) => !prevState);
+  useEffect(() => {
+    if (redirect === "/login") dispatch({ type: AUTH_RESET_MESSAGES });
+
+    // An error message
+    if (loginError) message.error(loginError);
+
+    // A success message
+    if (loginSuccess) {
+      message.success(loginSuccess);
+
+      // Fetch me
+      fetchUser();
+
+      if (userDetails?.otpVerified) {
+        navigate(`/Dashboard`);
+      }
+    }
+
+    if (loginError || loginSuccess) dispatch({ type: AUTH_RESET_MESSAGES });
+  }, [loginSuccess, loginError, userDetails]);
+
+  const onSubmit = (values) => {
+    const { staffNo, password } = values;
+    dispatch(login({ staffNo, password }));
   };
-  // const handleLoginSuccess = () => {
-  //   // Show OTP modal on successful login
-  //   setIsOtpModalVisible(true);
-  // };
 
- 
+  const onSubmitFailed = (values) => {
+    const errors = values.errorFields[0].errors.join(", ");
+    message.error(errors);
+  };
 
   return (
     <div
@@ -50,141 +71,60 @@ const Login = () => {
           borderRadius: "8px", // Apply border-radius to the card
         }}
       >
-        <div className="d-flex flex-row" style={{ width: "100%" }}>
-          {/* Right Side with Form */}
-          <div
-            className="p-4"
-            style={{
-              flex: 1,
-              maxWidth: "450px",
-              minWidth: "300px", // Ensure it doesn't shrink too much
-            }}
-          >
-            {/* Logo above the Welcome message */}
-            <div className="text-center mb-3">
-              <img
-                src={logoLogin}
-                alt="Logo"
-                style={{ width: "230px", height: "auto" }} // Adjust the size as needed
-              />
-            </div>
-
-            <p
-              className="text-center text-muted"
-              style={{ fontStyle: "italic" }}
+        <div
+          className="d-grid"
+          style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
+        >
+          {/* Left Side with Form */}
+          <Space direction="vertical" className="p-4">
+            <img src={logoLogin} alt="Logo Image" width={240} />
+            <p style={{ color: "#888" }}>Sign in to access your account</p>
+            <Form
+              name="login"
+              layout="vertical"
+              autoComplete="off"
+              onFinish={onSubmit}
+              onFinishFailed={onSubmitFailed}
             >
-              Sign in to access your account
-            </p>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleLogin(); // Proceed with login action
-                //   handleLoginSuccess(); // Trigger OTP modal on login success
-              }}
-            >
-              {/* {error && (
-                <Alert
-                  message={error}
-                  type="error"
-                  showIcon
-                  closeText="Close"
-                />
-              )} */}
-
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">
-                  Staff No<span className="text-danger">*</span>
-                </label>
-                <Input
-                  size="large"
-                  id="staffNo"
-                  value={staffNo}
-                  onChange={(e) => setStaffNo(e.target.value)}
-                  placeholder="Enter your Staff No"
-                  required
-                />
-              </div>
-
-              <div className="mb-3 text-start">
-                <label htmlFor="password" className="form-label">
-                  Password<span className="text-danger">*</span>
-                </label>
-                <Input
-                  size="large"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  prefix={
-                    <span
-                      onClick={togglePasswordVisibility}
-                      style={{ cursor: "pointer" }}
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                  }
-                  placeholder="Enter your password"
-                />
-              </div>
-              {/* <div className="mb-3 text-start">
-      <label htmlFor="branchCode" className="form-label">
-        Branch <span className="text-danger">*</span>
-      </label>
-      <Select
-        size="large"
-        name="branchCode"
-        id="branchCode"
-        value={branchCode} // Bind the value of the select to branchCode
-        onChange={(value) => setBranchCode(value)} // Update branchCode state when a branch is selected
-        required
-        options={branches}
-        placeholder="Select Branch" // Placeholder text for the dropdown
-        style={{ width: "100%", color: "black" }}
-      />
-    </div> */}
-              <div className="py-2 d-flex align-items-center">
-                <input
-                  className="form-check-input me-2"
-                  type="checkbox"
-                  id="flexCheckDefault"
-                />
-                <label
-                  className="form-check-label text-muted"
-                  htmlFor="flexCheckDefault"
-                >
-                  Remember me
-                </label>
-              </div>
-
-              <div className="my-3">
-                <Button
-                  size="large"
-                  htmlType="submit"
-                  type="primary"
-                  disabled={loading}
-                  block
-                >
-                  {loading ? "Logging in..." : "Login"}
-                </Button>
-              </div>
-            </form>
-
-            {/* Forgot Password Link */}
-            <div className="text-center mt-3">
-              <a
-                href="/forgot-password"
-                className="text-muted"
-                style={{ fontSize: "14px" }}
+              <Form.Item
+                name="staffNo"
+                label="Username"
+                rules={[
+                  { required: true, message: "Please input your username!" },
+                ]}
               >
-                Forgot password?
-              </a>
-            </div>
-          </div>
+                <Input placeholder="JDOE" />
+              </Form.Item>
 
-          {/* Left Side with Image */}
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
+                <Input.Password placeholder="********" />
+              </Form.Item>
+              <Form.Item label={null}>
+                <Button
+                  block
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  disabled={loading}
+                >
+                  Log In
+                </Button>
+              </Form.Item>
+            </Form>
+            <Link
+              to="/forgot-password"
+              style={{ color: "#aeaeae", textDecoration: "none" }}
+            >
+              Forgot your password?
+            </Link>
+          </Space>
+          {/* Right Side with Image */}
           <div
             className="login-image"
             style={{
@@ -209,57 +149,9 @@ const Login = () => {
           </div>
         </div>
       </Card>
-
-      {/* OTP Modal */}
-      <Modal
-        title="Enter OTP"
-        visible={isOtpRequired}
-        onCancel={() => setIsOtpRequired(false)}
-        footer={null}
-        width={400}
-        maskClosable={false}
-        centered
-      >
-        <div
-          style={{
-            textAlign: "center",
-            padding: "20px",
-          }}
-        >
-          <img
-            src={logoLogin}
-            alt="Logo"
-            style={{ width: "100px", marginBottom: "10px" }}
-          />
-          <Title level={5}>Enter OTP</Title>
-          <p style={{ color: "#888" }}>
-            We sent a 6-digit code to your email. Please enter it below.
-          </p>
-
-          <Input
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)} // Ensure this correctly updates the OTP state
-            placeholder="Enter OTP"
-            maxLength={6}
-            onPressEnter={handleVerifyOtp}
-            style={{
-              textAlign: "center",
-              width: "100%",
-              maxWidth: "300px",
-              marginBottom: "20px",
-            }}
-          />
-{/* onenter key down handleverify otp */}
-          <Button type="primary" block  onClick={handleVerifyOtp}>
-            Submit
-          </Button>
-        </div>
-      </Modal>
+      <OTPModal open={showOTPModal} />
     </div>
   );
 };
 
 export default Login;
-
-
-

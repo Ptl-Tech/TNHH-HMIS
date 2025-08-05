@@ -7,9 +7,7 @@ import TreatmentSheetFormData from "../forms/nurse-forms/TreatmentSheetFormData"
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getTreatmentSheetLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
-import InpatientCardInfo from "../InpatientCardInfo";
-import { is } from "immutable";
-import useAuth from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/auth";
 
 const TreatmentsSheet = ({ patientDetails }) => {
   const [form] = Form.useForm();
@@ -19,7 +17,8 @@ const TreatmentsSheet = ({ patientDetails }) => {
   const location = useLocation();
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
-  const userRole = useAuth().userData.departmentName;
+  const { user } = useAuth();
+  const userRole = user?.role;
 
   const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
     (state) => state.getTreatmentSheet || {}
@@ -27,7 +26,7 @@ const TreatmentsSheet = ({ patientDetails }) => {
 
   // Open drawer by default if Doctor
   useEffect(() => {
-    if (userRole === "Doctor") {
+    if (userRole == "Doctor") {
       setDrawerVisible(true);
     }
   }, [userRole]);
@@ -43,7 +42,6 @@ const TreatmentsSheet = ({ patientDetails }) => {
   };
 
   const toggleDrawer = () => {
-    // Just toggle state; role is already handled in useEffect
     setDrawerVisible((prev) => !prev);
   };
 
@@ -51,8 +49,15 @@ const TreatmentsSheet = ({ patientDetails }) => {
     <div>
       <NurseInnerHeader icon={<FileOutlined />} title="Treatments Sheet" />
 
-      <div style={{ display: "flex", gap: "20px", marginTop: 20, marginBottom: 20 }}>
-        {userRole === "Nurse" && (
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginTop: 20,
+          marginBottom: 20,
+        }}
+      >
+        {userRole == "Nurse" && (
           <Button
             type={isFormVisible ? "default" : "primary"}
             icon={<PlusOutlined />}
@@ -62,7 +67,10 @@ const TreatmentsSheet = ({ patientDetails }) => {
           </Button>
         )}
 
-        <Button onClick={toggleDrawer} type={isFormVisible ? "primary" : "default"}>
+        <Button
+          onClick={toggleDrawer}
+          type={isFormVisible ? "primary" : "default"}
+        >
           View Medication Sheet
         </Button>
       </div>
@@ -88,7 +96,6 @@ const TreatmentsSheet = ({ patientDetails }) => {
         //close icon visible on the right
         extra={<Button onClick={toggleDrawer} icon={<CloseOutlined />} danger>Close</Button>}
       >
-
         <TreatmentSheetTable
           loadingTreatmentSheet={loadingTreatmentSheet}
           treatmentSheet={treatmentSheet}

@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const SAVE_DOCTOR_NOTES_RESET = "SAVE_DOCTOR_NOTES_RESET";
 export const SAVE_DOCTOR_NOTES_ERROR = "SAVE_DOCTOR_NOTES_ERROR";
@@ -24,15 +24,15 @@ export const saveDoctorNotes = (data) => async (dispatch, getState) => {
     dispatch({ type: SAVE_DOCTOR_NOTES_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

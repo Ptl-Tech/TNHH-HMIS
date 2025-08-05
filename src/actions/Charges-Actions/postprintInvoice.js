@@ -7,8 +7,7 @@ export const PRINT_INVOICE_SUCCESS = "PRINT_INVOICE_SUCCESS";
 export const PRINT_INVOICE_FAIL = "PRINT_INVOICE_FAIL";
 export const PRINT_INVOICE_RESET = "PRINT_INVOICE_RESET";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL || "https://chiromo.potestastechnologies.net:8085";
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const postPrintInvoice = (patientNo) => async (dispatch, getState) => {
   try {
@@ -18,17 +17,16 @@ export const postPrintInvoice = (patientNo) => async (dispatch, getState) => {
 
     const config = apiHeaderConfig(getState);
 
-    //get staffNo from userInfo
+    
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-
 
     const response = await axios.post(
       `${API_URL}/Reports/InsuranceInvoiceReport`,
       patientNo,
       config
-    );      
+    );
 
     dispatch({
       type: PRINT_INVOICE_SUCCESS,

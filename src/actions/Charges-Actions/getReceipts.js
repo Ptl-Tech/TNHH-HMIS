@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_RECEIPTS_LIST = "REQUEST_RECEIPTS_LIST";
 export const REQUEST_RECEIPTS_LIST_SUCCESS = "REQUEST_RECEIPTS_LIST_SUCCESS";
@@ -18,12 +18,12 @@ export const getReceipts = () => async (dispatch, getState) => {
     dispatch({ type: REQUEST_RECEIPTS_LIST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Handle missing userInfo or branchCode
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
       window.location.href = "/login";
       return;
     }
@@ -31,8 +31,8 @@ export const getReceipts = () => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -61,12 +61,12 @@ export const getReceiptsByPatientNo =
       dispatch({ type: REQUEST_RECEIPTS_LIST_BY_PATIENT_NO });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
-      // Handle missing userInfo or branchCode
-      if (!userInfo || !branchCode) {
+      
+      if (!user|| !branchCode) {
         window.location.href = "/login";
         return;
       }
@@ -74,8 +74,8 @@ export const getReceiptsByPatientNo =
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };

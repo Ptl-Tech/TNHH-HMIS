@@ -1,22 +1,30 @@
-import { Button, Form } from "antd";
-import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import { BorderlessTableOutlined, PlusOutlined } from "@ant-design/icons";
-import useAuth from "../../../hooks/useAuth";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { Button, Form } from "antd";
+import { BorderlessTableOutlined, PlusOutlined } from "@ant-design/icons";
+import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
+
+import { useAbility } from "../../../hooks/casl";
+
 import CarePlanFormData from "./CarePlanFormData";
 import CarePlanFormTable from "../tables/nurse-tables/CarePlanFormTable";
-import { useDispatch, useSelector } from "react-redux";
 import { getNursingCarePlanSlice } from "../../../actions/nurse-actions/postNursingCarePlanFormSlice";
-import { useLocation } from "react-router-dom";
 
 const CarePlanForm = () => {
-  const role = useAuth().userData.departmentName;
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const ability = useAbility();
   const dispatch = useDispatch();
-  const [form] = Form.useForm();
   const location = useLocation();
-  const patientDetails = location.state?.patientDetails;
+
+  const [form] = Form.useForm();
+
+  const canCreateNursingPlan = ability.can("create", "nursingPlan");
+
   const [isViewing, setIsViewing] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const patientDetails = location.state?.patientDetails;
 
   const { loadingGetCarePlan, getCarePlan } = useSelector(
     (state) => state.getNursingCarePlan
@@ -39,7 +47,7 @@ const CarePlanForm = () => {
       />
 
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-        {!isFormVisible && role === "Nurse" && (
+        {!isFormVisible && canCreateNursingPlan && (
           <>
             <Button type="primary" onClick={handleButtonVisibility}>
               <PlusOutlined /> Nursing Care Plan

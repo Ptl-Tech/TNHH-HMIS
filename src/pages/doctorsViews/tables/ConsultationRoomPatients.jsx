@@ -1,34 +1,35 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { Table } from 'antd';
+import { Table } from "antd";
 
-import useAuth from '../../../hooks/useAuth';
-import { rowClassName } from '../../../utils/helpers';
-import Loading from '../../../partials/nurse-partials/Loading';
+import { useAbility } from "../../../hooks/casl";
+import { rowClassName } from "../../../utils/helpers";
+import Loading from "../../../partials/nurse-partials/Loading";
 
-import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
-import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
+import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
+import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
 
-import { waitingListColumns } from './tables-utils';
-import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
-import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
+import { waitingListColumns } from "./tables-utils";
+import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
+import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
+import { subject } from "@casl/ability";
 
 const ConsultationRoomPatients = () => {
+  const ability = useAbility();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-  const currentPath = location.pathname;
-  const role = useAuth().userData.departmentName;
-  const doctorId = useAuth().userData.doctorID;
 
-  const [searchName, setSearchName] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
-  const [searchVisitNumber, setSearchVisitNumber] = useState('');
+  const currentPath = location.pathname;
+
+  const [searchName, setSearchName] = useState("");
+  const [searchVisitNumber, setSearchVisitNumber] = useState("");
+  const [searchPatientNumber, setSearchPatientNumber] = useState("");
 
   const { loadingWaitingList, triageWaitingList: patients } = useSelector(
-    (state) => state.getTriageWaitingList,
+    (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
@@ -40,18 +41,20 @@ const ConsultationRoomPatients = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-  const isDoctorRole = role === 'Doctor' || role === 'Psychology';
+  const canReadOwnConsultationNotes = (doctorId) =>
+    ability.can("read", subject("ownConsultationNotes", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
   const filterByStatus = (status) =>
-    treatmentList?.filter((item) =>
-      isDoctorRole
-        ? item.Status === status && item.DoctorID === doctorId
-        : item.Status === status,
+    treatmentList?.filter(
+      (item) =>
+        (canReadOwnConsultationNotes(item?.DoctorID) || canReadOutPatients) &&
+        item.Status === status
     );
 
-  const openDoctorVisitList = filterByStatus('New');
-  const activeConsultationList = filterByStatus('Active');
-  const closedConsultationList = filterByStatus('Completed');
+  const openDoctorVisitList = filterByStatus("New");
+  const activeConsultationList = filterByStatus("Active");
+  const closedConsultationList = filterByStatus("Completed");
 
   const closedConsultationListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,
@@ -64,35 +67,36 @@ const ConsultationRoomPatients = () => {
 
   const combinedList = activeConsultationList?.map((room) => {
     const matchingPatient = closedConsultationListWithPatientDetails.find(
-      (patient) => patient.PatientNo === room.PatientNo,
+      (patient) => patient.PatientNo === room.PatientNo
     );
 
     return {
       ...room,
       PatientNo: room?.PatientNo,
-      SearchName: matchingPatient ? matchingPatient.SearchName : '',
-      IDNumber: matchingPatient ? matchingPatient.IDNumber : '',
-      Age: matchingPatient ? matchingPatient.Age : '',
-      PatientType: matchingPatient ? matchingPatient.PatientType : '',
-      Inpatient: matchingPatient ? matchingPatient.Inpatient : '',
+      SearchName: matchingPatient ? matchingPatient.SearchName : "",
+      IDNumber: matchingPatient ? matchingPatient.IDNumber : "",
+      Age: matchingPatient ? matchingPatient.Age : "",
+      PatientType: matchingPatient ? matchingPatient.PatientType : "",
+      Inpatient: matchingPatient ? matchingPatient.Inpatient : "",
     };
   });
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      `/${role}/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+      `/Dashboard/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
           observationNo: record.ObservationNo,
           patientDetails: record,
         },
-      },
+      }
     );
   };
 
   return (
-    <div style={{ padding: '10px 10px' }}>
+    <div style={{ padding: "10px 10px" }}>
+     
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}
@@ -120,11 +124,11 @@ const ConsultationRoomPatients = () => {
             searchVisitNumber,
             searchPatientNumber,
           })}
-          showSorterTooltip={{ target: 'sorter-icon' }}
+          showSorterTooltip={{ target: "sorter-icon" }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            position: ['bottom', 'right'],
+            position: ["bottom", "right"],
             showTotal: (total, range) =>
               `${range[0]}-${range[1]} of ${total} items`,
           }}

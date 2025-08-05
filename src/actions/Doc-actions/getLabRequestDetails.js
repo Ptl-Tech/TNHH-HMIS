@@ -2,7 +2,7 @@ import axios from "axios";
 import { message } from "antd";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const REQUEST_LAB_DETAILS = "REQUEST_LAB_DETAILS";

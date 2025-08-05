@@ -5,7 +5,6 @@ import {
   TRIAGE_VISIT_LIST_SUCCESS,
   TRIAGE_VISIT_LIST_FAIL,
 } from "../constants/TriageConstants";
-import useAuth from "../hooks/useAuth";
 import {
   POST_TRIAGE_VISIT_REQUEST,
   POST_TRIAGE_VISIT_SUCCESS,
@@ -17,17 +16,17 @@ export const TriageWaitingList = () => async (dispatch, getState) => {
     dispatch({ type: TRIAGE_VISIT_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -48,16 +47,16 @@ export const DispatchToTriage = (visitNo) => async (dispatch, getState) => {
     dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };

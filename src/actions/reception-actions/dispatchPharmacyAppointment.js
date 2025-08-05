@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = 'https://chiromo.potestastechnologies.net:8085/';
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const POST_PHARMACY_APPOINTMENT_REQUEST =
   'POST_PHARMACY_APPOINTMENT_REQUEST';
@@ -15,10 +15,10 @@ export const postPharmacyAppointment = (record = {}, patientNo = null) => async 
     dispatch({ type: POST_PHARMACY_APPOINTMENT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = user.branchCode
 
     // Use patientNo if explicitly passed, otherwise extract from record
     const resolvedPatientNo = patientNo || record.PatientNo;
@@ -30,8 +30,8 @@ export const postPharmacyAppointment = (record = {}, patientNo = null) => async 
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode,
       },
     };

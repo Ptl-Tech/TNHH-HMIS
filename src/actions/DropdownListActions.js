@@ -1,6 +1,5 @@
 import axios from "axios";
 import { message } from "antd";
-import useAuth from "../hooks/useAuth";
 import {
   COUNTRIES_LIST_FAIL,
   COUNTRIES_LIST_REQUEST,
@@ -38,29 +37,26 @@ import {
   LOCATION_LIST_REQUEST,
   LOCATION_LIST_SUCCESS,
   LOCATION_LIST_FAIL,
-
-
 } from "../constants/DropDownConstants";
 import apiHeaderConfig from "./configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const listCountries = () => async (dispatch, getState) => {
   try {
     dispatch({ type: COUNTRIES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
         branchCode: branchCode,
+        "Content-Type": "application/json",
+        // Add sessionToken as a Bearer token
       },
     };
 
@@ -70,7 +66,6 @@ export const listCountries = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: COUNTRIES_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: COUNTRIES_LIST_FAIL, payload: error.message });
   }
@@ -81,17 +76,15 @@ export const listCounties = () => async (dispatch, getState) => {
     dispatch({ type: COUNTIES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
         branchCode: branchCode,
+        staffNo: user.staffNo,
       },
     };
 
@@ -101,7 +94,6 @@ export const listCounties = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: COUNTIES_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: COUNTIES_LIST_FAIL, payload: error.message });
   }
@@ -112,16 +104,16 @@ export const listSubCounties = () => async (dispatch, getState) => {
     dispatch({ type: SUB_COUNTIES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -132,7 +124,6 @@ export const listSubCounties = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: SUB_COUNTIES_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: SUB_COUNTIES_LIST_FAIL, payload: error.message });
   }
@@ -150,7 +141,6 @@ export const listSubCountyWards = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: SUB_COUNTY_WARDS_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: SUB_COUNTY_WARDS_LIST_FAIL, payload: error.message });
   }
@@ -161,16 +151,16 @@ export const listClinics = () => async (dispatch, getState) => {
     dispatch({ type: CLINICS_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -181,26 +171,25 @@ export const listClinics = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: CLINICS_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: CLINICS_LIST_FAIL, payload: error.message });
   }
 };
 export const listKinsRelationships = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: KINS_LIST_REQUEST});
+    dispatch({ type: KINS_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -211,28 +200,26 @@ export const listKinsRelationships = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: KINS_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: KINS_LIST_FAIL, payload: error.message });
   }
 };
 
-
 export const listInsuranceOptions = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: INSURANCE_LIST_REQUEST});
+    dispatch({ type: INSURANCE_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -243,7 +230,6 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: INSURANCE_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: INSURANCE_LIST_FAIL, payload: error.message });
   }
@@ -251,19 +237,19 @@ export const listInsuranceOptions = () => async (dispatch, getState) => {
 
 export const marketingStrategies = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: MARKETING_LIST_REQUEST});
+    dispatch({ type: MARKETING_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -274,28 +260,26 @@ export const marketingStrategies = () => async (dispatch, getState) => {
     );
 
     dispatch({ type: MARKETING_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: MARKETING_LIST_FAIL, payload: error.message });
   }
 };
-
 
 export const listDoctors = () => async (dispatch, getState) => {
   try {
     dispatch({ type: DOCTOR_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };
@@ -311,28 +295,26 @@ export const listDoctors = () => async (dispatch, getState) => {
     // );
 
     dispatch({ type: DOCTOR_LIST_SUCCESS, payload: data });
-    
   } catch (error) {
     dispatch({ type: DOCTOR_LIST_FAIL, payload: error.message });
   }
 };
-
 
 export const getEmployeesList = () => async (dispatch, getState) => {
   try {
     dispatch({ type: EMPLOYEES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };
@@ -348,59 +330,57 @@ export const getEmployeesList = () => async (dispatch, getState) => {
     // );
 
     dispatch({ type: EMPLOYEES_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: EMPLYEES_LIST_FAIL, payload: error.message });
   }
 };
 
-export const getEmployeeByNumber = (staffNumber) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: EMPLOYEE_DETAILS_REQUEST });
+export const getEmployeeByNumber =
+  (staffNumber) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: EMPLOYEE_DETAILS_REQUEST });
 
-    const {
-      otpVerify: { userInfo },
-    } = getState();
+      const {
+        auth: { user },
+      } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
-        branchCode: branchCode,
-      },
-    };
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: user.staffNo,
 
-    // Correct URL construction, ensuring the staff number is correctly quoted in the query
-    const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyEmployees&isList=false&query=$filter=No eq '${staffNumber}'`,
-      config
-    );
+          branchCode: branchCode,
+        },
+      };
 
-    // Dispatch success action with the fetched employee data
-    dispatch({ type: EMPLOYEE_DETAILS_SUCCESS, payload: data });
+      // Correct URL construction, ensuring the staff number is correctly quoted in the query
+      const { data } = await axios.get(
+        `${API}data/odatafilter?webservice=QyEmployees&isList=false&query=$filter=No eq '${staffNumber}'`,
+        config
+      );
 
-  } catch (error) {
-    dispatch({ type: EMPLOYEE_DETAILS__FAIL, payload: error.message });
-  }
-};
-
+      // Dispatch success action with the fetched employee data
+      dispatch({ type: EMPLOYEE_DETAILS_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({ type: EMPLOYEE_DETAILS__FAIL, payload: error.message });
+    }
+  };
 
 export const branchesList = (patient) => async (dispatch, getState) => {
   try {
     dispatch({ type: PATIENT_REGISTER_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portal_Session_Token, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
       },
     };
 
@@ -435,22 +415,21 @@ export const branchesList = (patient) => async (dispatch, getState) => {
   }
 };
 
-
 export const getLoactions = () => async (dispatch, getState) => {
   try {
     dispatch({ type: LOCATION_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };
@@ -466,11 +445,7 @@ export const getLoactions = () => async (dispatch, getState) => {
     // );
 
     dispatch({ type: LOCATION_LIST_SUCCESS, payload: data });
-
   } catch (error) {
     dispatch({ type: LOCATION_LIST_FAIL, payload: error.message });
   }
 };
-
-
-

@@ -84,7 +84,7 @@ const PatientRegistration = () => {
         // }
 
         navigate(
-          `/reception/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
+          `/Dashboard/Add-Appointment?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }
@@ -93,7 +93,7 @@ const PatientRegistration = () => {
 
       case "request_admission":
         navigate(
-          `/Reception/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
+          `/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientDetails.PatientNo}`,
           {
             state: { existingPatient: patientDetails },
           }

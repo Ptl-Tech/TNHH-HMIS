@@ -2,17 +2,32 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getVisitorsList } from "../actions/visitorsActions";
 import { listPatients, convertPatient } from "../actions/patientActions";
-import { Table, Skeleton, message, Button, Input, Space,Dropdown, Menu } from "antd";
+import {
+  Table,
+  Skeleton,
+  message,
+  Button,
+  Input,
+  Space,
+  Dropdown,
+  Menu,
+} from "antd";
 import dayjs from "dayjs";
 import { ConvertPatientModal } from "./reception-views/visitorsListPartialViews/ConvertPatientModal";
 import { useNavigate } from "react-router-dom";
-import { ReloadOutlined, SearchOutlined,DownOutlined } from "@ant-design/icons";
+import {
+  ReloadOutlined,
+  SearchOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
 
 const VisitorList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { visitors: data } = useSelector((state) => state.visitorsList);
-  const { loading: loadingPatients, patients } = useSelector((state) => state.patientList);
+  const { loading: loadingPatients, patients } = useSelector(
+    (state) => state.patientList
+  );
 
   const [filteredVisitors, setFilteredVisitors] = useState([]);
   const [displayedVisitors, setDisplayedVisitors] = useState([]);
@@ -38,11 +53,11 @@ const VisitorList = () => {
 
   const filterVisitors = () => {
     if (!data || data.length === 0 || !patients || patients.length === 0) {
-      return;
+      return [];
     }
-  
+
     setLoadingFiltered(true);
-  
+
     try {
       const patientSet = new Set(patients.map((p) => p.IDNumber));
       const filteredList = data.filter((visitor) => {
@@ -51,7 +66,7 @@ const VisitorList = () => {
         const isPatient = patientSet.has(visitor.IDNumber);
         return isToday && isEntered && !isPatient;
       });
-  
+
       setFilteredVisitors(filteredList);
     } catch (error) {
       console.error("Error filtering visitors:", error);
@@ -59,8 +74,6 @@ const VisitorList = () => {
       setLoadingFiltered(false);
     }
   };
-  ;
-
   const applySearchFilter = () => {
     if (!searchTerm) {
       setDisplayedVisitors(filteredVisitors.slice(0, 20)); // Initial load
@@ -84,7 +97,9 @@ const VisitorList = () => {
 
       if (response) {
         message.success(`Patient Number: ${response}`, 5);
-        navigate(`/Reception/Patient-Registration/Patient?PatientNo=${response}`);
+        navigate(
+          `/Dashboard/Patient-Registration/Patient?PatientNo=${response}`
+        );
       } else {
         message.error("Failed to retrieve patient number");
       }
@@ -141,17 +156,19 @@ const VisitorList = () => {
             <Menu.Item
               key="register"
               onClick={() =>
-                navigate(`/Reception/Register-walkin`, { state: { visitorData: record } })
+                navigate(`/Dashboard/Register-walkin`, {
+                  state: { visitorData: record },
+                })
               }
             >
               Register Walk In
             </Menu.Item>
           </Menu>
         );
-  
+
         return (
           <Dropdown overlay={menu}>
-            <Button type="primary" size="small" >
+            <Button type="primary" size="small">
               Actions <DownOutlined />
             </Button>
           </Dropdown>
@@ -171,7 +188,11 @@ const VisitorList = () => {
           allowClear
           style={{ width: 300 }}
         />
-        <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={loadingFiltered}>
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={handleRefresh}
+          loading={loadingFiltered}
+        >
           Refresh
         </Button>
       </Space>

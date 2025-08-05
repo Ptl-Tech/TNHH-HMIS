@@ -5,18 +5,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllergiesAndMedicationsSlice } from "../../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
 import { postAllergiesMedicationSlice } from "../../../../actions/triage-actions/postAllergiesMedicationSlice";
 import { SaveOutlined, CloseOutlined } from "@ant-design/icons";
-import useAuth from "../../../../hooks/useAuth";
+import useAuth from "../../../../hooks/auth";
 import TextArea from "antd/es/input/TextArea";
 import { useLocation, useSearchParams } from "react-router-dom";
 
-const AllergyAndMedication = ({
-  observationNumber,
-  setIsFormVisible,
-}) => {
+const AllergyAndMedication = ({ observationNumber, setIsFormVisible }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const config = useAuth().userData;
-  const location = useLocation()
+  const config = useAuth();
+  const location = useLocation();
   const admissionNo = new useSearchParams(location.search)[0].get("AdmNo");
 
   const { postAllergyMedicationLoading } = useSelector(
@@ -30,19 +27,21 @@ const AllergyAndMedication = ({
   const onFinish = (values) => {
     const { complains, foodAllergy, drugAllergy } = values.allergy;
     const createAllergyAndMedicationData = {
-      complaints: complains,
       foodAllergy,
       drugAllergy,
-      staffNo: config.no,
-      observationNo: observationNumber ?? admissionNo,
-      assessedBy: config.no,
       myAction: "create",
+      complaints: complains,
+      staffNo: config.staffNo,
+      assessedBy: config.staffNo,
+      observationNo: observationNumber ?? admissionNo,
     };
     dispatch(postAllergiesMedicationSlice(createAllergyAndMedicationData)).then(
       (data) => {
         if (data?.status === "success") {
           message.success("Successfully saved allergy and medication");
-          dispatch(getAllergiesAndMedicationsSlice(observationNumber ?? admissionNo));
+          dispatch(
+            getAllergiesAndMedicationsSlice(observationNumber ?? admissionNo)
+          );
           setIsFormVisible(false);
         } else if (data?.status === "error") {
           message.error(

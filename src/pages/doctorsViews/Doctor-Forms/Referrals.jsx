@@ -35,17 +35,19 @@ import {
 } from "../../../actions/Doc-actions/postRefferalDetails";
 import { useLocation } from "react-router-dom";
 import moment from "moment";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { getHospitalNumber } from "../../../actions/Doc-actions/getHospitalNumber";
 import { getReferralLines } from "../../../actions/Doc-actions/getReferralLines";
 import { Option } from "antd/es/mentions";
+import { useAuth } from "../../../hooks/auth";
 
 const Referrals = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const treatmentNo = queryParams.get("TreatmentNo");
   const employeeData = useAuth();
   const dispatch = useDispatch();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const treatmentNo = queryParams.get("TreatmentNo");
   const { loading: saveLoading } = useSelector(
     (state) => state.saveRefferalDetails
   );
@@ -56,7 +58,7 @@ const Referrals = () => {
   const { loading: referralLinesLoading, data: referralLines } = useSelector(
     (state) => state.getReferralLines
   );
-  
+
   const { data } = useSelector((state) => state.getHosNumber);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStaffNo, setSelectedStaffNo] = useState(null);
@@ -72,7 +74,7 @@ const Referrals = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if(treatmentNo){
+    if (treatmentNo) {
       dispatch(getReferralLines(treatmentNo));
     }
   }, [dispatch, treatmentNo]);
@@ -178,21 +180,21 @@ const Referrals = () => {
           </Typography.Text>
         );
       },
-    }
+    },
   ];
 
-  const dataSource=[
+  const dataSource = [
     {
-      key:referralLines?.TreatmentNo,
+      key: referralLines?.TreatmentNo,
       TreatmentNo: referralLines?.TreatmentNo,
       ReferralReason: referralLines?.ReferralReason,
       ClinicalHistoryTreatment: referralLines?.ClinicalHistoryTreatment,
       DateReferred: referralLines?.DateReferred,
       HospitalName: referralLines?.HospitalName,
       ContactPerson: referralLines?.ContactPerson,
-      Status: referralLines?.Status
-    }
-  ]
+      Status: referralLines?.Status,
+    },
+  ];
 
   return (
     <div>
@@ -202,7 +204,14 @@ const Referrals = () => {
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Referral Details
         </Typography.Title>
-        <div style={{ display: "flex", gap: "10px", alignItems: "right" , justifyContent: "flex-end"}}>
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "right",
+            justifyContent: "flex-end",
+          }}
+        >
           <Button
             type="default"
             icon={<PrinterOutlined />}
@@ -338,57 +347,31 @@ const Referrals = () => {
                   dataSource={[
                     {
                       title: "Name",
-                      content:
-                        `${employeeData.userData.firstName} ${employeeData.userData.lastName}` ||
-                        "N/A",
+                      content: `${employeeData?.staffName}` || "N/A",
                       icon: <UserOutlined style={{ fontSize: "20px" }} />,
                     },
                     {
-                      title: "Gender",
-                      content: employeeData.userData.Gender,
-                      icon: (
-                        <AppstoreAddOutlined style={{ fontSize: "20px" }} />
-                      ),
-                    },
-                    {
-                      title: "Title",
-                      content: employeeData.userData.title,
-                      icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
-                    },
-                    {
                       title: "Staff No",
-                      content: employeeData.userData.no,
+                      content: employeeData.staffNo,
                       icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
                     },
                     {
                       title: "Profession",
-                      content:
-                        employeeData.userData.Shortcut_Dimension_2_Code ||
-                        "N/A",
+                      content: employeeData?.role,
                       icon: (
                         <AppstoreAddOutlined style={{ fontSize: "20px" }} />
                       ),
                     },
                     {
-                      title: "Contact",
-                      content: employeeData.userData.workPhoneNumber,
-                      icon: <PhoneOutlined style={{ fontSize: "20px" }} />,
-                    },
-                    {
                       title: "Branch",
-                      content: employeeData.userData.shortcut_Dimension_1_Code,
+                      content: employeeData.branchCode,
                       icon: (
                         <EnvironmentOutlined style={{ fontSize: "20px" }} />
                       ),
                     },
                     {
-                      title: "Email",
-                      content: employeeData.userData.companyEMail,
-                      icon: <MailOutlined style={{ fontSize: "20px" }} />,
-                    },
-                    {
                       title: "Designation",
-                      content: employeeData.userData.shortcut_Dimension_4_Code,
+                      content: employeeData.branchCode,
                       icon: <IdcardOutlined style={{ fontSize: "20px" }} />,
                     },
                   ]}

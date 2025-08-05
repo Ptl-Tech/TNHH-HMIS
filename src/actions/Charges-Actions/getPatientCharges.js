@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_PATIENT_CHARGES = "REQUEST_PATIENT_CHARGES";
 export const REQUEST_PATIENT_CHARGES_SUCCESS = "REQUEST_PATIENT_CHARGES_SUCCESS";
@@ -13,20 +13,20 @@ export const getPatientCharges = (appointmentNo) => async (dispatch, getState) =
     dispatch({ type: REQUEST_PATIENT_CHARGES });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Validate userInfo and branchCode for better error handling
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
       throw new Error("User information or branch code is missing");
     }
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

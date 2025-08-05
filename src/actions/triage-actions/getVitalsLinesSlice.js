@@ -1,28 +1,26 @@
-import configHelpers from '../../actions/configHelpers';
-import axios from 'axios';
+import configHelpers from "../../actions/configHelpers";
+import axios from "axios";
 
-export const GET_VITAL_LINES_REQUEST = 'GET_VITAL_LINES_REQUEST';
-export const GET_VITAL_LINES_SUCCESS = 'GET_VITAL_LINES_SUCCESS';
-export const GET_VITAL_LINES_FAILURE = 'GET_VITAL_LINES_FAILURE';
+export const GET_VITAL_LINES_REQUEST = "GET_VITAL_LINES_REQUEST";
+export const GET_VITAL_LINES_SUCCESS = "GET_VITAL_LINES_SUCCESS";
+export const GET_VITAL_LINES_FAILURE = "GET_VITAL_LINES_FAILURE";
 
 export const GET_PATIENT_VITALS_LINES_REQUEST =
-  'GET_PATIENT_VITALS_LINES_REQUEST';
+  "GET_PATIENT_VITALS_LINES_REQUEST";
 export const GET_PATIENT_VITALS_LINES_SUCCESS =
-  'GET_PATIENT_VITALS_LINES_SUCCESS';
+  "GET_PATIENT_VITALS_LINES_SUCCESS";
 export const GET_PATIENT_VITALS_LINES_FAILURE =
-  'GET_PATIENT_VITALS_LINES_FAILURE';
-export const GET_PATIENT_VITALS_LINES_RESET = 'GET_PATIENT_VITALS_LINES_RESET';
+  "GET_PATIENT_VITALS_LINES_FAILURE";
+export const GET_PATIENT_VITALS_LINES_RESET = "GET_PATIENT_VITALS_LINES_RESET";
 
 export const GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST =
-  'GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST';
+  "GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST";
 export const GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS =
-  'GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS';
+  "GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS";
 export const GET_PATIENT_VITALS_BY_PATIENT_NUMBER_FAILURE =
-  'GET_PATIENT_VITALS_BY_PATIENT_NUMBER_FAILURE';
+  "GET_PATIENT_VITALS_BY_PATIENT_NUMBER_FAILURE";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL ||
-  'https://chiromo.potestastechnologies.net:8085';
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 export const getVitalsLinesSlice =
   (observationNo) => async (dispatch, getState) => {
@@ -31,7 +29,7 @@ export const getVitalsLinesSlice =
       dispatch({ type: GET_VITAL_LINES_REQUEST });
       const { data } = await axios.get(
         `${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=true&query=$filter=ObservationNo eq '${observationNo}'`,
-        config,
+        config
       );
 
       dispatch({ type: GET_VITAL_LINES_SUCCESS, payload: data });
@@ -42,7 +40,7 @@ export const getVitalsLinesSlice =
         type: GET_VITAL_LINES_SUCCESS,
         payload: {
           message: error.message,
-          status: error.response?.status || 'Network Error',
+          status: error.response?.status || "Network Error",
           data: error.response?.data || null,
         },
       });
@@ -58,7 +56,7 @@ export const getSinglePatientAllVitalsLines =
       dispatch({ type: GET_PATIENT_VITALS_BY_PATIENT_NUMBER_REQUEST });
       const { data } = await axios.get(
         `${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=true&query=$filter=PatientNo eq '${patientNumber}'`,
-        config,
+        config
       );
 
       dispatch({
@@ -75,7 +73,7 @@ export const getSinglePatientAllVitalsLines =
         type: GET_PATIENT_VITALS_BY_PATIENT_NUMBER_SUCCESS,
         payload: {
           message: error.message,
-          status: error.response?.status || 'Network Error',
+          status: error.response?.status || "Network Error",
           data: error.response?.data || null,
         },
       });
@@ -93,7 +91,7 @@ export const getPatientVitalsLinesSlice = () => async (dispatch, getState) => {
     dispatch({ type: GET_PATIENT_VITALS_LINES_REQUEST });
     const { data } = await axios.get(
       `${API_URL}/data/odatafilter?webservice=QyVitalsLines&isList=true`,
-      config,
+      config
     );
 
     dispatch({ type: GET_PATIENT_VITALS_LINES_SUCCESS, payload: data });

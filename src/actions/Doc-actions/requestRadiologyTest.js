@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import Ant Design message for error handling
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_RADIOLOGY_TEST = "REQUEST_RADIOLOGY_TEST";
 export const REQUEST_RADIOLOGY_TEST_SUCCESS = "REQUEST_RADIOLOGY_TEST_SUCCESS";
@@ -18,15 +18,15 @@ export const requestRadiologyTest = (treatmentId) => async (dispatch, getState) 
     dispatch({ type: REQUEST_RADIOLOGY_TEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -67,15 +67,15 @@ export const getPatientRadiologyTest = (treatmentId) => async (dispatch, getStat
     dispatch({ type: VIEW_PATIENT_RADIOLOGY_TEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

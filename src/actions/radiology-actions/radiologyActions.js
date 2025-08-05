@@ -2,7 +2,7 @@ import axios from "axios";
 import { message } from "antd";
 import apiHeaderConfig from "../configHelpers";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // post radiology requests
 export const POST_RADIOLOGY_RESULTS_REQUEST = "POST_RADIOLOGY_RESULTS_REQUEST";
@@ -27,15 +27,15 @@ export const postRadiologyResults = (resultsData) => async (dispatch, getState) 
     dispatch({ type: POST_RADIOLOGY_RESULTS_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -69,15 +69,15 @@ export const forwardRadiologyResults = (radiologyNo) => async (dispatch, getStat
     dispatch({ type: FORWARD_RADIOLOGY_RESULTS_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd"; // Import message for error handling
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 
 export const QY_RADIOLOGY_TEST_LIST_REQUEST = "QY_RADIOLOGY_TEST_LIST_REQUEST";
@@ -14,15 +14,15 @@ export const getRadiologySetup = () => async (dispatch, getState) => {
         dispatch({ type: QY_RADIOLOGY_TEST_LIST_REQUEST });
 
         const {
-            otpVerify: { userInfo },
+            auth: { user }
         } = getState();
-        const branchCode = localStorage.getItem("branchCode");
+        const branchCode = user.branchCode;
 
         const config = {
             headers: {
                 "Content-Type": "application/json",
-                staffNo: userInfo.userData.no, // Add staffNo as a custom header
-                sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+                staffNo: user.staffNo, // Add staffNo as a custom header
+                 // Add sessionToken as a Bearer token
                 branchCode: branchCode,
             },
         };

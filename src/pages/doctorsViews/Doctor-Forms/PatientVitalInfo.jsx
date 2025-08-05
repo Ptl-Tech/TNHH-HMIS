@@ -20,7 +20,7 @@ import {
 import { LiaAllergiesSolid } from "react-icons/lia";
 import { BsHeartPulse, BsClipboard2Pulse } from "react-icons/bs";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { NoData } from "../../../components/NoData";
 import {
   vitalsInfo,
@@ -63,6 +63,7 @@ import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions
 import { MdAttachFile } from "react-icons/md";
 import dayjs from "dayjs";
 import PatientSignsReport from "./PatientSignsReport";
+import { useAuth } from "../../../hooks/auth";
 
 const PatientVitalInfo = () => {
   const observationNo = useLocation()?.state?.observationNo;
@@ -244,7 +245,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       patientNo,
       observationNo,
       myAction: "create",
-      bloodPressure: `${diastolic}/${systolic}`,
+      bloodPressure: `${systolic}/${diastolic}`,
     };
 
     dispatch(postTriageListVitalsSlice(finalValues));
@@ -500,10 +501,12 @@ const AllergiesAndMedications = () => {
 };
 
 const AddAllergiesAndMedicines = ({ open, setOpen }) => {
+  const { user } = useAuth();
+
   const dispatch = useDispatch();
   const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
-  const staffNo = useAuth().userData.no;
+  const staffNo = user?.staffNo;
   const admissioNo = new URLSearchParams(search).get("AdmNo");
 
   const { TextArea } = Input;

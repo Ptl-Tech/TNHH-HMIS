@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_INVOICE_LIST = "REQUEST_INVOICE_LIST";
 export const REQUEST_INVOICE_LIST_SUCCESS = "REQUEST_INVOICE_LIST_SUCCESS";
@@ -13,12 +13,12 @@ export const getInvoiceList = (patientNo) => async (dispatch, getState) => {
     dispatch({ type: REQUEST_INVOICE_LIST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Handle missing userInfo or branchCode
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
      window.location.href = "/login";
       return;
     }
@@ -26,8 +26,8 @@ export const getInvoiceList = (patientNo) => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

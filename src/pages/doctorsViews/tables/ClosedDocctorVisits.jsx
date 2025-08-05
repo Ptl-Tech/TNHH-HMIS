@@ -1,35 +1,35 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import { Table } from 'antd';
+import { Table } from "antd";
 
-import Loading from '../../../partials/nurse-partials/Loading';
-import ConsultationRoomSummeryCard from '../ConsultationRoomSummeryCard';
+import Loading from "../../../partials/nurse-partials/Loading";
+import ConsultationRoomSummeryCard from "../ConsultationRoomSummeryCard";
 
-import useAuth from '../../../hooks/useAuth';
-import { rowClassName } from '../../../utils/helpers';
+// import useAuth from '../../../hooks/useAuth';
+import { useAbility } from "../../../hooks/casl";
+import { rowClassName } from "../../../utils/helpers";
 
-import { waitingListColumns } from './tables-utils';
-import { getOutPatientTreatmentList } from '../../../actions/Doc-actions/OutPatientAction';
-import FilterConsultationRoom from '../../../partials/nurse-partials/FilterConsultationRoom';
-import { getTriageWaitingList } from '../../../actions/triage-actions/getTriageWaitingListSlice';
+import { waitingListColumns } from "./tables-utils";
+import { getOutPatientTreatmentList } from "../../../actions/Doc-actions/OutPatientAction";
+import FilterConsultationRoom from "../../../partials/nurse-partials/FilterConsultationRoom";
+import { getTriageWaitingList } from "../../../actions/triage-actions/getTriageWaitingListSlice";
+import { subject } from "@casl/ability";
 
 export default function CloseList() {
-  const doctorId = useAuth().userData.doctorID;
-  const role = useAuth().userData.departmentName;
-
+  const ability = useAbility();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
 
   const currentPath = location.pathname;
-  const [searchName, setSearchName] = useState('');
-  const [searchVisitNumber, setSearchVisitNumber] = useState('');
-  const [searchPatientNumber, setSearchPatientNumber] = useState('');
+  const [searchName, setSearchName] = useState("");
+  const [searchVisitNumber, setSearchVisitNumber] = useState("");
+  const [searchPatientNumber, setSearchPatientNumber] = useState("");
 
   const { triageWaitingList: patients } = useSelector(
-    (state) => state.getTriageWaitingList,
+    (state) => state.getTriageWaitingList
   );
   const { loading: treatmentListLoading, patients: treatmentList } =
     useSelector((state) => state.docTreatmentList);
@@ -39,32 +39,34 @@ export default function CloseList() {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-  const openDoctorVisitList = useMemo(() => {
-    return treatmentList?.filter((item) => {
-      if (role === 'Doctor' || role === 'Psychology') {
-        return item.Status === 'New' && item.DoctorID === doctorId;
-      }
-      return item.Status === 'New';
-    });
-  }, [treatmentList, role, doctorId]);
+  // TODO: filter the record by own id
+  const canReadOwnRecords = (doctorId) =>
+    ability.can("read", subject("ownDoctorVisitRecords", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
-  const activeConsultationList = useMemo(() => {
-    return treatmentList?.filter((item) => {
-      if (role === 'Doctor' || role === 'Psychology') {
-        return item.Status === 'Active' && item.DoctorID === doctorId;
-      }
-      return item.Status === 'Active';
-    });
-  }, [treatmentList, role, doctorId]);
+  console.log({ treatmentList });
 
-  const closedConsultationList = useMemo(() => {
+  const filterConsultations = (status) => {
     return treatmentList?.filter((item) => {
-      if (role === 'Doctor' || role === 'Psychology') {
-        return item.Status === 'Completed' && item.DoctorID === doctorId;
-      }
-      return item.Status === 'Completed';
+      const matchesStatus = item.Status === status;
+      const matchesDoctor =
+        canReadOwnRecords(item.DoctorID) || canReadOutPatients;
+      return matchesStatus && matchesDoctor;
     });
-  }, [treatmentList, role, doctorId]);
+  };
+
+  const openDoctorVisitList = useMemo(
+    () => filterConsultations("New"),
+    [treatmentList]
+  );
+  const activeConsultationList = useMemo(
+    () => filterConsultations("Active"),
+    [treatmentList]
+  );
+  const closedConsultationList = useMemo(
+    () => filterConsultations("Completed"),
+    [treatmentList]
+  );
 
   const closedConsultationListWithPatientDetails = useMemo(() => {
     return patients?.map((patient) => ({
@@ -80,40 +82,36 @@ export default function CloseList() {
   const combinedList = useMemo(() => {
     return closedConsultationList.map((room) => {
       const matchingPatient = closedConsultationListWithPatientDetails.find(
-        (patient) => patient.PatientNo === room.PatientNo,
+        (patient) => patient.PatientNo === room.PatientNo
       );
 
       return {
         ...room,
         PatientNo: room?.PatientNo,
-        SearchName: matchingPatient?.SearchName || '',
-        IDNumber: matchingPatient?.IDNumber || '',
-        Age: matchingPatient?.Age || '',
-        PatientType: matchingPatient?.PatientType || '',
-        Inpatient: matchingPatient?.Inpatient || '',
+        SearchName: matchingPatient?.SearchName || "",
+        IDNumber: matchingPatient?.IDNumber || "",
+        Age: matchingPatient?.Age || "",
+        PatientType: matchingPatient?.PatientType || "",
+        Inpatient: matchingPatient?.Inpatient || "",
       };
     });
   }, [closedConsultationList, closedConsultationListWithPatientDetails]);
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      role === 'Doctor'
-        ? `/Doctor/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-        : role === 'Psychology'
-        ? `/Psychology/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`
-        : `/Nurse/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+      `/Dashboard/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,
           observationNo: record.ObservationNo,
           patientDetails: record,
         },
-      },
+      }
     );
   };
 
   return (
-    <div style={{ padding: '10px 10px' }}>
+    <div style={{ padding: "10px 10px" }}>
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}
@@ -136,14 +134,14 @@ export default function CloseList() {
             handleNavigate,
             searchVisitNumber,
             searchPatientNumber,
-            checkInButton: 'View Closed',
+            checkInButton: "View Closed",
           })}
           dataSource={combinedList}
           bordered
           size="small"
           rowClassName={rowClassName} // Apply the row color
           pagination={{
-            position: ['bottom', 'right'],
+            position: ["bottom", "right"],
             showSizeChanger: true,
             pageSize: 10,
             showTotal: (total, range) =>

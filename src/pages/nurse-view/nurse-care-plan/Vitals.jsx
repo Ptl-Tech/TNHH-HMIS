@@ -1,22 +1,30 @@
-import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import dayjs from "dayjs";
+
 import {
   FolderViewOutlined,
   FolderAddOutlined,
   FileMarkdownOutlined,
 } from "@ant-design/icons";
+import { Button, Col, DatePicker, Form, Input, Modal, Row } from "antd";
+
+import { useAbility } from "../../../hooks/casl";
+
 import VitalsTable from "../tables/triage-tables/VitalsTable";
-import { useLocation } from "react-router-dom";
-import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import VitalsFormData from "../forms/nurse-forms/VitalsFormData";
+import useSetTableCheckBoxHook from "../../../hooks/useSetTableCheckBoxHook";
 import NurseInnerHeader from "../../../partials/nurse-partials/NurseInnerHeader";
-import dayjs from "dayjs";
-import { useDispatch, useSelector } from "react-redux";
 import { getSinglePatientAllVitalsLines } from "../../../actions/triage-actions/getVitalsLinesSlice";
-import useAuth from "../../../hooks/useAuth";
 
 const Vitals = () => {
   const [form] = Form.useForm();
+  const ability = useAbility();
+
+  const canCreateVitals = ability.can("create", "vitals");
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedRowKey, rowSelection, selectedRow } =
     useSetTableCheckBoxHook();
@@ -25,7 +33,6 @@ const Vitals = () => {
   const queryParams = new URLSearchParams(location.search);
   const AdmNo = queryParams.get("AdmNo");
   const PatientNo = queryParams.get("PatientNo");
-  const role = useAuth().userData.departmentName;
 
   const { loading: loadingInpatientVitals, data: filterInpatientVitals } =
     useSelector((state) => state.getPatientVitals);
@@ -70,7 +77,7 @@ const Vitals = () => {
         title="Inpatient Vitals"
       />
 
-      {(role === "Doctor" || (role === "Nurse" && !isVitalFormVisible)) && (
+      {canCreateVitals && (
         <div
           style={{
             display: "flex",

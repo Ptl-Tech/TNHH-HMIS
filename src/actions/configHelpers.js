@@ -1,18 +1,15 @@
-
 const apiHeaderConfig = (getState) => {
-    const {
-      otpVerify: { userInfo },
-    } = getState();
-  
-    return {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no,
-        sessionToken: userInfo?.userData?.portalSessionToken,
-        branchCode: localStorage?.getItem("branchCode"),
-      },
-    };
+  const {
+    auth: { user },
+  } = getState();
+
+  return {
+    headers: {
+      "Content-Type": "application/json",
+      staffNo: user?.staffNo,
+      branchCode: user?.branchCode,
+    },
   };
-  
-  export default apiHeaderConfig;
-  
+};
+
+export default apiHeaderConfig;

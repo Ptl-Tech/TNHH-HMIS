@@ -180,7 +180,7 @@ const DischargeList = () => {
   const handlePostedConsumables = () => {
     if (selectedRow[0]?.AdmissionNo) {
       navigate(
-        `/Nurse/Discharge-list/Posted-Consumables?AdmNo=${selectedRow[0].AdmissionNo}`,
+        `/Dashboard/Discharge-list/Posted-Consumables?AdmNo=${selectedRow[0].AdmissionNo}`,
         {
           state: { patientDetails: selectedRow[0] },
         }

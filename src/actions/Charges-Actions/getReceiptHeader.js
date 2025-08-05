@@ -1,7 +1,7 @@
 import axios from "axios";
 import { message } from "antd";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const REQUEST_RECEIPT_HEADER = "REQUEST_RECEIPT_HEADER";
 export const REQUEST_RECEIPT_HEADER_SUCCESS = "REQUEST_RECEIPT_HEADER_SUCCESS";
@@ -13,12 +13,12 @@ export const getReceiptHeader = (visitNo) => async (dispatch, getState) => {
     dispatch({ type: REQUEST_RECEIPT_HEADER });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Handle missing userInfo or branchCode
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
       const errorMsg = "User information or branch code is missing";
       dispatch({ type: REQUEST_RECEIPT_HEADER_FAIL, payload: errorMsg });
       message.error(errorMsg);
@@ -28,8 +28,8 @@ export const getReceiptHeader = (visitNo) => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

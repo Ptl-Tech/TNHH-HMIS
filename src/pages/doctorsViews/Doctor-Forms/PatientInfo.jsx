@@ -20,7 +20,7 @@ import TextArea from "antd/es/input/TextArea";
 import { UserOutlined } from "@ant-design/icons";
 import { IoCloseOutline, IoEllipsisVertical } from "react-icons/io5";
 
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 
 import {
   smartMerge,
@@ -30,10 +30,13 @@ import {
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
+import { useAbility } from "../../../hooks/casl";
+import { useAuth } from "../../../hooks/auth";
 import PatientCharges from "../../billing/CashPatients/PatientCharges";
 import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
-const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
+const PatientInfo = ({ patientNo, treatmentNo, patientDetails }) => {
+  const ability = useAbility();
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -41,6 +44,7 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
     location.state?.patientDetails || {},
     patientDetails || {}
   );
+  const canSeePatientReview = ability.can("read", "patientReview");
 
   const [moreDetailsOpen, setMoreDetailOpen] = useState(false);
   const [patientReviewOpen, setPatientReviewOpen] = useState(false);
@@ -48,9 +52,10 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails, role }) => {
   const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted
   );
-const {loadingPatientDetails, patientDetails: patientdeets}=useFetchPatientDetailsHook(patientNo)
+  const { loadingPatientDetails, patientDetails: patientdeets } =
+    useFetchPatientDetailsHook(patientNo);
 
-console.log("patient details", patientdeets);
+  console.log("patient details", patientdeets);
   const handleMarkAsCompleted = () => {
     dispatch(postMarkasCompleted(treatmentNo))
       .then((data) => {
@@ -106,35 +111,34 @@ console.log("patient details", patientdeets);
             >
               More Details
             </Button>
-            {(role === "Doctor" || role === "Psychology") &&
-              patient?.Status !== "Completed" && (
-                <PopoverMenu
-                  content={
-                    <CardMenu
-                      items={[
-                        {
-                          key: "0",
-                          children: "Finalize",
-                          onClick: handleMarkAsCompleted,
-                          loading: markasCompleteLoading,
-                          disabled: markasCompleteLoading,
-                        },
-                        {
-                          key: "1",
-                          onClick: () => setPatientReviewOpen(true),
-                          children: "Request Patient Review",
-                        },
-                      ]}
-                    />
-                  }
-                >
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<IoEllipsisVertical />}
-                  ></Button>
-                </PopoverMenu>
-              )}
+            {canSeePatientReview && patient?.Status !== "Completed" && (
+              <PopoverMenu
+                content={
+                  <CardMenu
+                    items={[
+                      {
+                        key: "0",
+                        children: "Finalize",
+                        onClick: handleMarkAsCompleted,
+                        loading: markasCompleteLoading,
+                        disabled: markasCompleteLoading,
+                      },
+                      {
+                        key: "1",
+                        onClick: () => setPatientReviewOpen(true),
+                        children: "Request Patient Review",
+                      },
+                    ]}
+                  />
+                }
+              >
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<IoEllipsisVertical />}
+                ></Button>
+              </PopoverMenu>
+            )}
           </div>
         </div>
       </Card>
@@ -143,9 +147,11 @@ console.log("patient details", patientdeets);
 };
 
 const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
-  const [form] = Form.useForm();
+  const { user } = useAuth();
   const dispatch = useDispatch();
-  const staffNo = useAuth()?.userData.no;
+
+  const [form] = Form.useForm();
+  const staffNo = user?.staffNo;
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -190,7 +196,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
     const matchingDoctors = doctorsPayload.filter(
-      (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase()
+      (doctor) => doctor?.Specialization.toUpperCase() === value.toUpperCase()
     );
     setFilteredDoctors(matchingDoctors);
   };
@@ -285,7 +291,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   );
 };
 
-const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
+const MoreDeailsDrawer = ({ open, setOpen, values, activeVisitNo }) => {
   return (
     <Drawer
       closable
@@ -297,22 +303,21 @@ const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
       width={850}
     >
       <>
-      <div
-  style={{
-    padding: "8px",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "10px",
-    backgroundColor: "#f9f9f9", // light background for contrast
-  }}
->
-  {values.map((patientInfo, index) => (
-    <RenderPatientDetails key={index} component={patientInfo} />
-  ))}
-</div>
+        <div
+          style={{
+            padding: "8px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "10px",
+            backgroundColor: "#f9f9f9", // light background for contrast
+          }}
+        >
+          {values.map((patientInfo, index) => (
+            <RenderPatientDetails key={index} component={patientInfo} />
+          ))}
+        </div>
 
-<PatientCharges activeVisitNo={activeVisitNo} />
-
+        <PatientCharges activeVisitNo={activeVisitNo} />
       </>
     </Drawer>
   );
@@ -405,7 +410,7 @@ const AvatarComponent = ({ values }) => {
           level={5}
           style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
         >
-          {name.toUpperCase()}
+          {name?.toUpperCase()}
         </Title>
         <Text style={{ fontSize: "13px", color: "gray", fontWeight: "bold" }}>
           {ageLabel}: {age}
@@ -416,7 +421,7 @@ const AvatarComponent = ({ values }) => {
 };
 
 const InfoRow = ({ label, value }) => (
- // <div style={{ display: "flex", justifyContent: "space-between" }}>
+  // <div style={{ display: "flex", justifyContent: "space-between" }}>
   <div
     style={{
       display: "flex",
@@ -433,16 +438,15 @@ const InfoRow = ({ label, value }) => (
   </div>
 );
 
-
 const InfoCard = ({ InfoRow }) => (
-  <Row gutter={16} style={{ marginTop: '20px' }}>
+  <Row gutter={16} style={{ marginTop: "20px" }}>
     <Col xs={24} sm={24} md={12} lg={12} xl={12}>
       <Card
         style={{
-          padding: '16px 24px',
-          borderTop: '3px solid #0f5689',
+          padding: "16px 24px",
+          borderTop: "3px solid #0f5689",
           boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-          minHeight: '260px',
+          minHeight: "260px",
         }}
       >
         {patientPrimaryInfo.map(({ label, value }, index) => (

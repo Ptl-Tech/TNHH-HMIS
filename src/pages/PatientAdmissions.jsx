@@ -121,7 +121,7 @@ const PatientAdmissions = () => {
   };
 
   const handleNewPatient = () => {
-    navigate("/Nurse/Patient-list"); // Redirect to new patient registration page
+    navigate("/Dashboard/Patient-list"); // Redirect to new patient registration page
   };
 
   // Function to download data as Excel

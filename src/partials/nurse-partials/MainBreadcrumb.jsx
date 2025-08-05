@@ -16,7 +16,7 @@ const MainBreadcrumb = ({ pathSegments }) => {
         }}
         >
         <Breadcrumb.Item>
-        <Link to="/Nurse/Dashboard" style={{ color: "#67336d", textDecoration: "none" }}>
+        <Link to="/Dashboard/Dashboard" style={{ color: "#67336d", textDecoration: "none" }}>
             <Space>
                 <HomeOutlined />
                 Home

@@ -1,7 +1,7 @@
 import apiHeaderConfig from "../../configHelpers";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 export const GET_PATIENT_VISIT_BY_NO_REQUEST = "GET_PATIENT_VISIT_BY_NO_REQUEST";
 export const GET_PATIENT_VISIT_BY_NO_SUCCESS = "GET_PATIENT_VISIT_BY_NO_SUCCESS";
@@ -28,7 +28,7 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
 
   try {
     const config = apiHeaderConfig(getState);
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
     
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyAppointmentHeader&isList=false&query=$filter=AppointmentNo eq '${visitNo}'`,
@@ -40,10 +40,10 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
       const dataArray = Array.isArray(data) ? data : [data] || []; // Ensure it's an array
       const filteredData = dataArray.filter((item) => item?.Branch === branchCode);
 
-      if (filteredData.length > 0) {
+      if (dataArray.length > 0) {
         dispatch({
           type: GET_PATIENT_VISIT_BY_NO_SUCCESS,
-          payload: filteredData[0], // Store the first matching record
+          payload: dataArray[0],
         });
       } else {
         dispatch({ type: GET_PATIENT_VISIT_BY_NO_FAIL, payload: "No records found" });

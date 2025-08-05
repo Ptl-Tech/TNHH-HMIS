@@ -1,7 +1,7 @@
 import { message } from "antd";
 import axios from "axios";
 
-const API = "https://chiromo.potestastechnologies.net:8085/";
+const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action types
 export const POST_PATIENT_HISTORY_NOTES_REQUEST = "POST_PATIENT_HISTORY_NOTES_REQUEST";
@@ -17,17 +17,17 @@ export const postPatientHistoryNotes = (historyNotes) => async (dispatch, getSta
 
     // Retrieve user information and branch code
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Request configuration
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Staff number from user data
-        sessionToken: userInfo.userData.portalSessionToken, // Session token
-        branchCode: branchCode, // Branch code from localStorage
+        staffNo: user.staffNo, // Staff number from user data
+         // Session token
+        branchCode: branchCode, 
       },
     };
 
