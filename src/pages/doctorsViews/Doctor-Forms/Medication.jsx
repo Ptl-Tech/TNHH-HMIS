@@ -38,30 +38,33 @@ const Medication = () => {
 
   return (
     <div>
-      {canCreatePrescriptionRequest &&
-        patientDetails?.Status !== "Completed" && (
-          <Tabs
-            type="card"
-            items={[
-              {
-                key: "createPrescriptions",
-                label: "Create Prescription",
-                children: <PrescriptionForm />,
-              },
-              {
-                key: "sentPrescriptions",
-                label: "Sent Prescriptions",
-                children: (
-                  <PrescriptionTable
-                    columns={pharmacyTable}
-                    filteredPrescriptions={prescriptions}
-                    loadingPrescriptions={loadingPrescriptions}
-                  />
-                ),
-              },
-            ]}
-          />
-        )}
+      {patientDetails?.Status !== "Completed" && (
+        <Tabs
+          type="card"
+          items={[
+            ...(canCreatePrescriptionRequest
+              ? [
+                  {
+                    key: "createPrescriptions",
+                    label: "Create Prescription",
+                    children: <PrescriptionForm />,
+                  },
+                ]
+              : []),
+            {
+              key: "sentPrescriptions",
+              label: "Sent Prescriptions",
+              children: (
+                <PrescriptionTable
+                  columns={pharmacyTable}
+                  filteredPrescriptions={prescriptions}
+                  loadingPrescriptions={loadingPrescriptions}
+                />
+              ),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };
