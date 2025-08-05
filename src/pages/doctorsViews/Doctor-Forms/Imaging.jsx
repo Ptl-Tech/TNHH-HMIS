@@ -37,12 +37,12 @@ const Imaging = () => {
   const ability = useAbility();
   const location = useLocation();
 
+  const queryParams = new URLSearchParams(location.search);
   const canCreateImagingRequest = ability.can("create", "imagingRequest");
 
   const admissionNo = queryParams.get("AdmNo");
   const treatmentNo = queryParams.get("TreatmentNo");
   const patientDetails = location.state?.patientDetails;
-  const queryParams = new URLSearchParams(location.search);
 
   const dispatch = useDispatch();
   const [showForm, setShowForm] = useState(false);

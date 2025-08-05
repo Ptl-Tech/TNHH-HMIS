@@ -42,6 +42,8 @@ const NursingNotes = () => {
     (state) => state.getNurseAdmissionNotes
   );
 
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+
   useEffect(() => {
     dispatch(getNurseAdmissionNotesSlice(patientDetails?.Admission_No));
   }, [dispatch, patientDetails?.Admission_No]);

@@ -62,7 +62,7 @@ const DoctorVisits = () => {
     ) {
       message.success("Patient checked in to the Consultation Room ");
       navigate(
-        `Dashboard/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
+        `/Dashboard/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
         {
           state: {
             patientDetails: currentRecord,
@@ -83,10 +83,13 @@ const DoctorVisits = () => {
 
   const isDoctorOrPsychology = (doctorId) =>
     ability.can("read", subject("ownVisits", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
   const filterConsultations = (status) =>
     treatmentList?.filter(
-      (item) => isDoctorOrPsychology(item.DoctorID) && item.Status === status
+      (item) =>
+        (isDoctorOrPsychology(item.DoctorID) || canReadOutPatients) &&
+        item.Status === status
     );
 
   const openDoctorVisitList = filterConsultations("New");

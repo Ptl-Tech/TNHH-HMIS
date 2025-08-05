@@ -258,13 +258,11 @@ const AdmitPatients = () => {
           title="Patient Admissions List"
           icon={<InboxOutlined />}
         />
-
         <FilterInpatientList
           setSearchName={setSearchName}
           setSearchPatientNumber={setSearchPatientNumber}
           setSearchAdmissionNumber={setSearchAdmissionNumber}
         />
-
         <Card className="admit-patient-card-container">
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Space className="admit-patient-button-container">

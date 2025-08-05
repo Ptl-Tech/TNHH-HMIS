@@ -42,6 +42,7 @@ const CreateVisitDrawer = ({
   // onUpdateVisit,
 }) => {
   const { user } = useAuth();
+const [form] = Form.useForm();
   const dispatch = useDispatch();
   const location = useLocation();
 

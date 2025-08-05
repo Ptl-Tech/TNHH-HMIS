@@ -7,9 +7,7 @@ import TreatmentSheetFormData from "../forms/nurse-forms/TreatmentSheetFormData"
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getTreatmentSheetLineSlice } from "../../../actions/Doc-actions/QyPrescriptionLinesSlice";
-import InpatientCardInfo from "../InpatientCardInfo";
-import { is } from "immutable";
-// import useAuth from "../../../hooks/useAuth";
+import { useAuth } from "../../../hooks/auth";
 
 const TreatmentsSheet = ({ patientDetails }) => {
   const [form] = Form.useForm();
@@ -20,7 +18,7 @@ const TreatmentsSheet = ({ patientDetails }) => {
   const admissionNo = new URLSearchParams(location.search).get("AdmNo");
   const dispatch = useDispatch();
   const { user } = useAuth();
-  const userRole = user.role;
+  const userRole = user?.role;
 
   const { loading: loadingTreatmentSheet, data: treatmentSheet } = useSelector(
     (state) => state.getTreatmentSheet || {}

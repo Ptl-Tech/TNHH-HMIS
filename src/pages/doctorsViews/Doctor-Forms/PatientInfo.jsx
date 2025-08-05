@@ -196,7 +196,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
     const matchingDoctors = doctorsPayload.filter(
-      (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase()
+      (doctor) => doctor?.Specialization.toUpperCase() === value.toUpperCase()
     );
     setFilteredDoctors(matchingDoctors);
   };
@@ -410,7 +410,7 @@ const AvatarComponent = ({ values }) => {
           level={5}
           style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
         >
-          {name.toUpperCase()}
+          {name?.toUpperCase()}
         </Title>
         <Text style={{ fontSize: "13px", color: "gray", fontWeight: "bold" }}>
           {ageLabel}: {age}

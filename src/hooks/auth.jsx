@@ -5,7 +5,8 @@ import { getUserDetails } from "../actions/getUserDetails";
 
 const AuthContext = createContext(null);
 
-export default function AuthProvider({ children }) {
+export default function AuthProvider(props) {
+  const { children } = props || {};
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 

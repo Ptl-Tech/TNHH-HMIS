@@ -75,7 +75,7 @@ const PastEncounters = () => {
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      `Dashboard/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
+      `/Dashboard/Consultation-List/Patient?TreatmentNo=${treatmentNo}&PatientNo=${record.PatientNo}`,
       {
         state: {
           patientDetails: record,

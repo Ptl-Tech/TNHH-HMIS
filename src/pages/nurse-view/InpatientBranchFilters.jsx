@@ -37,7 +37,7 @@ const InpatientBranchFilters = () => {
             renderItem={(item) => (
               <List.Item
                 onClick={() =>
-                  navigate(`/Nurse/Inpatient/Inpatient-List/${item.Code}`, {
+                  navigate(`/Dashboard/Inpatient/Inpatient-List/${item.Code}`, {
                     state: { filterParam: item.Code },
                   })
                 }

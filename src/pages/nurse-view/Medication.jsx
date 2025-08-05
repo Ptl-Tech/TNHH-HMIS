@@ -16,7 +16,7 @@ const Medication = ({ patientDetails }) => {
   const [activeItem, setActiveItem] = useState("Prescription");
   const [selectedItem, setSelectedItem] = useState(<InpatientMedication />);
   const { user } = useAuth();
-  const userRole = user.role;
+  const userRole = user?.role;
 
   const handleOnClick = (item) => {
     setActiveItem(item.label);

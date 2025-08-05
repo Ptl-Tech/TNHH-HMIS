@@ -42,13 +42,15 @@ export default function CloseList() {
   // TODO: filter the record by own id
   const canReadOwnRecords = (doctorId) =>
     ability.can("read", subject("ownDoctorVisitRecords", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
   console.log({ treatmentList });
 
   const filterConsultations = (status) => {
     return treatmentList?.filter((item) => {
       const matchesStatus = item.Status === status;
-      const matchesDoctor = canReadOwnRecords(item.DoctorID);
+      const matchesDoctor =
+        canReadOwnRecords(item.DoctorID) || canReadOutPatients;
       return matchesStatus && matchesDoctor;
     });
   };
@@ -97,7 +99,7 @@ export default function CloseList() {
 
   const handleNavigate = (record, treatmentNo) => {
     navigate(
-      `Dashboard/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
+      `/Dashboard/Consultation-List/Patient?PatientNo=${record.PatientNo}&TreatmentNo=${treatmentNo}`,
       {
         state: {
           patientNo: record.PatientNo,

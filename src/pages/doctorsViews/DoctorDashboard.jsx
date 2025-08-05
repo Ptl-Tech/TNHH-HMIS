@@ -53,10 +53,13 @@ const DoctorDashboard = () => {
 
   const canSeeOwnVisitsOnly = (doctorId) =>
     ability.can("read", subject("ownVisits", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
   const filterVisits = (status) =>
     treatmentList?.filter(
-      (item) => canSeeOwnVisitsOnly(item.DoctorID) && item.Status === status
+      (item) =>
+        (canSeeOwnVisitsOnly(item.DoctorID) || canReadOutPatients) &&
+        item.Status === status
     );
 
   console.log({ filterVisits: filterVisits("Completed") });
@@ -109,7 +112,7 @@ const DoctorDashboard = () => {
       icon: <SafetyOutlined />,
       color: "#000",
       backgroundColor: "#ac8342",
-      link: "Dashboard/PendingConsultationList",
+      link: "/Dashboard/PendingConsultationList",
     },
     {
       title: "Closed Consultations",
@@ -118,7 +121,7 @@ const DoctorDashboard = () => {
       icon: <UserOutlined />,
       color: "#000",
       backgroundColor: "#5c85d6",
-      link: "Dashboard/ClosedConsultationList",
+      link: "/Dashboard/ClosedConsultationList",
     },
     {
       title: "Inpatients List",
@@ -127,7 +130,7 @@ const DoctorDashboard = () => {
       icon: <UserAddOutlined />,
       color: "#000",
       backgroundColor: "#b0afaf",
-      link: "Dashboard/Inpatient",
+      link: "/Dashboard/Inpatient",
     },
   ];
 

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
 
+import { subject } from "@casl/ability";
 import { useAbility } from "../../hooks/casl.jsx";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
@@ -12,12 +13,14 @@ import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientLi
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
-import { subject } from "@casl/ability";
+import { useAuth } from "../../hooks/auth.jsx";
 
 const Inpatient = () => {
+  const user = useAuth();
   const ability = useAbility();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
@@ -35,8 +38,6 @@ const Inpatient = () => {
   }, [currentInpatientError]);
 
   const handleNavigate = (record) => {
-    console.log({ record });
-
     dispatch(currentInpatient(record));
     navigate(
       `/Dashboard/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
@@ -70,13 +71,12 @@ const Inpatient = () => {
 
   const canReadOwnInpatients = (doctorId) =>
     ability.can("read", subject("ownInPatients", { doctorId }));
-
-  console.log({ combinedPatients });
+  const canReadAllInpatients = ability.can("read", "inPatients");
 
   // filter the patient based on the doctor
   const filterPatientBasedWithDoctor = useMemo(() => {
-    return combinedPatients?.filter((patient) =>
-      canReadOwnInpatients(patient.Doctor)
+    return combinedPatients?.filter(
+      (patient) => canReadOwnInpatients(patient.Doctor) || canReadAllInpatients
     );
   }, [combinedPatients, ability]);
 
