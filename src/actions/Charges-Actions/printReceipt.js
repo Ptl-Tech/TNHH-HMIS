@@ -17,11 +17,11 @@ export const printReceipt = (invoiceData) => async (dispatch, getState) => {
 
     const config = apiHeaderConfig(getState);
 
-    //get staffNo from userInfo
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    invoiceData.staffNo = userInfo?.userData?.staffNo;
+    
+    invoiceData.staffNo = user?.staffNo;
 
     const response = await axios.post(
       `${API_URL}/Reports/ReceiptReport`,

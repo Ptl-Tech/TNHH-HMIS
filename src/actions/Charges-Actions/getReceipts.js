@@ -18,12 +18,12 @@ export const getReceipts = () => async (dispatch, getState) => {
     dispatch({ type: REQUEST_RECEIPTS_LIST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Handle missing userInfo or branchCode
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
       window.location.href = "/login";
       return;
     }
@@ -31,8 +31,8 @@ export const getReceipts = () => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -61,12 +61,12 @@ export const getReceiptsByPatientNo =
       dispatch({ type: REQUEST_RECEIPTS_LIST_BY_PATIENT_NO });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
-      // Handle missing userInfo or branchCode
-      if (!userInfo || !branchCode) {
+      
+      if (!user|| !branchCode) {
         window.location.href = "/login";
         return;
       }
@@ -74,8 +74,8 @@ export const getReceiptsByPatientNo =
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };

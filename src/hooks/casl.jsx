@@ -25,8 +25,6 @@ export const AbilityProvider = ({ children }) => {
 
   useEffect(() => {
     if (!loading) {
-      console.log({ user, isTrue: user === null });
-
       if (user === null && !isInAuthPages()) return navigate("/login");
       if (user && isInAuthPages()) return navigate("/Dashboard");
     }

@@ -12,18 +12,18 @@ export const postGenerateInvoice = (patientNo) => async (dispatch, getState) => 
   try {
     dispatch({ type: POST_GENERATE_INVOICE_REQUEST });
 
-    // Get user information and branch code from state and localStorage
+   
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Set headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

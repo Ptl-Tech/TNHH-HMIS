@@ -17,16 +17,16 @@ export const getReceiptHeaders= () => async (dispatch, getState) => {
       dispatch({ type: GET_RECEIPT_HEADERS_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
   
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };

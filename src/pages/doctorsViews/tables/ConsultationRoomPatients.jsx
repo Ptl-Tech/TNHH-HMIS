@@ -96,6 +96,7 @@ const ConsultationRoomPatients = () => {
 
   return (
     <div style={{ padding: "10px 10px" }}>
+     
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}

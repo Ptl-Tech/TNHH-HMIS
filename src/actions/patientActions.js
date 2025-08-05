@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   PATIENT_REGISTER_FAIL,
   PATIENT_REGISTER_REQUEST,
@@ -31,36 +31,36 @@ import {
   APPMNT_LIST_REQUEST,
   APPMNT_LIST_SUCCESS,
   APPMNT_LIST_FAIL,
-} from '../constants/patientConstants';
-export const CREATE_WALK_IN_PATIENT_REQUEST = 'CREATE_WALK_IN_PATIENT_REQUEST';
-export const CREATE_WALK_IN_PATIENT_SUCCESS = 'CREATE_WALK_IN_PATIENT_SUCCESS';
-export const CREATE_WALK_IN_PATIENT_FAIL = 'CREATE_WALK_IN_PATIENT_FAIL';
-export const CREATE_WALK_IN_PATIENT_RESET = 'CREATE_WALK_IN_PATIENT_RESET';
+} from "../constants/patientConstants";
+export const CREATE_WALK_IN_PATIENT_REQUEST = "CREATE_WALK_IN_PATIENT_REQUEST";
+export const CREATE_WALK_IN_PATIENT_SUCCESS = "CREATE_WALK_IN_PATIENT_SUCCESS";
+export const CREATE_WALK_IN_PATIENT_FAIL = "CREATE_WALK_IN_PATIENT_FAIL";
+export const CREATE_WALK_IN_PATIENT_RESET = "CREATE_WALK_IN_PATIENT_RESET";
 
 export const DISPATCH_WALK_IN_PATIENT_LAB_REQUEST =
-  'DISPATCH_WALK_IN_PATIENT_LAB_REQUEST';
+  "DISPATCH_WALK_IN_PATIENT_LAB_REQUEST";
 export const DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS =
-  'DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS';
+  "DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS";
 export const DISPATCH_WALK_IN_PATIENT_LAB_FAIL =
-  'DISPATCH_WALK_IN_PATIENT_LAB_FAIL';
+  "DISPATCH_WALK_IN_PATIENT_LAB_FAIL";
 export const DISPATCH_WALK_IN_PATIENT_LAB_RESET =
-  'DISPATCH_WALK_IN_PATIENT_LAB_RESET';
+  "DISPATCH_WALK_IN_PATIENT_LAB_RESET";
 
 export const DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST =
-  'DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST';
+  "DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST";
 export const DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS =
-  'DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS';
+  "DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS";
 export const DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL =
-  'DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL';
+  "DISPATCH_WALK_IN_PATIENT_PHARMACY_FAIL";
 export const DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET =
-  'DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET';
+  "DISPATCH_WALK_IN_PATIENT_PHARMACY_RESET";
 
-export const PATIENT_BY_ID_REQUEST = 'PATIENT_BY_ID_REQUEST';
-export const PATIENT_BY_ID_SUCCESS = 'PATIENT_BY_ID_SUCCESS';
-export const PATIENT_BY_ID_FAIL = 'PATIENT_BY_ID_FAIL';
-export const PATIENT_BY_ID_RESET = 'PATIENT_BY_ID_RESET';
+export const PATIENT_BY_ID_REQUEST = "PATIENT_BY_ID_REQUEST";
+export const PATIENT_BY_ID_SUCCESS = "PATIENT_BY_ID_SUCCESS";
+export const PATIENT_BY_ID_FAIL = "PATIENT_BY_ID_FAIL";
+export const PATIENT_BY_ID_RESET = "PATIENT_BY_ID_RESET";
 
-import { message } from 'antd';
+import { message } from "antd";
 
 const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
@@ -69,22 +69,22 @@ export const createPatient = (patient) => async (dispatch, getState) => {
     dispatch({ type: PATIENT_REGISTER_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
     const response = await axios.post(
       `${API}reception/PatientRegistration`,
       patient,
-      config,
+      config
     );
 
     // Extract response details
@@ -95,7 +95,7 @@ export const createPatient = (patient) => async (dispatch, getState) => {
 
     setTimeout(() => {
       dispatch({ type: PATIENT_REGISTER_SUCCESS, payload: responseData });
-      console.log('Dispatched Payload:', responseData);
+      console.log("Dispatched Payload:", responseData);
     }, 2000);
 
     // Return patient ID for further use
@@ -115,15 +115,15 @@ export const createWalkInPatient = (patient) => async (dispatch, getState) => {
     dispatch({ type: CREATE_WALK_IN_PATIENT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -131,7 +131,7 @@ export const createWalkInPatient = (patient) => async (dispatch, getState) => {
     const response = await axios.post(
       `${API}reception/WalkinPatientRegistration `,
       patient,
-      config,
+      config
     );
 
     // Extract response details
@@ -142,7 +142,7 @@ export const createWalkInPatient = (patient) => async (dispatch, getState) => {
 
     setTimeout(() => {
       dispatch({ type: CREATE_WALK_IN_PATIENT_SUCCESS, payload: responseData });
-      console.log('Dispatched Payload:', responseData);
+      console.log("Dispatched Payload:", responseData);
     }, 2000);
 
     // Return patient ID for further use
@@ -162,15 +162,15 @@ export const dispatchWalkInLab = (patient) => async (dispatch, getState) => {
     dispatch({ type: DISPATCH_WALK_IN_PATIENT_LAB_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -178,7 +178,7 @@ export const dispatchWalkInLab = (patient) => async (dispatch, getState) => {
     const response = await axios.post(
       `${API}reception/PatientRegistration`,
       patient,
-      config,
+      config
     );
 
     // Extract response details
@@ -192,7 +192,7 @@ export const dispatchWalkInLab = (patient) => async (dispatch, getState) => {
         type: DISPATCH_WALK_IN_PATIENT_LAB_SUCCESS,
         payload: responseData,
       });
-      console.log('Dispatched Payload:', responseData);
+      console.log("Dispatched Payload:", responseData);
     }, 2000);
 
     // Return patient ID for further use
@@ -213,15 +213,15 @@ export const dispatchWalkInPharmacy =
       dispatch({ type: DISPATCH_WALK_IN_PATIENT_PHARMACY_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user },
       } = getState();
-      const branchCode = localStorage.getItem('branchCode');
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
-          'Content-Type': 'application/json',
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          "Content-Type": "application/json",
+          staffNo: user.staffNo, // Add staffNo as a custom header
+          // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };
@@ -229,7 +229,7 @@ export const dispatchWalkInPharmacy =
       const response = await axios.post(
         `${API}reception/PatientRegistration`,
         patient,
-        config,
+        config
       );
 
       // Extract response details
@@ -243,7 +243,7 @@ export const dispatchWalkInPharmacy =
           type: DISPATCH_WALK_IN_PATIENT_PHARMACY_SUCCESS,
           payload: responseData,
         });
-        console.log('Dispatched Payload:', responseData);
+        console.log("Dispatched Payload:", responseData);
       }, 2000);
 
       // Return patient ID for further use
@@ -265,16 +265,16 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
     dispatch({ type: TRIAGE_VISIT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem('branchCode');
+
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -282,7 +282,7 @@ export const createTriageVisit = (visitData) => async (dispatch, getState) => {
     const { data } = await axios.post(
       `${API}reception/CreateVisit`,
       visitData,
-      config,
+      config
     );
 
     console.log({ data });
@@ -314,15 +314,15 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
     dispatch({ type: POST_TRIAGE_VISIT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        "Content-Type": "application/json",
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };
@@ -330,7 +330,7 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
     const response = await axios.post(
       `${API}reception/DispatchToTriage`,
       visitData,
-      config,
+      config
     );
 
     // Extract response details
@@ -341,11 +341,11 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
 
     message.success(
       `Patient dispatched successfully! Observation No: ${responseData.msg}`,
-      5,
+      5
     );
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
-    return {type: POST_TRIAGE_VISIT_SUCCESS, payload: response};
+    return { type: POST_TRIAGE_VISIT_SUCCESS, payload: response };
   } catch (error) {
     // Extract error message from different possible sources
     const errorMessage =
@@ -353,7 +353,7 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
-      'Failed to dispatch patient!';
+      "Failed to dispatch patient!";
 
     message.error(errorMessage, 5);
 
@@ -370,43 +370,39 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
 };
 
 export const listPatients =
-  (parameterName = '', parameterValue = '') =>
+  (parameterName = "", parameterValue = "") =>
   async (dispatch, getState) => {
     const newParameterValue =
-      typeof parameterValue === 'boolean'
+      typeof parameterValue === "boolean"
         ? parameterValue
         : `'${parameterValue}'`;
 
     const filters =
       parameterName && parameterValue
         ? `&query=$filter=${parameterName} eq ${newParameterValue}`
-        : '';
+        : "";
 
     try {
       dispatch({ type: PATIENT_LIST_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user },
       } = getState();
 
-      // Fetch branchCode from localStorage
-      const branchCode = localStorage.getItem('branchCode');
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
-          'Content-Type': 'application/json',
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-          branchCode: branchCode, // Include branchCode in headers
+          "Content-Type": "application/json",
+          staffNo: user.staffNo,
+          branchCode: branchCode,
         },
       };
 
       const { data } = await axios.get(
         `${API}data/odatafilter?webservice=QyPatients${filters}`,
-        config,
+        config
       );
-
-    
 
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } catch (error) {
@@ -419,29 +415,28 @@ export const appmntList = () => async (dispatch, getState) => {
     dispatch({ type: APPMNT_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode, // Include branchCode in headers
       },
     };
 
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyAppointmentHeader`,
-      config,
+      config
     );
 
     // Filter the patients by branchCode matching GlobalDimension1Code
     const filteredData = data.filter(
-      (patient) => patient.Branch === branchCode,
+      (patient) => patient.Branch === branchCode
     );
 
     dispatch({ type: APPMNT_LIST_SUCCESS, payload: filteredData });
@@ -457,15 +452,15 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
     dispatch({ type: CONVERT_TO_PATIENT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -473,7 +468,7 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
     const { data } = await axios.post(
       `${API}reception/ConvertVisitorToPatient `,
       { visitorNo: visitorNo },
-      config,
+      config
     );
 
     //  // Extract response details
@@ -497,23 +492,23 @@ export const activePatients = () => async (dispatch, getState) => {
     dispatch({ type: ACTIVE_lIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem('branchCode');
+
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
 
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyAppointmentHeader`,
-      config,
+      config
     );
 
     dispatch({ type: ACTIVE_LIST_SUCCESS, payload: data });
@@ -527,27 +522,23 @@ export const getpatientById = (idNumber) => async (dispatch, getState) => {
     dispatch({ type: PATIENT_BY_ID_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    if (!userInfo || !userInfo.userData) {
-      throw new Error('User information not available.');
-    }
-
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
 
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=IDNumber eq '${idNumber}'`,
-      config,
+      config
     );
 
     if (data && Object.keys(data).length > 0) {
@@ -556,7 +547,7 @@ export const getpatientById = (idNumber) => async (dispatch, getState) => {
     } else {
       dispatch({
         type: PATIENT_BY_ID_FAIL,
-        payload: 'Registered visitor not found',
+        payload: "Registered visitor not found",
       });
       return null;
     }
@@ -564,7 +555,7 @@ export const getpatientById = (idNumber) => async (dispatch, getState) => {
     const errorMessage =
       error.response?.data?.message ||
       error.message ||
-      'An error occurred while fetching visitor data.';
+      "An error occurred while fetching visitor data.";
     dispatch({ type: PATIENT_BY_ID_FAIL, payload: errorMessage });
     return null;
   }
@@ -577,15 +568,15 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
     dispatch({ type: PATIENT_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem('branchCode');
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -593,14 +584,14 @@ export const getPatientByNo = (patientNo) => async (dispatch, getState) => {
     // Fetch patient details by patientNo
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyPatients&isList=false&query=$filter=PatientNo eq '${patientNo}'`,
-      config,
+      config
     );
 
     // Check if a patient was found
     if (data && Object.keys(data).length > 0) {
       dispatch({ type: PATIENT_LIST_SUCCESS, payload: data });
     } else {
-      dispatch({ type: PATIENT_LIST_FAIL, payload: 'Patient not found' });
+      dispatch({ type: PATIENT_LIST_FAIL, payload: "Patient not found" });
       //   message.warning('No patient found with the provided patient number.', 5);
     }
   } catch (error) {
@@ -614,13 +605,12 @@ export const triageList = () => async (dispatch, getState) => {
     dispatch({ type: TRIAGE_VISIT_LIST_REQUEST });
 
     const {
-      userLogin: { userInfo },
+      auth: { user },
     } = getState();
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${userInfo.accessToken}`,
+        "Content-Type": "application/json",
       },
     };
 
@@ -640,20 +630,19 @@ export const postDoctorTreatment =
     doctorNotes,
     diagnosis,
     recommendedTreatment,
-    additionalNotes,
+    additionalNotes
   ) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: POST_DOCTOR_TREATMENT_REQUEST });
 
       const {
-        userLogin: { userInfo },
+        auth: { user },
       } = getState();
 
       const config = {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.accessToken}`,
+          "Content-Type": "application/json",
         },
       };
 
@@ -669,7 +658,7 @@ export const postDoctorTreatment =
           recommendedTreatment,
           additionalNotes,
         },
-        config,
+        config
       );
 
       dispatch({ type: POST_DOCTOR_TREATMENT_SUCCESS, payload: data });
@@ -687,13 +676,12 @@ export const postPatientVitals =
       dispatch({ type: POST_PATIENT_VITALS_REQUEST });
 
       const {
-        userLogin: { userInfo },
+        auth: { user },
       } = getState();
 
       const config = {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.accessToken}`,
+          "Content-Type": "application/json",
         },
       };
 
@@ -701,7 +689,7 @@ export const postPatientVitals =
       const { data } = await axios.post(
         `${API}patient/post-patient-vitals`,
         { triageId, ...vitals },
-        config,
+        config
       );
 
       dispatch({ type: POST_PATIENT_VITALS_SUCCESS, payload: data });

@@ -28,7 +28,7 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
 
   try {
     const config = apiHeaderConfig(getState);
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
     
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyAppointmentHeader&isList=false&query=$filter=AppointmentNo eq '${visitNo}'`,

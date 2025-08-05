@@ -18,11 +18,11 @@ export const postInterimInvoice =
 
       const config = apiHeaderConfig(getState);
 
-      //get staffNo from userInfo
+      
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      invoiceData.staffNo = userInfo?.userData?.no;
+      invoiceData.staffNo = user.staffNo;
 
       const postDataInvoice = JSON.stringify(invoiceData);
       const response = await axios.post(

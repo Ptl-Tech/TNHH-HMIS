@@ -1,6 +1,6 @@
 const apiHeaderConfig = (getState) => {
   const {
-    otpVerify: { user },
+    auth: { user },
   } = getState();
 
   return {

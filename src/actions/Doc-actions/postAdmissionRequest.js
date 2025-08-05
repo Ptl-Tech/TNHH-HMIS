@@ -20,23 +20,23 @@ export const saveAdmissionDetails = (Admission) => async (dispatch, getState) =>
     dispatch({ type: SAVE_ADMISSION_DETAILS_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
 
     const admissionData = {
       ...Admission,
-      staffNo: userInfo.userData.no,
+      staffNo: user.staffNo,
     };
 
     const response = await axios.post(`${API}Doctor/PatientAdmission`, admissionData, config);
@@ -81,16 +81,16 @@ export const requestPatientAdmission = (treatmentId) => async (dispatch, getStat
 
     // Get user info and branch code from state and local storage
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Configure headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Custom header with staff number
-        sessionToken: userInfo.userData.portalSessionToken, // Bearer token for session
+        staffNo: user.staffNo, // Custom header with staff number
+         // Bearer token for session
         branchCode: branchCode, // Branch code from local storage
       },
     };

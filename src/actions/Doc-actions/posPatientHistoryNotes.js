@@ -17,17 +17,17 @@ export const postPatientHistoryNotes = (historyNotes) => async (dispatch, getSta
 
     // Retrieve user information and branch code
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Request configuration
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Staff number from user data
-        sessionToken: userInfo.userData.portalSessionToken, // Session token
-        branchCode: branchCode, // Branch code from localStorage
+        staffNo: user.staffNo, // Staff number from user data
+         // Session token
+        branchCode: branchCode, 
       },
     };
 

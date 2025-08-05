@@ -13,12 +13,12 @@ export const getReceiptPage = (visitNo) => async (dispatch, getState) => {
     dispatch({ type: REQUEST_RECEIPT_PAGE });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-    // Handle missing userInfo or branchCode
-    if (!userInfo || !branchCode) {
+    
+    if (!user|| !branchCode) {
       const errorMsg = "User information or branch code is missing";
       dispatch({ type: REQUEST_RECEIPT_PAGE_FAIL, payload: errorMsg });
       message.error(errorMsg);
@@ -28,8 +28,8 @@ export const getReceiptPage = (visitNo) => async (dispatch, getState) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };

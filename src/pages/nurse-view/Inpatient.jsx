@@ -10,17 +10,17 @@ import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
+import { useAuth } from "../../hooks/auth.jsx";
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
-import { useAuth } from "../../hooks/auth.jsx";
 
 const Inpatient = () => {
-  const user = useAuth();
+  const { user } = useAuth();
   const ability = useAbility();
+  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
@@ -82,7 +82,9 @@ const Inpatient = () => {
 
   const filteredByStatus = useMemo(() => {
     const filteredByStatus = filterPatientBasedWithDoctor?.filter(
-      ({ Status }) => Status === "Admitted" || Status === "Discharge Pending"
+      ({ Status, Branch }) =>
+        (Status === "Admitted" || Status === "Discharge Pending") &&
+        (user.role == "NURSE" ? Branch == location.state.filterParam : true)
     );
 
     return filteredByStatus;

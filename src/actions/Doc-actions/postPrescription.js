@@ -42,15 +42,15 @@ export const postPrescriptionDetails =
       dispatch({ type: POST_PRESCRIPTION_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };
@@ -94,15 +94,15 @@ export const postInPatientPrescriptionDetails =
       dispatch({ type: POST_INPATIENT_PRESCRIPTION_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };
@@ -145,15 +145,15 @@ export const sendtoPharmacy = (treatmentId) => async (dispatch, getState) => {
     dispatch({ type: POST_PRESCRIPTION_TO_PHARMACY_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -194,15 +194,15 @@ export const InpatientSendToPharmacy =
       dispatch({ type: POST_INPATIENT_PRESCRIPTION_TO_PHARMACY_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          staffNo: user.staffNo, // Add staffNo as a custom header
+           // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };

@@ -14,22 +14,22 @@ export const postPsychologyRequestReviewSlice  = (radiologyRequest) => async (di
       dispatch({ type: POST_PSYCHOLOGY_REQUEST_REVIEW_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          staffNo: user.staffNo, // Add staffNo as a custom header
+           // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };
   
   const requestData = {
     ...radiologyRequest,
-    staffNo: userInfo.userData.no,
+    staffNo: user.staffNo,
   }
       const response = await axios.post(
         `${API}Doctor/PatientRadiology`,

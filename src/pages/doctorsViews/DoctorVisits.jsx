@@ -50,11 +50,9 @@ const DoctorVisits = () => {
   useEffect(() => {
     dispatch(getTriageWaitingList());
     dispatch(getOutPatientTreatmentList());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    console.log({ checkInPatient });
-
     if (
       checkInPatient?.status === "success" &&
       currentRecord &&
@@ -79,7 +77,6 @@ const DoctorVisits = () => {
       message.error("An error occurred, please try again");
     }
   }, [checkInError, checkInPatient]);
-  // console.log('consultation Room list', treatmentList);
 
   const isDoctorOrPsychology = (doctorId) =>
     ability.can("read", subject("ownVisits", { doctorId }));
@@ -135,7 +132,6 @@ const DoctorVisits = () => {
         activeConsultationList={activeConsultationList}
         closedConsultationList={closedConsultationList}
       />
-
       <FilterConsultationRoom
         setSearchName={setSearchName}
         setSearchVisitNumber={setSearchVisitNumber}

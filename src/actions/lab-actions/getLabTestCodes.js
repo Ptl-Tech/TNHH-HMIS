@@ -15,18 +15,18 @@ export const getLabTestCodes = () => async (dispatch, getState) => {
     dispatch({ type: GET_LAB_TEST_CODES_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem("branchCode") || "";
+    
+    const branchCode = user.branchCode || "";
 
     // Set up the request configuration with headers
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
+        staffNo: user.staffNo,
+       
         branchCode,
       },
     };

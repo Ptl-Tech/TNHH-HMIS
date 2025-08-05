@@ -16,16 +16,16 @@ export const getDoctorsNotesData =
       dispatch({ type: GET_DOCTOR_NOTES_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      // Fetch branchCode from localStorage
-      const branchCode = localStorage.getItem("branchCode");
+      
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          staffNo: user.staffNo, // Add staffNo as a custom header
+           // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };

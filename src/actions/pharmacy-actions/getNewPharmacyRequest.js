@@ -27,15 +27,15 @@ export const getNewPharmacyRequests =
       dispatch({ type: GET_NEW_PHARMACY_REQUESTS });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem('branchCode');
+      const branchCode = user.branchCode
 
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          staffNo: userInfo?.userData?.no,
-          sessionToken: userInfo?.userData?.portalSessionToken,
+          staffNo: user.staffNo,
+         
           branchCode: branchCode,
         },
       };

@@ -16,16 +16,16 @@ export const getPendingAdmissionsList = () => async (dispatch, getState) => {
 
     // Get user info and branch code from state and local storage
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     // Configure headers for the VERIFY
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no, // Custom header with staff number
-        sessionToken: userInfo?.userData?.portalSessionToken, // Bearer token for session
+        staffNo: user.staffNo, // Custom header with staff number
+        // Bearer token for session
         branchCode, // Branch code from local storage
       },
     };

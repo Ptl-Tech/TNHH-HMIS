@@ -34,8 +34,8 @@ const SuicidalForm = () => {
   );
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  const userInfo = useAuth();
-  const staffNo = userInfo?.staffNo;
+  const { user } = useAuth();
+  const staffNo = user?.staffNo;
 
   let formattedSffNo =
     staffNo.charAt(0).toUpperCase() + staffNo.slice(1).toLowerCase();

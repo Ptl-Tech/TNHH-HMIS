@@ -9,17 +9,21 @@ export const GET_BILLING_LIST_SUCCESS = "GET_BILLING_LIST_SUCCESS";
 export const GET_BILLING_LIST_FAIL = "GET_BILLING_LIST_FAIL";
 export const GET_BILLING_LIST_RESET = "GET_BILLING_LIST_RESET";
 
-
-export const GET_PATIENT_BILLING_LIST_REQUEST = "GET_PATIENT_BILLING_LIST_REQUEST";
-export const GET_PATIENT_BILLING_LIST_SUCCESS = "GET_PATIENT_BILLING_LIST_SUCCESS";
+export const GET_PATIENT_BILLING_LIST_REQUEST =
+  "GET_PATIENT_BILLING_LIST_REQUEST";
+export const GET_PATIENT_BILLING_LIST_SUCCESS =
+  "GET_PATIENT_BILLING_LIST_SUCCESS";
 export const GET_PATIENT_BILLING_LIST_FAIL = "GET_PATIENT_BILLING_LIST_FAIL";
 export const GET_PATIENT_BILLING_LIST_RESET = "GET_PATIENT_BILLING_LIST_RESET";
 
-export const GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST = "GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST";
-export const GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS = "GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS";
-export const GET_PAST_ENCOUNTER_BILLING_LIST_FAIL = "GET_PAST_ENCOUNTER_BILLING_LIST_FAIL";
-export const GET_PAST_ENCOUNTER_BILLING_LIST_RESET = "GET_PAST_ENCOUNTER_BILLING_LIST_RESET";
-
+export const GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST =
+  "GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST";
+export const GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS =
+  "GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS";
+export const GET_PAST_ENCOUNTER_BILLING_LIST_FAIL =
+  "GET_PAST_ENCOUNTER_BILLING_LIST_FAIL";
+export const GET_PAST_ENCOUNTER_BILLING_LIST_RESET =
+  "GET_PAST_ENCOUNTER_BILLING_LIST_RESET";
 
 // Action to fetch billing list
 export const getBillingList = () => async (dispatch, getState) => {
@@ -30,17 +34,17 @@ export const getBillingList = () => async (dispatch, getState) => {
     dispatch({ type: GET_BILLING_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    // Retrieve branch code from localStorage or fallback to empty string
-    const branchCode = localStorage.getItem("branchCode") || "";
+    
+    const branchCode = user.branchCode || "";
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
+        staffNo: user.staffNo,
+
         branchCode,
       },
     };
@@ -69,97 +73,97 @@ export const getBillingList = () => async (dispatch, getState) => {
   }
 };
 
-export const getPatientPastEncounterBilling=(patientNo)=>async(dispatch,getState)=>{
-  try {
-    dispatch({ type: GET_PATIENT_BILLING_LIST_REQUEST });
+export const getPatientPastEncounterBilling =
+  (patientNo) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: GET_PATIENT_BILLING_LIST_REQUEST });
 
-    const {
-      otpVerify: { userInfo },
-    } = getState();
+      const {
+        auth: { user },
+      } = getState();
 
-    // Retrieve branch code from localStorage or fallback to empty string
-    const branchCode = localStorage.getItem("branchCode") || "";
+      
+      const branchCode = user.branchCode || "";
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
-        branchCode,
-      },
-    };
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: user.staffNo,
 
-    const { data } = await axios.get(
-     `${API}data/odatafilter?webservice=QyPatientCharges&isList=true&query=$filter=Patient_No eq '${patientNo}'`,
-      config
-    );
+          branchCode,
+        },
+      };
 
-    dispatch({
-      type: GET_PATIENT_BILLING_LIST_SUCCESS,
-      payload: data,
-    });
+      const { data } = await axios.get(
+        `${API}data/odatafilter?webservice=QyPatientCharges&isList=true&query=$filter=Patient_No eq '${patientNo}'`,
+        config
+      );
 
-    return data; // Return only filtered data
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "An error occurred";
+      dispatch({
+        type: GET_PATIENT_BILLING_LIST_SUCCESS,
+        payload: data,
+      });
 
-    dispatch({
-      type: GET_PATIENT_BILLING_LIST_FAIL,
-      payload: errorMessage,
-    });
+      return data; // Return only filtered data
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
 
-    message.error(errorMessage, 5);
-    throw error;
-  }
-}
+      dispatch({
+        type: GET_PATIENT_BILLING_LIST_FAIL,
+        payload: errorMessage,
+      });
 
-
-export const getPastEncounterBillingList=(encounterId)=>async(dispatch,getState)=>{
-  try {
-    dispatch({ type: GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST });
-
-    const {
-      otpVerify: { userInfo },
-    } = getState();
-
-    // Retrieve branch code from localStorage or fallback to empty string
-    const branchCode = localStorage.getItem("branchCode") || "";
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
-        branchCode,
-      },
-    };
-
-    const { data } = await axios.get(
-     `${API}PastEncounters/GetPastEncounterBilling?encounterId=${encounterId}`,
-      config
-    );
-
-    const result={
-      salesInvoices: data?.salesInvoices || [],
-      receipts: data?.postedReceipts || [],
+      message.error(errorMessage, 5);
+      throw error;
     }
+  };
 
-    dispatch({
-      type: GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS,
-      payload: result,
-    });
+export const getPastEncounterBillingList =
+  (encounterId) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: GET_PAST_ENCOUNTER_BILLING_LIST_REQUEST });
 
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "An error occurred";
+      const {
+        auth: { user },
+      } = getState();
 
-    dispatch({
-      type: GET_PAST_ENCOUNTER_BILLING_LIST_FAIL,
-      payload: errorMessage,
-    });
+      
+      const branchCode = user.branchCode || "";
 
-    message.error(errorMessage, 5);
-    throw error;
-  }
-}
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: user.staffNo,
+
+          branchCode,
+        },
+      };
+
+      const { data } = await axios.get(
+        `${API}PastEncounters/GetPastEncounterBilling?encounterId=${encounterId}`,
+        config
+      );
+
+      const result = {
+        salesInvoices: data?.salesInvoices || [],
+        receipts: data?.postedReceipts || [],
+      };
+
+      dispatch({
+        type: GET_PAST_ENCOUNTER_BILLING_LIST_SUCCESS,
+        payload: result,
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || error.message || "An error occurred";
+
+      dispatch({
+        type: GET_PAST_ENCOUNTER_BILLING_LIST_FAIL,
+        payload: errorMessage,
+      });
+
+      message.error(errorMessage, 5);
+      throw error;
+    }
+  };
