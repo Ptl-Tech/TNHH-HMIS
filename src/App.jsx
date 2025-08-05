@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 
+import { useAuth } from "./hooks/auth";
 import { useAbility } from "./hooks/casl";
+import { axiosConfig } from "./utils/axiosHelpers";
 
 import Login from "./Auth/Login";
 import LabRoutes from "./Routes/LabRoutes";
@@ -15,7 +17,10 @@ import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PsychologyRoutes from "./Routes/PsychologyRoutes";
 
 function App() {
+  const { user } = useAuth();
   const ability = useAbility();
+
+  axiosConfig(user);
 
   return (
     <>

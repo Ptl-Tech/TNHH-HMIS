@@ -6,7 +6,6 @@ import { Provider as ReduxProvider } from "react-redux";
 import "./index.css";
 import App from "./App.jsx";
 
-import axios from "axios";
 import { ConfigProvider } from "antd";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -14,8 +13,6 @@ import store from "./store.js";
 import { theme } from "./utils/theme.js";
 import AuthProvider from "./hooks/auth.jsx";
 import { AbilityProvider } from "./hooks/casl.jsx";
-
-axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
