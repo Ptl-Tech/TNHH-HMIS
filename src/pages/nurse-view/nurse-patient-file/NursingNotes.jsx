@@ -119,7 +119,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-      {!isNursingNotesFormVisible && canCreateNurseNotes && (
+      {canCreateNurseNotes && (
         <div
           style={{
             display: "flex",
@@ -129,7 +129,7 @@ const NursingNotes = () => {
             marginTop: "20px",
           }}
         >
-          {!isNursingNotesFormVisible && !isDoctor && (
+          {!isNursingNotesFormVisible && (
             <Button type="primary" onClick={handleNurseNotesButtonVisibility}>
               <PlusOutlined />
               Nursing Notes
