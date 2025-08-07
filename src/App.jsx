@@ -18,7 +18,7 @@ import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PsychologyRoutes from "./Routes/PsychologyRoutes";
 
 function App() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const ability = useAbility();
 
   axiosConfig(user);
@@ -41,7 +41,7 @@ function App() {
         {ability.can("read", "receptionNavigation") && ReceptionRoutes()}
         {ability.can("read", "psychologyNavigation") && PsychologyRoutes()}
 
-        <Route path="*" element={<NotFound />} />
+        {!loading && <Route path="*" element={<NotFound />} />}
       </Routes>
     </>
   );
