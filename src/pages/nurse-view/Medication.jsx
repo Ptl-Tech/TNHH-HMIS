@@ -1,15 +1,18 @@
-import { Button, Divider } from "antd";
 import { useState } from "react";
-import InpatientMedication from "./nurse-care-plan/InpatientMedication";
-import TreatmentsSheet from "./nurse-care-plan/TreatmentsSheet";
-import Consumables from "./nurse-patient-file/Consumables";
+
 import {
-  MedicineBoxOutlined,
-  ExperimentOutlined,
-  ShoppingCartOutlined,
   RollbackOutlined,
+  ExperimentOutlined,
+  MedicineBoxOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
+import { Button, Divider } from "antd";
+
 import useAuth from "../../hooks/auth";
+
+import Consumables from "./nurse-patient-file/Consumables";
+import TreatmentsSheet from "./nurse-care-plan/TreatmentsSheet";
+import InpatientMedication from "./nurse-care-plan/InpatientMedication";
 import NursePharmacyReturnLine from "./tables/NursePharmacyReturnLine";
 
 const Medication = ({ patientDetails }) => {
