@@ -24,7 +24,7 @@ export const saveDoctorNotes = (data) => async (dispatch, getState) => {
     dispatch({ type: SAVE_DOCTOR_NOTES_REQUEST });
 
     const {
-      auth: { user }
+      auth: { user },
     } = getState();
     const branchCode = user.branchCode;
 
@@ -32,7 +32,7 @@ export const saveDoctorNotes = (data) => async (dispatch, getState) => {
       headers: {
         "Content-Type": "application/json",
         staffNo: user.staffNo,
-        
+
         branchCode: branchCode,
       },
     };
