@@ -62,13 +62,13 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
 
   const items = [
     {
-      label: "Consultation Notes",
       icon: <CgNotes />,
+      label: "Consultation Notes",
       children: <ConsultationNotes filter={"PH"} data={doctorNotesData} />,
     },
     {
-      label: "Patient History Notes",
       icon: <SolutionOutlined />,
+      label: "Patient History Notes",
       children: <SearchChildView filter={"PH"} data={doctorNotesData} />,
     },
     ...(canSeeNurseOrDoctorContent

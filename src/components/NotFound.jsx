@@ -155,8 +155,8 @@ const NotFound = () => {
             </p>
             <p>
               Check the URL you entered for any mistakes and try again.
-              Alternatively, search for whatever is missing or take a look
-              around the rest of our site.
+              Alternatively, click on one of these links to be taken to a link
+              we are sure will work.
             </p>
           </div>
           <div className="d-flex gap-2">

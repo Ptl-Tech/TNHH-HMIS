@@ -30,7 +30,7 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
         dispatch(
           saveDoctorNotes({
             sectionId,
-            myAction: "edit",
+            myAction: "delete",
             itemId: prevItem,
             isSelected: false,
             specifiedText: "",
@@ -45,9 +45,9 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
         dispatch(
           saveDoctorNotes({
             sectionId,
-            myAction: "edit",
             isSelected: false,
             specifiedText: "",
+            myAction: "delete",
             itemId: valueToReset,
             encounterNo: treatmentNo,
           })
@@ -57,7 +57,7 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
           saveDoctorNotes({
             sectionId,
             itemId: value,
-            myAction: "edit",
+            myAction: "create",
             isSelected: true,
             specifiedText: "",
             encounterNo: treatmentNo,

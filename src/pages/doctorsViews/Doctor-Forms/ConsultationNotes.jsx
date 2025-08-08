@@ -2,35 +2,23 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
+import dayjs from "dayjs";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
 import { RiEdit2Fill } from "react-icons/ri";
-import {
-  Tabs,
-  Space,
-  Badge,
-  Input,
-  Select,
-  Button,
-  Tooltip,
-  message,
-  Table,
-  Drawer,
-} from "antd";
+import { IoCloseOutline } from "react-icons/io5";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa6";
+import { Space, Input, Drawer, Select, Button, Tooltip, message } from "antd";
 
 import { NoData } from "../../../components/NoData";
-
 import {
   POST_DOCTOR_NOTES_RESET,
   postDoctorNotes,
 } from "../../../actions/Doc-actions/postDoctorNotes";
 import { getDoctorsNotesSections } from "../../../actions/Doc-actions/getDoctorNotesSections";
 import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
-import { IoClose, IoCloseOutline } from "react-icons/io5";
-import dayjs from "dayjs";
 
 export const ConsultationNotes = () => {
   const dispatch = useDispatch();
@@ -57,38 +45,23 @@ export const ConsultationNotes = () => {
     dispatch(getDoctorsNotesSections({ treatmentNo }));
   }, [postDoctorNotesData]);
 
-  const items = [
-    {
-      key: 0,
-      label: "Add Notes",
-      children: (
-        <AddConsultationNotes doctorNotesSections={doctorNotesSections} />
-      ),
-    },
-    {
-      key: 1,
-      label: (
-        <Space>
-          <span>Check Notes</span>
-          <Badge
-            count={ipGetProcedure?.length}
-            style={{ backgroundColor: "#b08444" }}
-          />
-        </Space>
-      ),
-      children: (
-        <ViewConsultationNotes
-          notes={ipGetProcedure}
-          loading={loadingGetIpProcedure}
-        />
-      ),
-    },
-  ];
-
-  return <Tabs type="card" items={items} />;
+  return (
+    <>
+      <AddConsultationNotes
+        notes={ipGetProcedure}
+        loading={loadingGetIpProcedure}
+        doctorNotesSections={doctorNotesSections}
+      />
+      ;
+    </>
+  );
 };
 
-export const AddConsultationNotes = ({ doctorNotesSections }) => {
+export const AddConsultationNotes = ({
+  notes,
+  loading,
+  doctorNotesSections,
+}) => {
   const [editing, setEditing] = useState(false);
   const [SectionId, setSectionId] = useState(null);
   const [fullTranscript, setFullTranscript] = useState("");
@@ -182,12 +155,12 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
 
   const handleSubmit = () => {
     const data = {
-      myAction: "create",
       recId: "",
       patientNo,
       SectionId,
       treatmentNo,
       notesType: "1",
+      myAction: "create",
       notes: fullTranscript,
     };
 
@@ -198,9 +171,9 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
     <Space direction="vertical" style={{ width: "100%" }}>
       <Space>
         <Select
-          placeholder="Choose Category"
           style={{ width: 320 }}
           onChange={setSectionId}
+          placeholder="Choose Category"
           options={doctorNotesSections.map(({ Section_ID, Section_Name }) => ({
             value: Section_ID,
             label: Section_Name,
@@ -253,6 +226,7 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
         >
           Submit
         </Button>
+        <NotesViewDrawer notes={notes} loading={loading} />
       </Space>
       {editing ? (
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -274,32 +248,10 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
   );
 };
 
-export const columns = [
-  {
-    title: "Notes Type",
-    dataIndex: "Notes_Type",
-    key: "Notes_Type",
-  },
-  {
-    title: "User ID",
-    dataIndex: "User_ID",
-    key: "User_ID",
-  },
-  {
-    title: "Created Date",
-    dataIndex: "Created_Date",
-    key: "Created_Date",
-  },
-  {
-    key: "SystemId",
-    title: "Actions",
-    dataIndex: "SystemId",
-    render: (_, record) => <NotesViewDrawer data={record} />,
-  },
-];
-
-export const NotesViewDrawer = ({ data }) => {
+export const NotesViewDrawer = ({ notes }) => {
   const [open, setOpen] = useState(false);
+
+  console.log({ notes });
 
   return (
     <Space direction="vertical">
@@ -307,33 +259,39 @@ export const NotesViewDrawer = ({ data }) => {
         View Notes
       </Button>
       <Drawer
-        title={`${data.Notes_Type} taken on ${dayjs(data.Created_Date).format(
-          "dddd, DD MM YYYY"
-        )}`}
+        title={
+          <span style={{ fontSize: "18px", fontWeight: "300" }}>
+            Consulatation Notes for {notes[0]?.Patient_Name}
+          </span>
+        }
         open={open}
         size="large"
+        closeIcon={null}
         onClose={() => setOpen(false)}
         extra={
           <Button icon={<IoCloseOutline />} onClick={() => setOpen(false)} />
         }
-        closeIcon={null}
       >
         <Space direction="vertical">
-          <span className="fw-bolder">Content:</span>
-          {data.Notes}
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {notes.map((note) => (
+              <>
+                <li>
+                  <h3 style={{ fontWeight: "300", fontSize: "18px" }}>
+                    {note.Notes_Section_Id} -{" "}
+                    {dayjs(note.Treatment_Date).format(
+                      "dddd DD MMM YYYY hh:mm A"
+                    )}
+                  </h3>
+                  <p style={{ fontSize: "15px", fontWeight: "400" }}>
+                    {note.Notes}
+                  </p>
+                </li>
+              </>
+            ))}
+          </ul>
         </Space>
       </Drawer>
     </Space>
-  );
-};
-
-export const ViewConsultationNotes = ({ loading, notes }) => {
-  return (
-    <Table
-      loading={loading}
-      columns={columns}
-      style={{ width: "100%" }}
-      dataSource={notes.sort((a, b) => a.LineNo - b.LineNo)}
-    />
   );
 };

@@ -347,6 +347,8 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
     return { type: POST_TRIAGE_VISIT_SUCCESS, payload: response };
   } catch (error) {
+    console.log({ error });
+
     // Extract error message from different possible sources
     const errorMessage =
       error.response?.data?.errors || // Extract 'errors' field from response

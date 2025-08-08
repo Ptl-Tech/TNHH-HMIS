@@ -137,8 +137,8 @@ export default function NurseRoutes() {
         <Route index element={<Dashboard />} />
 
         {/* Routes */}
-        <Route path="Patient-Registration" element={<PatientRegistration />} />
         <Route path="Past-doctor-visit" element={<PastDoctorVisit />} />
+        <Route path="Patient-Registration" element={<PatientRegistration />} />
         <Route path="Past-doctor-visit/Patient" element={<TreatmentCard />} />
         <Route
           path="Past-doctor-visit/Encounter"
@@ -154,7 +154,10 @@ export default function NurseRoutes() {
         {/* <Route path="New-Patients" element={<NewPatients />} /> */}
 
         <Route path="Inpatient" element={<InpatientBranchFilters />} />
-            <Route path="Inpatient/Inpatient-List/:branch" element={<Inpatient />} />
+        <Route
+          path="Inpatient/Inpatient-List/:branch"
+          element={<Inpatient />}
+        />
         <Route path="Consultation-List" element={<DoctorVisits />} />
         <Route path="Admit-patient" element={<AdmitPatients />} />
         <Route path="Admit-patient/Patient" element={<AdmitPatient />} />

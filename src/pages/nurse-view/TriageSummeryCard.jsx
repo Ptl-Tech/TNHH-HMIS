@@ -10,14 +10,15 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const TriageSummeryCard = ({ currentPath }) => {
-
   const { triageList } = useSelector((state) => state.getTriageList) || {};
 
-  const openTriageList = triageList.filter((item)=>item.Status==='New')
-  const pendingTriageList = triageList.filter((item)=>item.Status==='Pending')
-  const closedTriageList = triageList.filter((item)=>item.Status==='Closed')
-
-
+  const openTriageList = triageList.filter((item) => item.Status === "New");
+  const pendingTriageList = triageList.filter(
+    (item) => item.Status === "Pending"
+  );
+  const closedTriageList = triageList.filter(
+    (item) => item.Status === "Closed"
+  );
 
   const cardData = [
     {
@@ -43,36 +44,40 @@ const TriageSummeryCard = ({ currentPath }) => {
     },
   ];
 
-  const activeCard = 
-    {
-      borderLeft: "2px solid #ac8342",
-      backgroundColor: "#faf6e7",
-    }
+  const activeCard = {
+    borderLeft: "2px solid #ac8342",
+    backgroundColor: "#faf6e7",
+  };
 
-  
   return (
     <div style={{ display: "flex", marginBottom: "10px", gap: "10px" }}>
-        {cardData.map((card, index) => {
-            const isActive = currentPath === card.link;
-          return (
-            <Card key={index} style={{ flex: 1, padding: "10px 16px", ...(isActive ? activeCard : {})}}>
+      {cardData.map((card, index) => {
+        const isActive = currentPath === card.link;
+        return (
+          <Card
+            key={index}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              ...(isActive ? activeCard : {}),
+            }}
+          >
             <Link to={card.link} style={{ textDecoration: "none" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <div
-                style={{
-                  display: "grid",
-                  placeItems: "center",
-                  backgroundColor: card.backgroundColor,
-                  borderRadius: "4px",
-                  width: "30px",
-                  height: "30px",
-                  color: "white",
-                }}
-              >
-                {card.icon}
-              </div>
-              <div style={{ marginLeft: "20px" }}>
-                
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    placeItems: "center",
+                    backgroundColor: card.backgroundColor,
+                    borderRadius: "4px",
+                    width: "30px",
+                    height: "30px",
+                    color: "white",
+                  }}
+                >
+                  {card.icon}
+                </div>
+                <div style={{ marginLeft: "20px" }}>
                   <Typography.Title level={5} style={{ color: "gray" }}>
                     {card.title}
                   </Typography.Title>
@@ -82,19 +87,14 @@ const TriageSummeryCard = ({ currentPath }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    <CountUp start={0} 
-                    end={card.count} 
-                    duration={1} 
-                    />
+                    <CountUp start={0} end={card.count} duration={1} />
                   </Typography.Text>
-               
+                </div>
               </div>
-            </div>
             </Link>
           </Card>
-          ) 
-        }
-      )}
+        );
+      })}
     </div>
   );
 };
