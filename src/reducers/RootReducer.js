@@ -340,6 +340,8 @@ import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReduce
 import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
 import { getAdmissionsReducer } from "./nurse-reducers/getPgAdmissionsReducer";
 import { authReducer } from "./auth/auth-reducer";
+import { getConsultationNotesFormReducer } from "./doc-reducers/getConsultationNotesReducer";
+import { getBriefMSENotesFormReducer } from "./doc-reducers/getBriefMSENotesFormReducer";
 
 export const rootReducer = combineReducers({
   // Auth
@@ -421,6 +423,8 @@ export const rootReducer = combineReducers({
   getDoctorsNotesData: getDoctorsNotesDataReducer,
   getBriefMSENotesData: getBriefMSENotesDataReducer,
   saveDoctorNotes: saveDoctorNotesReducer,
+  getBriefMSENotesForm: getBriefMSENotesFormReducer,
+  getConsultationNotesForm: getConsultationNotesFormReducer,
   // past encounters
   getPatientEncounters: getPatientEncounterListReducer,
   getEncounterList: getEncounterListReducer,

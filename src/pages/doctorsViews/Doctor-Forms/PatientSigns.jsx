@@ -9,7 +9,11 @@ import {
 import { NoData } from "../../../components/NoData";
 import { Categories } from "./Consultation-Room/Categories";
 
-const PatientSigns = ({ tree, searchValue, selectedTreeReport }) => {
+const PatientSigns = ({
+  tree,
+  searchValue,
+  selectedTreeReport,
+}) => {
   const location = useLocation();
 
   const { patientDetails } = location.state || {};

@@ -20,13 +20,14 @@ import {
   keywordFilterHelper,
   buildSelectedItemsTree,
 } from "../../../utils/doctorNotesTree";
-// import useAuth from "../../../hooks/useAuth";
+import { useAbility } from "../../../hooks/casl";
 
+import { ConsultationNotes } from "./ConsultationNotes";
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
 import { SAVE_DOCTOR_NOTES_RESET } from "../../../actions/Doc-actions/saveDoctorNotes";
 import { getBriefMSENotesData } from "../../../actions/nurse-actions/getBriefMSENotesData";
-import { ConsultationNotes } from "./ConsultationNotes";
-import { useAbility } from "../../../hooks/casl";
+import { getBriefMSENotesForm } from "../../../actions/nurse-actions/getBriefMSENotesForm";
+import { getConsultationNotesForm } from "../../../actions/Doc-actions/getConsultationNotesForm";
 
 const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const ability = useAbility();
@@ -43,13 +44,24 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   const { data: briefMSENotesData } = useSelector(
     (state) => state.getBriefMSENotesData
   );
+  const { data: briefMSENotesForm } = useSelector(
+    (state) => state.getBriefMSENotesForm
+  );
   const { data: saveDoctorNotesData, error: saveDoctorNotesError } =
     useSelector((state) => state.saveDoctorNotes);
 
+  const { data: consultationNotesForm } = useSelector(
+    (state) => state.getConsultationNotesForm
+  );
+
+  console.log({ briefMSENotesData });
+
   // Loading the doctor notes data to add
   useEffect(() => {
-    dispatch(getDoctorsNotesData({ treatmentNo }));
-    dispatch(getBriefMSENotesData(treatmentNo));
+    dispatch(getDoctorsNotesData());
+    dispatch(getBriefMSENotesData());
+    dispatch(getBriefMSENotesForm({ treatmentNo }));
+    dispatch(getConsultationNotesForm({ treatmentNo }));
   }, [treatmentNo, dispatch, saveDoctorNotesData]);
 
   // Tracking when the adding of data has failed
@@ -69,21 +81,39 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
     {
       icon: <SolutionOutlined />,
       label: "Patient History Notes",
-      children: <SearchChildView filter={"PH"} data={doctorNotesData} />,
+      children: (
+        <SearchChildView
+          filter={"PH"}
+          data={doctorNotesData}
+          selected={consultationNotesForm}
+        />
+      ),
     },
     ...(canSeeNurseOrDoctorContent
       ? [
           {
             label: "Physical Examination",
             icon: <HeartOutlined />,
-            children: <SearchChildView filter={"PE"} data={doctorNotesData} />,
+            children: (
+              <SearchChildView
+                filter={"PE"}
+                data={doctorNotesData}
+                selected={consultationNotesForm}
+              />
+            ),
           },
         ]
       : []),
     {
       label: "Mental Status Exam",
       icon: <SolutionOutlined />,
-      children: <SearchChildView filter={"MSE"} data={doctorNotesData} />,
+      children: (
+        <SearchChildView
+          filter={"MSE"}
+          data={doctorNotesData}
+          selected={consultationNotesForm}
+        />
+      ),
     },
     ...(canSeeNurseOrDoctorContent
       ? [
@@ -91,7 +121,11 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
             label: "Brief MSE Form",
             icon: <HeartOutlined />,
             children: (
-              <SearchChildView filter={"Brief MSE"} data={briefMSENotesData} />
+              <SearchChildView
+                filter={"Brief MSE"}
+                data={briefMSENotesData}
+                selected={briefMSENotesForm}
+              />
             ),
           },
         ]
@@ -127,7 +161,7 @@ const ConsultationroomDetails = ({ observationNo, patientNo }) => {
   );
 };
 
-const SearchChildView = ({ data, filter }) => {
+const SearchChildView = ({ data, filter, selected }) => {
   const { Search } = Input;
   const { sections, sectionCategories, formItems } = data || {};
 
@@ -136,8 +170,6 @@ const SearchChildView = ({ data, filter }) => {
   const filteredData = searchValue
     ? keywordFilterHelper(sections, sectionCategories, formItems, searchValue)
     : { sections, sectionCategories, formItems };
-
-  // console.log({ data, filter });
 
   // The filter function for the category we are in
   const filterSections = () => {
@@ -158,17 +190,14 @@ const SearchChildView = ({ data, filter }) => {
     ? buildFormStructure(
         filterSections(),
         filteredData.sectionCategories,
-        filteredData.formItems
+        filteredData.formItems,
+        selected
       )
     : null;
 
   // This is the tree that holds the selected items in the currrent category.
   const selectedTreeReport = tree
-    ? buildSelectedItemsTree(
-        filterSections(filter),
-        sectionCategories,
-        formItems
-      )
+    ? buildSelectedItemsTree(filterSections(), sectionCategories, selected)
     : null;
 
   return (

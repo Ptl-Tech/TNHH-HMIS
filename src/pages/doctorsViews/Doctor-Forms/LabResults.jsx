@@ -303,7 +303,6 @@ const LabResults = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Laboratory Request
       </Typography.Title>
-
       {canCreateLabRequest && patientDetails?.Status !== "Completed" ? (
         <div className="d-block d-md-flex align-items-center gap-3 my-3">
           <div className="d-flex justify-content-start align-items-center">

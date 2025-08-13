@@ -1,4 +1,9 @@
-export function buildFormStructure(sections, sectionCategories, formItems) {
+export function buildFormStructure(
+  sections,
+  sectionCategories,
+  formItems,
+  selectedItems
+) {
   const categoryMap = new Map();
   sectionCategories.forEach((category) => {
     if (!categoryMap.has(category.Section_ID)) {
@@ -12,7 +17,22 @@ export function buildFormStructure(sections, sectionCategories, formItems) {
     if (!formItemMap.has(item.Category_ID)) {
       formItemMap.set(item.Category_ID, []);
     }
-    formItemMap.get(item.Category_ID)?.push(item);
+
+    // We want to check if the current item is selected
+    const selectedItem = selectedItems?.find(
+      (currItem) => currItem.Item_ID === item.Item_ID
+    );
+
+    /*  
+      If it's selected, we want to append the following properties
+      IsSelected
+      SystemId
+      Is_Text_Item
+      Other_Specify
+    */
+    const newItem = selectedItem ? selectedItem : item;
+
+    formItemMap.get(item.Category_ID)?.push(newItem);
   });
 
   const buildCategoryTree = (parentCategoryId) => {
@@ -56,8 +76,8 @@ export function buildSelectedItemsTree(sections, sectionCategories, formItems) {
       );
 
       // if it doesn't have a parent category we want to add the section it's a child of
-      if (!currentCategory.Parent_Category_ID) {
-        return newSectionIds.add(currentCategory.Section_ID);
+      if (!currentCategory?.Parent_Category_ID) {
+        return newSectionIds.add(currentCategory?.Section_ID);
       } else {
         // if we have a parent category, we add it to the list and then we call perfom the action again recursively
         newSectionCategoriesIds.add(currentCategory.Parent_Category_ID);
