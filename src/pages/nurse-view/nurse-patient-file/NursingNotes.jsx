@@ -8,7 +8,6 @@ import {
   POST_NURSE_ADMISSION_NOTES_SUCCESS,
   postNurseAdmissionNotesSlice,
 } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
-import useAuth from "../../../hooks/useAuth";
 
 import { EditorState, convertToRaw } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
@@ -19,14 +18,21 @@ import NursingNotesFormData from "../nurse-forms/NursingNotesFormData";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
 import { is } from "immutable";
+import { useAuth } from "../../../hooks/auth";
+import { useAbility } from "../../../hooks/casl";
 
 const NursingNotes = () => {
-  const role = useAuth().userData.departmentName; // Get user role from useAuth hook
+  const ability = useAbility();
+  const { user } = useAuth();
+    const dispatch = useDispatch();
+
+  const role = user?.role; // Get user role from useAuth hook
   const isDoctor = role.toLowerCase() === "doctor";
 
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
+
+  const canCreateNurseNotes = ability.can("create", "nurseNotes");
   const branchCode = user?.branchCode;
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
     useState(false);

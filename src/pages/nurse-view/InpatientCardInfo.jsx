@@ -26,6 +26,8 @@ const InpatientCardInfo = ({ patientDetail }) => {
     setPatientFileVisible(false);
   };
 
+  console.log('paientDetails', patientDetails);
+
   return (
     <>
       <Card
@@ -83,10 +85,13 @@ const InpatientCardInfo = ({ patientDetail }) => {
                 }
               />
             ) : (
-              <Typography.Text>
-                {calculateAge(patientDetails?.DateOfBirth) || "N/A"},{" "}
-                {patientDetails?.Gender || "N/A"}
-              </Typography.Text>
+             <Typography.Text>
+  {patientDetails?.AgeinYears
+    ? `${patientDetails.AgeinYears} years`
+    : "N/A"}
+  , {patientDetails?.Gender || "N/A"}
+</Typography.Text>
+
             )}
           </div>
 
@@ -102,9 +107,9 @@ const InpatientCardInfo = ({ patientDetail }) => {
             <Typography.Text strong>Date of Admission:</Typography.Text>
             <br />
             <Typography.Text>
-              {moment(patientDetails?.Admission_Date).isValid() &&
-              patientDetails?.Admission_Date !== invalidDate
-                ? moment(patientDetails?.Admission_Date).format(
+              {moment(patientDetails?.AdmissionsDate).isValid() &&
+              patientDetails?.AdmissionsDate !== invalidDate
+                ? moment(patientDetails?.AdmissionsDate).format(
                     "dddd, MMMM Do, YYYY"
                   )
                 : "N/A"}
@@ -130,21 +135,39 @@ const InpatientCardInfo = ({ patientDetail }) => {
               {patientDetails?.PatientType || "N/A"}
             </Typography.Text>
           </div>
-         {patientDetails?.PatientType && patientDetails?.PatientType !== "Cash" && (
-            <div>
-            <Typography.Text strong>Insurance Name:</Typography.Text>
-            <br />
-            <Typography.Text>
-              {patientDetails?.InsuranceName || "N/A"}
-            </Typography.Text>
-          </div>
-         )}
+          {patientDetails?.PatientType &&
+            patientDetails?.PatientType !== "Cash" && (
+              <div>
+                <Typography.Text strong>Insurance Name:</Typography.Text>
+                <br />
+                <Typography.Text>
+                  {patientDetails?.InsuranceName || "N/A"}
+                </Typography.Text>
+              </div>
+            )}
           <div>
-            <Typography.Text strong>Ward and Room:</Typography.Text>
+            <Typography.Text strong>Ward and Bed Number:</Typography.Text>
             <br />
             <Typography.Text>
               {patientDetail?.Ward || "N/A"}, {patientDetail?.Bed || "N/A"}
             </Typography.Text>
+          </div>
+          <div>
+            <Typography.Text strong>Days Admitted:</Typography.Text>
+            <br />
+           <Typography.Text>
+  {moment(patientDetails?.AdmissionsDate).isValid() &&
+  patientDetails?.AdmissionsDate !== invalidDate
+    ? (() => {
+        const days = moment().diff(
+          moment(patientDetails?.AdmissionsDate),
+          "days"
+        );
+        return `${days} day${days !== 1 ? "s" : ""}`;
+      })()
+    : "N/A"}
+</Typography.Text>
+
           </div>
         </div>
       </Card>

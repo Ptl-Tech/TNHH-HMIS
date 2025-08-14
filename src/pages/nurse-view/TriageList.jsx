@@ -162,6 +162,7 @@ const TriageList = () => {
       sorter: (a, b) =>
         new Date(b.ObservationDate) - new Date(a.ObservationDate),
       defaultSortOrder: "ascend",
+      render: (date) => new Date(date).toLocaleDateString(),
     },
 
     {
@@ -198,7 +199,7 @@ const TriageList = () => {
       ),
     },
   ];
-
+console.log('triage list', combinedList);
   return (
     <div style={{ padding: "10px 10px" }}>
       <TriageSummeryCard
@@ -220,7 +221,7 @@ const TriageList = () => {
           columns={waitingListColumns}
           dataSource={combinedList}
           bordered
-          size="middle"
+          size="small"
           pagination={{
             ...pagination,
             showSizeChanger: true,

@@ -20,19 +20,28 @@ const NursingNotesTable = ({
   const [initLoading, setInitLoading] = useState(true);
   const [sortedNotes, setSortedNotes] = useState([]);
 
-  const renderNotes = (notes) => {
-    if (!notes) return null;
-    const plainText = DOMPurify.sanitize(notes).replace(/<\/?[^>]+(>|$)/g, "");
-    return plainText
-      .split(/[\r\n]+|(?<=\.)\s+/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line, idx) => (
-        <div key={idx}>
-          {line.charAt(0).toUpperCase() + line.slice(1).toLowerCase()}
-        </div>
-      ));
-  };
+const renderNotes = (notes) => {
+  if (!notes) return null;
+
+  const sanitized = DOMPurify.sanitize(notes);
+
+  const plainText = sanitized
+    .replace(/<\/?[^>]+(>|$)/g, "") 
+    .replace(/&nbsp;/gi, " ")      
+    .replace(/\s+/g, " ")         
+    .trim();
+
+  return plainText
+    .split(/[\r\n]+|(?<=\.)\s+/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line, idx) => (
+      <div key={idx}>
+        {line.charAt(0).toUpperCase() + line.slice(1).toLowerCase()}
+      </div>
+    ));
+};
+
 
   useEffect(() => {
     if (!getNurseNotes?.length) return;

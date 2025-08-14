@@ -26,7 +26,7 @@ const InpatientTable = ({
       title: "#",
       key: "key",
       dataIndex: "key",
-      render: (index) => index + 1,
+      render: (text, record, index) => index + 1,
     },
     {
       title: "Adm No",
