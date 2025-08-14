@@ -8,7 +8,7 @@ import {
   POST_NURSE_ADMISSION_NOTES_SUCCESS,
   postNurseAdmissionNotesSlice,
 } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
-// import useAuth from "../../../hooks/useAuth";
+import useAuth from "../../../hooks/useAuth";
 
 import { EditorState, convertToRaw } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
@@ -18,21 +18,23 @@ import PropTypes from "prop-types";
 import NursingNotesFormData from "../nurse-forms/NursingNotesFormData";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
-import { useAbility } from "../../../hooks/casl";
-import { useAuth } from "../../../hooks/auth";
+import { is } from "immutable";
 
 const NursingNotes = () => {
-  const { user } = useAuth();
-  const ability = useAbility();
-
-  const canCreateNurseNotes = ability.can("create", "nurseNotes");
+  const role = useAuth().userData.departmentName; // Get user role from useAuth hook
+  const isDoctor = role.toLowerCase() === "doctor";
 
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
-    useState(false);
+  const userDetails = useAuth();
+  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] = useState(
+    isDoctor ? false : true
+  );
+  const [isDrawerVisible, setIsDrawerVisible] = useState(
+    isDoctor ? true : false
+  );
 
   const { loadingNurseNotes } = useSelector(
     (state) => state.postNurseAdmissionNotes
@@ -69,7 +71,7 @@ const NursingNotes = () => {
       const notesData = {
         myAction: "create",
         recId: "",
-        staffNo: user.staffNo,
+        staffNo: userDetails.userData.no,
         branchCode: branchCode,
         patientNo: patientDetails?.Patient_No,
         admissionNo: patientDetails?.Admission_No,
@@ -117,8 +119,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-      {!isNursingNotesFormVisible && canCreateNurseNotes && (
-        <div
+     <div
           style={{
             display: "flex",
             alignItems: "center",

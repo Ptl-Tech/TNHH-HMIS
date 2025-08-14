@@ -38,7 +38,7 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
 
     if (data && Object.keys(data).length > 0) {
       const dataArray = Array.isArray(data) ? data : [data] || []; // Ensure it's an array
-      const filteredData = dataArray.filter((item) => item?.Branch === branchCode);
+ //     const filteredData = dataArray.filter((item) => item?.Branch === branchCode);
 
       if (dataArray.length > 0) {
         dispatch({
