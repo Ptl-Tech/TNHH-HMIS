@@ -44,9 +44,6 @@ const MainLayout = () => {
       { permission: "psychologyNavigation", routes: psychologyRoutes },
     ];
 
-    console.log({routeMap});
-    
-
     const found = routeMap.find(({ permission }) =>
       ability.can("read", permission)
     );
@@ -72,7 +69,7 @@ const MainLayout = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  
+
   return (
     <Layout>
       <Header className="headerstyle" style={{ zIndex: "999" }}>

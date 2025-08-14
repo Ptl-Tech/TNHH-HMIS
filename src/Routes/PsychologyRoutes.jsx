@@ -67,58 +67,6 @@ export const psychologyRoutes = [
       },
     ],
   },
-  {
-    key: "/Dashboard/radiology",
-    icon: <RadarChartOutlined style={{ color: "#fff" }} />,
-    label: "Radiology",
-    children: [
-      {
-        key: "/Dashboard/Radiology-Patients",
-        label: "Radiology List OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
-  {
-    key: "/Dashboard/lab",
-    icon: <ExperimentOutlined style={{ color: "#fff" }} />,
-    label: "Lab",
-    children: [
-      {
-        key: "/Dashboard/Lab-Patients",
-        label: "Labortory OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
-  {
-    key: "/Dashboard/pharmacy",
-    icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
-    label: "Pharmacy",
-    children: [
-      {
-        key: "/Dashboard/Pharmacy-OutPatient",
-        label: "Pharmacy List OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "/Dashboard/Pharmacy-Inpatient",
-        label: "Pharmacy List InPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-
-      {
-        key: "/Dashboard/Pharmacy-Returns",
-        label: "Pharmacy List Returns",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "/Dashboard/Pharmacy-History",
-        label: "Pharmacy History",
-        icon: <HistoryOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
 ];
 
 export default function PsychologyRoutes() {

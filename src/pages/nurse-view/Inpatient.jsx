@@ -1,21 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
 
+import { subject } from "@casl/ability";
 import { useAbility } from "../../hooks/casl.jsx";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
+import { useAuth } from "../../hooks/auth.jsx";
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
-import { subject } from "@casl/ability";
 
-const Impatient = () => {
+const Inpatient = () => {
+  const { user } = useAuth();
   const ability = useAbility();
+  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,8 +38,6 @@ const Impatient = () => {
   }, [currentInpatientError]);
 
   const handleNavigate = (record) => {
-    console.log({ record });
-
     dispatch(currentInpatient(record));
     navigate(
       `/Dashboard/Inpatient/Patient-card?PatientNo=${record?.Patient_No}&AdmNo=${record?.Admission_No}`,
@@ -70,29 +71,24 @@ const Impatient = () => {
 
   const canReadOwnInpatients = (doctorId) =>
     ability.can("read", subject("ownInPatients", { doctorId }));
-
-  console.log({ combinedPatients });
+  const canReadAllInpatients = ability.can("read", "inPatients");
 
   // filter the patient based on the doctor
   const filterPatientBasedWithDoctor = useMemo(() => {
-    return combinedPatients?.filter((patient) =>
-      canReadOwnInpatients(patient.Doctor)
+    return combinedPatients?.filter(
+      (patient) => canReadOwnInpatients(patient.Doctor) || canReadAllInpatients
     );
   }, [combinedPatients, ability]);
 
   const filteredByStatus = useMemo(() => {
     const filteredByStatus = filterPatientBasedWithDoctor?.filter(
-      ({ Status }) => Status === "Admitted" || Status === "Discharge Pending"
+      ({ Status, Branch }) =>
+        (Status === "Admitted" || Status === "Discharge Pending") &&
+        (user.role == "NURSE" ? Branch == location.state.filterParam : true)
     );
-    //filter by bracnh from the route parameter
-    if(paramFromRoute) {
-      return filteredByStatus?.filter(
-        ({ Branch }) => Branch === paramFromRoute
-      );
-    }
-    return filteredByStatus;
-  }, [filterPatientBasedWithDoctor, paramFromRoute, filterParam]); // Use paramFromRoute if available, otherwise use filterParam
 
+    return filteredByStatus;
+  }, [filterPatientBasedWithDoctor]);
 
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
@@ -128,4 +124,4 @@ const Impatient = () => {
   );
 };
 
-export default Impatient;
+export default Inpatient;

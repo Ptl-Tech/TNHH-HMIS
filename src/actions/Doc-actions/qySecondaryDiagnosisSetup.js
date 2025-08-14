@@ -12,18 +12,18 @@ export const getSecondaryDiagnosisSetup = () => async (dispatch, getState) => {
     dispatch({ type: QY_SECONDARY_DIAGNOSIS_SETUP });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
     if (!branchCode) throw new Error("Branch code not found in local storage.");
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+         // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };

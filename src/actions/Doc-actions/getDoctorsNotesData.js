@@ -7,60 +7,53 @@ export const GET_DOCTOR_NOTES_RESET = "GET_DOCTOR_NOTES_RESET";
 export const GET_DOCTOR_NOTES_REQUEST = "GET_DOCTOR_NOTES_REQUEST";
 export const GET_DOCTOR_NOTES_SUCCESS = "GET_DOCTOR_NOTES_SUCCESS";
 
-export const getDoctorsNotesData =
-  ({ treatmentNo: encounterNo }) =>
-  async (dispatch, getState) => {
-    console.log({ encounterNo });
+export const getDoctorsNotesData = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_DOCTOR_NOTES_REQUEST });
 
-    try {
-      dispatch({ type: GET_DOCTOR_NOTES_REQUEST });
+    const {
+      auth: { user },
+    } = getState();
 
-      const {
-        otpVerify: { userInfo },
-      } = getState();
-      // Fetch branchCode from localStorage
-      const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-          branchCode: branchCode,
-        },
-      };
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
+        branchCode: branchCode,
+      },
+    };
 
-      const [
-        sectionsResponse,
-        sectionCategoriesResponse,
-        consultationNotesFormResponse,
-      ] = await Promise.all([
-        axios.get(
-          `${API}data/odatafilter?webservice=PgFormSectionSetup`,
-          config
-        ),
-        axios.get(
-          `${API}data/odatafilter?webservice=PgFormSectionCategories`,
-          config
-        ),
-        axios.get(
-          `${API}data/odatafilter?webservice=QyFormItems`,
-          config
-        ),
-      ]);
+    const [
+      sectionsResponse,
+      sectionCategoriesResponse,
+      consultationNotesFormResponse,
+    ] = await Promise.all([
+      axios.get(`${API}data/odatafilter?webservice=PgFormSectionSetup`, config),
+      axios.get(
+        `${API}data/odatafilter?webservice=PgFormSectionCategories`,
+        config
+      ),
+      axios.get(
+        `${API}data/odatafilter?webservice=QyFormItems&query=$filter=Form_Type ne 'Brief MSE'`,
+        config
+      ),
+    ]);
 
-      console.log({
-        consultationNotesFormResponse: consultationNotesFormResponse.data,
-      });
+    console.log({
+      consultationNotesFormResponse: consultationNotesFormResponse.data,
+    });
 
-      const result = {
-        sections: sectionsResponse?.data,
-        sectionCategories: sectionCategoriesResponse?.data,
-        formItems: consultationNotesFormResponse.data,
-      };
+    const result = {
+      sections: sectionsResponse?.data,
+      formItems: consultationNotesFormResponse.data,
+      sectionCategories: sectionCategoriesResponse?.data,
+    };
 
-      dispatch({ type: GET_DOCTOR_NOTES_SUCCESS, payload: result });
-    } catch (error) {
-      dispatch({ type: GET_DOCTOR_NOTES_FAIL, payload: error.message });
-    }
-  };
+    dispatch({ type: GET_DOCTOR_NOTES_SUCCESS, payload: result });
+  } catch (error) {
+    dispatch({ type: GET_DOCTOR_NOTES_FAIL, payload: error.message });
+  }
+};

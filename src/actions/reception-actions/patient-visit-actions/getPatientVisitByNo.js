@@ -28,7 +28,7 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
 
   try {
     const config = apiHeaderConfig(getState);
-    const branchCode = localStorage.getItem("branchCode");
+    // const branchCode = user.branchCode; // Commented this out as it is not used in this function
     
     const { data } = await axios.get(
       `${API}data/odatafilter?webservice=QyAppointmentHeader&isList=false&query=$filter=AppointmentNo eq '${visitNo}'`,
@@ -38,7 +38,7 @@ export const getPatientVisitByNo = (visitNo) => async (dispatch, getState) => {
 
     if (data && Object.keys(data).length > 0) {
       const dataArray = Array.isArray(data) ? data : [data] || []; // Ensure it's an array
- //     const filteredData = dataArray.filter((item) => item?.Branch === branchCode);
+      // const filteredData = dataArray.filter((item) => item?.Branch === branchCode); // Commented out as branchCode is not used here
 
       if (dataArray.length > 0) {
         dispatch({

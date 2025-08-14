@@ -24,15 +24,15 @@ export const saveDoctorNotes = (data) => async (dispatch, getState) => {
     dispatch({ type: SAVE_DOCTOR_NOTES_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+
         branchCode: branchCode,
       },
     };

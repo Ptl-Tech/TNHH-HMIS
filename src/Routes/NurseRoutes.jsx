@@ -26,7 +26,6 @@ import OutpatientList from "../pages/OutpatientList";
 import DirectAdmission from "../pages/nurse-view/DirectAdmission";
 import TreatmentCard from "../pages/nurse-view/TreatmentCard";
 import ExaminePatientInTriage from "../pages/nurse-view/ExaminePatientInTriage";
-import Inpatient from "../pages/nurse-view/Inpatient";
 import AdmitPatient from "../pages/nurse-view/forms/nurse-forms/AdmitPatient";
 import {
   AppstoreOutlined,
@@ -40,9 +39,9 @@ import {
   HistoryOutlined,
   RadiusUprightOutlined,
 } from "@ant-design/icons";
+import Inpatient from "../pages/nurse-view/Inpatient";
 import Consumables from "../pages/nurse-view/nurse-patient-file/Consumables";
 import InpatientBranchFilters from "../pages/nurse-view/InpatientBranchFilters";
-import Impatient from "../pages/nurse-view/Inpatient";
 
 export const nurseRoutes = [
   {
@@ -138,8 +137,8 @@ export default function NurseRoutes() {
         <Route index element={<Dashboard />} />
 
         {/* Routes */}
-        <Route path="Patient-Registration" element={<PatientRegistration />} />
         <Route path="Past-doctor-visit" element={<PastDoctorVisit />} />
+        <Route path="Patient-Registration" element={<PatientRegistration />} />
         <Route path="Past-doctor-visit/Patient" element={<TreatmentCard />} />
         <Route
           path="Past-doctor-visit/Encounter"
@@ -155,7 +154,10 @@ export default function NurseRoutes() {
         {/* <Route path="New-Patients" element={<NewPatients />} /> */}
 
         <Route path="Inpatient" element={<InpatientBranchFilters />} />
-            <Route path="Inpatient/Inpatient-List/:branch" element={<Impatient />} />
+        <Route
+          path="Inpatient/Inpatient-List/:branch"
+          element={<Inpatient />}
+        />
         <Route path="Consultation-List" element={<DoctorVisits />} />
         <Route path="Admit-patient" element={<AdmitPatients />} />
         <Route path="Admit-patient/Patient" element={<AdmitPatient />} />

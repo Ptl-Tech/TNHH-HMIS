@@ -6,22 +6,14 @@ import {
   Button,
   Card,
   Col,
-  Dropdown,
-  Menu,
   message,
   Row,
   Skeleton,
-  Table,
   Tag,
   Typography,
 } from "antd";
-import {
-  ArrowLeftOutlined,
-  UserOutlined,
-  MoreOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, UserOutlined } from "@ant-design/icons";
 import CreateVisitDrawer from "./createVisit/CreateVisitDrawer";
-import useFetchPatientVisitDetailsHook from "../hooks/useFetchPatientVisitDetailsHook";
 import PatientCharges from "./billing/CashPatients/PatientCharges";
 import { postTriageVisit } from "../actions/patientActions";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,17 +42,9 @@ const CreateVisitForm = () => {
     error,
     data: patientVisitDetails,
   } = useSelector((state) => state.getVisitById);
-  const {
-    loading: postVisitLoading,
-    success: postVisitSuccess,
-    error: postVisitError,
-    data: postVisitdata,
-  } = useSelector((state) => state.postTriageVisit);
-  const {
-    loading,
-    error: patientChargesError,
-    data,
-  } = useSelector((state) => state.getPatientCharges);
+  const { success: postVisitSuccess, error: postVisitError } = useSelector(
+    (state) => state.postTriageVisit
+  );
   useEffect(() => {
     if (patientDetails) {
       if (patientDetails.Activated) {
@@ -121,30 +105,13 @@ const CreateVisitForm = () => {
       await dispatch(postTriageVisit(payload));
       setDispatchingtotriage(true);
     }
-  
   };
 
-  const handleDirectAdmission=()=>{
-    navigate(`/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientNo}`);
-  }
-
-  // // Actions menu
-  // const menu = (
-  //   <Menu onClick={({ key }) => key === "visit_action" && setView(true)}>
-  //     <Menu.Item key="visit_action">
-  //       {patientDetails.Activated && patientDetails.ActiveVisitNo
-  //         ? "View Visit Details"
-  //         : "Visit Card"}
-  //     </Menu.Item>
-  //     <Menu.Item key="triage_action" onClick={handleDispatchtoTriage}>
-  //       Dispatch to Triage
-  //     </Menu.Item>
-
-  //     <Menu.Item key="request_admission" onClick={handleDirectAdmission}>
-  //       Request Admission
-  //     </Menu.Item>
-  //   </Menu>
-  // );
+  const handleDirectAdmission = () => {
+    navigate(
+      `/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientNo}`
+    );
+  };
 
   return (
     <div
@@ -163,9 +130,9 @@ const CreateVisitForm = () => {
         >
           Go back
         </Button>
-         <Typography.Title level={5}>
-                  <u>Visit Card</u>
-                </Typography.Title>
+        <Typography.Title level={5}>
+          <u>Visit Card</u>
+        </Typography.Title>
         <div className="d-flex justify-content-between align-items-center">
           {patientDetails?.Activated && patientDetails?.ActiveVisitNo ? (
             <Button type="primary" onClick={() => setView(true)}>
@@ -221,28 +188,6 @@ const CreateVisitForm = () => {
                   <span>
                     <b>ID No:</b> {patientDetails.IDNumber}
                   </span>
-                  {/* <span>
-                    <b>Status:</b>
-                    <Tag
-                      color={
-                        visitData?.Status
-                          ? visitData.Status === "New"
-                            ? "blue"
-                            : visitData.Status === "Request Made"
-                            ? "orange"
-                            : visitData.Status === "Dispatched"
-                            ? "yellow"
-                            : "default"
-                          : patientData?.Activated
-                          ? "green"
-                          : "red"
-                      }
-                    >
-                      {visitData?.Status ||
-                        (patientData?.Activated ? "Active" : "Inactive")}
-                    </Tag>
-                  </span> */}
-
                   <span>
                     <b>Gender:</b> {patientDetails.Gender}
                   </span>
@@ -252,10 +197,8 @@ const CreateVisitForm = () => {
                   <span>
                     <b>Visit Date:</b>{" "}
                     {visitData?.AppointmentDate
-                      ? moment(visitData.AppointmentDate).format(
-                          "DD/MM/YYYY"
-                        )
-                      : moment().format("DD/MM/YYYY")}                    
+                      ? moment(visitData.AppointmentDate).format("DD/MM/YYYY")
+                      : moment().format("DD/MM/YYYY")}
                   </span>
                   <span>
                     <b>Doctor:</b> {visitData?.DoctorsName}

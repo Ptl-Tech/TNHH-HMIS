@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
-import { Button, notification } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-// import useAuth from '../../hooks/useAuth';
+
+import { Button, notification } from "antd";
+
+import useAuth from "../../hooks/auth";
 import {
   postRefreshPatientCharges,
   POST_REFRESH_PATIENT_CHARGES_RESET,

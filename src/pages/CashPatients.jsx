@@ -12,8 +12,8 @@ import {
   Modal,
   Tabs,
 } from "antd";
-import { EyeOutlined, TeamOutlined } from "@ant-design/icons";
-import { appmntList, listPatients } from "../actions/patientActions";
+import { TeamOutlined } from "@ant-design/icons";
+import { appmntList } from "../actions/patientActions";
 import { useNavigate } from "react-router-dom";
 import { getPatientDetails } from "../actions/triage-actions/getPatientDetailsSlice";
 // // import useAuth from "../hooks/useAuth";
@@ -21,8 +21,6 @@ import { postInterimInvoice } from "../actions/Charges-Actions/printInterimInvoi
 import TabPane from "antd/es/tabs/TabPane";
 import { getBillingList } from "../actions/Charges-Actions/getBillingList";
 import { saveAs } from "file-saver";
-import Page from "react-pdf/dist/cjs/Page.js";
-import { Document, pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 

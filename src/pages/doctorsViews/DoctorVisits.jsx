@@ -50,11 +50,9 @@ const DoctorVisits = () => {
   useEffect(() => {
     dispatch(getTriageWaitingList());
     dispatch(getOutPatientTreatmentList());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    console.log({ checkInPatient });
-
     if (
       checkInPatient?.status === "success" &&
       currentRecord &&
@@ -62,7 +60,7 @@ const DoctorVisits = () => {
     ) {
       message.success("Patient checked in to the Consultation Room ");
       navigate(
-        `Dashboard/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
+        `/Dashboard/Consultation-List/Patient?PatientNo=${currentRecord.PatientNo}&TreatmentNo=${currentTreatmentNo}`,
         {
           state: {
             patientDetails: currentRecord,
@@ -79,14 +77,16 @@ const DoctorVisits = () => {
       message.error("An error occurred, please try again");
     }
   }, [checkInError, checkInPatient]);
-  // console.log('consultation Room list', treatmentList);
 
   const isDoctorOrPsychology = (doctorId) =>
     ability.can("read", subject("ownVisits", { doctorId }));
+  const canReadOutPatients = ability.can("read", "outPatients");
 
   const filterConsultations = (status) =>
     treatmentList?.filter(
-      (item) => isDoctorOrPsychology(item.DoctorID) && item.Status === status
+      (item) =>
+        (isDoctorOrPsychology(item.DoctorID) || canReadOutPatients) &&
+        item.Status === status
     );
 
   const openDoctorVisitList = filterConsultations("New");
@@ -132,7 +132,6 @@ const DoctorVisits = () => {
         activeConsultationList={activeConsultationList}
         closedConsultationList={closedConsultationList}
       />
-
       <FilterConsultationRoom
         setSearchName={setSearchName}
         setSearchVisitNumber={setSearchVisitNumber}

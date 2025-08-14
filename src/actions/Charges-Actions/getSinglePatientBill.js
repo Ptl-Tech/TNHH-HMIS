@@ -18,16 +18,16 @@ export const getSinglePatientBill =
       dispatch({ type: GET_SINGLE_PATIENT_BILL_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
 
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Add staffNo as a custom header
-          sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+          staffNo: user.staffNo, // Add staffNo as a custom header
+           // Add sessionToken as a Bearer token
           branchCode: branchCode,
         },
       };

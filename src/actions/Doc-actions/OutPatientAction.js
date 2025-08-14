@@ -13,29 +13,12 @@ export const GET_PATIENT_DETAILS_SUCCESS = "GET_PATIENT_DETAILS_SUCCESS";
 export const GET_PATIENT_DETAILS_FAILURE = "GET_PATIENT_DETAILS_FAILURE";
 export const GET_PATIENT_DETAILS_RESET = "GET_PATIENT_DETAILS_RESET";
 
-export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
+export const getOutPatientTreatmentList = () => async (dispatch) => {
   try {
     dispatch({ type: TREATMENT_LIST_REQUEST });
 
-    const {
-      otpVerify: { userInfo },
-    } = getState();
-
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
-        branchCode: branchCode, // Include branchCode in headers
-      },
-    };
-
     const { data } = await axios.get(
-      `${API}data/odatafilter?webservice=QyTreatmentHeaders`,
-      config
+      `${API}data/odatafilter?webservice=QyTreatmentHeaders`
     );
 
     // Filter the patients by branchCode matching GlobalDimension1Code
@@ -44,6 +27,8 @@ export const getOutPatientTreatmentList = () => async (dispatch, getState) => {
 
     dispatch({ type: TREATMENT_LIST_SUCCESS, payload: filteredData });
   } catch (error) {
+    console.log({ error });
+
     dispatch({ type: TREATMENT_LIST_FAIL, payload: error.message });
   }
 };
@@ -57,14 +42,14 @@ export const getPatientDetails = (patientNo) => async (dispatch, getState) => {
       auth: { user },
     } = getState();
 
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: user.staffNo, // Add staffNo as a custom header
-        branchCode: user.branchCode, // Include branchCode in headers
+        staffNo: user?.staffNo, // Add staffNo as a custom header
+        branchCode: user?.branchCode, // Include branchCode in headers
       },
     };
 

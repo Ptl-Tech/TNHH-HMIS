@@ -67,18 +67,13 @@ const LabResults = () => {
     testPackageCode: "",
     treatmentNo: treatmentNo ? treatmentNo : admissionNo,
   });
-  const [modalVisible, setModalVisible] = useState(false);
-  const [noResultsMessage, setNoResultsMessage] = useState(false);
-  const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
-  const [currentReportData, setCurrentReportData] = useState(reportData);
 
   const {
     data: reportData,
     error: reportError,
     loading: reportLoading,
   } = useSelector((state) => state.generateLabResultsReport);
-
-  const { data: labTestSetupData } = useSelector(
+    const { data: labTestSetupData } = useSelector(
     (state) => state.getlabRequestSetup
   );
   const { loading: loadingLabRequestPost } = useSelector(
@@ -90,6 +85,11 @@ const LabResults = () => {
   const { loading: loadingPatientLabTest, data: patientLabTest } = useSelector(
     (state) => state.patientLabTest
   );
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [noResultsMessage, setNoResultsMessage] = useState(false);
+  const [selectedTestPackage, setSelectedTestPackage] = useState(null); // Track selected test package
+  const [currentReportData, setCurrentReportData] = useState(reportData);
 
   const showLargeDrawer = async (record) => {
     setSize("large");
@@ -303,7 +303,6 @@ const LabResults = () => {
         <FileTextOutlined style={{ marginRight: "8px" }} />
         Laboratory Request
       </Typography.Title>
-
       {canCreateLabRequest && patientDetails?.Status !== "Completed" ? (
         <div className="d-block d-md-flex align-items-center gap-3 my-3">
           <div className="d-flex justify-content-start align-items-center">

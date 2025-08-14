@@ -16,18 +16,18 @@ export const getSinglePatient =
       dispatch({ type: GET_SINGLE_PATIENT_REQUEST });
 
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
 
-      // Ensure `branchCode` is correctly fetched from localStorage
-      const branchCode = localStorage.getItem('branchCode') || '';
+      
+      const branchCode = user.branchCode
 
       // Set up the request configuration with headers
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          staffNo: userInfo?.userData?.no || '',
-          sessionToken: userInfo?.userData?.portalSessionToken || '',
+          staffNo:  user.staffNo,
+          
           branchCode,
         },
       };

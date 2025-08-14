@@ -15,25 +15,25 @@ import {
   Typography,
   Row,
   Col,
+  Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { UserOutlined } from "@ant-design/icons";
 import { IoCloseOutline, IoEllipsisVertical } from "react-icons/io5";
-
-// import useAuth from "../../../hooks/useAuth";
 
 import {
   smartMerge,
   fullPatientInfo,
   summaryPatientInfo,
 } from "./doctor-utils";
+import { useAuth } from "../../../hooks/auth";
+import { useAbility } from "../../../hooks/casl";
+
+import PatientCharges from "../../billing/CashPatients/PatientCharges";
 import { listClinics, listDoctors } from "../../../actions/DropdownListActions";
+import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 import { postMarkasCompleted } from "../../../actions/Doc-actions/postMarkasCompleted";
 import { postPsychologyRequestReviewSlice } from "../../../actions/Doc-actions/psychologyReducers";
-import { useAbility } from "../../../hooks/casl";
-import { useAuth } from "../../../hooks/auth";
-import PatientCharges from "../../billing/CashPatients/PatientCharges";
-import useFetchPatientDetailsHook from "../../../hooks/useFetchPatientDetailsHook";
 
 const PatientInfo = ({ patientNo, treatmentNo, patientDetails }) => {
   const ability = useAbility();
@@ -52,9 +52,9 @@ const PatientInfo = ({ patientNo, treatmentNo, patientDetails }) => {
   const { loadinCheckInPatient: markasCompleteLoading } = useSelector(
     (state) => state.markAsCompleted
   );
-const {loadingPatientDetails, patientDetails: patientdeets}=useFetchPatientDetailsHook(patientNo)
+  const { patientDetails: patientdeets } =
+    useFetchPatientDetailsHook(patientNo);
 
-console.log("patient details", patientdeets);
   const handleMarkAsCompleted = () => {
     dispatch(postMarkasCompleted(treatmentNo))
       .then((data) => {
@@ -70,15 +70,72 @@ console.log("patient details", patientdeets);
       });
   };
 
+  const Extra = () => {
+    return (
+      <div className="d-flex gap-2 py-2">
+        <Button
+          onClick={() => {
+            setMoreDetailOpen(true);
+          }}
+        >
+          More Details
+        </Button>
+        {canSeePatientReview && patient?.Status !== "Completed" && (
+          <PopoverMenu
+            content={
+              <CardMenu
+                items={[
+                  {
+                    key: "0",
+                    children: "Finalize",
+                    onClick: handleMarkAsCompleted,
+                    loading: markasCompleteLoading,
+                    disabled: markasCompleteLoading,
+                  },
+                  {
+                    key: "1",
+                    onClick: () => setPatientReviewOpen(true),
+                    children: "Request Patient Review",
+                  },
+                ]}
+              />
+            }
+          >
+            <Button
+              type="text"
+              shape="circle"
+              icon={<IoEllipsisVertical />}
+            ></Button>
+          </PopoverMenu>
+        )}
+      </div>
+    );
+  };
+
+  console.log(fullPatientInfo(patient), summaryPatientInfo(patient));
+
   return (
-    <div
-      style={{
-        gap: "20px",
-        display: "flex",
-        paddingBottom: "20px",
-        alignContent: "center",
-      }}
-    >
+    <div>
+      <Card
+        size="small"
+        extra={<Extra />}
+        title="Patient Information"
+        style={{
+          borderTop: "2px solid rgb(15, 86, 137)",
+          borderBottom: "2px solid rgb(15, 86, 137)",
+        }}
+        styles={{
+          header: {
+            fontSize: "16px",
+            color: "rgb(15, 86, 137)",
+            background: "rgba(0, 0, 0, 0.02)",
+          },
+        }}
+      >
+        {summaryPatientInfo(patient).map((patientInfo) => (
+          <RenderPatientDetails component={patientInfo} />
+        ))}
+      </Card>
       <PatientReviewModal
         patientNo={patientNo}
         open={patientReviewOpen}
@@ -91,56 +148,6 @@ console.log("patient details", patientdeets);
         values={fullPatientInfo(patient)}
         activeVisitNo={patientdeets.ActiveVisitNo}
       />
-      <Card
-        size="small"
-        styles={{ body: { boxShadow: "none" } }}
-        style={{ width: "100%", boxShadow: "none", borderColor: "#d9d9d9" }}
-      >
-        <div style={{ display: "flex" }}>
-          <div className="d-grid gap-2 p-3" style={{ width: "100%" }}>
-            {summaryPatientInfo(patient).map((patientInfo) => (
-              <RenderPatientDetails component={patientInfo} />
-            ))}
-          </div>
-          <div className="d-flex gap-2 p-3">
-            <Button
-              onClick={() => {
-                setMoreDetailOpen(true);
-              }}
-            >
-              More Details
-            </Button>
-            {canSeePatientReview && patient?.Status !== "Completed" && (
-              <PopoverMenu
-                content={
-                  <CardMenu
-                    items={[
-                      {
-                        key: "0",
-                        children: "Finalize",
-                        onClick: handleMarkAsCompleted,
-                        loading: markasCompleteLoading,
-                        disabled: markasCompleteLoading,
-                      },
-                      {
-                        key: "1",
-                        onClick: () => setPatientReviewOpen(true),
-                        children: "Request Patient Review",
-                      },
-                    ]}
-                  />
-                }
-              >
-                <Button
-                  type="text"
-                  shape="circle"
-                  icon={<IoEllipsisVertical />}
-                ></Button>
-              </PopoverMenu>
-            )}
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
@@ -150,7 +157,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const dispatch = useDispatch();
 
   const [form] = Form.useForm();
-  const staffNo = user.staffNo;
+  const staffNo = user?.staffNo;
 
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -195,7 +202,7 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   const handleSelectChange = (value) => {
     setSelectedClinic(value);
     const matchingDoctors = doctorsPayload.filter(
-      (doctor) => doctor.Specialization.toUpperCase() === value.toUpperCase()
+      (doctor) => doctor?.Specialization.toUpperCase() === value.toUpperCase()
     );
     setFilteredDoctors(matchingDoctors);
   };
@@ -290,35 +297,39 @@ const PatientReviewModal = ({ open, setOpen, patientNo, treatmentNo }) => {
   );
 };
 
-const MoreDeailsDrawer = ({ open, setOpen, values , activeVisitNo}) => {
+const MoreDeailsDrawer = ({ open, setOpen, values, activeVisitNo }) => {
   return (
     <Drawer
       closable
       open={open}
+      width={850}
       footer={null}
       onClose={() => setOpen(false)}
       onCancel={() => setOpen(false)}
       closeIcon={<IoCloseOutline size={21} color="black" />}
-      width={850}
     >
-      <>
-      <div
-  style={{
-    padding: "8px",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "10px",
-    backgroundColor: "#f9f9f9", // light background for contrast
-  }}
->
-  {values.map((patientInfo, index) => (
-    <RenderPatientDetails key={index} component={patientInfo} />
-  ))}
-</div>
-
-<PatientCharges activeVisitNo={activeVisitNo} />
-
-      </>
+      <Space className="d-grid gap-4" direction="vertical">
+        <Card
+          size="small"
+          title="Patient Information"
+          style={{
+            borderTop: "2px solid rgb(15, 86, 137)",
+            borderBottom: "2px solid rgb(15, 86, 137)",
+          }}
+          styles={{
+            header: {
+              fontSize: "16px",
+              color: "rgb(15, 86, 137)",
+              background: "rgba(0, 0, 0, 0.02)",
+            },
+          }}
+        >
+          {values.map((patientInfo, index) => (
+            <RenderPatientDetails key={index} component={patientInfo} />
+          ))}
+        </Card>
+        <PatientCharges activeVisitNo={activeVisitNo} />
+      </Space>
     </Drawer>
   );
 };
@@ -364,8 +375,8 @@ const PopoverMenu = ({ content, children }) => {
       styles={{
         body: {
           padding: 0,
-          background: "rgba(255, 255, 255, .7)",
           backdropFilter: "blur(10px)",
+          background: "rgba(255, 255, 255, .7)",
         },
       }}
       onOpenChange={handleOpenChange}
@@ -376,15 +387,15 @@ const PopoverMenu = ({ content, children }) => {
 };
 
 const RenderPatientDetails = ({ component }) => {
-  const { type, value, label } = component;
+  const { type, value } = component;
   var componentToRender;
 
   switch (type) {
     case "avatar":
       componentToRender = <AvatarComponent values={value} />;
       break;
-    case "rowData":
-      componentToRender = <InfoRow label={label} value={value} />;
+    case "rows":
+      componentToRender = <InfoRows value={value} />;
     default:
       break;
   }
@@ -399,18 +410,15 @@ const AvatarComponent = ({ values }) => {
     <div
       style={{
         gap: "8px",
+        padding: "8px",
         display: "flex",
-        padding: "8px 0px",
         alignItems: "center",
       }}
     >
       <Avatar icon={<UserOutlined />} size={48} />
       <div className="d-grid" style={{ gap: "2px" }}>
-        <Title
-          level={5}
-          style={{ margin: 0, fontSize: "16px", color: "#0F5689" }}
-        >
-          {name.toUpperCase()}
+        <Title level={5} style={{ margin: 0, fontSize: "16px", color: "#333" }}>
+          {name?.toUpperCase()}
         </Title>
         <Text style={{ fontSize: "13px", color: "gray", fontWeight: "bold" }}>
           {ageLabel}: {age}
@@ -420,16 +428,54 @@ const AvatarComponent = ({ values }) => {
   );
 };
 
+const InfoRows = ({ value }) => {
+  const itemsPerRow = 4;
+
+  return (
+    <table
+      style={{
+        width: "100%",
+        fontSize: "16px",
+        borderTop: "1px solid #f0f0f0",
+      }}
+    >
+      {Array.from(
+        { length: Math.ceil(value.length / itemsPerRow) },
+        (item, index) => index * itemsPerRow
+      ).map((idx) => {
+        return (
+          <tr style={{ borderTop: idx === 0 ? "0px" : "1px dashed #d3d3d3" }}>
+            {Array.from(
+              { length: itemsPerRow },
+              (item, index) =>
+                value[idx + index] && (
+                  <td style={{ width: "25%" }}>
+                    <InfoRow
+                      label={value[idx + index].label}
+                      value={value[idx + index].value}
+                    />
+                  </td>
+                )
+            )}
+          </tr>
+        );
+      })}
+    </table>
+  );
+};
+
 const InfoRow = ({ label, value }) => (
- // <div style={{ display: "flex", justifyContent: "space-between" }}>
   <div
     style={{
+      padding: "8px",
       display: "flex",
-      justifyContent: "space-between",
-      marginBottom: "8px",
+      flexDirection: "column",
     }}
   >
-    <Typography.Title level={5} style={{ fontSize: "14px", margin: 0 }}>
+    <Typography.Title
+      level={5}
+      style={{ color: "rgb(15, 86, 137)", fontSize: "14px", margin: 0 }}
+    >
       {label}
     </Typography.Title>
     <Typography.Text style={{ fontSize: "14px", color: "gray" }}>
@@ -438,23 +484,4 @@ const InfoRow = ({ label, value }) => (
   </div>
 );
 
-
-const InfoCard = ({ InfoRow }) => (
-  <Row gutter={16} style={{ marginTop: '20px' }}>
-    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-      <Card
-        style={{
-          padding: '16px 24px',
-          borderTop: '3px solid #0f5689',
-          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-          minHeight: '260px',
-        }}
-      >
-        {patientPrimaryInfo.map(({ label, value }, index) => (
-          <PrimaryInfoCard key={index} label={label} value={value} />
-        ))}
-      </Card>
-    </Col>
-  </Row>
-);
 export default PatientInfo;

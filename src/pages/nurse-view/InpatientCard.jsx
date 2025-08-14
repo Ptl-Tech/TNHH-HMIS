@@ -14,8 +14,6 @@ import NursingPatientCharges from "./billing/NursingPatientCharges";
 import PatientVitalInfo from "../doctorsViews/Doctor-Forms/PatientVitalInfo";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 
-// import useAuth from "../../hooks/useAuth";
-
 import {
   postInitiateDischargeSlice,
   POST_INITIATE_DISCHARGE_FAILURE,

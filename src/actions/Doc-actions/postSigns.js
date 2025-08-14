@@ -12,15 +12,15 @@ export const postSignsRequest = (signs) => async (dispatch, getState) => {
     dispatch({ type: POST_SIGNS_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Staff number
-        sessionToken: userInfo.userData.portalSessionToken, // Session token
+        staffNo: user.staffNo, // Staff number
+         // Session token
         branchCode: branchCode, // Branch code
       },
     };

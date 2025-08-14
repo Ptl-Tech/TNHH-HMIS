@@ -91,63 +91,6 @@ export const doctorRoutes = [
       },
     ],
   },
-  {
-    key: "/Dashboard/radiology",
-    icon: <RadarChartOutlined style={{ color: "#fff" }} />,
-    label: "Radiology",
-    children: [
-      {
-        key: "/Dashboard/Radiology-Patients",
-        label: "Radiology List OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
-  {
-    key: "/Dashboard/lab",
-    icon: <ExperimentOutlined style={{ color: "#fff" }} />,
-    label: "Lab",
-    children: [
-      {
-        key: "/Dashboard/Lab-Patients",
-        label: "Laoratory OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
-  {
-    key: "/Dashboard/pharmacy",
-    icon: <MedicineBoxOutlined style={{ color: "#fff" }} />,
-    label: "Pharmacy",
-    children: [
-      {
-        key: "/Dashboard/Pharmacy-Dashboard",
-        label: "Dashboard",
-        icon: <AppstoreOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "/Dashboard/Pharmacy-OutPatient",
-        label: "Pharmacy List OutPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "/Dashboard/Pharmacy-Inpatient",
-        label: "Pharmacy List InPatient",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-
-      {
-        key: "/Dashboard/Pharmacy-Returns",
-        label: "Pharmacy List Returns",
-        icon: <CalendarOutlined style={{ color: "#fff" }} />,
-      },
-      {
-        key: "/Dashboard/Pharmacy-History",
-        label: "Pharmacy History",
-        icon: <HistoryOutlined style={{ color: "#fff" }} />,
-      },
-    ],
-  },
 ];
 
 export default function DoctorRoutes() {
@@ -160,7 +103,10 @@ export default function DoctorRoutes() {
       <Route path="/Dashboard" element={<MainLayout />}>
         <Route index element={<DoctorDashboard />} />
         <Route path="/Dashboard/Consultation-List" element={<DoctorVisits />} />
-        <Route path="/Dashboard/ClosedConsultationList" element={<CloseList />} />
+        <Route
+          path="/Dashboard/ClosedConsultationList"
+          element={<CloseList />}
+        />
         <Route
           path="/Dashboard/PendingConsultationList"
           element={<ConsultationRoomPatients />}
@@ -181,7 +127,10 @@ export default function DoctorRoutes() {
           path="/Dashboard/Discharge-requests"
           element={<DischargeRequests />}
         />
-        <Route path="/Dashboard/Past-doctor-visit" element={<PastDoctorVisit />} />
+        <Route
+          path="/Dashboard/Past-doctor-visit"
+          element={<PastDoctorVisit />}
+        />
         <Route
           path="/Dashboard/Past-doctor-visit/Patient"
           element={<TreatmentCard />}

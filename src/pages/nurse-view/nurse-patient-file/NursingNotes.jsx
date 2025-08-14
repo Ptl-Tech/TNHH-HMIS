@@ -27,14 +27,9 @@ const NursingNotes = () => {
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const branchCode = localStorage.getItem("branchCode").toLocaleLowerCase();
-  const userDetails = useAuth();
-  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] = useState(
-    isDoctor ? false : true
-  );
-  const [isDrawerVisible, setIsDrawerVisible] = useState(
-    isDoctor ? true : false
-  );
+  const branchCode = user?.branchCode;
+  const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
+    useState(false);
 
   const { loadingNurseNotes } = useSelector(
     (state) => state.postNurseAdmissionNotes
@@ -43,6 +38,8 @@ const NursingNotes = () => {
   const { loadingGetNurseAdmissionNotes, getNurseNotes } = useSelector(
     (state) => state.getNurseAdmissionNotes
   );
+
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getNurseAdmissionNotesSlice(patientDetails?.Admission_No));
@@ -71,7 +68,7 @@ const NursingNotes = () => {
       const notesData = {
         myAction: "create",
         recId: "",
-        staffNo: userDetails.userData.no,
+        staffNo: user?.staffNo,
         branchCode: branchCode,
         patientNo: patientDetails?.Patient_No,
         admissionNo: patientDetails?.Admission_No,
@@ -119,7 +116,8 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-     <div
+      {!isNursingNotesFormVisible && canCreateNurseNotes && (
+        <div
           style={{
             display: "flex",
             alignItems: "center",
@@ -128,7 +126,7 @@ const NursingNotes = () => {
             marginTop: "20px",
           }}
         >
-          {!isNursingNotesFormVisible && !isDoctor && (
+          {!isNursingNotesFormVisible && (
             <Button type="primary" onClick={handleNurseNotesButtonVisibility}>
               <PlusOutlined />
               Nursing Notes
@@ -136,9 +134,10 @@ const NursingNotes = () => {
           )}
           <Button type="primary" onClick={() => setIsDrawerVisible(true)}>
             <FileProtectOutlined />
-           View Nursing Notes
+            View Nursing Notes
           </Button>
         </div>
+      )}
       {isNursingNotesFormVisible && (
         <NursingNotesFormData
           form={form}
@@ -161,8 +160,3 @@ const NursingNotes = () => {
 };
 
 export default NursingNotes;
-// props validation
-NursingNotes.propTypes = {
-  setSelectedItem: PropTypes.string,
-  selectedItem: PropTypes.string,
-};

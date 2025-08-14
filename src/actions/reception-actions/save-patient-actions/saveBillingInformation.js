@@ -10,50 +10,54 @@ export const SAVE_BILLING_INFORMATION_SUCCESS =
 export const SAVE_BILLING_INFORMATION_FAIL = "SAVE_BILLING_INFORMATION_FAIL";
 export const SAVE_BILLING_INFORMATION_RESET = "SAVE_BILLING_INFORMATION_RESET";
 
-export const saveBillingInformation = (billingData) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: SAVE_BILLING_INFORMATION_REQUEST });
+export const saveBillingInformation =
+  (billingData) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: SAVE_BILLING_INFORMATION_REQUEST });
 
-    const {
-        otpVerify: { userInfo },
+      const {
+        auth: { user },
       } = getState();
-  
-      if (!userInfo || !userInfo.userData) {
-        navigate("/login"); // Redirect to login
-        throw new Error("User information not available.");
-      }
-  
-      const branchCode = localStorage.getItem("branchCode");
-  
+
+      const branchCode = user.branchCode;
+
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no, // Staff number
-          sessionToken: userInfo.userData.portalSessionToken, // Session token
+          staffNo: user.staffNo, // Staff number
+          // Session token
           branchCode: branchCode, // Branch Code
         },
       };
 
-    const formattedData = {
-      ...billingData,  // Use billingData instead of 'data'
-      branchCode: branchCode,
-    };
+      const formattedData = {
+        ...billingData, // Use billingData instead of 'data'
+        branchCode: branchCode,
+      };
 
-    const response = await axios.post(
-      `${API}Reception/PatientDataBilling`,
-      formattedData,
-      config
-    );
+      const response = await axios.post(
+        `${API}Reception/PatientDataBilling`,
+        formattedData,
+        config
+      );
 
-    dispatch({ type: SAVE_BILLING_INFORMATION_SUCCESS, payload: response.data });
-    return ({
-      type: SAVE_BILLING_INFORMATION_SUCCESS,
-      payload: response.data,
-    });
-  } catch (error) {
-    console.error("Error saving billing information:", error);
-    dispatch({ type: SAVE_BILLING_INFORMATION_FAIL, payload: error.response?.data?.errors });
+      dispatch({
+        type: SAVE_BILLING_INFORMATION_SUCCESS,
+        payload: response.data,
+      });
+      return {
+        type: SAVE_BILLING_INFORMATION_SUCCESS,
+        payload: response.data,
+      };
+    } catch (error) {
+      console.error("Error saving billing information:", error);
+      dispatch({
+        type: SAVE_BILLING_INFORMATION_FAIL,
+        payload: error.response?.data?.errors,
+      });
 
-    throw new Error(error.response?.data?.errors || "Failed to save billing information.");
-  }
-};
+      throw new Error(
+        error.response?.data?.errors || "Failed to save billing information."
+      );
+    }
+  };

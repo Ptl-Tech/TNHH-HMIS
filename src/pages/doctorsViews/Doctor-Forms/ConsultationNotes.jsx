@@ -2,35 +2,34 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
+import dayjs from "dayjs";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { Interweave } from "interweave";
 
-import { RiEdit2Fill } from "react-icons/ri";
 import {
   Tabs,
   Space,
-  Badge,
   Input,
+  Drawer,
   Select,
   Button,
   Tooltip,
   message,
-  Table,
-  Drawer,
+  Card,
 } from "antd";
+import { RiEdit2Fill } from "react-icons/ri";
+import { IoCloseOutline } from "react-icons/io5";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa6";
 
 import { NoData } from "../../../components/NoData";
-
 import {
-  POST_DOCTOR_NOTES_RESET,
   postDoctorNotes,
+  POST_DOCTOR_NOTES_RESET,
 } from "../../../actions/Doc-actions/postDoctorNotes";
 import { getDoctorsNotesSections } from "../../../actions/Doc-actions/getDoctorNotesSections";
 import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
-import { IoClose, IoCloseOutline } from "react-icons/io5";
-import dayjs from "dayjs";
 
 export const ConsultationNotes = () => {
   const dispatch = useDispatch();
@@ -59,23 +58,15 @@ export const ConsultationNotes = () => {
 
   const items = [
     {
-      key: 0,
-      label: "Add Notes",
+      key: "addConsultation",
+      label: "Add Consultation Notes",
       children: (
         <AddConsultationNotes doctorNotesSections={doctorNotesSections} />
       ),
     },
     {
-      key: 1,
-      label: (
-        <Space>
-          <span>Check Notes</span>
-          <Badge
-            count={ipGetProcedure?.length}
-            style={{ backgroundColor: "#b08444" }}
-          />
-        </Space>
-      ),
+      key: "consultationNotes",
+      label: "View Consultation Notes",
       children: (
         <ViewConsultationNotes
           notes={ipGetProcedure}
@@ -85,7 +76,7 @@ export const ConsultationNotes = () => {
     },
   ];
 
-  return <Tabs type="card" items={items} />;
+  return <Tabs size="medium" type="card" items={items} />;
 };
 
 export const AddConsultationNotes = ({ doctorNotesSections }) => {
@@ -182,12 +173,12 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
 
   const handleSubmit = () => {
     const data = {
-      myAction: "create",
       recId: "",
       patientNo,
       SectionId,
       treatmentNo,
       notesType: "1",
+      myAction: "create",
       notes: fullTranscript,
     };
 
@@ -198,9 +189,9 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
     <Space direction="vertical" style={{ width: "100%" }}>
       <Space>
         <Select
-          placeholder="Choose Category"
           style={{ width: 320 }}
           onChange={setSectionId}
+          placeholder="Choose Category"
           options={doctorNotesSections.map(({ Section_ID, Section_Name }) => ({
             value: Section_ID,
             label: Section_Name,
@@ -274,66 +265,42 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
   );
 };
 
-export const columns = [
-  {
-    title: "Notes Type",
-    dataIndex: "Notes_Type",
-    key: "Notes_Type",
-  },
-  {
-    title: "User ID",
-    dataIndex: "User_ID",
-    key: "User_ID",
-  },
-  {
-    title: "Created Date",
-    dataIndex: "Created_Date",
-    key: "Created_Date",
-  },
-  {
-    key: "SystemId",
-    title: "Actions",
-    dataIndex: "SystemId",
-    render: (_, record) => <NotesViewDrawer data={record} />,
-  },
-];
-
-export const NotesViewDrawer = ({ data }) => {
-  const [open, setOpen] = useState(false);
-
+export const ViewConsultationNotes = ({ notes }) => {
   return (
-    <Space direction="vertical">
-      <Button type="primary" onClick={() => setOpen(true)}>
-        View Notes
-      </Button>
-      <Drawer
-        title={`${data.Notes_Type} taken on ${dayjs(data.Created_Date).format(
-          "dddd, DD MM YYYY"
-        )}`}
-        open={open}
-        size="large"
-        onClose={() => setOpen(false)}
-        extra={
-          <Button icon={<IoCloseOutline />} onClick={() => setOpen(false)} />
-        }
-        closeIcon={null}
+    <Card
+      size="small"
+      title="Consultation Notes"
+      styles={{
+        header: {
+          fontSize: "16px",
+          color: "rgb(15, 86, 137)",
+          background: "rgba(0,0,0,0.02)",
+        },
+      }}
+    >
+      <ul
+        style={{
+          padding: 0,
+          listStyle: "none",
+        }}
       >
-        <Space direction="vertical">
-          <span className="fw-bolder">Content:</span>
-          {data.Notes}
-        </Space>
-      </Drawer>
-    </Space>
-  );
-};
-
-export const ViewConsultationNotes = ({ loading, notes }) => {
-  return (
-    <Table
-      loading={loading}
-      columns={columns}
-      style={{ width: "100%" }}
-      dataSource={notes.sort((a, b) => a.LineNo - b.LineNo)}
-    />
+        {notes.map((note, index) => (
+          <li
+            style={{
+              padding: "16px",
+              borderTop: index ? "1px dashed #efefef" : "0px",
+            }}
+          >
+            <h3 style={{ fontWeight: "300", fontSize: "16px" }}>
+              {note.Notes_Section_Name} -{" "}
+              {dayjs(note.Creation_DateTime).format("DD, MMM YYYY hh:mm A")}
+            </h3>
+            <div className="">
+              <Interweave content={note.Notes} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 };

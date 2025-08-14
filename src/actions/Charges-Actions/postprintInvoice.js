@@ -17,9 +17,9 @@ export const postPrintInvoice = (patientNo) => async (dispatch, getState) => {
 
     const config = apiHeaderConfig(getState);
 
-    //get staffNo from userInfo
+    
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
     const response = await axios.post(

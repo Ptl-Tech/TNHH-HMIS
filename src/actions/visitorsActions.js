@@ -24,15 +24,15 @@ export const createVisitor = (visitor) => async (dispatch, getState) => {
     dispatch({ type: REGISTER_VISITOR_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -68,15 +68,15 @@ export const admitVisitor = (visitorId) => async (dispatch, getState) => {
     dispatch({ type: ADMIT_VISITOR_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -113,16 +113,16 @@ export const getVisitorsList = () => async (dispatch, getState) => {
     dispatch({ type: VISITORS_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
-    // Fetch branchCode from localStorage
-    const branchCode = localStorage.getItem("branchCode");
+    
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -147,20 +147,16 @@ export const getVisitorById = (idNumber) => async (dispatch, getState) => {
     dispatch({ type: VISITOR_BY_ID_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    if (!userInfo || !userInfo.userData) {
-      throw new Error("User information not available.");
-    }
-
-    const branchCode = localStorage.getItem("branchCode") || "";
+    const branchCode = user.branchCode || "";
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no, // Add staffNo as a custom header
-        sessionToken: userInfo.userData.portalSessionToken, // Add sessionToken as a Bearer token
+        staffNo: user.staffNo, // Add staffNo as a custom header
+        // Add sessionToken as a Bearer token
         branchCode: branchCode,
       },
     };
@@ -174,11 +170,17 @@ export const getVisitorById = (idNumber) => async (dispatch, getState) => {
       dispatch({ type: VISITOR_BY_ID_SUCCESS, payload: data });
       return data;
     } else {
-      dispatch({ type: VISITOR_BY_ID_FAIL, payload: "Registered visitor not found" });
+      dispatch({
+        type: VISITOR_BY_ID_FAIL,
+        payload: "Registered visitor not found",
+      });
       return null;
     }
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || "An error occurred while fetching visitor data.";
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "An error occurred while fetching visitor data.";
     dispatch({ type: VISITOR_BY_ID_FAIL, payload: errorMessage });
     return null;
   }
@@ -189,17 +191,16 @@ export const clearVisitor = (visitorId) => async (dispatch, getState) => {
     dispatch({ type: VISITOR_CLEARANCE_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user },
     } = getState();
 
-    const branchCode = localStorage.getItem("branchCode");
-    const staffNo = userInfo.userData.no;
+    const staffNo = user.staffNo;
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
         staffNo: staffNo,
-        sessionToken: userInfo.userData.portalSessionToken,
         branchCode: branchCode,
       },
     };

@@ -7,7 +7,12 @@ import { InputForm } from "./InputForm";
 
 import { saveDoctorNotes } from "../../../../actions/Doc-actions/saveDoctorNotes";
 
-export const CheckboxInputs = ({ formItems, treatmentNo, sectionId }) => {
+export const CheckboxInputs = ({
+  formItems,
+  sectionId,
+  categoryId,
+  treatmentNo,
+}) => {
   const CheckboxGroup = Checkbox.Group;
 
   const dispatch = useDispatch();
@@ -24,35 +29,45 @@ export const CheckboxInputs = ({ formItems, treatmentNo, sectionId }) => {
 
     // updating the state
     setSelectedValues((formerValues) => {
-      // getting the removed item
-      const removedItem = formerValues.findIndex(
+      // getting the removed item position
+      const removedItemIndex = formerValues.findIndex(
         (formerValue) => !newValues.includes(formerValue)
       );
-      // getting the added item
-      const addedItem = newValues.find(
+
+      // getting the added item id
+      const addedItemId = newValues.find(
         (newValue) => !formerValues.includes(newValue)
       );
 
-      if (removedItem >= 0) {
+      if (removedItemIndex >= 0) {
+        // get the system id
+        const { SystemId: systemId } = formItems.find(
+          (item) => item.Item_ID === formerValues[removedItemIndex]
+        );
+
         // delete an item from the database
         dispatch(
           saveDoctorNotes({
+            systemId,
             sectionId,
-            myAction: "edit",
+            categoryId,
+            myAction: "delete",
             isSelected: false,
             specifiedText: "",
             encounterNo: treatmentNo,
-            itemId: formerValues[removedItem],
+            itemId: formerValues[removedItemIndex],
           })
         );
-      } else if (addedItem) {
+      } else if (addedItemId) {
         // add an item to the database
         dispatch(
           saveDoctorNotes({
             sectionId,
-            myAction: "edit",
+            categoryId,
+            systemId: "",
+            myAction: "create",
             isSelected: true,
-            itemId: addedItem,
+            itemId: addedItemId,
             specifiedText: "",
             encounterNo: treatmentNo,
           })
@@ -63,15 +78,22 @@ export const CheckboxInputs = ({ formItems, treatmentNo, sectionId }) => {
     });
   };
 
-  const checkboxOptions = formItems.map(
-    ({ Is_Text_Item, Item_ID: value, Item_Name: label, Other_Specify }) => ({
+  const checkboxOptions = formItems.map((formItem) => {
+    const {
+      Is_Text_Item,
+      Item_ID: value,
+      Item_Name: label,
+      Other_Specify,
+    } = formItem;
+
+    return {
       label: Is_Text_Item ? (
         selectedValues.includes(value) ? (
           editing ? (
             <InputForm
-              treatmentNo={treatmentNo}
-              formItem={{ Other_Specify, Item_ID: value }}
               setEditing={setEditing}
+              treatmentNo={treatmentNo}
+              formItem={{ ...formItem, Section_ID: sectionId }}
             />
           ) : (
             <Space>
@@ -99,14 +121,14 @@ export const CheckboxInputs = ({ formItems, treatmentNo, sectionId }) => {
       ),
       value,
       className: Is_Text_Item ? "other-select" : "",
-    })
-  );
+    };
+  });
 
   return (
     <CheckboxGroup
-      onChange={(values) => onChange(values)}
       value={selectedValues}
       options={checkboxOptions}
+      onChange={(values) => onChange(values)}
       style={{ display: "grid", gap: 8, width: "100%" }}
     />
   );

@@ -13,19 +13,19 @@ export const postRefreshPatientCharges =
     try {
       dispatch({ type: POST_REFRESH_PATIENT_CHARGES_REQUEST });
 
-      // Get user information and branch code from state and localStorage
+     
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
 
     
       // Set headers for the request
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };

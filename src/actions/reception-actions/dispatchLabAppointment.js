@@ -15,10 +15,10 @@ export const postLabAppointment = (record = {}, patientNo = null) => async (disp
     dispatch({ type: POST_LAB_APPOINTMENT_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    const branchCode = localStorage.getItem('branchCode') || '';
+    const branchCode = user.branchCode
 
     // Use patientNo if explicitly passed, otherwise extract from record
     const resolvedPatientNo = patientNo || record.PatientNo;
@@ -30,15 +30,15 @@ export const postLabAppointment = (record = {}, patientNo = null) => async (disp
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode,
       },
     };
 
     const payload={
       patientNo: String(resolvedPatientNo),
-      staffNo: userInfo.userData.no,
+      staffNo: user.staffNo,
       branchCode: branchCode
 
     }

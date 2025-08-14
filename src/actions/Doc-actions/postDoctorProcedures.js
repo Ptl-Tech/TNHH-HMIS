@@ -40,15 +40,15 @@ export const postPatientECTRequest = (prescription) => async (dispatch, getState
     dispatch({ type: POST_PATIENT_ETC_REQUEST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
-    const branchCode = localStorage.getItem("branchCode");
+    const branchCode = user.branchCode;
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo.userData.no,
-        sessionToken: userInfo.userData.portalSessionToken,
+        staffNo: user.staffNo,
+        
         branchCode: branchCode,
       },
     };
@@ -95,15 +95,15 @@ export const postPatientImplantRequest = (prescription) => async (dispatch, getS
       dispatch({ type: POST_PATIENT_IMPLANT_REQUEST_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };
@@ -150,15 +150,15 @@ export const postPatientKetamineRequest = (prescription) => async (dispatch, get
       dispatch({ type: POST_PATIENT_KETAMINE_REQUEST_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo.userData.no,
-          sessionToken: userInfo.userData.portalSessionToken,
+          staffNo: user.staffNo,
+          
           branchCode: branchCode,
         },
       };
@@ -206,15 +206,15 @@ export const getPatientECTRequest = (treatmentNo) => async (dispatch, getState) 
       dispatch({ type: GET_PATIENT_ETC_REQUEST_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo?.userData?.no,
-          sessionToken: userInfo?.userData?.portalSessionToken,
+          staffNo: user.staffNo,
+         
           branchCode: branchCode,
         },
       };
@@ -241,15 +241,15 @@ export const getPatientECTRequest = (treatmentNo) => async (dispatch, getState) 
       dispatch({ type: GET_PATIENT_KETAMINE_REQUEST_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo?.userData?.no,
-          sessionToken: userInfo?.userData?.portalSessionToken,
+          staffNo: user.staffNo,
+         
           branchCode: branchCode,
         },
       };
@@ -276,15 +276,15 @@ export const getPatientECTRequest = (treatmentNo) => async (dispatch, getState) 
       dispatch({ type: GET_PATIENT_IMPLANT_REQUEST_REQUEST });
   
       const {
-        otpVerify: { userInfo },
+        auth: { user }
       } = getState();
-      const branchCode = localStorage.getItem("branchCode");
+      const branchCode = user.branchCode;
   
       const config = {
         headers: {
           "Content-Type": "application/json",
-          staffNo: userInfo?.userData?.no,
-          sessionToken: userInfo?.userData?.portalSessionToken,
+          staffNo: user.staffNo,
+         
           branchCode: branchCode,
         },
       };

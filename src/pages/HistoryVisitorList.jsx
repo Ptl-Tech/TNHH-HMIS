@@ -18,14 +18,10 @@ import dayjs from "dayjs";
 import { getVisitorsList } from "../actions/visitorsActions";
 import moment from "moment";
 
-const { Search } = Input;
-
 const HistoryVisitorList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const { loading, error, visitors } = useSelector((state) => state.visitorsList);
-  const { userInfo } = useSelector((state) => state.otpVerify); 
+  const {  visitors } = useSelector((state) => state.visitorsList);
 
   const [searchParams, setSearchParams] = useState({
     VisitorNumber: "",

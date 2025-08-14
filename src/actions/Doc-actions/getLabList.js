@@ -18,11 +18,6 @@ export const getLabList = () => async (dispatch, getState) => {
       auth: { user },
     } = getState();
 
-    // Ensure `branchCode` is correctly fetched from localStorage
-    const branchCode = localStorage.getItem("branchCode") || "";
-
-    console.log({ user });
-
     // Set up the request configuration with headers
     const config = {
       headers: {

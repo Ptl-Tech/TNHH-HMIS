@@ -1,11 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import {
-  otpVerifyReducer,
-  userLoginReducer,
-  userRegisterReducer,
-  forgotPasswordReducer,
-  resetPwdReducer,
-} from "./userReducer";
+
 import {
   activePatientsReducer,
   appmntListReducer,
@@ -226,7 +220,11 @@ import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgen
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
 import { postDoctorNotesReducer } from "./doc-reducers/postDoctorNotesReducer";
-import { getBillingListReducer, getPastEncounterBillingListReducer, getPatientBillingListReducer } from "./ChargesReducers/getBillingListReducer";
+import {
+  getBillingListReducer,
+  getPastEncounterBillingListReducer,
+  getPatientBillingListReducer,
+} from "./ChargesReducers/getBillingListReducer";
 import { postPatientHistoryNotesReducer } from "./doc-reducers/postPatientHistoryNotesReducer";
 import { getPatientHistoryNotes } from "./doc-reducers/getPatientHistoryReducer";
 import { postMSENotesReducer } from "./doc-reducers/postMSEFormReducer";
@@ -342,15 +340,12 @@ import { postDispatchToLabReducer } from "./lab-reducers/postDispatchToLabReduce
 import { getDoctorNotesSectionsReducer } from "./doc-reducers/getDoctorNotesSectionsReducers";
 import { getAdmissionsReducer } from "./nurse-reducers/getPgAdmissionsReducer";
 import { authReducer } from "./auth/auth-reducer";
+import { getConsultationNotesFormReducer } from "./doc-reducers/getConsultationNotesReducer";
+import { getBriefMSENotesFormReducer } from "./doc-reducers/getBriefMSENotesFormReducer";
 
 export const rootReducer = combineReducers({
   // Auth
   auth: authReducer,
-  userLogin: userLoginReducer,
-  otpVerify: otpVerifyReducer,
-  userRegister: userRegisterReducer,
-  forgotPassword: forgotPasswordReducer,
-  resetPwd: resetPwdReducer,
 
   //security reducers:-->>mercy
   registerVisitor: visitorCreateReducer,
@@ -391,10 +386,10 @@ export const rootReducer = combineReducers({
   getRadiologyDetails: getRadiologyDetailsReducer,
   postTriageVisit: postTriageVisitReducer,
   marketingList: getmarketingStrategiesReducer,
-  // triageList:triageListReducer,
+
   postPatientVitals: postPatientVitalsReducer,
   postDoctorTreatment: postDoctorTreatmentReducer,
-  // loadUserInfo:loadUserInfo,
+
   getTriageWaitingList: getTriageWaitingListReducer,
 
   getTriageList: getTriageListReducer,
@@ -428,6 +423,8 @@ export const rootReducer = combineReducers({
   getDoctorsNotesData: getDoctorsNotesDataReducer,
   getBriefMSENotesData: getBriefMSENotesDataReducer,
   saveDoctorNotes: saveDoctorNotesReducer,
+  getBriefMSENotesForm: getBriefMSENotesFormReducer,
+  getConsultationNotesForm: getConsultationNotesFormReducer,
   // past encounters
   getPatientEncounters: getPatientEncounterListReducer,
   getEncounterList: getEncounterListReducer,
@@ -497,7 +494,7 @@ export const rootReducer = combineReducers({
   // ************************************* /
 
   // nurse
-  getBranchesList:QyBranchesListReducer,
+  getBranchesList: QyBranchesListReducer,
   getSinglePatient: getSinglePatientReducer,
   getIPVisitors: getVisitorsListReducer,
   postSuicidalForm: postSuicidalFormReducer,
@@ -591,7 +588,7 @@ export const rootReducer = combineReducers({
   postMSEForm: postMSENotesReducer,
   getPatientMSE: getPatientMSENotesReducer,
   getTreatmentDiagnosisLines: getPatientTreamentDiagnosisLinesReducer,
-  getAdmissionList:getAdmissionsReducer,
+  getAdmissionList: getAdmissionsReducer,
   getPgAdmissionsAdmitted: getAdmissionsAdmittedReducer,
   getSingleAdmitted: getSingleAdmittedReducer,
   getQyPrescriptionLine: getQyPrescriptionLinesReducer,

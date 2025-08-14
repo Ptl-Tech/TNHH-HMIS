@@ -43,11 +43,13 @@ const ConsultationRoomPatients = () => {
 
   const canReadOwnConsultationNotes = (doctorId) =>
     ability.can("read", subject("ownConsultationNotes", { doctorId }));
-  
+  const canReadOutPatients = ability.can("read", "outPatients");
+
   const filterByStatus = (status) =>
     treatmentList?.filter(
       (item) =>
-        canReadOwnConsultationNotes(item?.DoctorID) && item.Status === status
+        (canReadOwnConsultationNotes(item?.DoctorID) || canReadOutPatients) &&
+        item.Status === status
     );
 
   const openDoctorVisitList = filterByStatus("New");
@@ -94,6 +96,7 @@ const ConsultationRoomPatients = () => {
 
   return (
     <div style={{ padding: "10px 10px" }}>
+     
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}

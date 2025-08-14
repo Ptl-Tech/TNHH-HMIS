@@ -14,9 +14,10 @@ export const AbilityProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isInAuthPages = () => {
-    return location.pathname === "/login";
-  };
+  const isInAuthPages = () =>
+    new Set(["/login", "/forgot-password", "/reset-password"]).has(
+      location.pathname
+    );
 
   useEffect(() => {
     fetchUser();
@@ -24,9 +25,7 @@ export const AbilityProvider = ({ children }) => {
 
   useEffect(() => {
     if (!loading) {
-      console.log({ user, isTrue: user === null });
-
-      if (user === null) return navigate("/login");
+      if (user === null && !isInAuthPages()) return navigate("/login");
       if (user && isInAuthPages()) return navigate("/Dashboard");
     }
   }, [user, loading, navigate]);

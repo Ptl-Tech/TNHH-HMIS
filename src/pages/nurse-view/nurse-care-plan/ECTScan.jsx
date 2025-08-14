@@ -14,7 +14,7 @@ const ECTScan = () => {
   const ability = useAbility();
   const location = useLocation();
 
-  const canCreateECTRequest = ability.can("create", "eCTRequest");
+  const canCreateECTRequest = ability.can("create", "ectRequest");
 
   const patientDetails = location.state?.patientDetails;
   const queryParams = new URLSearchParams(location.search);

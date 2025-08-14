@@ -7,7 +7,12 @@ import { InputForm } from "./InputForm";
 
 import { saveDoctorNotes } from "../../../../actions/Doc-actions/saveDoctorNotes";
 
-export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
+export const RadioInputs = ({
+  sectionId,
+  formItems,
+  categoryId,
+  treatmentNo,
+}) => {
   // console.log({ formItems });
 
   const RadioGroup = Radio.Group;
@@ -27,10 +32,17 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
     setSelectedItem((prevItem) => {
       // removing the previous item from the database
       if (prevItem) {
+        // get the system id
+        const { SystemId: systemId } = formItems.find(
+          (item) => item.Item_ID === prevItem
+        );
+
         dispatch(
           saveDoctorNotes({
+            systemId,
             sectionId,
-            myAction: "edit",
+            categoryId,
+            myAction: "delete",
             itemId: prevItem,
             isSelected: false,
             specifiedText: "",
@@ -42,12 +54,19 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
       // save the added item to the database
       // if they are same, then it should be removed
       if (valueToReset && prevItem === valueToReset) {
+        // get the system id
+        const { SystemId: systemId } = formItems.find(
+          (item) => item.Item_ID === valueToReset
+        );
+
         dispatch(
           saveDoctorNotes({
+            systemId,
             sectionId,
-            myAction: "edit",
+            categoryId,
             isSelected: false,
             specifiedText: "",
+            myAction: "delete",
             itemId: valueToReset,
             encounterNo: treatmentNo,
           })
@@ -56,8 +75,10 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
         dispatch(
           saveDoctorNotes({
             sectionId,
+            categoryId,
+            systemId: "",
             itemId: value,
-            myAction: "edit",
+            myAction: "create",
             isSelected: true,
             specifiedText: "",
             encounterNo: treatmentNo,
@@ -69,15 +90,22 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
     });
   };
 
-  const radioOptions = formItems.map(
-    ({ Is_Text_Item, Item_ID: value, Item_Name: label, Other_Specify }) => ({
+  const radioOptions = formItems.map((formItem) => {
+    const {
+      Is_Text_Item,
+      Item_ID: value,
+      Item_Name: label,
+      Other_Specify,
+    } = formItem;
+
+    return {
       label: Is_Text_Item ? (
         selectedItem === value ? (
           editing ? (
             <InputForm
-              treatmentNo={treatmentNo}
-              formItem={{ Other_Specify, Item_ID: value }}
+              formItem={{ ...formItem, Section_ID: sectionId }}
               setEditing={setEditing}
+              treatmentNo={treatmentNo}
             />
           ) : (
             <Space>
@@ -139,8 +167,8 @@ export const RadioInputs = ({ formItems, treatmentNo, sectionId }) => {
       ),
       value,
       className: Is_Text_Item ? "other-select" : "",
-    })
-  );
+    };
+  });
 
   return (
     <RadioGroup

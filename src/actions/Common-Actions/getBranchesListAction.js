@@ -16,17 +16,17 @@ export const QyBranchesList = () => async (dispatch, getState) => {
     dispatch({ type: GET_BRANCHES_LIST_REQUEST });
 
     const {
-      otpVerify: { userInfo },
+      auth: { user }
     } = getState();
 
-    // Retrieve branch code from localStorage or fallback to empty string
-    const branchCode = localStorage.getItem("branchCode") || "";
+    
+    const branchCode = user.branchCode || "";
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        staffNo: userInfo?.userData?.no || "",
-        sessionToken: userInfo?.userData?.portalSessionToken || "",
+        staffNo: user.staffNo,
+       
         branchCode,
       },
     };
