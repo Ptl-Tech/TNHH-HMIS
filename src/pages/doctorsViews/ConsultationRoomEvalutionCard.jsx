@@ -41,6 +41,7 @@ const ConsultationRoomEvalutionCard = () => {
             patientDetails={patientDetails}
           />
         )}
+        <div className="p-8">&nbsp;</div>
         <EvaluationCardContent
           patientNo={patientNo}
           treatmentNo={treatmentNo}

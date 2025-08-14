@@ -6,16 +6,27 @@ import dayjs from "dayjs";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { Interweave } from "interweave";
 
+import {
+  Tabs,
+  Space,
+  Input,
+  Drawer,
+  Select,
+  Button,
+  Tooltip,
+  message,
+  Card,
+} from "antd";
 import { RiEdit2Fill } from "react-icons/ri";
 import { IoCloseOutline } from "react-icons/io5";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa6";
-import { Space, Input, Drawer, Select, Button, Tooltip, message } from "antd";
 
 import { NoData } from "../../../components/NoData";
 import {
-  POST_DOCTOR_NOTES_RESET,
   postDoctorNotes,
+  POST_DOCTOR_NOTES_RESET,
 } from "../../../actions/Doc-actions/postDoctorNotes";
 import { getDoctorsNotesSections } from "../../../actions/Doc-actions/getDoctorNotesSections";
 import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
@@ -45,23 +56,30 @@ export const ConsultationNotes = () => {
     dispatch(getDoctorsNotesSections({ treatmentNo }));
   }, [postDoctorNotesData]);
 
-  return (
-    <>
-      <AddConsultationNotes
-        notes={ipGetProcedure}
-        loading={loadingGetIpProcedure}
-        doctorNotesSections={doctorNotesSections}
-      />
-      ;
-    </>
-  );
+  const items = [
+    {
+      key: "addConsultation",
+      label: "Add Consultation Notes",
+      children: (
+        <AddConsultationNotes doctorNotesSections={doctorNotesSections} />
+      ),
+    },
+    {
+      key: "consultationNotes",
+      label: "View Consultation Notes",
+      children: (
+        <ViewConsultationNotes
+          notes={ipGetProcedure}
+          loading={loadingGetIpProcedure}
+        />
+      ),
+    },
+  ];
+
+  return <Tabs size="medium" type="card" items={items} />;
 };
 
-export const AddConsultationNotes = ({
-  notes,
-  loading,
-  doctorNotesSections,
-}) => {
+export const AddConsultationNotes = ({ doctorNotesSections }) => {
   const [editing, setEditing] = useState(false);
   const [SectionId, setSectionId] = useState(null);
   const [fullTranscript, setFullTranscript] = useState("");
@@ -226,7 +244,6 @@ export const AddConsultationNotes = ({
         >
           Submit
         </Button>
-        <NotesViewDrawer notes={notes} loading={loading} />
       </Space>
       {editing ? (
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -248,50 +265,42 @@ export const AddConsultationNotes = ({
   );
 };
 
-export const NotesViewDrawer = ({ notes }) => {
-  const [open, setOpen] = useState(false);
-
-  console.log({ notes });
-
+export const ViewConsultationNotes = ({ notes }) => {
   return (
-    <Space direction="vertical">
-      <Button type="primary" onClick={() => setOpen(true)}>
-        View Notes
-      </Button>
-      <Drawer
-        title={
-          <span style={{ fontSize: "18px", fontWeight: "300" }}>
-            Consulatation Notes for {notes[0]?.Patient_Name}
-          </span>
-        }
-        open={open}
-        size="large"
-        closeIcon={null}
-        onClose={() => setOpen(false)}
-        extra={
-          <Button icon={<IoCloseOutline />} onClick={() => setOpen(false)} />
-        }
+    <Card
+      size="small"
+      title="Consultation Notes"
+      styles={{
+        header: {
+          fontSize: "16px",
+          color: "rgb(15, 86, 137)",
+          background: "rgba(0,0,0,0.02)",
+        },
+      }}
+    >
+      <ul
+        style={{
+          padding: 0,
+          listStyle: "none",
+        }}
       >
-        <Space direction="vertical">
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {notes.map((note) => (
-              <>
-                <li>
-                  <h3 style={{ fontWeight: "300", fontSize: "18px" }}>
-                    {note.Notes_Section_Id} -{" "}
-                    {dayjs(note.Treatment_Date).format(
-                      "dddd DD MMM YYYY hh:mm A"
-                    )}
-                  </h3>
-                  <p style={{ fontSize: "15px", fontWeight: "400" }}>
-                    {note.Notes}
-                  </p>
-                </li>
-              </>
-            ))}
-          </ul>
-        </Space>
-      </Drawer>
-    </Space>
+        {notes.map((note, index) => (
+          <li
+            style={{
+              padding: "16px",
+              borderTop: index ? "1px dashed #efefef" : "0px",
+            }}
+          >
+            <h3 style={{ fontWeight: "300", fontSize: "16px" }}>
+              {note.Notes_Section_Name} -{" "}
+              {dayjs(note.Creation_DateTime).format("DD, MMM YYYY hh:mm A")}
+            </h3>
+            <div className="">
+              <Interweave content={note.Notes} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 };

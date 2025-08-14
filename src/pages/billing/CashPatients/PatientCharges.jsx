@@ -26,7 +26,6 @@ const formatKES = (amount) => {
   });
 };
 
-
 const PatientCharges = ({ activeVisitNo }) => {
   const dispatch = useDispatch();
   const { loading, error, data } = useSelector(
@@ -198,20 +197,7 @@ const PatientCharges = ({ activeVisitNo }) => {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
-        <div className="d-flex flex-column">
-          <Typography.Text
-            strong
-            underline
-            style={{ fontSize: "14px", color: "#0f5689", marginBottom: "12px" }}
-          >
-            Service Items
-          </Typography.Text>
-          <span
-            style={{ fontSize: "14px", color: "#888", fontStyle: "italic" }}
-          >
-            Billing Items
-          </span>
-        </div>
+        <div className="d-flex flex-column"></div>
         <Button
           type="primary"
           onClick={handleAddChargeView}
