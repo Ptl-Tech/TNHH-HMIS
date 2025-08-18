@@ -1,50 +1,97 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { QyBranchesList } from "../../actions/Common-Actions/getBranchesListAction";
-import { Divider, List, Spin, Typography, Skeleton } from "antd";
+import { Divider, List, Skeleton, Typography, Select } from "antd";
+import { useGetWardManagementHook } from "../../hooks/useGetWardManagementHook";
+import { useAuth } from "../../hooks/auth";
 
-const InpatientBranchFilters = () => {
+const { Option } = Select;
+
+const InpatientWardFilters = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, data } = useSelector((state) => state.getBranchesList);
+  const { user } = useAuth();
+  const branchCode = user.branchCode;
 
-  useEffect(() => {
-    dispatch(QyBranchesList());
-  }, [dispatch]);
+  const { getBeds, loadingWards, getWards } = useGetWardManagementHook();
+  const [branchFilter, setBranchFilter] = useState(branchCode); // default to user's branch
 
-  console.log("Branches List Data:", data);
+  // Extract branch codes for dropdown
+  const branchOptions = useMemo(() => {
+    if (!Array.isArray(getWards)) return [];
+    const uniqueBranches = [...new Set(getWards.map(w => w.Branch_Code))];
+    return uniqueBranches.map(code => ({
+      value: code,
+      label: code
+    }));
+  }, [getWards]);
 
+  // Filter wards based on selected branch
+  const filteredWards = useMemo(() => {
+    if (!Array.isArray(getWards)) return [];
+    return getWards.filter(w => w.Branch_Code === branchFilter);
+  }, [getWards, branchFilter]);
   return (
     <>
-      <Typography.Title level={4}>Inpatient Branch Filters</Typography.Title>
+      <Typography.Title level={4}>Inpatient Ward Filters</Typography.Title>
 
-      {loading ? (
+      {loadingWards ? (
         <Skeleton active paragraph={{ rows: 2 }} />
       ) : (
         <>
-          <Typography.Text type="secondary">
-            Click on a branch to filter the inpatient list.
+        
+          <Divider />
+  <Typography.Text type="secondary" style={{ paddingBottom: 26, fontWeight: "bold" }}>
+            Select a branch to filter wards, then click a ward to view inpatients.
           </Typography.Text>
 
-          <Divider />
+          <Select
+            allowClear
+            placeholder="Filter by Branch Code"
+            style={{ width: "100%", marginBottom: 16, marginTop: 8}}
+            onChange={value => setBranchFilter(value || branchCode)}
+            value={branchFilter}
+          >
+            {branchOptions.map(branch => (
+              <Option key={branch.value} value={branch.value}>
+                {branch.label}
+              </Option>
+            ))}
+          </Select>
 
           <List
-            header={<div>Branch Details</div>}
+            header={<div>Ward List</div>}
             bordered
-            size="Large"
-            dataSource={Array.isArray(data) ? data.filter((item) => item.Code !== "MUTHITHI-94" && item.Code !== "MUTHITHI" && item.Code !== "UPPERHILL" && item.Code !== "CHIROMO") : []}
+            size="large"
+            dataSource={filteredWards}
             renderItem={(item) => (
               <List.Item
                 onClick={() =>
-                  navigate(`/Dashboard/Inpatient/Inpatient-List/${item.Code}`, {
-                    state: { filterParam: item.Code },
+                  navigate(`/Dashboard/Inpatient/Inpatient-List/${item.Ward_Code}`, {
+                    state: { filterParam: item.Ward_Code },
                   })
                 }
+                style={{ cursor: "pointer" }}
               >
-                <Typography.Text style={{ marginRight: 8, cursor: "pointer", color: "#0f5689", fontWeight: "bold", textTransform: "uppercase" }}  strong>{item.Name}</Typography.Text>
-                <span style={{ marginLeft: 8, color: "#999", fontSize: "0.9em", fontStyle: "italic", cursor: "pointer" }}>
-                  {item.Code}
+                <Typography.Text
+                  style={{
+                    marginRight: 8,
+                    color: "#0f5689",
+                    fontWeight: "bold",
+                    textTransform: "uppercase"
+                  }}
+                >
+                  {item.Ward_Name}
+                </Typography.Text>
+                <span
+                  style={{
+                    marginLeft: 8,
+                    color: "#999",
+                    fontSize: "0.9em",
+                    fontStyle: "italic"
+                  }}
+                >
+                  {item.Branch_Code}
                 </span>
               </List.Item>
             )}
@@ -57,4 +104,4 @@ const InpatientBranchFilters = () => {
   );
 };
 
-export default InpatientBranchFilters;
+export default InpatientWardFilters;

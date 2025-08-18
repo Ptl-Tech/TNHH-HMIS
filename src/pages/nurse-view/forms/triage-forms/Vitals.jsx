@@ -23,24 +23,31 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
     dispatch(getVitalsLinesSlice(observationNumber));
   }, [dispatch, observationNumber]);
 
-  // useEffect(() => {
-  //   if (vitalsLines) {
-  //     form.setFieldsValue({
-  //       vitals: {
-  //         pulseRate: PulseRate || '',
-  //         height: Height || '',
-  //         weight: Weight || '',
-  //         temperature: Temperature || '',
-  //         bloodPreasure: BloodPressure || '',
-  //         sP02: SP02,
-  //         respirationRate: RespirationRate || '',
-  //         bmi: BMI ? BMI.toFixed(2) : "0.0",
-  //       },
-  //     });
-  //   }else{
-  //     form.resetFields();
-  //   }
-  //   }, [PulseRate, Pain, Height, Weight, Temperature, BloodPressure, SP02, RespirationRate, BMI, form, vitalsLines]);
+  useEffect(() => {
+   if (Array.isArray(vitalsLines) && vitalsLines.length > 0) {
+  const latest = vitalsLines[vitalsLines.length - 1]; // last record in array
+  form.setFieldsValue({
+    vitals: {
+      pulseRate: latest?.PulseRate || "",
+      height: latest?.Height || "",
+      weight: latest?.Weight || "",
+      temperature: latest?.Temperature || "",
+      systolic: latest?.BloodPressure
+        ? latest?.BloodPressure.split("/")[0]
+        : "",
+      diastolic: latest?.BloodPressure
+        ? latest?.BloodPressure.split("/")[1]
+        : "",
+      sP02: latest?.SP02 || "",
+      respirationRate: latest?.RespirationRate || "",
+      bmi: latest?.BMI ? latest?.BMI.toFixed(2) : "0.0",
+    },
+  });
+} else {
+  form.resetFields();
+}
+
+  }, [vitalsLines, form]);
 
   const onFinish = async (values) => {
     try {
@@ -62,10 +69,12 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
         height: parseFloat(cleanValue(height)),
         weight: parseFloat(cleanValue(weight)),
         temperature: parseFloat(cleanValue(temperature)),
-        bloodPreasure: `${cleanValue(systolic)}/${cleanValue(diastolic)}`,
+        bloodPressure:'',
+        systolicBp:  parseFloat(cleanValue(systolic)),
+        diastolicBp: parseFloat(cleanValue(diastolic)),
         sP02,
         respirationRate,
-        BMI: calculateBMI(height, weight),
+       // BMI: calculateBMI(height, weight),
       };
 
       // Common payload properties
@@ -144,6 +153,13 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
   };
 
   const columns = [
+     {
+          title: "No",
+          dataIndex: "No",
+          key: "No",
+          render: (_, __, index) => index + 1,
+          width: 50,  
+        },
     {
       title: "Observation No",
       dataIndex: "ObservationNo",
@@ -171,11 +187,11 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
       dataIndex: "Temperature",
       key: "Temperature",
     },
-    {
-      title: "Blood BloodPressure",
-      dataIndex: "BloodPressure",
-      key: "BloodPressure",
-    },
+    // {
+    //   title: "Blood BloodPressure",
+    //   dataIndex: "BloodPressure",
+    //   key: "BloodPressure",
+    // },
     {
       title: "SP02",
       dataIndex: "SP02",
@@ -500,10 +516,17 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
             <div style={{ marginTop: "10px" }}>
               <Table
                 columns={columns}
+                size="middle"
                 dataSource={
-                  Array.isArray(vitalsLines) ? vitalsLines : [vitalsLines]
-                }
-                pagination={false}
+  Array.isArray(vitalsLines)
+    ? [...vitalsLines].reverse() // reverse order for newest first
+    : [vitalsLines]
+}
+                pagination={{
+                  defaultPageSize: 10,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "30", "40", "50"],
+                }}
               />
             </div>
           )}

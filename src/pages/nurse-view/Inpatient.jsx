@@ -79,12 +79,11 @@ const Inpatient = () => {
       (patient) => canReadOwnInpatients(patient.Doctor) || canReadAllInpatients
     );
   }, [combinedPatients, ability]);
-
   const filteredByStatus = useMemo(() => {
     const filteredByStatus = filterPatientBasedWithDoctor?.filter(
-      ({ Status, Branch }) =>
+      ({ Status, Ward }) =>
         (Status === "Admitted" || Status === "Discharge Pending") &&
-        (user.role == "NURSE" ? Branch == location.state.filterParam : true)
+        (user.role == "NURSE" ? Ward == location.state.filterParam : true)
     );
 
     return filteredByStatus;

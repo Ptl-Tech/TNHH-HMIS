@@ -8,7 +8,6 @@ import {
   POST_NURSE_ADMISSION_NOTES_SUCCESS,
   postNurseAdmissionNotesSlice,
 } from "../../../actions/nurse-actions/postNurseAdmissionNotesSlice";
-// import useAuth from "../../../hooks/useAuth";
 
 import { EditorState, convertToRaw } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
@@ -18,18 +17,22 @@ import PropTypes from "prop-types";
 import NursingNotesFormData from "../nurse-forms/NursingNotesFormData";
 import NursingNotesTable from "../tables/nurse-tables/NursingNotesTable";
 import { getNurseAdmissionNotesSlice } from "../../../actions/nurse-actions/getNurseAdmissionNotesSlice";
-import { useAbility } from "../../../hooks/casl";
+import { is } from "immutable";
 import { useAuth } from "../../../hooks/auth";
+import { useAbility } from "../../../hooks/casl";
 
 const NursingNotes = () => {
-  const { user } = useAuth();
   const ability = useAbility();
+  const { user } = useAuth();
+    const dispatch = useDispatch();
 
-  const canCreateNurseNotes = ability.can("create", "nurseNotes");
+  const role = user?.role; // Get user role from useAuth hook
+  const isDoctor = role.toLowerCase() === "doctor";
 
   const { patientDetails } = useLocation().state;
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
+
+  const canCreateNurseNotes = ability.can("create", "nurseNotes");
   const branchCode = user?.branchCode;
   const [isNursingNotesFormVisible, setIsNursingNotesFormVisible] =
     useState(false);
@@ -119,7 +122,7 @@ const NursingNotes = () => {
     <div>
       <NurseInnerHeader icon={<FileProtectOutlined />} title="Nursing Notes" />
 
-      {canCreateNurseNotes && (
+      {!isNursingNotesFormVisible && canCreateNurseNotes && (
         <div
           style={{
             display: "flex",

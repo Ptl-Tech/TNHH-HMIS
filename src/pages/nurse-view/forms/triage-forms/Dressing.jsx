@@ -11,33 +11,23 @@ import {
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import PropTypes from "prop-types";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getStoreRequisitionHeadersSlice } from "../../../../actions/triage-actions/getStoreRequisitionHeadersSlice";
 import { getItemsSlice } from "../../../../actions/triage-actions/getItemsSlice";
-import { getItemUnitsOfMeasureSlice } from "../../../../actions/triage-actions/getItemUnitsOfMeasureSlice";
 import { getDressingSlice } from "../../../../actions/triage-actions/getDressingSlice";
 import { SaveOutlined } from "@ant-design/icons";
 import { postDressingsSlice } from "../../../../actions/triage-actions/postDressingsSlice";
 
 const Dressing = ({ observationNumber, staffNo }) => {
   const dispatch = useDispatch();
-  const { requisitionHeaders } = useSelector(
-    (state) => state.getStoreRequisitionHeaders
-  );
   const { items } = useSelector((state) => state.getItems);
-  const { itemUnitsOfMeasure } = useSelector((state) => state.getItemUnits);
   const { dressing } = useSelector((state) => state.getDressing);
   const { dressingsLoading } = useSelector((state) => state.postDressings);
 
-  const onFinish = (values) => {
-    const {
-      processNumber,
-      itemNumber,
-      unitsOfMeasure,
-      quantity,
-      injectionRemarks,
-    } = values.dressing;
+  // Save handler
+  const onFinish =async (values) => {
+    const { processNumber, itemNumber, unitsOfMeasure, quantity, injectionRemarks } =
+      values.dressing;
 
     const createDressing = {
       processNo: processNumber,
@@ -50,61 +40,50 @@ const Dressing = ({ observationNumber, staffNo }) => {
       myAction: "create",
     };
 
-    //check if vitals exists ifs so update else create
-    dispatch(postDressingsSlice(createDressing)).then((data) => {
+    await dispatch(postDressingsSlice(createDressing)).then((data) => {
       if (data?.status === "success") {
-        message.success(data?.status);
-        // dispatch(getVitalsLinesSlice(patientNo));
+        message.success("Dressing saved successfully");
+        dispatch(getDressingSlice(observationNumber));
       } else {
         message.error("Error saving dressings");
       }
     });
-
-    dispatch(getDressingSlice(observationNumber));
   };
 
-  useEffect(() => {
-    dispatch(getStoreRequisitionHeadersSlice());
-  }, [dispatch]);
-
+  // Fetch initial data
   useEffect(() => {
     dispatch(getItemsSlice());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getItemUnitsOfMeasureSlice());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(getDressingSlice(observationNumber));
   }, [dispatch, observationNumber]);
 
+  // Columns definition
   const columns = [
-    {
-      title: "Item Number",
-      dataIndex: "itemNo",
-      key: "itemNo",
-    },
-    {
-      title: "Unit of Measure",
-      dataIndex: "unitOfMeasure",
-      key: "unitOfMeasure",
-    },
+    { title: "Item Number", dataIndex: "itemNo", key: "itemNo" },
+    { title: "Unit of Measure", dataIndex: "unitOfMeasure", key: "unitOfMeasure" },
   ];
 
-  const [ItemNo, ProcessNo, UnitOfMeasure, Remarks, ObservationNo, Quantity] =
-    dressing;
+  // Normalize dressing data
+  const dataSource = useMemo(() => {
+    if (!dressing) return [];
 
-  const dataSource = [
-    {
-      key: ObservationNo,
-      quantity: Quantity,
-      itemNo: ItemNo,
-      processNumber: ProcessNo,
-      unitOfMeasure: UnitOfMeasure,
-      remarks: Remarks,
-    },
-  ];
+    let records = Array.isArray(dressing) ? dressing : [dressing];
+
+    // Sort latest first (assuming there's a createdAt or similar timestamp)
+    records = records.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+
+    return records.map((rec, index) => ({
+      key: rec.id || `${rec.itemNo}-${index}`,
+      quantity: rec.quantity,
+      itemNo: rec.itemNo,
+      processNumber: rec.processNo,
+      unitOfMeasure: rec.unitOfMeasure,
+      remarks: rec.remarks,
+    }));
+  }, [dressing]);
 
   return (
     <div>
@@ -128,10 +107,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
               label="Item No"
               name={["dressing", "itemNumber"]}
               hasFeedback
-              rules={[{ required: true, message: "Please input item no!" }]}
+              rules={[{ required: true, message: "Please select item no!" }]}
             >
               <Select
-                key={"location"}
                 style={{ width: "100%" }}
                 optionFilterProp="label"
                 options={items.map((item) => ({
@@ -140,7 +118,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
                 }))}
                 placeholder="Select item number"
                 showSearch
-              ></Select>
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -148,53 +126,10 @@ const Dressing = ({ observationNumber, staffNo }) => {
               label="Quantity"
               name={["dressing", "quantity"]}
               hasFeedback
+              rules={[{ required: true, message: "Please input quantity!" }]}
             >
               <Input type="number" />
             </Form.Item>
-          </Col>
-          {/* <Col span={12}>
-                        <Form.Item label="Unit of measure" name={['dressing', 'unitsOfMeasure']}
-                            hasFeedback
-                        >
-                            <Select
-                                key={'location'}
-                                style={{ width: '100%' }}
-                                optionFilterProp="label"
-                                options={itemUnitsOfMeasure.map((itemUnit) => ({ label: itemUnit.ItemNo, value: itemUnit.ItemNo }))}
-                                placeholder="Select units of measure"
-                                showSearch
-
-                            >
-                            </Select>
-
-                        </Form.Item>
-                    </Col> */}
-        </Row>
-        <Row gutter={[16, 16]}>
-          {/* <Col span={12}>
-                        <Form.Item label="Quantity" name={['dressing', 'quantity']}
-                            hasFeedback
-                        >
-                            <Input type='number'
-
-                            />
-                        </Form.Item>
-                    </Col> */}
-          <Col span={12}>
-            {/* <Form.Item label="Process No" name={['dressing', 'processNumber']}
-            rules={[{ required: true, message: 'Please input process no!' }]}
-            hasFeedback
-        >
-         <Select 
-            key={'location'}
-            style={{ width: '100%' }}
-            optionFilterProp="label"
-            options={requisitionHeaders} 
-            placeholder="Select process number"
-            
-        >
-        </Select>
-        </Form.Item> */}
           </Col>
         </Row>
 
@@ -210,7 +145,6 @@ const Dressing = ({ observationNumber, staffNo }) => {
                   minRows: 3,
                   maxRows: 5,
                 }}
-                name="injectionRemarks"
               />
             </Form.Item>
             <Col span={12}>
@@ -230,7 +164,7 @@ const Dressing = ({ observationNumber, staffNo }) => {
         </Row>
       </Form>
 
-      {dressing && Object.keys(dressing).length > 0 && (
+      {dataSource.length > 0 && (
         <div style={{ marginTop: "10px" }}>
           <Divider />
           <Table
@@ -240,10 +174,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
             expandable={{
               expandedRowRender: (record) => (
                 <p style={{ margin: 0 }}>
-                  Quantity : {record.quantity}, Remarks : {record.remarks},
+                  Quantity: {record.quantity}, Remarks: {record.remarks}
                 </p>
               ),
-              rowExpandable: (record) => record.name !== "Not Expandable",
             }}
           />
         </div>
@@ -252,11 +185,9 @@ const Dressing = ({ observationNumber, staffNo }) => {
   );
 };
 
-export default Dressing;
-
-//propTypes validation
-
 Dressing.propTypes = {
   observationNumber: PropTypes.string.isRequired,
   staffNo: PropTypes.string.isRequired,
 };
+
+export default Dressing;
