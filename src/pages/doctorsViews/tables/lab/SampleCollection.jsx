@@ -117,6 +117,7 @@ const SampleForm = ({ closeModal, test }) => {
     { value: "saliva", label: "Saliva" },
     { value: "citrate", label: "Citrate" },
     { value: "heparin", label: "Heparin" },
+    { value: "aspirate", label: "Aspirate" },
     { value: "fluoride", label: "Fluoride" },
     { value: "tissue", label: "Tissue Biopsy" },
     { value: "nasal_swab", label: "Nasal Swab" },
