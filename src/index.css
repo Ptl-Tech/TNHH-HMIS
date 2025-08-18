@@ -325,6 +325,22 @@ main {
   }
 }
 
+.loading-logo {
+  animation: ping-loading 1s infinite ease-in-out;
+}
+
+@keyframes ping-loading {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .sideStyle {
     display: block; /* Hide the Sider component on smaller screens */

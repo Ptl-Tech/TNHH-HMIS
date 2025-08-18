@@ -416,6 +416,70 @@ export const diagnosisObjectArray = [
   },
 ];
 
+export const followUpObjectArray = [
+  {
+    width: 300,
+    minWidth: 300,
+    title: "Type",
+    fixed: "left",
+    key: "Notes_Section_Name",
+    dataIndex: "Notes_Section_Name",
+    onCell: (column) => {
+      return {
+        style: {
+          minWidth: "100px",
+          background: "white",
+          verticalAlign: "top",
+        },
+      };
+    },
+    onHeaderCell: (column) => {
+      return {
+        style: {
+          background: "#0f5689",
+        },
+      };
+    },
+  },
+  {
+    key: "Notes",
+    title: "Notes",
+    dataIndex: "Notes",
+    render: (value) => <pre>{value}</pre>,
+  },
+  {
+    width: 200,
+    title: "Type",
+    fixed: "right",
+    key: "Creation_DateTime",
+    dataIndex: "Creation_DateTime",
+    render: (value) => {
+      return (
+        <span style={{}}>
+          {dayjs(value).format("DD MMM YY")} at
+          {dayjs(value).format("hh:mm A")}
+        </span>
+      );
+    },
+    onCell: (column) => {
+      return {
+        style: {
+          minWidth: "120px",
+          background: "white",
+          verticalAlign: "top",
+        },
+      };
+    },
+    onHeaderCell: (column) => {
+      return {
+        style: {
+          background: "#0f5689",
+        },
+      };
+    },
+  },
+];
+
 export const prescriptionObjectArray = [
   {
     key: "drugName",

@@ -16,6 +16,7 @@ import PharmacyRoutes from "./Routes/PharmacyRoutes";
 import RadiologyRoutes from "./Routes/RadiologyRoutes";
 import ReceptionRoutes from "./Routes/ReceptionRoutes";
 import PsychologyRoutes from "./Routes/PsychologyRoutes";
+import { LoadingPage } from "./components/LoadingPage";
 
 function App() {
   const { user, loading } = useAuth();
@@ -41,7 +42,12 @@ function App() {
         {ability.can("read", "receptionNavigation") && ReceptionRoutes()}
         {ability.can("read", "psychologyNavigation") && PsychologyRoutes()}
 
-        {!loading && <Route path="*" element={<NotFound />} />}
+        {loading ? (
+          <Route path="*" element={<LoadingPage />} />
+        ) : (
+          <Route path="*" element={<LoadingPage />} />
+          // <Route path="*" element={<NotFound />} />
+        )}
       </Routes>
     </>
   );
