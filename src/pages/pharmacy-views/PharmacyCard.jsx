@@ -57,6 +57,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     { label: "Cancelled", value: "Cancelled" },
   ];
 
+  // These are the pharmacy requests
   const { data: pharmacyRequests, loading: pharmacyRequestsLoading } =
     useSelector((state) => state.getPharmacyRequestsAll);
   // This gets the value once we issue the drugs
@@ -67,7 +68,10 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const { data: postArchivePrescriptionData } = useSelector(
     (state) => state.postArchivePrescription
   );
+
+  // This gets the items for searching the meds
   const { items } = useSelector((state) => state.getItems);
+  // This is after posting the pharmacy line
   const {
     data: postPharmacyLineData,
     error: postPharmacyLineError,
@@ -79,6 +83,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     (state) => state.getPatientPharmacyReturnLine
   );
 
+  // This gets the returned drugs
   const { data: returnedDrugs } = useSelector((state) => state.returnDrugs);
 
   // getting the items to be searched with

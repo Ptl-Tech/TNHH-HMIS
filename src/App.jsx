@@ -45,8 +45,7 @@ function App() {
         {loading ? (
           <Route path="*" element={<LoadingPage />} />
         ) : (
-          <Route path="*" element={<LoadingPage />} />
-          // <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         )}
       </Routes>
     </>
