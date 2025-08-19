@@ -57,16 +57,15 @@ export const getPharmacyRequestsAll =
       dispatch({ type: GET_PHARMACY_REQUESTS_ALL });
 
       const {
-        auth: { user }
+        auth: { user },
       } = getState();
       const branchCode = user.branchCode;
 
       const config = {
         headers: {
-          "Content-Type": "application/json",
           staffNo: user.staffNo,
-         
           branchCode: branchCode,
+          "Content-Type": "application/json",
         },
       };
 

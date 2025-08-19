@@ -6,11 +6,14 @@ import { EditableCell } from "./PharmacyEditableCell";
 export const PharmacyCurrentSelection = ({
   data,
   columns,
-  summary = undefined,
   style = {},
   size = "small",
+  loading = false,
+  pagination = false,
+  summary = undefined,
 }) => {
   const { Title } = Typography;
+
   return (
     <Space direction="vertical" className="d-grid">
       <Title
@@ -24,10 +27,10 @@ export const PharmacyCurrentSelection = ({
         bordered
         size={size}
         style={style}
-        loading={false}
+        loading={loading}
         dataSource={data}
         columns={columns}
-        pagination={false}
+        pagination={pagination}
         components={{ body: { cell: EditableCell } }}
         summary={summary ? (pageData) => summary(pageData) : summary}
       />

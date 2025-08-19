@@ -15,15 +15,21 @@ import {
 import { NoData } from "../../../components/NoData";
 
 import { getDoctorsNotesData } from "../../../actions/Doc-actions/getDoctorsNotesData";
+import { getConsultationNotesForm } from "../../../actions/Doc-actions/getConsultationNotesForm";
 
 const PatientSignsReport = ({ treatmentNo }) => {
+  console.log({ treatmentNo });
+
   const dispatch = useDispatch();
 
   const { data: getDoctorNotesData } = useSelector(
     (state) => state.getDoctorsNotesData
   );
+  const { data: formItems } = useSelector(
+    (state) => state.getConsultationNotesForm
+  );
 
-  const { sections, sectionCategories, formItems } = getDoctorNotesData || {};
+  const { sections, sectionCategories } = getDoctorNotesData || {};
 
   const tree = Object.keys(getDoctorNotesData).length
     ? buildFormStructure(sections, sectionCategories, formItems)
@@ -35,8 +41,11 @@ const PatientSignsReport = ({ treatmentNo }) => {
 
   // loading the doctor notes data to add
   useEffect(() => {
-    dispatch(getDoctorsNotesData({ treatmentNo }));
+    dispatch(getDoctorsNotesData());
+    dispatch(getConsultationNotesForm({ treatmentNo }));
   }, [treatmentNo, dispatch]);
+
+  console.log({ formItems });
 
   const items = tree?.map(({ Section_Name: label, Section_ID: key }) => {
     const matchingResultsSection = selectedTreeReport.find(

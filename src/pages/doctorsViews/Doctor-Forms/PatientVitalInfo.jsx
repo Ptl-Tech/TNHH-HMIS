@@ -45,6 +45,7 @@ import {
   generateFileTabsData,
   nurseCardExObjectArray,
   dailyWardRoundsObjectArray,
+  followUpObjectArray,
 } from "./doctor-utils";
 
 import {
@@ -60,6 +61,7 @@ import { getTriageList } from "../../../actions/triage-actions/getTriageListSlic
 import { getEncounterDetails } from "../../../actions/encounters/encounter-details";
 import { getSinglePatientAllVitalsLines } from "../../../actions/triage-actions/getVitalsLinesSlice";
 import { getAllergiesAndMedicationsSlice } from "../../../actions/triage-actions/getAllergiesAndMedicationsSlice";
+import { getQyInpatientProcessProceduresSlice } from "../../../actions/nurse-actions/getQyInpatientProcessProceduresSlice";
 import { MdAttachFile } from "react-icons/md";
 import dayjs from "dayjs";
 import PatientSignsReport from "./PatientSignsReport";
@@ -84,7 +86,7 @@ const PatientVitalInfo = () => {
           {
             key: "2",
             label: "Triage Notes",
-            children: <TraigeNotes />,
+            children: <TriageNotes />,
           },
         ]
       : []),
@@ -116,7 +118,6 @@ const Vitals = () => {
   const { state } = useLocation() || {};
   const patientNo = new URLSearchParams(location.search).get("PatientNo");
   const dispatch = useDispatch();
-  console.log(patientNo);
 
   const [openAddVitals, setOpenAddVitals] = useState(false);
   const [openPreviousVitals, setOpenPreviousVitals] = useState(false);
@@ -607,10 +608,9 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
   );
 };
 
-const TraigeNotes = ({}) => {
+const TriageNotes = ({}) => {
   const dispatch = useDispatch();
   const { state } = useLocation() || {};
-  console.log({ state, location: useLocation() });
 
   const { observationNo, patientDetails } = state || {};
   const { Admission_No } = patientDetails || {};
@@ -623,7 +623,6 @@ const TraigeNotes = ({}) => {
   const value = observationNo;
 
   useEffect(() => {
-    console.log({ observationNo });
     dispatch(getTriageList({ key, value }));
   }, [observationNo]);
 
@@ -849,6 +848,12 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     radiologyRequests,
     laboratoryRequests,
   } = treatmentDetails || admissionDetails || {};
+  const { loadingGetIpProcedure, ipGetProcedure } = useSelector(
+    (state) => state.getQyInpatientProcessProcedure
+  );
+
+  console.log({ treatmentDetails, admissionDetails });
+
   const { triageVitals, triageDetails, triageAllergies } = triage || {};
   const {
     cardex,
@@ -857,17 +862,15 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     dietaryIntake,
     nursingCareplan,
     suicideFormList,
-    triage: nursingTriage,
-    mentalStatusChecklist,
     consultationNotes,
+    mentalStatusChecklist,
+    triage: nursingTriage,
   } = nursingTool || {};
   const {
     triageVitals: nursingTriageVitals,
     triageAllergies: nursingTriageAllergies,
     treatmentDetails: nursingTreatmentDetails,
   } = nursingTriage || {};
-
-  console.log({ dailyWardRounds });
 
   const tableTriageVitals = vitalKeys.map(({ label, key }) => {
     const row = {
@@ -879,6 +882,8 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     });
     return row;
   });
+
+  console.log({ ipGetProcedure });
 
   const objectsToRenderFile = [
     {
@@ -917,10 +922,20 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
       renderer: FileConsultationNotes,
       title: "Doctor Consultation Notes",
       data:
-        treatmentHeader?.treatmentNo || (dischargeDetails && [0]?.admission_No),
+        treatmentHeader?.treatmentNo ||
+        (dischargeDetails && dischargeDetails[0]?.admission_No),
       display:
         treatmentHeader?.treatmentNo ||
         (dischargeDetails && dischargeDetails[0]?.admission_No),
+    },
+    {
+      scroll: { x: true },
+      renderer: FileSectionTable,
+      title: "Follow Up Notes",
+      dataSource: ipGetProcedure,
+      loading: loadingGetIpProcedure,
+      columns: followUpObjectArray,
+      display: ipGetProcedure?.length,
     },
     {
       pagination: false,
@@ -966,7 +981,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
     },
     {
       pagination: false,
-      title: "Dietrary Intake",
+      title: "Dietary Intake",
       dataSource: dietaryIntake,
       renderer: FileSectionTable,
       display: dietaryIntake?.length,
@@ -1072,6 +1087,7 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
           patientCategory: encounterType,
         })
       );
+      dispatch(getQyInpatientProcessProceduresSlice(encounterNo));
     }
   }, [encounter]);
 
@@ -1150,7 +1166,6 @@ const EncounterDrawer = ({ open, setOpen, encounter, setEncounter }) => {
                     color: display ? "#333" : "gray",
                   }}
                   onClick={() => {
-                    console.log({ ref: objectsToRenderRefs[index] });
                     objectsToRenderRefs.current[index]?.scrollIntoView({
                       behavior: "smooth",
                     });
