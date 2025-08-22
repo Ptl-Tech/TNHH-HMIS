@@ -12,6 +12,7 @@ import {
   postDrugIssuance,
   postArchivePrescription,
   POST_ARCHIVE_PRESCRIPTION_RESET,
+  POST_PHARMACY_DRUG_ISSUANCE_RESET,
 } from "../../actions/pharmacy-actions/postPharmacyAction";
 
 export const PharmacyPrescriptionActionButtons = ({
@@ -29,11 +30,14 @@ export const PharmacyPrescriptionActionButtons = ({
     (state) => state.getSinglePharmacyRecord
   );
   // This gets the data once we post the prescription
-  const { data: postDrugIssuanceData, loading: postDrugIssuanceLoading } =
-    useSelector((state) => state.postDrugIssuance);
+  const {
+    data: postDrugIssuanceData,
+    error: postDrugIssuanceError,
+    loading: postDrugIssuanceLoading,
+  } = useSelector((state) => state.postDrugIssuance);
   // Getting the drugs that are currently selected for this prescription
   const { data: pharmacyLineData } = useSelector(
-    (state) => state.getPatientPharmacyReturnLine
+    (state) => state.getPatientPharmacyReturnLines
   );
 
   // This gets the data once we archive the prescription
@@ -47,13 +51,19 @@ export const PharmacyPrescriptionActionButtons = ({
     if (postDrugIssuanceData) {
       const status = postDrugIssuanceData.status;
 
-      message[status](
-        status === "success"
-          ? "The prescription has been posted successfully"
-          : "Something went wrong when posting the prescription"
-      );
+      if (status) {
+        message[status](
+          status === "success"
+            ? "The prescription has been posted successfully"
+            : "Something went wrong when posting the prescription"
+        );
+      }
     }
-  }, [postDrugIssuanceData]);
+
+    if (postDrugIssuanceError) message.error(postDrugIssuanceError);
+
+    dispatch({ type: POST_PHARMACY_DRUG_ISSUANCE_RESET });
+  }, [postDrugIssuanceData, postDrugIssuanceError]);
 
   // The archive functionality
   useEffect(() => {
@@ -103,7 +113,6 @@ export const PharmacyPrescriptionActionButtons = ({
       };
 
       const base64String = await blobToBase64(blob);
-      console.log({ base64String });
 
       // Displaying the printables
       setViewPDFLabel(() => {
@@ -111,7 +120,7 @@ export const PharmacyPrescriptionActionButtons = ({
         return true;
       });
     } catch (error) {
-      console.log({ error: error?.message });
+      console.error({ error: error?.message });
     }
   };
 

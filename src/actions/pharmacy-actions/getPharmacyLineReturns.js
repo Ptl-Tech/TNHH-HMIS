@@ -26,18 +26,17 @@ export const GET_PATIENT_PHARMACY_RETURN_RESET =
 export const getPharmacyLineReturnList = () => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_PHARMACY_RETURN_LIST_REQUEST });
-    
+
     const {
       auth: { user },
     } = getState();
-    const branchCode = user.branchCode;;
+    const branchCode = user.branchCode;
 
     // Configure headers for the request
     const config = {
       headers: {
         "Content-Type": "application/json",
         staffNo: user.staffNo,
-
         branchCode: branchCode,
       },
     };
@@ -47,6 +46,8 @@ export const getPharmacyLineReturnList = () => async (dispatch, getState) => {
       `${API}data/odatafilter?webservice=PgPharmacyLine&isList=true`,
       config
     );
+
+    console.log({ response });
 
     // Dispatch success with the response data
     dispatch({
@@ -76,7 +77,7 @@ export const getPharmacyLineReturnbyPharmacyNo =
       const {
         auth: { user },
       } = getState();
-      const branchCode = user.branchCode;;
+      const branchCode = user.branchCode;
 
       // Configure headers for the request
       const config = {
@@ -93,6 +94,61 @@ export const getPharmacyLineReturnbyPharmacyNo =
         `${API}data/odatafilter?webservice=PgPharmacyLine&isList=true&query=$filter=${parameterType} eq '${paramterValue}'`,
         config
       );
+      // Dispatch success with the response data
+      dispatch({
+        type: GET_PATIENT_PHARMACY_RETURN_SUCCESS,
+        payload: response.data,
+      });
+    } catch (error) {
+      console.log({ error });
+
+      // Handle error and show a message using Ant Design
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch pharmacy return data";
+
+      message.error(errorMessage);
+
+      // Dispatch failure with the error message
+      dispatch({
+        type: GET_PATIENT_PHARMACY_RETURN_FAILURE,
+        payload: errorMessage,
+      });
+    }
+  };
+
+// Action to get Pharmacy Return by Pharmacy Number
+export const getPharmacyLineReturnbyPharmacyNos =
+  (parameterType, paramterValues) => async (dispatch, getState) => {
+    const filterQuery = paramterValues
+      .map((value) => `${parameterType} eq '${value}'`)
+      .join(" or ");
+
+    try {
+      dispatch({ type: GET_PATIENT_PHARMACY_RETURN_REQUEST });
+
+      const {
+        auth: { user },
+      } = getState();
+      const branchCode = user.branchCode;
+
+      // Configure headers for the request
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          staffNo: user.staffNo,
+
+          branchCode: branchCode,
+        },
+      };
+
+      // Send GET request to fetch Pharmacy Return by Pharmacy Number
+      const response = await axios.get(
+        `${API}data/odatafilter?webservice=PgPharmacyLine&isList=true&query=$filter=${filterQuery}`,
+        config
+      );
+
       // Dispatch success with the response data
       dispatch({
         type: GET_PATIENT_PHARMACY_RETURN_SUCCESS,

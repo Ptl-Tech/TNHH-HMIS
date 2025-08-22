@@ -1,32 +1,32 @@
-import axios from 'axios';
-import { message } from 'antd'; // Ensure message is imported
-import apiHeaderConfig from '../configHelpers';
+import axios from "axios";
+import { message } from "antd"; // Ensure message is imported
+import apiHeaderConfig from "../configHelpers";
 
 const API = `${import.meta.env.VITE_PORTAL_API_BASE_URL}/`;
 
 // Action Types
 export const POST_PHARMACY_DRUG_ISSUANCE_REQUEST =
-  'POST_PHARMACY_DRUG_ISSUANCE_REQUEST';
+  "POST_PHARMACY_DRUG_ISSUANCE_REQUEST";
 export const POST_PHARMACY_DRUG_ISSUANCE_SUCCESS =
-  'POST_PHARMACY_DRUG_ISSUANCE_SUCCESS';
+  "POST_PHARMACY_DRUG_ISSUANCE_SUCCESS";
 export const POST_PHARMACY_DRUG_ISSUANCE_FAILURE =
-  'POST_PHARMACY_DRUG_ISSUANCE_FAILURE';
+  "POST_PHARMACY_DRUG_ISSUANCE_FAILURE";
 export const POST_PHARMACY_DRUG_ISSUANCE_RESET =
-  'POST_PHARMACY_DRUG_ISSUANCE_RESET';
+  "POST_PHARMACY_DRUG_ISSUANCE_RESET";
 
 export const POST_ARCHIVE_PRESCRIPTION_REQUEST =
-  'POST_ARCHIVE_PRESCRIPTION_REQUEST';
+  "POST_ARCHIVE_PRESCRIPTION_REQUEST";
 export const POST_ARCHIVE_PRESCRIPTION_SUCCESS =
-  'POST_ARCHIVE_PRESCRIPTION_SUCCESS';
+  "POST_ARCHIVE_PRESCRIPTION_SUCCESS";
 export const POST_ARCHIVE_PRESCRIPTION_FAILURE =
-  'POST_ARCHIVE_PRESCRIPTION_FAILURE';
+  "POST_ARCHIVE_PRESCRIPTION_FAILURE";
 export const POST_ARCHIVE_PRESCRIPTION_RESET =
-  'POST_ARCHIVE_PRESCRIPTION_RESET';
+  "POST_ARCHIVE_PRESCRIPTION_RESET";
 
-export const POST_EDIT_PRESCRIPTION_REQUEST = 'POST_EDIT_PRESCRIPTION_REQUEST';
-export const POST_EDIT_PRESCRIPTION_SUCCESS = 'POST_EDIT_PRESCRIPTION_SUCCESS';
-export const POST_EDIT_PRESCRIPTION_FAILURE = 'POST_EDIT_PRESCRIPTION_FAILURE';
-export const POST_EDIT_PRESCRIPTION_RESET = 'POST_EDIT_PRESCRIPTION_RESET';
+export const POST_EDIT_PRESCRIPTION_REQUEST = "POST_EDIT_PRESCRIPTION_REQUEST";
+export const POST_EDIT_PRESCRIPTION_SUCCESS = "POST_EDIT_PRESCRIPTION_SUCCESS";
+export const POST_EDIT_PRESCRIPTION_FAILURE = "POST_EDIT_PRESCRIPTION_FAILURE";
+export const POST_EDIT_PRESCRIPTION_RESET = "POST_EDIT_PRESCRIPTION_RESET";
 
 export const postPrescriptionQuantity =
   (pharmacyData) => async (dispatch, getState) => {
@@ -39,7 +39,7 @@ export const postPrescriptionQuantity =
       const response = await axios.post(
         `${API}Pharmacy/PharmacyLine`, // Endpoint for POSTing drug issuance
         pharmacyData,
-        config,
+        config
       );
 
       // Extract response details
@@ -82,16 +82,16 @@ export const postDrugIssuance = (pharmacyNo) => async (dispatch, getState) => {
 
     // Get user info and branch code from state and local storage
     const {
-      auth: { user }
+      auth: { user },
     } = getState();
-    const branchCode = user.branchCode
+    const branchCode = user.branchCode;
 
     // Configure headers for the POST
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         staffNo: user.staffNo, // Custom header with staff number
-         // Bearer token for session
+        // Bearer token for session
         branchCode: branchCode, // Branch code from local storage
       },
     };
@@ -100,36 +100,31 @@ export const postDrugIssuance = (pharmacyNo) => async (dispatch, getState) => {
     const response = await axios.post(
       `${API}Pharmacy/PostDrugIssuance`, // Endpoint for POSTing drug issuance
       { pharmacyNo }, // Send pharmacyNo as part of the POST body
-      config,
+      config
     );
+
+    console.log({ response: response.response.data.errors });
+    if ((response.status = 400))
+      throw new Error(response.response?.data?.errors);
 
     // Extract response details
     const responseData = {
-      status: response.data.status,
+      status: response.data?.status,
       data: response.data, // Assuming `data` contains the response data
     };
 
-    // Dispatch success after a small delay
-    setTimeout(() => {
-      dispatch({
-        type: POST_PHARMACY_DRUG_ISSUANCE_SUCCESS,
-        payload: responseData,
-      });
-    }, 2000);
+    dispatch({
+      type: POST_PHARMACY_DRUG_ISSUANCE_SUCCESS,
+      payload: responseData,
+    });
 
     // Return the data for further use
     return responseData.data;
   } catch (error) {
-    setTimeout(() => {
-      dispatch({
-        type: POST_PHARMACY_DRUG_ISSUANCE_FAILURE,
-        payload: error.response?.data?.message || error.errors,
-      });
-      message.error(error.response?.data?.errors || error.errors);
-    }, 1200);
-
-    // Rethrow error for any additional handling
-    throw error;
+    dispatch({
+      type: POST_PHARMACY_DRUG_ISSUANCE_FAILURE,
+      payload: error?.message || error.response?.data?.message || error.errors,
+    });
   }
 };
 
@@ -142,16 +137,16 @@ export const postArchivePrescription =
 
       // Get user info and branch code from state and local storage
       const {
-        auth: { user }
+        auth: { user },
       } = getState();
-      const branchCode = user.branchCode
+      const branchCode = user.branchCode;
 
       // Configure headers for the POST
       const config = {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           staffNo: user.staffNo, // Custom header with staff number
-           // Bearer token for session
+          // Bearer token for session
           branchCode: branchCode, // Branch code from local storage
         },
       };
@@ -160,7 +155,7 @@ export const postArchivePrescription =
       const response = await axios.post(
         `${API}Pharmacy/ArchivePrescription`, // Endpoint for POSTing prescription
         { pharmacyNo }, // Send pharmacyNo as part of the POST body
-        config,
+        config
       );
 
       // Extract response details

@@ -17,37 +17,23 @@ import {
   postPrescriptionQuantity,
   POST_EDIT_PRESCRIPTION_RESET,
 } from "../../actions/pharmacy-actions/postPharmacyAction";
-import {
-  GET_PHARMACY_RETURN_LIST_RESET,
-  getPharmacyLineReturnbyPharmacyNo,
-} from "../../actions/pharmacy-actions/getPharmacyLineReturns";
 import { getItemsSlice } from "../../actions/triage-actions/getItemsSlice";
 import { getPharmacyRequestsAll } from "../../actions/pharmacy-actions/getPharmacyRequestsAll";
 
 import { SearchDrugTable } from "./SearchDrugTable";
 import { PharmacyPatientCard } from "./PharmacyPatientCard";
+import { PharmacyPrescriptions } from "./PharmacyPrescriptions";
 import { pharmacyCardSearchDrugsColumns } from "./pharmacy-utils";
-import { PharmacyCurrentPrescription } from "./PharmacyCurrentPrescription";
+import { getPharmacyLineReturnbyPharmacyNos } from "../../actions/pharmacy-actions/getPharmacyLineReturns";
 
 const PharmacyCard = ({ type, title, hideSelector }) => {
   const dispatch = useDispatch();
   const location = useLocation();
-
-  const { RangePicker } = DatePicker;
-
   const searchParams = new URLSearchParams(location.search);
-
-  const [currentRequest, setCurrentRequest] = useState(null);
-  const [Status, setStatus] = useState(searchParams.get("status") || "");
-  const [dateRange, setDateRange] = useState(
-    location.state?.dateRange || {
-      from: dayjs(new Date()).format("YYYY-MM-DD"),
-      to: dayjs(new Date()).format("YYYY-MM-DD"),
-    }
-  );
 
   const { Title } = Typography;
   const SpaceCompact = Space.Compact;
+  const { RangePicker } = DatePicker;
 
   const statuses = [
     { label: "All", value: "" },
@@ -56,6 +42,15 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     { label: "Completed", value: "Completed" },
     { label: "Cancelled", value: "Cancelled" },
   ];
+  const [dateRange, setDateRange] = useState(
+    location.state?.dateRange || {
+      from: dayjs(new Date()).format("YYYY-MM-DD"),
+      to: dayjs(new Date()).format("YYYY-MM-DD"),
+    }
+  );
+  const [currentVisit, setCurrentVisit] = useState(null);
+  const [currentPharmacyNo, setCurrentPharmacyNo] = useState(null);
+  const [Status, setStatus] = useState(searchParams.get("status") || "");
 
   // These are the pharmacy requests
   const { data: pharmacyRequests, loading: pharmacyRequestsLoading } =
@@ -68,7 +63,6 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   const { data: postArchivePrescriptionData } = useSelector(
     (state) => state.postArchivePrescription
   );
-
   // This gets the items for searching the meds
   const { items } = useSelector((state) => state.getItems);
   // This is after posting the pharmacy line
@@ -77,14 +71,18 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     error: postPharmacyLineError,
     loading: postPharmacyLineLoading,
   } = useSelector((state) => state.postPrescriptionQuantity);
-
-  // Success after getting the currently selected drugs
-  const { success: pharmacyLineDataSuccess } = useSelector(
-    (state) => state.getPatientPharmacyReturnLine
-  );
-
   // This gets the returned drugs
   const { data: returnedDrugs } = useSelector((state) => state.returnDrugs);
+
+  const groupedRequests = Object.entries(
+    Object.groupBy(
+      pharmacyRequests,
+      ({ Link_No, Search_Name, Patient_No }) =>
+        `${Search_Name}__${Link_No}__${Patient_No}`
+    )
+  );
+  const [_, currentPrescriptions] =
+    groupedRequests.find(([key]) => key.split("__")[1] === currentVisit) || [];
 
   // getting the items to be searched with
   useEffect(() => {
@@ -92,31 +90,22 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     if (!items.length) {
       dispatch(getItemsSlice());
     }
-
-    if (
-      (!pharmacyLineDataSuccess && currentRequest) ||
-      postPharmacyLineData?.status === "success" ||
-      returnedDrugs
-    ) {
-      dispatch(
-        getPharmacyLineReturnbyPharmacyNo("Pharmacy_No", currentRequest)
-      );
-    } else {
-      dispatch({ type: GET_PHARMACY_RETURN_LIST_RESET });
-    }
-  }, [
-    items,
-    returnedDrugs,
-    currentRequest,
-    postDrugIssuanceData,
-    postPharmacyLineData,
-    pharmacyLineDataSuccess,
-  ]);
+  }, [items, returnedDrugs, postDrugIssuanceData, postPharmacyLineData]);
 
   // This requests the pharmacy patients
   useEffect(() => {
-    dispatch(getPharmacyRequestsAll({ type, status: Status, dateRange }));
-  }, [postArchivePrescriptionData, type, Status, dateRange]);
+    dispatch(getPharmacyRequestsAll({ type, status: "", dateRange }));
+  }, [postArchivePrescriptionData, type, dateRange]);
+
+  // This get's the current patient's pharmacy lines
+  useEffect(() => {
+    dispatch(
+      getPharmacyLineReturnbyPharmacyNos(
+        "Pharmacy_No",
+        (currentPrescriptions || []).map(({ Pharmacy_No }) => Pharmacy_No)
+      )
+    );
+  }, [currentVisit, currentPrescriptions]);
 
   // to track once the pharmacy line has been updated
   useEffect(() => {
@@ -138,22 +127,34 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   }, [postPharmacyLineData, postPharmacyLineError]);
 
   const handleAddDrug = (drugNo) => {
+    if (!currentPharmacyNo)
+      return message.error(
+        "Kindly select the pharmacy request to add drugs to"
+      );
+
     dispatch(
       postPrescriptionQuantity({
         drugNo,
         quantity: 0,
         myAction: "create",
-        pharmacyNo: currentRequest,
+        pharmacyNo: currentPharmacyNo,
       })
     );
   };
 
-  const handleRequestChange = (value) => {
-    setCurrentRequest(value.split("-").at(-1));
+  const handleVisitChange = (value) => {
+    setCurrentPharmacyNo(null);
+    setCurrentVisit(value.split("-").at(1));
   };
 
   const handleStatusChange = (value) => {
+    setCurrentPharmacyNo(null);
     setStatus(value);
+  };
+
+  const handlePharmacyChange = (event) => {
+    const value = event.target.value;
+    setCurrentPharmacyNo(value);
   };
 
   return (
@@ -169,11 +170,12 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
             <Select
               showSearch
               options={statuses}
-              prefix={<Tag color="#ac8342">Status</Tag>}
               placeholder="Status"
               defaultValue={Status}
               style={{ width: "200px" }}
               onChange={handleStatusChange}
+              disabled={!Boolean(currentVisit)}
+              prefix={<Tag color="#ac8342">Status</Tag>}
             />
           )}
           <RangePicker
@@ -192,8 +194,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
           <Select
             showSearch
             style={{ width: "400px" }}
-            onChange={handleRequestChange}
-            placeholder="Select a patient"
+            onChange={handleVisitChange}
+            placeholder="Select a patient's visit"
             notFoundContent={
               pharmacyRequestsLoading ? (
                 <Spin size="small" />
@@ -204,24 +206,40 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
             options={
               pharmacyRequestsLoading
                 ? []
-                : pharmacyRequests.map((request) => ({
-                    label: (
-                      <span>
-                        {request.Search_Name} - {request.Link_No}
-                      </span>
-                    ),
-                    value: `${request.Search_Name}-${request.Link_No}-${request.Pharmacy_No}`,
-                  }))
+                : groupedRequests.map(([key, value]) => {
+                    const [SearchName, LinkNo, PatientNo] = key.split("__");
+                    return {
+                      label: (
+                        <span>
+                          {SearchName} - {LinkNo}
+                        </span>
+                      ),
+                      value: `${SearchName}-${LinkNo}-${PatientNo}`,
+                    };
+                  })
             }
           />
         </SpaceCompact>
       </Space>
       {/* Pharmacy Patient Information Card */}
-      <PharmacyPatientCard currentRequest={currentRequest} />
-      {currentRequest && (
+      <PharmacyPatientCard
+        currentVisit={groupedRequests.find(
+          ([key, value]) => key?.split("__")[1] === currentVisit
+        )}
+      />
+      {currentVisit && (
         <>
           {/* Pharmacy Current Prescription Drugs */}
-          <PharmacyCurrentPrescription currentRequest={currentRequest} />
+          <PharmacyPrescriptions
+            pharmacyNo={currentPharmacyNo}
+            loading={pharmacyRequestsLoading}
+            onPharmacyChange={handlePharmacyChange}
+            currentPrescriptions={(
+              (currentPrescriptions || []).filter((cP) =>
+                cP.Status.includes(Status)
+              ) || []
+            ).toReversed()}
+          />
           {/* Pharmacy Drugs to select from */}
           <SearchDrugTable
             items={items}

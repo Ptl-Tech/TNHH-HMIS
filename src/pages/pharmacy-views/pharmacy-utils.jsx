@@ -94,10 +94,6 @@ export const pharmacyQuotationSearchDrugsColumns = (handleAddDrug) => [
 export const pharmacyCardPatientData = [
   [
     {
-      name: "Pharmacy No",
-      value: "Pharmacy_No",
-    },
-    {
       name: "Visit Number",
       value: "Link_No",
     },

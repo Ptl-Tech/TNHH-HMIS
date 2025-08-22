@@ -7,7 +7,7 @@ import { ReturnDrugsComponent } from "../../pharmacy-views/ReturnDrugsComponent"
 const NursePharmacyReturnLine = ({ patientNo }) => {
   const dispatch = useDispatch();
   const { data = [], loading, error } = useSelector(
-    (state) => state.getPatientPharmacyReturnLine || {}
+    (state) => state.getPatientPharmacyReturnLines || {}
   );
 
   const [open, setOpen] = useState(false);

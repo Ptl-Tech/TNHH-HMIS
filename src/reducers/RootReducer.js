@@ -490,7 +490,7 @@ export const rootReducer = combineReducers({
   postArchivePrescription: postArchivePrescriptionReducer,
   postPrescriptionQuantity: postPrescriptionQuantityReducer,
   getPharmacyReturnLinesList: getPharmacyReturnLinesListReducer,
-  getPatientPharmacyReturnLine: getPatientPharmacyReturnLinesReducer,
+  getPatientPharmacyReturnLines: getPatientPharmacyReturnLinesReducer,
   // ************************************* /
 
   // nurse

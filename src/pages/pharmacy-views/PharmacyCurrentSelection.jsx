@@ -1,6 +1,5 @@
-import { Space, Table, Typography } from "antd";
+import { Space, Table } from "antd";
 
-import { CiMedicalClipboard } from "react-icons/ci";
 import { EditableCell } from "./PharmacyEditableCell";
 
 export const PharmacyCurrentSelection = ({
@@ -12,17 +11,9 @@ export const PharmacyCurrentSelection = ({
   pagination = false,
   summary = undefined,
 }) => {
-  const { Title } = Typography;
 
   return (
     <Space direction="vertical" className="d-grid">
-      <Title
-        level={5}
-        className="d-flex align-items-center gap-2 m-0 text-main-primary"
-      >
-        <CiMedicalClipboard strokeWidth={1} />
-        Selected Drugs
-      </Title>
       <Table
         bordered
         size={size}

@@ -76,8 +76,6 @@ export const getPharmacyRequestsAll =
         config
       );
 
-      console.log({ response });
-
       if (response.data === "") {
         return message.error(
           "The requested pharmacy header could not be found"

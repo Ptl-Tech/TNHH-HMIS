@@ -1,62 +1,13 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
 import { Col, Row, Card, Typography } from "antd";
 import { IdcardOutlined } from "@ant-design/icons";
 
 import { pharmacyCardPatientData } from "./pharmacy-utils";
 
-import {
-  POST_ARCHIVE_PRESCRIPTION_RESET,
-  POST_PHARMACY_DRUG_ISSUANCE_RESET,
-} from "../../actions/pharmacy-actions/postPharmacyAction";
-import { getSinglePharmacyRecord } from "../../actions/pharmacy-actions/getSinglePharmacyRecord";
+export const PharmacyPatientCard = ({ currentVisit }) => {
+  const [key, value] = currentVisit || [];
+  const [pharmacyRecord] = value || [];
 
-export const PharmacyPatientCard = ({ currentRequest }) => {
   const { Title, Text } = Typography;
-
-  const dispatch = useDispatch();
-
-  // This gets the value once we issue the drugs
-  const { data: postDrugIssuanceData } = useSelector(
-    (state) => state.postDrugIssuance
-  );
-  const { data: postPharmacyLineData } = useSelector(
-    (state) => state.postPrescriptionQuantity
-  );
-  const { data: postArchivePrescriptionData } = useSelector(
-    (state) => state.postArchivePrescription
-  );
-
-  // This gets a single patient record
-  const { data: pharmacyRecord } = useSelector(
-    (state) => state.getSinglePharmacyRecord
-  );
-
-  // to get a single pharmacy record
-  useEffect(() => {
-    // We cannot update based on whether we have archived or not because the request will not be found
-    if (
-      (currentRequest && !pharmacyRecord) ||
-      (currentRequest &&
-        pharmacyRecord &&
-        currentRequest !== pharmacyRecord.Pharmacy_No) ||
-      postDrugIssuanceData?.status === "success" ||
-      postArchivePrescriptionData?.status === "success"
-    ) {
-      dispatch(getSinglePharmacyRecord("Pharmacy_No", currentRequest));
-      if (postArchivePrescriptionData)
-        dispatch({ type: POST_ARCHIVE_PRESCRIPTION_RESET });
-      if (postDrugIssuanceData)
-        dispatch({ type: POST_PHARMACY_DRUG_ISSUANCE_RESET });
-    }
-  }, [
-    currentRequest,
-    pharmacyRecord,
-    postDrugIssuanceData,
-    postPharmacyLineData,
-    postArchivePrescriptionData,
-  ]);
 
   return (
     <Card
