@@ -9,16 +9,16 @@ import {
   POST_EDIT_PRESCRIPTION_RESET,
 } from "../actions/pharmacy-actions/postPharmacyAction";
 
-export const useCurrentPrescription = ({ currentPrescription }) => {
+export const useCurrentPrescription = ({ form, currentPrescription }) => {
   const { confirm } = Modal;
   const dispatch = useDispatch();
 
   const disabled =
     currentPrescription?.Status === "Completed" ||
     currentPrescription?.Status === "Cancelled";
-  const isEditing = (record) => record.No === editingKey;
 
   const [editingKey, setEditingKey] = useState("");
+  const isEditing = (record) => record.No === editingKey;
 
   // When the line has been updated
   const {

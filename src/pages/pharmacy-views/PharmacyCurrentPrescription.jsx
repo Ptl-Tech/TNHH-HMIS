@@ -14,6 +14,8 @@ export const PharmacyCurrentPrescription = ({
   currentPrescription,
   pharmacyLineDataLoading,
 }) => {
+  const [form] = Form.useForm();
+
   const {
     edit,
     save,
@@ -24,10 +26,9 @@ export const PharmacyCurrentPrescription = ({
     postDrugIssuanceLoading,
     postPharmacyLineLoading,
     postArchivePrescriptionLoading,
-  } = useCurrentPrescription({ currentPrescription });
+  } = useCurrentPrescription({ form, currentPrescription });
 
   // This gets the data once we post the prescription
-  const [form] = Form.useForm();
   const { Title, Text } = Typography;
   const {
     Summary: { Row: TableSummaryRow, Cell: TableSummaryCell },
