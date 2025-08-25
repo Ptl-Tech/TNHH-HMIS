@@ -230,8 +230,10 @@ const Vitals = () => {
 
 const AddVitalsDrawer = ({ open, setOpen }) => {
   const dispatch = useDispatch();
+
   const { state, search } = useLocation() || {};
   const { observationNo } = state || {};
+
   const patientNo = new URLSearchParams(search).get("PatientNo");
 
   const { Compact: SpaceCompact } = Space;
@@ -246,12 +248,22 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       patientNo,
       observationNo,
       myAction: "create",
+      systolicBp: parseFloat(systolic),
+      diastolicBp: parseFloat(diastolic),
       bloodPressure: `${systolic}/${diastolic}`,
     };
 
     dispatch(postTriageListVitalsSlice(finalValues));
     form.resetFields();
     setOpen(false);
+  };
+
+  const handleFormChange = (_, allValues) => {
+    const { height, weight } = allValues;
+    const heightM = height / 100;
+
+    const BMI = Math.round((weight / Math.pow(heightM, 2)) * 100) / 100;
+    form.setFieldValue("BMI", BMI);
   };
 
   return (
@@ -275,8 +287,9 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       <Form
         form={form}
         layout="vetical"
-        name="control-hooks"
         onFinish={onFinish}
+        name="control-hooks"
+        onValuesChange={handleFormChange}
       >
         <FormItem
           name="pulseRate"
@@ -363,6 +376,67 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         >
           <Input required type="number" placeholder="eg. 16" />
         </FormItem>
+        <Space direction="vertical">
+          <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            Height, Weight and BMI
+          </span>
+          <SpaceCompact>
+            <FormItem
+              name="height"
+              label={
+                <span style={{ color: "#333333", fontWeight: "bolder" }}>
+                  Height &#40;cm&#41;
+                </span>
+              }
+              layout="vertical"
+              rules={[
+                { required: false, message: "Please add the height value" },
+              ]}
+            >
+              <Input required type="number" placeholder="eg. 120" />
+            </FormItem>
+            <FormItem
+              name="weight"
+              label={
+                <span style={{ color: "#333333", fontWeight: "bolder" }}>
+                  Weight &#40;kg&#41;
+                </span>
+              }
+              layout="vertical"
+              rules={[
+                { required: false, message: "Please add the weight value" },
+              ]}
+            >
+              <Input required type="number" placeholder="eg. 80" />
+            </FormItem>
+            <FormItem
+              name="BMI"
+              label={
+                <span style={{ color: "#333333", fontWeight: "bolder" }}>
+                  BMI &#40;kg/m²&#41;
+                </span>
+              }
+              layout="vertical"
+              rules={[{ required: false, message: "Please add the BMI value" }]}
+            >
+              <Input disabled required type="number" />
+            </FormItem>
+          </SpaceCompact>
+        </Space>
+        {/* <FormItem
+          name="bloodSugar"
+          label={
+            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+              Blood Sugar &#40;mg/dL&#41;
+            </span>
+          }
+          layout="vertical"
+          rules={[
+            { required: false, message: "Please add the blood sugar levels" },
+          ]}
+        >
+          <Input required type="number" placeholder="eg. 16" />
+        </FormItem> */}
         <Button block type="primary" htmlType="submit">
           Submit Vitals
         </Button>
