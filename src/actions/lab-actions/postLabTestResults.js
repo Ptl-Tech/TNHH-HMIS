@@ -6,8 +6,7 @@ export const POST_LAB_TEST_RESULTS_RESET = "POST_LAB_TEST_RESULTS_RESET";
 export const POST_LAB_TEST_RESULTS_REQUEST = "POST_LAB_TEST_RESULTS_REQUEST";
 export const POST_LAB_TEST_RESULTS_SUCCESS = "POST_LAB_TEST_RESULTS_SUCCESS";
 
-const API_URL =
-  import.meta.env.VITE_PORTAL_API_BASE_URL;
+const API_URL = import.meta.env.VITE_PORTAL_API_BASE_URL;
 
 const transformLabResult = (result) => {
   const {
@@ -78,7 +77,7 @@ const processLabResults = async (results, config) => {
 
 const postLabResultComments = async (remarks, config) => {
   if (!remarks) return { status: "success" };
-
+  
   const { data } = await axios.post(
     `${API_URL}/Laboratory/LabTestLine`,
     remarks,
