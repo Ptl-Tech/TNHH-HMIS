@@ -304,7 +304,7 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   } = useSelector((state) => state.singleLabDetails);
 
   const [results, setResults] = useState(
-    [...initialData].map((item) => ({ ...item }))
+    [...(initialData || [])].map((item) => ({ ...item }))
   );
   const [editingKey, setEditingKey] = useState(null);
   const [remarks, setRemarks] = useState(singleLabDetails?.Remarks || "");
