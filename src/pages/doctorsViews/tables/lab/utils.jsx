@@ -54,6 +54,30 @@ export const labResultsColumns = [
     key: "Test_Normal_Ranges",
   },
   {
+    title: "Flag",
+    dataIndex: "Results",
+    key: "Test_Normal_Ranges",
+    render: (value, record) => {
+      const { Test_Normal_Ranges } = record;
+      var [minNum, maxNum] = Test_Normal_Ranges.split(" - ");
+      try {
+        minNum = parseFloat(minNum);
+        maxNum = parseFloat(maxNum);
+        var result = parseFloat(value);
+
+        if (typeof minNum == "number" && typeof maxNum == "number" && typeof result == "number") {
+          if (result < minNum) return <span style={{ color: "red" }}>LOW</span>;
+          if (result > maxNum)
+            return <span style={{ color: "red" }}>HIGH</span>;
+          if (result >= minNum && result <= maxNum)
+            return <span style={{ color: "green" }}>NORMAL</span>;
+        }
+      } catch (error) {
+        return "";
+      }
+    },
+  },
+  {
     key: "Remarks",
     editable: true,
     title: "Remarks",

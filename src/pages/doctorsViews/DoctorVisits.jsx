@@ -78,20 +78,42 @@ const DoctorVisits = () => {
     }
   }, [checkInError, checkInPatient]);
 
-  const isDoctorOrPsychology = (doctorId) =>
-    ability.can("read", subject("ownVisits", { doctorId }));
-  const canReadOutPatients = ability.can("read", "outPatients");
+  /* 
+    Logic on how this works
+    Corporate doctors can read only Chiromo's patients
+    External doctors can read only their patients
+    Nurses can see all patients
+  */
+  const isExternalDoctor = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
+  const canReadAllVisits = ability.can("read", "allVisits"); // Nurses & Psychologists
+  const canReadCorporateVisits = (Resident_Doctor) => {
+    console.log({
+      Resident_Doctor,
+      ability: ability.can("read", "corporateVisits"),
+    });
+
+    return Resident_Doctor && ability.can("read", "corporateVisits");
+  }; // Corporate Doctors
 
   const filterConsultations = (status) =>
     treatmentList?.filter(
       (item) =>
-        (isDoctorOrPsychology(item.DoctorID) || canReadOutPatients) &&
+        (canReadAllVisits ||
+          isExternalDoctor(item.DoctorID) ||
+          canReadCorporateVisits(item.Resident_Doctor)) &&
         item.Status === status
     );
 
   const openDoctorVisitList = filterConsultations("New");
   const activeConsultationList = filterConsultations("Active");
   const closedConsultationList = filterConsultations("Completed");
+
+  console.log({
+    openDoctorVisitList,
+    activeConsultationList,
+    closedConsultationList,
+  });
 
   const openDoctorVisitListWithPatientDetails = patients?.map((patient) => ({
     PatientNo: patient.PatientNo,

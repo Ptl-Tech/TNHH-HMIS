@@ -1,121 +1,34 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
 
-import { Form, Modal, Table, Typography } from "antd";
-import { SignatureOutlined, ExclamationCircleFilled } from "@ant-design/icons";
+import { IoCalendarOutline } from "react-icons/io5";
+import { Form, Space, Table, Typography } from "antd";
 
-import { postPrescriptionQuantity } from "../../actions/pharmacy-actions/postPharmacyAction";
+import { useCurrentPrescription } from "../../hooks/useCurrentPrescription";
 
 import { PharmacyCurrentSelection } from "./PharmacyCurrentSelection";
 import { pharmacyCardCurrentSelectionColumns } from "./pharmacy-utils";
 import { PharmacyPrescriptionActionButtons } from "./PharmacyPrescriptionActionButtons";
 
-export const PharmacyCurrentPrescription = ({ currentRequest }) => {
-  const dispatch = useDispatch();
-
-  // This gets a single patient record
-  const { data: pharmacyRecord } = useSelector(
-    (state) => state.getSinglePharmacyRecord
-  );
-  // This gets the data once we post the prescription
-  const { loading: postDrugIssuanceLoading } = useSelector(
-    (state) => state.postDrugIssuance
-  );
-
-  const { loading: postArchivePrescriptionLoading } = useSelector(
-    (state) => state.postArchivePrescription
-  );
-
-  // Getting the drugs that are currently selected for this prescription
-  const { data: pharmacyLineData, loading: pharmacyLineDataLoading } =
-    useSelector((state) => state.getPatientPharmacyReturnLine);
-
-  const { loading: postPharmacyLineLoading } = useSelector(
-    (state) => state.postPrescriptionQuantity
-  );
-
-  const { confirm } = Modal;
+export const PharmacyCurrentPrescription = ({
+  pharmacyLineData,
+  currentPrescription,
+  pharmacyLineDataLoading,
+}) => {
   const [form] = Form.useForm();
 
-  const [editingKey, setEditingKey] = useState("");
+  const {
+    edit,
+    save,
+    cancel,
+    disabled,
+    isEditing,
+    showConfirm,
+    postDrugIssuanceLoading,
+    postPharmacyLineLoading,
+    postArchivePrescriptionLoading,
+  } = useCurrentPrescription({ form, currentPrescription });
 
-  const disabled =
-    pharmacyRecord?.Status === "Completed" ||
-    pharmacyRecord?.Status === "Cancelled";
-
-  const isEditing = (record) => record.No === editingKey;
-
-  const edit = (record) => {
-    form.setFieldsValue({ ...record });
-    setEditingKey(record.No);
-  };
-
-  const cancel = () => {
-    setEditingKey("");
-  };
-
-  const deleteRecord = (record) => {
-    // deleting a pharmacy line
-    dispatch(
-      postPrescriptionQuantity({
-        myAction: "delete",
-        recId: record.SystemId,
-        pharmacyNo: record.Pharmacy_No,
-        quantity: record.Quantity,
-        drugNo: record.No,
-      })
-    );
-  };
-
-  const save = async (record) => {
-    try {
-      const row = await form.validateFields();
-      const { SystemId, Pharmacy_No, No, UnitPrice } = record;
-      const {
-        Dosage,
-        Duration_Days,
-        Frequency,
-        Quantity,
-        Take = 0,
-        remarks = "",
-      } = row;
-
-      console.log({ row });
-
-      dispatch(
-        postPrescriptionQuantity({
-          myAction: "edit",
-          recId: SystemId,
-          pharmacyNo: Pharmacy_No,
-          quantity: Quantity,
-          take: Take,
-          drugNo: No,
-          noOfDays: Duration_Days,
-          frequency: Frequency,
-          dosage: Dosage,
-          TotalAmount: Math.round(UnitPrice * Quantity * 1) / 1,
-          remarks,
-        })
-      );
-
-      setEditingKey("");
-    } catch (error) {
-      console.log({ error });
-    }
-  };
-
-  const showConfirm = (record) => {
-    confirm({
-      title: "Delete the pharmacy line?",
-      icon: <ExclamationCircleFilled />,
-      content: "Are you sure you want to delete the pharmacy line?",
-      onOk() {
-        deleteRecord(record);
-      },
-      onCancel() {},
-    });
-  };
-
+  // This gets the data once we post the prescription
   const { Title, Text } = Typography;
   const {
     Summary: { Row: TableSummaryRow, Cell: TableSummaryCell },
@@ -145,24 +58,62 @@ export const PharmacyCurrentPrescription = ({ currentRequest }) => {
     );
   };
 
+  if (!pharmacyLineData) return;
+
   return (
-    <div style={{ display: "grid", gap: "16px" }}>
+    <div
+      style={{
+        gap: "16px",
+        width: "100%",
+        display: "grid",
+        paddingBottom: "32px",
+      }}
+    >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Title
           level={5}
           style={{
             gap: "8px",
+            fontSize: "24",
             display: "flex",
-            color: "#0f5689",
+            color: "#777",
+            fontWeight: "400",
             alignItems: "center",
           }}
         >
-          <SignatureOutlined />
-          Prescription
+          <Space.Compact
+            className="border"
+            style={{
+              display: "flex",
+              borderRadius: "4px",
+              alignItems: "center",
+            }}
+          >
+            <div
+              className="p-2"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                borderRight: "1px solid #dee2e6",
+              }}
+            >
+              <IoCalendarOutline />
+            </div>
+            <span className="px-2">
+              {`${dayjs(currentPrescription?.Pharmacy_Date).format(
+                "DD MMM YYYY"
+              )} at
+              ${dayjs(
+                currentPrescription?.Pharmacy_Date +
+                  " " +
+                  currentPrescription?.Pharmacy_Time
+              ).format("hh:mm A")}`}
+            </span>
+          </Space.Compact>
         </Title>
         <PharmacyPrescriptionActionButtons
           disabled={disabled}
-          currentRequest={currentRequest}
+          currentRequest={currentPrescription.Pharmacy_No}
           loading={postArchivePrescriptionLoading || postDrugIssuanceLoading}
         />
       </div>
@@ -175,7 +126,7 @@ export const PharmacyCurrentPrescription = ({ currentRequest }) => {
             disabled,
             isEditing,
             showConfirm,
-            completed: pharmacyRecord?.Status === "Completed",
+            completed: currentPrescription?.Status === "Completed",
           })}
           data={[...pharmacyLineData]
             .sort(

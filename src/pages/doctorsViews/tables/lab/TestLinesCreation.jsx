@@ -138,7 +138,7 @@ const LabTestDrawer = ({ open, data: testData, onOk, onCancel }) => {
             optionFilterProp="label"
             placeholder="Select a test"
             options={testData
-              .sort(
+              ?.sort(
                 (a, b) =>
                   a.Description.toLowerCase() - b.Description.toLowerCase()
               )

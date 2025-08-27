@@ -117,8 +117,6 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
     if (record) dispatch(getLabTestResults({ labNo, testCode }));
   }, [record]);
 
-  console.log({ record });
-
   return (
     <Drawer
       open={open}
@@ -160,8 +158,6 @@ const ResultsDrawer = ({ record, open, handleOk, handleCancel }) => {
 };
 
 const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
-  console.log({ initialData });
-
   const dispatch = useDispatch();
   const {
     Flag,
@@ -170,8 +166,6 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
     Specimen_Code,
     SystemId: TestLineSystemId,
   } = initialData[0] || {};
-
-  console.log({ currentLabLine });
 
   const { recId, laboratoryNo } = currentLabLine;
 
@@ -190,12 +184,11 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
 
   useEffect(() => {
     if (labResultsData) {
-      console.log({ labResultsData });
-
       const { labResults, labRemarks } = labResultsData;
       labRemarks?.status === "success" && labResults?.status === "success"
         ? message.success("Results submitted successfully!")
         : message.error("Something went wrong!");
+      dispatch(getLabDetails(laboratoryNo));
       dispatch({ type: POST_LAB_TEST_RESULTS_RESET });
       handleClose();
     }
@@ -208,28 +201,44 @@ const WYSIWYGContainer = ({ initialData, currentLabLine, handleClose }) => {
     if (labResultsLoading) message.info("Submitting the results");
   }, [labResultsData, labResultsLoading, labResultsError]);
 
-  const { Positive, SystemId, MeasuringUnitCode, LaboratoryTestCode } =
-    singleLabDetails || {};
+  const {
+    Positive,
+    SystemId,
+    CountValue,
+    SpecimenCode,
+    MeasuringUnitCode,
+    LaboratoryTestCode,
+  } = singleLabDetails || {};
 
   const handleSubmit = (remarks) => {
     if (!(recId && SystemId)) return;
 
-    const results = [
-      {
-        Results,
-        Positive,
-        Reactive,
-        flag: Flag,
-        Specimen_Code,
-        Remarks: remarks,
-        SystemId: TestLineSystemId,
-        Laboratory_No: laboratoryNo,
-        Measuring_Unit_Code: MeasuringUnitCode,
-        Laboratory_Test_Code: LaboratoryTestCode,
-      },
-    ];
+    const results = {
+      Results,
+      Positive,
+      Reactive,
+      flag: Flag,
+      Specimen_Code,
+      Remarks: remarks,
+      SystemId: TestLineSystemId,
+      Laboratory_No: laboratoryNo,
+      Measuring_Unit_Code: MeasuringUnitCode,
+      Laboratory_Test_Code: LaboratoryTestCode,
+    };
 
-    dispatch(postLabTestResults([...results], ""));
+    const newRemarks = {
+      recId,
+      laboratoryNo,
+      remarks: "N/A",
+      myAction: "edit",
+      positive: Positive,
+      countValue: CountValue,
+      specimenCode: SpecimenCode,
+      labTestCode: LaboratoryTestCode,
+      unitOfMeasure: MeasuringUnitCode,
+    };
+
+    dispatch(postLabTestResults([results], newRemarks));
   };
 
   return (
@@ -285,8 +294,6 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   const { TextArea } = Input;
   const { Item, useForm } = Form;
 
-  console.log({ initialData });
-
   const { recId, laboratoryNo } = currentLabLine;
 
   const [form] = useForm();
@@ -304,7 +311,7 @@ const ResultsTable = ({ loading, initialData, currentLabLine }) => {
   } = useSelector((state) => state.singleLabDetails);
 
   const [results, setResults] = useState(
-    [...initialData].map((item) => ({ ...item }))
+    [...(initialData || [])].map((item) => ({ ...item }))
   );
   const [editingKey, setEditingKey] = useState(null);
   const [remarks, setRemarks] = useState(singleLabDetails?.Remarks || "");

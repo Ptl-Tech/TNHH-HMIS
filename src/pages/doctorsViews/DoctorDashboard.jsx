@@ -51,49 +51,32 @@ const DoctorDashboard = () => {
     dispatch(listDoctors());
   }, [dispatch]);
 
-  const canSeeOwnVisitsOnly = (doctorId) =>
-    ability.can("read", subject("ownVisits", { doctorId }));
-  const canReadOutPatients = ability.can("read", "outPatients");
+  /* 
+    Logic on how this works
+    Corporate doctors can read only Chiromo's patients
+    External doctors can read only their patients
+    Nurses can see all patients
+  */
+  const isExternalDoctor = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
+  const canReadAllVisits = ability.can("read", "allVisits"); // Nurses & Psychologists
+  const canReadCorporateVisits = (Resident_Doctor) =>
+    Resident_Doctor && ability.can("read", "corporateVisits"); // Corporate Doctors
 
   const filterVisits = (status) =>
-    treatmentList?.filter(
+    (status ? treatmentList : admittedPatients)?.filter(
       (item) =>
-        (canSeeOwnVisitsOnly(item.DoctorID) || canReadOutPatients) &&
-        item.Status === status
+        (canReadAllVisits ||
+          isExternalDoctor(item.DoctorID) ||
+          canReadCorporateVisits(item.Resident_Doctor)) &&
+        (status ? item.Status === status : true)
     );
 
-  console.log({ filterVisits: filterVisits("Completed") });
-
+  const inpatients = filterVisits();
   const activeVisitCount = filterVisits("Active");
   const openDoctorVisitList = filterVisits("New");
   const closedVisitCount = filterVisits("Completed");
 
-  // get the list of doctors
-  const formattedDoctorDetails = useMemo(() => {
-    return data?.map((doctor) => ({
-      DoctorID: doctor?.DoctorID,
-      DoctorsName: doctor?.DoctorsName,
-    }));
-  }, [data]);
-
-  // getting the list of inpatients and combining with the correponding doctor
-  const combinedPatients = useMemo(() => {
-    if (!admittedPatients || !formattedDoctorDetails) return [];
-
-    return admittedPatients.map((patient) => {
-      const matchingDoctor = formattedDoctorDetails.find(
-        (doctor) => patient?.Doctor === doctor?.DoctorID
-      );
-      return {
-        ...patient,
-        DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
-      };
-    });
-  }, [admittedPatients, formattedDoctorDetails]);
-
-  const filterPatientBasedWithDoctor = useMemo(() => {
-    return combinedPatients?.filter(() => canSeeOwnVisitsOnly);
-  }, [combinedPatients, ability]);
   // Updated card data for the dashboard
   const cardData = [
     {
@@ -125,7 +108,7 @@ const DoctorDashboard = () => {
     },
     {
       title: "Inpatients List",
-      value: filterPatientBasedWithDoctor?.length,
+      value: inpatients?.length,
       subtitle: "Increase in 30 days",
       icon: <UserAddOutlined />,
       color: "#000",
@@ -155,7 +138,7 @@ const DoctorDashboard = () => {
     "TreatmentDate"
   );
   const inPatientCountsByDate = countRegistrationsByDate(
-    filterPatientBasedWithDoctor,
+    inpatients,
     "Admission_Date"
   );
 

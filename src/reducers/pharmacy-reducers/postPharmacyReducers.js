@@ -11,7 +11,7 @@ import {
   POST_EDIT_PRESCRIPTION_SUCCESS,
   POST_EDIT_PRESCRIPTION_FAILURE,
   POST_EDIT_PRESCRIPTION_RESET,
-} from '../../actions/pharmacy-actions/postPharmacyAction';
+} from "../../actions/pharmacy-actions/postPharmacyAction";
 
 const initialState = {
   data: null,
@@ -21,7 +21,7 @@ const initialState = {
 
 export const postPrescriptionQuantityReducer = (
   state = initialState,
-  action,
+  action
 ) => {
   switch (action.type) {
     case POST_EDIT_PRESCRIPTION_REQUEST:
@@ -44,6 +44,7 @@ export const postDrugIssuanceReducer = (state = initialState, action) => {
     case POST_PHARMACY_DRUG_ISSUANCE_SUCCESS:
       return { ...state, loading: false, data: action.payload };
     case POST_PHARMACY_DRUG_ISSUANCE_FAILURE:
+      console.log({ action, state });
       return { ...state, loading: false, error: action.payload };
     case POST_PHARMACY_DRUG_ISSUANCE_RESET:
       return initialState;
@@ -54,7 +55,7 @@ export const postDrugIssuanceReducer = (state = initialState, action) => {
 
 export const postArchivePrescriptionReducer = (
   state = initialState,
-  action,
+  action
 ) => {
   switch (action.type) {
     case POST_ARCHIVE_PRESCRIPTION_REQUEST:

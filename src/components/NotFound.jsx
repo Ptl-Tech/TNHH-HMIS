@@ -6,8 +6,6 @@ const NotFound = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log({ location });
-
   const letters = [
     "c",
     "h",

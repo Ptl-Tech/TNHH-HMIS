@@ -317,6 +317,10 @@ main {
   height: 4px;
 }
 
+.block-label span.ant-radio-label {
+  width: 100%;
+}
+
 @keyframes ping {
   75%,
   100% {
