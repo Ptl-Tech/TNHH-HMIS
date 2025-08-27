@@ -103,8 +103,9 @@ export const postDrugIssuance = (pharmacyNo) => async (dispatch, getState) => {
       config
     );
 
-    console.log({ response: response.response.data.errors });
-    if ((response.status = 400))
+    console.log({ response });
+
+    if (response.status == 400)
       throw new Error(response.response?.data?.errors);
 
     // Extract response details
@@ -121,6 +122,8 @@ export const postDrugIssuance = (pharmacyNo) => async (dispatch, getState) => {
     // Return the data for further use
     return responseData.data;
   } catch (error) {
+    console.log({ error });
+
     dispatch({
       type: POST_PHARMACY_DRUG_ISSUANCE_FAILURE,
       payload: error?.message || error.response?.data?.message || error.errors,
