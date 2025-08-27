@@ -138,9 +138,10 @@ const InpatientTable = ({
     },
     {
       title: "Doctor",
-      dataIndex: "DoctorsName",
-      key: "DoctorsName",
-      render: (doctor) => doctor || "Not assigned",
+      dataIndex: "Doctors_Name",
+      key: "Doctors_Name",
+      render: (doctor, record) =>
+        record.Doctors_Name || record.DoctorsName || "Not assigned",
     },
     {
       title: "Status",
@@ -173,9 +174,12 @@ const InpatientTable = ({
   const navigate = useNavigate();
   const handleClick = (record) => {
     record?.Patient_No &&
-      navigate(`/Dashboard/Admit-patient/Patient?PatientNo=${record?.Patient_No}`, {
-        state: { patientDetails: record },
-      });
+      navigate(
+        `/Dashboard/Admit-patient/Patient?PatientNo=${record?.Patient_No}`,
+        {
+          state: { patientDetails: record },
+        }
+      );
   };
 
   return (
