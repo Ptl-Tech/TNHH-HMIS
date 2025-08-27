@@ -65,7 +65,7 @@ export const usePharmacyCard = ({ type }) => {
   // This requests the pharmacy requests
   useEffect(() => {
     dispatch(getPharmacyRequestsAll({ type, status: "", dateRange }));
-  }, [postArchivePrescriptionData, type, dateRange]);
+  }, [postArchivePrescriptionData, type, dateRange, postDrugIssuanceData]);
 
   const handleAddDrug = (drugNo) => {
     if (!currentPharmacyNo)

@@ -1,28 +1,31 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Button, Drawer, Form, Input, message } from 'antd';
+import { Button, Drawer, Form, Input, message } from "antd";
 
-import { RETURN_DRUGS_RESET, returnDrugs } from '../../actions/pharmacy-actions/returnDrugs';
+import {
+  RETURN_DRUGS_RESET,
+  returnDrugs,
+} from "../../actions/pharmacy-actions/returnDrugs";
 
 export const ReturnDrugsComponent = ({ record }) => {
   const dispatch = useDispatch();
-console.log({ record });
+
   const { Item: FormItem } = Form;
   const { DrugName, Description, SystemId, Quantity } = record;
 
   const [open, setOpen] = useState(false);
-  
+
   const { data, loading, error } = useSelector((state) => state.returnDrugs);
 
   useEffect(() => {
     if (data) {
-      message.success('The return was successful');
+      message.success("The return was successful");
       setOpen(false);
     }
 
     if (error) {
-      message.error('Something went wrong when removing the drugs');
+      message.error("Something went wrong when removing the drugs");
     }
 
     if (data || error) {
@@ -43,7 +46,6 @@ console.log({ record });
         destroyOnHidden={true}
         onClose={() => setOpen(false)}
         title={`Return ${DrugName || Description}`}
-    
         children={
           <Form
             layout="vertical"
@@ -53,14 +55,9 @@ console.log({ record });
             <FormItem
               name="returnQty"
               label="Number to return"
-              rules={[{ required: true, message: 'Quantity is required' }]}
+              rules={[{ required: true, message: "Quantity is required" }]}
             >
-              <Input
-                min={1}
-                required
-                type="number"
-                max={Quantity}
-              />
+              <Input min={1} required type="number" max={Quantity} />
             </FormItem>
             <small>
               Value must be <strong>greater</strong> than <strong>0</strong> or
@@ -70,29 +67,22 @@ console.log({ record });
               name="returnRemarks"
               label="Reason of returning"
               rules={[
-                { required: true, message: 'Please enter reason of returning' },
+                { required: true, message: "Please enter reason of returning" },
               ]}
             >
               <Input
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 placeholder="Reason of returning"
               />
             </FormItem>
-            <Button
-              type="primary"
-              disabled={loading}
-              htmlType="submit"
-            >
+            <Button type="primary" disabled={loading} htmlType="submit">
               Submit
             </Button>
             <FormItem
               name="recId"
-              rules={[{ required: true, message: 'Record ID is required' }]}
+              rules={[{ required: true, message: "Record ID is required" }]}
             >
-              <Input
-                type="hidden"
-                max={Quantity}
-              />
+              <Input type="hidden" max={Quantity} />
             </FormItem>
           </Form>
         }
