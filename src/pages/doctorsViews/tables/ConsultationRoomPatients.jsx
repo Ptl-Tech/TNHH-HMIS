@@ -51,7 +51,7 @@ const ConsultationRoomPatients = () => {
     treatmentList?.filter(
       (item) =>
         (canReadAllVisits ||
-          isExternalDoctor(item.Doctor) ||
+          isExternalDoctor(item.DoctorID) ||
           canReadCorporateVisits(item.Resident_Doctor)) &&
         item.Status === status
     );
