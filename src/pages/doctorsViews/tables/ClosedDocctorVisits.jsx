@@ -39,21 +39,20 @@ export default function CloseList() {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-  // TODO: filter the record by own id
-  const canReadOwnRecords = (doctorId) =>
-    ability.can("read", subject("ownDoctorVisitRecords", { doctorId }));
-  const canReadOutPatients = ability.can("read", "outPatients");
+  const isExternalDoctor = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
+  const canReadAllVisits = ability.can("read", "allVisits"); // Nurses & Psychologists
+  const canReadCorporateVisits = (Resident_Doctor) =>
+    Resident_Doctor && ability.can("read", "corporateVisits"); // Corporate Doctors
 
-  console.log({ treatmentList });
-
-  const filterConsultations = (status) => {
-    return treatmentList?.filter((item) => {
-      const matchesStatus = item.Status === status;
-      const matchesDoctor =
-        canReadOwnRecords(item.DoctorID) || canReadOutPatients;
-      return matchesStatus && matchesDoctor;
-    });
-  };
+  const filterConsultations = (status) =>
+    treatmentList?.filter(
+      (item) =>
+        (canReadAllVisits ||
+          isExternalDoctor(item.DoctorID) ||
+          canReadCorporateVisits(item.Resident_Doctor)) &&
+        item.Status === status
+    );
 
   const openDoctorVisitList = useMemo(
     () => filterConsultations("New"),

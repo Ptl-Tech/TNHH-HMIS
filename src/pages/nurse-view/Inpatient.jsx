@@ -1,26 +1,25 @@
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { message } from "antd";
-
 import { subject } from "@casl/ability";
 import { useAbility } from "../../hooks/casl.jsx";
 import InpatientTable from "./tables/nurse-tables/InpatientTable";
 import NurseInnerHeader from "../../partials/nurse-partials/NurseInnerHeader";
 import FilterInpatientList from "../../partials/nurse-partials/FilterInpatientList";
 
-import { useAuth } from "../../hooks/auth.jsx";
 import { listDoctors } from "../../actions/DropdownListActions";
 import { currentInpatient } from "../../actions/Doc-actions/currentInpatient.js";
 import { getPgAdmissionsAdmittedSlice } from "../../actions/nurse-actions/getPgAdmissionsAdmittedSlice";
 
 const Inpatient = () => {
-  const { user } = useAuth();
   const ability = useAbility();
-  const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  console.log({ location });
 
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
@@ -47,47 +46,26 @@ const Inpatient = () => {
     );
   };
 
-  // get the list of doctors
-  const formattedDoctorDetails = useMemo(() => {
-    return data?.map((doctor) => ({
-      DoctorID: doctor?.DoctorID,
-      DoctorsName: doctor?.DoctorsName,
-    }));
-  }, [data]);
+  const isExternalDoctor = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
+  const canReadAllVisits = (Ward) =>
+    Ward
+      ? Ward === location.state.filterParam && ability.can("read", "allVisits")
+      : ability.can("read", "allVisits"); // Nurses & Psychologists
+  const canReadCorporateVisits = (Resident_Doctor) =>
+    Resident_Doctor && ability.can("read", "corporateVisits"); // Corporate Doctors
 
-  const combinedPatients = useMemo(() => {
-    if (!admittedPatients || !formattedDoctorDetails) return [];
-
-    return admittedPatients.map((patient) => {
-      const matchingDoctor = formattedDoctorDetails.find(
-        (doctor) => patient?.Doctor === doctor?.DoctorID
-      );
-      return {
-        ...patient,
-        DoctorsName: matchingDoctor ? matchingDoctor.DoctorsName : null,
-      };
-    });
-  }, [admittedPatients, formattedDoctorDetails]);
-
-  const canReadOwnInpatients = (doctorId) =>
-    ability.can("read", subject("ownInPatients", { doctorId }));
-  const canReadAllInpatients = ability.can("read", "inPatients");
-
-  // filter the patient based on the doctor
-  const filterPatientBasedWithDoctor = useMemo(() => {
-    return combinedPatients?.filter(
-      (patient) => canReadOwnInpatients(patient.Doctor) || canReadAllInpatients
-    );
-  }, [combinedPatients, ability]);
-  const filteredByStatus = useMemo(() => {
-    const filteredByStatus = filterPatientBasedWithDoctor?.filter(
-      ({ Status, Ward }) =>
-        (Status === "Admitted" || Status === "Discharge Pending") &&
-        (user.role == "NURSE" ? Ward == location.state.filterParam : true)
+  const filterConsultations = () =>
+    admittedPatients?.filter(
+      (item) =>
+        canReadAllVisits(item.Ward) ||
+        isExternalDoctor(item.DoctorID) ||
+        canReadCorporateVisits(item.Resident_Doctor)
     );
 
-    return filteredByStatus;
-  }, [filterPatientBasedWithDoctor]);
+  console.log({ admittedPatients });
+
+  const inPatients = filterConsultations();
 
   useEffect(() => {
     dispatch(getPgAdmissionsAdmittedSlice());
@@ -103,7 +81,7 @@ const Inpatient = () => {
     <div style={{ margin: "20px 10px 10px 10px" }}>
       <NurseInnerHeader
         title="Current Inpatients"
-        filterInPatients={filteredByStatus}
+        filterInPatients={inPatients}
       />
       <FilterInpatientList
         setSearchName={setSearchName}
@@ -113,8 +91,8 @@ const Inpatient = () => {
       <InpatientTable
         loading={loading}
         searchName={searchName}
+        filterInPatients={inPatients}
         handleNavigate={handleNavigate}
-        filterInPatients={filteredByStatus}
         searchPatientNumber={searchPatientNumber}
         searchAdmissionNumber={searchAdmissionNumber}
         loadingAdmittedPatients={loadingAdmittedPatients}

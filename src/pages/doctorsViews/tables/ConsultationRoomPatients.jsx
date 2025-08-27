@@ -41,14 +41,18 @@ const ConsultationRoomPatients = () => {
     dispatch(getOutPatientTreatmentList());
   }, [dispatch]);
 
-  const canReadOwnConsultationNotes = (doctorId) =>
-    ability.can("read", subject("ownConsultationNotes", { doctorId }));
-  const canReadOutPatients = ability.can("read", "outPatients");
+  const isExternalDoctor = (doctorId) =>
+    ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
+  const canReadAllVisits = ability.can("read", "allVisits"); // Nurses & Psychologists
+  const canReadCorporateVisits = (Resident_Doctor) =>
+    Resident_Doctor && ability.can("read", "corporateVisits"); // Corporate Doctors
 
   const filterByStatus = (status) =>
     treatmentList?.filter(
       (item) =>
-        (canReadOwnConsultationNotes(item?.DoctorID) || canReadOutPatients) &&
+        (canReadAllVisits ||
+          isExternalDoctor(item.DoctorID) ||
+          canReadCorporateVisits(item.Resident_Doctor)) &&
         item.Status === status
     );
 
@@ -96,7 +100,6 @@ const ConsultationRoomPatients = () => {
 
   return (
     <div style={{ padding: "10px 10px" }}>
-     
       <ConsultationRoomSummeryCard
         currentPath={currentPath}
         openDoctorVisitList={openDoctorVisitList}
