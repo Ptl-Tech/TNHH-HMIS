@@ -50,7 +50,8 @@ const Inpatient = () => {
     ability.can("read", subject("ownVisits", { doctorId })); // External Doctors
   const canReadAllVisits = (Ward) =>
     Ward
-      ? Ward === location.state.filterParam && ability.can("read", "allVisits")
+      ? Ward === location.state?.filterParam &&
+        ability.can("read", "allVisits")
       : ability.can("read", "allVisits"); // Nurses & Psychologists
   const canReadCorporateVisits = (Resident_Doctor) =>
     Resident_Doctor && ability.can("read", "corporateVisits"); // Corporate Doctors
