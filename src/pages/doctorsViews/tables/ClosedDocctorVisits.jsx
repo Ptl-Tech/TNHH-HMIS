@@ -49,7 +49,7 @@ export default function CloseList() {
     treatmentList?.filter(
       (item) =>
         (canReadAllVisits ||
-          isExternalDoctor(item.DoctorID) ||
+          isExternalDoctor(item.Doctor) ||
           canReadCorporateVisits(item.Resident_Doctor)) &&
         item.Status === status
     );

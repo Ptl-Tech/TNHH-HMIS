@@ -61,7 +61,7 @@ const Inpatient = () => {
     admittedPatients?.filter(
       (item) =>
         canReadAllVisits(item.Ward) ||
-        isExternalDoctor(item.DoctorID) ||
+        isExternalDoctor(item.Doctor) ||
         canReadCorporateVisits(item.Resident_Doctor)
     );
 

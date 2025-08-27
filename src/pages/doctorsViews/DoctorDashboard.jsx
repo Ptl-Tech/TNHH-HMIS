@@ -67,7 +67,7 @@ const DoctorDashboard = () => {
     (status ? treatmentList : admittedPatients)?.filter(
       (item) =>
         (canReadAllVisits ||
-          isExternalDoctor(item.DoctorID) ||
+          isExternalDoctor(item.Doctor) ||
           canReadCorporateVisits(item.Resident_Doctor)) &&
         (status ? item.Status === status : true)
     );
