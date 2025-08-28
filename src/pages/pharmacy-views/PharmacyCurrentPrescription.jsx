@@ -60,6 +60,8 @@ export const PharmacyCurrentPrescription = ({
 
   if (!pharmacyLineData) return;
 
+  console.log({ currentPrescription });
+
   return (
     <div
       style={{
@@ -113,6 +115,7 @@ export const PharmacyCurrentPrescription = ({
         </Title>
         <PharmacyPrescriptionActionButtons
           disabled={disabled}
+          pharmacyRecord={currentPrescription}
           currentRequest={currentPrescription.Pharmacy_No}
           loading={postArchivePrescriptionLoading || postDrugIssuanceLoading}
         />

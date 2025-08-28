@@ -17,6 +17,7 @@ import {
 
 export const PharmacyPrescriptionActionButtons = ({
   disabled,
+  pharmacyRecord,
   currentRequest,
 }) => {
   const dispatch = useDispatch();
@@ -25,10 +26,6 @@ export const PharmacyPrescriptionActionButtons = ({
   const [pdfLabels, setPdfLabels] = useState(null);
   const [viewPDFLabel, setViewPDFLabel] = useState(false);
 
-  // This gets a single patient record
-  const { data: pharmacyRecord } = useSelector(
-    (state) => state.getSinglePharmacyRecord
-  );
   // This gets the data once we post the prescription
   const {
     data: postDrugIssuanceData,
