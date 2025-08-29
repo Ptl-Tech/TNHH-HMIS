@@ -24,29 +24,28 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
   }, [dispatch, observationNumber]);
 
   useEffect(() => {
-   if (Array.isArray(vitalsLines) && vitalsLines.length > 0) {
-  const latest = vitalsLines[vitalsLines.length - 1]; // last record in array
-  form.setFieldsValue({
-    vitals: {
-      pulseRate: latest?.PulseRate || "",
-      height: latest?.Height || "",
-      weight: latest?.Weight || "",
-      temperature: latest?.Temperature || "",
-      systolic: latest?.BloodPressure
-        ? latest?.BloodPressure.split("/")[0]
-        : "",
-      diastolic: latest?.BloodPressure
-        ? latest?.BloodPressure.split("/")[1]
-        : "",
-      sP02: latest?.SP02 || "",
-      respirationRate: latest?.RespirationRate || "",
-      bmi: latest?.BMI ? latest?.BMI.toFixed(2) : "0.0",
-    },
-  });
-} else {
-  form.resetFields();
-}
-
+    if (Array.isArray(vitalsLines) && vitalsLines.length > 0) {
+      const latest = vitalsLines[vitalsLines.length - 1]; // last record in array
+      form.setFieldsValue({
+        vitals: {
+          pulseRate: latest?.PulseRate || "",
+          height: latest?.Height || "",
+          weight: latest?.Weight || "",
+          temperature: latest?.Temperature || "",
+          systolic: latest?.BloodPressure
+            ? latest?.BloodPressure.split("/")[0]
+            : "",
+          diastolic: latest?.BloodPressure
+            ? latest?.BloodPressure.split("/")[1]
+            : "",
+          sP02: latest?.SP02 || "",
+          respirationRate: latest?.RespirationRate || "",
+          bmi: latest?.BMI ? latest?.BMI.toFixed(2) : "0.0",
+        },
+      });
+    } else {
+      form.resetFields();
+    }
   }, [vitalsLines, form]);
 
   const onFinish = async (values) => {
@@ -69,12 +68,12 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
         height: parseFloat(cleanValue(height)),
         weight: parseFloat(cleanValue(weight)),
         temperature: parseFloat(cleanValue(temperature)),
-        bloodPressure:'',
-        systolicBp:  parseFloat(cleanValue(systolic)),
+        bloodPressure: "",
+        systolicBp: parseFloat(cleanValue(systolic)),
         diastolicBp: parseFloat(cleanValue(diastolic)),
         sP02,
         respirationRate,
-       // BMI: calculateBMI(height, weight),
+        // BMI: calculateBMI(height, weight),
       };
 
       // Common payload properties
@@ -153,13 +152,13 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
   };
 
   const columns = [
-     {
-          title: "No",
-          dataIndex: "No",
-          key: "No",
-          render: (_, __, index) => index + 1,
-          width: 50,  
-        },
+    {
+      title: "No",
+      dataIndex: "No",
+      key: "No",
+      render: (_, __, index) => index + 1,
+      width: 50,
+    },
     {
       title: "Observation No",
       dataIndex: "ObservationNo",
@@ -518,10 +517,10 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
                 columns={columns}
                 size="middle"
                 dataSource={
-  Array.isArray(vitalsLines)
-    ? [...vitalsLines].reverse() // reverse order for newest first
-    : [vitalsLines]
-}
+                  Array.isArray(vitalsLines)
+                    ? [...vitalsLines].reverse() // reverse order for newest first
+                    : [vitalsLines]
+                }
                 pagination={{
                   defaultPageSize: 10,
                   showSizeChanger: true,
