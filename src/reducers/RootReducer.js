@@ -215,7 +215,7 @@ import { postAdmissionFormDetailsReducer } from "./nurse-reducers/postAdmissionF
 
 import { getPatientVisitReducer } from "./doc-reducers/getPatientVisitDetails";
 import { QySecondaryDiagnosisSetupReducer } from "./doc-reducers/getSecondaryDiagnosisSetup";
-import { postInterimInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
+import { postInterimInvoiceReducer, postSHAInvoiceReducer } from "./ChargesReducers/postInterimInvoiceReducer";
 import { getQyUrgencyColorCodingSetupReducer } from "./nurse-reducers/getQyUrgencyColorCodingSetupReducer";
 import { getPgWardRoomsSetupReducer } from "./nurse-reducers/getPgWardRoomsSetupReducer";
 import { postVisitorListReducer } from "./nurse-reducers/postVisitorListReducer";
@@ -256,7 +256,7 @@ import { savePaymentReducer } from "./ChargesReducers/savePaymentReducer";
 import { getReceiptHeaderReducer } from "./ChargesReducers/getReceiptHeaderReducer";
 import { getTransactionListReducer } from "./ChargesReducers/getTransactionListReducer";
 import { postPatientChargesReducer } from "./ChargesReducers/postPatientChargesReducer";
-import { postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
+import { generateSHAInvoiceReducer, postGenerateInvoiceReducer } from "./ChargesReducers/postGenerateInvoiceReducer";
 import {
   getNursingCarePlanReducer,
   postNursingCarePlanReducer,
@@ -324,7 +324,7 @@ import { getEncounterDetailsReducer } from "./encounter-reducers/encounterDetail
 import { returnDrugsReducer } from "./pharmacy-reducers/returnDrugsReducer";
 import { getSingleDischargeRequestReducer } from "./ChargesReducers/getSingleDischargeRequestDetails";
 import { getReceiptsReducer } from "./ChargesReducers/getReceiptsReducer";
-import { getInvoiceReducer } from "./ChargesReducers/getInvoiceListReducer";
+import { getInvoiceReducer, getUnpostedInvoiceReducer } from "./ChargesReducers/getInvoiceListReducer";
 import { postNurseOrderSheetReducer } from "./nurse-reducers/postNurseOrderSheetReducer";
 import { postDischargeTCAReducer } from "./postDischargeTCAReducer";
 import { postPrintSickOffReducer } from "./doc-reducers/postPrintSickOffReducer";
@@ -374,6 +374,8 @@ export const rootReducer = combineReducers({
   getSingleDischargeRequest: getSingleDischargeRequestReducer,
   getReceipts: getReceiptsReducer,
   getInvoiceList: getInvoiceReducer,
+getUnpostedInvoiceList:getUnpostedInvoiceReducer,
+
 
   patientList: patientListReducer,
   activePatients: activePatientsReducer,
@@ -573,6 +575,7 @@ export const rootReducer = combineReducers({
   getPatientVisit: getPatientVisitReducer,
   getSecondaryDiagnosisSetup: QySecondaryDiagnosisSetupReducer,
   postInterimInvoice: postInterimInvoiceReducer,
+  printSHAInvoice:postSHAInvoiceReducer,
   getQyReceiptSplitList: getSplitReceiptLinesReducer,
   postSplitReceipt: postReceiptSplitLineReducer,
   getReceiptPage: getReceiptPageReducer,
@@ -624,6 +627,7 @@ export const rootReducer = combineReducers({
   getChargesLines: getChargesLinesReducer,
   postPatientCharges: postPatientChargesReducer,
   generateInvoice: postGenerateInvoiceReducer,
+  generateSHAInvoice: generateSHAInvoiceReducer,
   postReverseCharges: postReverseChargeReducer,
   getPatientReceipt: getPatientReceiptsReducer,
   getPatientReceiptHeader: getPatientReceiptsHeadersReducer,

@@ -96,19 +96,33 @@ const PatientCharges = ({ activeVisitNo }) => {
       ? data.filter((item) => item.Transaction_Type !== "ZRECEIPT")
       : [];
 
-  const pendingCharges = filteredData.filter((charge) => !charge.Posted);
-  const postedCharges = filteredData.filter((charge) => charge.Posted);
+  const pendingCharges = data.filter((charge) => !charge.Posted);
+  const postedCharges = data.filter((charge) => charge.Posted);
 
   const columns = [
     {
       title: "Transaction Type",
       dataIndex: "Transaction_Type",
       key: "Transaction_Type",
+      filters: [
+        ...new Set(data.map((item) => item.Transaction_Type)),
+      ].map((type) => ({ text: type, value: type })),
+    
+      onFilter: (value, record) => record.Transaction_Type === value,
+      filterSearch: true,
+      width: 150,
     },
     {
       title: "Description",
       dataIndex: "Description",
       key: "Description",
+      width: 250,
+      ellipsis: true,
+      filters: [
+        ...new Set(data.map((item) => item.Description)),
+      ].map((desc) => ({ text: desc, value: desc })),
+      onFilter: (value, record) => record.Description === value,
+      filterSearch: true,
     },
     {
       title: "Quantity",

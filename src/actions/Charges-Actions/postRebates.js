@@ -35,13 +35,12 @@ export const postRebates =
         rebatesData,
         config
       );
-console.log("status78", response.data.status);
       // Extract and validate the response data
       dispatch({
         type: POST_REBATES_SUCCESS,
-        payload: response.data.status,
+        payload: response.data,
       });
-      message.success(`Patient Rebates allocated: ${response.data.status}fully`);
+     return response;
     } catch (error) {
         console.error(error);
       // Dispatch failure action

@@ -52,7 +52,7 @@ const [form] = Form.useForm();
   const [dispatchVisit, setDispatchVisit] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(0);
   const [dispatchArea, setDispatchArea] = useState(0);
-
+const[submitLoading,setSubmitLoading]=useState(false)
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [visitData, setVisitData] = useState(null);
   const { clinics } = useSelector((state) => state.clinics);
@@ -194,43 +194,50 @@ const [form] = Form.useForm();
     );
     setFilteredDoctors(filtered);
   };
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
+ const handleSubmit = async () => {
+  try {
+    const values = await form.validateFields();
 
-      const payload = {
-        myAction: patientDetails.Activated ? "edit" : "create",
-        patientNo,
-        dispatchArea: values.dispatchArea,
-        clinic: values.clinic,
-        doctor: values.doctor,
-        paymentMode: values.paymentMode,
-        insuranceNo: values.insuranceNo || "",
-        insuranceName: values.insuranceName || "",
-        insurancePrinicipalMemberName:
-          values.insurancePrinicipalMemberName || "",
-        isPrincipleMember: values.isPrincipleMember || false,
-        membershipNo: values.membershipNo || "",
-        schemeName: values.schemeName || "",
-      };
+    const payload = {
+      myAction: patientDetails.Activated ? "edit" : "create",
+      patientNo,
+      dispatchArea: values.dispatchArea,
+      clinic: values.clinic,
+      doctor: values.doctor,
+      paymentMode: values.paymentMode,
+      insuranceNo: values.insuranceNo || "",
+      insuranceName: values.insuranceName || "",
+      insurancePrinicipalMemberName: values.insurancePrinicipalMemberName || "",
+      isPrincipleMember: values.isPrincipleMember || false,
+      membershipNo: values.membershipNo || "",
+      schemeName: values.schemeName || "",
+    };
 
-      const response = await dispatch(createPatientVisitRequest(payload));
-      if (response.type === CREATE_PATIENT_VISIT_SUCCESS) {
-        showNotification("success", "Success", "Visit created successfully");
-        refetchDetails();
-        //  setDispatchVisit(true);
-        //  onClose();
-      } else if (response.type === CREATE_PATIENT_VISIT_FAIL) {
-        showNotification(
-          "error",
-          "Error",
-          response.payload.message || "An error occurred while creating visit"
-        );
-      }
-    } catch (error) {
-      showNotification("error", "Error", error.message);
-    }
-  };
+    setSubmitLoading(true);
+
+    const response = await dispatch(createPatientVisitRequest(payload));
+    console.log("Create Visit Response:", response);
+
+    if (response && response.status === "success" && response.data?.appointmentNo) {
+      setDispatchVisit(true);
+      showNotification(
+        "success",
+        "Success",
+        `Patient visit created successfully with ID: ${response.data.appointmentNo}`
+      );
+      refetchDetails();
+    };
+  } catch (error) {
+    console.error("Validation Failed:", error);
+    showNotification(
+      "error",
+      "Error",
+      error.response?.data?.errors || error.message || "Unexpected error occurred"
+    );
+  } finally {
+    setSubmitLoading(false);
+  }
+};
 
   return (
     <Drawer
@@ -285,7 +292,7 @@ const [form] = Form.useForm();
       footer={null}
       closable={{ "aria-label": "Close Button" }}
     >
-      <Spin size="large" tip="Creating Visit..." spinning={visitLoading}>
+      <Spin size="large" tip="Creating Visit..." spinning={submitLoading}>
         <Form
           form={form}
           layout="vertical"
@@ -508,8 +515,8 @@ const [form] = Form.useForm();
               type="primary"
               size="medium"
               block
-              disabled={visitLoading}
-              loading={visitLoading}
+              disabled={submitLoading}
+              loading={submitLoading}
             >
               Save Visit
             </Button>

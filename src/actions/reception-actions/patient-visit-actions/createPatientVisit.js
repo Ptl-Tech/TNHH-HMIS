@@ -13,23 +13,34 @@ export const createPatientVisitRequest = (visitData, navigate) => async (dispatc
     dispatch({ type: CREATE_PATIENT_VISIT_REQUEST });
 
     const config = apiHeaderConfig(getState);
+    const { data } = await axios.post(`${API}Reception/CreateVisit`, visitData, config);
+console.log("data logged", data);
+    let responseData;
 
-    // If config is missing, redirect to login and stop execution
-    if (!config) {
-      navigate("/login"); 
-      throw new Error("User information not available.");
-    }
+    if (data?.status === "success") {
+      responseData = {
+        status: data.status,
+        message: data.message,
+        data: data.data,
+      };
 
-    const response = await axios.post(`${API}Reception/CreateVisit`, visitData, config);
+      dispatch({ type: CREATE_PATIENT_VISIT_SUCCESS, payload: responseData });
+    }; 
 
-    dispatch({ type: CREATE_PATIENT_VISIT_SUCCESS, payload: response.data });
-return{type: CREATE_PATIENT_VISIT_SUCCESS, payload: response.data}; 
   } catch (error) {
-    dispatch({
-      type: CREATE_PATIENT_VISIT_FAIL,
-      payload: error.response?.data?.errors || "An error occurred",
-    });
+    const errMsg =
+      error.response?.data?.errors ||
+      error.response?.data?.message ||
+      error.message ||
+      "An unexpected error occurred";
 
-return {type: CREATE_PATIENT_VISIT_FAIL, payload: error.response?.data?.errors || "An error occurred"}
+    const errorResponse = {
+      status: "error",
+      message: errMsg,
+    };
+
+    dispatch({ type: CREATE_PATIENT_VISIT_FAIL, payload: errorResponse });
+    return errorResponse; // ✅ return structured error instead of throwing
   }
 };
+

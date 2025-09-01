@@ -35,6 +35,7 @@ import SplitPayments from "../CashPatients/SplitPayments";
 import PatientReceiptLines from "../CashPatients/PatientReceiptLines";
 import PreviousBill from "../PreviousBill";
 import RefreshPatientCharges from "../RefreshPatientCharges";
+import { PaymentDetails } from "../CashPatients/PaymentDetails";
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "KES 0.00";
@@ -116,6 +117,7 @@ const InvoicePatient = () => {
     setRebatesModal(false);
     setDiscountModal(false);
     setSplitAmountModal(false);
+    setReceiptModalVisible(false);
   };
   const showReceiptModal = () => {
     setReceiptModalVisible(true);
@@ -179,11 +181,12 @@ const InvoicePatient = () => {
         />
       </Menu.Item>
       <Menu.Divider />
+      <Menu.Item key="receipt_action">Show Payment Details </Menu.Item>
+
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
 
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="discount_action">Allocate Patient Discount</Menu.Item>
-      <Menu.Item key="receipt_action">Receipt Lines</Menu.Item>
       <Menu.Divider />
       <Menu.Item key="close_bill">
         <ClosePatientBill />
@@ -283,9 +286,8 @@ const InvoicePatient = () => {
                 className="text-danger fw-bold"
                 style={{ gridColumn: "span 2" }}
               >
-                <DollarOutlined /> Bill Balance: {" "}
-                                 {formatKES(patientBillData?.[0]?.Balance)}
-
+                <DollarOutlined /> Bill Balance:{" "}
+                {formatKES(patientBillData?.[0]?.Balance)}
               </p>
 
               {/* Receipt no section */}
@@ -354,27 +356,10 @@ const InvoicePatient = () => {
           <div className="col-12 col-md-4">
             <Card className="shadow-sm p-3">
               <div className="d-flex flex-column gap-2">
-                {/* <div className="d-flex justify-content-between">
-                  <p className="fw-bold">Total Amount:</p>
-                  <p>KSh {patientBillData[0]?.Balance?.toFixed(2) || "0.00"}</p>
-                </div> */}
-                {/* <div className="d-flex justify-content-between">
-                  <p className="fw-bold">Amount  Paid:</p>
-                  <p className="text-primary fw-semibold">
-                    KSh{" "}
-                    {Array.isArray(data) && data.length > 0
-                      ? data[data.length - 1]?.Amount?.toFixed(2) || "0.00"
-                      : "0.00"}
-                  </p>{" "}
-                </div> */}
-                {/* <div className="d-flex justify-content-between">
-                  <p className="fw-bold">Discount:</p>
-                  <p>KSh {data?.Discount?.toFixed(2) || "0.00"}</p>
-                </div> */}
                 <div className="d-flex justify-content-between">
                   <p className="fw-bold">Balance:</p>
                   <p className="text-danger fw-semibold">
-                  {formatKES(patientBillData?.[0]?.Balance)}
+                    {formatKES(patientBillData?.[0]?.Balance)}
                   </p>
                 </div>
               </div>
@@ -414,15 +399,17 @@ const InvoicePatient = () => {
                 activeVisitNo={activeVisitNo || ""}
                 amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
               />
-              <PatientReceiptLines
-                activeVisitNo={activeVisitNo}
-                visible={receiptModalVisible}
-                onClose={() => setReceiptModalVisible(false)}
-              />
+
               <PreviousBill
                 visible={view}
                 patientNo={patientBillData[0]?.PatientNo}
                 onClose={() => setView(false)}
+              />
+              <PaymentDetails
+                visible={receiptModalVisible}
+                onClose={handleCancel}
+                activeVisitNo={activeVisitNo}
+                patientNo={patientVisitDetails?.PatientNo}
               />
             </Card>
           </div>
