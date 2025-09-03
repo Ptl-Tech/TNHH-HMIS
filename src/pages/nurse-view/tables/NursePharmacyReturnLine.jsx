@@ -3,12 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPharmacyLineReturnbyPharmacyNo } from "../../../actions/pharmacy-actions/getPharmacyLineReturns";
 import { Button, Space, Table, Typography, Alert } from "antd";
 import { ReturnDrugsComponent } from "../../pharmacy-views/ReturnDrugsComponent";
+import { classNames } from "@react-pdf-viewer/core";
 
 const NursePharmacyReturnLine = ({ patientNo }) => {
   const dispatch = useDispatch();
-  const { data = [], loading, error } = useSelector(
-    (state) => state.getPatientPharmacyReturnLines || {}
-  );
+  const {
+    data = [],
+    loading,
+    error,
+  } = useSelector((state) => state.getPatientPharmacyReturnLines || {});
 
   const [open, setOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -26,24 +29,55 @@ const NursePharmacyReturnLine = ({ patientNo }) => {
 
   const columns = [
     {
-      title: "Drug No",
-      dataIndex: "No",
-      key: "No",
-    },
-    {
       title: "Drug Name",
       dataIndex: "DrugName",
       key: "DrugName",
-    },
-    {
-      title: "Prescription Dose",
-      dataIndex: "Prescription_Dose",
-      key: "Prescription_Dose",
+      fixed: "left",
+      // className: "bg-white",
+      onHeaderCell: (column) => {
+        return {
+          style: {
+            background: "#0f5689 !important",
+            color: "white",
+          },
+        };
+      },
+      onCell: (column) => {
+        return {
+          style: {
+            minWidth: "100px",
+            background: "white",
+            verticalAlign: "top",
+          },
+        };
+      },
     },
     {
       title: "Quantity",
       dataIndex: "Quantity",
       key: "Quantity",
+      fixed: "left",
+      onCell: (column) => {
+        return {
+          style: {
+            minWidth: "100px",
+            background: "white",
+            verticalAlign: "top",
+          },
+        };
+      },
+      onHeaderCell: (column) => {
+        return {
+          style: {
+            background: "#0f5689",
+          },
+        };
+      },
+    },
+    {
+      title: "Prescription Dose",
+      dataIndex: "Prescription_Dose",
+      key: "Prescription_Dose",
     },
     {
       title: "Issued Quantity",
@@ -70,10 +104,7 @@ const NursePharmacyReturnLine = ({ patientNo }) => {
       key: "Actions",
       render: (_, record) => (
         <Space>
-         <ReturnDrugsComponent
-record={record}
-         
-        />
+          <ReturnDrugsComponent record={record} />
         </Space>
       ),
     },
@@ -94,14 +125,12 @@ record={record}
 
       <Table
         rowKey="SystemId"
-        scroll={{ x: "max-content" }}
         columns={columns}
         dataSource={data}
         loading={loading}
         pagination={false}
+        scroll={{ x: "max-content" }}
       />
-
-     
     </>
   );
 };

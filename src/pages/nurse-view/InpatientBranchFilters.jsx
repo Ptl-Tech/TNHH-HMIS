@@ -14,7 +14,7 @@ const InpatientWardFilters = () => {
   const branchCode = user.branchCode;
 
   const { getBeds, loadingWards, getWards } = useGetWardManagementHook();
-  const [branchFilter, setBranchFilter] = useState(branchCode); // default to user's branch
+  const [branchFilter, setBranchFilter] = useState(branchCode);
 
   // Extract branch codes for dropdown
   const branchOptions = useMemo(() => {

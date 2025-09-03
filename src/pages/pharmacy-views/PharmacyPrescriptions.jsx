@@ -19,6 +19,8 @@ export const PharmacyPrescriptions = ({
   const { data: pharmacyLineData, loading: pharmacyLineDataLoading } =
     useSelector((state) => state.getPatientPharmacyReturnLines);
 
+  console.log({ currentPrescriptions });
+
   // This get's the current patient's pharmacy lines
   useEffect(() => {
     dispatch(

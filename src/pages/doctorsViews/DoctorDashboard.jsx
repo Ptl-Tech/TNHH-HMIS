@@ -56,6 +56,7 @@ const DoctorDashboard = () => {
     Corporate doctors can read only Chiromo's patients
     External doctors can read only their patients
     Nurses can see all patients
+    Psychologists can see all patients
   */
   const isExternalDoctor = (doctorId) =>
     ability.can("read", subject("ownVisits", { doctorId })); // External Doctors

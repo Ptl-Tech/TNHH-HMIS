@@ -34,6 +34,7 @@ import {
 import PreviousBill from "../PreviousBill";
 import AllocateRebates from "../AllocateRebates";
 import RefreshPatientCharges from "../RefreshPatientCharges";
+import { GenerateSHAInvoice, PaymentDetails } from "./PaymentDetails";
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
   if (isNaN(parsed)) return "KES 0.00";
@@ -208,7 +209,7 @@ const ReceiptInpatient = () => {
         }
       }}
     >
-      <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
+      <Menu.Item key="visit_action">Show Payment Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="initiate_discharge">Initiate Discharge</Menu.Item>
@@ -350,10 +351,16 @@ const ReceiptInpatient = () => {
             </Card>
           </Skeleton>
           <div className="d-flex justify-content-between gap-3 my-3">
+            <div className="d-flex justify-content-between gap-3 my-3">
             <RefreshPatientCharges
               patientNo={patientBillData[0]?.PatientNo}
               activeVisitNo={activeVisitNo}
             />
+            <GenerateSHAInvoice
+              activeVisitNo={activeVisitNo}
+              patientNo={patientBillData[0]?.PatientNo}
+            />
+            </div>
             <div className="d-flex justify-content-end gap-3 my-3">
               <PrintReceipt
                 receiptNo={
@@ -387,7 +394,7 @@ const ReceiptInpatient = () => {
                   <div className="d-flex justify-content-between">
                     <p className="fw-bold">Amount to be Paid :</p>
                     <p className="text-danger fw-bold">
-                  {formatKES(patientBillData?.[0]?.Balance)}
+                      {formatKES(patientBillData?.[0]?.Balance)}
                     </p>
                   </div>
 
@@ -441,11 +448,11 @@ const ReceiptInpatient = () => {
                   onClose={handleCancel}
                   activeVisitNo={activeVisitNo}
                 />
-                <PatientReceiptLines
+                {/* <PatientReceiptLines
                   activeVisitNo={activeVisitNo}
                   visible={receiptModalVisible}
                   onClose={handleCancel}
-                />
+                /> */}
                 <SplitPayments
                   receiptNo={
                     Array.isArray(receiptHeader) && receiptHeader.length > 0
@@ -472,6 +479,12 @@ const ReceiptInpatient = () => {
           onClose={handleCancel}
           patientNo={patientBillData[0]?.PatientNo}
         />
+         <PaymentDetails
+                  visible={receiptModalVisible}
+                  onClose={handleCancel}
+                  activeVisitNo={activeVisitNo}
+                  patientNo={patientBillData[0]?.PatientNo}
+                />
       </div>
     </>
   );

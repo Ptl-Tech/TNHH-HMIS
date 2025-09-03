@@ -29,7 +29,8 @@ import { shape } from "prop-types";
 import RefreshPatientCharges from "../RefreshPatientCharges";
 import PreviousBill from "../PreviousBill";
 import AllocateRebates from "../AllocateRebates";
-
+import { GenerateSHAInvoice, PaymentDetails } from "./PaymentDetails";
+import { SHAInvoicePrintout } from "../InsurancePatients/SHAInvoicePrintout";
 
 const formatKES = (amount) => {
   const parsed = parseFloat(amount);
@@ -76,6 +77,7 @@ const ReceiptPatient = () => {
   const [RebatesModal, setRebatesModal] = useState(false);
 
   const [view, setView] = useState(false);
+  const [receiptNo, setreceiptNo] = useState("");
 
   useEffect(() => {
     if (activeVisitNo) {
@@ -89,8 +91,7 @@ const ReceiptPatient = () => {
     setIsModalVisible(false);
     setReceiptModalVisible(false);
     setSplitAmountModal(false);
-        setRebatesModal(false);
-
+    setRebatesModal(false);
   };
 
   const showReceiptModal = () => {
@@ -99,8 +100,12 @@ const ReceiptPatient = () => {
 
   const InitiateSplitPayment = () => {
     setSplitAmountModal(true);
-    //setreceiptNo("")
   };
+
+  const handleReceiptUpdate = (receiptNo) => {
+    console.log('receiptt', receiptNo);
+setreceiptNo(receiptNo)
+  }    
 
   const handleBalanceCalculation = () => {
     if (!Array.isArray(receiptLines) || receiptLines.length === 0) {
@@ -115,27 +120,31 @@ const ReceiptPatient = () => {
   };
 
   const handlePaymentProcessing = async () => {
-    if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
-      return;
-    }
+    // if (!Array.isArray(receiptHeader) || receiptHeader.length === 0) {
+    //   return;
+    // }
 
-    const lastReceipt = receiptHeader[receiptHeader.length - 1];
+    // const lastReceipt = receiptHeader[receiptHeader.length - 1];
 
     const payload = {
       recId: "",
       patientNo: patientVisitDetails?.PatientNo,
-      receiptNo: lastReceipt?.No,
+      receiptNo: receiptNo,
     };
 
     try {
-      const status = dispatch(postReceipt(payload));
-
-      if (status === "success") {
+      const response = dispatch(postReceipt(payload));
+      console.log("response", response);
+      if (response.data.status === "success") {
         // setIsModalVisible(false);
         // Optionally refresh receiptLines
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
         dispatch(getReceiptPage(activeVisitNo));
+      } else {
+        const error =
+          response?.response?.data?.errors || "Failed to post receipt";
+        message.error(error);
       }
     } catch (error) {
       message.error("Failed to post receipt. Please try again.");
@@ -155,7 +164,7 @@ const ReceiptPatient = () => {
         }
       }}
     >
-      <Menu.Item key="visit_action">Show Receipt Details</Menu.Item>
+      <Menu.Item key="visit_action">Show Payment Details</Menu.Item>
       <Menu.Item key="split_amount">Split Payment</Menu.Item>
       <Menu.Item key="rebates_action">Allocate SHIF Rebates</Menu.Item>
       <Menu.Item key="request_admission">Waive Charge</Menu.Item>
@@ -259,7 +268,7 @@ const ReceiptPatient = () => {
                   className="text-danger fw-bold"
                   style={{ gridColumn: "span 2" }}
                 >
-                  <DollarOutlined /> Bill Balance: {" "}
+                  <DollarOutlined /> Bill Balance:{" "}
                   {formatKES(patientBillData?.[0]?.Balance)}
                 </p>
 
@@ -293,11 +302,16 @@ const ReceiptPatient = () => {
             </Card>
           </Skeleton>
           <div className="d-flex justify-content-between gap-3 my-3">
-            <RefreshPatientCharges
-              patientNo={patientVisitDetails?.PatientNo}
-              activeVisitNo={activeVisitNo}
-            />
+            <div className="d-flex justify-content-between gap-3 my-3">
+              <RefreshPatientCharges
+                patientNo={patientVisitDetails?.PatientNo}
+                activeVisitNo={activeVisitNo}
+              />
+             
+            </div>
+
             <div className="d-flex justify-content-end gap-3 my-3">
+              
               <PrintReceipt
                 receiptNo={
                   Array.isArray(receiptHeader) && receiptHeader?.length > 0
@@ -309,17 +323,15 @@ const ReceiptPatient = () => {
                 patientNo={patientVisitDetails?.PatientNo}
                 activeVisitNo={activeVisitNo}
               />
-
-              {/* <Button type="primary" icon={<WalletTwoTone />} iconPosition="end" onClick={() => setIsModalVisible(true)}>
-            MPESA Payment
-          </Button> */}
             </div>
           </div>
           <PatientCharges activeVisitNo={activeVisitNo} />
           <div className="row gap-3 gap-md-0">
             {/* Left Side (Split Receipt) */}
             <div className="col-12 col-md-8">
-              <PaymentSection patientNo={patientVisitDetails?.PatientNo} />
+              <PaymentSection patientNo={patientVisitDetails?.PatientNo} 
+              handleReceiptUpdate={handleReceiptUpdate}
+              />
             </div>
 
             {/* Right Side (Amount Details + Buttons) */}
@@ -329,45 +341,13 @@ const ReceiptPatient = () => {
                   <div className="d-flex justify-content-between">
                     <p className="fw-bold">Amount to be Paid :</p>
                     <p className="text-danger fw-bold">
-                  {formatKES(patientBillData?.[0]?.Balance)}
+                      {formatKES(patientBillData?.[0]?.Balance)}
                     </p>
-                  </div>
-
-                  {/* <div className="d-flex justify-content-between">
-                    <p className="fw-bold">Amount Received:</p>
-                    <p className="text-success fw-bold">
-                      KSh{" "}
-                      {Array.isArray(receiptHeader) && receiptHeader.length > 0
-                        ? receiptHeader[
-                            receiptHeader.length - 1
-                          ]?.Amount_Recieved?.toFixed(2) || "0.00"
-                        : "0.00"}
-                    </p>
-                  </div> */}
-                  {/* <div className="d-flex justify-content-between">
-                    <p className="fw-bold">Discount:</p>
-                    <p>KSh {patientBillData?.Discount?.toFixed(2) || "0.00"}</p>
-                  </div> */}
-                  {/* <div className="d-flex justify-content-between">
-                    <p className="fw-bold">Balance:</p>
-                    <p className="fw-bold  text-danger">
-                      KSh{" "}
-                      {Array.isArray(receiptHeader) && receiptHeader.length > 0
-                        ? (
-                            (receiptHeader[receiptHeader.length - 1]
-                              ?.Total_Amount || 0) -
-                            (receiptHeader[receiptHeader.length - 1]
-                              ?.Amount_Recieved || 0)
-                          ).toFixed(2)
-                        : "0.00"}
-                    </p>
-                  </div> */}
+                  </div>             
                 </div>
 
                 <div className="d-flex justify-content-end gap-2 mt-3">
-                  {/* <Button type="default" danger>
-                    Discard
-                  </Button> */}
+                 
                   <Button
                     type="primary"
                     onClick={handlePaymentProcessing}
@@ -378,32 +358,34 @@ const ReceiptPatient = () => {
                     Post Receipt
                   </Button>
                 </div>
-                <MpesaPayment
-                  visible={isModalVisible}
-                  onClose={handleCancel}
-                  activeVisitNo={activeVisitNo}
-                />
-                <PatientReceiptLines
-                  activeVisitNo={activeVisitNo}
-                  visible={receiptModalVisible}
-                  onClose={handleCancel}
-                />
-                <SplitPayments
-                  receiptNo={
-                    Array.isArray(receiptHeader) && receiptHeader.length > 0
-                      ? receiptHeader[receiptHeader.length - 1].No
-                      : "N/A"
-                  }
-                  open={splitAmountModal}
-                  onCancel={handleCancel}
-                  activeVisitNo={activeVisitNo || ""}
-                  amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
-                  patientNo={patientVisitDetails?.PatientNo}
-                />
               </Card>
             </div>
           </div>
         </div>
+        <MpesaPayment
+          visible={isModalVisible}
+          onClose={handleCancel}
+          activeVisitNo={activeVisitNo}
+        />
+        <PaymentDetails
+          visible={receiptModalVisible}
+          onClose={handleCancel}
+          activeVisitNo={activeVisitNo}
+          patientNo={patientVisitDetails?.PatientNo}
+        />
+       
+        <SplitPayments
+          receiptNo={
+            Array.isArray(receiptHeader) && receiptHeader.length > 0
+              ? receiptHeader[receiptHeader.length - 1].No
+              : "N/A"
+          }
+          open={splitAmountModal}
+          onCancel={handleCancel}
+          activeVisitNo={activeVisitNo || ""}
+          amount={patientBillData[0]?.Balance?.toFixed(2) || "0.00"}
+          patientNo={patientVisitDetails?.PatientNo}
+        />
         <PreviousBill
           visible={view}
           patientNo={patientVisitDetails?.PatientNo}

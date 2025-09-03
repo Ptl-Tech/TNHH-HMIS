@@ -36,22 +36,13 @@ export const postReceipt = (receipt) => async (dispatch, getState) => {
     );
 
     // Extract and validate the response data
-    const { status } = response.data;
-    if (status === "success" ) {
-      // Dispatch success action
-      dispatch({
+    
+     dispatch({
         type: POST_RECEIPT_SUCCESS,
-        payload: { status, },
+        payload:response.data,
       });
+          return response;
 
-      // Display success message
-      message.success(`Receipt Generated: ${status}`);
-
-      // Return the receipt number 
-      return status;
-    } else {
-      throw new Error("Invalid response format or missing ReceiptNo.");
-    }
   } catch (error) {
     let errorMessage = "An unexpected error occurred.";
 

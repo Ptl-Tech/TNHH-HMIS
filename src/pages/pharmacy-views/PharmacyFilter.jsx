@@ -67,7 +67,7 @@ export const PharmacyFilter = ({
                       {SearchName} - {LinkNo}
                     </span>
                   ),
-                  value: `${SearchName}-${LinkNo}-${PatientNo}`,
+                  value: `${SearchName}__${LinkNo}__${PatientNo}`,
                 };
               })
         }

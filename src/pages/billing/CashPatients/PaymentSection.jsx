@@ -7,7 +7,7 @@ import { postReceiptHeader } from "../../../actions/Charges-Actions/postReceiptH
 import { getReceiptLines } from "../../../actions/Charges-Actions/getReceiptLines";
 import { getReceiptPage } from "../../../actions/Charges-Actions/getReceiptPage";
 
-const PaymentSection = ({ patientNo }) => {
+const PaymentSection = ({ patientNo, handleReceiptUpdate }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -40,11 +40,15 @@ const PaymentSection = ({ patientNo }) => {
         }),
       };
       setPaymentSavingLoading(true)
-      await dispatch(postReceiptHeader(payload));
-      setPaymentSavingLoading(false)
+  const res= await dispatch(postReceiptHeader(payload));
+  if(res != null){
+ setPaymentSavingLoading(false)
+ handleReceiptUpdate(res);
       message.success("Payment saved successfully", 5);
       dispatch(getReceiptPage(activeVisitNo));
       form.resetFields();
+  }
+     
     } catch (error) {
       setPaymentSavingLoading(false);
       message.error("Failed to save payment");

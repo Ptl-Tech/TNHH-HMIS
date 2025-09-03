@@ -53,6 +53,9 @@ export const usePharmacyCard = ({ type }) => {
         `${Search_Name}__${Link_No}__${Patient_No}`
     )
   );
+
+  console.log({ groupedRequests, currentVisit });
+
   const [_, currentPrescriptions] =
     groupedRequests.find(([key]) => key.split("__")[1] === currentVisit) || [];
 
@@ -85,7 +88,7 @@ export const usePharmacyCard = ({ type }) => {
 
   const handleVisitChange = (value) => {
     setCurrentPharmacyNo(null);
-    setCurrentVisit(value.split("-").at(1));
+    setCurrentVisit(value.split("__").at(1));
   };
 
   const handleStatusChange = (value) => {

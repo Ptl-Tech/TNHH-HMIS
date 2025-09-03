@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { listInsuranceOptions } from "../../actions/DropdownListActions";
-import { postRebates,POST_REBATES_RESET } from "../../actions/Charges-Actions/postRebates";
+import {
+  postRebates,
+  POST_REBATES_RESET,
+} from "../../actions/Charges-Actions/postRebates";
 import moment from "moment";
 import { getSinglePatientBill } from "../../actions/Charges-Actions/getSinglePatientBill";
 
@@ -12,15 +15,13 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
   const dispatch = useDispatch();
   const activeVisitNo = new URLSearchParams(location.search).get("PatientNo");
   const { loading, success, error } = useSelector((state) => state.postRebates);
-  const {
-    data: insurancePayload,
-  } = useSelector((state) => state.getInsurance);
+  const { data: insurancePayload } = useSelector((state) => state.getInsurance);
 
-    const {
-      loading: patientBillLoading,
-      error: patientBillError,
-      data: patientBillData,
-    } = useSelector((state) => state.getSingleBill);
+  const {
+    loading: patientBillLoading,
+    error: patientBillError,
+    data: patientBillData,
+  } = useSelector((state) => state.getSingleBill);
   const [rebatesData, setRebatesData] = useState({
     rebateAmount: 0,
     chargeDate: moment().format("YYYY-MM-DD"), // Default to today in correct format
@@ -31,14 +32,13 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
     dispatch(listInsuranceOptions());
   }, [dispatch]);
 
-  
   useEffect(() => {
     if (error) {
       message.error(error);
       dispatch({ type: POST_REBATES_RESET }); // Reset error state
       setRebatesData((prev) => ({
         ...prev,
-        rebateAmount: 0, 
+        rebateAmount: 0,
       }));
     }
   }, [error, dispatch]);
@@ -58,29 +58,45 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
   };
   const handleSubmitRebates = async () => {
     try {
-
       const RebatesPayload = {
         ...rebatesData,
+        chargeDate: rebatesData.chargeDate.toString("YYYY-MM-DD"),
         patientNo: patientNo,
+      };
+      const response = await dispatch(postRebates(RebatesPayload));
+
+      if (response?.status === 200) {
+        message.success("Rebate allocated successfully");
+        await dispatch(getSinglePatientBill(activeVisitNo));
+        form.resetFields(); 
+      } else {
+        message.error(
+          response?.response?.data?.errors || "Failed to allocate rebate"
+        );
+        return; // Exit if there was an error
       }
-      await dispatch(postRebates(RebatesPayload));
-  
-      await dispatch(getSinglePatientBill(activeVisitNo));
-  
-      form.resetFields(); // Reset form after successful submission
+
       onClose(); // Close the modal
     } catch (error) {
       message.error("Failed to allocate rebate.");
     }
   };
-  
 
   return (
     <Modal
       title={
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <span>Allocate Rebates for Patient: {rebatesData.patientNo}</span>
-          <IoCloseOutline onClick={onClose} style={{ marginRight: 10, fontSize: 16, cursor: "pointer" }} />
+          <IoCloseOutline
+            onClick={onClose}
+            style={{ marginRight: 10, fontSize: 16, cursor: "pointer" }}
+          />
         </div>
       }
       open={visible}
@@ -88,10 +104,10 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
       style={{ top: 20 }}
       width={600}
       footer={null}
-         afterClose={() => {
-              form.resetFields();                
-              dispatch({ type: POST_REBATES_RESET }); 
-            }}
+      afterClose={() => {
+        form.resetFields();
+        dispatch({ type: POST_REBATES_RESET });
+      }}
     >
       <Form layout="vertical" onFinish={handleSubmitRebates} form={form}>
         {/* Allocation Amount */}
@@ -115,7 +131,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
           rules={[{ required: true, message: "Please select a date" }]}
         >
           <DatePicker
-            format="YYYY-MM-DD"
+            format="DD/MM/YYYY"
             className="w-100"
             value={moment(rebatesData.chargeDate)}
             onChange={handleDateChange}
@@ -136,9 +152,7 @@ const AllocateRebates = ({ onClose, visible, patientNo }) => {
             showSearch
             allowClear
             filterOption={(input, option) =>
-              option.children
-                .toLowerCase()
-                .indexOf(input.toLowerCase()) >= 0
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
           >
             <Select.Option value="">--Select Insurance--</Select.Option>
