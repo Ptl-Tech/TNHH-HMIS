@@ -45,7 +45,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
     (state) => state.getPatientCharges
   );
 
-//  console.log("patientBillData", patientBillData);
+  //  console.log("patientBillData", patientBillData);
   useEffect(() => {
     if (activeVisitNo) {
       dispatch(getSinglePatientBill(activeVisitNo));
@@ -118,7 +118,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
         dispatch(getReceiptLines(activeVisitNo));
         dispatch(getSinglePatientBill(activeVisitNo));
         getPatientCharges(activeVisitNo);
-              dispatch(getReceiptPage(activeVisitNo));
+        dispatch(getReceiptPage(activeVisitNo));
 
       }
     } catch (error) {
@@ -163,10 +163,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
                 <Select.Option value={2}>Cheque </Select.Option>
                 <Select.Option value={3}>EFT</Select.Option>
                 <Select.Option value={6}>Rtgs</Select.Option>
-
-
+                <Select.Option value={4}>Deposit Slip</Select.Option>
                 <Select.Option value={7}>MPESA</Select.Option>
-
                 <Select.Option value={9}>PDQ</Select.Option>
               </Select>
             </Form.Item>
@@ -244,7 +242,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
               type="primary"
               htmlType="submit"
               loading={saveloading}
-              disabled={saveloading }
+              disabled={saveloading}
             >
               Save Payment
             </Button>
@@ -271,8 +269,8 @@ const InsurancePaymentSection = ({ patientNo }) => {
                 <Button
                   type="primary"
                   onClick={handleReceiptPost}
-                 loading={postReceiptLoading}
-                 disabled={postReceiptLoading}
+                  loading={postReceiptLoading}
+                  disabled={postReceiptLoading}
                 >
                   Post Receipt
                 </Button>
