@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Drawer,
   message,
@@ -26,6 +27,7 @@ import {
 import { getPatientCharges } from "../../../actions/Charges-Actions/getPatientCharges";
 import { postsalesInvoice } from "../../../actions/Charges-Actions/postSalesInvoice";
 import { SHAInvoicePrintout } from "../InsurancePatients/SHAInvoicePrintout";
+import { render } from "@react-pdf/renderer";
 
 export function GenerateSHAInvoice({ patientNo, activeVisitNo }) {
   const dispatch = useDispatch();
@@ -188,7 +190,7 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      //  render: (text) => formatKES(text),
+     render: (text) => `KSh ${text?.toFixed(2)}`
     },
     {
       title: "Payment Mode",
@@ -224,15 +226,15 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
     },
     {
       title: "Insurance Name",
-      dataIndex: "Insurance_Name",
-      key: "Insurance_Name",
+      dataIndex: "insuranceName",
+      key: "insuranceName",
       render: (text) => text || "N/A",
     },
     {
       title: "Amount",
-      dataIndex: "Amount",
-      key: "Amount",
-      // render: (text) => formatKES(text),
+      dataIndex: "amount",
+      key: "amount",
+     render: (text) => `KSh ${text?.toFixed(2)}`
     },
     {
       title: "Actions",
@@ -246,10 +248,7 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
     },
   ];
 
-  const UnpostedInvoices = receipts?.map((receipt) => ({
-    ...receipt,
-    key: receipt.receiptNo,
-  }));
+
   const PostedInvoices = salesInvoices?.map((invoice) => ({
     ...invoice,
     key: invoice.invoiceNo,
@@ -263,18 +262,28 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
         size="small"
         columns={receiptColumns}
         rowKey="receiptNo"
-        dataSource={UnpostedInvoices}
+        dataSource={receipts}
         loading={loading}
         pagination={{ pageSize: 15 }}
       />
       <Tabs defaultActiveKey="1" style={{ marginTop: 20 }}>
-        <Tabs.TabPane tab="Unposted Invoices" key="1">
+        <Tabs.TabPane
+          key="1"
+          tab={
+            <span>
+              Unposted Invoices <Badge
+          count={useSelector((state) => state.getUnpostedInvoiceList.data?.length || 0)}
+          offset={[8, -2]}
+        />
+            </span>
+          }
+        >
           <FetchUnpostedInvoices
             patientNo={patientNo}
             activeVisitNo={activeVisitNo}
           />
         </Tabs.TabPane>
-        <Tabs.TabPane tab="Posted Invoices" key="2">
+        <Tabs.TabPane tab={<span>Posted Invoices <Badge count={PostedInvoices?.length} offset={[8, -2]} /></span>} key="2">
           <Table
             bordered
             size="small"
@@ -290,44 +299,6 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
   );
 }
 
-function FetchPostedInvoices({ patientNo, activeVisitNo }) {
-  const dispatch = useDispatch();
-  const { data: PostedInvoices = [], loading } = useSelector(
-    (state) => state.getInvoiceList
-  );
-  useEffect(() => {
-    if (activeVisitNo) {
-      dispatch(getInvoiceList(activeVisitNo));
-    }
-  }, [dispatch, activeVisitNo]);
-
-  const columns = [
-    {
-      title: "Invoice No",
-      dataIndex: "No",
-      key: "No",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => <PrintReceipt receiptNo={record.No} />,
-    },
-  ];
-
-  return (
-    <>
-      <Table
-        bordered
-        size="small"
-        columns={columns}
-        rowKey="SystemId"
-        dataSource={PostedInvoices}
-        loading={loading}
-        pagination={{ pageSize: 15 }}
-      />
-    </>
-  );
-}
 
 export function PaymentDetails({ patientNo, activeVisitNo, visible, onClose }) {
   return (

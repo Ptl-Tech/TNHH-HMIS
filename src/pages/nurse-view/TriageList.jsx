@@ -12,10 +12,13 @@ import dayjs from "dayjs";
 import { getTriageWaitingList } from "../../actions/triage-actions/getTriageWaitingListSlice";
 import FilterTriageList from "../../partials/nurse-partials/FilterTriageList";
 import { listDoctors } from "../../actions/DropdownListActions";
+import { useAuth } from "../../hooks/auth";
 
 const TriageList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+    const { user } = useAuth();
+    const branchCode = user.branchCode;
   const [searchName, setSearchName] = useState("");
   const [searchPatientNumber, setSearchPatientNumber] = useState("");
   const [searchObservationNumber, setSearchObservationNumber] = useState("");
@@ -31,7 +34,7 @@ const TriageList = () => {
     (state) => state.getTriageWaitingList
   );
 
-  const openTriageList = triageList.filter((item) => item.Status === "New");
+  const openTriageList = triageList.filter((item) => item.Status === "New" && item.Branch=== branchCode);
 
   const formattedTriageWaitingList = triageWaitingList.map((patient) => {
     return {
@@ -143,7 +146,12 @@ const TriageList = () => {
           : false,
       render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
     },
-
+{
+title: "Branch",
+dataIndex: "Branch",
+key: "Branch",
+render: (branch) => <div style={{ color: "#0f5689" }}>{branch}</div>,
+},
     {
       title: "Doctor Name",
       dataIndex: "DoctorsName",
