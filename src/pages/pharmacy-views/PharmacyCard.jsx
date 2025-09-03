@@ -28,6 +28,8 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
     pharmacyRequestsLoading,
   } = usePharmacyCard({ type });
 
+  console.log({ currentPrescriptions });
+
   return (
     <div style={{ display: "grid", gap: "16px", padding: "16px 0" }}>
       {/* Pharmacy Title */}

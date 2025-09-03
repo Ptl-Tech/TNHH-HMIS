@@ -119,7 +119,7 @@ export const authReducer = (state = initialState, action) => {
         showOTPModal: !data.otpVerified,
       };
 
-    // These are supposed to handle the login flow
+    // These are supposed to handle getting the user
     case GET_USER_DETAILS_REQUEST:
       return { ...state, loading: true };
     case GET_USER_DETAILS_FAIL:
