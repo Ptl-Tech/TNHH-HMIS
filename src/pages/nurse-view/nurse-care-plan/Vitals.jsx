@@ -112,7 +112,6 @@ const Vitals = () => {
           number={PatientNo}
         />
       )}
-
       {!isVitalFormVisible && (
         <VitalsTable
           rowSelection={rowSelection}

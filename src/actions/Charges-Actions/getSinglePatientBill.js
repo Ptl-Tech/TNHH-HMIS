@@ -33,7 +33,7 @@ export const getSinglePatientBill =
       };
 
       const { data } = await axios.get(
-        `${API}data/odatafilter?webservice=PgPatientsList&isList=false&query=$filter=ActiveVisitNo eq '${ActiveVisitNo}'`,
+        `${API}data/odatafilter?webservice=PgPatientsList&isList=false&query=$filter=ActiveVisitNo eq '${ActiveVisitNo}' and Activated eq true`,
         config
       );
     //   dispatch({ type: GET_SINGLE_PATIENT_BILL_SUCCESS, payload: data });
