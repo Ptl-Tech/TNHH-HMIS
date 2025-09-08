@@ -155,9 +155,9 @@ useEffect(() => {
         doctorId: calculateDoctorFee ? selectedDoctor : "",
       };
       
-      await dispatch(postPatientCharges(payload)); // Wait for charges to be posted
-      dispatch(getPatientCharges(activeVisitNo)); // Fetch updated patient charges
-      dispatch(getSinglePatientBill(activeVisitNo)); // Fetch updated bill balance
+      await dispatch(postPatientCharges(payload)); 
+      dispatch(getPatientCharges(activeVisitNo)); 
+      dispatch(getSinglePatientBill(activeVisitNo)); 
   
       onClose();
       form.resetFields();

@@ -252,15 +252,24 @@ const PreviousBill = ({ visible, patientNo, onClose }) => {
           </h4>
         }
         extra={
-          <Button
+        
+         
+           <Button
             onClick={() => setEncounterDrawerVisible(false)}
             icon={<CloseOutlined />}
             danger
           >
-            Close
+           
           </Button>
+         
         }
       >
+         <div className="d-flex mb-1 justify-content-end">  
+          <PrintInterimInvoice
+                    patientNo={patientNo}
+                    activeVisitNo={activeVisitNo}
+                  /></div>
+        
         <PatientHeader activeVisitNo={activeVisitNo} patientNo={patientNo} />
         <div className="mt-3">
           <Typography.Title level={5}>List of Receipts</Typography.Title>
