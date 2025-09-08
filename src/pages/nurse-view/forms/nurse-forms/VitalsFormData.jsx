@@ -1,72 +1,72 @@
-import { Button, Col, Form, Input, message, Row, Space, } from 'antd'
-import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { POST_TRIAGE_LIST_VITALS_SUCCESS, postTriageListVitalsSlice } from '../../../../actions/triage-actions/postTriageListVitalsSlice';
-import Loading from '../../../../partials/nurse-partials/Loading';
-import { SaveOutlined } from '@ant-design/icons';
-import { CloseOutlined } from '@ant-design/icons';
-import { getSinglePatientAllVitalsLines } from '../../../../actions/triage-actions/getVitalsLinesSlice';
+import { Button, Col, Form, Input, message, Row, Space } from "antd";
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  POST_TRIAGE_LIST_VITALS_SUCCESS,
+  postTriageListVitalsSlice,
+} from "../../../../actions/triage-actions/postTriageListVitalsSlice";
+import Loading from "../../../../partials/nurse-partials/Loading";
+import { SaveOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
+import { getSinglePatientAllVitalsLines } from "../../../../actions/triage-actions/getVitalsLinesSlice";
 
-const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisible}) => {
-
+const VitalsFormData = ({
+  observationNumber,
+  patientNumber,
+  setIsVitalFormVisible,
+}) => {
   const [form] = Form.useForm();
 
   const dispatch = useDispatch();
-  const {loadingVitalsLines } = useSelector((state) => state.getVitalsLines);
+  const { loadingVitalsLines } = useSelector((state) => state.getVitalsLines);
   const { loading } = useSelector((state) => state.postTriageListVitals);
 
-    const onFinish = async (values) => {
-      try {
-        const {
-          pulseRate,
-          temperature,
-          bloodPreasure,
-          sP02,
-          respirationRate,
-        } = values.vitals;
-    
-        // Transform values
-        const transformedValues = {
-          pulseRate,
-          temperature: parseFloat(cleanValue(temperature)),
-          bloodPreasure,
-          sP02,
-          respirationRate,
-        
-        };
-        
-    
-        // Common payload properties
-        const baseVitals = {
-          ...transformedValues,
-          patientNo: patientNumber,
-          observationNo: observationNumber,
-        };
-      
-          // Create vitals
-          const createVitals = {
-            ...baseVitals,
-            type: 0,
-            myAction: "create",
-          };
- 
-          const response = await dispatch(postTriageListVitalsSlice(createVitals));
-          if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
-            setIsVitalFormVisible(false);
-            dispatch(getSinglePatientAllVitalsLines(patientNumber))
-            message.success(response.payload.message || "Vitals successfully created");
-          } else if(response.type === "POST_TRIAGE_LIST_VITALS_FAIL"){
-            message.error(response.payload.message ||"Error saving vitals data");
-          }
-        
-      } catch (error) {
-        // Generic error handling
-        message.error(error.payload.message || "An error occurred while saving vitals data.");
+  const onFinish = async (values) => {
+    try {
+      const { pulseRate, temperature, bloodPreasure, sP02, respirationRate } =
+        values.vitals;
+
+      // Transform values
+      const transformedValues = {
+        pulseRate,
+        temperature: parseFloat(cleanValue(temperature)),
+        bloodPreasure,
+        sP02,
+        respirationRate,
+      };
+
+      // Common payload properties
+      const baseVitals = {
+        ...transformedValues,
+        patientNo: patientNumber,
+        observationNo: observationNumber,
+      };
+
+      // Create vitals
+      const createVitals = {
+        ...baseVitals,
+        type: 0,
+        myAction: "create",
+      };
+
+      const response = await dispatch(postTriageListVitalsSlice(createVitals));
+      if (response.type === POST_TRIAGE_LIST_VITALS_SUCCESS) {
+        setIsVitalFormVisible(false);
+        dispatch(getSinglePatientAllVitalsLines(patientNumber));
+        message.success(
+          response.payload.message || "Vitals successfully created"
+        );
+      } else if (response.type === "POST_TRIAGE_LIST_VITALS_FAIL") {
+        message.error(response.payload.message || "Error saving vitals data");
       }
-    };
-    
-  
-  
+    } catch (error) {
+      // Generic error handling
+      message.error(
+        error.payload.message || "An error occurred while saving vitals data."
+      );
+    }
+  };
+
   const cleanValue = (value) => {
     if (typeof value === "string") {
       return value.replace(/[^\d.-]/g, "");
@@ -76,11 +76,11 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
 
   const calculateBMI = (height, weight) => {
     if (!height || !weight) {
-      return null; 
+      return null;
     }
-    const heightInMeters = height / 100; 
+    const heightInMeters = height / 100;
     const bmi = weight / (heightInMeters * heightInMeters);
-    return bmi.toFixed(2); 
+    return bmi.toFixed(2);
   };
 
   const handleValuesChange = (_, allValues) => {
@@ -94,47 +94,44 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
   };
 
   return (
-   <div>
-    {
-      loadingVitalsLines ? (
+    <div>
+      {loadingVitalsLines ? (
         <Loading />
-      ):(
-        
-      <div>
-        <Form layout="vertical" 
-
-          form={form}
-          onFinish={onFinish}
-          initialValues={{
-            vitals: {
-              pulseRate: '',
-              bloodPreasure: '',
-              temperature: '',
-              sP02: '',
-              height: '',
-              weight: '',
-              respirationRate: '',
-              bmi: "0.0"
-            },
-            
-          }}
-          autoComplete="off"
-          onValuesChange={handleValuesChange}
+      ) : (
+        <div>
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={onFinish}
+            initialValues={{
+              vitals: {
+                pulseRate: "",
+                bloodPreasure: "",
+                temperature: "",
+                sP02: "",
+                height: "",
+                weight: "",
+                respirationRate: "",
+                bmi: "0.0",
+              },
+            }}
+            autoComplete="off"
+            onValuesChange={handleValuesChange}
           >
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Pulse Rate (bpm)"
-                  name={['vitals', 'pulseRate']}
+                <Form.Item
+                  label="Pulse Rate (bpm)"
+                  name={["vitals", "pulseRate"]}
                   hasFeedback
-                  
                   rules={[
                     {
                       required: true,
-                      message: 'Please input pulse rate!',
+                      message: "Please input pulse rate!",
                     },
                     {
                       pattern: /^[0-9]+$/, // Validate numeric input
-                      message: 'Pulse rate must be a valid number!',
+                      message: "Pulse rate must be a valid number!",
                     },
                     {
                       validator: (_, value) => {
@@ -142,38 +139,40 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                           return Promise.resolve(); // Skip if no value (handled by required rule)
                         }
                         if (value < 40 || value > 180) {
-                          return Promise.reject(new Error('Pulse rate must be between 40 and 180 bpm!'));
+                          return Promise.reject(
+                            new Error(
+                              "Pulse rate must be between 40 and 180 bpm!"
+                            )
+                          );
                         }
                         return Promise.resolve(); // Valid input
                       },
                     },
                   ]}
                 >
-                  <Input type='text'
-          
-                    placeholder='eg 70'
-                    
-                  />
+                  <Input type="text" placeholder="eg 70" />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Blood Pressure (mmHg)" 
-                  name={['vitals', 'bloodPreasure']}
-                  validateTrigger={['onBlur', 'onChange']}
+                <Form.Item
+                  label="Blood Pressure (mmHg)"
+                  name={["vitals", "bloodPreasure"]}
+                  validateTrigger={["onBlur", "onChange"]}
                   hasFeedback
                   rules={[
-                    { required: true, message: 'Blood Pressure is required!' },
+                    { required: true, message: "Blood Pressure is required!" },
                     {
                       validator(_, value) {
-                        
                         const regex = /^\d{2,3}\/\d{2,3}$/; // Pattern to match "120/80"
                         if (!regex.test(value)) {
                           return Promise.reject(
-                            new Error('Enter a valid format (e.g., 120/80)')
+                            new Error("Enter a valid format (e.g., 120/80)")
                           );
                         }
-          
-                        const [systolic, diastolic] = value.split('/').map(Number);
+
+                        const [systolic, diastolic] = value
+                          .split("/")
+                          .map(Number);
                         if (
                           systolic < 90 ||
                           systolic > 200 ||
@@ -182,153 +181,172 @@ const VitalsFormData = ({ observationNumber, patientNumber, setIsVitalFormVisibl
                         ) {
                           return Promise.reject(
                             new Error(
-                              'Values out of range. Systolic: 90-200, Diastolic: 60-120.'
+                              "Values out of range. Systolic: 90-200, Diastolic: 60-120."
                             )
                           );
                         }
-          
+
                         return Promise.resolve();
                       },
                     },
                   ]}
-                  >
-                  <Input type='text' 
-                     
-                      placeholder='eg 120/80'
-                      
-                  />
+                >
+                  <Input type="text" placeholder="eg 120/80" />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Temperature (&deg;C)" name={['vitals', 'temperature']}
-                  validateTrigger={['onBlur', 'onChange']}
+                <Form.Item
+                  label="Temperature (&deg;C)"
+                  name={["vitals", "temperature"]}
+                  validateTrigger={["onBlur", "onChange"]}
                   hasFeedback
                   rules={[
-                    { required: true, message: 'Please input temperature!' },
+                    { required: true, message: "Please input temperature!" },
                     {
                       validator(_, value) {
-                        if (value === undefined || value === null || value === '') {
-                          return Promise.reject(new Error('Temperature is required!'));
-                        }
-                
-                        const temperature = parseFloat(value);
-                        if (isNaN(temperature)) {
-                          return Promise.reject(new Error('Temperature must be a number!'));
-                        }
-                
-                        if (temperature < 35.0 || temperature > 42.0) {
+                        if (
+                          value === undefined ||
+                          value === null ||
+                          value === ""
+                        ) {
                           return Promise.reject(
-                            new Error('Temperature must be between 35.0°C and 42.0°C.')
+                            new Error("Temperature is required!")
                           );
                         }
-                
+
+                        const temperature = parseFloat(value);
+                        if (isNaN(temperature)) {
+                          return Promise.reject(
+                            new Error("Temperature must be a number!")
+                          );
+                        }
+
+                        if (temperature < 35.0 || temperature > 42.0) {
+                          return Promise.reject(
+                            new Error(
+                              "Temperature must be between 35.0°C and 42.0°C."
+                            )
+                          );
+                        }
+
                         return Promise.resolve();
                       },
                     },
                   ]}
                 >
-                  <Input type='number' 
-                   
-                     placeholder='eg: 32.7'
-                    
-                  />
+                  <Input type="number" placeholder="eg: 32.7" />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="SPO2 (%)" name={['vitals', 'sP02']}
-                    validateTrigger={['onBlur', 'onChange']}
-                    hasFeedback
-                    rules={[
-                      { required: true, message: 'Please input SPO2!' },
-                      {
-                        validator(_, value) {
-                          if (value === undefined || value === null || value.trim() === '') {
-                            return Promise.reject(new Error('SPO2 is required!'));
-                          }
-                  
-                          // Ensure value is a valid percentage
-                          const percentageMatch = value.match(/^(\d{1,2}|100)$/);
-                          if (!percentageMatch) {
-                            return Promise.reject(
-                              new Error('SPO2 must be a valid percentage (e.g., 98%).')
-                            );
-                          }
-                  
-                          const numericValue = parseInt(percentageMatch[1], 10);
-                          if (numericValue < 0 || numericValue > 100) {
-                            return Promise.reject(
-                              new Error('SPO2 must be between 0% and 100%.')
-                            );
-                          }
-                  
-                          return Promise.resolve();
-                        },
+                <Form.Item
+                  label="SPO2 (%)"
+                  name={["vitals", "sP02"]}
+                  validateTrigger={["onBlur", "onChange"]}
+                  hasFeedback
+                  rules={[
+                    { required: true, message: "Please input SPO2!" },
+                    {
+                      validator(_, value) {
+                        if (
+                          value === undefined ||
+                          value === null ||
+                          value.trim() === ""
+                        ) {
+                          return Promise.reject(new Error("SPO2 is required!"));
+                        }
+
+                        // Ensure value is a valid percentage
+                        const percentageMatch = value.match(/^(\d{1,2}|100)$/);
+                        if (!percentageMatch) {
+                          return Promise.reject(
+                            new Error(
+                              "SPO2 must be a valid percentage (e.g., 98%)."
+                            )
+                          );
+                        }
+
+                        const numericValue = parseInt(percentageMatch[1], 10);
+                        if (numericValue < 0 || numericValue > 100) {
+                          return Promise.reject(
+                            new Error("SPO2 must be between 0% and 100%.")
+                          );
+                        }
+
+                        return Promise.resolve();
                       },
-                    ]}
+                    },
+                  ]}
                 >
-                  <Input type='text' 
-                    name='sP02'
-                    placeholder='eg 98%'
-              
-                  />
+                  <Input type="text" name="sP02" placeholder="eg 98%" />
                 </Form.Item>
               </Col>
-            </Row>    
+            </Row>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Respiration Rate (bpm)" name={['vitals', 'respirationRate']}
+                <Form.Item
+                  label="Respiration Rate (bpm)"
+                  name={["vitals", "respirationRate"]}
                   hasFeedback
-                   rules={[
-                    { required: true, message: 'Please input respiration rate!' },
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input respiration rate!",
+                    },
                     {
                       pattern: /^[0-9]+$/,
-                      message: 'Respiration rate must be a valid number!',
+                      message: "Respiration rate must be a valid number!",
                     },
                     {
                       validator(_, value) {
                         if (!value || (value >= 12 && value <= 25)) {
                           return Promise.resolve();
                         }
-                        return Promise.reject(new Error('Respiration rate must be between 12 and 25 bpm!'));
+                        return Promise.reject(
+                          new Error(
+                            "Respiration rate must be between 12 and 25 bpm!"
+                          )
+                        );
                       },
                     },
                   ]}
                 >
-                  <Input type='text' 
-                  
-                  name='respirationRate'
-                  placeholder='eg 18'
-                  
+                  <Input
+                    type="text"
+                    name="respirationRate"
+                    placeholder="eg 18"
                   />
                 </Form.Item>
               </Col>
-            
-        
             </Row>
-            
-            <Col span={12}>
-                <Form.Item >
-                  <Space>
-                    <Button type="primary" loading={loading} htmlType="submit">
-                      <SaveOutlined />
-                      Save Vitals
-                    </Button>
-                    <Button variant='outlined' color='danger' onClick={() => setIsVitalFormVisible(false)} icon={<CloseOutlined />}>Cancel</Button>
-                  </Space>
-                </Form.Item>
-            </Col>
-        </Form>
-    
-        </div>
-      )
-    }
-   </div>
-  )
-}
 
-export default VitalsFormData
+            <Col span={12}>
+              <Form.Item>
+                <Space>
+                  <Button type="primary" loading={loading} htmlType="submit">
+                    <SaveOutlined />
+                    Save Vitals
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="danger"
+                    onClick={() => setIsVitalFormVisible(false)}
+                    icon={<CloseOutlined />}
+                  >
+                    Cancel
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Col>
+          </Form>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default VitalsFormData;
 
 //prop type validation
 VitalsFormData.propTypes = {
@@ -336,4 +354,4 @@ VitalsFormData.propTypes = {
   patientNumber: PropTypes.string.isRequired,
   setIsVitalFormVisible: PropTypes.bool.isRequired,
   admissionNumber: PropTypes.string,
-}
+};

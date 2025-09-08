@@ -54,8 +54,6 @@ export const usePharmacyCard = ({ type }) => {
     )
   );
 
-  console.log({ groupedRequests, currentVisit });
-
   const [_, currentPrescriptions] =
     groupedRequests.find(([key]) => key.split("__")[1] === currentVisit) || [];
 

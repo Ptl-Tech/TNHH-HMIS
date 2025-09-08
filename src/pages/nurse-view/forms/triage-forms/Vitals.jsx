@@ -28,17 +28,13 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
       const latest = vitalsLines[vitalsLines.length - 1]; // last record in array
       form.setFieldsValue({
         vitals: {
-          pulseRate: latest?.PulseRate || "",
+          sP02: latest?.SP02 || "",
           height: latest?.Height || "",
           weight: latest?.Weight || "",
+          systolic: latest?.SystolicBp || "",
+          pulseRate: latest?.PulseRate || "",
+          diastolic: latest?.DiastolicBp || "",
           temperature: latest?.Temperature || "",
-          systolic: latest?.BloodPressure
-            ? latest?.BloodPressure.split("/")[0]
-            : "",
-          diastolic: latest?.BloodPressure
-            ? latest?.BloodPressure.split("/")[1]
-            : "",
-          sP02: latest?.SP02 || "",
           respirationRate: latest?.RespirationRate || "",
           bmi: latest?.BMI ? latest?.BMI.toFixed(2) : "0.0",
         },
@@ -51,29 +47,26 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
   const onFinish = async (values) => {
     try {
       const {
-        pulseRate,
+        sP02,
         height,
         weight,
-        temperature,
-        // bloodPreasure,
         systolic,
         diastolic,
-        sP02,
+        pulseRate,
+        temperature,
         respirationRate,
       } = values.vitals;
 
       // Transform values
       const transformedValues = {
+        sP02,
         pulseRate,
+        respirationRate,
         height: parseFloat(cleanValue(height)),
         weight: parseFloat(cleanValue(weight)),
-        temperature: parseFloat(cleanValue(temperature)),
-        bloodPressure: "",
         systolicBp: parseFloat(cleanValue(systolic)),
         diastolicBp: parseFloat(cleanValue(diastolic)),
-        sP02,
-        respirationRate,
-        // BMI: calculateBMI(height, weight),
+        temperature: parseFloat(cleanValue(temperature)),
       };
 
       // Common payload properties
@@ -90,10 +83,12 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
         // Update vitals
         const updateVitals = {
           ...baseVitals,
-          lineNo: editingLine?.LineNo,
           type: 1,
           myAction: "edit",
+          lineNo: editingLine?.LineNo,
         };
+
+        console.log({ updateVitals });
 
         await dispatch(updateTriageListVitalsSlice(updateVitals));
         message.success("Successfully updated vitals");
@@ -106,6 +101,8 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
           type: 0,
           myAction: "create",
         };
+
+        console.log({ createVitals });
 
         await dispatch(postTriageListVitalsSlice(createVitals)).then((data) => {
           if (data) {
@@ -182,15 +179,20 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
       key: "Weight",
     },
     {
+      title: "Systolic",
+      dataIndex: "SystolicBp",
+      key: "SystolicBp",
+    },
+    {
+      title: "Diastolic",
+      dataIndex: "DiastolicBp",
+      key: "DiastolicBp",
+    },
+    {
       title: "Temperature",
       dataIndex: "Temperature",
       key: "Temperature",
     },
-    // {
-    //   title: "Blood BloodPressure",
-    //   dataIndex: "BloodPressure",
-    //   key: "BloodPressure",
-    // },
     {
       title: "SP02",
       dataIndex: "SP02",
@@ -218,8 +220,8 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
           <Space size="middle">
             <Button
               type="primary"
-              onClick={() => handleEdit(record)}
               icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
             >
               Update
             </Button>
@@ -235,21 +237,28 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
   const handleEdit = (record) => {
     setIsEditing(true);
     setEditingLine(record);
-    const [systolic, diastolic] = record.BloodPressure
-      ? record.BloodPressure.split("/").map((v) => v.trim())
-      : ["", ""];
+    const {
+      BMI,
+      SP02,
+      Height,
+      Weight,
+      PulseRate,
+      SystolicBp,
+      DiastolicBp,
+      Temperature,
+      RespirationRate,
+    } = record;
     form.setFieldsValue({
       vitals: {
-        pulseRate: record.PulseRate || "",
-        height: record.Height || "",
-        weight: record.Weight || "",
-        temperature: record.Temperature || "",
-        // bloodPreasure: record.BloodPressure || "",
-        systolic: systolic,
-        diastolic: diastolic,
-        sP02: record.SP02,
-        respirationRate: record.RespirationRate || "",
-        bmi: record.BMI ? record.BMI.toFixed(2) : "0.0",
+        sP02: SP02,
+        systolic: SystolicBp,
+        height: Height || "",
+        weight: Weight || "",
+        diastolic: DiastolicBp,
+        pulseRate: PulseRate || "",
+        temperature: Temperature || "",
+        bmi: BMI ? BMI.toFixed(2) : "0.0",
+        respirationRate: RespirationRate || "",
       },
     });
   };
@@ -267,7 +276,6 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
             initialValues={{
               vitals: {
                 pulseRate: "",
-                bloodPreasure: "",
                 temperature: "",
                 systolic: "",
                 diastolic: "",
@@ -330,7 +338,11 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
                           },
                         ]}
                       >
-                        <Input placeholder="Systolic" type="number" />
+                        <Input
+                          type="number"
+                          // name="systolic"
+                          placeholder="Systolic"
+                        />
                       </Form.Item>
                     </Col>
 
@@ -350,7 +362,11 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
                           },
                         ]}
                       >
-                        <Input placeholder="Diastolic" type="number" />
+                        <Input
+                          type="number"
+                          // name="diastolic"
+                          placeholder="Diastolic"
+                        />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -505,7 +521,6 @@ const FormVitals = ({ observationNumber, patientNumber }) => {
             <Form.Item>
               <Button type="primary" loading={loading} htmlType="submit">
                 <SaveOutlined />
-
                 {isEditing ? "Update vitals" : "Save vitals"}
               </Button>
             </Form.Item>
