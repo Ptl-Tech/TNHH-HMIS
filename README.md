@@ -8,4 +8,4 @@ Clone the project using git clone command :
 
 Navigate to the project directory and run npm install :
 
-Once all the dependencies are installed, run npm run dev command to run the current project
+Once all the dependencies are installed, run npm run dev command to run the current project.

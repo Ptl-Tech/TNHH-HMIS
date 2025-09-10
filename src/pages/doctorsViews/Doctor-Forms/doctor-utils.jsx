@@ -149,7 +149,7 @@ export const vitalsInfo = (vitals) => [
   },
   {
     label: "Blood Pressure",
-    value: `${vitals["BloodPressure"]} (mmHg)`,
+    value: `${vitals["SystolicBp"]}/${vitals["DiastolicBp"]} (mmHg)`,
   },
   {
     label: "SpO₂",
@@ -206,6 +206,13 @@ export const vitalsTableColumns = [
     title: "Blood Pressure (mmHg)",
     dataIndex: "BloodPressure",
     key: "BloodPressure",
+    render: (_, record) => {
+      return (
+        <span>
+          {record?.SystolicBp}/{record?.DiastolicBp}
+        </span>
+      );
+    },
   },
   { title: "SpO₂ (%)", dataIndex: "SP02", key: "SP02" },
   { title: "Height (cm)", dataIndex: "Height", key: "Height" },
