@@ -34,6 +34,7 @@ const Dashboard = () => {
 
   const { data } = useSelector((state) => state.getDoctorsList);
   const { triageList } = useSelector((state) => state.getTriageList) || {};
+  console.log("triage list", triageList);
   const openTriageList = useMemo(() => {
     return Array.isArray(triageList)
       ? triageList.filter((item) => item.Status === "New")

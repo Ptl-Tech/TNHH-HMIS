@@ -14,6 +14,7 @@ export const getTriageList = (options) => async (dispatch, getState) => {
   const finalValue = isBoolean ? value : `'${value}'`;
   const filters = key && value ? `&query=$filter=${key} eq ${finalValue}` : "";
   const config = configHelpers(getState);
+  console.log("filters", filters);
   const query = `${API_URL}/data/odatafilter?webservice=QyTriageList&isList=true${filters}`;
 
   try {
