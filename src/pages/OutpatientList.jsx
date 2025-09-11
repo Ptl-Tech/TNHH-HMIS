@@ -76,9 +76,8 @@ const OutpatientList = () => {
       const updatedParams = { ...prevState, [field]: value };
       // If all search fields are empty, hide the list
       if (
-        !updatedParams.SearchName &&
-        !updatedParams.patientId &&
-        !updatedParams.patientNo
+        !updatedParams.SearchName 
+       
       ) {
         setShowList(false);
       } else {
@@ -93,7 +92,7 @@ const OutpatientList = () => {
   const filterPatients = (params) => {
     const { SearchName, patientId, patientNo } = params;
 
-    if (!Array.isArray(patientsToFilter)) return; // Ensure no filter on undefined data
+    if (!Array.isArray(patientsToFilter)) return; 
 
     const filtered = patientsToFilter.filter((patient) => {
       return (
@@ -129,7 +128,7 @@ const OutpatientList = () => {
       title: "Patient Name",
       dataIndex: "SearchName",
       key: "SearchName",
-      sorter: (a, b) => a.SearchName.localeCompare(b.SearchName),
+     
       render: (text) => (
         <Tooltip title={text}>
           <Typography.Text
@@ -140,6 +139,9 @@ const OutpatientList = () => {
           </Typography.Text>
         </Tooltip>
       ),
+      filterSearch: true,
+      onFilter: (value, record) =>
+        record.SearchName.toLowerCase().includes(value.toLowerCase()),
     },
     { title: "Gender", dataIndex: "Gender", key: "Gender" },
     { title: "Patient Type", dataIndex: "PatientType", key: "PatientType" },
@@ -302,6 +304,8 @@ const OutpatientList = () => {
             columns={columns}
             dataSource={filteredPatients}
             pagination={{ pageSize: 10 }}
+            //responsive
+            scroll={{ x: "max-content" }}
           />
         </div>
       )}

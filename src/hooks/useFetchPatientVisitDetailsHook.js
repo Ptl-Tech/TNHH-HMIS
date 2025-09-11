@@ -31,7 +31,7 @@ const useFetchPatientVisitDetailsHook = (appmntId) => {
     dispatch(getPatientVisitByNo(visitNo));   
   }, [dispatch, visitNo]);
 
-  return { loading, error, patientVisitDetails };
+  return { loading, error, patientVisitDetails, refetchVisitDetails: () => dispatch(getPatientVisitByNo(visitNo)) };
 };
 
 export default useFetchPatientVisitDetailsHook;

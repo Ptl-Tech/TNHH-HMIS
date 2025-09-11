@@ -7,17 +7,18 @@ export const axiosConfig = (user) => {
 
   axios.interceptors.response.use(
     (response) => response,
-    (rejected) => {
+    (error) => {
       const isInAuthPages = new Set([
         "/login",
         "/forgot-password",
         "/reset-password",
       ]).has(window.location.pathname);
 
-      if (rejected.status === 401 && !isInAuthPages)
-        return (window.location.href = "/login");
+      if (error.response?.status === 401 && !isInAuthPages) {
+        window.location.href = "/login";
+      }
 
-      return rejected;
+      return Promise.reject(error);
     }
   );
 };

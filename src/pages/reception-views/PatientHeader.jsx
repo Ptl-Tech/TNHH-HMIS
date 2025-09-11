@@ -94,7 +94,16 @@ const PatientHeader = ({ activeVisitNo, patientNo, initialVisitData }) => {
                   </Tag>
                 )}
               </span>
-
+              {displayData?.Activated && (
+                <span>
+                  <b>Visit No:</b> <Tag style={tagStyle} color="red">{displayData?.AppointmentNo}</Tag>
+                </span>
+              )}
+  {displayData?.Activated && (
+                <span>
+                  <b>Visit Type:</b> <Tag style={tagStyle} color="blue">{displayData?.visitType}</Tag>
+                </span>
+              )}
               {displayData?.PatientType !== "Cash" && displayData?.InsuranceName && (
                 <span>
                   <b>Insurance Name:</b> {displayData?.InsuranceName}

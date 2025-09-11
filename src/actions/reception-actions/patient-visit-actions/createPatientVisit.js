@@ -14,25 +14,26 @@ export const createPatientVisitRequest = (visitData, navigate) => async (dispatc
 
     const config = apiHeaderConfig(getState);
     const { data } = await axios.post(`${API}Reception/CreateVisit`, visitData, config);
-console.log("data logged", data);
     let responseData;
+    console.log("data", data);
+    if (data?.status?.toLowerCase() === "success") {
 
-    if (data?.status === "success") {
       responseData = {
         status: data.status,
-        message: data.message,
-        data: data.data,
+        message: data.appointmentNo,
+        data: data.appointment,
       };
 
       dispatch({ type: CREATE_PATIENT_VISIT_SUCCESS, payload: responseData });
     }; 
+  return responseData;
 
   } catch (error) {
     const errMsg =
-      error.response?.data?.errors ||
+      error.response?.data?.errors || 
       error.response?.data?.message ||
       error.message ||
-      "An unexpected error occurred";
+      "An unexpected error occurred while creating the patient visit. Please try again later.If the problem persists, please contact support.";
 
     const errorResponse = {
       status: "error",
@@ -40,7 +41,7 @@ console.log("data logged", data);
     };
 
     dispatch({ type: CREATE_PATIENT_VISIT_FAIL, payload: errorResponse });
-    return errorResponse; // ✅ return structured error instead of throwing
+    return errorResponse; 
   }
 };
 

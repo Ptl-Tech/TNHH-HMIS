@@ -34,6 +34,7 @@ import {
   DispatchToTriage,
 } from "./helper/DispatchActions";
 import { useAuth } from "../../hooks/auth";
+import { getPatientVisitByNo } from "../../actions/reception-actions/patient-visit-actions/getPatientVisitByNo";
 
 const CreateVisitDrawer = ({
   visible,
@@ -89,6 +90,7 @@ const[submitLoading,setSubmitLoading]=useState(false)
     loading,
     error,
     patientVisitDetails: initialVisitData,
+    refetchVisitDetails
   } = useFetchPatientVisitDetailsHook(activeVisitNo);
 
   useEffect(() => {
@@ -109,6 +111,8 @@ const[submitLoading,setSubmitLoading]=useState(false)
           isPrincipleMember: patientDetails?.Principal,
           membershipNo: patientDetails?.MembershipNo,
           schemeName: patientDetails?.SchemeName,
+          //update dispatch area based on clinic
+
         });
       } else {
         setVisitData(null);
@@ -162,14 +166,14 @@ const[submitLoading,setSubmitLoading]=useState(false)
     }
   }, [paymentMethod, dispatch]);
 
-  useEffect(() => {
-    if (dispatchVisit && visitError) {
-      showNotification("error", "Error", visitError);
-    }
-    if (dispatchVisit && visitSuccess) {
-      showNotification("success", "Success", "Visit created successfully");
-    }
-  }, [visitError, dispatchVisit, visitSuccess]);
+  // useEffect(() => {
+  //   if (dispatchVisit && visitError) {
+  //     showNotification("error", "Error", visitError);
+  //   }
+  //   if (dispatchVisit && visitSuccess) {
+  //     showNotification("success", "Success", "Visit created successfully");
+  //   }
+  // }, [visitError, dispatchVisit, visitSuccess]);
   useEffect(() => {
     if (dispatchArea !== 1) {
       form.setFieldsValue({ doctor: undefined });
@@ -216,23 +220,29 @@ const[submitLoading,setSubmitLoading]=useState(false)
     setSubmitLoading(true);
 
     const response = await dispatch(createPatientVisitRequest(payload));
-    console.log("Create Visit Response:", response);
 
-    if (response && response.status === "success" && response.data?.appointmentNo) {
-      setDispatchVisit(true);
-      showNotification(
-        "success",
-        "Success",
-        `Patient visit created successfully with ID: ${response.data.appointmentNo}`
-      );
-      refetchDetails();
-    };
+   if (response && response.status === "success" && response.data?.appointmentNo) {
+  // Dispatch details fetch with appointmentNo
+  await dispatch(getPatientVisitByNo(response.data.appointmentNo));
+await refetchVisitDetails();
+  // 🔄 Re-sync patient details (so ActiveVisitNo updates)
+  await refetchDetails();
+
+  setDispatchVisit(true);
+  showNotification(
+    "success",
+    "Success",
+    `Patient visit created successfully with ID: ${response.data.appointmentNo}`
+  );
+}
+else {
+      showNotification("error", "Error", response.message);
+    }
   } catch (error) {
-    console.error("Validation Failed:", error);
     showNotification(
       "error",
       "Error",
-      error.response?.data?.errors || error.message || "Unexpected error occurred"
+      error.response?.data?.errors || error.errorFields[0].errors[0] || "Unexpected error occurred"
     );
   } finally {
     setSubmitLoading(false);
@@ -350,19 +360,17 @@ const[submitLoading,setSubmitLoading]=useState(false)
                 <Form.Item
                   name="doctor"
                   label="Doctor"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Please select a doctor!" }]}
                 >
                   <Select
                     onChange={(value) => form.setFieldsValue({ doctor: value })}
                     showSearch
                     allowClear
                     filterOption={(input, option) =>
-                      option.children
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
+                      option.children.toLowerCase().includes(input.toLowerCase())
                     }
                   >
-                    {filteredDoctors?.map((doc) => (
+                    {filteredDoctors && filteredDoctors?.map((doc) => (
                       <Select.Option key={doc.DoctorID} value={doc.DoctorID}>
                         {doc.DoctorsName}
                       </Select.Option>
@@ -499,13 +507,7 @@ const[submitLoading,setSubmitLoading]=useState(false)
             </Row>
           )}
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "26px",
-              marginTop: "26px",
-              alignItems: "center",
-            }}
+           className="d-flex justify-content-between my-5 gap-2"
           >
             <Button onClick={onClose} size="medium" block danger>
               Close Visit Card
