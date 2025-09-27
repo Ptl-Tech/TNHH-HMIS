@@ -31,7 +31,7 @@ const formatKES = (amount) => {
 
 const PreviousBill = ({ visible, patientNo, onClose }) => {
   const dispatch = useDispatch();
-
+console.log("PatientNo", patientNo);
   const { loading: encountersLoading, data: encountersData } = useSelector(
     (state) => state.getPatientPastEncounterBillingList
   );
@@ -52,9 +52,7 @@ const PreviousBill = ({ visible, patientNo, onClose }) => {
     if (patientNo) {
       dispatch(getPatientPastEncounterBilling(patientNo));
       dispatch(getBillingList());
-    } else {
-      dispatch(getPatientPastEncounterBilling(null)); // Reset
-    }
+    } 
   }, [dispatch, patientNo]);
 
   const handleViewEncounter = (visitNo) => {

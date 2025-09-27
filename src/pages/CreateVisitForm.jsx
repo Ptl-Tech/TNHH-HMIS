@@ -112,7 +112,7 @@ const CreateVisitForm = () => {
       `/Dashboard/patient-list/Direct-Admission/?PatientNo=${patientNo}`
     );
   };
-
+console.log("visit data",visitData);
   return (
     <div
       style={{
@@ -125,7 +125,7 @@ const CreateVisitForm = () => {
       <div className="d-flex justify-content-between align-items-center mb-2">
         <Button
           type="link"
-          onClick={() => navigate("/Reception/Patient-list")}
+          onClick={() => navigate(-1)}
           icon={<ArrowLeftOutlined />}
         >
           Go back
@@ -252,6 +252,16 @@ const CreateVisitForm = () => {
                       </Tag>
                     )}
                   </span>
+                  {patientDetails?.Activated && (
+                                  <span>
+                                    <b>Visit No:</b> <Tag style={tagStyle} color="red">{visitData?.AppointmentNo}</Tag>
+                                  </span>
+                                )}
+                    {patientDetails?.Activated && (
+                                  <span>
+                                    <b>Visit Type:</b> <Tag style={tagStyle} color="blue">{visitData?.visitType}</Tag>
+                                  </span>
+                                )}
                 </div>
               </Col>
             </Row>
@@ -289,4 +299,11 @@ const CreateVisitForm = () => {
   );
 };
 
+const tagStyle = {
+  textTransform: "capitalize",
+  fontWeight: "bold",
+  fontSize: "14px",
+  fontFamily: "Arial, sans-serif",
+  marginLeft: "5px",
+};
 export default CreateVisitForm;

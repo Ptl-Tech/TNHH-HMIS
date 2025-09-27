@@ -339,25 +339,20 @@ export const postTriageVisit = (visitData) => async (dispatch, getState) => {
       msg: response.data.observationNo,
     };
 
-    message.success(
-      `Patient dispatched successfully! Observation No: ${responseData.msg}`,
-      5
-    );
+    
 
     dispatch({ type: POST_TRIAGE_VISIT_SUCCESS, payload: response });
     return { type: POST_TRIAGE_VISIT_SUCCESS, payload: response };
   } catch (error) {
-    console.log({ error });
 
     // Extract error message from different possible sources
     const errorMessage =
-      error.response?.data?.errors || // Extract 'errors' field from response
+      error.response?.data?.errors || 
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
       "Failed to dispatch patient!";
 
-    message.error(errorMessage, 5);
 
     dispatch({
       type: POST_TRIAGE_VISIT_FAIL,
@@ -475,7 +470,6 @@ export const convertPatient = (visitorNo) => async (dispatch, getState) => {
 
     //  // Extract response details
     const responseData = data.patientNo;
-    console.log(responseData);
     dispatch({ type: CONVERT_TO_PATIENT_SUCCESS, payload: responseData });
     //message with success message and observationNo
     return responseData;

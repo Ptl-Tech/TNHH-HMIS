@@ -77,6 +77,11 @@ const InsurancePatients = () => {
   };
 
   const columns = [
+     {
+      title:"#",
+      //index: "index",
+      render: (text, record, index) => index + 1.,
+    },
     {
       title: "Admission No  ",
       dataIndex: "ActiveVisitNo",
@@ -199,7 +204,7 @@ const InsurancePatients = () => {
             type="primary"
             onClick={() => handleViewCharges(record.ActiveVisitNo)}
           >
-            <CgEyeAlt />
+            <CgEyeAlt /> View Charges
           </Button>
         </Tooltip>
       ),
@@ -228,13 +233,18 @@ const InsurancePatients = () => {
           dataSource={formattedPatients}
           size="small"
           bordered
-          pagination={{
-            current: currentPage,
-            pageSize: pageSize,
-            total: formattedPatients?.length || 0,
-            onChange: (page) => setCurrentPage(page),
-            showSizeChanger: false,
-          }}
+           pagination={{
+  position: ["bottomRight"],
+  showSizeChanger: true,
+  pageSizeOptions: ["25", "50", "100", "200"], // user can pick
+  defaultPageSize: 35, // least page size
+}}
+
+          rowKey="ActiveVisitNo"
+          locale={{ emptyText: "No patients found" }}
+          style={{ marginTop: "10px", borderRadius: "8px",  }}
+          //responsive
+          scroll={{ x: "max-content" }}
         />
       )}
     </div>

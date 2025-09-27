@@ -80,6 +80,11 @@ const InpatientCash = () => {
 
   const columns = [
     {
+      title:"#",
+      //index: "index",
+      render: (text, record, index) => index + 1.,
+    },
+    {
       title: "Admission No  ",
       dataIndex: "ActiveVisitNo",
       key: "ActiveVisitNo",
@@ -106,6 +111,9 @@ const InpatientCash = () => {
       title: "Patient Name",
       dataIndex: "Names",
       key: "Names",
+     onFilter: (value, record) => record.Names.toLowerCase().includes(value.toLowerCase()),
+      filterSearch: true,
+      
       render: (text, record) => (
         <Typography.Text
           style={{ cursor: "pointer", color: "#0f5689", fontWeight: "bold" }}
@@ -122,11 +130,11 @@ const InpatientCash = () => {
       key: "PatientType",
     },
 
-    {
-      title: "Branch Code",
-      dataIndex: "Global_Dimension_1_Code",
-      key: "Global_Dimension_1_Code",
-    },
+    // {
+    //   title: "Branch Code",
+    //   dataIndex: "Global_Dimension_1_Code",
+    //   key: "Global_Dimension_1_Code",
+    // },
     {
       title: "Admission Date",
       dataIndex: "AdmissionDate",
@@ -156,6 +164,7 @@ const InpatientCash = () => {
       title: "Balance",
       dataIndex: "Balance",
       key: "Balance",
+
       render: (_, record) => {
         const numericBalance =
           parseFloat(record.Balance?.toString().replace(/[^0-9.-]+/g, "")) || 0;
@@ -179,10 +188,11 @@ const InpatientCash = () => {
             type="primary"
             onClick={() => handleViewCharges(record.ActiveVisitNo)}
           >
-            <CgEyeAlt />
+            <CgEyeAlt />View Charges
           </Button>
         </Tooltip>
       ),
+    
     },
   ];
 
@@ -204,17 +214,25 @@ const InpatientCash = () => {
         </div>
       ) : (
         <Table
+        //fixed columns
+
           columns={columns}
           dataSource={formattedPatients}
           size="small"
           bordered
-          pagination={{
-            current: currentPage,
-            pageSize: pageSize,
-            total: formattedPatients?.length || 0,
-            onChange: (page) => setCurrentPage(page),
-            showSizeChanger: false,
-          }}
+         //pagination shld allow for more than 100 and show changer
+        pagination={{
+  position: ["bottomRight"],
+  showSizeChanger: true,
+  pageSizeOptions: ["25", "50", "100", "200"], // user can pick
+  defaultPageSize: 35, // least page size
+}}
+
+          rowKey="ActiveVisitNo"
+          locale={{ emptyText: "No patients found" }}
+          style={{ marginTop: "10px", borderRadius: "8px",  }}
+          //responsive
+          scroll={{ x: "max-content" }}
         />
       )}
     </div>
