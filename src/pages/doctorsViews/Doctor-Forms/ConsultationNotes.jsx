@@ -81,7 +81,6 @@ export const ConsultationNotes = () => {
 
 export const AddConsultationNotes = ({ doctorNotesSections }) => {
   const [editing, setEditing] = useState(false);
-  const [SectionId, setSectionId] = useState(null);
   const [fullTranscript, setFullTranscript] = useState("");
 
   const dispatch = useDispatch();
@@ -175,7 +174,6 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
     const data = {
       recId: "",
       patientNo,
-      SectionId,
       treatmentNo,
       notesType: "1",
       myAction: "create",
@@ -188,15 +186,6 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
   return (
     <Space direction="vertical" style={{ width: "100%" }}>
       <Space>
-        <Select
-          style={{ width: 320 }}
-          onChange={setSectionId}
-          placeholder="Choose Category"
-          options={doctorNotesSections.map(({ Section_ID, Section_Name }) => ({
-            value: Section_ID,
-            label: Section_Name,
-          }))}
-        />
         <Tooltip
           placement="top"
           title={
@@ -237,9 +226,7 @@ export const AddConsultationNotes = ({ doctorNotesSections }) => {
         <Button
           type="primary"
           loading={postDoctorNotesLoading}
-          disabled={
-            listening || editing || !SectionId || !fullTranscript?.trim()
-          }
+          disabled={listening || editing || !fullTranscript?.trim()}
           onClick={handleSubmit}
         >
           Submit
