@@ -21,7 +21,7 @@ const SuicidalFormTable = ({
         moment(a.Date, "DD-MM-YYYY").valueOf(),
       render: (text) => (
         <span
-          style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}
+          style={{ fontSize: "14px", fontWeight: "bold", color: "#b96000" }}
         >
           {moment(text).format("DD-MM-YYYY")}
         </span>
@@ -33,7 +33,7 @@ const SuicidalFormTable = ({
       key: "Time",
       render: (text) => (
         <span
-          style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}
+          style={{ fontSize: "14px", fontWeight: "bold", color: "#b96000" }}
         >
           {text}
         </span>

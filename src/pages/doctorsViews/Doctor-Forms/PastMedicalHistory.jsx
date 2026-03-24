@@ -77,7 +77,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
     <div>
       <Space
         style={{
-          color: "#0f5689",
+          color: "#b96000",
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -88,7 +88,7 @@ const PastMedicalHistory = ({ treatmentNo, patientNo }) => {
         <Typography.Title
           level={5}
           style={{
-            color: "#0F5689",
+            color: "#b96000",
             fontSize: "16px",
             marginBottom: "12px",
             display: "flex",

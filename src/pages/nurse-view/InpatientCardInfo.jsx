@@ -34,26 +34,26 @@ const InpatientCardInfo = ({ patientDetail }) => {
         className="card"
         style={{
           width: "100%",
-          borderTop: "3px solid #0f5689",
+          borderTop: "3px solid #b96000",
           padding: "20px",
         }}
       >
         <div className="d-flex justify-content-between align-items-center">
           <div>
             <Typography.Text
-              style={{ fontWeight: "bold", fontSize: "16px", color: "#0f5689" }}
+              style={{ fontWeight: "bold", fontSize: "16px", color: "#b96000" }}
             >
               {patientDetails?.SearchName || "N/A"}
             </Typography.Text>
             <br />
-            <Typography.Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+            <Typography.Text style={{ fontWeight: "bold", color: "#b96000" }}>
               Patient Number: {patientDetails?.PatientNo || "N/A"}
             </Typography.Text>
           </div>
           <div>
             <Button
               type="primary"
-              style={{ backgroundColor: "#0f5689", color: "#ffffff" }}
+              style={{ backgroundColor: "#b96000", color: "#ffffff" }}
               onClick={handlePatientFileClick}
             >
               Patient File
@@ -79,7 +79,7 @@ const InpatientCardInfo = ({ patientDetail }) => {
               <Spin
                 indicator={
                   <LoadingOutlined
-                    style={{ fontSize: 24, color: "#0f5689" }}
+                    style={{ fontSize: 24, color: "#b96000" }}
                     spin
                   />
                 }

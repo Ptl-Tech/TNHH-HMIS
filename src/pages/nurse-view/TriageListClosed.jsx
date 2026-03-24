@@ -109,14 +109,14 @@ const TriageListClosed = () => {
         record?.SearchName
           ? record.SearchName.toLowerCase().includes(value.toLowerCase())
           : false,
-      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
+      render: (name) => <div style={{ color: "#b96000" }}>{name}</div>,
     },
 
     {
       title: "Doctor Name",
       dataIndex: "DoctorName",
       key: "DoctorName",
-      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
+      render: (name) => <div style={{ color: "#b96000" }}>{name}</div>,
       filters: formattedDoctorDetails.map((doctor) => ({
         text: doctor.DoctorsName,
         value: doctor.DoctorsName,

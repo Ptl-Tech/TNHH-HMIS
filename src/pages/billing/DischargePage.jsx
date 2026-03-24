@@ -168,7 +168,7 @@ const DischargePage = () => {
                   backgroundColor: "#ffffff",
                   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                   padding: "10px 16px",
-                  borderTop: "3px solid #0f5689",
+                  borderTop: "3px solid #b96000",
                 }}
               >
                 {patientPrimaryInfo.map((info, index) => (
@@ -196,7 +196,7 @@ const DischargePage = () => {
                   backgroundColor: "#ffffff",
                   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                   padding: "10px 16px",
-                  borderTop: "3px solid #0f5689",
+                  borderTop: "3px solid #b96000",
                 }}
               >
                 {patientSecondaryInfo.map((info, index) => (
@@ -224,7 +224,7 @@ const DischargePage = () => {
                   backgroundColor: "#ffffff",
                   boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                   padding: "10px 16px",
-                  borderTop: "3px solid #0f5689",
+                  borderTop: "3px solid #b96000",
                 }}
               >
                 <NurseInnerHeader

@@ -59,7 +59,7 @@ const ReceptionDashboard = () => {
       subtitle: "Today’s Entries",
       icon: <HourglassOutlined />,
       color: "#fff",
-      backgroundColor: "#0f5689",
+      backgroundColor: "#b96000",
       link: "/Dashboard/visitors-list",
     },
     {

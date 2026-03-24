@@ -312,7 +312,7 @@ const InpatientList = () => {
       <Modal
         title={
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography.Title level={5} style={{ color: "#0f5689" }}>
+            <Typography.Title level={5} style={{ color: "#b96000" }}>
               Patient Details
             </Typography.Title>
             <Button

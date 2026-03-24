@@ -53,7 +53,7 @@ const PatientFile = ({ patientDetails }) => {
           <Button
             key={index}
             style={{
-              backgroundColor: "#0f5689",
+              backgroundColor: "#b96000",
               color: "#ffffff",
               border: "none",
               padding: "18px 20px",

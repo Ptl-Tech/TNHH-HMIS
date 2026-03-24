@@ -272,7 +272,7 @@ const Diagnosis = () => {
       <Typography.Title
         level={5}
         style={{
-          color: "#0F5689",
+          color: "#b96000",
           fontSize: "16px",
           display: "flex",
           alignItems: "center",

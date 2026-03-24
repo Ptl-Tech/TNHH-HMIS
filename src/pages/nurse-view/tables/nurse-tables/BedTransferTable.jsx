@@ -35,7 +35,7 @@ const BedTransferTable = ({
       render: (_, record) => {
         if (record?.Patient_Name && record?.Occupied === true) {
           return (
-            <Typography.Text style={{ color: "#0f5689" }}>
+            <Typography.Text style={{ color: "#b96000" }}>
               Blocked for: {record?.Patient_Name}
             </Typography.Text>
           );

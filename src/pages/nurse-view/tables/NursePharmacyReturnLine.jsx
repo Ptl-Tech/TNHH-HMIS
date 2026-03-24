@@ -37,7 +37,7 @@ const NursePharmacyReturnLine = ({ patientNo }) => {
       onHeaderCell: (column) => {
         return {
           style: {
-            background: "#0f5689 !important",
+            background: "#b96000 !important",
             color: "white",
           },
         };
@@ -69,7 +69,7 @@ const NursePharmacyReturnLine = ({ patientNo }) => {
       onHeaderCell: (column) => {
         return {
           style: {
-            background: "#0f5689",
+            background: "#b96000",
           },
         };
       },

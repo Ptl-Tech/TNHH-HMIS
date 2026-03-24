@@ -80,7 +80,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
       case "Voided":
         return "#ad4e00";
       case "Forwarded":
-        return "#0060a3";
+        return "#ED9D47";
       case "Review":
         return "#006d75";
       case "Recalled":
@@ -250,7 +250,7 @@ const LabHeader = ({ patientData, patientLabRecord }) => {
                 style={{
                   padding: "8px",
                   marginBottom: 0,
-                  color: "#0F5689",
+                  color: "#b96000",
                   background: "#efefef89",
                 }}
               >

@@ -9,7 +9,7 @@ const Theatre = () => {
   return (
     <div>
       <Typography.Title level={4} style={{
-        color: "#0F5689",
+        color: "#b96000",
         marginBottom: "12px",
       }}>
         <UserOutlined style={{ marginRight: '8px' }} />
@@ -25,7 +25,7 @@ const Theatre = () => {
               <Col>
                 {/* Submit Button */}
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" style={{ marginLeft: '8px', backgroundColor: '#0F5689' }}>
+                  <Button type="primary" htmlType="submit" style={{ marginLeft: '8px', backgroundColor: '#b96000' }}>
                     Send to theatre
                   </Button>
                 </Form.Item>

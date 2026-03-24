@@ -144,19 +144,19 @@ const TriageList = () => {
         record?.SearchName
           ? record.SearchName.toLowerCase().includes(value.toLowerCase())
           : false,
-      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
+      render: (name) => <div style={{ color: "#b96000" }}>{name}</div>,
     },
 {
 title: "Branch",
 dataIndex: "Branch",
 key: "Branch",
-render: (branch) => <div style={{ color: "#0f5689" }}>{branch}</div>,
+render: (branch) => <div style={{ color: "#b96000" }}>{branch}</div>,
 },
     {
       title: "Doctor Name",
       dataIndex: "DoctorsName",
       key: "DoctorsName",
-      render: (name) => <div style={{ color: "#0f5689" }}>{name}</div>,
+      render: (name) => <div style={{ color: "#b96000" }}>{name}</div>,
       filters: formattedDoctorDetails.map((doctor) => ({
         text: doctor.DoctorsName,
         value: doctor.DoctorsName,

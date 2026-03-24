@@ -215,7 +215,7 @@ const InpatientConsumablesTable = ({
       key: "Drug_Name",
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record.Drug_Name}
           </Typography.Text>
         );

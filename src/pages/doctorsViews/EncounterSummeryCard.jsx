@@ -7,12 +7,12 @@ const EncounterSummeryCard = ({ patientDetails, loadingPatientDetail, otherPatie
   if(loadingPatientDetail) return <Loading />
   return (
     <div style={{ display: 'flex', alignContent: 'center', gap: '20px', paddingBottom: '20px' }}>
-        <Card className="card" style={{ width: '100%', borderTop: '3px solid #0f5689', padding: "10px 16px" }}>
+        <Card className="card" style={{ width: '100%', borderTop: '3px solid #b96000', padding: "10px 16px" }}>
             <div className="inpatient-details-container-1">
-                <Typography.Text className="patient-name" style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                <Typography.Text className="patient-name" style={{ fontWeight: 'bold', color: '#b96000' }}>
                 Patient Name: {patientDetails?.PatientNames || data?.SearchName || 'N/A' }
                 </Typography.Text>
-                <Typography.Text className="patient-id" style={{ fontWeight: 'bold', color: '#0f5689' }}>
+                <Typography.Text className="patient-id" style={{ fontWeight: 'bold', color: '#b96000' }}>
                     Patient Number : {patientDetails?.PatientNo || otherPatientDetails?.PatientNo||'N/A' }
                 </Typography.Text>
             </div>

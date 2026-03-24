@@ -79,7 +79,7 @@ const PatientRequests = () => {
         {buttonItems.map((item, index) => (
           <Button
             key={index}
-            style={{ backgroundColor: "#0f5689", color: "#ffffff", border: "none", padding: "18px 20px" }}
+            style={{ backgroundColor: "#b96000", color: "#ffffff", border: "none", padding: "18px 20px" }}
             className={activeItem === item.label ? "active-button" : ""}
             onClick={() => handleOnClick(item)}
           >

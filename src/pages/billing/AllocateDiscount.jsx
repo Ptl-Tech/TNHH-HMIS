@@ -93,7 +93,7 @@ form.resetFields(); // Reset form fields after submission
         <Form.Item label="Patient No" name="patientNo" style={ { display: "none" }}>
           <Input
             value={discountData.patientNo}
-            style={{ color: "#0F5689", fontWeight: "semibold" }}
+            style={{ color: "#b96000", fontWeight: "semibold" }}
             disabled
           />
         </Form.Item>

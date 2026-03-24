@@ -80,7 +80,7 @@ const DoctorVisits = () => {
 
   /* 
     Logic on how this works
-    Corporate doctors can read only Chiromo's patients
+    Corporate doctors can read only TNHH's patients
     External doctors can read only their patients
     Nurses can see all patients
   */

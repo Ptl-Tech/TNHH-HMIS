@@ -25,7 +25,7 @@ const AdmissionsSummaryCard = ({ currentPath = "/" }) => {
 
   const cardData = [
     {
-      backgroundColor: "#0f5689",
+      backgroundColor: "#b96000",
       icon: <HourglassOutlined />,
       title: "Admission Requests",
       link: "/Dashboard/Admissions",

@@ -245,14 +245,14 @@ const WardManagement = () => {
       >
         {getBeds && (
           <Typography.Text
-            style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+            style={{ fontWeight: "bold", color: "#b96000", fontSize: "14px" }}
           >
             Total Beds {getBeds ? `: ${getBeds?.length}` : ""}
           </Typography.Text>
         )}
         {getBeds && (
           <Typography.Text
-            style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+            style={{ fontWeight: "bold", color: "#b96000", fontSize: "14px" }}
           >
             Free Beds {freeBeds ? `: ${freeBeds?.length}` : ""}
           </Typography.Text>
@@ -266,7 +266,7 @@ const WardManagement = () => {
         )}
         {selectedRoom && (
           <Typography.Text
-            style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+            style={{ fontWeight: "bold", color: "#b96000", fontSize: "14px" }}
           >
             Room Selected {selectedRoom ? `: ${selectedRoom}` : ""}
           </Typography.Text>
@@ -305,7 +305,7 @@ const WardManagement = () => {
                     <InsertRowLeftOutlined
                       style={{
                         fontSize: 48,
-                        color: "#0f5689",
+                        color: "#b96000",
                         marginBottom: 20,
                         fontWeight: "normal",
                       }}
@@ -319,7 +319,7 @@ const WardManagement = () => {
               renderItem={(item) => (
                 <List.Item
                   onClick={() => handleRoom(item.value)}
-                  style={{ color: "#0f5689" }}
+                  style={{ color: "#b96000" }}
                 >
                   {item.label}
                 </List.Item>

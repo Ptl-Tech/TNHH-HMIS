@@ -105,7 +105,7 @@ const Dashboard = () => {
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
       color: "#fff", // You can set the color here
-      backgroundColor: "#0f5689", // You can set the background color here,
+      backgroundColor: "#b96000", // You can set the background color here,
       link: "/Dashboard/Triage", // You can set the link here
     },
     {

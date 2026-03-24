@@ -76,7 +76,7 @@ const InpatientWardFilters = () => {
                 <Typography.Text
                   style={{
                     marginRight: 8,
-                    color: "#0f5689",
+                    color: "#b96000",
                     fontWeight: "bold",
                     textTransform: "uppercase"
                   }}

@@ -43,7 +43,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
       fixed: "left",
       width: 150,
       render: (text) => (
-        <span style={{ fontWeight: "bold", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "bold", color: "#b96000" }}>{text}</span>
       ),
     },
     { title: "Temperature (°C)", dataIndex: "temperature", key: "temperature" },
@@ -202,7 +202,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
               <Divider />
               <Typography.Title
                 level={5}
-                style={{ marginBottom: "12px", color: "#0F5689" }}
+                style={{ marginBottom: "12px", color: "#b96000" }}
               >
                 <FileTextOutlined style={{ marginRight: "8px" }} />
                 Patient Vitals
@@ -539,7 +539,7 @@ const FormVitals = ({ observationNo, patientNo }) => {
                     <Input
                       type="text"
                       disabled
-                      style={{ color: "#0f5689", fontWeight: "bold" }}
+                      style={{ color: "#b96000", fontWeight: "bold" }}
                     />
                   </Form.Item>
                 </Col> */}

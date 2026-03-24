@@ -64,7 +64,7 @@ const DoctorDashboard = () => {
         <div className="row gap-3 gap-md-0">
           {/* Existing KPI Cards */}
           <div className="col col-12 col-md-3">
-          <div className="card" style={{ backgroundColor: "#0060a3", color: "#fafafa" }}>
+          <div className="card" style={{ backgroundColor: "#ED9D47", color: "#fafafa" }}>
           <div className="card-body">
                 <div className="card-title p-2">
                   <UsergroupAddOutlined style={{ marginRight: 8 }} />
@@ -87,7 +87,7 @@ const DoctorDashboard = () => {
             </div>
           </div>
           <div className="col col-12 col-md-3">
-          <div className="card" style={{ backgroundColor: "#0060a3", color: "#fafafa" }}>
+          <div className="card" style={{ backgroundColor: "#ED9D47", color: "#fafafa" }}>
               <div className="card-body">
                 <div className="card-title p-2">
                   <FaUser style={{ marginRight: 8 }} />

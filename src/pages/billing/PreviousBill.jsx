@@ -84,7 +84,7 @@ console.log("PatientNo", patientNo);
       dataIndex: "Visit_No",
       key: "Visit_No",
       render: (text) => (
-        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#b96000" }}>{text}</span>
       ),
     },
 
@@ -120,7 +120,7 @@ console.log("PatientNo", patientNo);
       dataIndex: "receiptNo",
       key: "receiptNo",
       render: (text) => (
-        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#b96000" }}>{text}</span>
       ),
     },
     {
@@ -152,7 +152,7 @@ console.log("PatientNo", patientNo);
       dataIndex: "invoiceNo",
       key: "invoiceNo",
       render: (text) => (
-        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#b96000" }}>{text}</span>
       ),
     },
     {
@@ -221,7 +221,7 @@ console.log("PatientNo", patientNo);
         onClose={onClose}
         open={visible}
         maskClosable={false}
-        title={<h5 style={{ color: "#0f5689" }}>Previous Encounter Billing Details</h5>}
+        title={<h5 style={{ color: "#b96000" }}>Previous Encounter Billing Details</h5>}
         extra={
           <Button onClick={onClose} icon={<CloseOutlined />} danger>
             Close
@@ -245,7 +245,7 @@ console.log("PatientNo", patientNo);
         open={encounterDrawerVisible}
         maskClosable={false}
         title={
-          <h4 style={{ color: "#0f5689" }}>
+          <h4 style={{ color: "#b96000" }}>
             Encounter Details - {activeVisitNo}
           </h4>
         }

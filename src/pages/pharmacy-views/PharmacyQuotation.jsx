@@ -80,10 +80,10 @@ export default function PharmacyQuotation() {
       <TableSummaryRow>
         <TableSummaryCell index={0} colSpan={4} />
         <TableSummaryCell index={0}>
-          <Text style={{ fontWeight: "bold", color: "#0f5689" }}>Total</Text>
+          <Text style={{ fontWeight: "bold", color: "#b96000" }}>Total</Text>
         </TableSummaryCell>
         <TableSummaryCell index={1}>
-          <Text style={{ fontWeight: "bold", color: "#0f5689" }}>
+          <Text style={{ fontWeight: "bold", color: "#b96000" }}>
             {totalValue}
           </Text>
         </TableSummaryCell>
@@ -98,7 +98,7 @@ export default function PharmacyQuotation() {
     <div style={{ color: "rgba(0, 0, 0, 0.88)" }}>
       <div
         className="d-flex"
-        style={{ color: "#0f5689", gap: "8px", padding: "8px 0" }}
+        style={{ color: "#b96000", gap: "8px", padding: "8px 0" }}
       >
         <GiPayMoney size={20} />
         <h6>Pharmacy Quotation</h6>

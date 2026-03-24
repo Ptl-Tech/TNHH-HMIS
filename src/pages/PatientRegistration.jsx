@@ -213,7 +213,7 @@ const PatientRegistration = () => {
           className="card"
           style={{
             width: "100%",
-            borderTop: "3px solid #0f5689",
+            borderTop: "3px solid #b96000",
             padding: "20px",
           }}
         >
@@ -299,7 +299,7 @@ const PatientRegistration = () => {
               title: (
                 <span
                   style={{
-                    color: current === index ? "#52c41a" : "#0f5689",
+                    color: current === index ? "#52c41a" : "#b96000",
                     fontWeight: current === index ? "bold" : "normal",
                   }}
                 >
@@ -309,7 +309,7 @@ const PatientRegistration = () => {
               icon: (
                 <span
                   style={{
-                    color: current === index ? "#52c41a" : "#0f5689",
+                    color: current === index ? "#52c41a" : "#b96000",
                   }}
                 >
                   {step.icon}

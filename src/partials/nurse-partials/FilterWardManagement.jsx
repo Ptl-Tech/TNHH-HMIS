@@ -27,7 +27,7 @@ const FilterWardManagement = ({
         style={{
           padding: "24px 10px 10px 10px",
           marginTop: "10px",
-          borderTop: "3px solid #0f5689",
+          borderTop: "3px solid #b96000",
         }}
       >
         <Form form={form} onFinish={handleOnFinish}>

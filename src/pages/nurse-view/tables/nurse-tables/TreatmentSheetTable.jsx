@@ -124,7 +124,7 @@ const TreatmentSheetTable = ({
       fixed: "left",
       width: 180,
       render: (text) => (
-        <Text ellipsis style={{ color: "#0f5689" }}>
+        <Text ellipsis style={{ color: "#b96000" }}>
           {text}
         </Text>
       ),

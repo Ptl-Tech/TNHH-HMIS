@@ -98,7 +98,7 @@ const PatientSignsTabsChild = ({
           minHeight: "500px",
         }}
         title={
-          <h6 className="pt-2" style={{ color: "#0f5689" }}>
+          <h6 className="pt-2" style={{ color: "#b96000" }}>
             {label} Preview Report
           </h6>
         }

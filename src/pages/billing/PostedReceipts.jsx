@@ -122,7 +122,7 @@ const PostedReceipts = () => {
       render: (_, record) => (
         <Space size="middle">
           <Dropdown overlay={menu(record)} trigger={['click']}>
-            <Button style={{ color: '#0f5689', fontSize: '16px', fontWeight: 'bold' }}>...</Button>
+            <Button style={{ color: '#b96000', fontSize: '16px', fontWeight: 'bold' }}>...</Button>
           </Dropdown>
         </Space>
       ),

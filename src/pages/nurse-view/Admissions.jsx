@@ -64,7 +64,7 @@ const Admissions = () => {
           <Button
             type="link"
             onClick={() => handleNavigate(record)}
-            style={{ color: "#0f5689" }}
+            style={{ color: "#b96000" }}
           >
             {record.SearchName}
           </Button>

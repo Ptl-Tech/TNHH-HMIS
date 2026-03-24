@@ -54,7 +54,7 @@ const Ketamine = () => {
         }}
       >
         <div>
-          <Typography.Title level={5} style={{ color: "#0F5689" }}>
+          <Typography.Title level={5} style={{ color: "#b96000" }}>
             <FileTextOutlined style={{ marginRight: "8px" }} />
             Ketamine Request
           </Typography.Title>

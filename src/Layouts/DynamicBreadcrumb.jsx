@@ -30,7 +30,7 @@ const DynamicBreadcrumb = ({ collapsed }) => {
           to={dashboardUrl}
           style={{
             textDecoration: "none",
-            color: "#0f5689",
+            color: "#b96000",
             backgroundColor: "#e5e3e3",
           }}
         >
@@ -51,7 +51,7 @@ const DynamicBreadcrumb = ({ collapsed }) => {
                 to={path}
                 style={{
                   textDecoration: "none",
-                  color: "#0f5689",
+                  color: "#b96000",
                   backgroundColor: "#e5e3e3",
                 }}
               >

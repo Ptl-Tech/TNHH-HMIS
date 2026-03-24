@@ -110,7 +110,7 @@ export const RadioInputs = ({
           ) : (
             <Space>
               <div className="d-flex gap-2" style={{ whiteSpace: "nowrap" }}>
-                <span style={{ color: "#0f5689" }}>Added value:</span>
+                <span style={{ color: "#b96000" }}>Added value:</span>
                 <span>{Other_Specify}</span>
               </div>
 

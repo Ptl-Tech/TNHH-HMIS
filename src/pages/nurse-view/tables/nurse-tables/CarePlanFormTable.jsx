@@ -40,7 +40,7 @@ const CarePlanFormTable = ({
           fixed: "left",
           width: 150,
           render: (text, record) => (
-            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}>
+            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#b96000" }}>
               {new Date(record.Date).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short",
@@ -54,7 +54,7 @@ const CarePlanFormTable = ({
           dataIndex: "Admission_No",
           key: "Admission_No",
           render: (text, record) => (
-            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}>
+            <span style={{ fontSize: "14px", fontWeight: "bold", color: "#b96000" }}>
               {record.Admission_No}
             </span>
           )

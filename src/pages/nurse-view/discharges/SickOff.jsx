@@ -72,7 +72,7 @@ function SickOffCard({ posted, admissionNo, treatmentNo, isInpatient }) {
     <Skeleton loading={printSickOffLoading}>
       {posted && printData ? (
         <Card
-          styles={{ header: { color: "#0f5689", fontWeight: "700" } }}
+          styles={{ header: { color: "#b96000", fontWeight: "700" } }}
           size="small"
           title={"Off Duty Info"}
           children={<PDFViewer base64String={printData} />}

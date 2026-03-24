@@ -73,7 +73,7 @@ const WardTransfer = () => {
     {
       key: "1",
       label: (
-        <p style={{ fontWeight: "bold", color: "#0f5689" }}>
+        <p style={{ fontWeight: "bold", color: "#b96000" }}>
           Transfer to another bed in this ward - {patientDetail?.Ward}
         </p>
       ),
@@ -103,7 +103,7 @@ const WardTransfer = () => {
     {
       key: "2",
       label: (
-        <p style={{ fontWeight: "bold", color: "#0f5689" }}>
+        <p style={{ fontWeight: "bold", color: "#b96000" }}>
           Transfer to another ward
         </p>
       ),

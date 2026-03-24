@@ -275,9 +275,9 @@ export const encounterDetailsTable = (setOpen, setEncounter) => [
         <Space style={{ alignItems: "center" }}>
           <MdAttachFile
             size={18}
-            style={{ rotate: "45deg", color: "#0f5689" }}
+            style={{ rotate: "45deg", color: "#b96000" }}
           />
-          <span style={{ color: "#0f5689" }}>View Encounter</span>
+          <span style={{ color: "#b96000" }}>View Encounter</span>
         </Space>
       </Button>
     ),
@@ -443,7 +443,7 @@ export const followUpObjectArray = [
     onHeaderCell: (column) => {
       return {
         style: {
-          background: "#0f5689",
+          background: "#b96000",
         },
       };
     },
@@ -480,7 +480,7 @@ export const followUpObjectArray = [
     onHeaderCell: (column) => {
       return {
         style: {
-          background: "#0f5689",
+          background: "#b96000",
         },
       };
     },

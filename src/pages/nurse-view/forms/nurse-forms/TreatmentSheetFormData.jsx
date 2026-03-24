@@ -132,7 +132,7 @@ const TreatmentSheetFormData = ({
       style={{
         width: "100%",
         backgroundColor: "#f5f9fc", // subtle light blue background
-        color: "#0f5689",
+        color: "#b96000",
         fontWeight: 600,
         border: "1px solid #d9d9d9",
         borderRadius: "6px",
@@ -159,7 +159,7 @@ const TreatmentSheetFormData = ({
       style={{
         width: "100%",
         backgroundColor: "#f5f9fc",
-        color: "#0f5689 !important",
+        color: "#b96000 !important",
         fontWeight: 600,
         border: "1px solid #d9d9d9",
         borderRadius: "6px",

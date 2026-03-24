@@ -72,7 +72,7 @@ const InsurancePatients = () => {
       key: "Names",
       render: (text, record) => (
         <Typography.Text
-          style={{ cursor: "pointer", color: "#0f5689" }}
+          style={{ cursor: "pointer", color: "#b96000" }}
           onClick={() => handleViewCharges(record.ActiveVisitNo)}
         >
           {text.toUpperCase()}
@@ -105,7 +105,7 @@ const InsurancePatients = () => {
 
         return (
           <span
-            style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}
+            style={{ color: isZero ? "black" : "#b96000", fontWeight: "600" }}
           >
             {formatKES(numericBalance)}
           </span>

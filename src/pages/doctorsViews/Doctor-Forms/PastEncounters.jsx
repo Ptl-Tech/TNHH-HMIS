@@ -105,7 +105,7 @@ const PastEncounters = () => {
           <span
             onClick={() => handleNavigate(record, record.TreatmentNo)}
             className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            style={{ color: "#b96000", cursor: "pointer" }}
           >
             {text.toUpperCase()}
           </span>
@@ -126,7 +126,7 @@ const PastEncounters = () => {
         return (
           <span
             onClick={() => handleNavigate(record, record.TreatmentNo)}
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            style={{ color: "#b96000", cursor: "pointer" }}
           >
             {text.toUpperCase()}
           </span>
@@ -159,7 +159,7 @@ const PastEncounters = () => {
         <Typography.Text
           style={{
             fontWeight: "bold",
-            color: "#0f5689",
+            color: "#b96000",
             fontSize: "14px",
             marginLeft: "8px",
           }}

@@ -78,7 +78,7 @@ const ReadNurseNotes = () => {
           {patientInfo.map((info, index) => (
             <Col key={index} xs={24} sm={24} md={12} lg={6} xl={6}>
               <Card
-                style={{ padding: "10px 16px", borderTop: "3px solid #0f5689" }}
+                style={{ padding: "10px 16px", borderTop: "3px solid #b96000" }}
               >
                 <Typography.Title level={5}>{info.title}</Typography.Title>
                 <Typography.Text>{info.value}</Typography.Text>
@@ -101,7 +101,7 @@ const ReadNurseNotes = () => {
           }}
         >
           <Row
-            style={{ backgroundColor: "#0f5689", padding: "10px 0" }}
+            style={{ backgroundColor: "#b96000", padding: "10px 0" }}
             justify="center"
           >
             <Col

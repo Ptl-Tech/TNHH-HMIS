@@ -183,7 +183,7 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
       dataIndex: "receiptNo",
       key: "receiptNo",
       render: (text) => (
-        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#b96000" }}>{text}</span>
       ),
     },
     {
@@ -215,7 +215,7 @@ function FetchCurrenEncounterPaymentDetails({ patientNo, activeVisitNo }) {
       dataIndex: "invoiceNo",
       key: "invoiceNo",
       render: (text) => (
-        <span style={{ fontWeight: "600", color: "#0f5689" }}>{text}</span>
+        <span style={{ fontWeight: "600", color: "#b96000" }}>{text}</span>
       ),
     },
     {

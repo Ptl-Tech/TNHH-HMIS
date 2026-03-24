@@ -54,7 +54,7 @@ const SecurityDashBoard = () => {
           <div className="col col-12 col-md-6">
             <div
               className="card"
-              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              style={{ backgroundColor: "#ED9D47", color: "#fafafa" }}
             >
               <div className="card-body">
                 <div className="card-title p-2">
@@ -70,7 +70,7 @@ const SecurityDashBoard = () => {
           <div className="col col-12 col-md-6">
             <div
               className="card"
-              style={{ backgroundColor: "#0060a3", color: "#fafafa" }}
+              style={{ backgroundColor: "#ED9D47", color: "#fafafa" }}
               onClick={handleCardClick} // Add onClick handler here
             >
               <div className="card-body">

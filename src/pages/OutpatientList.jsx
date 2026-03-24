@@ -119,7 +119,7 @@ const OutpatientList = () => {
       key: "PatientNo",
       sorter: (a, b) => a.PatientNo - b.PatientNo,
       render: (text) => (
-        <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
+        <Typography.Text style={{ color: "#b96000", fontWeight: "bold" }}>
           {text}
         </Typography.Text>
       ),
@@ -133,7 +133,7 @@ const OutpatientList = () => {
         <Tooltip title={text}>
           <Typography.Text
             ellipsis
-            style={{ maxWidth: "200px", color: "#0f5689", fontWeight: "bold" }}
+            style={{ maxWidth: "200px", color: "#b96000", fontWeight: "bold" }}
           >
             {text}
           </Typography.Text>

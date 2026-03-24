@@ -120,7 +120,7 @@ const MainLayout = () => {
               color: "#fff",
               height: "100vh",
               paddingBottom: "90px",
-              backgroundColor: "#0f5689 !important",
+              backgroundColor: "#b96000 !important",
             }}
             items={generateMenuItems()} // Pass items here
           />
@@ -148,7 +148,7 @@ const MainLayout = () => {
           color: "#67336d",
         }}
       >
-        HMIS @ {new Date().getFullYear()} By Chiromo Hospital Group
+        HMIS @ {new Date().getFullYear()} By TNHH Hospital Group
       </Footer>
     </Layout>
   );

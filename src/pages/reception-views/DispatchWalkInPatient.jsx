@@ -429,7 +429,7 @@ export const DispatchWalkInPatient = () => {
                   gap: "8px",
                 }}
               >
-                <Typography.Title level={5} style={{ color: "#0F5689" }}>
+                <Typography.Title level={5} style={{ color: "#b96000" }}>
                   {colData.title}
                 </Typography.Title>
                 {colData.data.map((cellData, idx) =>
@@ -456,7 +456,7 @@ export const DispatchWalkInPatient = () => {
         onSubmit={(keys) => handleLabSubmit(keys)}
       />
       <Divider orientation="left">
-        <span style={{ color: "#0F5689" }}>Dispatches Made</span>
+        <span style={{ color: "#b96000" }}>Dispatches Made</span>
       </Divider>
       {existingPatient ? (
         <DispatchesTable

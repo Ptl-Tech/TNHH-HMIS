@@ -34,7 +34,7 @@ const KetamineTable = ({ loadingKetamine, data, doctors }) => {
       key: "Link_No",
       render: (text) => (
         <span
-          style={{ color: "#0f5689", cursor: "pointer", fontWeight: "bold" }}
+          style={{ color: "#b96000", cursor: "pointer", fontWeight: "bold" }}
         >
           {text}
         </span>

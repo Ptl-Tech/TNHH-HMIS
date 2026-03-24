@@ -162,7 +162,7 @@ const ActiveAppmnts = () => {
           >
             <Button
               type="text"
-              style={{ color: '#0f5689', fontWeight: '600' }}
+              style={{ color: '#b96000', fontWeight: '600' }}
             >
               Dispatch Patient
             </Button>

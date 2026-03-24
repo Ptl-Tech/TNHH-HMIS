@@ -24,7 +24,7 @@ const DischargeRequests = () => {
       dataIndex: 'Search_Name',
       key: 'Search_Name',
       render: (_, record) => {
-        return <Typography.Text style={{ color: '#0f5689' }}>
+        return <Typography.Text style={{ color: '#b96000' }}>
           {record.Search_Name}
         </Typography.Text>
       }
@@ -147,9 +147,9 @@ const DischargeRequests = () => {
 
   return (
     <div style={{ margin: "20px 10px 10px 10px" }}>
-      <Space style={{ color: "#0f5689", display: "flex", alignItems: "center", gap: "8px", paddingBottom: "10px" }}>
+      <Space style={{ color: "#b96000", display: "flex", alignItems: "center", gap: "8px", paddingBottom: "10px" }}>
         <ProfileOutlined />
-        <Typography.Text style={{ fontWeight: "bold", color: "#0f5689", fontSize: "16px" }}>
+        <Typography.Text style={{ fontWeight: "bold", color: "#b96000", fontSize: "16px" }}>
           Discharge Request List
         </Typography.Text>
       </Space>

@@ -230,7 +230,7 @@ const Injections = ({ observationNumber }) => {
           <Typography.Title
             level={5}
             style={{
-              color: "#0F5689",
+              color: "#b96000",
               fontSize: "16px",
               marginBottom: "12px",
               display: "flex",

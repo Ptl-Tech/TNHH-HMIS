@@ -132,7 +132,7 @@ const BriefMentalStateExamFormData = ({ setIsFormVisible, patientNo }) => {
     return (
         <>
             <Form form={form} style={{ paddingTop: "10px" }} onFinish={handleOnFinish}>
-                <Row style={{ backgroundColor: "#0f5689", padding: "10px 0", color: "#fff", fontWeight: "bold" }} justify="center">
+                <Row style={{ backgroundColor: "#b96000", padding: "10px 0", color: "#fff", fontWeight: "bold" }} justify="center">
                     <Col span={12} style={{ borderRight: "1px solid #ddd", paddingLeft: "10px" }}>Category</Col>
                     <Col span={12} style={{ borderRight: "1px solid #ddd", paddingLeft: "10px" }}>Descriptor</Col>
                 </Row>

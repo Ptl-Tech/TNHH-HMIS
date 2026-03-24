@@ -25,7 +25,7 @@ const PrescriptionTable = ({ loadingPrescriptions, filteredPrescriptions }) => {
       fixed: "left",
       width: 150,
       render: (text) => (
-        <Typography.Text style={{ color: "#0f5689", fontWeight: "bold" }}>
+        <Typography.Text style={{ color: "#b96000", fontWeight: "bold" }}>
           {text}
         </Typography.Text>
       ),

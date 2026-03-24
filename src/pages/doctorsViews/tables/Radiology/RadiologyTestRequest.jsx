@@ -166,7 +166,7 @@ const RadiologyTestRequest = ({ rerender, setRerender, radiologyDetails }) => {
     <div>
       <Typography.Title
         level={5}
-        style={{ color: "#0F5689", marginBottom: "12px" }}
+        style={{ color: "#b96000", marginBottom: "12px" }}
       >
         <FileTextOutlined style={{ marginRight: "8px" }} />
         <FileTextOutlined style={{ marginRight: "8px" }} />

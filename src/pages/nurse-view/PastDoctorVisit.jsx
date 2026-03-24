@@ -63,7 +63,7 @@ const PastDoctorVisit = () => {
           <Button
             type="link"
             onClick={() => handleNavigate(record)}
-            style={{ color: "#0f5689", fontWeight: "bold" }}
+            style={{ color: "#b96000", fontWeight: "bold" }}
           >
             {record.SearchName}
           </Button>

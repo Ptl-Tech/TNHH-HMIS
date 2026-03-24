@@ -200,7 +200,7 @@ const Referrals = () => {
     <div>
       {/* Button Section */}
       <div style={{ marginBottom: "20px" }}>
-        <Typography.Title level={4} style={{ color: "#0F5689" }}>
+        <Typography.Title level={4} style={{ color: "#b96000" }}>
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Referral Details
         </Typography.Title>

@@ -36,7 +36,7 @@ const TriageSummeryCard = ({ currentPath }) => {
       count: Object.keys(pendingTriageList).length || 0,
     },
     {
-      backgroundColor: "#0f5689",
+      backgroundColor: "#b96000",
       icon: <StopOutlined />,
       title: "Closed",
       link: "/Dashboard/ClosedTriageList",

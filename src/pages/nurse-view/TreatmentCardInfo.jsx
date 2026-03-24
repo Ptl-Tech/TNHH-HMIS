@@ -17,7 +17,7 @@ const TreatmentCardInfo = () => {
           width: "100%",
           backgroundColor: "#e5e3e3",
           border: "none",
-          borderTop: "3px solid #0f5689",
+          borderTop: "3px solid #b96000",
           padding: "10px 16px",
         }}
       >
@@ -27,7 +27,7 @@ const TreatmentCardInfo = () => {
         >
           <Typography.Text
             className="patient-id"
-            style={{ fontWeight: "bold", color: "#0f5689" }}
+            style={{ fontWeight: "bold", color: "#b96000" }}
           >
             Patient Name : {patientDetails?.SearchName || "N/A"}
           </Typography.Text>
@@ -42,7 +42,7 @@ const TreatmentCardInfo = () => {
         >
           <div className="patient-hospital-number-container">
             <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Patient Number
             </h5>
@@ -53,7 +53,7 @@ const TreatmentCardInfo = () => {
 
           <div className="patient-hospital-number-container">
             <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Patient Type
             </h5>
@@ -81,13 +81,13 @@ const TreatmentCardInfo = () => {
               {
             patientDetails.TreatmentNo ? (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
               >
                 Treatment Number
                 </h5>
             ) : (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
               >
                 Admission Number
                 </h5>
@@ -99,7 +99,7 @@ const TreatmentCardInfo = () => {
           </div>
           <div className="patient-hospital-number-container">
             <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Clinic
             </h5>
@@ -118,7 +118,7 @@ const TreatmentCardInfo = () => {
         style={{
           width: "100%",
           border: "none",
-          borderTop: "3px solid #0f5689",
+          borderTop: "3px solid #b96000",
           padding: "10px 16px",
           boxShadow: "10px 10px 10px 10px #e6e6e6",
         }}
@@ -129,7 +129,7 @@ const TreatmentCardInfo = () => {
         >
           <Typography.Text
             className="patient-id"
-            style={{ fontWeight: "bold", color: "#0f5689" }}
+            style={{ fontWeight: "bold", color: "#b96000" }}
           >
             Admitted by Doctor : {patientDetails?.DoctorsName || patientDetails?.doctorsName ||"N/A"}
           </Typography.Text>
@@ -146,13 +146,13 @@ const TreatmentCardInfo = () => {
             {
             patientDetails.TreatmentDate ? (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Treatment Date
             </h5>
             ) : (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Discharge Date
             </h5>
@@ -174,13 +174,13 @@ const TreatmentCardInfo = () => {
             {
             patientDetails.TreatmentDate ? (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Treatment Time
             </h5>
             ) :(
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Discharge Time
             </h5>
@@ -209,13 +209,13 @@ const TreatmentCardInfo = () => {
             {
             patientDetails.Status ? (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Treatment Status
             </h5>
             ) : (
               <h5
-              style={{ fontWeight: "bold", color: "#0f5689", fontSize: "12px" }}
+              style={{ fontWeight: "bold", color: "#b96000", fontSize: "12px" }}
             >
               Discharge Status
             </h5>

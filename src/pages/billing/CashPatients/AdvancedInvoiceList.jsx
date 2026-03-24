@@ -244,7 +244,7 @@ const handleReset = (clearFilters) => {
 
   return (
     <>
-      <h4 style={{ color: "#0f5689" }}>Previous Bill - Insurance</h4>
+      <h4 style={{ color: "#b96000" }}>Previous Bill - Insurance</h4>
       <div style={{ marginTop: "20px" , flexDirection: "row", alignItems: "center"}}>
             <Input
             placeholder="Search by Patient Name or No..."

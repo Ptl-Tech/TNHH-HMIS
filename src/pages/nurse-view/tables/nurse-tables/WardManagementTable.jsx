@@ -73,7 +73,7 @@ const WardManagementTable = ({ rowSelection, filteredBeds, loadingBeds }) => {
                 <InsertRowBelowOutlined
                   style={{
                     fontSize: 48,
-                    color: "#0f5689",
+                    color: "#b96000",
                     marginBottom: 20,
                     fontWeight: "normal",
                   }}

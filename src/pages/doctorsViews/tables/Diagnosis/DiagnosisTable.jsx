@@ -25,7 +25,7 @@ const DiagnosisTable = ({ treatmentNo }) => {
       dataIndex: "TreatmentNo",
       key: "TreatmentNo",
       render: (text) => (
-        <span style={{ color: "#0F5689", fontWeight: "bold" }}>{text}</span>
+        <span style={{ color: "#b96000", fontWeight: "bold" }}>{text}</span>
       ),
     },
     {

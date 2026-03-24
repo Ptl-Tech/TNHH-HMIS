@@ -81,7 +81,7 @@ const AdmitPatients = () => {
           : false,
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record.Names}
           </Typography.Text>
         );
@@ -95,7 +95,7 @@ const AdmitPatients = () => {
       defaultSortOrder: "descend",
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record.Date}
           </Typography.Text>
         );
@@ -108,7 +108,7 @@ const AdmitPatients = () => {
       key: "DoctorName",
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record.DoctorName}
           </Typography.Text>
         );

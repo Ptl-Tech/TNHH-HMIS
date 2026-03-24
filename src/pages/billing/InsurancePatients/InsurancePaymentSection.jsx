@@ -252,7 +252,7 @@ const InsurancePaymentSection = ({ patientNo }) => {
             <Button
               onClick={handleClear}
               type="default"
-              style={{ marginLeft: 8, color: '#0f5689' }}
+              style={{ marginLeft: 8, color: '#b96000' }}
               danger
             >
               Clear

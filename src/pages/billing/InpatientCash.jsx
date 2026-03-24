@@ -93,7 +93,7 @@ const InpatientCash = () => {
           style={{
             textTransform: "capitalize",
             fontWeight: "bold",
-            color: "#0f5689",
+            color: "#b96000",
           }}
         >
           {text || "-"}
@@ -116,7 +116,7 @@ const InpatientCash = () => {
       
       render: (text, record) => (
         <Typography.Text
-          style={{ cursor: "pointer", color: "#0f5689", fontWeight: "bold" }}
+          style={{ cursor: "pointer", color: "#b96000", fontWeight: "bold" }}
           onClick={() => handleViewCharges(record.ActiveVisitNo)}
         >
           {text.toUpperCase()}
@@ -172,7 +172,7 @@ const InpatientCash = () => {
 
         return (
           <span
-            style={{ color: isZero ? "black" : "#0f5689", fontWeight: "600" }}
+            style={{ color: isZero ? "black" : "#b96000", fontWeight: "600" }}
           >
             {formatKES(numericBalance)}
           </span>

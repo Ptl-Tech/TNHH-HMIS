@@ -40,7 +40,7 @@ const ConsumablesTables = ({ showModal, loadingGetPatientConsumables, getPatient
           title: 'Action',
           dataIndex: 'action',
           key: 'action',
-          render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
+          render: (text) => <Button style={{ color: '#b96000'}} onClick={() => showModal(text)}>{text}</Button>
         }
       ]
 

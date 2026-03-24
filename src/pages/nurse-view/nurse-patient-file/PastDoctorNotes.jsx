@@ -50,7 +50,7 @@ const DoctorNotes = () => {
     <div>
       <Space
         style={{
-          color: "#0f5689",
+          color: "#b96000",
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -59,7 +59,7 @@ const DoctorNotes = () => {
       >
         <ProfileOutlined />
         <Typography.Text
-          style={{ fontWeight: "bold", color: "#0f5689", fontSize: "14px" }}
+          style={{ fontWeight: "bold", color: "#b96000", fontSize: "14px" }}
         >
           Past Encounter Notes
         </Typography.Text>

@@ -102,7 +102,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
     <div>
       <Space
         style={{
-          color: "#0f5689",
+          color: "#b96000",
           display: "flex",
           alignItems: "center",
           gap: "8px",
@@ -113,7 +113,7 @@ const FourPsForm = ({ treatmentNo, patientNo }) => {
         <Typography.Title
           level={5}
           style={{
-            color: "#0F5689",
+            color: "#b96000",
             fontSize: "16px",
             marginBottom: "12px",
             display: "flex",

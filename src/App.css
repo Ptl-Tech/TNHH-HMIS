@@ -52,14 +52,14 @@
 }
 .custom-disabled-picker.ant-picker-disabled {
   background-color: #f5f9fc !important;
-  color: #0f5689 !important;
+  color: #b96000 !important;
   font-weight: 600;
   opacity: 1 !important; /* Prevent grayed-out look */
   cursor: not-allowed;
 }
 
 .custom-disabled-picker .ant-picker-input > input[disabled] {
-  color: #0f5689 !important;
+  color: #b96000 !important;
   font-weight: 600;
   opacity: 1 !important;
 }

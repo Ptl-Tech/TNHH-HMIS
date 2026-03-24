@@ -182,11 +182,11 @@ console.log("Active Visit No:", activeVisitNo);
       <div className="d-flex justify-content-between align-items-center">
         <div className="d-flex flex-column">
           <div className="d-flex align-items-center mb-2">
-            <FaCoins style={{ fontSize: "22px", color: "#0f5689" }} />
+            <FaCoins style={{ fontSize: "22px", color: "#b96000" }} />
           <Typography.Text
             strong
             underline
-            style={{ fontSize: "14px", color: "#0f5689", marginLeft: "8px" }}
+            style={{ fontSize: "14px", color: "#b96000", marginLeft: "8px" }}
           >
          </Typography.Text>
             </div>

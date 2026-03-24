@@ -148,7 +148,7 @@ const AdmitPatientForm = () => {
       <div style={{ marginBottom: "20px" }}>
         <Typography.Title
           level={4}
-          style={{ color: "#0F5689", display: "flex", alignItems: "center" }}
+          style={{ color: "#b96000", display: "flex", alignItems: "center" }}
         >
           <FileTextOutlined style={{ marginRight: "8px" }} />
           Patient Admission
@@ -224,7 +224,7 @@ const AdmitPatientForm = () => {
             <Input
               style={{
                 width: "100%",
-                color: "#0F5689",
+                color: "#b96000",
                 fontWeight: "bold",
               }}
               disabled

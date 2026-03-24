@@ -141,7 +141,7 @@ const InpatientCard = () => {
           <Button
             type="primary"
             icon={<i className="fas fa-ellipsis-v"></i>}
-            style={{ backgroundColor: "#0f5689", color: "#ffffff" }}
+            style={{ backgroundColor: "#b96000", color: "#ffffff" }}
             onClick={handleInitiateDischarge}
           >
             Proceed to Initiate Discharge
@@ -160,7 +160,7 @@ const InpatientCard = () => {
               style={{
                 textAlign: "center",
                 marginBottom: 16,
-                color: "#0f5689",
+                color: "#b96000",
               }}
             >
               Nursing Tools

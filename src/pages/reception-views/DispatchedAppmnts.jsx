@@ -79,7 +79,7 @@ const DispatchedAppmnts = () => {
         return (
           <span
             className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            style={{ color: "#b96000", cursor: "pointer" }}
           >
             {text.toUpperCase()}
           </span>

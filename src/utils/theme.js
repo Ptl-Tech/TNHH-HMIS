@@ -1,8 +1,8 @@
 export const theme = {
   token: {
     colorIcon: "#FAFAFA",
-    colorPrimary: "#0060a3",
-    colorPrimaryBg: "#0060a3",
+    colorPrimary: "#ED9D47",
+    colorPrimaryBg: "#ED9D47",
   },
   components: {
     Menu: {
@@ -13,11 +13,11 @@ export const theme = {
       itemHoverBg: "rgba(172, 131, 66, 0.6)",
     },
     Table: {
-      headerBg: "#0f5689",
+      headerBg: "#b96000",
       headerColor: "#FAFAFA",
       rowHoverBg: "transparent", // No hover effect
-      headerCellBg: "#0f5689",
-      rowHoverColor: "#0f5689", // Keeps hover text white
+      headerCellBg: "#b96000",
+      rowHoverColor: "#b96000", // Keeps hover text white
       rowSelectedBg: "#ac8342",
       headerCellHoverBg: "#ac8342",
       headerCellHoverColor: "#ffffff",

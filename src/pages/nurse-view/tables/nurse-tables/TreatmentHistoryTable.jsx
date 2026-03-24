@@ -34,7 +34,7 @@ const TreatmentHistoryTable = () => {
           title: 'Treatment Report',
           dataIndex: 'treatmentReport',
           key: 'treatmentReport',
-          // render: (text) => <Button style={{ color: '#0f5689'}} onClick={() => showModal(text)}>{text}</Button>
+          // render: (text) => <Button style={{ color: '#b96000'}} onClick={() => showModal(text)}>{text}</Button>
         }
       ]
     

@@ -29,9 +29,9 @@ const Injections = () => {
   return (
     <div>
 
-        <Space style={{ color: '#0f5689', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
+        <Space style={{ color: '#b96000', display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '30px', position: 'relative'}}>
           <ProfileOutlined />
-          <Typography.Text style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '14px'}}>
+          <Typography.Text style={{ fontWeight: 'bold', color: '#b96000', fontSize: '14px'}}>
               Injections
           </Typography.Text>
         </Space>

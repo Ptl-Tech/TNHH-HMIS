@@ -1,10 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+* {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: rgb(216, 216, 216);
   border-radius: 40px;
 }
+
 ::-webkit-scrollbar-track {
   background-color: transparent;
 }
@@ -12,12 +22,15 @@
 .ProseMirror:focus {
   outline: none;
 }
+
 .custom-alert .ant-alert-close-icon {
-  color: #000 !important; /* black */
+  color: #000 !important;
+  /* black */
 }
 
 .custom-alert .ant-alert-close-icon:hover {
-  color: #000 !important; /* black on hover too */
+  color: #000 !important;
+  /* black on hover too */
 }
 
 .ant-layout-sider {
@@ -26,6 +39,7 @@
   min-width: 230px !important;
   width: 230px !important;
 }
+
 .admit-patient-table-container::-webkit-scrollbar {
   height: 6px;
 }
@@ -46,22 +60,18 @@
 
 .ant-menu-light.ant-menu-light {
   color: #ffffff;
-  background: #0f5689 !important;
+  background: #b96000 !important;
 }
 
 .ant-table-wrapper .ant-table-thead th.ant-table-column-sort {
-  background: #0f5689 !important;
+  background: #b96000 !important;
 }
 
-:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper
-  .ant-table-thead
-  th.ant-table-column-sort {
-  background: #0f5689 !important;
+:where(.css-dev-only-do-not-override-191squa).ant-table-wrapper .ant-table-thead th.ant-table-column-sort {
+  background: #b96000 !important;
 }
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper
-  .ant-table-tbody
-  > tr
-  > th {
+
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-table-wrapper .ant-table-tbody>tr>th {
   background-color: #fff !important;
   color: #000 !important;
   font-weight: normal !important;
@@ -69,19 +79,20 @@
 
 /* Override submenu background to make it transparent */
 :where(.css-dev-only-do-not-override-191squa).ant-menu-light,
-:where(.css-dev-only-do-not-override-191squa).ant-menu-light > .ant-menu {
+:where(.css-dev-only-do-not-override-191squa).ant-menu-light>.ant-menu {
   color: #ffffff;
-  background: #0f5689 !important;
+  background: #b96000 !important;
 }
+
 :where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light,
-:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light > .ant-menu {
+:where(.css-dev-only-do-not-override-1kca8y1).ant-menu-light>.ant-menu {
   color: #ffffff;
 }
 
 :where(.css-191squa).ant-menu-light,
-:where(.css-191squa).ant-menu-light > .ant-menu {
+:where(.css-191squa).ant-menu-light>.ant-menu {
   color: #ffffff;
-  background: #0f5689 !important;
+  background: #b96000 !important;
 }
 
 .ant-layout-sider-collapsed {
@@ -95,7 +106,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0f5689;
+  background-color: #b96000;
   color: rgb(0, 35, 41);
   padding: 8px 12px 8px 12px;
   position: sticky;
@@ -126,7 +137,7 @@
   line-height: 22px;
   padding-bottom: 22px;
   color: #fff;
-  background-color: #0f5689 !important;
+  background-color: #b96000 !important;
   position: fixed !important;
   left: 0;
   overflow-y: auto !important;
@@ -144,7 +155,7 @@
 }
 
 .text-main-primary {
-  color: #0f5689 !important;
+  color: #b96000 !important;
 }
 
 .ant-card .ant-card-body {
@@ -157,7 +168,7 @@
   position: fixed !important;
   left: 0 !important;
   top: 0 !important;
-  background-color: #002329 !important  ;
+  background-color: #002329 !important;
   transition: 0.2s ease;
   color: #ffff !important;
 }
@@ -174,15 +185,20 @@
   outline: none;
   box-shadow: none;
 }
+
 .steps-action {
   display: flex;
   justify-content: flex-end;
-  gap: 28px; /* Adjust spacing as needed */
+  gap: 28px;
+  /* Adjust spacing as needed */
   margin-top: 16px;
 }
+
 .iframe-scrollbar {
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: transparent transparent; /* For Firefox */
+  scrollbar-width: thin;
+  /* For Firefox */
+  scrollbar-color: transparent transparent;
+  /* For Firefox */
 }
 
 .iframe-scrollbar::-webkit-scrollbar {
@@ -204,6 +220,7 @@
 .custom-input:focus {
   border-color: #ac8342;
 }
+
 /* Custom styling for the Select input */
 .custom-select {
   border: none;
@@ -227,26 +244,32 @@
 
 /* Optional: Style for the option list */
 .custom-select .ant-select-item {
-  border-bottom: 1px solid #f0f0f0; /* Add light border for dropdown items */
+  border-bottom: 1px solid #f0f0f0;
+  /* Add light border for dropdown items */
 }
+
 .modal-title-content {
-  background-color: #f5f5dc; /* Light greyish cream */
+  background-color: #f5f5dc;
+  /* Light greyish cream */
   padding: 20px;
 }
 
 .modal-logo-container {
-  margin-bottom: 10px; /* Space between logo and title */
+  margin-bottom: 10px;
+  /* Space between logo and title */
   text-align: center;
 }
 
 .modal-logo {
-  max-width: 150px; /* Adjust the logo size */
+  max-width: 150px;
+  /* Adjust the logo size */
   height: auto;
 }
 
 .custom-header {
-  background-color: #e89641;
-  font-weight: bold; /* Optional */
+  background-color: #b96000;
+  font-weight: bold;
+  /* Optional */
 }
 
 .equal-height-cards {
@@ -256,34 +279,38 @@
 }
 
 .danger-row {
-  background-color: #ffccc7; /* Light red */
+  background-color: #ffccc7;
+  /* Light red */
 }
 
 .warning-row {
-  background-color: #ffe58f; /* Light yellow */
+  background-color: #ffe58f;
+  /* Light yellow */
 }
 
 .row-green {
-  background-color: #dfffd6; /* Light green */
+  background-color: #dfffd6;
+  /* Light green */
 }
 
 .row-orange {
-  background-color: #ffedd6; /* Light orange */
+  background-color: #ffedd6;
+  /* Light orange */
 }
 
 .row-red {
-  background-color: #ffd6d6; /* Light red */
+  background-color: #ffd6d6;
+  /* Light red */
 }
 
-:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert
-  .ant-alert-close-icon
-  .anticon-close {
-  color: #0f5689 !important;
+:where(.css-dev-only-do-not-override-1gx1iy6).ant-alert .ant-alert-close-icon .anticon-close {
+  color: #b96000 !important;
 }
 
 main {
   height: 100%;
 }
+
 .ant-layout .ant-layout-sider-trigger {
   display: none !important;
 }
@@ -322,6 +349,7 @@ main {
 }
 
 @keyframes ping {
+
   75%,
   100% {
     transform: scale(7);
@@ -337,9 +365,11 @@ main {
   0% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.6;
   }
+
   100% {
     opacity: 1;
   }
@@ -347,9 +377,11 @@ main {
 
 @media screen and (max-width: 768px) {
   .sideStyle {
-    display: block; /* Hide the Sider component on smaller screens */
+    display: block;
+    /* Hide the Sider component on smaller screens */
     z-index: 1;
   }
+
   .ant-layout-sider {
     flex: 0 0 230px !important;
     max-width: 230px !important;
@@ -365,8 +397,10 @@ main {
     min-width: 0px !important;
     width: 0 !important;
   }
+
   .contentStyle {
-    margin-left: 0; /* Adjust content margin for smaller screens */
+    margin-left: 0;
+    /* Adjust content margin for smaller screens */
     width: 100%;
     padding: 0;
   }
@@ -381,12 +415,15 @@ main {
   0% {
     content: "";
   }
+
   33% {
     content: ".";
   }
+
   66% {
     content: "..";
   }
+
   100% {
     content: "...";
   }
@@ -412,6 +449,7 @@ main {
   margin-bottom: 20px;
   gap: 10px;
 }
+
 @media screen and (max-width: 768px) {
   .admit-patient-filter-container {
     flex-direction: column;
@@ -436,7 +474,7 @@ main {
 
 .inpatient-header {
   display: flex;
-  color: #0f5689;
+  color: #b96000;
   align-items: center;
   gap: 8px;
   padding-bottom: 10px;
@@ -444,9 +482,10 @@ main {
 
 .inpatient-header .inpatient-header-text {
   font-weight: bold;
-  color: #0f5689;
+  color: #b96000;
   font-size: 16px;
 }
+
 .inpatient-card-container {
   display: flex;
   flex-direction: row;
@@ -456,24 +495,29 @@ main {
 .inpatient-card-container .inpatient-card-left-col .card {
   padding: 10px 16px;
 }
+
 .inpatient-card-container .inpatient-card-right-col .card {
   padding: 10px 16px;
 }
+
 .inpatient-details-container-1 {
   display: flex;
   justify-content: center;
   justify-content: space-between;
   align-items: center;
 }
+
 .inpatient-card-right-col .patient-name {
   font-weight: bold;
-  color: #0f5689;
+  color: #b96000;
   font-size: 16px;
 }
+
 .inpatient-card-right-col .patient-id {
   color: gray;
   font-size: 14px;
 }
+
 .inpatient-details-container-2 {
   display: flex;
   flex-direction: row;
@@ -481,6 +525,7 @@ main {
   justify-content: space-between;
   margin-top: 10px;
 }
+
 .inpatient-details-container-2 .patient-hospital-number-container {
   display: flex;
   flex-direction: column;
@@ -494,25 +539,31 @@ main {
 .patient-hospital-number-container .hospital-number-header {
   font-size: 14px;
 }
+
 .patient-hospital-number-container .hospital-number {
   font-size: 14px;
   color: gray;
 }
+
 .patient-age-gender-container .age-and-gender {
   font-size: 14px;
   color: gray;
 }
+
 .inpatient-details-container-2 .age-and-gender-container {
   display: flex;
   flex-direction: column;
 }
+
 .age-and-gender-container .age-and-gender-header {
   font-size: 14px;
 }
+
 .age-and-gender-container .age-and-gender {
   font-size: 14px;
   color: gray;
 }
+
 .print-button-container {
   display: flex;
   align-items: center;
@@ -534,6 +585,7 @@ main {
     gap: 10px;
   }
 }
+
 .dashboard-statistics-container {
   display: flex;
 }
@@ -543,10 +595,12 @@ main {
     gap: 10px;
   }
 }
+
 .allergies-card {
   margin-top: 10px;
   padding: 10px 16px;
 }
+
 .allergies-item-list-title {
   font-weight: bold;
   font-size: 14px;
@@ -556,14 +610,15 @@ main {
   display: flex;
   gap: 10px;
 }
+
 .treatment-card-patient-treatment-info {
   margin-top: 10px;
   padding: 10px 16px;
 }
 
 .ant-table-wrapper .ant-table-row-expand-icon {
-  color: #0f5689 !important;
-  border: 1px solid #0f5689 !important;
+  color: #b96000 !important;
+  border: 1px solid #b96000 !important;
 }
 
 .dashboard-card {
@@ -588,14 +643,15 @@ main {
   font-size: 14px !important;
 }
 
-.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
-.ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
-  background-color: #0f5689 !important;
+.ant-tabs-card>.ant-tabs-nav .ant-tabs-tab,
+.ant-tabs-card>div>.ant-tabs-nav .ant-tabs-tab {
+  background-color: #b96000 !important;
   color: #ffffff !important;
   border: none !important;
 }
-.ant-tabs-card.ant-tabs-top > .ant-tabs-nav .ant-tabs-tab-active,
-.ant-tabs-card.ant-tabs-top > div > .ant-tabs-nav .ant-tabs-tab-active {
+
+.ant-tabs-card.ant-tabs-top>.ant-tabs-nav .ant-tabs-tab-active,
+.ant-tabs-card.ant-tabs-top>div>.ant-tabs-nav .ant-tabs-tab-active {
   background-color: #dddada !important;
 }
 

@@ -70,7 +70,7 @@ const MentalStatusExaminationTable = ({ rowSelection, loadingIpGetMentalStatusFo
           title: 'Action',
           dataIndex: 'Action',
           key: 'Action',
-          render: (text, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleDelete(record)} icon={<DeleteOutlined />}>Delete</Button>
+          render: (text, record) => <Button style={{ color: '#b96000'}} onClick={() => handleDelete(record)} icon={<DeleteOutlined />}>Delete</Button>
         }
     ]
 

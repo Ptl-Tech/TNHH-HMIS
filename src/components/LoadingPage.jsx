@@ -1,5 +1,5 @@
 import { Image, Space } from "antd";
-import ChiromoLogo from "../assets/images/ChiromoLogo.png";
+import TNHHLogo from "../assets/images/TNHHLogo.png";
 
 export const LoadingPage = () => {
   return (
@@ -17,8 +17,8 @@ export const LoadingPage = () => {
           width={200}
           height={"auto"}
           preview={false}
-          src={ChiromoLogo}
-          alt="Chiromo Hospital Logo"
+          src={TNHHLogo}
+          alt="TNHH Hospital Logo"
         />
       </div>
     </div>

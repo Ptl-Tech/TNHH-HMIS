@@ -18,7 +18,7 @@ export const PharmacyPatientCard = ({ currentVisit }) => {
           style={{
             gap: "8px",
             display: "flex",
-            color: "#0f5689",
+            color: "#b96000",
             alignItems: "center",
           }}
         >
@@ -30,7 +30,7 @@ export const PharmacyPatientCard = ({ currentVisit }) => {
     >
       <div
         style={{
-          color: "#0F5689",
+          color: "#b96000",
           padding: "0 16px",
           borderRadius: "5px",
           fontWeight: "semibold",

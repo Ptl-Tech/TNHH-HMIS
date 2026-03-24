@@ -35,7 +35,7 @@ const TCA_Appointment = () => {
     <div>
       {/* Button Section with View Patient History and Cancel Dispatch */}
       <div style={{ marginBottom: '20px' }}>
-        <Typography.Title level={4} style={{ color: "#0F5689", display: 'inline-block', marginRight: '10px' }}>
+        <Typography.Title level={4} style={{ color: "#b96000", display: 'inline-block', marginRight: '10px' }}>
           <CustomerServiceOutlined style={{ marginRight: '8px' }} /> {/* Psychology Icon */}
           View Psychology Visit History
         </Typography.Title>

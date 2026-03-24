@@ -21,7 +21,7 @@ const PastDoctorNotesTable = ({
           <span
             onClick={() => handleNavigate(record)}
             className="fw-bold"
-            style={{ color: "#0f5689", cursor: "pointer" }}
+            style={{ color: "#b96000", cursor: "pointer" }}
           >
             {text.toUpperCase()}
           </span>
@@ -56,7 +56,7 @@ const PastDoctorNotesTable = ({
       width: 200,
       render: (_, record) => (
         <Button
-          style={{ color: "#0f5689" }}
+          style={{ color: "#b96000" }}
           onClick={() => handleNavigate(record)}
         >
           Encounter Summary

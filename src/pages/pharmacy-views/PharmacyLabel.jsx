@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import ChiromoLogo from "../../assets/images/ChiromoLogo.png";
+import TNHHLogo from "../../assets/images/TNHHLogo.png";
 import {
   Page,
   Text,
@@ -71,9 +71,9 @@ function PharmacyLabel({ items }) {
           <Page size={[210, undefined]} wrap={false} style={styles.page}>
             <View style={styles.canvas}>
               <View style={styles.row}>
-                <Image src={ChiromoLogo} style={styles.image} />
+                <Image src={TNHHLogo} style={styles.image} />
                 <Text style={{ ...styles.bigText, ...styles.boldText }}>
-                  CHIROMO HOSPITAL GROUP
+                  TNHH HOSPITAL GROUP
                 </Text>
               </View>
               <View style={styles.borderBottom} />

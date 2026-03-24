@@ -69,7 +69,7 @@ const EvaluatePatientInTriage = () => {
       >
         <div>
           <Typography.Text
-            style={{ fontSize: "18px", color: "#0f5689", fontWeight: "600" }}
+            style={{ fontSize: "18px", color: "#b96000", fontWeight: "600" }}
           >
             <DiffOutlined style={{ paddingRight: "8px" }} />
             Triage Observation Form
@@ -98,7 +98,7 @@ const EvaluatePatientInTriage = () => {
               style={{
                 padding: "10px 16px",
                 marginRight: "10px",
-                borderTop: "3px solid #0f5689",
+                borderTop: "3px solid #b96000",
               }}
             >
               <div
@@ -126,7 +126,7 @@ const EvaluatePatientInTriage = () => {
                 <Typography.Title
                   level={5}
                   style={{
-                    color: "#0f5689",
+                    color: "#b96000",
                     fontSize: "14px",
                     margin: "10px 0 10px 0",
                   }}
@@ -146,13 +146,13 @@ const EvaluatePatientInTriage = () => {
               style={{
                 padding: "10px 16px",
                 marginRight: "10px",
-                borderTop: "3px solid #0f5689",
+                borderTop: "3px solid #b96000",
               }}
             >
               <Typography.Title
                 level={5}
                 style={{
-                  color: "#0f5689",
+                  color: "#b96000",
                   fontSize: "14px",
                   margin: "10px 0 10px 0",
                 }}

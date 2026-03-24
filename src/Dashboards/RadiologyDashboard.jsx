@@ -42,7 +42,7 @@ const RadiologyDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
+              style={{ backgroundColor: '#ED9D47', color: '#fafafa' }}
               onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
@@ -58,7 +58,7 @@ const RadiologyDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
+              style={{ backgroundColor: '#ED9D47', color: '#fafafa' }}
               onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
@@ -74,7 +74,7 @@ const RadiologyDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
+              style={{ backgroundColor: '#ED9D47', color: '#fafafa' }}
               onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">
@@ -92,7 +92,7 @@ const RadiologyDashboard = () => {
           <div className="col col-12 col-md-3">
             <div
               className="card"
-              style={{ backgroundColor: '#0060a3', color: '#fafafa' }}
+              style={{ backgroundColor: '#ED9D47', color: '#fafafa' }}
               onClick={() => navigate('/Dashboard/Radiology-Outpatient')}
             >
               <div className="card-body">

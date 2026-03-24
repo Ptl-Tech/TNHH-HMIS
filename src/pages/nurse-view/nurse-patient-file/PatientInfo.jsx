@@ -87,7 +87,7 @@ const patientSecondaryInfo = [
           ):(
             <Row gutter={16} style={{ marginTop: '20px' }}>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #b96000', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
                     {patientPrimaryInfo.map((info, index) => (
                         <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                             <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>
@@ -97,7 +97,7 @@ const patientSecondaryInfo = [
                 </Card>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <Card style={{ padding: '10px 16px', borderTop: '3px solid #0f5689', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
+                <Card style={{ padding: '10px 16px', borderTop: '3px solid #b96000', boxShadow: "10px 10px 10px 10px #e6e6e6" }}>
                     {patientSecondaryInfo.map((info, index) => (
                         <div key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                             <Typography.Text strong style={{ paddingTop: '5px'}}>{info.title}</Typography.Text>

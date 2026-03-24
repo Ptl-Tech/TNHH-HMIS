@@ -60,7 +60,7 @@ const InpatientTable = ({
       render: (_, record) => (
         <a
           onClick={() => handleNavigate(record)}
-          style={{ color: "#0f5689", fontWeight: "bold" }}
+          style={{ color: "#b96000", fontWeight: "bold" }}
         >
           {record.PatientName}
         </a>
@@ -106,7 +106,7 @@ const InpatientTable = ({
             <span>Assign Ward</span>
           </Button>
         ) : (
-          <span style={{ color: "#0f5689" }}>Not yet assigned</span>
+          <span style={{ color: "#b96000" }}>Not yet assigned</span>
         ),
     },
     {
@@ -133,7 +133,7 @@ const InpatientTable = ({
             <span>Assign Bed</span>
           </Button>
         ) : (
-          <span style={{ color: "#0f5689" }}>Not yet assigned</span>
+          <span style={{ color: "#b96000" }}>Not yet assigned</span>
         ),
     },
     {

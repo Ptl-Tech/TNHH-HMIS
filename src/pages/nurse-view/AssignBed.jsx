@@ -134,7 +134,7 @@ useEffect(() => {
                     <InsertRowLeftOutlined
                       style={{
                         fontSize: 48,
-                        color: "#0f5689",
+                        color: "#b96000",
                         marginBottom: 20,
                         fontWeight: "normal",
                       }}
@@ -148,7 +148,7 @@ useEffect(() => {
               renderItem={(item) => (
                 <List.Item
                   onClick={() => handleRoom(item.value)}
-                  style={{ color: "#0f5689" }}
+                  style={{ color: "#b96000" }}
                 >
                   {item.label}
                 </List.Item>

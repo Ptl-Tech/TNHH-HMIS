@@ -55,7 +55,7 @@ import {
   
     return (
       <div>
-        <Typography.Title level={5} style={{ color: "#0F5689", marginBottom: "12px" }}>
+        <Typography.Title level={5} style={{ color: "#b96000", marginBottom: "12px" }}>
      External     Results Recording
         </Typography.Title>
   

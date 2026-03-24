@@ -59,7 +59,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                 <Typography.Title
                   level={5}
                   style={{
-                    color: "#0f5689",
+                    color: "#b96000",
                     fontSize: "18px",
                     fontWeight: "bold",
                   }}
@@ -142,7 +142,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                       }}
                     >
                       <EnvironmentOutlined
-                        style={{ fontSize: "18px", color: "#0f5689" }}
+                        style={{ fontSize: "18px", color: "#b96000" }}
                       />
                     </div>
                     <div
@@ -153,7 +153,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                       }}
                     >
                       <BorderlessTableOutlined
-                        style={{ fontSize: "18px", color: "#0f5689" }}
+                        style={{ fontSize: "18px", color: "#b96000" }}
                       />
                     </div>
                   </>
@@ -180,7 +180,7 @@ const DashboardStatistics = ({ user, chartData, loadingPatientList }) => {
                   style={{
                     width: "10px",
                     height: "10px",
-                    backgroundColor: "#0060a3",
+                    backgroundColor: "#ED9D47",
                     borderRadius: "50%",
                     display: "inline-block",
                   }}

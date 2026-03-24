@@ -33,7 +33,7 @@ const AdmissionRequests = () => {
       key: 'PatientName',
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: '#0f5689' }}>
+          <Typography.Text style={{ color: '#b96000' }}>
             {record.PatientName}
           </Typography.Text>
         );
@@ -166,7 +166,7 @@ const AdmissionRequests = () => {
     <div style={{ margin: '20px 10px 10px 10px' }}>
       <Space
         style={{
-          color: '#0f5689',
+          color: '#b96000',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -176,7 +176,7 @@ const AdmissionRequests = () => {
       >
         <ProfileOutlined />
         <Typography.Text
-          style={{ fontWeight: 'bold', color: '#0f5689', fontSize: '16px' }}
+          style={{ fontWeight: 'bold', color: '#b96000', fontSize: '16px' }}
         >
           Admission Requests
         </Typography.Text>

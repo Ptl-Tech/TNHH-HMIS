@@ -47,7 +47,7 @@ const DischargeTable = ({
           : false,
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record.Search_Names}
           </Typography.Text>
         );
@@ -69,7 +69,7 @@ const DischargeTable = ({
         key: "BillBalance",
         render: (_, record) => {
           return (
-            <Typography.Text style={{ color: "#0f5689" }}>
+            <Typography.Text style={{ color: "#b96000" }}>
               {`Ksh ${record?.BillBalance}`}
             </Typography.Text>
           );
@@ -92,7 +92,7 @@ const DischargeTable = ({
       key: "DoctorName",
       render: (_, record) => {
         return (
-          <Typography.Text style={{ color: "#0f5689" }}>
+          <Typography.Text style={{ color: "#b96000" }}>
             {record?.DoctorName || ""}
           </Typography.Text>
         );

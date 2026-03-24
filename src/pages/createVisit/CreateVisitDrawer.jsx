@@ -255,13 +255,13 @@ else {
         <>
           <div className="d-flex justify-content-between">
             <div className="d-flex flex-column ">
-              <span style={{ color: "#0f5689", fontSize: "20px" }}>
+              <span style={{ color: "#b96000", fontSize: "20px" }}>
                 Patient Visit Card -{" "}
                 {patientDetails?.SearchName?.toUpperCase() || "Patient"}
               </span>
               <span
                 style={{
-                  color: "#0f5689",
+                  color: "#b96000",
                   fontSize: "9px",
                   fontStyle: "italic",
                 }}

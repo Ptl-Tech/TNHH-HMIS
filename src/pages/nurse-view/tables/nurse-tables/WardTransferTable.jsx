@@ -42,7 +42,7 @@ const WardTransferTable = ({ getWards, loadingWards, currentWard }) => {
       key: "Ward_Name",
       render: (text) => (
         <span
-          style={{ fontSize: "14px", fontWeight: "bold", color: "#0f5689" }}
+          style={{ fontSize: "14px", fontWeight: "bold", color: "#b96000" }}
         >
           {text}
         </span>
@@ -56,7 +56,7 @@ const WardTransferTable = ({ getWards, loadingWards, currentWard }) => {
         return (
           <button
             style={{
-              backgroundColor: "#0f5689",
+              backgroundColor: "#b96000",
               color: "white",
               padding: "5px 10px",
               borderRadius: "5px",

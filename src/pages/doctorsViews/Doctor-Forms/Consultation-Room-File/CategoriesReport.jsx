@@ -52,7 +52,7 @@ export const CategoriesReportPreview = ({
         }`,
       }}
     >
-      <h6 style={{ color: "#0f5689" }}>{Category_Name}</h6>
+      <h6 style={{ color: "#b96000" }}>{Category_Name}</h6>
       {!!formItems?.length && renderFormItemsReport(formItems, Input_Type)}
       {subCategories?.length > 0 && (
         <CategoriesReport
@@ -89,7 +89,7 @@ export const CategoriesReportShowReport = ({
         padding: `0px ${!Parent_Category_ID ? "0px" : "8px"} 0px 8px`,
       }}
     >
-      <h6 style={{ color: "#0f5689", padding: "8px" }}>{Category_Name}</h6>
+      <h6 style={{ color: "#b96000", padding: "8px" }}>{Category_Name}</h6>
       <div
         style={{
           display: "grid",

@@ -33,7 +33,7 @@ const PharmacyCard = ({ type, title, hideSelector }) => {
   return (
     <div style={{ display: "grid", gap: "16px", padding: "16px 0" }}>
       {/* Pharmacy Title */}
-      <Title level={4} style={{ color: "#0f5689", marginBottom: "0px" }}>
+      <Title level={4} style={{ color: "#b96000", marginBottom: "0px" }}>
         {title}
       </Title>
       {/* Pharmacy filter */}

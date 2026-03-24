@@ -178,7 +178,7 @@ const Vitals = () => {
                   <span
                     style={{
                       fontSize: "14px",
-                      color: "#0f5689",
+                      color: "#b96000",
                       fontWeight: "bolder",
                     }}
                   >
@@ -272,7 +272,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
       size="medium"
       styles={{
         header: {
-          color: "#0f5689",
+          color: "#b96000",
         },
       }}
       title={
@@ -294,7 +294,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         <FormItem
           name="pulseRate"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Pulse rate &#40;bpm&#41;
             </span>
           }
@@ -304,7 +304,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
           <Input required type="number" placeholder="eg. 70" />
         </FormItem>
         <Space direction="vertical">
-          <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+          <span style={{ color: "#b96000", fontWeight: "bolder" }}>
             Blood Pressure &#40;mmHg&#41;
           </span>
           <SpaceCompact>
@@ -341,7 +341,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         <FormItem
           name="temperature"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Temperature &#40;°C&#41;
             </span>
           }
@@ -353,7 +353,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         <FormItem
           name="sP02"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               SPO₂ &#40;%&#41;
             </span>
           }
@@ -365,7 +365,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         <FormItem
           name="respirationRate"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Respiration Rate &#40;BPM&#41;
             </span>
           }
@@ -377,7 +377,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
           <Input required type="number" placeholder="eg. 16" />
         </FormItem>
         <Space direction="vertical">
-          <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+          <span style={{ color: "#b96000", fontWeight: "bolder" }}>
             Height, Weight and BMI
           </span>
           <SpaceCompact>
@@ -426,7 +426,7 @@ const AddVitalsDrawer = ({ open, setOpen }) => {
         {/* <FormItem
           name="bloodSugar"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Blood Sugar &#40;mg/dL&#41;
             </span>
           }
@@ -477,7 +477,7 @@ const ViewPreviousVitals = ({ open, setOpen }) => {
       }
       styles={{
         header: {
-          color: "#0f5689",
+          color: "#b96000",
         },
       }}
       title={
@@ -615,7 +615,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
       onClose={() => setOpen(false)}
       styles={{
         header: {
-          color: "#0f5689",
+          color: "#b96000",
         },
       }}
       title={
@@ -634,7 +634,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
         <FormItem
           name="type"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Allergy Type
             </span>
           }
@@ -647,7 +647,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
         <FormItem
           name="allergen"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Allergen Name
             </span>
           }
@@ -659,7 +659,7 @@ const AddAllergiesAndMedicines = ({ open, setOpen }) => {
         <FormItem
           name="complaints"
           label={
-            <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+            <span style={{ color: "#b96000", fontWeight: "bolder" }}>
               Complaints
             </span>
           }
@@ -798,7 +798,7 @@ const LatestEncounter = () => {
                 >
                   <span
                     style={{
-                      color: "#0f5689",
+                      color: "#b96000",
                       fontSize: "14px",
                       fontWeight: "bolder",
                     }}
@@ -865,7 +865,7 @@ const PastEncountersDrawer = ({ open, setOpen, encounters }) => {
       closable={false}
       onClose={() => setOpen(false)}
       title={
-        <Space style={{ color: "#0f5689" }}>
+        <Space style={{ color: "#b96000" }}>
           <MdAttachFile size={21} />
           <h6 style={{ margin: "0" }}>Past Encounters</h6>
         </Space>
@@ -1314,7 +1314,7 @@ const FileSectionFrameWork = forwardRef(
                       justifyContent: "space-between",
                     }}
                   >
-                    <span style={{ color: "#0f5689", fontWeight: "bolder" }}>
+                    <span style={{ color: "#b96000", fontWeight: "bolder" }}>
                       {title}
                     </span>
                     <span style={{ color: "gray", fontWeight: "bolder" }}>

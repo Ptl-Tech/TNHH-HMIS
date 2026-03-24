@@ -53,7 +53,7 @@ export const waitingListColumns = ({
           ? record.SearchName.toLowerCase().includes(value.toLowerCase())
           : false,
       render: (text, record) => (
-        <span style={{ color: '#0f5689', fontWeight: 'bolder' }}>
+        <span style={{ color: '#b96000', fontWeight: 'bolder' }}>
           {text.toUpperCase()}
         </span>
       ),

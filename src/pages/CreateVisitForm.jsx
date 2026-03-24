@@ -158,7 +158,7 @@ console.log("visit data",visitData);
           className="card"
           style={{
             width: "100%",
-            borderTop: "3px solid #0f5689",
+            borderTop: "3px solid #b96000",
             padding: "20px",
           }}
         >

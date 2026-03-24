@@ -52,7 +52,7 @@ const DietaryIntakeTable = ({ filterDietaryIntakeForm, loadingGetIpDietaryForm, 
           key: 'Action',
           fixed: 'right',
           width: 150,
-          render: (text, record) => <Button style={{ color: '#0f5689'}} onClick={() => handleDelete(record)} icon={<DeleteOutlined />}>Delete</Button>
+          render: (text, record) => <Button style={{ color: '#b96000'}} onClick={() => handleDelete(record)} icon={<DeleteOutlined />}>Delete</Button>
         }
         
     ]

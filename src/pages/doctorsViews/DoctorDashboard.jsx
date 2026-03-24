@@ -53,7 +53,7 @@ const DoctorDashboard = () => {
 
   /* 
     Logic on how this works
-    Corporate doctors can read only Chiromo's patients
+    Corporate doctors can read only TNHH's patients
     External doctors can read only their patients
     Nurses can see all patients
     Psychologists can see all patients
@@ -86,7 +86,7 @@ const DoctorDashboard = () => {
       subtitle: "Increase in 30 days",
       icon: <HourglassOutlined />,
       color: "#fff",
-      backgroundColor: "#0f5689",
+      backgroundColor: "#b96000",
       link: "/Dashboard/Consultation-List",
     },
     {

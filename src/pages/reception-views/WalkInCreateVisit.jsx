@@ -121,7 +121,7 @@ export default function WalkInCreateVisit() {
   return (
     <div
       className="d-grid align-content-start p-2"
-      style={{ color: "#0f5689", maxWidth: "768px" }}
+      style={{ color: "#b96000", maxWidth: "768px" }}
     >
       <div className="d-grid">
         <h4>Create Visit</h4>
@@ -142,7 +142,7 @@ export default function WalkInCreateVisit() {
           <div>
             <div
               className="d-flex gap-2 align-items-center"
-              style={{ color: "#0f5689" }}
+              style={{ color: "#b96000" }}
             >
               <h5
                 className="d-flex align-items-center justify-content-center"
@@ -150,7 +150,7 @@ export default function WalkInCreateVisit() {
                   width: "30px",
                   height: "30px",
                   borderRadius: "50%",
-                  border: "1px solid #0f5689",
+                  border: "1px solid #b96000",
                 }}
               >
                 1
@@ -176,7 +176,7 @@ export default function WalkInCreateVisit() {
             <div className="d-grid gap-2">
               <div
                 className="d-flex gap-2 align-items-center"
-                style={{ color: "#0f5689" }}
+                style={{ color: "#b96000" }}
               >
                 <h5
                   className="d-flex align-items-center justify-content-center"
@@ -184,7 +184,7 @@ export default function WalkInCreateVisit() {
                     width: "30px",
                     height: "30px",
                     borderRadius: "50%",
-                    border: "1px solid #0f5689",
+                    border: "1px solid #b96000",
                   }}
                 >
                   2
@@ -247,7 +247,7 @@ export default function WalkInCreateVisit() {
             <div className="d-grid gap-2">
               <div
                 className="d-flex gap-2 align-items-center"
-                style={{ color: "#0f5689" }}
+                style={{ color: "#b96000" }}
               >
                 <h5
                   className="d-flex align-items-center justify-content-center"
@@ -255,7 +255,7 @@ export default function WalkInCreateVisit() {
                     width: "30px",
                     height: "30px",
                     borderRadius: "50%",
-                    border: "1px solid #0f5689",
+                    border: "1px solid #b96000",
                   }}
                 >
                   3

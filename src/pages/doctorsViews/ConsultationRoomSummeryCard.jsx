@@ -29,7 +29,7 @@ const ConsultationRoomSummeryCard = ({
       count: activeConsultationList?.length,
     },
     {
-      backgroundColor: "#0f5689",
+      backgroundColor: "#b96000",
       icon: <StopOutlined />,
       title: "Closed",
       link: "/Dashboard/ClosedConsultationList",

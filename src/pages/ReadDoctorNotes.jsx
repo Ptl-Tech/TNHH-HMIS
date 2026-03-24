@@ -47,7 +47,7 @@ const ReadDoctorNotes = () => {
             <Loading />
         ) : (
             <div style={{ border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden', fontWeight: 'bold', marginTop: '20px' }}>
-            <Row style={{ backgroundColor: '#0f5689', padding: '10px 0' }} justify="center">
+            <Row style={{ backgroundColor: '#b96000', padding: '10px 0' }} justify="center">
                 <Col span={4} style={{ borderRight: '1px solid #ddd', textAlign: 'center'}}>
                     Date
                 </Col>

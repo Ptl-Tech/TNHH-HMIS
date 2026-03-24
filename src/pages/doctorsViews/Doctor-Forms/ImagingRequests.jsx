@@ -42,7 +42,7 @@ import { getPatientKetamineRequest } from "../../../actions/Doc-actions/postDoct
         <div>
         <Typography.Title
             level={5}
-            style={{ color: "#0F5689" }}
+            style={{ color: "#b96000" }}
         >
             <FileTextOutlined style={{ marginRight: "8px" }} />
             Implant Request
